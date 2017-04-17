@@ -169,7 +169,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         // Prevent the default button action
         ev.preventDefault();
 
-        var direction = (action === 'moveleft') ? -1: 1;
+        var direction = (action === 'moveleft') ? -1 : 1;
 
         // And we need to determine the current and new indent level
         var indentdiv = activity.one(SELECTOR.MODINDENTDIV),
@@ -246,7 +246,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         ev.preventDefault();
 
         // Get the element we're working on
-        var element   = activity,
+        var element = activity,
             // Create confirm string (different if element has or does not have name)
             confirmstring = '',
             plugindata = {
@@ -410,7 +410,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             }
         }
 
-        button.replaceClass('editing_'+action, 'editing_'+nextaction);
+        button.replaceClass('editing_' + action, 'editing_' + nextaction);
         button.setData('action', nextaction);
         if (buttontext) {
             buttontext.set('text', newstring);
@@ -441,7 +441,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         if (availabilityinfo) {
             availabilityinfo.toggleClass(CSS.HIDE);
         }
-        return (action === 'hide') ? 0: 1;
+        return (action === 'hide') ? 0 : 1;
     },
 
     /**
@@ -592,13 +592,13 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             var reqstrings = [
                 {key: stringcurrent, component: 'core'},
                 {key: stringnext, component: 'core'}
-            ]
+            ];
             stringslib.get_strings(reqstrings).then(function (strings) {
                 var stringparam = {
                     activityname: title,
                     now: strings[0],
                     next:strings[1]
-                }
+                };
                 return stringslib.get_string('changegroupingmode', 'moodle', stringparam);
             }).then(function (string) {
                 return templates.renderIcon(flexicon, string);

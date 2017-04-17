@@ -51,7 +51,7 @@ Feature: User profile fields can be used via HR Import
       | Name                        | Unique dropdown menu test     |
       | Short name                  | dropdownmenutest              |
       | Should the data be unique?  | Yes                           |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       menuoptionone
       menuoptiontwo

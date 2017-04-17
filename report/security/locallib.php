@@ -223,20 +223,22 @@ function report_security_check_mediafilterswf($detailed=false) {
     $result->info    = null;
     $result->details = null;
     $result->status  = null;
-    $result->link    = "<a href=\"$CFG->wwwroot/$CFG->admin/filters.php\">".get_string('filtersettings', 'admin').'</a>';
+    $result->link    = "<a href=\"$CFG->wwwroot/$CFG->admin/settings.php?section=managemediaplayers\">" .
+        get_string('managemediaplayers', 'media') . '</a>';
 
     $activefilters = filter_get_globally_enabled();
 
-    if (array_search('mediaplugin', $activefilters) !== false and !empty($CFG->filter_mediaplugin_enable_swf)) {
-        $result->status = REPORT_SECURITY_CRITICAL;
-        $result->info   = get_string('check_mediafilterswf_error', 'report_security');
+    $enabledmediaplayers = \core\plugininfo\media::get_enabled_plugins();
+    if (array_search('mediaplugin', $activefilters) !== false and array_key_exists('swf', $enabledmediaplayers)) {
+        $result->status = REPORT_SECURITY_WARNING;
+        $result->info   = get_string('check_mediafilterswf_warning', 'report_security');
     } else {
         $result->status = REPORT_SECURITY_OK;
         $result->info   = get_string('check_mediafilterswf_ok', 'report_security');
     }
 
     if ($detailed) {
-        $result->details = get_string('check_mediafilterswf_details', 'report_security');
+        $result->details = get_string('check_mediafilterswf_trusteddetails', 'report_security');
     }
 
     return $result;

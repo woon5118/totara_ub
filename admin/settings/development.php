@@ -5,18 +5,12 @@
 if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     // Experimental settings page
-    $ADMIN->add('development', new admin_category('experimental', new lang_string('experimental','admin')));
-
     $temp = new admin_settingpage('experimentalsettings', new lang_string('experimentalsettings', 'admin'));
     //TODO: Re-enable cc-import once re-implemented in 2.0.x
     //$temp->add(new admin_setting_configcheckbox('enableimsccimport', new lang_string('enable_cc_import', 'imscc'), new lang_string('enable_cc_import_description', 'imscc'), 0));
     $temp->add(new admin_setting_configcheckbox('enablesafebrowserintegration', new lang_string('enablesafebrowserintegration', 'admin'), new lang_string('configenablesafebrowserintegration', 'admin'), 0));
 
     $temp->add(new admin_setting_configcheckbox('dndallowtextandlinks', new lang_string('dndallowtextandlinks', 'admin'), new lang_string('configdndallowtextandlinks', 'admin'), 0));
-    // The CSS optimiser setting. When changed we need to reset the theme caches in order to ensure they are regenerated through the optimiser.
-    $enablecssoptimiser = new admin_setting_configcheckbox('enablecssoptimiser', new lang_string('enablecssoptimiser','admin'), new lang_string('enablecssoptimiser_desc','admin'), 0);
-    $enablecssoptimiser->set_updatedcallback('theme_reset_all_caches');
-    $temp->add($enablecssoptimiser);
 
     $temp->add(new admin_setting_configcheckbox('enableglobalsearch', new lang_string('enableglobalsearch', 'admin'),
         new lang_string('enableglobalsearch_desc', 'admin'), 0, 1, 0));

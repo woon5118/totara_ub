@@ -410,7 +410,7 @@ class edit_item_form extends moodleform {
 
 /// perform extra validation before submission
     function validation($data, $files) {
-        global $COURSE, $DB;
+        global $COURSE;
         $grade_item = false;
         if ($data['id']) {
             $grade_item = new grade_item(array('id' => $data['id'], 'courseid' => $data['courseid']));
@@ -444,16 +444,6 @@ class edit_item_form extends moodleform {
             if ($data['grademax'] == $data['grademin'] or $data['grademax'] < $data['grademin']) {
                 $errors['grademin'] = get_string('incorrectminmax', 'grades');
                 $errors['grademax'] = get_string('incorrectminmax', 'grades');
-            }
-        }
-
-        // TOTARA: Check that grade to pass is set if it is required for completion (only for quizzes currently).
-        if ((empty($data['gradepass']) || $data['gradepass'] <= 0) && $data['id'] && $data['courseid']) {
-            $grade_item = new grade_item(array('id' => $data['id'], 'courseid' => $data['courseid']));
-            if ($grade_item->itemtype == 'mod' && $grade_item->itemmodule == 'quiz') {
-                if ($DB->get_field('quiz', 'completionpass', array('id' => $grade_item->iteminstance), MUST_EXIST)) {
-                    $errors['gradepass'] = get_string('gradepassrequiredforcompletion', 'mod_quiz');
-                }
             }
         }
 

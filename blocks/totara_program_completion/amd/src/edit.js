@@ -23,6 +23,9 @@
  */
 
 define(['jquery', 'core/config', 'core/str'], function ($, mdlconfig, mdlstrings) {
+
+    /* global totaraDialog totaraDialogs totaraDialog_handler_treeview_multiselect */
+
     var edit = {
 
         // Optional php params and defaults defined here, args passed to init method

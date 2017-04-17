@@ -23,6 +23,7 @@
  */
 namespace tool_templatelibrary;
 
+global $CFG;
 require_once("$CFG->libdir/externallib.php");
 
 use external_api;

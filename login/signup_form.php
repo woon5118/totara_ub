@@ -30,7 +30,7 @@ require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/user/profile/lib.php');
 require_once($CFG->dirroot . '/user/editlib.php');
 
-class login_signup_form extends moodleform {
+class login_signup_form extends moodleform implements renderable, templatable {
     function definition() {
         global $USER, $CFG;
 
@@ -58,10 +58,12 @@ class login_signup_form extends moodleform {
         $mform->addElement('text', 'email', get_string('email'), 'maxlength="100" size="25"');
         $mform->setType('email', core_user::get_property_type('email'));
         $mform->addRule('email', get_string('missingemail'), 'required', null, 'client');
+        $mform->setForceLtr('email');
 
         $mform->addElement('text', 'email2', get_string('emailagain'), 'maxlength="100" size="25"');
         $mform->setType('email2', core_user::get_property_type('email'));
         $mform->addRule('email2', get_string('missingemail'), 'required', null, 'client');
+        $mform->setForceLtr('email2');
 
         $namefields = useredit_get_required_name_fields();
         foreach ($namefields as $field) {
@@ -91,13 +93,13 @@ class login_signup_form extends moodleform {
             $mform->setDefault('country', '');
         }
 
+        profile_signup_fields($mform);
+
         if ($this->signup_captcha_enabled()) {
             $mform->addElement('recaptcha', 'recaptcha_element', get_string('security_question', 'auth'), array('https' => $CFG->loginhttps));
             $mform->addHelpButton('recaptcha_element', 'recaptcha', 'auth');
             $mform->closeHeaderBefore('recaptcha_element');
         }
-
-        profile_signup_fields($mform);
 
         $requirenojs = false;
         $nojs = optional_param('nojs', 0, PARAM_BOOL);
@@ -152,6 +154,7 @@ class login_signup_form extends moodleform {
 
     function validation($data, $files) {
         global $CFG, $DB;
+        $errors = parent::validation($data, $files);
 
         if ($this->signup_captcha_enabled()) {
             $recaptcha_element = $this->_form->getElement('recaptcha_element');
@@ -172,8 +175,6 @@ class login_signup_form extends moodleform {
                 return $errors;
             }
         }
-
-        $errors = parent::validation($data, $files);
 
         $authplugin = get_auth_plugin($CFG->registerauth);
 
@@ -262,4 +263,20 @@ class login_signup_form extends moodleform {
         return !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey) && $authplugin->is_captcha_enabled();
     }
 
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
+     * @return array
+     */
+    public function export_for_template(renderer_base $output) {
+        ob_start();
+        $this->display();
+        $formhtml = ob_get_contents();
+        ob_end_clean();
+        $context = [
+            'formhtml' => $formhtml
+        ];
+        return $context;
+    }
 }

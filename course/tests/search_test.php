@@ -43,6 +43,11 @@ class course_search_testcase extends advanced_testcase {
      */
     protected $mycoursesareaid = null;
 
+    protected function tearDown() {
+        $this->mycoursesareaid = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);

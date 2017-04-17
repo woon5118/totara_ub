@@ -30,8 +30,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/../lib.php');
-require_once(dirname(__FILE__) . '/helpers.php');
+require_once(__DIR__ . '/../lib.php');
+require_once(__DIR__ . '/helpers.php');
 
 
 /**
@@ -58,6 +58,8 @@ class question_attempt_testcase extends advanced_testcase {
         $this->question = null;
         $this->useageid = null;
         $this->qa = null;
+        $this->usageid = null;
+        parent::tearDown();
     }
 
     public function test_constructor_sets_maxmark() {

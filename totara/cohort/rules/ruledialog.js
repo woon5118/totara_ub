@@ -467,9 +467,9 @@ totaraDialog_handler_cohortruleform.prototype.every_load = function() {
     var orighandler = forms.get(0).onsubmit;
 
     forms.get(0).onsubmit = null;
-    forms.unbind('submit');
+    forms.off('submit');
 
-    forms.bind('submit', function(e) {
+    forms.on('submit', function(e) {
         e.preventDefault();
 
         // Check whether the original onsubmit worked

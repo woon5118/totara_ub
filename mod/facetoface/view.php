@@ -91,7 +91,6 @@ $title = $course->shortname . ': ' . format_string($facetoface->name);
 
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
-$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'facetoface'));
 
 $pagetitle = format_string($facetoface->name);
 

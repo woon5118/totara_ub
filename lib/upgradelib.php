@@ -371,6 +371,12 @@ function upgrade_stale_php_files_present() {
     global $CFG;
 
     $someexamplesofremovedfiles = array(
+        // Removed in 3.2.
+        '/calendar/preferences.php',
+        '/lib/alfresco/',
+        '/lib/jquery/jquery-1.12.1.min.js',
+        '/lib/password_compat/tests/',
+        '/lib/phpunit/classes/unittestcase.php',
         // Removed in 3.1.
         '/lib/classes/log/sql_internal_reader.php',
         '/lib/zend/',
@@ -409,6 +415,8 @@ function upgrade_stale_php_files_present() {
         '/blocks/admin/block_admin.php',
         '/blocks/admin_tree/block_admin_tree.php',
 
+        // Removed in Totara 10.
+        '/login/token.php',
         // Removed in Totara 9.0.
         '/blocks/facetoface/lib.php',
         '/totara/core/db/pre_any_upgrade.php',
@@ -1285,6 +1293,10 @@ function external_update_services() {
         $services = explode(',', $function->services);
 
         foreach ($services as $serviceshortname) {
+            if ($serviceshortname === 'moodle_mobile_app') {
+                // Totara: not compatible with Totara.
+                continue;
+            }
             // Get the service id by shortname.
             if (!empty($servicescache[$serviceshortname])) {
                 $serviceid = $servicescache[$serviceshortname];
@@ -2119,220 +2131,34 @@ function admin_mnet_method_get_help(ReflectionFunctionAbstract $function) {
     return implode("\n", $helplines);
 }
 
-
 /**
- * This function finds duplicate records (based on combinations of fields that should be unique)
- * and then progamatically generated a "most correct" version of the data, update and removing
- * records as appropriate
- *
- * Thanks to Dan Marsden for help
- *
- * @param   string  $table      Table name
- * @param   array   $uniques    Array of field names that should be unique
- * @param   array   $fieldstocheck  Array of fields to generate "correct" data from (optional)
- * @return  void
+ * Detect draft file areas with missing root directory records and add them.
  */
-function upgrade_course_completion_remove_duplicates($table, $uniques, $fieldstocheck = array()) {
+function upgrade_fix_missing_root_folders_draft() {
     global $DB;
 
-    // Find duplicates
-    $sql_cols = implode(', ', $uniques);
+    $transaction = $DB->start_delegated_transaction();
 
-    $sql = "SELECT {$sql_cols} FROM {{$table}} GROUP BY {$sql_cols} HAVING (count(id) > 1)";
-    $duplicates = $DB->get_recordset_sql($sql, array());
+    $sql = "SELECT contextid, itemid, MAX(timecreated) AS timecreated, MAX(timemodified) AS timemodified
+              FROM {files}
+             WHERE (component = 'user' AND filearea = 'draft')
+          GROUP BY contextid, itemid
+            HAVING MAX(CASE WHEN filename = '.' AND filepath = '/' THEN 1 ELSE 0 END) = 0";
 
-    // Loop through duplicates
-    foreach ($duplicates as $duplicate) {
-        $pointer = 0;
-
-        // Generate SQL for finding records with these duplicate uniques
-        $sql_select = implode(' = ? AND ', $uniques).' = ?'; // builds "fieldname = ? AND fieldname = ?"
-        $uniq_values = array();
-        foreach ($uniques as $u) {
-            $uniq_values[] = $duplicate->$u;
-        }
-
-        $sql_order = implode(' DESC, ', $uniques).' DESC'; // builds "fieldname DESC, fieldname DESC"
-
-        // Get records with these duplicate uniques
-        $records = $DB->get_records_select(
-            $table,
-            $sql_select,
-            $uniq_values,
-            $sql_order
-        );
-
-        // Loop through and build a "correct" record, deleting the others
-        $needsupdate = false;
-        $origrecord = null;
-        foreach ($records as $record) {
-            $pointer++;
-            if ($pointer === 1) { // keep 1st record but delete all others.
-                $origrecord = $record;
-            } else {
-                // If we have fields to check, update original record
-                if ($fieldstocheck) {
-                    // we need to keep the "oldest" of all these fields as the valid completion record.
-                    // but we want to ignore null values
-                    foreach ($fieldstocheck as $f) {
-                        if ($record->$f && (($origrecord->$f > $record->$f) || !$origrecord->$f)) {
-                            $origrecord->$f = $record->$f;
-                            $needsupdate = true;
-                        }
-                    }
-                }
-                $DB->delete_records($table, array('id' => $record->id));
-            }
-        }
-        if ($needsupdate || isset($origrecord->reaggregate)) {
-            // If this table has a reaggregate field, update to force recheck on next cron run
-            if (isset($origrecord->reaggregate)) {
-                $origrecord->reaggregate = time();
-            }
-            $DB->update_record($table, $origrecord);
-        }
+    $rs = $DB->get_recordset_sql($sql);
+    $defaults = array('component' => 'user',
+        'filearea' => 'draft',
+        'filepath' => '/',
+        'filename' => '.',
+        'userid' => 0, // Don't rely on any particular user for these system records.
+        'filesize' => 0,
+        'contenthash' => sha1(''));
+    foreach ($rs as $r) {
+        $r->pathnamehash = sha1("/$r->contextid/user/draft/$r->itemid/.");
+        $DB->insert_record('files', (array)$r + $defaults);
     }
-}
-
-/**
- * Find questions missing an existing category and associate them with
- * a category which purpose is to gather them.
- *
- * @return void
- */
-function upgrade_save_orphaned_questions() {
-    global $DB;
-
-    // Looking for orphaned questions
-    $orphans = $DB->record_exists_select('question',
-            'NOT EXISTS (SELECT 1 FROM {question_categories} WHERE {question_categories}.id = {question}.category)');
-    if (!$orphans) {
-        return;
-    }
-
-    // Generate a unique stamp for the orphaned questions category, easier to identify it later on
-    $uniquestamp = "unknownhost+120719170400+orphan";
-    $systemcontext = context_system::instance();
-
-    // Create the orphaned category at system level
-    $cat = $DB->get_record('question_categories', array('stamp' => $uniquestamp,
-            'contextid' => $systemcontext->id));
-    if (!$cat) {
-        $cat = new stdClass();
-        $cat->parent = 0;
-        $cat->contextid = $systemcontext->id;
-        $cat->name = get_string('orphanedquestionscategory', 'question');
-        $cat->info = get_string('orphanedquestionscategoryinfo', 'question');
-        $cat->sortorder = 999;
-        $cat->stamp = $uniquestamp;
-        $cat->id = $DB->insert_record("question_categories", $cat);
-    }
-
-    // Set a category to those orphans
-    $params = array('catid' => $cat->id);
-    $DB->execute('UPDATE {question} SET category = :catid WHERE NOT EXISTS
-            (SELECT 1 FROM {question_categories} WHERE {question_categories}.id = {question}.category)', $params);
-}
-
-/**
- * Rename old backup files to current backup files.
- *
- * When added the setting 'backup_shortname' (MDL-28657) the backup file names did not contain the id of the course.
- * Further we fixed that behaviour by forcing the id to be always present in the file name (MDL-33812).
- * This function will explore the backup directory and attempt to rename the previously created files to include
- * the id in the name. Doing this will put them back in the process of deleting the excess backups for each course.
- *
- * This function manually recreates the file name, instead of using
- * {@link backup_plan_dbops::get_default_backup_filename()}, use it carefully if you're using it outside of the
- * usual upgrade process.
- *
- * @see backup_cron_automated_helper::remove_excess_backups()
- * @link http://tracker.moodle.org/browse/MDL-35116
- * @return void
- * @since Moodle 2.4
- */
-function upgrade_rename_old_backup_files_using_shortname() {
-    global $CFG;
-    $dir = get_config('backup', 'backup_auto_destination');
-    $useshortname = get_config('backup', 'backup_shortname');
-    if (empty($dir) || !is_dir($dir) || !is_writable($dir)) {
-        return;
-    }
-
-    require_once($CFG->dirroot.'/backup/util/includes/backup_includes.php');
-    $backupword = str_replace(' ', '_', core_text::strtolower(get_string('backupfilename')));
-    $backupword = trim(clean_filename($backupword), '_');
-    $filename = $backupword . '-' . backup::FORMAT_MOODLE . '-' . backup::TYPE_1COURSE . '-';
-    $regex = '#^'.preg_quote($filename, '#').'.*\.mbz$#';
-    $thirtyapril = strtotime('30 April 2012 00:00');
-
-    // Reading the directory.
-    if (!$files = scandir($dir)) {
-        return;
-    }
-    foreach ($files as $file) {
-        // Skip directories and files which do not start with the common prefix.
-        // This avoids working on files which are not related to this issue.
-        if (!is_file($dir . '/' . $file) || !preg_match($regex, $file)) {
-            continue;
-        }
-
-        // Extract the information from the XML file.
-        try {
-            $bcinfo = backup_general_helper::get_backup_information_from_mbz($dir . '/' . $file);
-        } catch (backup_helper_exception $e) {
-            // Some error while retrieving the backup informations, skipping...
-            continue;
-        }
-
-        // Make sure this a course backup.
-        if ($bcinfo->format !== backup::FORMAT_MOODLE || $bcinfo->type !== backup::TYPE_1COURSE) {
-            continue;
-        }
-
-        // Skip the backups created before the short name option was initially introduced (MDL-28657).
-        // This was integrated on the 2nd of May 2012. Let's play safe with timezone and use the 30th of April.
-        if ($bcinfo->backup_date < $thirtyapril) {
-            continue;
-        }
-
-        // Let's check if the file name contains the ID where it is supposed to be, if it is the case then
-        // we will skip the file. Of course it could happen that the course ID is identical to the course short name
-        // even though really unlikely, but then renaming this file is not necessary. If the ID is not found in the
-        // file name then it was probably the short name which was used.
-        $idfilename = $filename . $bcinfo->original_course_id . '-';
-        $idregex = '#^'.preg_quote($idfilename, '#').'.*\.mbz$#';
-        if (preg_match($idregex, $file)) {
-            continue;
-        }
-
-        // Generating the file name manually. We do not use backup_plan_dbops::get_default_backup_filename() because
-        // it will query the database to get some course information, and the course could not exist any more.
-        $newname = $filename . $bcinfo->original_course_id . '-';
-        if ($useshortname) {
-            $shortname = str_replace(' ', '_', $bcinfo->original_course_shortname);
-            $shortname = core_text::strtolower(trim(clean_filename($shortname), '_'));
-            $newname .= $shortname . '-';
-        }
-
-        $backupdateformat = str_replace(' ', '_', get_string('backupnameformat', 'langconfig'));
-        $date = userdate($bcinfo->backup_date, $backupdateformat, 99, false);
-        $date = core_text::strtolower(trim(clean_filename($date), '_'));
-        $newname .= $date;
-
-        if (isset($bcinfo->root_settings['users']) && !$bcinfo->root_settings['users']) {
-            $newname .= '-nu';
-        } else if (isset($bcinfo->root_settings['anonymize']) && $bcinfo->root_settings['anonymize']) {
-            $newname .= '-an';
-        }
-        $newname .= '.mbz';
-
-        // Final check before attempting the renaming.
-        if ($newname == $file || file_exists($dir . '/' . $newname)) {
-            continue;
-        }
-        @rename($dir . '/' . $file, $dir . '/' . $newname);
-    }
+    $rs->close();
+    $transaction->allow_commit();
 }
 
 /**
@@ -2410,6 +2236,122 @@ function check_database_tables_row_format(environment_results $result) {
 }
 
 /**
+ * Totara: This function verifies that the database uses Barracuda file format.
+ *
+ * @param environment_results $result
+ * @return environment_results|null updated results object, or null
+ */
+function check_mysql_file_format(environment_results $result) {
+    global $DB;
+
+    if ($DB->get_dbfamily() !== 'mysql') {
+        return null;
+    }
+
+    if ($DB->get_row_format() !== "Barracuda") {
+        $result->setStatus(false);
+        return $result;
+    }
+    $result->setStatus(true);
+    return $result;
+}
+
+/**
+ * Totara: This function verifies that the database has a setting of one file per table.
+ *
+ * @param environment_results $result
+ * @return environment_results|null updated results object, or null
+ */
+function check_mysql_file_per_table(environment_results $result) {
+    global $DB;
+
+    if ($DB->get_dbfamily() !== 'mysql') {
+        return null;
+    }
+
+    if (!$DB->is_file_per_table_enabled()) {
+        $result->setStatus(false);
+        return $result;
+    }
+    $result->setStatus(true);
+    return $result;
+}
+
+/**
+ * Totara: This function verifies that the database has the setting of large prefix enabled. This is required only for 'utf8mb4'.
+ *
+ * @param environment_results $result
+ * @return environment_results|null updated results object, or null
+ */
+function check_mysql_large_prefix(environment_results $result) {
+    global $DB;
+
+    if ($DB->get_dbfamily() === 'mysql') {
+        $charset = $DB->get_charset();
+        if ($charset === 'utf8mb4') {
+            if (!$DB->is_large_prefix_enabled()) {
+                $result->setStatus(false);
+                return $result;
+            }
+            $result->setStatus(true);
+            return $result;
+        }
+    }
+    return null;
+}
+
+/**
+ * Upgrade the minmaxgrade setting.
+ *
+ * This step should only be run for sites running 2.8 or later. Sites using 2.7 will be fine
+ * using the new default system setting $CFG->grade_minmaxtouse.
+ *
+ * @return void
+ */
+function upgrade_minmaxgrade() {
+    global $CFG, $DB;
+
+    // 2 is a copy of GRADE_MIN_MAX_FROM_GRADE_GRADE.
+    $settingvalue = 2;
+
+    // Set the course setting when:
+    // - The system setting does not exist yet.
+    // - The system seeting is not set to what we'd set the course setting.
+    $setcoursesetting = !isset($CFG->grade_minmaxtouse) || $CFG->grade_minmaxtouse != $settingvalue;
+
+    // Identify the courses that have inconsistencies grade_item vs grade_grade.
+    $sql = "SELECT DISTINCT(gi.courseid)
+              FROM {grade_grades} gg
+              JOIN {grade_items} gi
+                ON gg.itemid = gi.id
+             WHERE gi.itemtype NOT IN (?, ?)
+               AND (gg.rawgrademax != gi.grademax OR gg.rawgrademin != gi.grademin)";
+
+    $rs = $DB->get_recordset_sql($sql, array('course', 'category'));
+    foreach ($rs as $record) {
+        // Flag the course to show a notice in the gradebook.
+        set_config('show_min_max_grades_changed_' . $record->courseid, 1);
+
+        // Set the appropriate course setting so that grades displayed are not changed.
+        $configname = 'minmaxtouse';
+        if ($setcoursesetting &&
+                !$DB->record_exists('grade_settings', array('courseid' => $record->courseid, 'name' => $configname))) {
+            // Do not set the setting when the course already defines it.
+            $data = new stdClass();
+            $data->courseid = $record->courseid;
+            $data->name     = $configname;
+            $data->value    = $settingvalue;
+            $DB->insert_record('grade_settings', $data);
+        }
+
+        // Mark the grades to be regraded.
+        $DB->set_field('grade_items', 'needsupdate', 1, array('courseid' => $record->courseid));
+    }
+    $rs->close();
+}
+
+
+/**
  * Assert the upgrade key is provided, if it is defined.
  *
  * The upgrade key can be defined in the main config.php as $CFG->upgradekey. If
@@ -2435,6 +2377,70 @@ function check_upgrade_key($upgradekeyhash) {
             }
         }
     }
+}
+
+/**
+ * Method used to check the installed unoconv version.
+ *
+ * @param environment_results $result object to update, if relevant.
+ * @return environment_results|null updated results or null if unoconv path is not executable.
+ */
+function check_unoconv_version(environment_results $result) {
+    global $CFG;
+
+    if (!during_initial_install() && !empty($CFG->pathtounoconv) && file_is_executable(trim($CFG->pathtounoconv))) {
+        $currentversion = 0;
+        $supportedversion = 0.7;
+        $unoconvbin = \escapeshellarg($CFG->pathtounoconv);
+        $command = "$unoconvbin --version";
+        exec($command, $output);
+
+        // If the command execution returned some output, then get the unoconv version.
+        if ($output) {
+            foreach ($output as $response) {
+                if (preg_match('/unoconv (\\d+\\.\\d+)/', $response, $matches)) {
+                    $currentversion = (float)$matches[1];
+                }
+            }
+        }
+
+        if ($currentversion < $supportedversion) {
+            $result->setInfo('unoconv version not supported');
+            $result->setStatus(false);
+            return $result;
+        }
+    }
+    return null;
+}
+
+/**
+ * Checks for up-to-date TLS libraries. NOTE: this is not currently used, see MDL-57262.
+ *
+ * @param environment_results $result object to update, if relevant.
+ * @return environment_results|null updated results or null if unoconv path is not executable.
+ */
+function check_tls_libraries(environment_results $result) {
+    global $CFG;
+
+    if (!function_exists('curl_version')) {
+        $result->setInfo('cURL PHP extension is not installed');
+        $result->setStatus(false);
+        return $result;
+    }
+
+    if (!\core\upgrade\util::validate_php_curl_tls(curl_version(), PHP_ZTS)) {
+        $result->setInfo('invalid ssl/tls configuration');
+        $result->setStatus(false);
+        return $result;
+    }
+
+    if (!\core\upgrade\util::can_use_tls12(curl_version(), php_uname('r'))) {
+        $result->setInfo('ssl/tls configuration not supported');
+        $result->setStatus(false);
+        return $result;
+    }
+
+    return null;
 }
 
 /**
@@ -2469,38 +2475,5 @@ function check_libcurl_version(environment_results $result) {
         return $result;
     }
 
-    return null;
-}
-/**
- * Method used to check the installed unoconv version.
- *
- * @param environment_results $result object to update, if relevant.
- * @return environment_results|null updated results or null if unoconv path is not executable.
- */
-function check_unoconv_version(environment_results $result) {
-    global $CFG;
-
-    if (!during_initial_install() && !empty($CFG->pathtounoconv) && file_is_executable(trim($CFG->pathtounoconv))) {
-        $currentversion = 0;
-        $supportedversion = 0.7;
-        $unoconvbin = \escapeshellarg($CFG->pathtounoconv);
-        $command = "$unoconvbin --version";
-        exec($command, $output);
-
-        // If the command execution returned some output, then get the unoconv version.
-        if ($output) {
-            foreach ($output as $response) {
-                if (preg_match('/unoconv (\\d+\\.\\d+)/', $response, $matches)) {
-                    $currentversion = (float)$matches[1];
-                }
-            }
-        }
-
-        if ($currentversion < $supportedversion) {
-            $result->setInfo('unoconv version not supported');
-            $result->setStatus(false);
-            return $result;
-        }
-    }
     return null;
 }

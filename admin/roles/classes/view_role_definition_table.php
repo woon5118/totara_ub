@@ -64,7 +64,7 @@ class core_role_view_role_definition_table extends core_role_define_role_table_a
         }
     }
 
-    protected function print_field($name, $caption, $field) {
+    protected function print_field($name, $caption, $field, $helpicon = null) {
         global $OUTPUT;
         // Attempt to generate HTML like formslib.
         echo '<div class="fitem">';

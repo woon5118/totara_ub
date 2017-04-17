@@ -48,12 +48,12 @@ class theme_standardtotararesponsive_core_renderer extends theme_bootstrapbase_c
         $separator = get_separator();
         for ($i=0;$i < $itemcount;$i++) {
             $item = $items[$i];
-            $item->last = false;
+            $item->set_last(false);
             $item->hideicon = true;
             if ($i===0) {
                 $content = html_writer::tag('li', $this->render($item));
             } else if ($i === $itemcount - 1) {
-                $item->last = true;
+                $item->set_last(true);
                 $content = html_writer::tag('li', $separator . $this->render($item));
             } else {
                 $content = html_writer::tag('li', $separator.$this->render($item));

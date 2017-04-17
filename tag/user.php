@@ -4,8 +4,6 @@ require_once('../config.php');
 require_once('lib.php');
 
 $action = optional_param('action', '', PARAM_ALPHA);
-$id = optional_param('id', 0, PARAM_INT);
-$tag = optional_param('tag', '', PARAM_TAG);
 
 require_login();
 
@@ -22,11 +20,6 @@ if (!confirm_sesskey()) {
 }
 
 $usercontext = context_user::instance($USER->id);
-
-// Either tag or tagid is required.
-if (empty($tag) && !$id) {
-    print_error('invaliddata');
-}
 
 switch ($action) {
     case 'addinterest':

@@ -2,11 +2,42 @@
     "name" : "totara/totaralms",
     "description" : "Totara LMS is a fully supported Open Source learning platform specifically designed for the requirements of corporate, industry and vocational training.",
     "license" : "GPL-3.0+",
+    "type": "project",
+    "homepage": "https://totaralms.com",
     "require-dev": {
-        "phpunit/phpunit": "4.8.*",
+        "phpunit/phpunit": "5.5.*",
         "phpunit/dbUnit": "1.4.*",
-        "sebastian/environment": "1.3.7",
-        "sebastian/recursion-context": "1.0.2",
-        "moodlehq/behat-extension": "3.31.6"
-    }
+
+        "behat/mink": "~1.7",
+        "behat/mink-extension": "~2.2",
+        "behat/mink-goutte-driver": "~1.2",
+        "behat/mink-selenium2-driver": "~1.3",
+        "symfony/process": "2.8.*",
+        "behat/behat": "3.2.*",
+        "totara/behat-extension": "@dev",
+
+        "php": ">=5.6.5 <7.2",
+        "ext-iconv": "*",
+        "ext-mbstring": "*",
+        "ext-curl": "*",
+        "ext-ctype": "*",
+        "ext-zip": "*",
+        "ext-zlib": "*",
+        "ext-gd": "*",
+        "ext-SimpleXML": "*",
+        "ext-spl": "*",
+        "ext-pcre": "*",
+        "ext-dom": "*",
+        "ext-xml": "*",
+        "ext-xmlreader": "*",
+        "ext-json": "*",
+        "ext-hash": "*"
+    },
+
+    "repositories": [
+        {
+            "type": "path",
+            "url": "lib/behat/behat-extension"
+        }
+    ]
 }

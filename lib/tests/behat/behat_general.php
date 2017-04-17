@@ -87,6 +87,15 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Opens course index page.
+     *
+     * @Given /^I am on course index$/
+     */
+    public function i_am_on_course_index() {
+        $this->getSession()->visit($this->locate_path('/course/index.php'));
+    }
+
+    /**
      * Reloads the current page.
      *
      * @Given /^I reload the page$/
@@ -713,8 +722,16 @@ class behat_general extends behat_base {
             function($context, $args) {
 
                 foreach ($args['nodes'] as $node) {
-                    if ($node->isVisible()) {
-                        throw new ExpectationException('"' . $args['text'] . '" text was found in the page', $context->getSession());
+                    // If element is removed from dom, then just exit.
+                    try {
+                        // If element is visible then throw exception, so we keep spinning.
+                        if ($node->isVisible()) {
+                            throw new ExpectationException('"' . $args['text'] . '" text was found in the page',
+                                $context->getSession());
+                        }
+                    } catch (WebDriver\Exception\NoSuchElement $e) {
+                        // Do nothing just return, as element is no more on page.
+                        return true;
                     }
                 }
 
@@ -726,7 +743,6 @@ class behat_general extends behat_base {
             false,
             true
         );
-
     }
 
     /**
@@ -1031,6 +1047,43 @@ class behat_general extends behat_base {
      */
     public function i_trigger_cron() {
         $this->getSession()->visit($this->locate_path('/admin/cron.php'));
+    }
+
+    /**
+     * Runs all ad-hoc tasks in the queue.
+     *
+     * This is faster and more reliable than running cron (running cron won't
+     * work more than once in the same test, for instance). However it is
+     * a little less 'realistic'.
+     *
+     * While the task is running, we suppress mtrace output because it makes
+     * the Behat result look ugly.
+     *
+     * @Given /^I run all adhoc tasks$/
+     * @throws DriverException
+     */
+    public function i_run_all_adhoc_tasks() {
+        // Do setup for cron task.
+        cron_setup_user();
+
+        // Run tasks. Locking is handled by get_next_adhoc_task.
+        $now = time();
+        ob_start(); // Discard task output as not appropriate for Behat output!
+        while (($task = \core\task\manager::get_next_adhoc_task($now)) !== null) {
+
+            try {
+                $task->execute();
+
+                // Mark task complete.
+                \core\task\manager::adhoc_task_complete($task);
+            } catch (Exception $e) {
+                // Mark task failed and throw exception.
+                \core\task\manager::adhoc_task_failed($task);
+                ob_end_clean();
+                throw new DriverException('An adhoc task failed', 0, $e);
+            }
+        }
+        ob_end_clean();
     }
 
     /**

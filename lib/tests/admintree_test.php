@@ -250,6 +250,7 @@ class core_admintree_testcase extends advanced_testcase {
         global $CFG;
         $this->resetAfterTest();
 
+        $CFG->theme = 'basis';
         $executable = new admin_setting_configexecutable('test1', 'Text 1', 'Help Path', '');
 
         // Check for an invalid path.
@@ -275,7 +276,8 @@ class core_admintree_testcase extends advanced_testcase {
 
         // Check for no file specified.
         $result = $executable->output_html('');
-        $this->assertRegexp('/name="s__test1" value=""/', $result);
+        $this->assertRegexp('/name="s__test1"/', $result);
+        $this->assertRegexp('/value=""/', $result);
     }
 
     /**

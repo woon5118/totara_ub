@@ -27,8 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/../lib.php');
-require_once(dirname(__FILE__) . '/helpers.php');
+require_once(__DIR__ . '/../lib.php');
+require_once(__DIR__ . '/helpers.php');
 
 
 /**
@@ -56,6 +56,16 @@ class question_engine_data_mapper_reporting_testcase extends qbehaviour_walkthro
 
     /** @var array */
     protected $allslots = array();
+
+    protected function tearDown() {
+        $this->dm = null;
+        $this->sa = null;
+        $this->essay = null;
+        $this->usageids = null;
+        $this->bothusages = null;
+        $this->allslots = null;
+        parent::tearDown();
+    }
 
     /**
      * Test the various methods that load data for reporting.

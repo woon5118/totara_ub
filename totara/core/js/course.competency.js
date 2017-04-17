@@ -163,7 +163,7 @@ M.totara_coursecompetency = M.totara_coursecompetency || {
                 var table = $('table#list-coursecompetency');
 
                 // If table found
-                if (table.size()) {
+                if (table.length) {
                     table.replaceWith(new_table);
                 }
                 else {
@@ -206,7 +206,7 @@ M.totara_coursecompetency = M.totara_coursecompetency || {
             // element because it has a new, unique ID different from when rendered
             // on page load.
             var tableid = 'coursecompetency-table-container';
-            $(totaraDialogs.evidence.dialog).bind('ajaxComplete', function(event) {
+            $(totaraDialogs.evidence.dialog).on('ajaxComplete', function(event) {
                 // to be double sure our newly appended DOM elements are ready to
                 // have a listener bound by a component action generated ID, respond
                 // when the attached parent node's 'contentready' event is fired.

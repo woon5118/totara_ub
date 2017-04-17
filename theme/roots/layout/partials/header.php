@@ -39,7 +39,10 @@ global $OUTPUT;
             <?php
                 if ($hastotaramenu) {
                     echo $OUTPUT->navbar_button();
+                    echo $OUTPUT->search_box();
                 }
+
+                echo $OUTPUT->navbar_plugin_output();
 
                 // Add profile menu (for logged in) or language menu (not logged in).
                 $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );

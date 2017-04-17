@@ -57,6 +57,12 @@ M.core_comment = {
                         this.view(0);
                         return false;
                     }, this);
+                    // Also handle space/enter key.
+                    handle.on('key', function(e) {
+                        e.preventDefault();
+                        this.view(0);
+                        return false;
+                    }, '13,32', this);
                 }
                 scope.toggle_textarea(false);
             },
@@ -190,8 +196,13 @@ M.core_comment = {
                         val = val.replace('___name___', list[i].fullname);
                     }
                     if (list[i]['delete']||newcmt) {
+                        var tokens = {
+                            user: list[i].fullname,
+                            time: list[i].time
+                        };
+                        var deleteStr = Y.Escape.html(M.util.get_string('deletecommentbyon', 'moodle', tokens));
                         var deletehtmlid = 'comment-delete-'+this.client_id+'-'+list[i].id;
-                        list[i].content = '<div class="comment-delete"><a href="#" id="' + deletehtmlid +'" title="'+M.util.get_string('deletecomment', 'moodle')+'"></a></div>' + list[i].content;
+                        list[i].content = '<div class="comment-delete"><a href="#" id="' + deletehtmlid +'" title="'+deleteStr+'"></a></div>' + list[i].content;
                         // A closure is required as otherwise i is list.length
                         require(['core/templates'], (function (deletehtmlid) {return function (templates) {
                             templates.renderIcon('delete', '').done(function (html) {
@@ -351,6 +362,7 @@ M.core_comment = {
                 );
             },
             view: function(page) {
+                var commenttoggler = Y.one('#comment-link-' + this.client_id);
                 var container = Y.one('#comment-ctrl-'+this.client_id);
                 var ta = Y.one('#dlg-content-'+this.client_id);
                 var commentlink = Y.one('#comment-link-' + this.client_id);
@@ -372,6 +384,9 @@ M.core_comment = {
                             });
                         });
                     }
+                    if (commenttoggler) {
+                        commenttoggler.setAttribute('aria-expanded', 'true');
+                    }
                 } else {
                     // hide
                     container.setStyle('display', 'none');
@@ -383,6 +398,9 @@ M.core_comment = {
                     });
                     if (ta) {
                         ta.set('value','');
+                    }
+                    if (commenttoggler) {
+                        commenttoggler.setAttribute('aria-expanded', 'false');
                     }
                 }
                 if (ta) {

@@ -65,6 +65,7 @@ if ($hassiteconfig
     $ADMIN->add('accounts', new admin_externalpage('profilefields', new lang_string('profilefields','admin'), "$CFG->wwwroot/user/profile/index.php", array('moodle/site:config', 'totara/core:manageprofilefields')));
     $ADMIN->add('accounts', new admin_externalpage('cohorts', new lang_string('cohorts', 'cohort'), $CFG->wwwroot . '/cohort/index.php', array('moodle/cohort:manage', 'moodle/cohort:view')));
 
+
     // stuff under the "roles" subcategory
 
     // "userpolicies" settingpage
@@ -217,7 +218,10 @@ if ($hassiteconfig
                     'department'  => new lang_string('department'),
                     'institution' => new lang_string('institution'),
                 )));
-        $temp->add(new admin_setting_configtext('fullnamedisplay', new lang_string('fullnamedisplay', 'admin'), new lang_string('configfullnamedisplay', 'admin'), 'language', PARAM_TEXT, 50));
+        $setting = new admin_setting_configtext('fullnamedisplay', new lang_string('fullnamedisplay', 'admin'),
+            new lang_string('configfullnamedisplay', 'admin'), 'language', PARAM_TEXT, 50);
+        $setting->set_force_ltr(true);
+        $temp->add($setting);
         $temp->add(new admin_setting_configtext('alternativefullnameformat', new lang_string('alternativefullnameformat', 'admin'),
                 new lang_string('alternativefullnameformat_desc', 'admin'),
                 'language', PARAM_RAW, 50));

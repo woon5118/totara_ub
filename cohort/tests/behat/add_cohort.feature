@@ -19,7 +19,7 @@ Feature: Add cohorts of users
     And I set the following fields to these values:
       | Name | Test cohort name |
       | Context | System |
-      | Audiences ID | 333 |
+      | Audience ID | 333 |
       | Description | Test cohort description |
     And I press "Save changes"
 
@@ -42,7 +42,8 @@ Feature: Add cohorts of users
     And the "Current users" select box should not contain "Forth User (forth@example.com)"
 
   Scenario: Add users to a cohort using a bulk user action
-    When I follow "Bulk user actions"
+    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I follow "Bulk user actions"
     And I set the field "Available" to "Third User"
     And I press "Add to selection"
     And I set the field "Available" to "Forth User"

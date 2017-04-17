@@ -20,6 +20,8 @@
  * @package totara_form
  */
 
+/* eslint-disable */
+
 define(['jquery'], function($) {
     return {
         /**

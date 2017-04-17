@@ -43,6 +43,46 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     /** @var totara_customfield_generator */
     protected $customfield_generator;
 
+    protected function tearDown() {
+        $this->facetoface_generator = null;
+        $this->customfield_generator = null;
+        $this->facetoface_data = null;
+        $this->facetoface_sessions_data = null;
+        $this->session_info_field = null;
+        $this->session_info_data = null;
+        $this->facetoface_sessions_dates_data = null;
+        $this->facetoface_signups_data = null;
+        $this->facetoface_signups_status_data = null;
+        $this->course_data = null;
+        $this->event_data = null;
+        $this->role_assignments_data = null;
+        $this->course_modules_data = null;
+        $this->grade_items_data = null;
+        $this->grade_categories_data = null;
+        $this->user_data = null;
+        $this->grade_grades_data = null;
+        $this->user_info_field_data = null;
+        $this->user_info_data_data = null;
+        $this->user_info_category_data = null;
+        $this->course_categories_data = null;
+        $this->facetoface_session_roles_data = null;
+        $this->user_preferences_data = null;
+        $this->facetoface = null;
+        $this->sessions = null;
+        $this->sessiondata = null;
+        $this->msgtrue = null;
+        $this->msgfalse = null;
+        $this->user1 = null;
+        $this->user2 = null;
+        $this->user3 = null;
+        $this->user4 = null;
+        $this->course1 = null;
+        $this->course2 = null;
+        $this->course3 = null;
+        $this->course4 = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         parent::setUp();
         $this->resetAfterTest();
@@ -2863,12 +2903,9 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      */
     public function facetoface_messaging_settings() {
         $data = array(
-            array(1, 'no-reply@example.com', ''),
-            array(1, 'no-reply@example.com', 'facetofacesender@example.com'),
-            array(1, '', ''),
-            array(0, 'no-reply@example.com', 'facetofacesender@example.com'),
-            array(0, 'no-reply@example.com', ''),
-            array(0, '', ''),
+            array('no-reply@example.com', ''),
+            array('no-reply@example.com', 'facetofacesender@example.com'),
+            array('', ''),
         );
         return $data;
     }
@@ -2876,15 +2913,13 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     /**
      * Test facetoface messaging.
      *
-     * When emailonlyfromnoreplyaddress is set, all messages should come from noreplyaddress, otherwise
-     * it should use facetoface_fromaddress or default to the appropiate user set if facetoface_fromaddress is empty
+     * NOTE: emailonlyfromnoreplyaddress is now alway on
      *
-     * @param int $emailonlyfromnoreplyaddress Setting to use only from no reply address
      * @param string $noreplyaddress No-reply address
      * @param string $senderfrom Sender from setting in Face to face
      * @dataProvider facetoface_messaging_settings
      */
-    public function test_facetoface_messages($emailonlyfromnoreplyaddress, $noreplyaddress, $senderfrom) {
+    public function test_facetoface_messages($noreplyaddress, $senderfrom) {
         $this->init_sample_data();
 
         $this->preventResetByRollback();
@@ -2905,7 +2940,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $manager1ja->id));
         \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $manager2ja->id));
 
-        set_config('emailonlyfromnoreplyaddress', $emailonlyfromnoreplyaddress);
         set_config('noreplyaddress', $noreplyaddress);
         set_config('facetoface_fromaddress', $senderfrom);
 
@@ -2943,7 +2977,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $userfrom = (!empty($senderfrom)) ? \mod_facetoface\facetoface_user::get_facetoface_user() : $user3;
 
         $checkformat = '%s %s (%s)';
-        $expectedemail = $emailonlyfromnoreplyaddress ? $noreplyaddress : $userfrom->email;
+        $expectedemail = $noreplyaddress;
         $expected = sprintf($checkformat, $userfrom->firstname, $userfrom->lastname, $expectedemail);
 
         foreach ($emails as $email) {

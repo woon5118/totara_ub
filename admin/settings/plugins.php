@@ -106,15 +106,22 @@ if ($hassiteconfig || $hasmodconfig) {
                                             new lang_string('forgottenpassword', 'auth'), ''));
     $temp->add(new admin_setting_confightmleditor('auth_instructions', new lang_string('instructions', 'auth'),
                                                 new lang_string('authinstructions', 'auth'), ''));
-    // TODO SCANMSG: re-add once force change feature integrated
-    //$temp->add(new admin_setting_confightmleditor('auth_forcedchangeinstructions', new lang_string('forcedchangeinstructions', 'auth'),
-    //                                        new lang_string('authforcedchangeinstructions', 'auth'), ''));
-    $temp->add(new admin_setting_configtext('allowemailaddresses', new lang_string('allowemailaddresses', 'admin'), new lang_string('configallowemailaddresses', 'admin'), '', PARAM_NOTAGS));
-    $temp->add(new admin_setting_configtext('denyemailaddresses', new lang_string('denyemailaddresses', 'admin'), new lang_string('configdenyemailaddresses', 'admin'), '', PARAM_NOTAGS));
+    $setting = new admin_setting_configtext('allowemailaddresses', new lang_string('allowemailaddresses', 'admin'),
+        new lang_string('configallowemailaddresses', 'admin'), '', PARAM_NOTAGS);
+    $setting->set_force_ltr(true);
+    $temp->add($setting);
+    $setting = new admin_setting_configtext('denyemailaddresses', new lang_string('denyemailaddresses', 'admin'),
+        new lang_string('configdenyemailaddresses', 'admin'), '', PARAM_NOTAGS);
+    $setting->set_force_ltr(true);
+    $temp->add($setting);
     $temp->add(new admin_setting_configcheckbox('verifychangedemail', new lang_string('verifychangedemail', 'admin'), new lang_string('configverifychangedemail', 'admin'), 1));
 
-    $temp->add(new admin_setting_configtext('recaptchapublickey', new lang_string('recaptchapublickey', 'admin'), new lang_string('configrecaptchapublickey', 'admin'), '', PARAM_NOTAGS));
-    $temp->add(new admin_setting_configtext('recaptchaprivatekey', new lang_string('recaptchaprivatekey', 'admin'), new lang_string('configrecaptchaprivatekey', 'admin'), '', PARAM_NOTAGS));
+    $setting = new admin_setting_configtext('recaptchapublickey', new lang_string('recaptchapublickey', 'admin'), new lang_string('configrecaptchapublickey', 'admin'), '', PARAM_NOTAGS);
+    $setting->set_force_ltr(true);
+    $temp->add($setting);
+    $setting = new admin_setting_configtext('recaptchaprivatekey', new lang_string('recaptchaprivatekey', 'admin'), new lang_string('configrecaptchaprivatekey', 'admin'), '', PARAM_NOTAGS);
+    $setting->set_force_ltr(true);
+    $temp->add($setting);
     $ADMIN->add('authsettings', $temp);
 
     $temp = new admin_externalpage('authtestsettings', get_string('testsettings', 'core_auth'), new moodle_url("/auth/test_settings.php"), 'moodle/site:config', true);
@@ -197,6 +204,28 @@ if ($hassiteconfig || $hasmodconfig) {
     foreach (core_plugin_manager::instance()->get_plugins_of_type('filter') as $plugin) {
         /** @var \core\plugininfo\filter $plugin */
         $plugin->load_settings($ADMIN, 'filtersettings', $hassiteconfig);
+    }
+
+    // Media players.
+    $ADMIN->add('modules', new admin_category('mediaplayers', new lang_string('type_media_plural', 'plugin')));
+    $temp = new admin_settingpage('managemediaplayers', new lang_string('managemediaplayers', 'media'));
+    $temp->add(new admin_setting_heading('mediaformats', get_string('mediaformats', 'core_media'),
+        format_text(get_string('mediaformats_desc', 'core_media'), FORMAT_MARKDOWN)));
+    $temp->add(new admin_setting_managemediaplayers());
+    $temp->add(new admin_setting_heading('managemediaplayerscommonheading', new lang_string('commonsettings', 'admin'), ''));
+    $temp->add(new admin_setting_configtext('media_default_width',
+        new lang_string('defaultwidth', 'core_media'), new lang_string('defaultwidthdesc', 'core_media'),
+        400, PARAM_INT, 10));
+    $temp->add(new admin_setting_configtext('media_default_height',
+        new lang_string('defaultheight', 'core_media'), new lang_string('defaultheightdesc', 'core_media'),
+        300, PARAM_INT, 10));
+    $ADMIN->add('mediaplayers', $temp);
+
+    $plugins = core_plugin_manager::instance()->get_plugins_of_type('media');
+    core_collator::asort_objects_by_property($plugins, 'displayname');
+    foreach ($plugins as $plugin) {
+        /** @var \core\plugininfo\media $plugin */
+        $plugin->load_settings($ADMIN, 'mediaplayers', $hassiteconfig);
     }
 
     // Data format settings.
@@ -302,25 +331,7 @@ if ($hassiteconfig || $hasmodconfig) {
 
 /// Web services
     $ADMIN->add('modules', new admin_category('webservicesettings', new lang_string('webservices', 'webservice')));
-    // You must have site config for this.
-    if ($hassiteconfig) {
-        // Mobile
-        $temp = new admin_settingpage('mobile', new lang_string('mobile', 'admin'), 'moodle/site:config', false);
 
-        // We should wait to the installation to finish since we depend on some configuration values that are set once
-        // the admin user profile is configured.
-        if (!during_initial_install()) {
-            $enablemobiledocurl = new moodle_url(get_docs_url('Enable_mobile_web_services'));
-            $enablemobiledoclink = html_writer::link($enablemobiledocurl, new lang_string('documentation'));
-            $default = 0; // Totara: no mobile!
-            $temp->add(new admin_setting_enablemobileservice('enablemobilewebservice',
-                new lang_string('enablemobilewebservice', 'admin'),
-                new lang_string('configenablemobilewebservice', 'admin', $enablemobiledoclink), $default));
-        }
-
-        $temp->add(new admin_setting_configtext('mobilecssurl', new lang_string('mobilecssurl', 'admin'), new lang_string('configmobilecssurl', 'admin'), '', PARAM_URL));
-        $ADMIN->add('experimental', $temp); // Totara: Moodle mobile apps will not work much
-    }
     /// overview page
     $temp = new admin_settingpage('webservicesoverview', new lang_string('webservicesoverview', 'webservice'));
     $temp->add(new admin_setting_webservicesoverview());
@@ -489,7 +500,7 @@ foreach ($pages as $page) {
 
 if ($hassiteconfig) {
     // Global Search engine plugins.
-    $ADMIN->add('experimental', new admin_category('searchplugins', new lang_string('search', 'admin')));
+    $ADMIN->add('modules', new admin_category('searchplugins', new lang_string('search', 'admin')));
     $temp = new admin_settingpage('manageglobalsearch', new lang_string('globalsearchmanage', 'admin'));
 
     $pages = array();
@@ -506,26 +517,22 @@ if ($hassiteconfig) {
             }
         }
     }
-
-if ($ADMIN->fulltree) { // Totara: do not load the settings when we do not need them, this saves lots of memory and file inclusions.
-    // Setup status.
-    $temp->add(new admin_setting_searchsetupinfo());
-
-    // Search engine selection.
-    $temp->add(new admin_setting_heading('searchengineheading', new lang_string('searchengine', 'admin'), ''));
-    $temp->add(new admin_setting_configselect('searchengine',
-                                new lang_string('selectsearchengine', 'admin'), '', 'solr', $engines));
-
-    // Enable search areas.
-    $temp->add(new admin_setting_heading('searchareasheading', new lang_string('availablesearchareas', 'admin'), ''));
-    $searchareas = \core_search\manager::get_search_areas_list();
-    foreach ($searchareas as $areaid => $searcharea) {
-        list($componentname, $varname) = $searcharea->get_config_var_name();
-        $temp->add(new admin_setting_configcheckbox($componentname . '/' . $varname . '_enabled', $searcharea->get_visible_name(true),
-            '', 1, 1, 0));
 }
+
+if ($hassiteconfig) { // Totara: do not load the settings when we do not need them, this saves lots of memory and file inclusions.
+
+    if ($ADMIN->fulltree) {
+        // Setup status.
+        $temp->add(new admin_setting_searchsetupinfo());
+
+        // Search engine selection.
+        $temp->add(new admin_setting_heading('searchengineheading', new lang_string('searchengine', 'admin'), ''));
+        $temp->add(new admin_setting_configselect('searchengine',
+            new lang_string('selectsearchengine', 'admin'), '', 'solr', $engines));
+        $ADMIN->add('searchplugins', $temp);
     }
-    $ADMIN->add('searchplugins', $temp);
+    $ADMIN->add('searchplugins', new admin_externalpage('searchareas', new lang_string('searchareas', 'admin'),
+        new moodle_url('/admin/searchareas.php')));
 
     foreach ($pages as $page) {
         $ADMIN->add('searchplugins', $page);

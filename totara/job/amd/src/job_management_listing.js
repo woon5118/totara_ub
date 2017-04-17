@@ -148,7 +148,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
         deferred.done(function() {
             var li = $(ul.find('a.editjoblink[data-id="'+targetItem.id+'"]').parents('li')[0]);
             li.fadeOut(50, function() {
-                li.css({backgroundColor: '#fefdb2'})
+                li.css({backgroundColor: '#fefdb2'});
             }).fadeIn(500, function(){
                 li.css({backgroundColor: 'initial'});
             });
@@ -180,7 +180,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
         deferred.done(function() {
             var li = $(ul.find('a.editjoblink[data-id="'+targetItem.id+'"]').parents('li')[0]);
             li.fadeOut(50, function() {
-                li.css({backgroundColor: '#fefdb2'})
+                li.css({backgroundColor: '#fefdb2'});
             }).fadeIn(500, function(){
                 li.css({backgroundColor: 'initial'});
             });

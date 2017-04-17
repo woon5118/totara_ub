@@ -271,8 +271,8 @@ class behat_facetoface extends behat_base {
      * @param int $row
      */
     public function i_click_to_edit_the_facetoface_session_in_row($term, $row) {
-        $summaryliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('previoussessionslist', 'facetoface'));
-        $titleliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('editsession', 'facetoface'));
+        $summaryliteral = behat_context_helper::escape(get_string('previoussessionslist', 'facetoface'));
+        $titleliteral = behat_context_helper::escape(get_string('editsession', 'facetoface'));
         $xpath = "//table[@summary={$summaryliteral}]/tbody/tr[{$row}]//a/span[@title={$titleliteral}]/parent::a";
         /** @var \Behat\Mink\Element\NodeElement[] $nodes */
         $nodes = $this->find_all('xpath', $xpath);
@@ -291,7 +291,7 @@ class behat_facetoface extends behat_base {
      * @param int $position
      */
     public function i_click_to_edit_the_seminar_event_date_at_position($position) {
-        $titleliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('editdate', 'facetoface'));
+        $titleliteral = behat_context_helper::escape(get_string('editdate', 'facetoface'));
         $xpath = "//table[contains(@class, 'f2fmanagedates')]/tbody/tr[{$position}]//a/span[@title={$titleliteral}]/parent::a";
         /** @var \Behat\Mink\Element\NodeElement[] $nodes */
         $nodes = $this->find_all('xpath', $xpath);

@@ -449,14 +449,11 @@ class page_requirements_manager {
      *
      * NOTE: this should not be used in official Moodle distribution!
      *
-     * We are going to bundle jQuery 1.9.x until we drop support
-     * all support for IE 6-8. Use $PAGE->requires->jquery_plugin('migrate')
-     * for code written for earlier jQuery versions.
-     *
      * {@see http://docs.moodle.org/dev/jQuery}
      */
     public function jquery() {
         $this->jquery_plugin('jquery');
+        $this->jquery_plugin('migrate3'); // TODO: TL-13958 this is needed four our outdated jquery ui
     }
 
     /**
@@ -469,7 +466,7 @@ class page_requirements_manager {
      *
      * Included core plugins:
      *   - jQuery UI
-     *   - jQuery Migrate (useful for code written for previous UI version)
+     *   - jQuery Migrate 3 (useful for code written for previous UI version)
      *
      * Add-ons may include extra jQuery plugins in jquery/ directory,
      * plugins.php file defines the mapping between plugin names and
@@ -516,8 +513,8 @@ class page_requirements_manager {
             return false;
         }
 
-        if ($component !== 'core' and in_array($plugin, array('jquery', 'ui', 'ui-css', 'migrate'))) {
-            debugging("jQuery plugin '$plugin' is included in Moodle core, other components can not use the same name.", DEBUG_DEVELOPER);
+        if ($component !== 'core' and in_array($plugin, array('jquery', 'ui', 'ui-css', 'migrate3'))) {
+            debugging("jQuery plugin '$plugin' is included in Totara core, other components can not use the same name.", DEBUG_DEVELOPER);
             $component = 'core';
         } else if ($component !== 'core' and strpos($component, '_') === false) {
             // Let's normalise the legacy activity names, Frankenstyle rulez!
@@ -767,7 +764,7 @@ class page_requirements_manager {
                 case 'core_comment':
                     $module = array('name'     => 'core_comment',
                                     'fullpath' => '/comment/comment.js',
-                                    'requires' => array('base', 'io-base', 'node', 'json', 'yui2-animation', 'overlay'),
+                                    'requires' => array('base', 'io-base', 'node', 'json', 'yui2-animation', 'overlay', 'escape'),
                                     'strings' => array(array('confirmdeletecomments', 'admin'), array('yes', 'moodle'), array('no', 'moodle'))
                                 );
                     break;
@@ -1574,17 +1571,12 @@ class page_requirements_manager {
      * Normally, this method is called automatically by the code that prints the
      * <head> tag. You should not normally need to call it in your own code.
      *
+     * @param core_renderer $renderer
      * @return string the HTML code to go at the start of the <body> tag.
      */
-    public function get_top_of_body_code() {
+    public function get_top_of_body_code(core_renderer $renderer) {
         // First the skip links.
-        $links = '';
-        $attributes = array('class' => 'skip');
-        foreach ($this->skiplinks as $url => $text) {
-            $links .= html_writer::link('#'.$url, $text, $attributes);
-        }
-        $output = html_writer::tag('div', $links, array('class'=>'skiplinks')) . "\n";
-        $this->js_init_call('M.util.init_skiplink');
+        $output = $renderer->render_skip_links($this->skiplinks);
 
         // YUI3 JS needs to be loaded early in the body. It should be cached well by the browser.
         $output .= $this->get_yui3lib_headcode();

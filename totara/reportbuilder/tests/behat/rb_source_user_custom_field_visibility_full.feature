@@ -68,7 +68,7 @@ Feature: Full visibility of user report source custom field values
       | Should the data be unique    | No                  |
       | Who is this field visible to | Visible to everyone |
       | Default value                | CCC                 |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       AAA
       BBB

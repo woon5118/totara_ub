@@ -16,21 +16,30 @@ Feature: Basic web service access
     # Enable services
     And I set the following administration settings values:
       | enablewebservices | 1 |
-      | enablemobilewebservice | 1 |
     And I navigate to "Manage protocols" node in "Site administration > Plugins > Web services"
-    And I "Enable" the "SOAP" web service protocol
+    And I "Enable" the "REST protocol" web service protocol
+    And I "Enable" the "SOAP protocol" web service protocol
     And I "Enable" the "XML-RPC protocol" web service protocol
 
-    # Enable web services authentication
+    # This WS stuff is crazy, this should never allow admin to authenticate, anyway.
     And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
     And I click on "Enable" "link" in the "Web services authentication" "table_row"
 
     # Configure web service
     And I navigate to "External services" node in "Site administration > Plugins > Web services"
-    And I click on "Edit" "link" in the "Moodle mobile web service" "table_row"
+    And I follow "Add"
     And I set the following fields to these values:
-      | Enabled    | 1                   |
-    And I press "Save changes"
+      | Name                  | testws |
+      | Enabled               | 1      |
+      | Authorised users only | 0      |
+    And I press "Add service"
+    And I follow "Add functions"
+    And I wait "2" seconds
+    And I set the following fields to these values:
+      | Name | core_user_get_users_by_field |
+    # Note: Autocomplete fields are a bloody mess, try some hacks to make it work here. Also the fieldset and button are the same here.
+    And I press key "13" in the field "Name"
+    And I press "id_submitbutton"
 
     # Perform REST test
     When I navigate to "Web service test client" node in "Site administration > Development"

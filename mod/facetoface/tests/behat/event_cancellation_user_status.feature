@@ -68,8 +68,8 @@ Feature: Seminar event cancellation status
   # -------------------------------------------------------------------------------------
   Scenario: Event cancellation in a Seminar with manager approval required.
     Given I click on "Test Seminar" "link"
-    And I press "Update this Seminar"
-    And I click on "Approval Options" "link"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
 

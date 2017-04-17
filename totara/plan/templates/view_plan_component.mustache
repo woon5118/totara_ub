@@ -53,7 +53,17 @@
 {{/launch}}
 <h3>{{{icon}}} {{title}}</h3>
 {{#edit_objective}}
-<div class="add-linked-course">{{>core/single_button}}</div>
+<div class="add-linked-course">
+    <div class="{{class}}">
+        <form{{#formattributes}} {{name}}="{{value}}"{{/formattributes}}>
+        <div>
+            {{#inputitems}}
+                <input{{#attributes}} {{name}}="{{value}}"{{/attributes}} />
+            {{/inputitems}}
+        </div>
+        </form>
+    </div>
+</div>
 {{/edit_objective}}
 
 {{#has_extra_information}}

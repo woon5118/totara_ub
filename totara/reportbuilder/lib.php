@@ -5057,15 +5057,11 @@ function sql_table_from_select($table, $select, array $params) {
 
             // Do we know collation?
             $collation = $DB->get_dbcollation();
-            $collationsql = '';
-            if ($collation) {
-                if (strpos($collation, 'utf8_') === 0) {
-                    $collationsql .= " DEFAULT CHARACTER SET utf8";
-                }
-                $collationsql .= " DEFAULT COLLATE = {$collation}";
-            }
+            $charset = $DB->get_charset();
+            $collationsql = "DEFAULT CHARACTER SET {$charset} DEFAULT COLLATE = {$collation}";
+            $rowformat = "ROW_FORMAT = Compressed";
 
-            $sql = "CREATE TABLE `{$table}` $enginesql $collationsql $select";
+            $sql = "CREATE TABLE `{$table}` $enginesql $collationsql $rowformat $select";
             $result = $DB->execute($sql, $params);
             break;
         case 'mssql':

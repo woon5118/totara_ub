@@ -180,16 +180,9 @@ class MoodleExcelWorksheet {
         // Replace any characters in the name that Excel cannot cope with.
         $name = strtr(trim($name, "'"), '[]*/\?:', '       ');
         // Shorten the title if necessary.
-        $len = strlen($name);
-        if ($len != 0 && $len > 31) {
-            $name = core_text::substr($name, 0, 31);
-            // Function core_text::substr can return false in certain circumstances.
-            if ($name === false) {
-                $name = '';
-            }
-            // After the substr, we might now have a single quote on the end.
-            $name = trim($name, "'");
-        }
+        $name = core_text::substr($name, 0, 31);
+        // After the substr, we might now have a single quote on the end.
+        $name = trim($name, "'");
 
         if ($name === '') {
             // Name is required!

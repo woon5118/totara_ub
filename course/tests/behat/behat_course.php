@@ -48,7 +48,11 @@ class behat_course extends behat_base {
      */
     public function i_turn_editing_mode_on() {
 
-        $this->execute("behat_forms::press_button", get_string('turneditingon'));
+        try {
+            $this->execute("behat_forms::press_button", get_string('turneditingon'));
+        } catch (Exception $e) {
+            $this->execute("behat_navigation::i_navigate_to_in_current_page_administration", [get_string('turneditingon')]);
+        }
     }
 
     /**
@@ -57,7 +61,11 @@ class behat_course extends behat_base {
      */
     public function i_turn_editing_mode_off() {
 
-        $this->execute("behat_forms::press_button", get_string('turneditingoff'));
+        try {
+            $this->execute("behat_forms::press_button", get_string('turneditingoff'));
+        } catch (Exception $e) {
+            $this->execute("behat_navigation::i_navigate_to_in_current_page_administration", [get_string('turneditingoff')]);
+        }
     }
 
     /**
@@ -646,7 +654,7 @@ class behat_course extends behat_base {
             // It should not exist at all.
             try {
                 $this->find_link($activityname);
-                throw new ExpectationException('The "' . $activityname . '" should not appear');
+                throw new ExpectationException('The "' . $activityname . '" should not appear', $this->getSession());
             } catch (ElementNotFoundException $e) {
                 // This is good, the activity should not be there.
             }
@@ -1535,7 +1543,7 @@ class behat_course extends behat_base {
      * @throws ExpectationException When unable to find the more information node.
      */
     public function i_follow_the_more_information_icon_for_the_course($coursename) {
-        $nameliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($coursename);
+        $nameliteral = behat_context_helper::escape($coursename);
         $xpath = "//div[contains(@class, 'coursebox')]//a[text()={$nameliteral}]/ancestor::div[contains(@class, 'info')]//a[@title='Summary']";
         $nodes = $this->getSession()->getDriver()->find($xpath);
         if (count($nodes) > 0) {
@@ -1609,7 +1617,7 @@ class behat_course extends behat_base {
      */
     public function i_should_see_the_courses_management_page($mode) {
         $this->execute("behat_general::assert_element_contains_text",
-            array("Course and category management", "h2", "css_element")
+            array("Course and category management", "#region-main h2", "css_element")
         );
 
         switch ($mode) {
@@ -1641,7 +1649,7 @@ class behat_course extends behat_base {
      */
     public function i_should_see_the_courses_management_page_with_a_course_selected($mode) {
         $this->execute("behat_general::assert_element_contains_text",
-            array("Course and category management", "h2", "css_element"));
+            array("Course and category management", "#region-main h2", "css_element"));
 
         switch ($mode) {
             case "Courses":

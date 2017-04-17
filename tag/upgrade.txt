@@ -61,4 +61,3 @@ here is intended especially for developers.
   - tag_get_correlated
   - tag_cloud_sort
 * Char field 'tagtype' in database table 'tag' is replaced with int (0 or 1) field 'isstandard'.
-* coursetag_rss_feeds() was removed

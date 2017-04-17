@@ -27,12 +27,11 @@
 $exceptions = array(
     'core_admin' => array(
         'configallowoverride2', 'configallowswitch', 'configallowuserswitchrolestheycantassign', 'showuseridentity_desc', // Caps.
-        'configenablemobilewebservice', // Broken mobile app.
         'requiredentrieschanged', // Upgrade notes.
-        'unsupporteddbtablerowformat', // Link to docs
         'cfgwwwrootslashwarning', // Link to moodle tracker
         'cfgwwwrootwarning', // Link to moodle tracker,
         'eventshandlersinuse', // Link to docs
+        'unsupporteddbfileformat', // Link to docs
     ),
     'core_cohort' => array('visible_help'), // Caps.
     'core_completion' => array('err_noroles', 'manualcompletionbynote', 'err_noroles'), // Caps.
@@ -55,5 +54,6 @@ $exceptions = array(
     'mod_facetoface' => array('mincapacity_help'),
     'auth_ldap' => array('auth_ntlmsso_enabled'),
     'theme_bootstrapbase' => array('choosereadme'),
-    'tool_mobile' => array('pluginname') // Moodle mobile stuff, no Totara equiv.
+    'tool_usertours' => true, // Not implemented yet
+
 );

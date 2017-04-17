@@ -32,12 +32,6 @@ if (!file_exists('../config.php')) {
 // Make sure we have everything necessary for standard libraries.
 require(__DIR__ . '/../lib/environmentmincheck.php');
 
-// Make sure xml extension is available.
-if (!extension_loaded('xml')) {
-    echo 'Moodle requires the xml PHP extension. Please install or enable the xml extension.';
-    die();
-}
-
 define('NO_OUTPUT_BUFFERING', true);
 
 if (isset($_POST['upgradekey'])) {
@@ -271,6 +265,8 @@ if (!$cache and $totarainfo->upgradecore) {
         $testsite = 'behat';
     }
 
+    // Totara: do not hack themerev here!
+
     // We purge all of MUC's caches here.
     // Caches are disabled for upgrade by CACHE_DISABLE_ALL so we must set the first arg to true.
     // This ensures a real config object is loaded and the stores will be purged.
@@ -279,6 +275,8 @@ if (!$cache and $totarainfo->upgradecore) {
     cache_helper::purge_all(true);
     // We then purge the regular caches.
     purge_all_caches();
+
+    // Totara: do not hack themerev here!
 
     /** @var core_admin_renderer $output */
     $output = $PAGE->get_renderer('core', 'admin');
@@ -532,6 +530,7 @@ $registered = $DB->count_records('registration_hubs', array('huburl' => HUB_MOOD
 $cachewarnings = cache_helper::warnings();
 // Check if there are events 1 API handlers.
 $eventshandlers = $DB->get_records_sql('SELECT DISTINCT component FROM {events_handlers}');
+$themedesignermode = !empty($CFG->themedesignermode);
 
 admin_externalpage_setup('adminnotifications');
 
@@ -555,4 +554,4 @@ $output = $PAGE->get_renderer('core', 'admin');
 
 echo $output->admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed, $cronoverdue, $dbproblems,
                                        $maintenancemode, null, null, $buggyiconvnomb,
-                                       $registered, $cachewarnings, $eventshandlers, $latesterror, $activeusers, $TOTARA->release);
+                                       $registered, $cachewarnings, $eventshandlers, $themedesignermode, $latesterror, $activeusers, $TOTARA->release);

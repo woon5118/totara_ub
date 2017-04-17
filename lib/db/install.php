@@ -117,7 +117,7 @@ function xmldb_main_install() {
 
     $defaults = array(
         'rolesactive'           => '0', // marks fully set up system
-        'auth'                  => 'email',
+        'auth'                  => '', // Totara: do not enable email auth by default.
         'auth_pop3mailbox'      => 'INBOX',
         'enrol_plugins_enabled' => 'manual,guest,self,cohort',
         'theme'                 => theme_config::DEFAULT_THEME,
@@ -131,6 +131,7 @@ function xmldb_main_install() {
         'filterall'             => 0, // setting page, so have to be initialised here.
         'texteditors'           => 'atto,tinymce,textarea',
         'antiviruses'           => '',
+        'media_plugins_sortorder' => 'videojs,youtube',
         'upgrade_minmaxgradestepignored' => 1, // New installs should not run this upgrade step.
         'upgrade_extracreditweightsstepignored' => 1, // New installs should not run this upgrade step.
         'upgrade_calculatedgradeitemsignored' => 1, // New installs should not run this upgrade step.

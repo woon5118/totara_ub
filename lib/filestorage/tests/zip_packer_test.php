@@ -37,6 +37,13 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
      */
     protected $progress;
 
+    protected function tearDown() {
+        $this->testfile = null;
+        $this->files = null;
+        $this->progress = null;
+        parent::tearDown();
+    }
+
     protected function setUp() {
         parent::setUp();
 
@@ -292,6 +299,41 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
             $this->assertFileNotExists($target.$file);
         }
 
+    }
+
+    /**
+     * @depends test_archive_to_storage
+     */
+    public function test_extract_to_pathname_returnvalue_successful() {
+        global $CFG;
+
+        $this->resetAfterTest(false);
+
+        $packer = get_file_packer('application/zip');
+
+        $target = make_request_directory();
+
+        $archive = "$CFG->tempdir/archive.zip";
+        $this->assertFileExists($archive);
+        $result = $packer->extract_to_pathname($archive, $target, null, null, true);
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @depends test_archive_to_storage
+     */
+    public function test_extract_to_pathname_returnvalue_failure() {
+        global $CFG;
+
+        $this->resetAfterTest(false);
+
+        $packer = get_file_packer('application/zip');
+
+        $target = make_request_directory();
+
+        $archive = "$CFG->tempdir/noarchive.zip";
+        $result = $packer->extract_to_pathname($archive, $target, null, null, true);
+        $this->assertFalse($result);
     }
 
     /**

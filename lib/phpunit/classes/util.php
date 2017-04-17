@@ -216,6 +216,7 @@ class phpunit_util extends testing_util {
         get_message_processors(false, true, true);
         filter_manager::reset_caches();
         core_filetypes::reset_caches();
+        \core_useragent::phpunit_reset(); // Totara: Make sure useragent tests are properly isolated.
         if (class_exists('prog_messages_manager', false)) {
             // Program messages exists, reset its caches just in case they have been used.
             prog_messages_manager::reset_cache();
@@ -227,6 +228,9 @@ class phpunit_util extends testing_util {
 
         \core_search\manager::clear_static();
         core_user::reset_caches();
+        if (class_exists('core_media_manager', false)) {
+            core_media_manager::reset_caches();
+        }
 
         // Reset static unit test options.
         if (class_exists('\availability_date\condition', false)) {
@@ -437,10 +441,12 @@ class phpunit_util extends testing_util {
 
         self::reset_dataroot();
         testing_initdataroot($CFG->dataroot, 'phpunit');
-        self::drop_dataroot();
 
-        // drop all tables
+        // Drop all tables.
         self::drop_database($displayprogress);
+
+        // Drop dataroot.
+        self::drop_dataroot();
     }
 
     /**
@@ -853,5 +859,45 @@ class phpunit_util extends testing_util {
         } else {
             return 'en_AU.UTF-8';
         }
+    }
+
+    /**
+     * Executes all adhoc tasks in the queue. Useful for testing asynchronous behaviour.
+     *
+     * @return void
+     */
+    public static function run_all_adhoc_tasks() {
+        $now = time();
+        while (($task = \core\task\manager::get_next_adhoc_task($now)) !== null) {
+            try {
+                $task->execute();
+                \core\task\manager::adhoc_task_complete($task);
+            } catch (Exception $e) {
+                \core\task\manager::adhoc_task_failed($task);
+            }
+        }
+    }
+
+    /**
+     * Helper function to call a protected/private method of an object using reflection.
+     *
+     * Example 1. Calling a protected object method:
+     *   $result = call_internal_method($myobject, 'method_name', [$param1, $param2], '\my\namespace\myobjectclassname');
+     *
+     * Example 2. Calling a protected static method:
+     *   $result = call_internal_method(null, 'method_name', [$param1, $param2], '\my\namespace\myclassname');
+     *
+     * @param object|null $object the object on which to call the method, or null if calling a static method.
+     * @param string $methodname the name of the protected/private method.
+     * @param array $params the array of function params to pass to the method.
+     * @param string $classname the fully namespaced name of the class the object was created from (base in the case of mocks),
+     *        or the name of the static class when calling a static method.
+     * @return mixed the respective return value of the method.
+     */
+    public static function call_internal_method($object, $methodname, array $params = array(), $classname) {
+        $reflection = new \ReflectionClass($classname);
+        $method = $reflection->getMethod($methodname);
+        $method->setAccessible(true);
+        return $method->invokeArgs($object, $params);
     }
 }

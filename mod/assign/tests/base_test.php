@@ -82,6 +82,19 @@ class mod_assign_base_testcase extends advanced_testcase {
     /** @var array $groups List of 10 groups in the course */
     protected $groups = null;
 
+    protected function tearDown() {
+        $this->course = null;
+        $this->teachers = null;
+        $this->editingteachers = null;
+        $this->students = null;
+        $this->extrateachers = null;
+        $this->extraeditingteachers = null;
+        $this->extrastudents = null;
+        $this->extrasuspendedstudents = null;
+        $this->groups = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup function - we will create a course and add an assign instance to it.
      */
@@ -205,7 +218,9 @@ class mod_assign_base_testcase extends advanced_testcase {
      */
     protected function create_instance($params=array()) {
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
-        $params['course'] = $this->course->id;
+        if (!isset($params['course'])) {
+            $params['course'] = $this->course->id;
+        }
         $instance = $generator->create_instance($params);
         $cm = get_coursemodule_from_instance('assign', $instance->id);
         $context = context_module::instance($cm->id);

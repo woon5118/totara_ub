@@ -40,6 +40,7 @@ class core_ajaxlib_testcase extends advanced_testcase {
 
     protected function tearDown() {
         ini_set('error_log', $this->oldlog);
+        $this->oldlog = null;
         parent::tearDown();
     }
 
@@ -70,7 +71,7 @@ class core_ajaxlib_testcase extends advanced_testcase {
         echo $content;
 
         if ($expectexception) {
-            $this->setExpectedException('coding_exception');
+            $this->expectException('coding_exception');
             ajax_check_captured_output();
         } else {
             $result = ajax_check_captured_output();

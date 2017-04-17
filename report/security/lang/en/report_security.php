@@ -84,10 +84,10 @@ $string['check_https_details'] = '<p>HTTP protocol is easily exploitable, it is 
 $string['check_https_warning'] = 'HTTPS protocol is not used.';
 $string['check_https_name'] = 'HTTPS protocol';
 $string['check_https_ok'] = 'HTTPS protocol is used.';
-$string['check_mediafilterswf_details'] = '<p>Automatic swf embedding is very dangerous - any registered user may launch an XSS attack against other server users. Please disable it on production servers.</p>';
-$string['check_mediafilterswf_error'] = 'Flash media filter is enabled - this is very dangerous for the majority of servers.';
 $string['check_mediafilterswf_name'] = 'Enabled .swf media filter';
 $string['check_mediafilterswf_ok'] = 'Flash media filter is not enabled.';
+$string['check_mediafilterswf_trusteddetails'] = '<p>Automatic swf embedding can be dangerous if users are not trusted. Review the security report for XSS trusted users. If not being used, disable Flash animation on production sites.</p>';
+$string['check_mediafilterswf_warning'] = 'Flash media filter is enabled for trusted users. This increases XSS risk.';
 $string['check_noauth_details'] = '<p>The <em>No authentication</em> plugin is not intended for production sites. Please disable it unless this is a development test site.</p>';
 $string['check_noauth_error'] = 'The No authentication plugin cannot be used on production sites.';
 $string['check_noauth_name'] = 'No authentication';
@@ -152,3 +152,7 @@ $string['statusok'] = 'OK';
 $string['statusserious'] = 'Serious';
 $string['statuswarning'] = 'Warning';
 $string['timewarning'] = 'Data processing may take a long time, please be patient...';
+
+// Deprecated since Totara 10.
+$string['check_mediafilterswf_details'] = '<p>Automatic swf embedding is very dangerous - any registered user may launch an XSS attack against other server users. Please disable it on production servers.</p>';
+$string['check_mediafilterswf_error'] = 'Flash media filter is enabled - this is very dangerous for the majority of servers.';

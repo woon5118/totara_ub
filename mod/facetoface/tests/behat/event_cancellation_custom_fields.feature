@@ -61,7 +61,7 @@ Feature: Seminar event cancellation custom fields
       | fullname    | cancelmenu |
       | shortname   | cancelmenu |
       | defaultdata | Ja         |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       Ja
       Nein

@@ -18,14 +18,13 @@ Feature: Reset dashboard page to default
       | student2 | C1 | student |
     And I log in as "student1"
     And I click on "Dashboard" in the totara menu
-
+  
   Scenario: Add blocks to page and reset
     When I press "Customise this page"
-    And I add the "Quick Links" block
-    And I should see "Quick Links"
+    And I add the "Online users" block
     And I add the "Comments" block
     And I press "Reset dashboard to default"
-    Then I should not see "Quick Links"
+    Then I should not see "Online users"
     And I should see "Latest badges"
     And I should see "Upcoming events"
     And I should not see "Comments"

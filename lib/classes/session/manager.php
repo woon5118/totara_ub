@@ -80,6 +80,7 @@ class manager {
             }
 
             self::initialise_user_session($isnewsession);
+            self::$sessionactive = true; // Set here, so the session can be cleared if the security check fails.
             self::check_security();
 
             // Link global $USER and $SESSION,
@@ -97,8 +98,6 @@ class manager {
             self::$sessionactive = false;
             throw $ex;
         }
-
-        self::$sessionactive = true;
     }
 
     /**
@@ -159,7 +158,8 @@ class manager {
     public static function init_empty_session() {
         global $CFG;
 
-        if (isset($GLOBALS['SESSION']->notifications)) {
+        // Totara: this persistent notification stuff is a nasty hack, make sure it is disabled in tests.
+        if (isset($GLOBALS['SESSION']->notifications) and !PHPUNIT_TEST) {
             // Backup notifications. These should be preserved across session changes until the user fetches and clears them.
             $notifications = $GLOBALS['SESSION']->notifications;
         }
@@ -252,12 +252,7 @@ class manager {
 
         // Set configuration.
         session_name($sessionname);
-        // The session cookie expiry time cannot be extended so this needs to be set to a reasonable period, longer than
-        // the sessiontimeout.
-        // This ensures that the cookie is unlikely to timeout before the session does.
-        $sessionlifetime = $CFG->sessiontimeout + WEEKSECS;
-        session_set_cookie_params($sessionlifetime, $CFG->sessioncookiepath, $CFG->sessioncookiedomain,
-                $cookiesecure, $CFG->cookiehttponly);
+        session_set_cookie_params(0, $CFG->sessioncookiepath, $CFG->sessioncookiedomain, $cookiesecure, $CFG->cookiehttponly);
         ini_set('session.use_trans_sid', '0');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.hash_function', '0');        // For now MD5 - we do not have room for sha-1 in sessions table.
@@ -844,9 +839,10 @@ class manager {
      * Login as another user - no security checks here.
      * @param int $userid
      * @param \context $context
+     * @param bool $generateevent Set to false to prevent the loginas event to be generated
      * @return void
      */
-    public static function loginas($userid, \context $context) {
+    public static function loginas($userid, \context $context, $generateevent = true) {
         global $USER;
 
         if (self::is_loggedinas()) {
@@ -868,21 +864,27 @@ class manager {
         // Let enrol plugins deal with new enrolments if necessary.
         enrol_check_plugins($user);
 
-        // Create event before $USER is updated.
-        $event = \core\event\user_loggedinas::create(
-            array(
-                'objectid' => $USER->id,
-                'context' => $context,
-                'relateduserid' => $userid,
-                'other' => array(
-                    'originalusername' => fullname($USER, true),
-                    'loggedinasusername' => fullname($user, true)
+        if ($generateevent) {
+            // Create event before $USER is updated.
+            $event = \core\event\user_loggedinas::create(
+                array(
+                    'objectid' => $USER->id,
+                    'context' => $context,
+                    'relateduserid' => $userid,
+                    'other' => array(
+                        'originalusername' => fullname($USER, true),
+                        'loggedinasusername' => fullname($user, true)
+                    )
                 )
-            )
-        );
+            );
+        }
+
         // Set up global $USER.
         \core\session\manager::set_user($user);
-        $event->trigger();
+
+        if ($generateevent) {
+            $event->trigger();
+        }
     }
 
     /**

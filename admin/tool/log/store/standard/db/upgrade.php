@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 function xmldb_logstore_standard_upgrade($oldversion) {
     global $CFG, $DB;
 
@@ -46,6 +48,9 @@ function xmldb_logstore_standard_upgrade($oldversion) {
         // Standard savepoint reached.
         upgrade_plugin_savepoint(true, 2016041200, 'logstore', 'standard');
     }
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

@@ -84,7 +84,7 @@ Feature: A privileged user can create cohorts using a CSV file
       | user  | role    | contextlevel | reference |
       | user1 | manager | Category     | CAT1      |
     When I log in as "user1"
-    And I click on "Courses" "link" in the "Navigation" "block"
+    And I am on course index
     And I follow "Cat 1"
     And I navigate to "Audiences" node in "Category: Cat 1"
     And I follow "Upload audiences"

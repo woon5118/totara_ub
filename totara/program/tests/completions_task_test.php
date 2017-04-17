@@ -38,6 +38,12 @@ class totara_program_completions_task_testcase extends advanced_testcase {
      */
     protected $generator_program;
 
+    protected function tearDown() {
+        $this->generator = null;
+        $this->generator_program = null;
+        parent::tearDown();
+    }
+
     /**
      * Prepares the environment prior to each test case.
      */

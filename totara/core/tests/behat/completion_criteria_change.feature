@@ -38,13 +38,9 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I follow "Course 1"
     And I press "Turn editing on"
     And I wait until the page is ready
-    And I click on "Add an activity or resource" "link"
-    And I click on "module_assign" "radio"
-    And I press "Add"
-    And I set the following fields to these values:
+    And I add a "Assignment" to section "1" and I fill the form with:
     | Assignment name | Assignment 1             |
     | Description     | Assignment 1 description |
-    And I press "Save and return to course"
     And I add the "Self completion" block
     # Set completion for Course 1 to Assignment 1 AND Manual self completion (will delete and remove self completion).
     Then I navigate to "Course completion" node in "Course administration"
@@ -57,13 +53,9 @@ Feature: Test reaggregating completion data when changing course completion sett
     Then I click on "Find Learning" in the totara menu
     And I follow "Course 2"
     And I wait until the page is ready
-    And I click on "Add an activity or resource" "link"
-    And I click on "module_assign" "radio"
-    And I press "Add"
-    And I set the following fields to these values:
+    And I add a "Assignment" to section "1" and I fill the form with:
     | Assignment name | Assignment 2             |
     | Description     | Assignment 2 description |
-    And I press "Save and return to course"
     And I add the "Self completion" block
     # Set completion for Course 2 to Assignment 2 AND Manual self completion (will delete and make no change).
     Then I navigate to "Course completion" node in "Course administration"
@@ -76,13 +68,9 @@ Feature: Test reaggregating completion data when changing course completion sett
     Then I click on "Find Learning" in the totara menu
     And I follow "Course 3"
     And I wait until the page is ready
-    And I click on "Add an activity or resource" "link"
-    And I click on "module_assign" "radio"
-    And I press "Add"
-    And I set the following fields to these values:
+    And I add a "Assignment" to section "1" and I fill the form with:
     | Assignment name | Assignment 3             |
     | Description     | Assignment 3 description |
-    And I press "Save and return to course"
     And I add the "Self completion" block
     # Set completion for Course 3 to Assignment 3 only (will not delete and add self completion).
     Then I navigate to "Course completion" node in "Course administration"

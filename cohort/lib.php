@@ -159,6 +159,9 @@ function cohort_delete_cohort($cohort) {
     $DB->delete_records('cohort_members', array('cohortid' => $cohort->id));
     $DB->delete_records('cohort', array('id' => $cohort->id));
 
+    // Notify the competency subsystem.
+    // \core_competency\api::hook_cohort_deleted($cohort);
+
     $collections = $DB->get_records('cohort_rule_collections', array('cohortid' => $cohort->id));
 
     foreach ($collections as $collection) {

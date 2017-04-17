@@ -27,8 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/../../../engine/lib.php');
-require_once(dirname(__FILE__) . '/../behaviour.php');
+require_once(__DIR__ . '/../../../engine/lib.php');
+require_once(__DIR__ . '/../behaviour.php');
 
 
 /**
@@ -43,6 +43,12 @@ class qbehaviour_adaptive_mark_display_test extends basic_testcase {
 
     /** @var question_display_options display options to use when rendering. */
     protected $options;
+
+    protected function tearDown() {
+        $this->renderer = null;
+        $this->options = null;
+        parent::tearDown();
+    }
 
     protected function setUp() {
         global $PAGE;

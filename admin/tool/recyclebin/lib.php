@@ -72,7 +72,7 @@ function tool_recyclebin_extend_navigation_course($navigation, $course, $context
         navigation_node::NODETYPE_LEAF,
         'tool_recyclebin',
         'tool_recyclebin',
-        new pix_icon('trash', $pluginname, 'tool_recyclebin')
+        new pix_icon('trash', '', 'tool_recyclebin')
     );
 
     if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
@@ -130,7 +130,7 @@ function tool_recyclebin_extend_navigation_category_settings($navigation, $conte
         navigation_node::NODETYPE_LEAF,
         'tool_recyclebin',
         'tool_recyclebin',
-        new pix_icon('trash', $pluginname, 'tool_recyclebin')
+        new pix_icon('trash', '', 'tool_recyclebin')
     );
 
     if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
@@ -149,6 +149,17 @@ function tool_recyclebin_pre_course_module_delete($cm) {
     if (\tool_recyclebin\course_bin::is_enabled()) {
         $coursebin = new \tool_recyclebin\course_bin($cm->course);
         $coursebin->store_item($cm);
+    }
+}
+
+/**
+ * Hook called to check whether async course module deletion should be performed or not.
+ *
+ * @return true if background deletion is required (is the recyclebin is enabled), false otherwise.
+ */
+function tool_recyclebin_course_module_background_deletion_recommended() {
+    if (\tool_recyclebin\course_bin::is_enabled()) {
+        return true;
     }
 }
 

@@ -59,7 +59,7 @@ Feature: Verify competencies completion status is updated when the associated co
     When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
       And I press "Add a new competency scale"
       And I set the field "Name" to "Graded Scale 1-3"
-      And I set the field "Scale values" to multiline
+      And I set the field "Scale values" to multiline:
 """
 Scale 3
 Scale 2

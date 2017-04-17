@@ -27,8 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/../lib.php');
-require_once(dirname(__FILE__) . '/helpers.php');
+require_once(__DIR__ . '/../lib.php');
+require_once(__DIR__ . '/helpers.php');
 
 
 /**
@@ -566,7 +566,7 @@ class question_usage_autosave_test extends qbehaviour_walkthrough_test_base {
         $transaction->allow_commit();
 
         // Now commit the other transaction.
-        $this->setExpectedException('dml_write_exception');
+        $this->expectException('dml_write_exception');
         $this->save_quba($DB2);
         $transaction2->allow_commit();
 
@@ -690,5 +690,6 @@ class question_usage_autosave_test extends qbehaviour_walkthrough_test_base {
         // This test relies on the destructor for the second DB connection being called before running the next test.
         // Without this change - there will be unit test failures on "some" DBs (MySQL).
         gc_collect_cycles();
+        parent::tearDown();
     }
 }

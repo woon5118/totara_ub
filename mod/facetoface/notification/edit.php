@@ -186,13 +186,10 @@ if ($id) {
     $PAGE->navbar->add(get_string('add', 'moodle'));
 }
 
-$button = $OUTPUT->update_module_button($cm->id, 'facetoface');
-
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_focuscontrol('');
 $PAGE->set_cacheable(true);
-$PAGE->set_button($button);
 echo $OUTPUT->header();
 
 if ($id) {

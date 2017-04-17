@@ -51,7 +51,7 @@ class profile_field_menu extends profile_field_base {
         parent::__construct($fieldid, $userid);
 
         // TOTARA - add static cache to improve performance for dropdowns with lot of items.
-        if (!isset($this::$optionscache[$fieldid])) {
+        if (!isset(self::$optionscache[$fieldid]) or PHPUNIT_TEST) {
 
             // Param 1 for menu type is the options.
             if (isset($this->field->param1)) {
@@ -59,12 +59,12 @@ class profile_field_menu extends profile_field_base {
             } else {
                 $options = array();
             }
-            $this::$optionscache[$fieldid] = array();
+            self::$optionscache[$fieldid] = array();
 
             // TOTARA - changed to always use choosedots as it never makes sense to blindly save the first value.
-            $this::$optionscache[$fieldid][''] = get_string('choosedots');
+            self::$optionscache[$fieldid][''] = get_string('choosedots');
             foreach ($options as $key => $option) {
-                $this::$optionscache[$fieldid][$key] = format_string($option); // Multilang formatting.
+                self::$optionscache[$fieldid][$key] = format_string($option); // Multilang formatting.
             }
         }
 
@@ -75,13 +75,13 @@ class profile_field_menu extends profile_field_base {
         if ($this->data !== null) {
             // Returns false if no match found, so we can't just
             // cast to an integer.
-            $match = array_search($this->data, $this::$optionscache[$fieldid]);
+            $match = array_search($this->data, self::$optionscache[$fieldid]);
             if ($match !== false) {
                 $this->datakey = (int)$match;
             }
         }
 
-        $this->options = $this::$optionscache[$fieldid];
+        $this->options = self::$optionscache[$fieldid];
     }
 
     /**

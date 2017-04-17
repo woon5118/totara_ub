@@ -37,15 +37,6 @@ function xmldb_totara_core_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
-    if ($oldversion < 2016112201) {
-        // Kiwifruit responsive was removed in Totara 10,
-        // do a full plugin uninstall if not present.
-        if (!file_exists("{$CFG->dirroot}/theme/kiwifruitresponsive/config.php")) {
-            uninstall_plugin('theme' , 'kiwifruitresponsive');
-        }
-        upgrade_plugin_savepoint(true, 2016112201, 'totara', 'core');
-    }
-
     if ($oldversion < 2017030800) {
         require_once($CFG->dirroot . '/totara/program/db/upgradelib.php');
         require_once($CFG->dirroot . '/totara/certification/db/upgradelib.php');
@@ -69,9 +60,19 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017030800, 'totara', 'core');
     }
 
-    if ($oldversion < 2017031300) {
-        totara_core_upgrade_delete_moodle_plugins_31();
-        upgrade_plugin_savepoint(true, 2017031300, 'totara', 'core');
+    if ($oldversion < 2017040803) {
+        totara_core_upgrade_delete_moodle_plugins();
+        upgrade_plugin_savepoint(true, 2017040803, 'totara', 'core');
+    }
+
+    if ($oldversion < 2017040900) {
+        // Remove private token column because all tokens were always supposed to be private.
+        $table = new xmldb_table('external_tokens');
+        $field = new xmldb_field('privatetoken', XMLDB_TYPE_CHAR, '64', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2017040900, 'totara', 'core');
     }
 
     return true;

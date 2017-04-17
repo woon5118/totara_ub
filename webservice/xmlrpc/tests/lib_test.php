@@ -38,6 +38,11 @@ require_once($CFG->dirroot . '/webservice/xmlrpc/lib.php');
  */
 class webservice_xmlrpc_test extends advanced_testcase {
 
+    protected function tearDown() {
+        $this->mockresponse = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup.
      */
@@ -85,7 +90,7 @@ class webservice_xmlrpc_test extends advanced_testcase {
         $client = new webservice_xmlrpc_client_mock('/webservice/xmlrpc/server.php', 'anytoken');
         $mockresponse = file_get_contents($CFG->dirroot . '/webservice/xmlrpc/tests/fixtures/fault_response.xml');
         $client->set_mock_response($mockresponse);
-        $this->setExpectedException('moodle_exception');
+        $this->expectException('moodle_exception');
         $client->call('testfunction');
     }
 }

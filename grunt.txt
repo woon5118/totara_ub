@@ -51,3 +51,13 @@ Totara employees should use the following procedure:
 13. verify there are no changed files
 14. submit patch for review
 15. remind developers in changelog they need to 'npm install' when switching branches or updating
+
+
+Steps for homebrew on OSX
+=========================
+
+1. brew uninstall all node versions
+2. use 'brew edit node@4' to remove the --without-npm from the make step
+3. use 'brew install node@4 --without-npm'
+4. add node bin directory to your path
+5. check the npm version is v2.15

@@ -14,6 +14,7 @@ Feature: Add badges to the system
     And I set the field "Default badge issuer name" to "Test Badge Site"
     And I set the field "Default badge issuer contact details" to "testuser@example.com"
     And I press "Save changes"
+    And I follow "Badges"
     When I follow "Add a new badge"
     Then the field "issuercontact" matches value "testuser@example.com"
     And the field "issuername" matches value "Test Badge Site"

@@ -32,6 +32,8 @@
  */
 define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_strings) {
 
+    /* global increment_filename build_querystring */
+
     M.totara_form = M.totara_form || {};
     M.totara_form.element_filemanager = M.totara_form.element_filemanager || {};
     M.totara_form.element_filemanager.templates = M.totara_form.element_filemanager.templates || {};
@@ -259,7 +261,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 return this.filemanager.ancestor('.fitem.disabled') !== null;
             },
             is_frozen: function() {
-                return this.options.frozen || this.filemanager.ancestor('[data-element-frozen="1"]') !== null
+                return this.options.frozen || this.filemanager.ancestor('[data-element-frozen="1"]') !== null;
             },
             setup_buttons: function() {
                 var button_download = this.filemanager.one('.fp-btn-download');
@@ -836,7 +838,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         this.setAttribute('readonly', 'readonly');
                     });
                     selectnode.all('form select').each(function(){
-                        this.setAttribute('disabled', 'disabled')
+                        this.setAttribute('disabled', 'disabled');
                     });
                 } else {
                     btn_update.on('click', function(e) {

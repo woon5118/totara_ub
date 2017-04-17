@@ -44,6 +44,11 @@ class mod_assign_search_testcase extends advanced_testcase {
      */
     protected $assignareaid = null;
 
+    protected function tearDown() {
+        $this->assignareaid = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);

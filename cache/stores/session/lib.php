@@ -76,7 +76,7 @@ abstract class session_data_store extends cache_store {
      */
     protected static function flush_store() {
         $ids = array_keys(self::$sessionstore);
-        unset(self::$sessionstore);
+        // Totara: do not unset declared object properties!
         self::$sessionstore = array();
         foreach ($ids as $id) {
             self::$sessionstore[$id] = array();
@@ -516,6 +516,14 @@ class cachestore_session extends session_data_store implements cache_is_key_awar
         return $cache;
     }
 
+    /**
+     * Generates the appropriate configuration required for unit testing.
+     *
+     * @return array Array of unit test configuration data to be used by initialise().
+     */
+    public static function unit_test_configuration() {
+        return array();
+    }
     /**
      * Returns the name of this instance.
      * @return string

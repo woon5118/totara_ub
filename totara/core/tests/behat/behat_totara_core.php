@@ -45,7 +45,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I should see the "([^"]*)" tab is disabled$/
      */
     public function i_should_see_the_tab_is_disabled($text) {
-        $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
+        $text = behat_context_helper::escape($text);
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' tabtree ')]//a[contains(concat(' ', normalize-space(@class), ' '), ' nolink ') and not(@href)]/*[contains(text(), {$text})]";
         // Bootstrap 3 has different markup.
         $xpath .= "| //*[contains(concat(' ', normalize-space(@class), ' '), ' tabtree ')]//li[contains(concat(' ', normalize-space(@class), ' '), ' disabled ')]/a[not(@href) and contains(text(), {$text})]";
@@ -89,7 +89,7 @@ class behat_totara_core extends behat_base {
      * @throws \Behat\Mink\Exception\ExpectationException
      */
     protected function find_totara_menu_item($text) {
-        $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
+        $text = behat_context_helper::escape($text);
         $xpath = "//*[@id = 'totaramenu']//a[contains(normalize-space(.),{$text})]";
         $node = $this->find(
             'xpath',
@@ -197,7 +197,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I edit "([^"]*)" totara menu item$/
      */
     public function i_edit_totara_menu_item($text) {
-        $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
+        $text = behat_context_helper::escape($text);
         $xpath = "//table[@id='totaramenutable']//td[contains(concat(' ', normalize-space(@class), ' '), ' name ')]/*[contains(text(),{$text})]//ancestor::tr//a[@title='Edit']";
         $node = $this->find(
             'xpath',
@@ -237,7 +237,7 @@ class behat_totara_core extends behat_base {
      */
     public function i_should_see_program_progress($text) {
 
-        $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
+        $text = behat_context_helper::escape($text);
         $xpath = "//div[@id = 'progressbar']//img[contains(@alt,{$text})]";
         $node = $this->find(
             'xpath',
@@ -350,7 +350,7 @@ class behat_totara_core extends behat_base {
         // if the container node does not exist.
         $containernode = $this->get_selected_node($containerselectortype, $containerelement);
 
-        $xpathliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($titleoralt);
+        $xpathliteral = behat_context_helper::escape($titleoralt);
         $locator = "//img[@alt={$xpathliteral} or @title={$xpathliteral}]";
 
         // Will throw an ElementNotFoundException if it does not exist, but, actually
@@ -377,7 +377,7 @@ class behat_totara_core extends behat_base {
         // if the container node does not exist.
         $containernode = $this->get_selected_node($containerselectortype, $containerelement);
 
-        $xpathliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($titleoralt);
+        $xpathliteral = behat_context_helper::escape($titleoralt);
         $locator = "//img[@alt={$xpathliteral} or @title={$xpathliteral}]";
 
         // Will throw an ElementNotFoundException if it does not exist, but, actually
@@ -430,7 +430,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I should see "([^"]*)" in the page title$/
      */
     public function i_should_see_in_the_page_title($text) {
-        $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
+        $text = behat_context_helper::escape($text);
         $xpath = "//title[contains(text(), {$text})]";
         $this->find(
             'xpath',

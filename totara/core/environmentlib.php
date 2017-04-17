@@ -40,23 +40,7 @@ function totara_core_mysql_environment_check(environment_results $result) {
             $result->setStatus(false);
             return $result;
         }
-
-        $fileformat = $DB->get_record_sql("SHOW VARIABLES LIKE 'innodb_file_format'");
-        if (!$fileformat or $fileformat->value !== 'Barracuda') {
-            $result->setRestrictStr(array('mysqlneedsbarracuda', 'totara_core', $engine));
-            $result->setStatus(false);
-            return $result;
-        }
-
-        $filepertable = $DB->get_record_sql("SHOW VARIABLES LIKE 'innodb_file_per_table'");
-        if (!$filepertable or $filepertable->value !== 'ON') {
-            $result->setRestrictStr(array('mysqlneedsfilepertable', 'totara_core', $engine));
-            $result->setStatus(false);
-            return $result;
-        }
-
-        $result->setStatus(true);
-        return $result;
+        // Do not show this entry unless we have a problem.
     }
 
     // Do not show anything for other databases.

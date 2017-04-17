@@ -30,8 +30,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/../lib.php');
-require_once(dirname(__FILE__) . '/helpers.php');
+require_once(__DIR__ . '/../lib.php');
+require_once(__DIR__ . '/helpers.php');
 
 
 /**
@@ -55,10 +55,14 @@ class question_attempt_with_steps_test extends advanced_testcase {
 
     protected function tearDown() {
         $this->qa = null;
+        $this->question = null;
+        parent::tearDown();
     }
 
+    /**
+     * @expectedException moodle_exception
+     */
     public function test_get_step_before_start() {
-        $this->setExpectedException('moodle_exception');
         $step = $this->qa->get_step(-1);
     }
 
@@ -72,8 +76,10 @@ class question_attempt_with_steps_test extends advanced_testcase {
         $this->assertEquals(2, $step->get_qt_var('i'));
     }
 
+    /**
+     * @expectedException moodle_exception
+     */
     public function test_get_step_past_end() {
-        $this->setExpectedException('moodle_exception');
         $step = $this->qa->get_step(3);
     }
 
@@ -151,7 +157,7 @@ class question_attempt_with_steps_test extends advanced_testcase {
 
     public function test_cannot_get_min_fraction_before_start() {
         $qa = new question_attempt($this->question, 0);
-        $this->setExpectedException('moodle_exception');
+        $this->expectException('moodle_exception');
         $qa->get_min_fraction();
     }
 
@@ -162,7 +168,7 @@ class question_attempt_with_steps_test extends advanced_testcase {
 
     public function test_cannot_get_max_fraction_before_start() {
         $qa = new question_attempt($this->question, 0);
-        $this->setExpectedException('moodle_exception');
+        $this->expectException('moodle_exception');
         $qa->get_max_fraction();
     }
 

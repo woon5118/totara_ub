@@ -1,14 +1,16 @@
 #id_availablechoices .question-rating-scale-header {
-  display: inline-block;
-  width: 180px;
+    display: inline-block;
+    width: 180px;
 }
 
 table.generaltable.question-review-table .r0 {
     background-color: #e6e6e6;
 }
+
 .generaltable.question-review-table td.cell {
     background-color: transparent;
 }
+
 .question-review-title {
     font-weight: bold;
     padding: 2px 2px;
@@ -67,7 +69,9 @@ table.generaltable.question-review-table .r0 {
 }
 
 .review-multifield .fitem_ftextarea {
+    /* stylelint-disable declaration-no-important */
     margin-top: -10px !important;
+    /* stylelint-enable */
 }
 
 select.aggregateselector[multiple] {

@@ -135,13 +135,16 @@ class search_solr_engine_testcase extends advanced_testcase {
         $schema->setup(false);
     }
 
-    public function tearDown() {
+    protected function tearDown() {
         // For unit tests before PHP 7, teardown is called even on skip. So only do our teardown if we did setup.
         if ($this->generator) {
             // Moodle DML freaks out if we don't teardown the temp table after each run.
             $this->generator->teardown();
             $this->generator = null;
         }
+        $this->search = null;
+        $this->engine = null;
+        parent::tearDown();
     }
 
     /**

@@ -26,6 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->libdir.'/upgradelib.php');
+
 /**
  * Tests various classes and functions in upgradelib.php library.
  */
@@ -43,12 +46,218 @@ class core_upgradelib_testcase extends advanced_testcase {
         $this->assertFalse(upgrade_stale_php_files_present());
     }
 
+    /**
+     * Populate some fake grade items into the database with specified
+     * sortorder and course id.
+     *
+     * NOTE: This function doesn't make much attempt to respect the
+     * gradebook internals, its simply used to fake some data for
+     * testing the upgradelib function. Please don't use it for other
+     * purposes.
+     *
+     * @param int $courseid id of course
+     * @param int $sortorder numeric sorting order of item
+     * @return stdClass grade item object from the database.
+     */
+    private function insert_fake_grade_item_sortorder($courseid, $sortorder) {
+        global $DB, $CFG;
+        require_once($CFG->libdir.'/gradelib.php');
+
+        $item = new stdClass();
+        $item->courseid = $courseid;
+        $item->sortorder = $sortorder;
+        $item->gradetype = GRADE_TYPE_VALUE;
+        $item->grademin = 30;
+        $item->grademax = 110;
+        $item->itemnumber = 1;
+        $item->iteminfo = '';
+        $item->timecreated = time();
+        $item->timemodified = time();
+
+        $item->id = $DB->insert_record('grade_items', $item);
+
+        return $DB->get_record('grade_items', array('id' => $item->id));
+    }
+
+    public function test_upgrade_fix_missing_root_folders_draft() {
+        global $DB, $SITE;
+
+        $this->resetAfterTest(true);
+
+        $user = $this->getDataGenerator()->create_user();
+        $usercontext = context_user::instance($user->id);
+        $this->setUser($user);
+        $resource1 = $this->getDataGenerator()->get_plugin_generator('mod_resource')
+            ->create_instance(array('course' => $SITE->id));
+        $context = context_module::instance($resource1->cmid);
+        $draftitemid = 0;
+        file_prepare_draft_area($draftitemid, $context->id, 'mod_resource', 'content', 0);
+
+        $queryparams = array(
+            'component' => 'user',
+            'contextid' => $usercontext->id,
+            'filearea' => 'draft',
+            'itemid' => $draftitemid,
+        );
+
+        // Make sure there are two records in files for the draft file area and one of them has filename '.'.
+        $records = $DB->get_records_menu('files', $queryparams, '', 'id, filename');
+        $this->assertEquals(2, count($records));
+        $this->assertTrue(in_array('.', $records));
+        $originalhash = $DB->get_field('files', 'pathnamehash', $queryparams + array('filename' => '.'));
+
+        // Delete record with filename '.' and make sure it does not exist any more.
+        $DB->delete_records('files', $queryparams + array('filename' => '.'));
+
+        $records = $DB->get_records_menu('files', $queryparams, '', 'id, filename');
+        $this->assertEquals(1, count($records));
+        $this->assertFalse(in_array('.', $records));
+
+        // Run upgrade script and make sure the record is restored.
+        upgrade_fix_missing_root_folders_draft();
+
+        $records = $DB->get_records_menu('files', $queryparams, '', 'id, filename');
+        $this->assertEquals(2, count($records));
+        $this->assertTrue(in_array('.', $records));
+        $newhash = $DB->get_field('files', 'pathnamehash', $queryparams + array('filename' => '.'));
+        $this->assertEquals($originalhash, $newhash);
+    }
+
+    /**
+     * Test upgrade minmaxgrade step.
+     */
+    public function test_upgrade_minmaxgrade() {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/gradelib.php');
+        $initialminmax = $CFG->grade_minmaxtouse;
+        $this->resetAfterTest();
+
+        $c1 = $this->getDataGenerator()->create_course();
+        $c2 = $this->getDataGenerator()->create_course();
+        $c3 = $this->getDataGenerator()->create_course();
+        $u1 = $this->getDataGenerator()->create_user();
+        $a1 = $this->getDataGenerator()->create_module('assign', array('course' => $c1, 'grade' => 100));
+        $a2 = $this->getDataGenerator()->create_module('assign', array('course' => $c2, 'grade' => 100));
+        $a3 = $this->getDataGenerator()->create_module('assign', array('course' => $c3, 'grade' => 100));
+
+        $cm1 = get_coursemodule_from_instance('assign', $a1->id);
+        $ctx1 = context_module::instance($cm1->id);
+        $assign1 = new assign($ctx1, $cm1, $c1);
+
+        $cm2 = get_coursemodule_from_instance('assign', $a2->id);
+        $ctx2 = context_module::instance($cm2->id);
+        $assign2 = new assign($ctx2, $cm2, $c2);
+
+        $cm3 = get_coursemodule_from_instance('assign', $a3->id);
+        $ctx3 = context_module::instance($cm3->id);
+        $assign3 = new assign($ctx3, $cm3, $c3);
+
+        // Give a grade to the student.
+        $ug = $assign1->get_user_grade($u1->id, true);
+        $ug->grade = 10;
+        $assign1->update_grade($ug);
+
+        $ug = $assign2->get_user_grade($u1->id, true);
+        $ug->grade = 20;
+        $assign2->update_grade($ug);
+
+        $ug = $assign3->get_user_grade($u1->id, true);
+        $ug->grade = 30;
+        $assign3->update_grade($ug);
+
+
+        // Run the upgrade.
+        upgrade_minmaxgrade();
+
+        // Nothing has happened.
+        $this->assertFalse($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c1->id)));
+        $this->assertSame(false, grade_get_setting($c1->id, 'minmaxtouse', false, true));
+        $this->assertFalse($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c1->id)));
+        $this->assertFalse($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c2->id)));
+        $this->assertSame(false, grade_get_setting($c2->id, 'minmaxtouse', false, true));
+        $this->assertFalse($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c2->id)));
+        $this->assertFalse($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c3->id)));
+        $this->assertSame(false, grade_get_setting($c3->id, 'minmaxtouse', false, true));
+        $this->assertFalse($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c3->id)));
+
+        // Create inconsistency in c1 and c2.
+        $giparams = array('itemtype' => 'mod', 'itemmodule' => 'assign', 'iteminstance' => $a1->id,
+                'courseid' => $c1->id, 'itemnumber' => 0);
+        $gi = grade_item::fetch($giparams);
+        $gi->grademin = 5;
+        $gi->update();
+
+        $giparams = array('itemtype' => 'mod', 'itemmodule' => 'assign', 'iteminstance' => $a2->id,
+                'courseid' => $c2->id, 'itemnumber' => 0);
+        $gi = grade_item::fetch($giparams);
+        $gi->grademax = 50;
+        $gi->update();
+
+
+        // C1 and C2 should be updated, but the course setting should not be set.
+        $CFG->grade_minmaxtouse = GRADE_MIN_MAX_FROM_GRADE_GRADE;
+
+        // Run the upgrade.
+        upgrade_minmaxgrade();
+
+        // C1 and C2 were partially updated.
+        $this->assertTrue($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c1->id)));
+        $this->assertSame(false, grade_get_setting($c1->id, 'minmaxtouse', false, true));
+        $this->assertTrue($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c1->id)));
+        $this->assertTrue($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c2->id)));
+        $this->assertSame(false, grade_get_setting($c2->id, 'minmaxtouse', false, true));
+        $this->assertTrue($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c2->id)));
+
+        // Nothing has happened for C3.
+        $this->assertFalse($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c3->id)));
+        $this->assertSame(false, grade_get_setting($c3->id, 'minmaxtouse', false, true));
+        $this->assertFalse($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c3->id)));
+
+
+        // Course setting should not be set on a course that has the setting already.
+        $CFG->grade_minmaxtouse = GRADE_MIN_MAX_FROM_GRADE_ITEM;
+        grade_set_setting($c1->id, 'minmaxtouse', -1); // Sets different value than constant to check that it remained the same.
+
+        // Run the upgrade.
+        upgrade_minmaxgrade();
+
+        // C2 was updated.
+        $this->assertSame((string) GRADE_MIN_MAX_FROM_GRADE_GRADE, grade_get_setting($c2->id, 'minmaxtouse', false, true));
+
+        // Nothing has happened for C1.
+        $this->assertSame('-1', grade_get_setting($c1->id, 'minmaxtouse', false, true));
+
+        // Nothing has happened for C3.
+        $this->assertFalse($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c3->id)));
+        $this->assertSame(false, grade_get_setting($c3->id, 'minmaxtouse', false, true));
+        $this->assertFalse($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c3->id)));
+
+
+        // Final check, this time we'll unset the default config.
+        unset($CFG->grade_minmaxtouse);
+        grade_set_setting($c1->id, 'minmaxtouse', null);
+
+        // Run the upgrade.
+        upgrade_minmaxgrade();
+
+        // C1 was updated.
+        $this->assertSame((string) GRADE_MIN_MAX_FROM_GRADE_GRADE, grade_get_setting($c1->id, 'minmaxtouse', false, true));
+
+        // Nothing has happened for C3.
+        $this->assertFalse($DB->record_exists('config', array('name' => 'show_min_max_grades_changed_' . $c3->id)));
+        $this->assertSame(false, grade_get_setting($c3->id, 'minmaxtouse', false, true));
+        $this->assertFalse($DB->record_exists('grade_items', array('needsupdate' => 1, 'courseid' => $c3->id)));
+
+        // Restore value.
+        $CFG->grade_minmaxtouse = $initialminmax;
+    }
+
     public function test_upgrade_extra_credit_weightoverride() {
         global $DB, $CFG;
 
         $this->resetAfterTest(true);
 
-        require_once($CFG->libdir.'/db/upgradelib.php');
+        require_once($CFG->libdir . '/db/upgradelib.php');
 
         $c = array();
         $a = array();
@@ -113,9 +322,10 @@ class core_upgradelib_testcase extends advanced_testcase {
      */
     public function test_upgrade_calculated_grade_items_freeze() {
         global $DB, $CFG;
+
         $this->resetAfterTest();
 
-        require_once($CFG->libdir.'/db/upgradelib.php');
+        require_once($CFG->libdir . '/db/upgradelib.php');
 
         // Create a user.
         $user = $this->getDataGenerator()->create_user();
@@ -243,9 +453,10 @@ class core_upgradelib_testcase extends advanced_testcase {
 
     function test_upgrade_calculated_grade_items_regrade() {
         global $DB, $CFG;
+
         $this->resetAfterTest();
 
-        require_once($CFG->libdir.'/db/upgradelib.php');
+        require_once($CFG->libdir . '/db/upgradelib.php');
 
         // Create a user.
         $user = $this->getDataGenerator()->create_user();
@@ -306,6 +517,25 @@ class core_upgradelib_testcase extends advanced_testcase {
 
         $this->assertEquals($gradecategoryitem->grademax, $grade->rawgrademax);
         $this->assertEquals($gradecategoryitem->grademin, $grade->rawgrademin);
+    }
+
+    /**
+     * Test libcurl custom check api.
+     */
+    public function test_check_libcurl_version() {
+        global $CFG;
+        require_once("$CFG->dirroot/lib/environmentlib.php");
+
+        $supportedversion = 0x071304;
+        $curlinfo = curl_version();
+        $currentversion = $curlinfo['version_number'];
+
+        $result = new environment_results("custom_checks");
+        if ($currentversion < $supportedversion) {
+            $this->assertFalse(check_libcurl_version($result)->getStatus());
+        } else {
+            $this->assertNull(check_libcurl_version($result));
+        }
     }
 
     /**
@@ -596,25 +826,6 @@ class core_upgradelib_testcase extends advanced_testcase {
         foreach ($newlettersscale as $record) {
             // There is no API to do this, so we have to manually insert into the database.
             $DB->insert_record('grade_letters', $record);
-        }
-    }
-
-    /**
-     * Test libcurl custom check api.
-     */
-    public function test_check_libcurl_version() {
-        global $CFG;
-        require_once("$CFG->dirroot/lib/environmentlib.php");
-
-        $supportedversion = 0x071304;
-        $curlinfo = curl_version();
-        $currentversion = $curlinfo['version_number'];
-
-        $result = new environment_results("custom_checks");
-        if ($currentversion < $supportedversion) {
-            $this->assertFalse(check_libcurl_version($result)->getStatus());
-        } else {
-            $this->assertNull(check_libcurl_version($result));
         }
     }
 }

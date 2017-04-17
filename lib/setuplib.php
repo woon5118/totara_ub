@@ -461,7 +461,7 @@ function is_early_init($backtrace) {
     $dangerouscode = array(
         array('function' => 'header', 'type' => '->'),
         array('class' => 'bootstrap_renderer'),
-        array('file' => dirname(__FILE__).'/setup.php'),
+        array('file' => __DIR__.'/setup.php'),
     );
     foreach ($backtrace as $stackframe) {
         foreach ($dangerouscode as $pattern) {
@@ -739,7 +739,7 @@ function get_docs_url($path = null) {
  */
 function format_backtrace($callers, $plaintext = false) {
     // do not use $CFG->dirroot because it might not be available in destructors
-    $dirroot = dirname(dirname(__FILE__));
+    $dirroot = dirname(__DIR__);
 
     if (empty($callers)) {
         return '';
@@ -1403,6 +1403,10 @@ function disable_output_buffering() {
     ini_set('output_handler', '');
 
     error_reporting($olddebug);
+
+    // Disable buffering in nginx.
+    header('X-Accel-Buffering: no');
+
 }
 
 /**
@@ -1413,7 +1417,7 @@ function disable_output_buffering() {
  */
 function redirect_if_major_upgrade_required() {
     global $CFG;
-    $lastmajordbchanges = 2015111606.00; // Anything before Totara 9.0rc1
+    $lastmajordbchanges = 2016112200.03;
     if (empty($CFG->version) or (float)$CFG->version < $lastmajordbchanges or
             during_initial_install() or !empty($CFG->adminsetuppending) or !isset($CFG->totara_version)) {
         try {
@@ -1879,6 +1883,14 @@ class renderer_base {
         static $templatecache = array();
         $mustache = $this->get_mustache();
 
+        try {
+            // Grab a copy of the existing helper to be restored later.
+            $uniqidhelper = $mustache->getHelper('uniqid');
+        } catch (Mustache_Exception_UnknownHelperException $e) {
+            // Helper doesn't exist.
+            $uniqidhelper = null;
+        }
+
         // Provide 1 random value that will not change within a template
         // but will be different from template to template. This is useful for
         // e.g. aria attributes that only work with id attributes and must be
@@ -1894,7 +1906,16 @@ class renderer_base {
                 throw new moodle_exception('Unknown template: ' . $templatename);
             }
         }
-        return trim($template->render($context));
+
+        $renderedtemplate = trim($template->render($context));
+
+        // If we had an existing uniqid helper then we need to restore it to allow
+        // handle nested calls of render_from_template.
+        if ($uniqidhelper) {
+            $mustache->addHelper('uniqid', $uniqidhelper);
+        }
+
+        return $renderedtemplate;
     }
 
 
@@ -1992,6 +2013,54 @@ class renderer_base {
     public function pix_url($imagename, $component = 'moodle') {
         return $this->page->theme->pix_url($imagename, $component);
     }
+
+    /**
+     * Return the site's logo URL, if any.
+     *
+     * @param int $maxwidth The maximum width, or null when the maximum width does not matter.
+     * @param int $maxheight The maximum height, or null when the maximum height does not matter.
+     * @return moodle_url|false
+     */
+    public function get_logo_url($maxwidth = null, $maxheight = 200) {
+        global $CFG;
+        $logo = get_config('core_admin', 'logo');
+        if (empty($logo)) {
+            return false;
+        }
+
+        // 200px high is the default image size which should be displayed at 100px in the page to account for retina displays.
+        // It's not worth the overhead of detecting and serving 2 different images based on the device.
+
+        // Hide the requested size in the file path.
+        $filepath = ((int) $maxwidth . 'x' . (int) $maxheight) . '/';
+
+        // Use $CFG->themerev to prevent browser caching when the file changes.
+        return moodle_url::make_pluginfile_url(context_system::instance()->id, 'core_admin', 'logo', $filepath,
+            theme_get_revision(), $logo);
+    }
+
+    /**
+     * Return the site's compact logo URL, if any.
+     *
+     * @param int $maxwidth The maximum width, or null when the maximum width does not matter.
+     * @param int $maxheight The maximum height, or null when the maximum height does not matter.
+     * @return moodle_url|false
+     */
+    public function get_compact_logo_url($maxwidth = 100, $maxheight = 100) {
+        global $CFG;
+        $logo = get_config('core_admin', 'logocompact');
+        if (empty($logo)) {
+            return false;
+        }
+
+        // Hide the requested size in the file path.
+        $filepath = ((int) $maxwidth . 'x' . (int) $maxheight) . '/';
+
+        // Use $CFG->themerev to prevent browser caching when the file changes.
+        return moodle_url::make_pluginfile_url(context_system::instance()->id, 'core_admin', 'logocompact', $filepath,
+            theme_get_revision(), $logo);
+    }
+
 }
 
 /**

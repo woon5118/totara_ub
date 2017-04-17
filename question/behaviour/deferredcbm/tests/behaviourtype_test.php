@@ -28,8 +28,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/../../../engine/lib.php');
-require_once(dirname(__FILE__) . '/../../../engine/tests/helpers.php');
+require_once(__DIR__ . '/../../../engine/lib.php');
+require_once(__DIR__ . '/../../../engine/tests/helpers.php');
 
 
 /**
@@ -42,6 +42,11 @@ class qbehaviour_deferredcbm_type_test extends qbehaviour_walkthrough_test_base 
 
     /** @var qbehaviour_deferredcbm_type */
     protected $behaviourtype;
+
+    protected function tearDown() {
+        $this->behaviourtype = null;
+        parent::tearDown();
+    }
 
     public function setUp() {
         parent::setUp();

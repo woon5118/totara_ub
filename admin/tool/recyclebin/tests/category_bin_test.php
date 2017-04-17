@@ -43,6 +43,12 @@ class tool_recyclebin_category_bin_tests extends advanced_testcase {
      */
     protected $coursebeingrestored;
 
+    protected function tearDown() {
+        $this->course = null;
+        $this->coursebeingrestored = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup for each test.
      */

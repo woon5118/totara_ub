@@ -20,7 +20,9 @@
  * @package totara_form
  */
 
-define(['jquery'], function ($) {
+/* eslint-disable */
+
+define(['jquery'], function($) {
 
     var ERROR_CONTAINER_CLASS = 'totara_form-error-container',
         ERROR_CONTAINER_SELECTOR = '.'+ERROR_CONTAINER_CLASS;

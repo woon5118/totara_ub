@@ -13,7 +13,7 @@ Feature: It is possible to bulk add a hierarchy tree structure
     #redirect
     Given I set the following fields to these values:
       | parentid | 0 |
-    And I set the field "itemnames" to multiline
+    And I set the field "itemnames" to multiline:
     """
     My new item
     My second new item
@@ -44,7 +44,7 @@ Feature: It is possible to bulk add a hierarchy tree structure
     #redirect
     Given I set the following fields to these values:
       | parentid | 0 |
-    And I set the field "itemnames" to multiline
+    And I set the field "itemnames" to multiline:
     """
     My new item
         This is an invalid depth

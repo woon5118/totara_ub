@@ -43,6 +43,11 @@ class mod_book_search_testcase extends advanced_testcase {
      */
     protected $bookchapterareaid = null;
 
+    protected function tearDown() {
+        $this->bookchapterareaid = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);
@@ -66,10 +71,10 @@ class mod_book_search_testcase extends advanced_testcase {
         // Enabled by default once global search is enabled.
         $this->assertTrue($searcharea->is_enabled());
 
-        set_config($varname . '_enabled', false, $componentname);
+        set_config($varname . '_enabled', 0, $componentname);
         $this->assertFalse($searcharea->is_enabled());
 
-        set_config($varname . '_enabled', true, $componentname);
+        set_config($varname . '_enabled', 1, $componentname);
         $this->assertTrue($searcharea->is_enabled());
     }
 

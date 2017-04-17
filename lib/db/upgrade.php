@@ -1073,7 +1073,7 @@ function xmldb_main_upgrade($oldversion) {
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2016052301.08) {
+    if ($oldversion < 2016081700.02) {
         // Default schedule values.
         $hour = 0;
         $minute = 0;
@@ -1111,10 +1111,63 @@ function xmldb_main_upgrade($oldversion) {
         unset_config('statsruntimestartminute');
         unset_config('statslastexecution');
 
-        upgrade_main_savepoint(true, 2016052301.08);
+        upgrade_main_savepoint(true, 2016081700.02);
     }
 
-    if ($oldversion < 2016052302.02) {
+    if ($oldversion < 2016082200.00) {
+        // An upgrade step to remove any duplicate stamps, within the same context, in the question_categories table, and to
+        // add a unique index to (contextid, stamp) to avoid future stamp duplication. See MDL-54864.
+
+        // Extend the execution time limit of the script to 2 hours.
+        upgrade_set_timeout(7200);
+
+        // This SQL fetches the id of those records which have duplicate stamps within the same context.
+        // This doesn't return the original record within the context, from which the duplicate stamps were likely created.
+        $fromclause = "FROM (
+                        SELECT min(id) AS minid, contextid, stamp
+                            FROM {question_categories}
+                            GROUP BY contextid, stamp
+                        ) minid
+                        JOIN {question_categories} qc
+                            ON qc.contextid = minid.contextid AND qc.stamp = minid.stamp AND qc.id > minid.minid";
+
+        // Get the total record count - used for the progress bar.
+        $countduplicatessql = "SELECT count(qc.id) $fromclause";
+        $total = $DB->count_records_sql($countduplicatessql);
+
+        // Get the records themselves.
+        $getduplicatessql = "SELECT qc.id $fromclause ORDER BY minid";
+        $rs = $DB->get_recordset_sql($getduplicatessql);
+
+        // For each duplicate, update the stamp to a new random value.
+        $i = 0;
+        $pbar = new progress_bar('updatequestioncategorystamp', 500, true);
+        foreach ($rs as $record) {
+            // Generate a new, unique stamp and update the record.
+            do {
+                $newstamp = make_unique_id_code();
+            } while (isset($usedstamps[$newstamp]));
+            $usedstamps[$newstamp] = 1;
+            $DB->set_field('question_categories', 'stamp', $newstamp, array('id' => $record->id));
+
+            // Update progress.
+            $i++;
+            $pbar->update($i, $total, "Updating duplicate question category stamp - $i/$total.");
+        }
+        unset($usedstamps);
+
+        // The uniqueness of each (contextid, stamp) pair is now guaranteed, so add the unique index to stop future duplicates.
+        $table = new xmldb_table('question_categories');
+        $index = new xmldb_index('contextidstamp', XMLDB_INDEX_UNIQUE, array('contextid', 'stamp'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Savepoint reached.
+        upgrade_main_savepoint(true, 2016082200.00);
+    }
+
+    if ($oldversion < 2016091900.02) {
 
         // Define index attemptstepid-name (unique) to be dropped from question_attempt_step_data.
         $table = new xmldb_table('question_attempt_step_data');
@@ -1126,18 +1179,257 @@ function xmldb_main_upgrade($oldversion) {
         }
 
         // Main savepoint reached.
-        upgrade_main_savepoint(true, 2016052302.02);
+        upgrade_main_savepoint(true, 2016091900.02);
     }
 
-    // Totara: we must uninstall plugins at the very end because uninstall is using core APIs that depend on db structure!
-    if ($oldversion < 2016052304.00) {
+    if ($oldversion < 2016100300.00) {
+        unset_config('enablecssoptimiser');
 
-        // Force uninstall of deleted tool.
-        if (!file_exists("$CFG->dirroot/webservice/amf")) {
-            // Totara: Uninstall plugin properly.
-            uninstall_plugin('webservice', 'amf');
+        upgrade_main_savepoint(true, 2016100300.00);
+    }
+
+    if ($oldversion < 2016100501.00) {
+
+        // Define field enddate to be added to course.
+        $table = new xmldb_table('course');
+        $field = new xmldb_field('enddate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'startdate');
+
+        // Conditionally launch add field enddate.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
-        upgrade_main_savepoint(true, 2016052304.00);
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016100501.00);
+    }
+
+    if ($oldversion < 2016101100.00) {
+        // Define field component to be added to message.
+        $table = new xmldb_table('message');
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'timeusertodeleted');
+
+        // Conditionally launch add field component.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field eventtype to be added to message.
+        $field = new xmldb_field('eventtype', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'component');
+
+        // Conditionally launch add field eventtype.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016101100.00);
+    }
+
+
+    if ($oldversion < 2016101101.00) {
+        // Define field component to be added to message_read.
+        $table = new xmldb_table('message_read');
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'timeusertodeleted');
+
+        // Conditionally launch add field component.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field eventtype to be added to message_read.
+        $field = new xmldb_field('eventtype', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'component');
+
+        // Conditionally launch add field eventtype.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016101101.00);
+    }
+
+    // Totara: no private tokens.
+
+    if ($oldversion < 2016110300.00) {
+        // Remove unused admin email setting.
+        unset_config('emailonlyfromreplyaddress');
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016110300.00);
+    }
+
+    if ($oldversion < 2016110500.00) {
+
+        $oldplayers = [
+            'vimeo' => null,
+            'mp3' => ['.mp3'],
+            'html5video' => ['.mov', '.mp4', '.m4v', '.mpeg', '.mpe', '.mpg', '.ogv', '.webm'],
+            'flv' => ['.flv', '.f4v'],
+            'html5audio' => ['.aac', '.flac', '.mp3', '.m4a', '.oga', '.ogg', '.wav'],
+            'youtube' => null,
+            'swf' => null,
+        ];
+
+        // Convert hardcoded media players to the settings of the new media player plugin type.
+        if (get_config('core', 'media_plugins_sortorder') === false) {
+            $enabledplugins = [];
+            $videoextensions = [];
+            $audioextensions = [];
+            foreach ($oldplayers as $oldplayer => $extensions) {
+                $settingname = 'core_media_enable_'.$oldplayer;
+                if (!empty($CFG->$settingname)) {
+                    if ($extensions) {
+                        // VideoJS will be used for all media files players that were used previously.
+                        $enabledplugins['videojs'] = 'videojs';
+                        if ($oldplayer === 'mp3' || $oldplayer === 'html5audio') {
+                            $audioextensions += array_combine($extensions, $extensions);
+                        } else {
+                            $videoextensions += array_combine($extensions, $extensions);
+                        }
+                    } else {
+                        // Enable youtube, vimeo and swf.
+                        $enabledplugins[$oldplayer] = $oldplayer;
+                    }
+                }
+            }
+
+            set_config('media_plugins_sortorder', join(',', $enabledplugins));
+
+            // Configure VideoJS to match the existing players set up.
+            if ($enabledplugins['videojs']) {
+                $enabledplugins[] = 'videojs';
+                set_config('audioextensions', join(',', $audioextensions), 'media_videojs');
+                set_config('videoextensions', join(',', $videoextensions), 'media_videojs');
+                $useflash = !empty($CFG->core_media_enable_flv) || !empty($CFG->core_media_enable_mp3);
+                set_config('useflash', $useflash, 'media_videojs');
+                if (empty($CFG->core_media_enable_youtube)) {
+                    // Normally YouTube is enabled in videojs, but if youtube converter was disabled before upgrade
+                    // disable it in videojs as well.
+                    set_config('youtube', false, 'media_videojs');
+                }
+            }
+        }
+
+        // Unset old settings.
+        foreach ($oldplayers as $oldplayer => $extensions) {
+            unset_config('core_media_enable_' . $oldplayer);
+        }
+
+        // Preset defaults if CORE_MEDIA_VIDEO_WIDTH and CORE_MEDIA_VIDEO_HEIGHT are specified in config.php .
+        // After this upgrade step these constants will not be used any more.
+        if (defined('CORE_MEDIA_VIDEO_WIDTH')) {
+            set_config('media_default_width', CORE_MEDIA_VIDEO_WIDTH);
+        }
+        if (defined('CORE_MEDIA_VIDEO_HEIGHT')) {
+            set_config('media_default_height', CORE_MEDIA_VIDEO_HEIGHT);
+        }
+
+        // Savepoint reached.
+        upgrade_main_savepoint(true, 2016110500.00);
+    }
+
+    if ($oldversion < 2016110600.00) {
+        // Define a field 'deletioninprogress' in the 'course_modules' table, to background deletion tasks.
+        $table = new xmldb_table('course_modules');
+        $field = new xmldb_field('deletioninprogress', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'availability');
+
+        // Conditionally launch add field 'deletioninprogress'.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016110600.00);
+    }
+
+    if ($oldversion < 2016112200.01) {
+
+        // Define field requiredbytheme to be added to block_instances.
+        $table = new xmldb_table('block_instances');
+        $field = new xmldb_field('requiredbytheme', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'showinsubcontexts');
+
+        // Conditionally launch add field requiredbytheme.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016112200.01);
+    }
+    if ($oldversion < 2016112200.02) {
+
+        // Change the existing site level admin and settings blocks to be requiredbytheme which means they won't show in boost.
+        $context = context_system::instance();
+        $params = array('blockname' => 'settings', 'parentcontextid' => $context->id);
+        $DB->set_field('block_instances', 'requiredbytheme', 1, $params);
+
+        $params = array('blockname' => 'navigation', 'parentcontextid' => $context->id);
+        $DB->set_field('block_instances', 'requiredbytheme', 1, $params);
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016112200.02);
+    }
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2016120501.05) {
+
+        // Define index useridfrom_timeuserfromdeleted_notification (not unique) to be added to message.
+        $table = new xmldb_table('message');
+        $index = new xmldb_index('useridfrom_timeuserfromdeleted_notification', XMLDB_INDEX_NOTUNIQUE, array('useridfrom', 'timeuserfromdeleted', 'notification'));
+
+        // Conditionally launch add index useridfrom_timeuserfromdeleted_notification.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index useridto_timeusertodeleted_notification (not unique) to be added to message.
+        $index = new xmldb_index('useridto_timeusertodeleted_notification', XMLDB_INDEX_NOTUNIQUE, array('useridto', 'timeusertodeleted', 'notification'));
+
+        // Conditionally launch add index useridto_timeusertodeleted_notification.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('useridto', XMLDB_INDEX_NOTUNIQUE, array('useridto'));
+
+        // Conditionally launch drop index useridto.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016120501.05);
+    }
+
+    if ($oldversion < 2016120501.06) {
+
+        // Define index useridfrom_timeuserfromdeleted_notification (not unique) to be added to message_read.
+        $table = new xmldb_table('message_read');
+        $index = new xmldb_index('useridfrom_timeuserfromdeleted_notification', XMLDB_INDEX_NOTUNIQUE, array('useridfrom', 'timeuserfromdeleted', 'notification'));
+
+        // Conditionally launch add index useridfrom_timeuserfromdeleted_notification.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index useridto_timeusertodeleted_notification (not unique) to be added to message_read.
+        $index = new xmldb_index('useridto_timeusertodeleted_notification', XMLDB_INDEX_NOTUNIQUE, array('useridto', 'timeusertodeleted', 'notification'));
+
+        // Conditionally launch add index useridto_timeusertodeleted_notification.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('useridto', XMLDB_INDEX_NOTUNIQUE, array('useridto'));
+
+        // Conditionally launch drop index useridto.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016120501.06);
     }
 
     return true;

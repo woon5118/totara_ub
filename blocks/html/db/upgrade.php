@@ -29,14 +29,19 @@ defined('MOODLE_INTERNAL') || die();
  * Upgrade code for the HTML block.
  *
  * @param int $oldversion
- * @param object $block
  */
-function xmldb_block_html_upgrade($oldversion, $block) {
+function xmldb_block_html_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
+
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

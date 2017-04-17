@@ -88,12 +88,12 @@ Feature: Enable/disable password field based on authentication selected.
     And I set the following fields to these values:
         | Short name                 | menushort    |
         | Name                       | menu profile |
-    And I set the field "Menu options (one per line)" to multiline
-          """
-          AAA
-          BBB
-          CCC
-          """
+    And I set the field "Menu options (one per line)" to multiline:
+"""
+AAA
+BBB
+CCC
+"""
     And I press "Save changes"
     Then I should see "menu profile"
     When I click on "Delete" "link" in the "menu profile" "table_row"

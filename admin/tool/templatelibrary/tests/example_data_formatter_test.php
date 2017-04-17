@@ -27,6 +27,11 @@ class example_data_formatter_testcase extends advanced_testcase {
 
     protected $initialthemedesignermode;
 
+    protected function tearDown() {
+        $this->initialthemedesignermode = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
 
         global $CFG;
@@ -132,7 +137,7 @@ JSON;
 
         theme_set_designer_mod(false);
 
-        $this->setExpectedException('coding_exception');
+        $this->expectException('coding_exception');
 
         example_data_formatter::to_json(array('foo'));
 
@@ -143,7 +148,7 @@ JSON;
      */
     public function test_to_json_throws_when_wrong_type() {
 
-        $this->setExpectedException('coding_exception');
+        $this->expectException('coding_exception');
 
         example_data_formatter::to_json(new moodle_url('/'));
 

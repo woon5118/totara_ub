@@ -577,6 +577,41 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     }
 
     /**
+     * Ensures that the provided node has a attribute value set. This step can be used to check if specific
+     * JS has finished modifying the node.
+     *
+     * @throws ExpectationException
+     * @param NodeElement $node
+     * @param string $attribute attribute name
+     * @param string $attributevalue attribute value to check.
+     * @return void Throws an exception if it times out without the element being visible
+     */
+    protected function ensure_node_attribute_is_set($node, $attribute, $attributevalue) {
+
+        if (!$this->running_javascript()) {
+            return;
+        }
+
+        // Exception if it timesout and the element is still there.
+        $msg = 'The "' . $node->getXPath() . '" xpath node is not visible and it should be visible';
+        $exception = new ExpectationException($msg, $this->getSession());
+
+        // It will stop spinning once the $args[1]) == $args[2], and method returns true.
+        $this->spin(
+            function($context, $args) {
+                if ($args[0]->getAttribute($args[1]) == $args[2]) {
+                    return true;
+                }
+                return false;
+            },
+            array($node, $attribute, $attributevalue),
+            self::EXTENDED_TIMEOUT,
+            $exception,
+            true
+        );
+    }
+
+    /**
      * Ensures that the provided element is visible and we can interact with it.
      *
      * Returns the node in case other actions are interested in using it.
@@ -666,6 +701,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 }
             }
         }
+
         if ($viewport) {
             // When setting viewport size, we set it so that the document width will be exactly
             // as specified, assuming that there is a vertical scrollbar. (In cases where there is
@@ -741,6 +777,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                     $pending = '';
                 }
             }
+
             // If there are no pending JS we stop waiting.
             if ($pending === '') {
                 return true;
@@ -774,7 +811,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         // Wrap in try in case we were interacting with a closed window.
         try {
 
-            // For performance reasons we've going to search for indicators first!
+            // TOTARA: For performance reasons we've going to search for indicators first!
             $strings = [
                 'data-rel="debugging"', // We control this, debugging calls, weblib.php.
                 'fatalerror', // A fatal error.
@@ -794,7 +831,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 return;
             }
 
-            // OK one or more indicators were found, start the full blown investigation.
+            // TOTARA: OK one or more indicators were found, start the full blown investigation.
 
             // Exceptions.
             $exceptionsxpath = "//div[@data-rel='fatalerror']";
@@ -830,6 +867,11 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
 
                 // Getting the debugging info and the backtrace.
                 $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.alert-error');
+                // If errorinfoboxes is empty, try find alert-danger (bootstrap4) class.
+                if (empty($errorinfoboxes)) {
+                    $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.alert-danger');
+                }
+
                 // If errorinfoboxes is empty, try find notifytiny (original) class.
                 if (empty($errorinfoboxes)) {
                     $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.notifytiny');

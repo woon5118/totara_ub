@@ -31,7 +31,6 @@ $THEME->parents = array('base');
 $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
 $THEME->sheets = array('totara');
-$THEME->supportscssoptimisation = false;
 
 // We need to include the Less files directly
 // so that any variable overrides in this theme

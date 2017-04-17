@@ -56,7 +56,7 @@ abstract class feedback_item_form extends moodleform {
         }
 
         $mform->setType('dependitem', PARAM_INT);
-        $mform->setType('dependvalue', PARAM_TEXT);
+        $mform->setType('dependvalue', PARAM_RAW);
 
         $position_select = $mform->addElement('select',
                                             'position',
@@ -76,7 +76,7 @@ abstract class feedback_item_form extends moodleform {
         $mform->addElement('hidden', 'template', 0);
         $mform->setType('template', PARAM_INT);
 
-        $mform->setType('name', PARAM_TEXT);
+        $mform->setType('name', PARAM_RAW);
         $mform->setType('label', PARAM_TEXT); // Totara: use format string to support multilang and to remove all other tags.
 
         $mform->addElement('hidden', 'typ', $this->type);

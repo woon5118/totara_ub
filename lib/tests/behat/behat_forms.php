@@ -66,10 +66,11 @@ class behat_forms extends behat_base {
     public function press_button_and_switch_to_main_window($button) {
         // Ensures the button is present, before pressing.
         $buttonnode = $this->find_button($button);
+        // Focus on button to ensure it is in viewport, before pressing it.
+        if ($this->running_javascript()) {
+            $buttonnode->focus();
+        }
         $buttonnode->press();
-
-        // Switch to main window.
-        $this->getSession()->switchToWindow(behat_general::MAIN_WINDOW_NAME);
     }
 
     /**
@@ -218,7 +219,7 @@ class behat_forms extends behat_base {
     /**
      * Sets the specified value to the field.
      *
-     * @Given /^I set the field "(?P<field_string>(?:[^"]|\\")*)" to multiline:?$/
+     * @Given /^I set the field "(?P<field_string>(?:[^"]|\\")*)" to multiline:$/
      * @throws ElementNotFoundException Thrown by behat_base::find
      * @param string $field
      * @param PyStringNode $value
@@ -233,13 +234,14 @@ class behat_forms extends behat_base {
      *
      * @Given /^I set the field with xpath "(?P<fieldxpath_string>(?:[^"]|\\")*)" to "(?P<field_value_string>(?:[^"]|\\")*)"$/
      * @throws ElementNotFoundException Thrown by behat_base::find
-     * @param string $field
+     * @param string $fieldxpath
      * @param string $value
      * @return void
      */
     public function i_set_the_field_with_xpath_to($fieldxpath, $value) {
-        $fieldNode = $this->find('xpath', $fieldxpath);
-        $field = behat_field_manager::get_form_field($fieldNode, $this->getSession());
+        $fieldnode = $this->find('xpath', $fieldxpath);
+        $this->ensure_node_is_visible($fieldnode);
+        $field = behat_field_manager::get_form_field($fieldnode, $this->getSession());
         $field->set_value($value);
     }
 

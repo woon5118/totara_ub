@@ -57,6 +57,15 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
     private $manager, $managerja;
     private $sink;
 
+    protected function tearDown() {
+        $this->program_generator = null;
+        $this->program1 = null;
+        $this->user1 = null;
+        $this->manager = null;
+        $this->sink = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         global $DB;
 
@@ -148,7 +157,7 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
                 $this->assertEquals($email->fullmessage, 'Staff Program Assignment', 'unexpected custom manager enrolment message');
             }
 
-            $this->assertEquals($email->fromemail, 'admin@example.com', 'unexpected default userfrom email address');
+            $this->assertEquals($email->fromemail, 'noreply@www.example.com', 'unexpected default userfrom email address');
         }
         $this->assertEquals(3, $managercount);
         $this->assertEquals(3, $learnercount);
@@ -200,7 +209,7 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
                 $this->assertEquals($email->fullmessage, 'Your staffmember has been assigned to the program', 'unexpected custom manager enrolment message');
             }
 
-            $this->assertEquals($email->fromemail, 'admin@example.com', 'unexpected default userfrom email address');
+            $this->assertEquals($email->fromemail, 'noreply@www.example.com', 'unexpected default userfrom email address');
         }
         $this->assertEquals(2, $learnercount);
         $this->assertEquals(2, $managercount);
@@ -522,7 +531,7 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
                 $this->assertEquals($email->fullmessage, 'Go tell your staff member to finish their program', 'unexpected custom manager enrolment message');
             }
 
-            $this->assertEquals($email->fromemail, 'admin@example.com', 'unexpected default userfrom email address');
+            $this->assertEquals($email->fromemail, 'noreply@www.example.com', 'unexpected default userfrom email address');
         }
         $this->assertEquals(3, $managercount);
         $this->assertEquals(3, $learnercount);
@@ -1266,7 +1275,7 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
                 $this->assertEquals($email->fullmessage, 'Staff Program Assignment', 'unexpected custom manager enrolment message');
             }
 
-            $this->assertEquals($email->fromemail, 'admin@example.com', 'unexpected default userfrom email address');
+            $this->assertEquals($email->fromemail, 'noreply@www.example.com', 'unexpected default userfrom email address');
         }
         $this->assertEquals(1, $managercount);
         $this->assertEquals(2, $learnercount);

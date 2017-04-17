@@ -78,7 +78,7 @@ Feature: Seminar Manager signup approval changes
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "Test seminar name"
-    And I press "Update this Seminar"
+    And I navigate to "Edit settings" in current page administration
     And I click on "Approval Options" "link"
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"

@@ -27,8 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/../lib.php');
-require_once(dirname(__FILE__) . '/helpers.php');
+require_once(__DIR__ . '/../lib.php');
+require_once(__DIR__ . '/helpers.php');
 
 
 /**
@@ -64,8 +64,12 @@ class question_engine_unit_of_work_test extends data_loading_method_test_base {
         $this->setup_initial_test_state($this->get_test_data());
      }
 
-    public function tearDown() {
+    protected function tearDown() {
         question_bank::end_unit_test();
+        $this->quba = null;
+        $this->slot = null;
+        $this->observer = null;
+        parent::tearDown();
     }
 
     protected function setup_initial_test_state($testdata) {

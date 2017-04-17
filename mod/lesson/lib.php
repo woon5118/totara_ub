@@ -241,7 +241,7 @@ function lesson_refresh_events($courseid = 0) {
     global $DB;
 
     if ($courseid == 0) {
-        if (!$lessons = $DB->get_records('lessons')) {
+        if (!$lessons = $DB->get_records('lesson')) {
             return true;
         }
     } else {
@@ -273,19 +273,6 @@ function lesson_delete_instance($id) {
     $lesson = $DB->get_record("lesson", array("id"=>$id), '*', MUST_EXIST);
     $lesson = new lesson($lesson);
     return $lesson->delete();
-}
-
-/**
- * Given a course object, this function will clean up anything that
- * would be leftover after all the instances were deleted
- *
- * @global object
- * @param object $course an object representing the course that is being deleted
- * @param boolean $feedback to specify if the process must output a summary of its work
- * @return boolean
- */
-function lesson_delete_course($course, $feedback=true) {
-    return true;
 }
 
 /**
@@ -417,8 +404,6 @@ function lesson_user_complete($course, $user, $mod, $lesson) {
             get_string("numberofpagesviewedheader", "lesson"),
             get_string("numberofcorrectanswersheader", "lesson"),
             get_string("time"));
-        $table->align = array ("center", "center", "center", "center", "center");
-        $table->size = array ("*", "*", "*", "*", "*");
 
         $retry = 0;
         $nquestions = 0;

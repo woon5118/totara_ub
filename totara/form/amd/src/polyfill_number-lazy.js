@@ -20,6 +20,7 @@
  * @package totara_form
  */
 
+/* eslint-disable */
 /* jshint ignore:start */
 define(['jquery'], function ($) {
     var number = {

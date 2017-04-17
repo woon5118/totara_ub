@@ -1342,8 +1342,9 @@ class report_builder_course_expand_form extends moodleform {
         $enddate = isset($this->_customdata['enddate']) ? $this->_customdata['enddate'] : '';
         $grade = isset($this->_customdata['grade']) ? $this->_customdata['grade'] : '';
         $courseid = $this->_customdata['courseid'];
-        $action = $this->_customdata['action'];
-        $url = $this->_customdata['url'];
+        // TODO: TL-12643 remove the following unused code and cleanup \rb_base_source::rb_expand_course_details()
+        //$action = $this->_customdata['action'];
+        //$url = $this->_customdata['url'];
         $viewcourse = isset($this->_customdata['viewcourse']) ? $this->_customdata['viewcourse'] : false;
 
         if (count($inlineenrolmentelements) > 0) {

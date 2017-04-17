@@ -779,6 +779,7 @@ class facetoface_notification extends data_object {
         $this->_event = new stdClass();
         $this->_event->component   = 'totara_message';
         $this->_event->name        = 'alert';
+        $this->_event->courseid    = $this->_facetoface->course;
         $this->_event->userto      = $user;
         $this->_event->userfrom    = $fromuser;
         $this->_event->notification = 1;

@@ -389,6 +389,8 @@ class lesson_display_answer_form_truefalse extends moodleform {
 
         $mform->addElement('header', 'pageheader');
 
+        $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
+
         $hasattempt = false;
         $disabled = '';
         if (isset($USER->modattempts[$lessonid]) && !empty($USER->modattempts[$lessonid])) {
@@ -427,7 +429,7 @@ class lesson_display_answer_form_truefalse extends moodleform {
             $i++;
         }
 
-        $radiogroup = $mform->addGroup($radiobuttons, $ansid, $contents, '', false);
+        $radiogroup = $mform->addGroup($radiobuttons, $ansid, '', array(''), false);
         $radiogroup->setAttributes(array('class' => 'answeroptiongroup'));
 
         if ($hasattempt) {

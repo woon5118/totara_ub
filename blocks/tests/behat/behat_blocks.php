@@ -151,4 +151,23 @@ class behat_blocks extends behat_base {
         $this->execute('behat_general::should_not_exist', array($xpath, 'xpath_element'));
     }
 
+    /**
+     * Ensures that block can be added to the page but does not actually add it.
+     *
+     * @Then /^the add block selector should contain "(?P<block_name_string>(?:[^"]|\\")*)" block$/
+     * @param string $blockname
+     */
+    public function the_add_block_selector_should_contain_block($blockname) {
+        $this->execute('behat_forms::the_select_box_should_contain', [get_string('addblock'), $blockname]);
+    }
+
+    /**
+     * Ensures that block can not be added to the page.
+     *
+     * @Then /^the add block selector should not contain "(?P<block_name_string>(?:[^"]|\\")*)" block$/
+     * @param string $blockname
+     */
+    public function the_add_block_selector_should_not_contain_block($blockname) {
+        $this->execute('behat_forms::the_select_box_should_not_contain', [get_string('addblock'), $blockname]);
+    }
 }

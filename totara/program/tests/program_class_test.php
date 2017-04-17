@@ -109,6 +109,13 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->messagesink->clear();
         $this->messagesink->close();
         $this->messagesink = null;
+        $this->data_generator = null;
+        $this->program_generator = null;
+        $this->hierarchy_generator = null;
+        $this->cohort_generator = null;
+        $this->plan_generator = null;
+        $this->orgframe = null;
+        $this->users = null;
         parent::tearDown();
     }
 
@@ -671,7 +678,8 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
 
         $this->assertEquals($program_record->id, $program_created->id);
 
-        $this->setExpectedException('coding_exception', 'Program created with incomplete program record');
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Program created with incomplete program record');
         new program($program_record);
     }
 
@@ -696,11 +704,13 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->assertEquals($program_record->id, $program_created->id);
         $this->assertEquals($course_record->id, $course_created->id);
 
-        $this->setExpectedException('coding_exception', 'Program created with incomplete program record');
-        new program($course_record);
-
         $program_loaded = new program($program_record);
         $this->compare_programs($program_created, $program_loaded);
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Program created with incomplete program record');
+
+        new program($course_record);
     }
 
     /**
@@ -709,7 +719,8 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     public function test_construction_from_invalid_id() {
 
         // This can't possibly exist, as we've not created it.
-        $this->setExpectedException('ProgramException', 'Program does not exist for ID : 7');
+        $this->expectException('ProgramException');
+        $this->expectExceptionMessage('Program does not exist for ID : 7');
         new program(7);
 
     }
@@ -729,16 +740,28 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $program = $this->program_generator->create_program($detail);
 
         $CFG->learnerroleid = 0;
-        $this->setExpectedException('moodle_exception', 'Could not find role with shortname student');
-        new program($program->id);
+        try {
+            new program($program->id);
+            $this->fail("Exception expected");
+        } catch (moodle_exception $e) {
+            $this->assertSame('Could not find role with shortname student', $e->getMessage());
+        }
 
         $CFG->learnerroleid = null;
-        $this->setExpectedException('moodle_exception', 'Could not find role with shortname student');
-        new program($program->id);
+        try {
+            new program($program->id);
+            $this->fail("Exception expected");
+        } catch (moodle_exception $e) {
+            $this->assertSame('Could not find role with shortname student', $e->getMessage());
+        }
 
         $CFG->learnerroleid = false;
-        $this->setExpectedException('moodle_exception', 'Could not find role with shortname student');
-        new program($program->id);
+        try {
+            new program($program->id);
+            $this->fail("Exception expected");
+        } catch (moodle_exception $e) {
+            $this->assertSame('Could not find role with shortname student', $e->getMessage());
+        }
     }
 
     /**
@@ -835,7 +858,8 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
      */
     public function test_creation_with_availabile_property_is_not_allowed() {
         // This is easy to test - just set availability to true, it is not allowed in any form at this point.
-        $this->setExpectedException('coding_exception', 'Property \'available\' is automatically calculated based on the given from and until dates and should not be manually specified');
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Property \'available\' is automatically calculated based on the given from and until dates and should not be manually specified');
         program::create(['available' => true]);
     }
 

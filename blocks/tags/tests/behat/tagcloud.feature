@@ -31,8 +31,7 @@ Feature: Block tags displaying tag cloud
     And I should see "Cats" in the "Tags" "block"
     And I should not see "Neverusedtag" in the "Tags" "block"
     And I click on "Dogs" "link" in the "Tags" "block"
-# Totara does not have .breadcrum
-    And I should see "Log in to the site" in the ".breadcrumb-nav" "css_element"
+    And I should see "You are not logged in"
 
   Scenario: Add Tags block in a course
     When I log in as "teacher1"

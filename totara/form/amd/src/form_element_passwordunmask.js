@@ -28,6 +28,8 @@
  */
 define(['jquery', 'totara_form/form'], function($, Form) {
 
+    /* eslint no-extend-native:"warn", no-eq-null:"warn", no-self-compare:"warn", no-bitwise:"warn" */
+
     // Needed for the password unmask.
     // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
     if (!String.prototype.repeat) {
@@ -71,7 +73,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
             // Could we try:
             // return Array(count + 1).join(this);
             return rpt;
-        }
+        };
     }
 
     /**

@@ -34,6 +34,12 @@ class auth_db_testcase extends advanced_testcase {
     /** @var int The amount of users to create for the large user set deletion test  */
     protected $largedeletionsetsize = 128;
 
+    protected function tearDown() {
+        $this->oldlog = null;
+        $this->largedeletionsetsize = null;
+        parent::tearDown();
+    }
+
     protected function init_auth_database() {
         global $DB, $CFG;
         require_once("$CFG->dirroot/auth/db/auth.php");
@@ -311,7 +317,6 @@ class auth_db_testcase extends advanced_testcase {
         $DB->update_record('auth_db_users', $user3);
         $this->assertTrue($auth->user_login('u3', 'heslo'));
 
-        require_once($CFG->libdir.'/password_compat/lib/password.php');
         set_config('passtype', 'saltedcrypt', 'auth/db');
         $auth->config->passtype = 'saltedcrypt';
         $user3->pass = password_hash('heslo', PASSWORD_BCRYPT);

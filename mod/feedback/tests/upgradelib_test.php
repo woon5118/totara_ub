@@ -51,6 +51,16 @@ class mod_feedback_upgradelib_testcase extends advanced_testcase {
     /** @var stdClass */
     protected $user;
 
+    protected function tearDown() {
+        $this->testsql = null;
+        $this->testsqltmp = null;
+        $this->course1 = null;
+        $this->course2 = null;
+        $this->feedback = null;
+        $this->user = null;
+        parent::tearDown();
+    }
+
     /**
      * Sets up the fixture
      * This method is called before a test is executed.

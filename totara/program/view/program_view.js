@@ -179,7 +179,7 @@ M.totara_programview = M.totara_programview || {
 
             var new_text = data.message;
 
-            if (extensiontext.size()) {
+            if (extensiontext.length) {
                 // If text found replace.
                 extensiontext.replaceWith(new_text);
             }

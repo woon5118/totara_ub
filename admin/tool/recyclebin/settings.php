@@ -34,7 +34,7 @@ if ($hassiteconfig) {
         'tool_recyclebin/coursebinenable',
         new lang_string('coursebinenable', 'tool_recyclebin'),
         '',
-        1
+        0 // Totara: disabled by default because it should be considered experimental.
     ));
 
     $settings->add(new admin_setting_configduration(
@@ -48,7 +48,7 @@ if ($hassiteconfig) {
         'tool_recyclebin/categorybinenable',
         new lang_string('categorybinenable', 'tool_recyclebin'),
         '',
-        1
+        0 // Totara: disabled by default because it should be considered experimental.
     ));
 
     $settings->add(new admin_setting_configduration(

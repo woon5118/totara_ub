@@ -81,12 +81,14 @@ class mod_forum_maildigest_testcase extends advanced_testcase {
     /**
      * Clear the message sinks set up in this test.
      */
-    public function tearDown() {
+    protected function tearDown() {
         $this->helper->messagesink->clear();
         $this->helper->messagesink->close();
 
         $this->helper->mailsink->clear();
         $this->helper->mailsink->close();
+        $this->helper = null;
+        parent::tearDown();
     }
 
     /**
@@ -229,7 +231,7 @@ class mod_forum_maildigest_testcase extends advanced_testcase {
         $this->assertFalse($currentsetting);
 
         // Try with an invalid value.
-        $this->setExpectedException('moodle_exception');
+        $this->expectException('moodle_exception');
         forum_set_user_maildigest($forum1, 42, $user);
     }
 

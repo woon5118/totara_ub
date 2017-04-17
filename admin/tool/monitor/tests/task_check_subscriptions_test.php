@@ -17,7 +17,7 @@ defined('MOODLE_INTERNAL') || exit();
 
 /**
  * Unit tests for the tool_monitor clean events task.
- * @since 3.0.5
+ * @since 3.2.0
  *
  * @package    tool_monitor
  * @category   test
@@ -32,6 +32,16 @@ class tool_monitor_task_check_subscriptions_testcase extends advanced_testcase {
     private $subscription;
     private $teacherrole;
     private $studentrole;
+
+    protected function tearDown() {
+        $this->course = null;
+        $this->user = null;
+        $this->rule = null;
+        $this->subscription = null;
+        $this->teacherrole = null;
+        $this->studentrole = null;
+        parent::tearDown();
+    }
 
     /**
      * Test set up.

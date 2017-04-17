@@ -52,5 +52,11 @@ function xmldb_block_selfcompletion_upgrade($oldversion, $block) {
 
     // Totara 10 branching line.
 
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
     return true;
 }

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -45,6 +44,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  *
+ * @global stdClass $CFG
+ * @global moodle_database $DB
  * @param int $oldversion
  * @return bool
  */
@@ -54,6 +55,9 @@ function xmldb_lesson_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
+
+    // Moodle v3.0.0 release upgrade line.
+    // Put any upgrade step following this.
 
     if ($oldversion < 2016012800) {
         // Convert lesson settings to use config_plugins instead of $CFG.
@@ -110,6 +114,11 @@ function xmldb_lesson_upgrade($oldversion) {
         // Lesson savepoint reached.
         upgrade_mod_savepoint(true, 2016012800, 'lesson');
     }
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

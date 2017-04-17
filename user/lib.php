@@ -231,7 +231,7 @@ function user_get_default_fields() {
         'institution', 'interests', 'firstaccess', 'lastaccess', 'auth', 'confirmed',
         'idnumber', 'lang', 'theme', 'timezone', 'mailformat', 'description', 'descriptionformat',
         'city', 'url', 'country', 'profileimageurlsmall', 'profileimageurl', 'customfields',
-        'groups', 'roles', 'preferences', 'enrolledcourses'
+        'groups', 'roles', 'preferences', 'enrolledcourses', 'suspended'
     );
 }
 
@@ -384,18 +384,18 @@ function user_get_user_details($user, $course = null, array $userfields = array(
         $hiddenfields = array();
         // Address, phone1 and phone2 not appears in hidden fields list but require viewhiddenfields capability
         // according to user/profile.php.
-        if ($user->address && in_array('address', $userfields)) {
+        if (!empty($user->address) && in_array('address', $userfields)) {
             $userdetails['address'] = $user->address;
         }
     } else {
         $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
     }
 
-    if ($user->phone1 && in_array('phone1', $userfields) &&
+    if (!empty($user->phone1) && in_array('phone1', $userfields) &&
             (in_array('phone1', $showuseridentityfields) or $canviewhiddenuserfields)) {
         $userdetails['phone1'] = $user->phone1;
     }
-    if ($user->phone2 && in_array('phone2', $userfields) &&
+    if (!empty($user->phone2) && in_array('phone2', $userfields) &&
             (in_array('phone2', $showuseridentityfields) or $canviewhiddenuserfields)) {
         $userdetails['phone2'] = $user->phone2;
     }
@@ -442,6 +442,9 @@ function user_get_user_details($user, $course = null, array $userfields = array(
     }
     if (in_array('msn', $userfields) && $user->msn && (!isset($hiddenfields['msnid']) or $isadmin)) {
         $userdetails['msn'] = $user->msn;
+    }
+    if (in_array('suspended', $userfields) && (!isset($hiddenfields['suspended']) or $isadmin)) {
+        $userdetails['suspended'] = (bool)$user->suspended;
     }
 
     if (in_array('firstaccess', $userfields) && (!isset($hiddenfields['firstaccess']) or $isadmin)) {
@@ -833,13 +836,23 @@ function user_get_user_navigation_info($user, $page, $options = array()) {
 
                 // Get login failures string.
                 $a = new stdClass();
-                $a->attempts = html_writer::tag('span', $count, array('class' => 'value'));
+                $a->attempts = $count;
                 $returnobject->metadata['userloginfail'] =
                     get_string('failedloginattempts', '', $a);
 
             }
         }
     }
+
+    // TOTARA: Removed the links to Moodle dashboards.
+    // Links: Dashboard.
+    // $myhome = new stdClass();
+    // $myhome->itemtype = 'link';
+    // $myhome->url = new moodle_url('/my/');
+    // $myhome->title = get_string('mymoodle', 'admin');
+    // $myhome->titleidentifier = 'mymoodle,admin';
+    // $myhome->pix = "i/course";
+    // $returnobject->navitems[] = $myhome;
 
     // Links: My Profile.
     $myprofile = new stdClass();
@@ -961,7 +974,6 @@ function user_get_user_navigation_info($user, $page, $options = array()) {
  */
 function user_add_password_history($userid, $password) {
     global $CFG, $DB;
-    require_once($CFG->libdir.'/password_compat/lib/password.php');
 
     if (empty($CFG->passwordreuselimit) or $CFG->passwordreuselimit < 0) {
         return;
@@ -1000,7 +1012,6 @@ function user_add_password_history($userid, $password) {
  */
 function user_is_previously_used_password($userid, $password) {
     global $CFG, $DB;
-    require_once($CFG->libdir.'/password_compat/lib/password.php');
 
     if (empty($CFG->passwordreuselimit) or $CFG->passwordreuselimit < 0) {
         return false;
@@ -1113,14 +1124,20 @@ function user_can_view_profile($user, $course = null, $usercontext = null) {
         return false;
     }
 
-    // If any of these four things, return true.
+    // Perform some quick checks and eventually return early.
+
     // Number 1.
-    if ($USER->id == $user->id) {
+    if (empty($CFG->forceloginforprofiles)) {
         return true;
+    } else {
+       if (!isloggedin() || isguestuser()) {
+            // User is not logged in and forceloginforprofile is set, we need to return now.
+            return false;
+        }
     }
 
     // Number 2.
-    if (empty($CFG->forceloginforprofiles)) {
+    if ($USER->id == $user->id) {
         return true;
     }
 
@@ -1142,6 +1159,11 @@ function user_can_view_profile($user, $course = null, $usercontext = null) {
     } else {
         $sharedcourses = enrol_get_shared_courses($USER->id, $user->id, true);
     }
+
+    if (empty($sharedcourses)) {
+        return false;
+    }
+
     foreach ($sharedcourses as $sharedcourse) {
         $coursecontext = context_course::instance($sharedcourse->id);
         if (has_capability('moodle/user:viewdetails', $coursecontext)) {

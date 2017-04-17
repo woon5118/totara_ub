@@ -27,7 +27,7 @@ Feature: View cohort list
       | user1 | manager | System       |           |
       | user2 | manager | Category     | CAT1      |
 
-  Scenario: Admin can see System audiences and All audiences
+  Scenario: Admin can see System audiences and all audiences
     When I log in as "admin"
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     Then I should see "System cohort"
@@ -39,7 +39,7 @@ Feature: View cohort list
     And I should see "Cohort in category 3"
     And I log out
 
-  Scenario: Manager can see System audiences and All audiences
+  Scenario: Manager can see System audiences and all audiences
     When I log in as "user1"
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     Then I should see "System cohort"
@@ -53,7 +53,7 @@ Feature: View cohort list
 
   Scenario: Manager in category can see cohorts in the category
     When I log in as "user2"
-    And I click on "Courses" "link" in the "Navigation" "block"
+    And I am on course index
     And I follow "Cat 1"
     And I follow "Audiences"
     And I should not see "All audiences"

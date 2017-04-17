@@ -31,7 +31,6 @@ $THEME->parents = array();
 
 $THEME->sheets = array('flexible-icons');
 $THEME->editor_sheets = array();
-$THEME->supportscssoptimisation = false;
 $THEME->enable_dock = false;
 
 $THEME->layouts = array(

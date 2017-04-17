@@ -1,27 +1,33 @@
 .f2fsessiongroup {
     padding-bottom: 10px;
 }
+
 .f2fsession {
     width: 100%;
     border-bottom: 1px solid #ccc;
 }
+
 .f2fsession:last-child {
     border-bottom: none;
 }
+
 .f2fsessiontime {
     width: 80%;
     display: inline-block;
     vertical-align: top;
     padding-top: 5px;
 }
+
 .f2finprogress .f2fsessiontime {
     width: 100%;
 }
+
 .f2foptions {
     width: 20%;
     display: inline-block;
     min-width: 60px;
 }
+
 .f2fsessionlinks,
 .f2fsessionnotice {
     font-size: 11px;
@@ -30,8 +36,9 @@
     display: block;
     padding: 3px;
 }
+
 .f2factivityname {
-    line-height:1.5;
+    line-height: 1.5;
 }
 
 span.errorstring {
@@ -68,17 +75,21 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
 }
 
 input.cellwidth {
+    /* stylelint-disable declaration-no-important */
     width: 90% !important;
+    /* stylelint-enable */
 }
+
 div.mod-indent form.togglecompletion input[type="image"] {
     left: -13px;
 }
+
 .dir-rtl div.mod-indent form.togglecompletion input[type="image"] {
     right: -5px;
 }
 
 .controls.addremove button {
-    display:block;
+    display: block;
     min-width: 100px;
     margin: 10px auto;
 }
@@ -94,7 +105,7 @@ div.mod-indent form.togglecompletion input[type="image"] {
 .path-admin-mod-facetoface.yui3-skin-sam .yui3-panel-content .yui3-widget-hd,
 .path-mod-facetoface.yui3-skin-sam .yui3-panel-content .yui3-widget-hd {
     background: #f5f5f5;
-    color: #444444;
+    color: #444;
     font-weight: bold;
 }
 
@@ -130,6 +141,7 @@ div.mod-indent form.togglecompletion input[type="image"] {
         margin-right: 26%;
     }
 }
+
 @media screen and (min-width: 640px) {
     .f2f-roomselect div {
         width: 24.4%;
@@ -157,22 +169,26 @@ div.mod-indent form.togglecompletion input[type="image"] {
 .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
     height: 1px;
 }
+
 /** Firefox requires a different hack **/
 .gecko .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
 .gecko .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
 .gecko .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
     height: 100%;
 }
+
 /** IE requires quite a bit more hacking! **/
 .ie .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
 .ie .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
 .ie .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
     height: 100%;
 }
+
 .ie .reportbuilder-table td.session_bookingstatus,
 .ie .reportbuilder-table td.session_overallstatus {
     overflow: hidden;
 }
+
 .ie .reportbuilder-table td.session_bookingstatus div,
 .ie .reportbuilder-table td.session_overallstatus div {
     padding-bottom: 9999px;
@@ -227,23 +243,23 @@ textarea[name="csvinput"] {
 }
 
 dl.f2fline {
-  width: 100%;
-  overflow: hidden;
-  padding: 0;
-  margin: 0 0 10px 0;
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+    margin: 0 0 10px 0;
 }
 
 .f2fline dt {
-  float: left;
-  clear: left;
-  padding: 0;
-  margin: 0 10px 0 0;
+    float: left;
+    clear: left;
+    padding: 0;
+    margin: 0 10px 0 0;
 }
 
 .f2fline dd {
-  float: left;
-  padding: 0;
-  margin: 0;
+    float: left;
+    padding: 0;
+    margin: 0;
 }
 
 .dir-rtl .f2fline dt {
@@ -252,7 +268,7 @@ dl.f2fline {
 }
 
 .dir-rtl .f2fline dd {
-    float:right;
+    float: right;
 }
 
 .noshow {

@@ -126,14 +126,21 @@ echo $OUTPUT->header();
         <div class="span5">
           <label for="removeselect"><?php print_string('existingadmins', 'core_role'); ?></label>
           <?php $admisselector->display(); ?>
-        </div>
-        <div class="span2 controls">
-          <input name="add" id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" />
-          <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>" title="<?php print_string('remove'); ?>" />
-          <input name="main" id="main" type="submit" value="<?php echo get_string('mainadminset', 'core_role'); ?>" title="<?php print_string('mainadminset', 'core_role'); ?>" />
-        </div>
-        <div class="span5">
-          <label for="addselect"><?php print_string('users'); ?></label>
+          </td>
+      <td id="buttonscell">
+        <p class="arrow_button">
+            <input name="add" id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>"
+                   title="<?php print_string('add'); ?>" class="btn btn-secondary"/><br />
+            <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>"
+                   title="<?php print_string('remove'); ?>" class="btn btn-secondary"/><br />
+            <input name="main" id="main" type="submit" value="<?php echo get_string('mainadminset', 'core_role'); ?>"
+                   title="<?php print_string('mainadminset', 'core_role'); ?>" class="btn btn-secondary"/>
+        </p>
+      </td>
+      <td id="potentialcell">
+          <p>
+            <label for="addselect"><?php print_string('users'); ?></label>
+          </p>
           <?php $potentialadmisselector->display(); ?>
         </div>
       </div>

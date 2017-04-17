@@ -34,7 +34,8 @@ Feature: Open calendar popup
     And I should see "Event 1:2"
     # Replaced 'follow "Home"' with am on homepage to prevent failure
     # when Home button is hidden in the dropdown menu
-    And I click on "Home" in the totara menu
+    And I am on homepage
+    And I follow "Go to calendar"
     And I hover over day "1" of this month in the calendar
     And I should see "Event 1:1"
     And I should see "Event 1:2"
@@ -49,6 +50,7 @@ Feature: Open calendar popup
     Then I should see "Today's event"
     # Replaced 'follow "Home"' with am on homepage to prevent failure
     # when Home button is hidden in the dropdown menu
-    And I click on "Home" in the totara menu
+    And I am on homepage
+    And I follow "Go to calendar"
     And I hover over today in the calendar
     And I should see "Today's event"

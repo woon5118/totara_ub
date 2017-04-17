@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once("{$CFG->dirroot}/totara/core/renderer.php");
 
 class theme_bootstrapbase_totara_core_renderer extends totara_core_renderer {

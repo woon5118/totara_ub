@@ -47,7 +47,7 @@ $string['dirroot'] = 'Directorio de Totara';
 $string['environmenthead'] = 'Comprobando su entorno';
 $string['environmentsub2'] = 'Cada versión de Totara tiene algún requisito mínimo de la versión de PHP y un número obligatorio de extensiones de PHP.
 Una comprobación del entorno completo se realiza antes de cada instalación y actualización. Por favor, póngase en contacto con el administrador del servidor si no sabes cómo instalar la nueva versión o habilitar las extensiones PHP.';
-$string['errorsinenvironment'] = 'La comprobación del entorno fallo!';
+$string['errorsinenvironment'] = '¡La comprobación del entorno fallo!';
 $string['installation'] = 'Instalación';
 $string['langdownloaderror'] = 'El idioma "{$a}" no pudo ser descargado. El proceso de instalación continuará en Inglés.';
 $string['memorylimithelp'] = '<p>El límite de memoria PHP en su servidor es actualmente {$a}.</p>

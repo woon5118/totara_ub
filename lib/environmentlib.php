@@ -1029,6 +1029,9 @@ function environment_check_unicode($version, $env_select) {
     } else {
         $result->setStatus(true);
     }
+    if (method_exists($DB, 'get_dbcollation')) {
+        $result->setInfo($DB->get_dbcollation());
+    }
 
     $result->setLevel($level);
 

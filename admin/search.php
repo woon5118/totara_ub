@@ -4,12 +4,15 @@
 
 require_once('../config.php');
 require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->dirroot . '/admin/admin_settings_search_form.php');
 
 $query = trim(optional_param('query', '', PARAM_NOTAGS));  // Search string
 
-$PAGE->set_context(context_system::instance());
+$context = context_system::instance();
+$PAGE->set_context($context);
 
 admin_externalpage_setup('search', '', array('query' => $query)); // now hidden page
+require_capability('moodle/site:config', $context); //Totara: this page is really for admins only!
 
 $adminroot = admin_get_root(); // need all settings here
 $adminroot->search = $query; // So we can reference it in search boxes later in this invocation
@@ -18,7 +21,7 @@ $errormsg  = '';
 $focus = '';
 
 // now we'll deal with the case that the admin has submitted the form with changed settings
-if ($data = data_submitted() and confirm_sesskey()) {
+if ($data = data_submitted() and confirm_sesskey() and isset($data->action) and $data->action == 'save-settings') {
     if (admin_write_settings($data)) {
         redirect($PAGE->url, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
@@ -36,6 +39,8 @@ if ($data = data_submitted() and confirm_sesskey()) {
 // to modify them
 echo $OUTPUT->header($focus);
 
+echo $OUTPUT->heading(get_string('administrationsite'));
+
 if ($errormsg !== '') {
     echo $OUTPUT->notification($errormsg);
 
@@ -43,24 +48,11 @@ if ($errormsg !== '') {
     echo $OUTPUT->notification($statusmsg, 'notifysuccess');
 }
 
-$resultshtml = admin_search_settings_html($query); // case insensitive search only
-
-echo '<form action="' . $PAGE->url->out(true) . '" method="post" id="adminsettings">';
-echo '<div>';
-echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
-// HACK to prevent browsers from automatically inserting the user's password into the wrong fields.
-echo prevent_form_autofill_password();
-echo '</div>';
-echo '<fieldset>';
-echo '<div class="clearer"><!-- --></div>';
-if ($resultshtml != '') {
-    echo $resultshtml;
-} else {
-    echo get_string('noresults','admin');
+$form = new admin_settings_search_form();
+$form->display();
+echo '<hr>';
+if ($query) {
+    echo admin_search_settings_html($query);
 }
-echo '</fieldset>';
-echo '</form>';
 
 echo $OUTPUT->footer();
-
-

@@ -20,6 +20,7 @@
  * @package totara_form
  */
 
+/* eslint-disable */
 /* jshint ignore:start */
 define(['jquery', 'jqueryui'], function($){
     /*! jQuery Timepicker Addon - v1.6.1 - 2015-11-14
@@ -322,7 +323,7 @@ define(['jquery', 'jqueryui'], function($){
             if (tp_inst._defaults.maxDateTime !== undefined && tp_inst._defaults.maxDateTime instanceof Date) {
                 tp_inst._defaults.maxDate = new Date(tp_inst._defaults.maxDateTime.getTime());
             }
-            tp_inst.$input.bind('focus', function () {
+            tp_inst.$input.on('focus', function () {
                 tp_inst._onFocus();
             });
 

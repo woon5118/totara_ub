@@ -39,7 +39,7 @@ Feature: Check room details with all possible custom fields
     And I set the following fields to these values:
       | Full name                   | Event menu of choices |
       | Short name (must be unique) | menuofchoices         |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       Apple
       Orange

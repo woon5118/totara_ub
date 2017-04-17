@@ -21,8 +21,8 @@
 }
 
 .block_totara_quicklinks .content .link {
-  border-top:1px solid;
-  border-top-color:#DDDDDD;
-  padding-bottom:5px;
-  font-size:0.82em;
+    border-top: 1px solid;
+    border-top-color: #ddd;
+    padding-bottom: 5px;
+    font-size: 0.82em;
 }

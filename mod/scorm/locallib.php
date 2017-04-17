@@ -917,7 +917,7 @@ function scorm_get_all_attempts($scormid, $userid) {
  * @param  stdClass $cm     course module object
  */
 function scorm_print_launch ($user, $scorm, $action, $cm) {
-    global $CFG, $DB, $PAGE, $OUTPUT, $COURSE;
+    global $CFG, $DB, $OUTPUT;
 
     if ($scorm->updatefreq == SCORM_UPDATE_EVERYTIME) {
         scorm_parse($scorm, false);
@@ -926,7 +926,7 @@ function scorm_print_launch ($user, $scorm, $action, $cm) {
     $organization = optional_param('organization', '', PARAM_INT);
 
     if ($scorm->displaycoursestructure == 1) {
-        echo $OUTPUT->box_start('generalbox boxaligncenter toc', 'toc');
+        echo $OUTPUT->box_start('generalbox boxaligncenter toc container', 'toc');
         echo html_writer::div(get_string('contents', 'scorm'), 'structurehead');
     }
     if (empty($organization)) {
@@ -960,6 +960,13 @@ function scorm_print_launch ($user, $scorm, $action, $cm) {
 
     $result = scorm_get_toc($user, $scorm, $cm->id, TOCFULLURL, $orgidentifier);
     $incomplete = $result->incomplete;
+    // Get latest incomplete sco to launch first.
+    if (!empty($result->sco->id)) {
+        $launchsco = $result->sco->id;
+    } else {
+        // Use launch defined by SCORM package.
+        $launchsco = $scorm->launch;
+    }
 
     // Do we want the TOC to be displayed?
     if ($scorm->displaycoursestructure == 1) {
@@ -975,14 +982,17 @@ function scorm_print_launch ($user, $scorm, $action, $cm) {
             echo html_writer::start_div('scorm-center');
             echo html_writer::start_tag('form', array('id' => 'scormviewform',
                                                         'method' => 'post',
-                                                        'action' => $CFG->wwwroot.'/mod/scorm/player.php'));
+                                                        'action' => $CFG->wwwroot.'/mod/scorm/player.php',
+                                                        'class' => 'container'));
         if ($scorm->hidebrowse == 0) {
             print_string('mode', 'scorm');
-            echo ': '.html_writer::empty_tag('input', array('type' => 'radio', 'id' => 'b', 'name' => 'mode', 'value' => 'browse')).
+            echo ': '.html_writer::empty_tag('input', array('type' => 'radio', 'id' => 'b', 'name' => 'mode',
+                    'value' => 'browse', 'class' => 'm-r-1')).
                         html_writer::label(get_string('browse', 'scorm'), 'b');
             echo html_writer::empty_tag('input', array('type' => 'radio',
                                                         'id' => 'n', 'name' => 'mode',
-                                                        'value' => 'normal', 'checked' => 'checked')).
+                                                        'value' => 'normal', 'checked' => 'checked',
+                                                        'class' => 'm-x-1')).
                     html_writer::label(get_string('normal', 'scorm'), 'n');
 
         } else {
@@ -1002,10 +1012,11 @@ function scorm_print_launch ($user, $scorm, $action, $cm) {
         }
 
         echo html_writer::empty_tag('br');
-        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'scoid', 'value' => $scorm->launch));
+        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'scoid', 'value' => $launchsco));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cm', 'value' => $cm->id));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'currentorg', 'value' => $orgidentifier));
-        echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('enter', 'scorm')));
+        echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('enter', 'scorm'),
+                'class' => 'btn btn-primary'));
         echo html_writer::end_tag('form');
         echo html_writer::end_div();
     }
@@ -1038,12 +1049,19 @@ function scorm_simple_play($scorm, $user, $context, $cmid) {
         }
         if ($scorm->skipview >= SCORM_SKIPVIEW_FIRST) {
             $sco = current($scoes);
-            $url = new moodle_url('/mod/scorm/player.php', array('a' => $scorm->id,
-                                                                'currentorg' => $orgidentifier,
-                                                                'scoid' => $sco->id));
+            $result = scorm_get_toc($user, $scorm, $cmid, TOCFULLURL, $orgidentifier);
+            $url = new moodle_url('/mod/scorm/player.php', array('a' => $scorm->id, 'currentorg' => $orgidentifier));
+
+            // Set last incomplete sco to launch first.
+            if (!empty($result->sco->id)) {
+                $url->param('scoid', $result->sco->id);
+            } else {
+                $url->param('scoid', $sco->id);
+            }
+
             if ($scorm->skipview == SCORM_SKIPVIEW_ALWAYS || !scorm_has_tracks($scorm->id, $user->id)) {
                 if (!empty($scorm->forcenewattempt)) {
-                    $result = scorm_get_toc($user, $scorm, $cmid, TOCFULLURL, $orgidentifier);
+
                     if ($result->incomplete === false) {
                         $url->param('newattempt', 'on');
                     }
@@ -1547,6 +1565,7 @@ function scorm_get_toc_object($user, $scorm, $currentorg='', $scoid='', $mode='n
 
             if ($sco->isvisible === 'true') {
                 if (!empty($sco->launch)) {
+                    // Set first sco to launch if in browse/review mode.
                     if (empty($scoid) && ($mode != 'normal')) {
                         $scoid = $sco->id;
                     }
@@ -1567,7 +1586,7 @@ function scorm_get_toc_object($user, $scorm, $currentorg='', $scoid='', $mode='n
                                 ($usertrack->status == 'incomplete') ||
                                 ($usertrack->status == 'browsed')) {
                             $incomplete = true;
-                            if ($play && empty($scoid)) {
+                            if (empty($scoid)) {
                                 $scoid = $sco->id;
                             }
                         }
@@ -1586,7 +1605,7 @@ function scorm_get_toc_object($user, $scorm, $currentorg='', $scoid='', $mode='n
                         }
 
                     } else {
-                        if ($play && empty($scoid)) {
+                        if (empty($scoid)) {
                             $scoid = $sco->id;
                         }
 

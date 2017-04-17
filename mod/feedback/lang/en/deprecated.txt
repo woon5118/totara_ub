@@ -1,7 +1,6 @@
 cancel_moving,mod_feedback
 cannotunmap,mod_feedback
 cannotmapfeedback,mod_feedback
-completed,mod_feedback
 line_values,mod_feedback
 mapcourses_help,mod_feedback
 max_args_exceeded,mod_feedback
@@ -30,3 +29,8 @@ submission,mod_feedback
 submitted,mod_feedback
 generategrade,mod_feedback
 generategrade_help,mod_feedback
+start,mod_feedback
+stop,mod_feedback
+switch_group,mod_feedback
+viewcompleted,mod_feedback
+viewcompleted_help,mod_feedback

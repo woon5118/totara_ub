@@ -57,7 +57,6 @@ $title = $course->shortname . ': ' . format_string($facetoface->name);
 
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
-$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'facetoface'));
 
 $mform = new mod_facetoface_interest_form(null, array('f' => $f, 'declare' => $declare));
 
