@@ -495,22 +495,17 @@ div.hide {
 a.skip-block,
 a.skip {
     &:extend(.sr-only); // screen-reader-only
-
-    // Display skip to content link when focused for keyboard navigators.
-    &:focus {
-        position: static;
-        display: block;
-        width: auto;
-        height: auto;
-    }
 }
 
+// Display skip to content link when focused for keyboard navigators.
 a.skip-block:focus,
 a.skip-block:active,
 a.skip:focus,
 a.skip:active {
     position: static;
     display: block;
+    width: auto;
+    height: auto;
 }
 
 .skip-block-to {
