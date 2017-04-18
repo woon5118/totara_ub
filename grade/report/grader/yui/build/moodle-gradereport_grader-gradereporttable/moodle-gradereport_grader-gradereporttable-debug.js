@@ -977,6 +977,12 @@ FloatingHeaders.prototype = {
             leftTitleFloats = floatingUserTriggerPoint > (this.firstNonUserCellLeft - this.firstUserCellWidth);
         }
 
+        // User column position.
+        // TL-9343
+        var gradeparent = Y.one('.gradeparent').getDOMNode();
+        // This page doesn't get translated for some reason.
+        leftTitleFloats = gradeparent.scrollLeft > (Y.one('.gradeparent .avg.lastrow th').get('offsetWidth') - Y.one('.gradeparent .user').get('offsetWidth'));
+
         // User column always floats in Totara as the grade table is scrolled (as opposed to Moodle where the whole page scrolls).
         userFloats = true;
         userColumnStyles.left = (gradeparent.scrollLeft) + 'px';
