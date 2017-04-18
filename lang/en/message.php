@@ -97,6 +97,7 @@ $string['outputnotavailable'] = 'Not available';
 $string['outputnotconfigured'] = 'Not configured';
 $string['permitted'] = 'Permitted';
 $string['processorsettings'] = 'Processor settings';
+$string['provider'] = 'Provider'; // Totara string.
 $string['removecontact'] = 'Remove contact';
 $string['removecoursefilter'] = 'Remove filter for course {$a}';
 $string['removefromyourcontacts'] = 'Remove from your contacts';
