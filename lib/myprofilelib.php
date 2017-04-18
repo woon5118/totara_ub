@@ -226,8 +226,10 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
 
     // Printing tagged interests. We want this only for full profile.
     if (empty($course) && ($interests = core_tag_tag::get_item_tags('core', 'user', $user->id))) {
+        // Totara TL-14103. It's better to not display 'more' and 'less' links to allow the user to control
+        // how many interests tags are displayed - set the tag_list limit to 0 to display them all.
         $node = new core_user\output\myprofile\node('contact', 'interests', get_string('interests'), null, null,
-                $OUTPUT->tag_list($interests, ''));
+                $OUTPUT->tag_list($interests, '', '', 0));
         $tree->add_node($node);
     }
 
