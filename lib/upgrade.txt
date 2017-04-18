@@ -103,6 +103,8 @@ information provided here is intended especially for developers.
 * Update pix_icon template, adding an "icon" class
 * The cron runner now sets up a fresh PAGE and OUTPUT between each task.
 * Added a lock to prevent 'coursemodinfo' cache to be built multiple times in parallel
+* PHPUnit's bootstrap has been changed to use HTTPS wwwroot (https://www.example.com/moodle) from previous HTTP version. Any
+  existing test expecting the old HTTP URLs will need to be switched to the new HTTPS value (reference: MDL-54901).
 
 === 11.0 ===
 
