@@ -63,10 +63,6 @@ class question_export_form extends moodleform {
         }
 
         $radioarray[] = $mform->createElement('static', 'makelasthelpiconshowup', '');
-        $mform->addGroup($radioarray, "formatchoices", '', $separators, false);
-        $mform->addRule("formatchoices", null, 'required', null, 'client');
-
-        $radioarray[] = $mform->createElement('static', 'makelasthelpiconshowup', '');
         $mform->addGroup($radioarray, "formatchoices", get_string('fileformat', 'question'), $separators, false);
         $mform->addRule("formatchoices", null, 'required', null, 'client');
 
