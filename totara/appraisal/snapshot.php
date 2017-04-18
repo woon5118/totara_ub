@@ -123,7 +123,7 @@ if ($action == 'snapshot') {
         ini_set('display_errors', '0');
         ini_set('log_errors', '1');
 
-        require_once($CFG->libdir . '/dompdf/lib.php');
+        require_once(__DIR__ . '/dompdf/lib.php');
 
         $out = "";
         $out .= $renderer->snapshot_header();
@@ -133,7 +133,7 @@ if ($action == 'snapshot') {
         $content = null;
         try {
             $pdf = new totara_dompdf();
-            $pdf->load_html($out);
+            $pdf->loadHtml($out);
             $pdf->render();
             $content = $pdf->output();
         } catch (Exception $e) {
@@ -145,7 +145,7 @@ if ($action == 'snapshot') {
             try {
                 $out = totara_dompdf::hack_html($out);
                 $pdf = new totara_dompdf();
-                $pdf->load_html($out);
+                $pdf->loadHtml($out);
                 $pdf->render();
                 $content = $pdf->output();
             } catch (Exception $e) {

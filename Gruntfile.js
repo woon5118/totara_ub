@@ -507,7 +507,6 @@ module.exports = function(grunt) {
             'theme/more/style/custom.css',
 
             '# Totara files to ignore',
-            'lib/dompdf/',
             'theme/standardtotararesponsive/', // Ignore this whole theme.
             'theme/roots/less/totara/totara_jquery/',
             'theme/roots/less/bootstrap3/',

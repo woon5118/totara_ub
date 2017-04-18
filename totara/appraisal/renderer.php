@@ -1964,7 +1964,6 @@ class totara_appraisal_renderer extends plugin_renderer_base {
     public function display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, $nouserpic, $stageschecked) {
         global $CFG, $TEXTAREA_OPTIONS;
 
-        require_once($CFG->libdir . '/dompdf/lib.php');
         require_once($CFG->dirroot . '/totara/appraisal/appraisal_forms.php');
 
         // Set up.

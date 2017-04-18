@@ -3,7 +3,6 @@ theme/bootstrapbase/style/
 theme/clean/style/custom.css
 theme/more/style/custom.css
 # Totara files to ignore
-lib/dompdf/
 theme/standardtotararesponsive/
 theme/roots/less/totara/totara_jquery/
 theme/roots/less/bootstrap3/
@@ -102,6 +101,7 @@ theme/bootstrapbase/javascript/html5shiv.js
 theme/bootstrapbase/amd/src/bootstrap.js
 theme/roots/less/bootstrap3/
 theme/roots/amd/src/bootstrap.js
+totara/appraisal/dompdf/
 totara/core/lib/SVGGraph/
 totara/core/lib/phpseclib/
 totara/core/js/lib/jquery-ui-1.10.4.custom.min.js
