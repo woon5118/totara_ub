@@ -1151,6 +1151,7 @@ class core_plugin_manager {
             // Totara 10.0 removals.
             'theme_kiwifruitresponsive',
             'theme_customtotararesponsive',
+            'theme_standardtotararesponsive',
 
             // Moodle merge removals - we do not want these!
             'block_lp',
@@ -1439,7 +1440,7 @@ class core_plugin_manager {
             'theme' => array(
                 'base', 'bootstrapbase'
                 // Totara:
-                , 'standardtotararesponsive', 'roots', 'basis',
+                , 'roots', 'basis',
             ),
 
             'tool' => array(

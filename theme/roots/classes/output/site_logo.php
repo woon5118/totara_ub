@@ -44,14 +44,14 @@ class site_logo implements \renderable, \templatable {
         );
 
         $templatecontext['logourl'] = $PAGE->theme->setting_file_url('logo', 'logo');
-        $templateocontext['logoalt'] = get_string('logo', 'theme_standardtotararesponsive', $SITE->fullname);
+        $templateocontext['logoalt'] = get_string('logo', 'totara_core', $SITE->fullname);
 
         if (!empty($PAGE->theme->settings->logo)) {
             $templatecontext['logourl'] = $PAGE->theme->setting_file_url('logo', 'logo');
-            $templatecontext['logoalt'] = get_string('logo', 'theme_standardtotararesponsive', $SITE->fullname);
+            $templatecontext['logoalt'] = get_string('logo', 'totara_core', $SITE->fullname);
         } else {
             $templatecontext['logourl'] = $OUTPUT->pix_url('logo', 'theme');
-            $templatecontext['logoalt'] = get_string('totaralogo', 'theme_standardtotararesponsive');
+            $templatecontext['logoalt'] = get_string('totaralogo', 'totara_core');
         }
 
         if (!empty($PAGE->theme->settings->alttext)) {

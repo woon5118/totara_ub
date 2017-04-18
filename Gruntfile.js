@@ -142,7 +142,7 @@ module.exports = function(grunt) {
      */
     var preprocessTheme = function(path) {
         var dontProcess = [
-            'base', 'bootstrapbase', 'standardtotararesponsive'
+            'base', 'bootstrapbase'
         ];
 
         for (var i = 0; i < dontProcess.length; i++) {
@@ -507,7 +507,6 @@ module.exports = function(grunt) {
             'theme/more/style/custom.css',
 
             '# Totara files to ignore',
-            'theme/standardtotararesponsive/', // Ignore this whole theme.
             'theme/roots/less/totara/totara_jquery/',
             'theme/roots/less/bootstrap3/',
             'theme/basis/less/bootswatch/',

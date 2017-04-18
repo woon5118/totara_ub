@@ -36,30 +36,30 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
     public function test_get_template_directories_for_component() {
         global $CFG;
         // Test a plugin.
-        $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'standardtotararesponsive');
+        $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'basis');
         $correct = array(
-            $CFG->dirroot . '/theme/standardtotararesponsive/templates/mod_assign/',
-            $CFG->dirroot . '/theme/bootstrapbase/templates/mod_assign/',
+            $CFG->dirroot . '/theme/basis/templates/mod_assign/',
+            $CFG->dirroot . '/theme/roots/templates/mod_assign/',
             $CFG->dirroot . '/theme/base/templates/mod_assign/',
             $CFG->dirroot . '/mod/assign/templates/'
         );
         $this->assertEquals($correct, $dirs);
 
         // Test a subsystem.
-        $dirs = mustache_template_finder::get_template_directories_for_component('core_user', 'standardtotararesponsive');
+        $dirs = mustache_template_finder::get_template_directories_for_component('core_user', 'basis');
         $correct = array(
-            $CFG->dirroot . '/theme/standardtotararesponsive/templates/core_user/',
-            $CFG->dirroot . '/theme/bootstrapbase/templates/core_user/',
+            $CFG->dirroot . '/theme/basis/templates/core_user/',
+            $CFG->dirroot . '/theme/roots/templates/core_user/',
             $CFG->dirroot . '/theme/base/templates/core_user/',
             $CFG->dirroot . '/user/templates/'
         );
         $this->assertEquals($correct, $dirs);
 
         // Test core.
-        $dirs = mustache_template_finder::get_template_directories_for_component('core', 'standardtotararesponsive');
+        $dirs = mustache_template_finder::get_template_directories_for_component('core', 'basis');
         $correct = array(
-            $CFG->dirroot . '/theme/standardtotararesponsive/templates/core/',
-            $CFG->dirroot . '/theme/bootstrapbase/templates/core/',
+            $CFG->dirroot . '/theme/basis/templates/core/',
+            $CFG->dirroot . '/theme/roots/templates/core/',
             $CFG->dirroot . '/theme/base/templates/core/',
             $CFG->dirroot . '/lib/templates/'
         );
@@ -97,12 +97,12 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $CFG->themedir = '/foo/bar';
-        $dirs = mustache_template_finder::get_template_directories_for_component('totara_core', 'standardtotararesponsive');
+        $dirs = mustache_template_finder::get_template_directories_for_component('totara_core', 'basis');
         $correct = array(
-            $CFG->dirroot . '/theme/standardtotararesponsive/templates/totara_core/',
-            '/foo/bar/standardtotararesponsive/templates/totara_core/',
-            $CFG->dirroot . '/theme/bootstrapbase/templates/totara_core/',
-            '/foo/bar/bootstrapbase/templates/totara_core/',
+            $CFG->dirroot . '/theme/basis/templates/totara_core/',
+            '/foo/bar/basis/templates/totara_core/',
+            $CFG->dirroot . '/theme/roots/templates/totara_core/',
+            '/foo/bar/roots/templates/totara_core/',
             $CFG->dirroot . '/theme/base/templates/totara_core/',
             '/foo/bar/base/templates/totara_core/',
             $CFG->dirroot . '/totara/core/templates/'
@@ -115,13 +115,13 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
      */
     public function test_invalid_get_template_directories_for_component() {
         // Test something invalid.
-        $dirs = mustache_template_finder::get_template_directories_for_component('octopus', 'standardtotararesponsive');
+        $dirs = mustache_template_finder::get_template_directories_for_component('octopus', 'basis');
     }
 
     public function test_get_template_filepath() {
         global $CFG;
 
-        $filename = mustache_template_finder::get_template_filepath('core/pix_icon', 'standardtotararesponsive');
+        $filename = mustache_template_finder::get_template_filepath('core/pix_icon', 'basis');
         $correct = $CFG->dirroot . '/lib/templates/pix_icon.mustache';
         $this->assertSame($correct, $filename);
     }
@@ -131,6 +131,6 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
      */
     public function test_invalid_get_template_filepath() {
         // Test something invalid.
-        $dirs = mustache_template_finder::get_template_filepath('core/octopus', 'standardtotararesponsive');
+        $dirs = mustache_template_finder::get_template_filepath('core/octopus', 'basis');
     }
 }

@@ -3,7 +3,6 @@ theme/bootstrapbase/style/
 theme/clean/style/custom.css
 theme/more/style/custom.css
 # Totara files to ignore
-theme/standardtotararesponsive/
 theme/roots/less/totara/totara_jquery/
 theme/roots/less/bootstrap3/
 theme/basis/less/bootswatch/

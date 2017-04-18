@@ -266,7 +266,7 @@ class core_outputcomponents_testcase extends advanced_testcase {
         // $this->assertSame($CFG->wwwroot.'/theme/image.php/formal_white/core/1/u/f2', $up2->get_url($page, $renderer)->out(false));
 
         // Test non-slashargument images.
-        set_config('theme', 'standardtotararesponsive');
+        set_config('theme', 'basis');
         $CFG->httpswwwroot = $CFG->wwwroot;
         $CFG->slasharguments = 0;
         $page = new moodle_page();

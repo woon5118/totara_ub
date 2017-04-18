@@ -288,7 +288,7 @@ function install_print_help_page($help) {
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
     echo '<html dir="'.(right_to_left() ? 'rtl' : 'ltr').'">
           <head>
-          <link rel="shortcut icon" href="theme/standardtotararesponsive/pix/favicon.ico" />
+          <link rel="shortcut icon" href="theme/basis/pix/favicon.ico" />
           <link rel="stylesheet" type="text/css" href="'.$CFG->wwwroot.'/install/css.php" />
           <title>'.get_string('installation','install').'</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -333,7 +333,7 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
     echo '<html dir="'.(right_to_left() ? 'rtl' : 'ltr').'">
           <head>
-          <link rel="shortcut icon" href="theme/standardtotararesponsive/pix/favicon.ico" />';
+          <link rel="shortcut icon" href="theme/basis/pix/favicon.ico" />';
 
     echo '<link rel="stylesheet" type="text/css" href="'.$CFG->wwwroot.'/install/css.php" />
           <title>'.get_string('installation','install').' - Totara '.$TOTARA->release.'</title>
@@ -407,7 +407,7 @@ function install_print_footer($config, $reload=false) {
 
     $homelink  = '<div class="sitelink">'.
        '<a title="Totara '. $TOTARA->release .'" href="https://help.totaralms.com/Getting_Started_for_Administrators.htm" onclick="this.target=\'_blank\'">'.
-       '<img src="theme/standardtotararesponsive/pix/logo.png" alt="totaralogo" /></a></div>';
+       '<img src="pix/logo.png" alt="totaralogo" /></a></div>';
 
     echo '</form></div>';
     echo '<div id="page-footer">'.$homelink.'</div>';

@@ -216,7 +216,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         global $CFG, $PAGE;
         $this->resetAfterTest();
 
-        $url = 'http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/forum/1/icon';
+        $url = 'http://www.example.com/moodle/theme/image.php/_s/basis/forum/1/icon';
         $flexicon = flex_icon::create_from_pix_url($url);
         $this->assertInstanceOf('core\output\flex_icon', $flexicon);
         $this->assertSame('mod_forum|icon', $flexicon->identifier);
