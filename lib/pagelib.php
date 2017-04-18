@@ -1676,11 +1676,6 @@ class moodle_page {
                     }
                 break;
 
-                case 'totarapdf':
-                    // Totara: Enforce standardtotararesponsive theme in PDF outputs - standardtotara is not available any more.
-                    return 'standardtotararesponsive';
-                break;
-
                 case 'session':
                     if (!empty($SESSION->theme)) {
                         return $SESSION->theme;

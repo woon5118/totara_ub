@@ -37,8 +37,6 @@ use totara_job\job_assignment;
  */
 class totara_appraisal_renderer extends plugin_renderer_base {
     /**
-     * @deprecated Since Totara 9.0.
-     *
      * Page header that is aware of dompdf limitations.
      * @return string
      */
@@ -55,7 +53,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $headhtml .= html_writer::empty_tag('meta', array('name' => 'viewport',
             'content' => 'width=device-width, initial-scale=1.'));
 
-        $styles = file_get_contents($CFG->dirroot . '/totara/appraisal/styles.css');
+        $styles = file_get_contents($CFG->dirroot . '/totara/appraisal/dompdf.css');
         $headhtml .= html_writer::tag('style', $styles);
 
         $headhtml .= $this->page->requires->get_head_code($this->page, $this->output);
@@ -69,8 +67,6 @@ class totara_appraisal_renderer extends plugin_renderer_base {
     }
 
     /**
-     * @deprecated Since Totara 9.0.
-     *
      * Page footer that is aware of pdf renderer limitations.
      * @return string
      */
