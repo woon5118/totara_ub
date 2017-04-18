@@ -405,6 +405,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/cust
                     throw new Error('Invalid response');
                 }
                 if (response[0].errormessage) {
+                    this._isSendingMessage = false;
                     throw new Error(response[0].errormessage);
                 }
                 // Fire an event to say the message was sent.
