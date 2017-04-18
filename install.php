@@ -306,7 +306,7 @@ if ($config->stage == INSTALL_SAVE) {
 
             install_print_header($config, 'config.php',
                                           get_string('configurationcompletehead', 'install'),
-                                          get_string('configurationcompletesub', 'install').get_string('configfilenotwritten', 'install'), 'alert-error');
+                                          get_string('configurationcompletesub', 'install').get_string('configfilenotwritten', 'install'), 'alert-danger');
             echo '<div class="configphp"><pre>';
             echo p($configphp);
             echo '</pre></div>';
@@ -469,7 +469,7 @@ if ($config->stage == INSTALL_DATABASE) {
     }
 
     if ($hint_database !== '') {
-        echo '<div class="alert alert-error">'.$hint_database.'</div>';
+        echo '<div class="alert alert-danger">'.$hint_database.'</div>';
     }
     echo '</div>';
     install_print_footer($config);
@@ -537,7 +537,7 @@ if ($config->stage == INSTALL_ENVIRONMENT or $config->stage == INSTALL_PATHS) {
                                       get_string('errorsinenvironment', 'install'),
                                       get_string('environmentsub2', 'install'));
 
-        echo '<div id="envresult"><dl>';
+        echo '<div class="alert alert-danger"><dl>';
         if ($curl_fail) {
             echo '<dt>'.get_string('phpextension', 'install', 'cURL').'</dt><dd>'.get_string('environmentrequireinstall', 'admin').'</dd>';
         }
@@ -589,7 +589,7 @@ if ($config->stage == INSTALL_PATHS) {
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_dataroot">'.$paths['dataroot'].'</label></div>';
     echo '<div class="fitemelement"><input id="id_dataroot" name="dataroot" type="text" class="text-ltr" value="'.s($config->dataroot).'" size="70" /></div>';
     if ($hint_dataroot !== '') {
-        echo '<div class="alert alert-error">'.$hint_dataroot.'</div>';
+        echo '<div class="alert alert-danger">'.$hint_dataroot.'</div>';
     }
     echo '</div>';
 
@@ -598,7 +598,7 @@ if ($config->stage == INSTALL_PATHS) {
         echo '<div class="fitem"><div class="fitemtitle"><label for="id_admin">'.$paths['admindir'].'</label></div>';
         echo '<div class="fitemelement"><input id="id_admin" name="admin" type="text" class="text-ltr" value="'.s($config->admin).'" size="10" /></div>';
         if ($hint_admindir !== '') {
-            echo '<div class="alert alert-error">'.$hint_admindir.'</div>';
+            echo '<div class="alert alert-danger">'.$hint_admindir.'</div>';
         }
         echo '</div>';
     }
