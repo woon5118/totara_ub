@@ -36,15 +36,17 @@
     Example context (json):
     { "message": "Your pants are on fire!", "closebutton": 1, "announce": 1, "extraclasses": "foo bar"}
 }}
-<div class="alert alert-danger alert-block fade in {{ extraclasses }}" {{!
+<div class="alert alert-danger {{#closebutton}}alert-dismissable{{/closebutton}} fade in {{ extraclasses }}" {{!
     }}{{# announce }} role="alert"{{/ announce }}{{!
     }}>
-    {{# closebutton }}<button type="button" class="close" data-dismiss="alert">&times;</button>{{/ closebutton }}
+    {{# closebutton }}<button type="button" class="close" data-dismiss="alert" aria-label="{{#str}}closebuttontitle, core{{/str}}">{{#flex_icon}}delete-ns, { "classes": "ft-size-100" }{{/flex_icon}}</button>{{/ closebutton }}
     {{{ message }}}
 </div>
-{{# js }}
-require(['jquery', 'theme_bootstrapbase/bootstrap'], function($) {
-    // Setup closing of bootstrap alerts.
-    $().alert();
-});
-{{/ js }}
+{{#closebutton}}
+    {{# js }}
+    require(['jquery', 'theme_roots/bootstrap'], function($) {
+        // Setup closing of bootstrap alerts.
+        $().alert();
+    });
+    {{/ js }}
+{{/closebutton}}

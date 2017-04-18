@@ -280,6 +280,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'block_lp',
         'report_competency',
         'theme_boost',
+        'theme_bootstrapbase',
         'theme_canvas',
         'theme_clean',
         'theme_more',

@@ -1157,6 +1157,7 @@ class core_plugin_manager {
             'block_lp',
             'report_competency',
             'theme_boost',
+            'theme_bootstrapbase',
             'theme_canvas',
             'theme_clean',
             'theme_more',
@@ -1438,7 +1439,7 @@ class core_plugin_manager {
             ),
 
             'theme' => array(
-                'base', 'bootstrapbase'
+                'base'
                 // Totara:
                 , 'roots', 'basis',
             ),

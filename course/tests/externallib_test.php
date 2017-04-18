@@ -67,7 +67,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $category2->name = 'Root Test Category 2';
         $category2->idnumber = 'rootcattest2';
         $category2->desc = 'Description for root test category 1';
-        $category2->theme = 'bootstrapbase';
+        $category2->theme = 'roots';
         $categories = array(
             array('name' => $category1->name, 'parent' => 0),
             array('name' => $category2->name, 'parent' => 0, 'idnumber' => $category2->idnumber,
@@ -408,7 +408,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $course2['completionstartonenrol'] = 1;
         $course2['completionnotify'] = 1;
         $course2['lang'] = 'en';
-        $course2['forcetheme'] = 'bootstrapbase';
+        $course2['forcetheme'] = 'roots';
         $course3['fullname'] = 'Test course 3';
         $course3['shortname'] = 'Testcourse3';
         $course3['categoryid'] = $category->id;
@@ -1094,7 +1094,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $course2['enablecompletion'] = 1;
         $course2['completionstartonenrol'] = 1;
         $course2['lang'] = 'en';
-        $course2['forcetheme'] = 'bootstrapbase';
+        $course2['forcetheme'] = 'roots';
         $courses = array($course1, $course2);
 
         $updatedcoursewarnings = core_course_external::update_courses($courses);

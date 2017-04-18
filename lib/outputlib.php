@@ -520,7 +520,7 @@ class theme_config {
 
         } else {
             // bad luck, the requested theme has some problems - admin see details in theme config
-            if ($themename !== 'boost') {
+            if ($themename !== 'boost') { // Totara: do not complain during migration from Moodle
                 debugging('This page should be using theme ' . $themename .
                     ' which cannot be initialised. Nor can the site theme ' . $CFG->theme .
                     '. Falling back to ' . theme_config::DEFAULT_THEME, DEBUG_NORMAL);
@@ -555,8 +555,8 @@ class theme_config {
         $this->name     = $config->name;
         $this->dir      = $config->dir;
 
-        if ($this->name != 'bootstrapbase') {
-            $baseconfig = theme_config::find_theme_config('bootstrapbase', $this->settings);
+        if ($this->name != 'base') {
+            $baseconfig = theme_config::find_theme_config('base', $this->settings);
         } else {
             $baseconfig = $config;
         }
@@ -2241,8 +2241,8 @@ class theme_config {
             }
         }
 
-        // Last resort, try the bootstrapbase theme for names
-        return get_string('region-' . $region, 'theme_bootstrapbase');
+        // Last resort, try the base theme for names
+        return get_string('region-' . $region, 'theme_base');
     }
 
     /**

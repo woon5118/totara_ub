@@ -1,2 +1,0 @@
-This file describes API changes in /theme/bootstrapbase
-information provided here is intended especially for theme designers.

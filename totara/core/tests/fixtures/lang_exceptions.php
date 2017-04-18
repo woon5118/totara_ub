@@ -53,7 +53,6 @@ $exceptions = array(
     'enrol_ldap' => array('autocreate'),
     'mod_facetoface' => array('mincapacity_help'),
     'auth_ldap' => array('auth_ntlmsso_enabled'),
-    'theme_bootstrapbase' => array('choosereadme'),
     'tool_usertours' => true, // Not implemented yet
 
 );

@@ -30,9 +30,7 @@ if (file_exists(__DIR__.'/../config.php')) {
 
 // include only the necessary stuff from themes, keep this small otherwise IE will complain...
 
-// MDL-43839 IE9 cannot handle all of our css.
-// Once IE9 is no longer supported we can include 'bootstrapbase/style/moodle.css'
-// and remove some of the CSS in $content.
+// TODO TL-14169 use theme/basis/style/totara.css here.
 $files = array();
 
 $content = '';
@@ -115,9 +113,7 @@ fieldset .alert {
 }
 
 /*
-MDL-43839 IE9 cannot handle all of our CSS.
-Once IE9 is no longer supported we can include 'bootstrapbase/style/moodle.css' above
-and remove the following.
+TODO TL-14169 delete stuff that is in basis theme
 */
 
 #page-footer {

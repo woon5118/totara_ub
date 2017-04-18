@@ -66,9 +66,6 @@ repository/s3/S3.php
 theme/base/fonts/
 theme/base/less/fa/
 theme/base/fonts/totara_font.json.zip
-theme/bootstrapbase/less/bootstrap/
-theme/bootstrapbase/javascript/html5shiv.js
-theme/bootstrapbase/amd/src/bootstrap.js
 theme/roots/less/bootstrap3/
 theme/roots/amd/src/bootstrap.js
 totara/appraisal/dompdf/
