@@ -120,6 +120,36 @@ class flex_icon extends \pix_icon {
     }
 
     /**
+     * Allow the flex icon to be rendered by the pix helper.
+     *
+     * Much simpler version of export that will produce the data required to render this pix with the
+     * pix helper in a mustache tag.
+     *
+     * Introduced by Moodle in 3.2 this method exports the basic properties of the icon so that it can be used
+     * within the pix helper.
+     * See TL-13982.
+     * Of course we don't want to use their pix icon, we want this to be a flex icon, as such we need this to be handled by
+     * the pix helper.
+     *
+     * TOTARA HACK:
+     * This code is a hack, it masquerades the flex_icon as a pix_icon and then detects the flex icon and renderers it correctly
+     * within a matching hack in \core\output\mustache_pix_helper::pix().
+     *
+     * If you change this code you must update that code also!
+     *
+     * @return array
+     */
+    public function export_for_pix() {
+        global $OUTPUT;
+        $icondata = $this->export_for_template($OUTPUT);
+        return [
+            'key' => $icondata['identifier'],
+            'component' => 'flexicon', // HACK ALERT: Read the phpdocs above.
+            'title' => json_encode($icondata)
+        ];
+    }
+
+    /**
      * Does a flex icon with this identifier exist?
      *
      * @param string $identifier Flex icon identifier.

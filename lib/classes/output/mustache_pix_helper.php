@@ -70,6 +70,16 @@ class mustache_pix_helper {
             $component = '';
         }
         $component = $helper->render($component);
+
+        if ($component === 'flexicon') {
+            // TOTARA HACK: The pix helper has received a flex icon, we can use the flex_helper.
+            // Arguments are passed as following:
+            //    identifier, component, json encoded icon data.
+            // This hack is facilitate by code in \core\output\flex_icon::export_for_pix()
+            $flexicon = new flex_icon($key, json_decode(strtok("")));
+            return $this->renderer->render($flexicon);
+        }
+
         $text = strtok("");
         // Allow mustache tags in the last argument.
         $text = $helper->render($text);
