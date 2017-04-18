@@ -273,6 +273,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
     $deleteplugins = array(
         // Totara 10.0 removals.
         'theme_kiwifruitresponsive',
+        'theme_customtotararesponsive',
 
         // Moodle merge removals - we do not want these!
         'block_lp',

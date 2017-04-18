@@ -142,7 +142,7 @@ module.exports = function(grunt) {
      */
     var preprocessTheme = function(path) {
         var dontProcess = [
-            'base', 'bootstrapbase', 'standardtotararesponsive', 'customtotararesponsive'
+            'base', 'bootstrapbase', 'standardtotararesponsive'
         ];
 
         for (var i = 0; i < dontProcess.length; i++) {
@@ -513,7 +513,6 @@ module.exports = function(grunt) {
             'theme/basis/less/bootswatch/',
             'theme/basis/style/settings-noprocess.css',
             'theme/basis/style/totara-rtl.css',
-            'theme/customtotararesponsive/style/settings.css',
             'theme/roots/style/totara-rtl.css',
             'theme/bootstrapbase/', // TOTARA: We will be removing this in the future.
         ]

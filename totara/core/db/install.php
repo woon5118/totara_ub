@@ -256,14 +256,14 @@ function xmldb_totara_core_install() {
         totara_core_fix_old_upgraded_mssql();
     }
 
-    totara_core_upgrade_delete_moodle_plugins();
-
     // Remove private token column because all tokens were always supposed to be private.
     $table = new xmldb_table('external_tokens');
     $field = new xmldb_field('privatetoken', XMLDB_TYPE_CHAR, '64', null, null, null, null);
     if ($dbman->field_exists($table, $field)) {
         $dbman->drop_field($table, $field);
     }
+
+    totara_core_upgrade_delete_moodle_plugins();
 
     return true;
 }

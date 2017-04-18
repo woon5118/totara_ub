@@ -9,7 +9,6 @@ theme/roots/less/bootstrap3/
 theme/basis/less/bootswatch/
 theme/basis/style/settings-noprocess.css
 theme/basis/style/totara-rtl.css
-theme/customtotararesponsive/style/settings.css
 theme/roots/style/totara-rtl.css
 theme/bootstrapbase/
 # CSS compiled from less
