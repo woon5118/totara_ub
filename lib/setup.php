@@ -216,6 +216,14 @@ if (!isset($CFG->langlocalroot)) {
     $CFG->langlocalroot = $CFG->dataroot.'/lang';
 }
 
+// Totara: redirect behat error logs to a special file, but do not log the errors from setup utils there.
+if (defined('BEHAT_SITE_RUNNING') or defined('BEHAT_TEST')) {
+    if (!defined('BEHAT_UTIL')) {
+        ini_set('error_log', dirname($CFG->dataroot) . '/' . basename($CFG->dataroot) . '_error.log');
+        ini_set('log_errors', 1);
+    }
+}
+
 // Totara: make sure forbidden settings are disabled.
 $CFG->pathtounoconv = ''; // Unoconv is not secure for web servers!
 $CFG->enablemobilewebservice = '0'; // Not compatible with Totara.

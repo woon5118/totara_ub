@@ -97,6 +97,23 @@ class behat_hooks extends behat_base {
     protected static $runningsuite = '';
 
     /**
+     * Send log message to error_log.
+     *
+     * Note: the main purpose of the method is to fix timezone in logs to match php.ini
+     *
+     * @param string $message
+     */
+    public static function error_log($message) {
+        $prevtz = date_default_timezone_get();
+        $tz = ini_get('date.timezone');
+        if ($tz) {
+            date_default_timezone_set($tz);
+        }
+        error_log($message);
+        date_default_timezone_set($prevtz);
+    }
+
+    /**
      * Hook to capture BeforeSuite event so as to give access to moodle codebase.
      * This will try and catch any exception and exists if anything fails.
      *
@@ -106,6 +123,7 @@ class behat_hooks extends behat_base {
     public static function before_suite_hook(BeforeSuiteScope $scope) {
         // If behat has been initialised then no need to do this again.
         if (self::$initprocessesfinished) {
+            self::error_log('Behat suite start: ' . $scope->getSuite()->getName());
             return;
         }
 
@@ -203,6 +221,15 @@ class behat_hooks extends behat_base {
                 declare(ticks = 1);
             }
         }
+
+        // Totara: create or purge the error log file.
+        $errorlog = ini_get('error_log');
+        if (strpos($errorlog, 'behatrun') !== false) {
+            $fp = fopen($errorlog, 'w');
+            fclose($fp);
+            self::error_log(''); // Add empty line to make the log more readable.
+            self::error_log('Behat suite start: ' . $scope->getSuite()->getName());
+        }
     }
 
 
@@ -214,6 +241,10 @@ class behat_hooks extends behat_base {
      * @BeforeFeature
      */
     public static function before_feature(BeforeFeatureScope $scope) {
+        // Totara: log scenario start for each new file.
+        global $CFG;
+        self::error_log('Feature start: ' . $scope->getFeature()->getTitle() . ' # ' . $scope->getFeature()->getFile());
+
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -246,6 +277,9 @@ class behat_hooks extends behat_base {
      * @AfterSuite
      */
     public static function after_suite(AfterSuiteScope $scope) {
+        // Totara: notify the suite was finished.
+        self::error_log('Behat suite finish: ' . $scope->getSuite()->getName());
+
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -555,6 +589,15 @@ class behat_hooks extends behat_base {
         // Totara: better restart browser after any failure to prevent cascading problems.
         if ($scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::FAILED) {
             self::$forcerestart = true;
+            // Log failed steps.
+            self::error_log('Failed step: ' . $scope->getStep()->getText() . ' # ' . $scope->getFeature()->getFile() . ':' .$scope->getStep()->getLine());
+            $result = $scope->getTestResult();
+            if ($result instanceof \Behat\Testwork\Tester\Result\ExceptionResult) {
+                if ($result->hasException()) {
+                    $ex = $result->getException();
+                    self::error_log('Exception: ' . $ex->getMessage() . ' (' . get_class($ex) . ')');
+                }
+            }
         }
     }
 
