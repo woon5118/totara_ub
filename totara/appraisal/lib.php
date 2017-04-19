@@ -671,19 +671,17 @@ class appraisal {
             $alert->subject = get_string('closealerttitledefault', 'totara_appraisal', $this);
 
             // Find all users in roles that are not learner, who have a learner who is not finished.
-            $rolesql = 'SELECT ara.userid AS id,
-                           ' . sql_group_concat(sql_cast2char('usr.id'),',') . ' AS staff
-                      FROM {appraisal_user_assignment} aua
-                      JOIN {appraisal_role_assignment} ara
-                        ON aua.id = ara.appraisaluserassignmentid
-                      JOIN {user} usr
-                        ON aua.userid = usr.id
-                     WHERE aua.timecompleted IS NULL
-                       AND aua.appraisalid = :appraisalid
-                       AND aua.status = :status
-                       AND ara.appraisalrole != :roletype
-                       AND ara.userid <> 0
-                  GROUP BY ara.userid';
+            $staffuid = $DB->sql_group_concat(sql_cast2char('usr.id'), ',');
+            $rolesql = "SELECT ara.userid AS id, {$staffuid} AS staff
+                          FROM {appraisal_user_assignment} aua
+                          JOIN {appraisal_role_assignment} ara ON aua.id = ara.appraisaluserassignmentid
+                          JOIN {user} usr ON aua.userid = usr.id
+                         WHERE aua.timecompleted IS NULL
+                           AND aua.appraisalid = :appraisalid
+                           AND aua.status = :status
+                           AND ara.appraisalrole != :roletype
+                           AND ara.userid <> 0
+                      GROUP BY ara.userid";
             $roleparams = array('appraisalid' => $formdata->id, 'status' => self::STATUS_ACTIVE, 'roletype' => self::ROLE_LEARNER);
             $roleusers = $DB->get_records_sql($rolesql, $roleparams);
 

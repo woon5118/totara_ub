@@ -73,6 +73,7 @@ class rb_source_pos extends rb_base_source {
 
         $pathconcatsql = $DB->sql_concat('p.path', "'/'", "'%'");
         $global_restriction_join_ja = $this->get_global_report_restriction_join('ja', 'userid');
+        $list = $DB->sql_group_concat_unique(sql_cast2char('c.fullname'), '<br>');
 
         $joinlist = array(
             new rb_join(
@@ -92,9 +93,10 @@ class rb_source_pos extends rb_base_source {
             new rb_join(
                 'comps',
                 'LEFT',
-                '(SELECT oc.positionid, ' .
-                sql_group_concat(sql_cast2char('c.fullname'), '<br>', true) .
-                " AS list FROM {pos_competencies} oc LEFT JOIN {comp} c ON oc.competencyid = c.id GROUP BY oc.positionid)",
+                "(SELECT oc.positionid, {$list} AS list
+                    FROM {pos_competencies} oc
+               LEFT JOIN {comp} c ON oc.competencyid = c.id
+                GROUP BY oc.positionid)",
                 'comps.positionid = base.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),

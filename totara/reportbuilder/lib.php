@@ -5230,28 +5230,13 @@ function sql_table_from_select($table, $select, array $params) {
 function sql_group_concat($field, $delimiter=', ', $unique=false) {
     global $DB;
 
-    // if not supported, just return single value - use min()
-    $sql = " MIN($field) ";
+    debugging('sql_group_concat() is deprecated. Use DB->sql_group_concat_unique() instead.', DEBUG_DEVELOPER);
 
-    switch ($DB->get_dbfamily()) {
-        case 'mysql':
-            // use native function
-            $distinct = $unique ? 'DISTINCT' : '';
-            $sql = " GROUP_CONCAT($distinct $field SEPARATOR '$delimiter') ";
-            break;
-        case 'postgres':
-            // use custom aggregate function - must have been defined
-            // in db/upgrade.php
-            $distinct = $unique ? 'TRUE' : 'FALSE';
-            $sql = " GROUP_CONCAT($field, '$delimiter', $distinct) ";
-            break;
-        case 'mssql':
-            $distinct = $unique ? 'DISTINCT' : '';
-            $sql = " dbo.GROUP_CONCAT_D($distinct $field, '$delimiter') ";
-        break;
+    if ($unique) {
+        return $DB->sql_group_concat_unique($field, $delimiter);
+    } else {
+        return $DB->sql_group_concat($field, $delimiter);
     }
-
-    return $sql;
 }
 
 /**

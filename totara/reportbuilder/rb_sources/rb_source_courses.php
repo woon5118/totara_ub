@@ -61,14 +61,17 @@ class rb_source_courses extends rb_base_source {
     //
 
     protected function define_joinlist() {
+        global $DB;
 
+        $list = $DB->sql_group_concat_unique(sql_cast2char('m.name'), '|');
         $joinlist = array(
             new rb_join(
                 'mods',
                 'LEFT',
-                '(SELECT cm.course, ' .
-                sql_group_concat(sql_cast2char('m.name'), '|', true) .
-                " AS list FROM {course_modules} cm LEFT JOIN {modules} m ON m.id = cm.module GROUP BY cm.course)",
+                "(SELECT cm.course, {$list} AS list
+                    FROM {course_modules} cm
+               LEFT JOIN {modules} m ON m.id = cm.module
+                GROUP BY cm.course)",
                 'mods.course = base.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),

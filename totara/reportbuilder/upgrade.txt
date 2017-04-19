@@ -21,14 +21,12 @@ information provided here is intended especially for developers.
 * Added rb_session_roles_content class in totara/reportbuilder/classes/rb_base_content.php
   to allow Seminar report content to be restricted by an event role in
   facetoface_events, facetoface_sessions and facetoface_summary reports
-
 * Removed unused $graphrecord and $isexport parameters from totara/reportbuilder/classes/local/graph::__construct()
-
 * Added isexport param to rb_base_source::rb_display_link_program_icon.
-
 * rb_display_orderedlist_to_newline() is now deprecated
-
 * rb_display_certif_renewalstatus has been moved in to a new auto-loading style of
   display function (\totara_certification\rb\display\certif_renewalstatus) to use this
   function $this->usedcomponents[] = 'totara_certification'; must be set in the
   constructor for the report source.
+* The sql_group_concat function has been deprecated, use $DB->sql_group_concat_unique function instead.
+
