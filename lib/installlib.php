@@ -407,7 +407,7 @@ function install_print_footer($config, $reload=false) {
 
     $homelink  = '<div class="sitelink">'.
        '<a title="Totara '. $TOTARA->release .'" href="https://help.totaralms.com/Getting_Started_for_Administrators.htm" onclick="this.target=\'_blank\'">'.
-       '<img src="pix/logo.png" alt="totaralogo" /></a></div>';
+       '<img src="totara/core/pix/logo.svg" alt="Totara logo" /></a></div>';
 
     echo '</form></div>';
     echo '<div id="page-footer">'.$homelink.'</div>';

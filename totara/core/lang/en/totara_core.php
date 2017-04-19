@@ -293,7 +293,6 @@ $string['learning'] = 'Learning';
 $string['learningplans'] = 'Learning Plans';
 $string['learningrecords'] = 'Learning Records';
 $string['localpostinstfailed'] = 'There was a problem setting up local modifications to this installation.';
-$string['logo'] = '{$a} logo';
 $string['managecertifications'] = 'Manage certifications';
 $string['managecustomicons'] = 'Manage custom icons';
 $string['managers'] = 'Manager\'s ';

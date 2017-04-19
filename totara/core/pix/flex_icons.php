@@ -326,6 +326,7 @@ $pixonlyimages = array(
     'jquery_ui_dialog/ui-icons_454545_256x240',
     'jquery_ui_dialog/ui-icons_888888_256x240',
     'jquery_ui_dialog/ui-icons_cd0a0a_256x240',
+    'logo',
     'programicons/achieving-success',
     'programicons/advanced-accounting',
     'programicons/advanced-business-process-improvement',
