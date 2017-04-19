@@ -45,6 +45,7 @@ class seminar_calendar_dynamic_content {
             return;
         }
 
+        $content = '';
         $class = 'pull-right';
         if (facetoface_check_signup($session->facetoface, $session->id)) {
             $class .= ' text-uppercase label label-default';
@@ -60,7 +61,9 @@ class seminar_calendar_dynamic_content {
                 array('class' => 'btn btn-default btn-sm')
             );
         }
-        $hook->content .= \html_writer::div($content, $class);
-        $hook->content .= \html_writer::div('&nbsp;', 'clearfix');
+        if (!empty($content)) {
+            $hook->content .= \html_writer::div($content, $class);
+            $hook->content .= \html_writer::div('&nbsp;', 'clearfix');
+        }
     }
 }
