@@ -311,9 +311,12 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $out = html_writer::tag('div', '', array('class' => "empty", 'id' => 'feedbackhead-anchor'));
 
-        // $this->notification strips out the save button so go direct to the template.
+        // HACK ALERT: Notifications by default put the content through clean text.
+        // This won't work for the above save progress button, but because they clean it in code the template doesn't attempt to
+        // clean it itself.
+        // We can get around this by using the template directly and making sure that we clean ourselves.
         $context = array('message' => $content);
-        $out .= html_writer::tag('div', $this->render_from_template('core/notification_message', $context), array('id' => 'feedbackhead'));
+        $out .= html_writer::tag('div', $this->render_from_template('core/notification_info', $context), array('id' => 'feedbackhead'));
 
         return $out;
     }

@@ -80,6 +80,8 @@ Feature: Normal feedback
     And I log in as "user2"
     And I click on "360° Feedback" in the totara menu
     And I click on "Respond now" "button" in the "User One" "table_row"
+    # If the next line fails check the hack in totara_feedback360_renderer::display_feedback_header
+    And "#feedbackhead .feedback360-save input[value='Save progress']" "css_element" should be visible
     And I set the field "How much do you like me?" to "Not at all"
     And I press "Submit feedback"
     And I log out
