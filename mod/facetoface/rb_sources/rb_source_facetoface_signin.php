@@ -196,7 +196,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'sessions.details',
                 array(
                     'joins' => 'sessions',
-                    'displayfunc' => 'tinymce_textarea',
+                    'displayfunc' => 'editor_textarea',
                     'extrafields' => array(
                         'filearea' => '\'session\'',
                         'component' => '\'mod_facetoface\'',

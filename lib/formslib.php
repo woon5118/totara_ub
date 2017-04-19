@@ -2405,9 +2405,6 @@ require(["core/event", "jquery"], function(Event, $) {
         } catch(e) {
             return true;
         }
-        if (typeof window.tinyMCE !== \'undefined\') {
-            window.tinyMCE.triggerSave();
-        }
         if (!myValidator()) {
             ev.preventDefault();
         }

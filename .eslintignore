@@ -13,11 +13,6 @@ enrol/lti/ims-blti/
 filter/algebra/AlgParser.pm
 filter/tex/mimetex.*
 lib/editor/atto/yui/src/rangy/js/*.*
-lib/editor/tinymce/plugins/moodleimage/tinymce/editor_plugin.js
-lib/editor/tinymce/plugins/pdw/tinymce/
-lib/editor/tinymce/plugins/spellchecker/rpc.php
-lib/editor/tinymce/plugins/spellchecker/tinymce/editor_plugin.js
-lib/editor/tinymce/tiny_mce/
 lib/adodb/
 lib/bennu/
 lib/evalmath/

@@ -87,9 +87,6 @@ define(['jquery'],
                         var attoEditor = $(this.selector + 'editable');
                         if (attoEditor.length) {
                             attoEditor.html(value.text);
-                        } else if (typeof tinyMCE !== 'undefined') {
-                            // If the editor is not Atto, try to fallback to TinyMCE.
-                            tinyMCE.execInstanceCommand(this.id, 'mceInsertContent', false, value.text);
                         }
 
                         // Set text to actual editor text area.

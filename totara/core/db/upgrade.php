@@ -70,9 +70,9 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017040900, 'totara', 'core');
     }
 
-    if ($oldversion < 2017041903) {
+    if ($oldversion < 2017041904) {
         totara_core_upgrade_delete_moodle_plugins();
-        upgrade_plugin_savepoint(true, 2017041903, 'totara', 'core');
+        upgrade_plugin_savepoint(true, 2017041904, 'totara', 'core');
     }
 
     return true;

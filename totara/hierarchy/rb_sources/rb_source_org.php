@@ -180,7 +180,7 @@ class rb_source_org extends rb_base_source {
                 'description',
                 get_string('description', 'rb_source_org'),
                 "base.description",
-                array('displayfunc' => 'tinymce_textarea',
+                array('displayfunc' => 'editor_textarea',
                     'extrafields' => array(
                         'filearea' => '\'org\'',
                         'component' => '\'totara_hierarchy\'',

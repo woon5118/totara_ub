@@ -169,7 +169,7 @@ class rb_source_goal_custom extends rb_base_source {
                 'goaldescription',
                 get_string('goaldescription', 'rb_source_goal_custom'),
                 'base.description',
-                array('displayfunc' => 'tinymce_textarea',
+                array('displayfunc' => 'editor_textarea',
                     'extrafields' => array(
                         'component' => '\'totara_hierarchy\'',
                         'filearea' => '\'goal\'',

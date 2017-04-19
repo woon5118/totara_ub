@@ -278,12 +278,15 @@ function totara_core_upgrade_delete_moodle_plugins() {
 
         // Moodle merge removals - we do not want these!
         'block_lp',
+        'editor_tinymce',
         'report_competency',
         'theme_boost',
         'theme_bootstrapbase',
         'theme_canvas',
         'theme_clean',
         'theme_more',
+        'tinymce_ctrlhelp', 'tinymce_managefiles', 'tinymce_moodleemoticon', 'tinymce_moodleimage',
+        'tinymce_moodlemedia', 'tinymce_moodlenolink', 'tinymce_pdw', 'tinymce_spellchecker', 'tinymce_wrap',
         'tool_cohortroles',
         'tool_installaddon',
         'tool_lp',
@@ -326,6 +329,16 @@ function totara_core_upgrade_delete_moodle_plugins() {
                 $DB->delete_records('external_services_functions', array('externalserviceid' => $service->id));
                 $DB->delete_records('external_services', array('id' => $service->id));
             }
+        }
+        if ($deleteplugin === 'editor_tinymce') {
+            $editors = get_config('core', 'texteditors');
+            if ($editors) {
+                $editors = explode(',', $editors);
+                $editors = array_flip($editors);
+                unset($editors['tinymce']);
+                set_config('texteditors', implode(',', array_keys($editors)));
+            }
+            // NOTE: there is no need to update user preference, if editor is not found the default is used instead.
         }
         uninstall_plugin($plugintype, $pluginname);
     }

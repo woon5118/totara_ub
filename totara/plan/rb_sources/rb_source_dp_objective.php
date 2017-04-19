@@ -276,7 +276,7 @@ class rb_source_dp_objective extends rb_base_source {
                 get_string('description', 'rb_source_dp_objective'),
                 'base.description',
                 array(
-                    'displayfunc' => 'tinymce_textarea',
+                    'displayfunc' => 'editor_textarea',
                     'extrafields' => array(
                         'filearea' => '\'dp_plan_objective\'',
                         'component' => '\'totara_plan\'',

@@ -1,2 +1,0 @@
-This files describes API changes in /lib/editor/tinymce/* - TinyMCE editor,
-information provided here is intended especially for developers.

@@ -1155,12 +1155,15 @@ class core_plugin_manager {
 
             // Moodle merge removals - we do not want these!
             'block_lp',
+            'editor_tinymce',
             'report_competency',
             'theme_boost',
             'theme_bootstrapbase',
             'theme_canvas',
             'theme_clean',
             'theme_more',
+            'tinymce_ctrlhelp', 'tinymce_managefiles', 'tinymce_moodleemoticon', 'tinymce_moodleimage',
+            'tinymce_moodlemedia', 'tinymce_moodlenolink', 'tinymce_pdw', 'tinymce_spellchecker', 'tinymce_wrap',
             'tool_cohortroles',
             'tool_installaddon',
             'tool_lp',
@@ -1280,7 +1283,7 @@ class core_plugin_manager {
             ),
 
             'editor' => array(
-                'atto', 'textarea', 'tinymce'
+                'atto', 'textarea'
             ),
 
             'enrol' => array(
@@ -1431,11 +1434,6 @@ class core_plugin_manager {
                 'interactions',
                 'graphs',
                 'objectives'
-            ),
-
-            'tinymce' => array(
-                'ctrlhelp', 'managefiles', 'moodleemoticon', 'moodleimage',
-                'moodlemedia', 'moodlenolink', 'pdw', 'spellchecker', 'wrap'
             ),
 
             'theme' => array(

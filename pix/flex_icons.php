@@ -2333,7 +2333,7 @@ $deprecated = array(
 /*
  * Pix only images are not supposed to be converted to flex icons.
  *
- * - e/xxx pix icons should be used by Atto and TinyMCE editors that do not support flex icons
+ * - e/xxx pix icons should be used by Atto editor that does not support flex icons
  *
  */
 $pixonlyimages = array(

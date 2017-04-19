@@ -189,7 +189,7 @@ class rb_source_pos extends rb_base_source {
                 'description',
                 get_string('description', 'rb_source_pos'),
                 "base.description",
-                array('displayfunc' => 'tinymce_textarea',
+                array('displayfunc' => 'editor_textarea',
                     'extrafields' => array(
                         'filearea' => '\'pos\'',
                         'component' => '\'totara_hierarchy\'',

@@ -3078,7 +3078,7 @@ abstract class rb_base_source {
                     "$join.summary") . ' END',
             array(
                 'joins' => $join,
-                'displayfunc' => 'tinymce_textarea',
+                'displayfunc' => 'editor_textarea',
                 'extrafields' => array(
                     'filearea' => '\'summary\'',
                     'component' => '\'course\'',
@@ -3094,7 +3094,7 @@ abstract class rb_base_source {
             "$join.summary",
             array(
                 'joins' => $join,
-                'displayfunc' => 'tinymce_textarea',
+                'displayfunc' => 'editor_textarea',
                 'extrafields' => array(
                     'format' => "$join.summaryformat",
                     'filearea' => '\'summary\'',
@@ -3329,7 +3329,7 @@ abstract class rb_base_source {
             "$join.summary",
             array(
                 'joins' => $join,
-                'displayfunc' => 'tinymce_textarea',
+                'displayfunc' => 'editor_textarea',
                 'extrafields' => array(
                     'filearea' => '\'summary\'',
                     'component' => '\'totara_program\'',

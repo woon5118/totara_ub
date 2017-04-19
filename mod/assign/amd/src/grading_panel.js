@@ -83,11 +83,6 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
      * @method _saveFormState
      */
     GradingPanel.prototype._saveFormState = function() {
-        // Grrrrr! TinyMCE you know what you did.
-        if (typeof window.tinyMCE !== 'undefined') {
-            window.tinyMCE.triggerSave();
-        }
-
         // Copy data from notify students checkbox which was moved out of the form.
         var checked = $('[data-region="grading-actions-form"] [name="sendstudentnotifications"]').prop("checked");
         $('.gradeform [name="sendstudentnotifications"]').val(checked);
