@@ -134,7 +134,7 @@ $string['viewmessageswith'] = 'View messages with {$a}';
 $string['viewnotificationresource'] = 'Go to: {$a}';
 $string['viewunreadmessageswith'] = 'View unread messages with {$a}';
 $string['writeamessage'] = 'Write a message...';
-$string['you'] = 'You:';
+$string['you'] = 'You: {$a}';
 
 // Deprecated since Moodle 3.2.
 $string['context'] = 'context';

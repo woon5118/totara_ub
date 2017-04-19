@@ -576,11 +576,9 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/cust
             // Get the text we will display on the contact panel.
             text = this._getContactText(text);
             if (sentbyuser) {
-                Str.get_string('you', 'message').done(function(string) {
+                Str.get_string('you', 'message', text).done(function(string) {
                     // Ensure we display that the message is from this user.
                     user.find(SELECTORS.LASTMESSAGEUSER).empty().append(string);
-                }).always(function() {
-                    user.find(SELECTORS.LASTMESSAGETEXT).empty().append(text);
                 });
             } else {
                 user.find(SELECTORS.LASTMESSAGEUSER).empty();
