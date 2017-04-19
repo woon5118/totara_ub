@@ -230,7 +230,7 @@ abstract class user_selector_base {
         }
         $output = '<div class="userselector" id="' . $this->name . '_wrapper">' . "\n" .
                 '<select name="' . $name . '" id="' . $this->name . '" ' .
-                $multiselect . 'size="' . $this->rows . '" class="form-control no-overflow">' . "\n";
+                $multiselect . 'size="' . $this->rows . '" class="form-control">' . "\n";
 
         // Populate the select.
         $output .= $this->output_options($groupedusers, $search);
