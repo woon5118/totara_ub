@@ -15,7 +15,8 @@ Feature: Edit activities in main menu block
     And I set the field "New name for activity My forum name" to "New forum name"
     And I press key "13" in the field "New name for activity My forum name"
     And I should see "New forum name"
-    Then I should not see "My forum name"
+    #TODO: remove restriction after TL-14176 has been completed
+    Then I should not see "My forum name" in the ".block_site_main_menu .instancename" "css_element"
     And I follow "New forum name"
     And I should not see "My forum name"
     And I should see "New forum name"

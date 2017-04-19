@@ -24,7 +24,9 @@ Feature: Edit activities in social activities block
     And I click on "Edit title" "link" in the "//*[contains(@class,'block_social_activities')]//li[contains(.,'My forum name')]" "xpath_element"
     And I set the field "New name for activity My forum name" to "New forum name"
     And I press key "13" in the field "New name for activity My forum name"
-    Then I should not see "My forum name" in the "Social activities" "block"
+    #TODO: use the line below once TL-14176 has been implemented
+    #Then I should not see "My forum name" in the "Social activities" "block"
+    Then "//*[contains(@class,'block_social_activities')]//*[contains(@class, 'instancename') and contains(., 'My forum name')]" "xpath_element" should not exist
     And I should see "New forum name"
     And I follow "New forum name"
     And I should not see "My forum name"
