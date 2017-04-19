@@ -55,14 +55,15 @@ $returnurl = new moodle_url('/blog/external_blogs.php');
 $action = (empty($id)) ? 'add' : 'edit';
 
 $external = new stdClass();
+$external->autotags = [];
 
 // Retrieve the external blog record.
 if (!empty($id)) {
     if (!$external = $DB->get_record('blog_external', array('id' => $id, 'userid' => $USER->id))) {
         print_error('wrongexternalid', 'blog');
     }
+    $external->autotags = core_tag_tag::get_item_tags_array('core', 'blog_external', $id);
 }
-$external->autotags = core_tag_tag::get_item_tags_array('core', 'blog_external', $id);
 
 $strformheading = ($action == 'edit') ? get_string('editexternalblog', 'blog') : get_string('addnewexternalblog', 'blog');
 $strexternalblogs = get_string('externalblogs', 'blog');
