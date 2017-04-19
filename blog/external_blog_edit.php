@@ -56,13 +56,13 @@ $action = (empty($id)) ? 'add' : 'edit';
 
 $external = new stdClass();
 
-// Check that this id exists.
-if (!empty($id) && !$DB->record_exists('blog_external', array('id' => $id))) {
-    print_error('wrongexternalid', 'blog');
-} else if (!empty($id)) {
-    $external = $DB->get_record('blog_external', array('id' => $id));
-    $external->autotags = core_tag_tag::get_item_tags_array('core', 'blog_external', $id);
+// Retrieve the external blog record.
+if (!empty($id)) {
+    if (!$external = $DB->get_record('blog_external', array('id' => $id, 'userid' => $USER->id))) {
+        print_error('wrongexternalid', 'blog');
+    }
 }
+$external->autotags = core_tag_tag::get_item_tags_array('core', 'blog_external', $id);
 
 $strformheading = ($action == 'edit') ? get_string('editexternalblog', 'blog') : get_string('addnewexternalblog', 'blog');
 $strexternalblogs = get_string('externalblogs', 'blog');
