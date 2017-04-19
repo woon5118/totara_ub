@@ -7,19 +7,7 @@ theme/basis/style/settings-noprocess.css
 theme/basis/style/totara-rtl.css
 theme/roots/style/totara-rtl.css
 # CSS compiled from less
-blocks/current_learning/styles.css
-blocks/totara_alerts/styles.css
 blocks/totara_featured_links/styles.css
-report/participation/styles.css
-report/progress/styles.css
-totara/appraisal/styles.css
-totara/customfield/styles.css
-totara/feedback360/styles.css
-totara/form/styles.css
-totara/job/styles.css
-totara/plan/styles.css
-totara/program/styles.css
-totara/reportbuilder/styles.css
 theme/base/style/flexible-icons.css
 theme/basis/style/totara.css
 theme/roots/style/totara.css
