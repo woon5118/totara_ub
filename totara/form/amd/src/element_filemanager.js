@@ -97,7 +97,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     this.pathbar.removeChild(this.pathnode);
                 }
                 // Initialize 'select file' panel.
-                this.selectnode = Y.Node.createWithFilesSkin(M.totara_form.element_filemanager.templates.fileselectlayout);
+                this.selectnode = Y.Node.create(M.totara_form.element_filemanager.templates.fileselectlayout);
                 this.selectnode.setAttribute('aria-live', 'assertive');
                 this.selectnode.setAttribute('role', 'dialog');
                 this.selectnode.generateID();
@@ -236,7 +236,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     header = M.util.get_string('info', 'moodle');
                 }
                 if (!this.msg_dlg) {
-                    this.msg_dlg_node = Y.Node.createWithFilesSkin(M.totara_form.element_filemanager.templates.message);
+                    this.msg_dlg_node = Y.Node.create(M.totara_form.element_filemanager.templates.message);
                     var nodeid = this.msg_dlg_node.generateID();
 
                     this.msg_dlg = new M.core.dialogue({
@@ -329,7 +329,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                             return valid;
                         };
                         if (!this.mkdir_dialog) {
-                            var node = Y.Node.createWithFilesSkin(M.totara_form.element_filemanager.templates.mkdir);
+                            var node = Y.Node.create(M.totara_form.element_filemanager.templates.mkdir);
                             this.mkdir_dialog = new M.core.dialogue({
                                 draggable    : true,
                                 bodyContent  : node,
@@ -769,7 +769,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
             show_confirm_dialog: function(dialog_options) {
                 // Instead of M.util.show_confirm_dialog(e, dialog_options).
                 if (!this.confirm_dlg) {
-                    this.confirm_dlg_node = Y.Node.createWithFilesSkin(M.totara_form.element_filemanager.templates.confirmdialog);
+                    this.confirm_dlg_node = Y.Node.create(M.totara_form.element_filemanager.templates.confirmdialog);
                     var node = this.confirm_dlg_node;
                     node.generateID();
                     this.confirm_dlg = new M.core.dialogue({
@@ -957,13 +957,16 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 btn_download.on('click', function(e) {
                     e.preventDefault();
                     if (this.selectui.fileinfo.type != 'folder') {
-                        var node = Y.Node.create('<iframe></iframe>').setStyles({
-                            visibility : 'hidden',
-                            width : '1px',
-                            height : '1px'
-                        });
-                        node.set('src', this.selectui.fileinfo.url);
-                        Y.one('body').appendChild(node);
+                        // Totara: iframe is not suitable for downloads due to embedding restrictions,
+                        //         all draft files force download, so attempting to change URL should be fine.
+                        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                            // Mobile Safari may try to open the file in browser even if they are asked
+                            // to download it - we do not want to leave the form, so try a new window instead.
+                            // Note that mobile IE might try to pretend to be an iPhone.
+                            window.open(this.selectui.fileinfo.url, '_blank');
+                        } else {
+                            window.location = this.selectui.fileinfo.url;
+                        }
                     }
                 }, this);
                 btn_cancel.on('click', function(e) {
