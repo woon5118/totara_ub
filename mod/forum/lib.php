@@ -3813,6 +3813,9 @@ function forum_print_discussion_header(&$post, $forum, $group = -1, $datestring 
     }
 
     echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'">'.$post->subject.'</a>';
+    if (forum_discussion_is_locked($forum, $post)) {
+        echo $OUTPUT->flex_icon('lock', array('alt' => get_string('discussionlocked', 'mod_forum')));
+    }
     echo "</td>\n";
 
     // Picture
@@ -8209,11 +8212,6 @@ function mod_forum_inplace_editable($itemtype, $itemid, $newvalue) {
  */
 function forum_discussion_is_locked($forum, $discussion) {
     if (empty($forum->lockdiscussionafter)) {
-        return false;
-    }
-
-    if ($forum->type === 'single') {
-        // It does not make sense to lock a single discussion forum.
         return false;
     }
 

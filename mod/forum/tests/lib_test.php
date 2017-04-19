@@ -3247,7 +3247,7 @@ class mod_forum_lib_testcase extends advanced_testcase {
             'Unlocked: lockdiscussionafter is set; forum is of type single; post is old' => [
                 (object) ['lockdiscussionafter' => MINSECS, 'type' => 'single'],
                 (object) ['timemodified' => time() - DAYSECS],
-                false
+                true
             ],
             'Unlocked: lockdiscussionafter is set; forum is of type eachuser; post is recent' => [
                 (object) ['lockdiscussionafter' => DAYSECS, 'type' => 'eachuser'],

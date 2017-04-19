@@ -258,6 +258,10 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($forum->name), 2);
 echo $OUTPUT->heading(format_string($discussion->name), 3, 'discussionname');
 
+if (forum_discussion_is_locked($forum, $discussion)) {
+    echo $OUTPUT->notification(get_string('discussionlocked', 'forum'), 'info');
+}
+
 // is_guest should be used here as this also checks whether the user is a guest in the current course.
 // Guests and visitors cannot subscribe - only enrolled users.
 if ((!is_guest($modcontext, $USER) && isloggedin()) && has_capability('mod/forum:viewdiscussion', $modcontext)) {
@@ -372,10 +376,6 @@ if (has_capability('mod/forum:pindiscussions', $modcontext)) {
 
 
 echo "</div></div>";
-
-if (forum_discussion_is_locked($forum, $discussion)) {
-    echo html_writer::div(get_string('discussionlocked', 'forum'), 'discussionlocked');
-}
 
 if (!empty($forum->blockafter) && !empty($forum->blockperiod)) {
     $a = new stdClass();

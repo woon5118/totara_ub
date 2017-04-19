@@ -161,7 +161,6 @@ class mod_forum_mod_form extends moodleform_mod {
         ];
         $mform->addElement('select', 'lockdiscussionafter', get_string('lockdiscussionafter', 'forum'), $options);
         $mform->addHelpButton('lockdiscussionafter', 'lockdiscussionafter', 'forum');
-        $mform->disabledIf('lockdiscussionafter', 'type', 'eq', 'single');
 
 //-------------------------------------------------------------------------------
         $mform->addElement('header', 'blockafterheader', get_string('blockafter', 'forum'));

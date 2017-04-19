@@ -142,6 +142,11 @@
             $discussion = array_pop($discussions);
         }
         if ($discussion) {
+            // Confirmation of unlocking only needs to occur if the discussion is currently locked.
+            if (forum_discussion_is_locked($forum, $discussion)) {
+                echo $OUTPUT->notification(get_string('discussionlocked', 'forum'), 'info');
+            }
+
             if ($mode) {
                 set_user_preference("forum_displaymode", $mode);
             }
