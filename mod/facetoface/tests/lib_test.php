@@ -2913,8 +2913,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     /**
      * Test facetoface messaging.
      *
-     * NOTE: emailonlyfromnoreplyaddress is now alway on
-     *
      * @param string $noreplyaddress No-reply address
      * @param string $senderfrom Sender from setting in Face to face
      * @dataProvider facetoface_messaging_settings

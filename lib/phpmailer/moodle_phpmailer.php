@@ -165,11 +165,14 @@ class moodle_phpmailer extends PHPMailer {
             $mail->body = $this->MIMEBody;
             $mail->subject = $this->Subject;
             $mail->from = $this->From;
+            $mail->fromname = $this->FromName; // Totara extra
             $mail->to = $this->to[0][0];
-
-            // Totara: additional details needed for testing that sent messages
-            // have correct values for other email fields.
-            $mail->fromname = $this->FromName;
+            $mail->toname = $this->to[0][1]; // Totara extra
+            if ($this->ReplyTo) { // Totara extra
+                $replyto = reset($this->ReplyTo);
+                $mail->replyto = $replyto[0];
+                $mail->replytoname = $replyto[1];
+            }
 
             phpunit_util::phpmailer_sent($mail);
             return true;

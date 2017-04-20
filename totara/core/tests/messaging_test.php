@@ -74,34 +74,20 @@ class totara_core_messaging_testcase extends advanced_testcase {
     }
 
     /**
-     * Data provider for the facetoface_messages function.
-     *
-     * @return array $data Data to be used by test_facetoface_messages.
-     */
-    public function messages_setting() {
-        $data = array(
-            array('no-reply@example.com'),
-            array(''),
-        );
-        return $data;
-    }
-
-    /**
      * Test from user is correctly set according to settings.
-     * @dataProvider messages_setting
      */
-    public function test_messages_from_no_reply($noreplyaddress) {
+    public function test_messages_from_no_reply() {
         global $USER, $CFG;
         $this->preventResetByRollback();
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
+        $noreplyaddress = 'no-reply@example.com';
+
         // Set the no reply address.
         set_config('noreplyaddress', $noreplyaddress);
 
         $sink = $this->redirectEmails();
-
-        ob_start(); // Start a buffer to catch all the mtraces in the task.
 
         // Messages in Programs.
         $program1 = $this->programgenerator->create_program();
@@ -111,17 +97,13 @@ class totara_core_messaging_testcase extends advanced_testcase {
 
         // Attempt to send any program messages.
         $task = new \totara_program\task\send_messages_task();
+        ob_start(); // Start a buffer to catch all the mtraces in the task.
         $task->execute();
+        ob_end_clean();
 
         // Check user from.
         $fromuser = $USER;
-        if ($noreplyaddress === '') {
-            // Messaging now forces a default email address of noreply@{wwwroot} if the no reply email
-            // has not been set.
-            // Within PHPUNIT the administrators email address is set the same as the default.
-            $noreplyaddress = 'noreply@' . get_host_from_url($CFG->wwwroot);
-        }
-        $expectedname = sprintf("%s %s (via phpunit)", $fromuser->firstname, $fromuser->lastname);
+        $expectedname = fullname($fromuser);
         $expectedemail = $noreplyaddress;
         $checkformat = '%s (%s)';
         $expected = sprintf($checkformat, $expectedname, $expectedemail);
@@ -148,6 +130,5 @@ class totara_core_messaging_testcase extends advanced_testcase {
             $this->assertEquals($expected, $actual);
         }
         $sink->clear();
-        ob_end_clean();
     }
 }

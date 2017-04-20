@@ -261,10 +261,6 @@ $temp->add(new admin_setting_heading('noreplydomainheading', new lang_string('no
         new lang_string('noreplydomaindetail', 'admin')));
 $temp->add(new admin_setting_configtext('noreplyaddress', new lang_string('noreplyaddress', 'admin'),
           new lang_string('confignoreplyaddress', 'admin'), 'noreply@' . get_host_from_url($CFG->wwwroot), PARAM_EMAIL));
-$temp->add(new admin_setting_configtextarea('allowedemaildomains',
-        new lang_string('allowedemaildomains', 'admin'),
-        new lang_string('configallowedemaildomains', 'admin'),
-        ''));
 $temp->add(new admin_setting_heading('emaildoesnotfit', new lang_string('doesnotfit', 'admin'),
         new lang_string('doesnotfitdetail', 'admin')));
 $charsets = get_list_of_charsets();
@@ -282,11 +278,8 @@ $options = array('LF' => 'LF', 'CRLF' => 'CRLF');
 $temp->add(new admin_setting_configselect('mailnewline', new lang_string('mailnewline', 'admin'),
           new lang_string('configmailnewline', 'admin'), 'LF', $options));
 
-$choices = array(new lang_string('never', 'admin'),
-                 new lang_string('always', 'admin'),
-                 new lang_string('onlynoreply', 'admin'));
-$temp->add(new admin_setting_configselect('emailfromvia', new lang_string('emailfromvia', 'admin'),
-          new lang_string('configemailfromvia', 'admin'), 1, $choices));
+$temp->add(new admin_setting_configcheckbox('emailfromvia', new lang_string('emailfromvia', 'admin'),
+          new lang_string('configemailfromvia', 'admin'), 0));
 
 $ADMIN->add('email', $temp);
 

@@ -265,5 +265,8 @@ function xmldb_totara_core_install() {
 
     totara_core_upgrade_delete_moodle_plugins();
 
+    // Remove settings for deleted Totara features.
+    unset_config('allowedemaildomains');
+
     return true;
 }

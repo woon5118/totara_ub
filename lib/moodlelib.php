@@ -535,21 +535,6 @@ define('COURSE_DISPLAY_MULTIPAGE', 1);
  */
 define('AUTH_PASSWORD_NOT_CACHED', 'not cached');
 
-/**
- * Email from header to never include via information.
- */
-define('EMAIL_VIA_NEVER', 0);
-
-/**
- * Email from header to always include via information.
- */
-define('EMAIL_VIA_ALWAYS', 1);
-
-/**
- * Email from header to only include via information if the address is no-reply.
- */
-define('EMAIL_VIA_NO_REPLY_ONLY', 2);
-
 // PARAMETER HANDLING.
 
 /**
@@ -5901,9 +5886,8 @@ function generate_email_messageid($localpart = null) {
  * @param string $messagehtml complete html version of the message (optional)
  * @param string $attachment a file on the filesystem, either relative to $CFG->dataroot or a full path to a file in $CFG->tempdir
  * @param string $attachname the name of the file (extension indicates MIME)
- * @param bool $usetrueaddress determines whether $from email address should
- *          be sent out. Will be overruled by user profile setting for maildisplay
- * @param string $replyto Email address to reply to
+ * @param bool $usetrueaddress determines whether user's email address should be put into replyto. False means never, true means use user profile setting for maildisplay
+ * @param string $replyto Email address to reply to, this overrides any $usetrueaddress value
  * @param string $replytoname Name of reply to recipient
  * @param int $wordwrapwidth custom word wrap width, default 79
  * @return bool Returns true if mail was sent OK and false if there was an error.
@@ -6023,20 +6007,16 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     $temprecipients = array();
     $tempreplyto = array();
 
-    $supportuser = core_user::get_support_user();
-
     // Make sure that we fall back onto some reasonable no-reply address.
-    $noreplyaddressdefault = 'noreply@' . get_host_from_url($CFG->wwwroot);
-    $noreplyaddress = empty($CFG->noreplyaddress) ? $noreplyaddressdefault : $CFG->noreplyaddress;
-
-    if (!validate_email($noreplyaddress)) {
-        debugging('email_to_user: Invalid noreply-email '.s($noreplyaddress));
-        $noreplyaddress = $noreplyaddressdefault;
-    }
-
-    if (!validate_email($supportuser->email)) {
-        debugging('email_to_user: Invalid support-email '.s($supportuser->email));
-        $supportuser->email = $noreplyaddress;
+    if (empty($CFG->noreplyaddress) or !validate_email($CFG->noreplyaddress)) {
+        if (empty($CFG->noreplyaddress)) {
+            debugging('email_to_user: Missing $CFG->noreplyaddress');
+        } else {
+            debugging('email_to_user: Invalid $CFG->noreplyaddress ' . s($CFG->noreplyaddress));
+        }
+        $noreplyaddress = 'noreply@' . get_host_from_url($CFG->wwwroot);
+    } else {
+        $noreplyaddress = $CFG->noreplyaddress;
     }
 
     // Make up an email address for handling bounces.
@@ -6046,71 +6026,48 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     } else {
         $mail->Sender = $noreplyaddress;
     }
+    $mail->From = $noreplyaddress;
 
     // Make sure that the explicit replyto is valid, fall back to the implicit one.
     if (!empty($replyto) && !validate_email($replyto)) {
         debugging('email_to_user: Invalid replyto-email '.s($replyto));
-        $replyto = $noreplyaddress;
-    }
-
-    $alloweddomains = null;
-    if (!empty($CFG->allowedemaildomains)) {
-        $alloweddomains = array_map('trim', explode("\n", $CFG->allowedemaildomains));
-    }
-
-    // Email will be sent using no reply address.
-    if (empty($alloweddomains)) {
+        $replyto = '';
+        $replytoname = '';
         $usetrueaddress = false;
     }
 
-    // Make sure that the explicit replyto is valid, fall back to the implicit one.
-    if (!empty($replyto) && !validate_email($replyto)) {
-        debugging('email_to_user: Invalid replyto-email '.s($replyto));
-        $replyto = $noreplyaddress;
+    if (is_string($from)) {
+        // This is an ugly hack, we do need some fake user here.
+        $fromstring = $from;
+        $from = \core_user::get_noreply_user();
+        $usetrueaddress = false; // Do not add any reply to address!
+    } else {
+        $fromstring = fullname($from);
     }
 
-    if (is_string($from)) { // So we can pass whatever we want if there is need.
-        $mail->From     = $noreplyaddress;
-        $mail->FromName = $from;
-    // Check if using the true address is true, and the email is in the list of allowed domains for sending email,
-    // and that the senders email setting is either displayed to everyone, or display to only other users that are enrolled
-    // in a course with the sender.
-    } else if ($usetrueaddress && can_send_from_real_email_address($from, $user, $alloweddomains)) {
-        if (!validate_email($from->email)) {
-            debugging('email_to_user: Invalid from-email '.s($from->email).' - not sending');
-            // Better not to use $noreplyaddress in this case.
-            return false;
-        }
-        $mail->From = $from->email;
-        $fromdetails = new stdClass();
-        $fromdetails->name = fullname($from);
-        $fromdetails->url = preg_replace('#^https?://#', '', $CFG->wwwroot);
-        $fromdetails->siteshortname = format_string($SITE->shortname);
-        $fromstring = $fromdetails->name;
-        if ($CFG->emailfromvia == EMAIL_VIA_ALWAYS) {
-            $fromstring = get_string('emailvia', 'core', $fromdetails);
-        }
+    // Add email via stuff if configured.
+    if (empty($CFG->emailfromvia)) {
         $mail->FromName = $fromstring;
-        if (empty($replyto)) {
-            $tempreplyto[] = array($from->email, fullname($from));
-        }
     } else {
-        $mail->From = $noreplyaddress;
         $fromdetails = new stdClass();
-        $fromdetails->name = fullname($from);
+        $fromdetails->name = $fromstring;
         $fromdetails->url = preg_replace('#^https?://#', '', $CFG->wwwroot);
         $fromdetails->siteshortname = format_string($SITE->shortname);
-        $fromstring = $fromdetails->name;
-        if ($CFG->emailfromvia != EMAIL_VIA_NEVER) {
-            $fromstring = get_string('emailvia', 'core', $fromdetails);
-        }
-        $mail->FromName = $fromstring;
-        if (empty($replyto)) {
+        $mail->FromName = get_string('emailvia', 'core', $fromdetails);
+    }
+
+    // Always add some replyto info.
+    if (empty($replyto)) {
+        // Parameter $usetrueaddress is specified by developer, it tells us if it makes sense to reply to this email.
+        if ($usetrueaddress and $from->maildisplay and validate_email($from->email)) {
+            // Use real user email and name because it makes sense and user allowed it.
+            $tempreplyto[] = array($from->email, $fromstring);
+        } else {
+            // The string 'noreplyname' should tell ppl to not reply even if they try.
             $tempreplyto[] = array($noreplyaddress, get_string('noreplyname'));
         }
-    }
-
-    if (!empty($replyto)) {
+    } else {
+        // Developer knows best, do what they say!
         $tempreplyto[] = array($replyto, $replytoname);
     }
 
@@ -6219,7 +6176,6 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     if ($attachment && $attachname) {
         if (preg_match( "~\\.\\.~" , $attachment )) {
             // Security check for ".." in dir path.
-            $temprecipients[] = array($supportuser->email, fullname($supportuser, true));
             $mail->addStringAttachment('Error in attachment.  User attempted to attach a filename with a unsafe name.', 'error.txt', '8bit', 'text/plain');
         } else {
             require_once($CFG->libdir.'/filelib.php');

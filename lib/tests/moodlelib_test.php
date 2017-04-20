@@ -2824,7 +2824,6 @@ class core_moodlelib_testcase extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user(array('mailformat' => 0, 'maildisplay' => 0));
         $user2 = $this->getDataGenerator()->create_user(array('mailformat' => 0, 'maildisplay' => 0));
         $user3 = $this->getDataGenerator()->create_user(array('mailformat' => 0, 'maildisplay' => 0));
-        set_config('allowedemaildomains', "example.com\r\nmoodle.org");
 
         $subject = 'subject';
         $messagetext = 'message text';
@@ -2874,21 +2873,11 @@ class core_moodlelib_testcase extends advanced_testcase {
         $sink->close();
         set_config('noreplyaddress', '');
         $sink = $this->redirectEmails();
+        $this->assertDebuggingNotCalled();
         email_to_user($user1, $user3, $subject, $messagetext);
+        $this->assertDebuggingCalled('email_to_user: Missing $CFG->noreplyaddress');
         $result = $sink->get_messages();
         $this->assertEquals('noreply@www.example.com', $result[0]->from);
-        $sink->close();
-
-        // Test $CFG->allowedemaildomains.
-        set_config('noreplyaddress', 'noreply@www.example.com');
-        $this->assertNotEmpty($CFG->allowedemaildomains);
-        $sink = $this->redirectEmails();
-        email_to_user($user1, $user2, $subject, $messagetext);
-        unset_config('allowedemaildomains');
-        email_to_user($user1, $user2, $subject, $messagetext);
-        $result = $sink->get_messages();
-        $this->assertEquals($CFG->noreplyaddress, $result[0]->from);
-        $this->assertEquals($CFG->noreplyaddress, $result[1]->from);
         $sink->close();
     }
 

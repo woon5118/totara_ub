@@ -196,6 +196,272 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $sink->clear();
     }
 
+    /**
+     * Test from in emails
+     */
+    public function test_email_to_user_from() {
+        $this->resetAfterTest();
+
+        $noreplyaddress = 'mynoreply@example.com';
+        $subject = 'My subject';
+        $noreplytext = get_string('noreplyname');
+
+        $userto = $this->getDataGenerator()->create_user();
+        $userfrom = $this->getDataGenerator()->create_user(array('maildisplay' => 1));
+        $userfrom2 = $this->getDataGenerator()->create_user(array('maildisplay' => 0));
+
+
+        set_config('noreplyaddress', $noreplyaddress);
+        set_config('emailfromvia', '0');
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom), $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($userfrom->email, $email->replyto);
+        $this->assertSame(fullname($userfrom), $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom2, $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom2), $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($noreplyaddress, $email->replyto);
+        $this->assertSame($noreplytext, $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', false);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom), $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($noreplyaddress, $email->replyto);
+        $this->assertSame($noreplytext, $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', true, 'other@example.com', 'Other');
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom), $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame('other@example.com', $email->replyto);
+        $this->assertSame('Other', $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, 'Fantomas', $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame('Fantomas', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($noreplyaddress, $email->replyto);
+        $this->assertSame($noreplytext, $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, 'Fantomas', $subject, 'My text message', 'My html message', '', '', true, 'other@example.com', 'Other');
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame('Fantomas', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame('other@example.com', $email->replyto);
+        $this->assertSame('Other', $email->replytoname);
+
+        set_config('noreplyaddress', '');
+        $sink = $this->redirectEmails();
+        $this->assertDebuggingNotCalled();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingCalled('email_to_user: Missing $CFG->noreplyaddress');
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame('noreply@www.example.com', $email->from);
+        $this->assertSame(fullname($userfrom), $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($userfrom->email, $email->replyto);
+        $this->assertSame(fullname($userfrom), $email->replytoname);
+    }
+
+    /**
+     * Test from in emails with emailfromvia enabled.
+     */
+    public function test_email_to_user_from_with_via() {
+        $this->resetAfterTest();
+
+        $noreplyaddress = 'mynoreply@example.com';
+        $subject = 'My subject';
+        $noreplytext = get_string('noreplyname');
+
+        $userto = $this->getDataGenerator()->create_user();
+        $userfrom = $this->getDataGenerator()->create_user(array('maildisplay' => 1));
+        $userfrom2 = $this->getDataGenerator()->create_user(array('maildisplay' => 0));
+
+        set_config('noreplyaddress', $noreplyaddress);
+        set_config('emailfromvia', '1');
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom) . ' (via phpunit)', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($userfrom->email, $email->replyto);
+        $this->assertSame(fullname($userfrom), $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom2, $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom2) . ' (via phpunit)', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($noreplyaddress, $email->replyto);
+        $this->assertSame($noreplytext, $email->replytoname);
+
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', false);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom) . ' (via phpunit)', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($noreplyaddress, $email->replyto);
+        $this->assertSame($noreplytext, $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', true, 'other@example.com', 'Other');
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame(fullname($userfrom) . ' (via phpunit)', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame('other@example.com', $email->replyto);
+        $this->assertSame('Other', $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, 'Fantomas', $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame('Fantomas' . ' (via phpunit)', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($noreplyaddress, $email->replyto);
+        $this->assertSame($noreplytext, $email->replytoname);
+
+        $sink = $this->redirectEmails();
+        $result = email_to_user($userto, 'Fantomas', $subject, 'My text message', 'My html message', '', '', true, 'other@example.com', 'Other');
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame($noreplyaddress, $email->from);
+        $this->assertSame('Fantomas' . ' (via phpunit)', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame('other@example.com', $email->replyto);
+        $this->assertSame('Other', $email->replytoname);
+
+        set_config('noreplyaddress', '');
+        $sink = $this->redirectEmails();
+        $this->assertDebuggingNotCalled();
+        $result = email_to_user($userto, $userfrom, $subject, 'My text message', 'My html message', '', '', true);
+        $this->assertTrue($result);
+        $this->assertDebuggingCalled('email_to_user: Missing $CFG->noreplyaddress');
+        $emails = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $this->assertSame($subject, $email->subject);
+        $this->assertSame('noreply@www.example.com', $email->from);
+        $this->assertSame(fullname($userfrom) . ' (via phpunit)', $email->fromname);
+        $this->assertSame($userto->email, $email->to);
+        $this->assertSame(fullname($userto), $email->toname);
+        $this->assertSame($userfrom->email, $email->replyto);
+        $this->assertSame(fullname($userfrom), $email->replytoname);
+    }
+
     public function test_fullname() {
         global $CFG;
         $this->resetAfterTest();
