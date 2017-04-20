@@ -196,7 +196,7 @@ function totara_readd_course_completion_changes() {
     if (!$dbman->index_exists($table, $index)) {
         // Clean up all instances of duplicate records
         // Add indexes to prevent new duplicates
-        upgrade_course_completion_remove_duplicates(
+        totara_upgrade_course_completion_remove_duplicates(
             'course_completions',
             array('userid', 'course'),
             array('timecompleted', 'timestarted', 'timeenrolled')
@@ -211,7 +211,7 @@ function totara_readd_course_completion_changes() {
 
     // Conditionally launch add index useridcoursecriteraid
     if (!$dbman->index_exists($table, $index)) {
-        upgrade_course_completion_remove_duplicates(
+        totara_upgrade_course_completion_remove_duplicates(
             'course_completion_crit_compl',
             array('userid', 'course', 'criteriaid'),
             array('timecompleted')
@@ -226,7 +226,7 @@ function totara_readd_course_completion_changes() {
 
     // Conditionally launch add index coursecriteratype
     if (!$dbman->index_exists($table, $index)) {
-        upgrade_course_completion_remove_duplicates(
+        totara_upgrade_course_completion_remove_duplicates(
             'course_completion_aggr_methd',
             array('course', 'criteriatype')
         );
@@ -260,6 +260,77 @@ function totara_readd_course_completion_changes() {
         $rs->close();
     }
 
+}
+
+/**
+ * This function finds duplicate records (based on combinations of fields that should be unique)
+ * and then programmatically generated a "most correct" version of the data, update and removing
+ * records as appropriate
+ *
+ * It was originally a part of Moodle, but removed in Moodle 3.1 as part of their upgrade cleanup.
+ * We copied it here as this is still potentially needed.
+ * It will be removed from here when we clean up our installation process.
+ *
+ * Thanks to Dan Marsden for help
+ *
+ * @param   string  $table      Table name
+ * @param   array   $uniques    Array of field names that should be unique
+ * @param   array   $fieldstocheck  Array of fields to generate "correct" data from (optional)
+ * @return  void
+ */
+function totara_upgrade_course_completion_remove_duplicates($table, $uniques, $fieldstocheck = array()) {
+    global $DB;
+    // Find duplicates
+    $sql_cols = implode(', ', $uniques);
+    $sql = "SELECT {$sql_cols} FROM {{$table}} GROUP BY {$sql_cols} HAVING (count(id) > 1)";
+    $duplicates = $DB->get_recordset_sql($sql, array());
+    // Loop through duplicates
+    foreach ($duplicates as $duplicate) {
+        $pointer = 0;
+        // Generate SQL for finding records with these duplicate uniques
+        $sql_select = implode(' = ? AND ', $uniques).' = ?'; // builds "fieldname = ? AND fieldname = ?"
+        $uniq_values = array();
+        foreach ($uniques as $u) {
+            $uniq_values[] = $duplicate->$u;
+        }
+        $sql_order = implode(' DESC, ', $uniques).' DESC'; // builds "fieldname DESC, fieldname DESC"
+        // Get records with these duplicate uniques
+        $records = $DB->get_records_select(
+            $table,
+            $sql_select,
+            $uniq_values,
+            $sql_order
+        );
+        // Loop through and build a "correct" record, deleting the others
+        $needsupdate = false;
+        $origrecord = null;
+        foreach ($records as $record) {
+            $pointer++;
+            if ($pointer === 1) { // keep 1st record but delete all others.
+                $origrecord = $record;
+            } else {
+                // If we have fields to check, update original record
+                if ($fieldstocheck) {
+                    // we need to keep the "oldest" of all these fields as the valid completion record.
+                    // but we want to ignore null values
+                    foreach ($fieldstocheck as $f) {
+                        if ($record->$f && (($origrecord->$f > $record->$f) || !$origrecord->$f)) {
+                            $origrecord->$f = $record->$f;
+                            $needsupdate = true;
+                        }
+                    }
+                }
+                $DB->delete_records($table, array('id' => $record->id));
+            }
+        }
+        if ($needsupdate || isset($origrecord->reaggregate)) {
+            // If this table has a reaggregate field, update to force recheck on next cron run
+            if (isset($origrecord->reaggregate)) {
+                $origrecord->reaggregate = time();
+            }
+            $DB->update_record($table, $origrecord);
+        }
+    }
 }
 
 /**
