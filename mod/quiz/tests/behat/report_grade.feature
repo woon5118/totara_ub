@@ -57,11 +57,10 @@ Feature: Check that the Grade display in the Set a quiz to be marked complete wh
         And I follow "Course 1"
         And I follow "Test quiz name"
         And I press "Attempt quiz now"
-        And I press "Start attempt"
         And I set the field "True" to "1"
         And I press "Next"
         And I set the field "False" to "1"
-        And I press "Next"
+        And I press "Finish attempt"
         And I press "Submit all and finish"
         And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
         And I click on "Record of Learning" in the totara menu
