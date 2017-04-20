@@ -1636,10 +1636,9 @@ class oci_native_moodle_database extends moodle_database {
      * @param string $expr      Expression to get individual values
      * @param string $separator The delimiter to separate the values, a simple string value only
      * @param string $orderby   ORDER BY clause that determines order of rows with values - required
-     * @param boolen $unique    use DISTINCT in the query, default value false
      * @return string SQL fragment equivalent to GROUP_CONCAT()
      */
-    public function sql_group_concat($expr, $separator, $orderby, $unique = false) {
+    public function sql_group_concat($expr, $separator, $orderby) {
         if ((string)$orderby === '') {
             throw new coding_exception('sql_group_concat method requires $orderby parameter');
         }

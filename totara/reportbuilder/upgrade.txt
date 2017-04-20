@@ -9,5 +9,3 @@ information provided here is intended especially for developers.
 * Removed unused $graphrecord and $isexport parameters from totara/reportbuilder/classes/local/graph::__construct()
 * Added isexport param to rb_base_source::rb_display_link_program_icon.
 * rb_display_orderedlist_to_newline() is now deprecated
-* The sql_group_concat has been deprecated, use $DB->sql_group_concat instead.
-

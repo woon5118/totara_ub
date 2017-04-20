@@ -5163,14 +5163,33 @@ function sql_table_from_select($table, $select, array $params) {
 /**
  * Returns the proper SQL to aggregate a field by joining with a specified delimiter
  *
- * @deprecated since Totara 10.0
+ *
  */
 function sql_group_concat($field, $delimiter=', ', $unique=false) {
     global $DB;
 
-    debugging('sql_group_concat() is deprecated. Use DB->sql_group_concat() instead.', DEBUG_DEVELOPER);
+    // if not supported, just return single value - use min()
+    $sql = " MIN($field) ";
 
-    return $DB->sql_group_concat($field, $delimiter, $field, $unique);
+    switch ($DB->get_dbfamily()) {
+        case 'mysql':
+            // use native function
+            $distinct = $unique ? 'DISTINCT' : '';
+            $sql = " GROUP_CONCAT($distinct $field SEPARATOR '$delimiter') ";
+            break;
+        case 'postgres':
+            // use custom aggregate function - must have been defined
+            // in db/upgrade.php
+            $distinct = $unique ? 'TRUE' : 'FALSE';
+            $sql = " GROUP_CONCAT($field, '$delimiter', $distinct) ";
+            break;
+        case 'mssql':
+            $distinct = $unique ? 'DISTINCT' : '';
+            $sql = " dbo.GROUP_CONCAT_D($distinct $field, '$delimiter') ";
+        break;
+    }
+
+    return $sql;
 }
 
 /**

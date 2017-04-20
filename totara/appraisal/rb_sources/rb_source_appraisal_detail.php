@@ -640,12 +640,11 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
                 $joinname = 'file' . $columnoption->type . $question->id;
                 $file = $DB->sql_concat('f.contextid', "'/'", 'f.component', "'/'", 'f.filearea', 'f.filepath', 'f.itemid',
                         "'/'", 'f.filename');
-                $file = $DB->sql_group_concat($file, ', ', 'f.itemid');
                 $this->joinlist[] =
                     new rb_join(
                         $joinname,
                         'LEFT',
-                        "(SELECT f.itemid AS appraisalroleassignmentid, {$file} AS files " .
+                        "(SELECT f.itemid AS appraisalroleassignmentid, " . sql_group_concat($file) . " AS files " .
                            "FROM {files} f " .
                           "WHERE f.contextid = {$FILEPICKER_OPTIONS['context']->id} " .
                             "AND f.component = 'totara_appraisal' " .

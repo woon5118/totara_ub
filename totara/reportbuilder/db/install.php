@@ -34,7 +34,7 @@ function xmldb_totara_reportbuilder_install() {
 
     // Create stored procedure for aggregating text by concatenation.
     // MySQL supports by default. The code below adds Postgres support.
-    // See $DB->sql_group_concat() function for usage.
+    // See sql_group_concat() function for usage.
     if ($DB->get_dbfamily() == 'postgres') {
         $typesql = "SELECT 1
                       FROM pg_type t
