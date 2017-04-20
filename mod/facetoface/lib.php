@@ -5210,84 +5210,11 @@ function facetoface_eventhandler_role_unassigned($ra) {
  * If the unassigned user belongs to a course with an upcoming
  * face-to-face session and they are signed-up to attend, cancel
  * the sign-up (and trigger notification).
+ *
+ * @deprecated since 10.0
  */
 function facetoface_eventhandler_role_unassigned_bulk($event) {
-    global $CFG, $USER, $DB;
-
-    // TODO: This is most probably not used any more.
-
-    $now = time();
-
-    $tmptable = $event['tmptable'];
-    $hascontextid = $event['hascontextid'];
-    $hasuserid = $event['hasuserid'];
-    $hasroleid = $event['hasroleid'];
-    $enrol = $event['enrol'];
-
-    // Nothing to do if there are no contexts or userids
-    if (!$hascontextid || !$hasuserid) {
-        return true;
-    }
-
-    $sql = "SELECT DISTINCT cx.id, cx.* from {context} cx inner join {{$tmptable}} t on cx.id=t.contextid where cx.contextlevel=";
-    $ctxlist = $DB->get_records_sql($sql, array(CONTEXT_COURSE));
-    if (!$ctxlist) {
-        return true;
-    }
-
-    foreach ($ctxlist as $ctx) {
-
-        // get all face-to-face activites in the course
-        $activities = $DB->get_records('facetoface', array('course' => $ctx->instanceid));
-        if ($activities) {
-            foreach ($activities as $facetoface) {
-                // get all upcoming sessions for each face-to-face
-                $sql = "SELECT s.id
-                        FROM {facetoface_sessions} s
-                        LEFT JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
-                        WHERE
-                            s.facetoface = ? AND d.sessionid = s.id AND
-                            (d.timestart is NULL OR d.timestart > ?)
-                        ORDER BY d.timestart
-                ";
-
-                if ($sessions = get_records_sql($sql, array($facetoface->id, $now))) {
-                    $cancelreason = "Unenrolled from course";
-                    foreach ($sessions as $sessiondata) {
-                        $session = facetoface_get_session($sessiondata->id); // load dates etc.
-
-                        // remove trainer session assignments for user (if any exist)
-                        if ($trainers = facetoface_get_trainers($session->id)) {
-                            foreach ($trainers as $role_id => $users) {
-                                foreach ($users as $user_id => $trainer) {
-                                    if ( record_exists($t, 'userid', $trainer->id, 'contextid', $ctx->id) ) {
-                                        $form = $trainers;
-                                        unset($form[$role_id][$user_id]); // remove trainer
-                                        facetoface_update_trainers($session->id, $form);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        $signups = $DB->get_records_sql("SELECT DISTINCT t.userid FROM {{$tmptable}} t INNER JOIN {facetoface_signups} fs ON t.userid=fs.userid WHERE fs.sessionid=?", array($session->id));
-                        if (!$signups) {
-                            $signups = array();
-                        }
-                        foreach ($signups as $signup) {
-                            // cancel learner signup for user (if any exist)
-                            $errorstr = '';
-                            if (facetoface_user_cancel($session, $signup->userid, true, $errorstr, $cancelreason)) {
-                                facetoface_send_cancellation_notice($facetoface, $session, $signup->userid);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return true;
+    throw new coding_exception('facetoface_eventhandler_role_unassigned_bulk has been deprecated since 10.');
 }
 
 

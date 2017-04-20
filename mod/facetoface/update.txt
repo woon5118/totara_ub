@@ -1,5 +1,0 @@
-This files describes API changes in Face to face,
-information provided here is intended especially for developers.
-
-=== 10 ===
-* Deprecated behat step 'I select to approve "([^"]*)"'. This should be replaced by 'I set the field "Approve <user> for this event" to "1"'
