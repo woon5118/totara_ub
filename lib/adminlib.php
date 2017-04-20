@@ -8286,11 +8286,11 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
         $context->default = get_string('defaultsettinginfo', 'admin', $defaultinfo);
     }
 
-
-    $context->error = '';
     $adminroot = admin_get_root();
     if (array_key_exists($context->fullname, $adminroot->errors)) {
-        $context->error = $adminroot->errors[$context->fullname]->error;
+        $notification = new \core\output\notification($adminroot->errors[$context->fullname]->error);
+        $notification->set_show_closebutton(false);
+        $context->error = $notification->export_for_template($OUTPUT);
     }
 
     // Totara: check if the setting is enforced via flavour and prevent any changes if yes.

@@ -58,7 +58,7 @@
     </div>
     <div class="form-setting">
         {{#error}}
-            <div><span class="error">{{error}}</span></div>
+            {{> core/notification_error}}
         {{/error}}
         {{{element}}}
         {{#default}}
