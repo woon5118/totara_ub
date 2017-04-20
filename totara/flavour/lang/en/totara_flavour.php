@@ -65,8 +65,8 @@ $string['setting_core_enablepositions'] = 'Positions';
 $string['setting_core_enablepositions_desc'] = 'Position hierarchies allow you to setup a learner’s position in the system, which allows for automatic assignment of learning and competencies as well as report filtering.';
 $string['setting_core_enablecompetencies'] = 'Competencies';
 $string['setting_core_enablecompetencies_desc'] = 'Totara competencies allow site administrators to define the skills and knowledge that a learner needs to fulfill and managers to assess staff performance.';
-$string['setting_core_enableteam'] = 'Team';
-$string['setting_core_enableteam_desc'] = 'The Team dashboard allows managers to view their direct reports to access user profiles, instructor led training, learning plans, records, and performance management options.';
+$string['setting_core_enablemyteam'] = 'Team';
+$string['setting_core_enablemyteam_desc'] = 'The Team dashboard allows managers to view their direct reports to access user profiles, instructor led training, learning plans, records, and performance management options.';
 $string['setting_core_feature_reportbuilder'] = 'Report Builder';
 $string['setting_core_feature_reportbuilder_desc'] = 'Report Builder allows site administrators to create and edit reports and make them available to users based on their role. Users can view report data, filter and save queries, export data, and schedule report data to be automatically emailed.';
 $string['setting_core_feature_organisationalhierarchy'] = 'Organisational hierarchies';
@@ -79,5 +79,5 @@ $string['unavailable'] = 'Unavailable';
 $string['unknown'] = 'Unknown';
 
 // depreacted
-$string['setting_core_enablemyteam'] = 'My Team';
-$string['setting_core_enablemyteam_desc'] = 'The My Team dashboard allows managers to view their direct reports to access user profiles, instructor led training, learning plans, records, and performance management options.';
+$string['setting_core_enableteam'] = 'My Team';
+$string['setting_core_enableteam_desc'] = 'The My Team dashboard allows managers to view their direct reports to access user profiles, instructor led training, learning plans, records, and performance management options.';

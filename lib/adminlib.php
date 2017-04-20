@@ -676,7 +676,7 @@ interface part_of_admin_tree {
      * If a class inherits parentable_part_of_admin_tree, this method should be called
      * recursively on all child objects (assuming, of course, the parent object's name
      * doesn't match the search criterion).
-     * 
+     *
      * NOTE: elements may use global tree map to speed up the lookup in the whole tree.
      *
      * @param string $name The internal name of the part_of_admin_tree we're searching for.
@@ -806,7 +806,7 @@ trait part_of_admin_tree_trait {
 
     /**
      * Destroy admin tree item.
-     * 
+     *
      * Intended for releasing of references.
      */
     public function destroy() {
@@ -8294,19 +8294,17 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
     }
 
     // Totara: check if the setting is enforced via flavour and prevent any changes if yes.
+    // Totara: additional override class for flavours
+    $context->flavourclass = '';
+    $context->upgradeneeded = '';
+
     if (empty($context->override)) {
         $enforcedsettings = \totara_flavour\helper::get_enforced_settings();
         $plugin = is_null($setting->plugin) ? 'moodle' : $setting->plugin;
         if (isset($enforcedsettings[$plugin][$setting->name])) {
             $context->override = get_string('settinglocked', 'totara_flavour');
-/* TODO TL-13922
-            // Add a description about this setting being locked because it is prohibited.
-            $enforcedsetting = '<div class="form-overridden flavourlock">'.get_string('settinglocked', \totara_flavour\helper::get_active_flavour_component()).'</div>';
-            // Add a notice to the title so that it can't be missed.
-            $override .= '<div class="form-overridden flavourlock">'.get_string('settinglocked', 'totara_flavour').'</div>';
-            // Add a mask to the form to block users from changing the setting an then being confused about why it doesn't save.
-            $form = '<div class="flavourlock-mask"><div class="mask"></div>'.$form.'</div>';
-*/
+            $context->flavourclass = ' flavourlock';
+            $context->upgradeneeded = get_string('settinglocked', \totara_flavour\helper::get_active_flavour_component());
         }
     }
 
