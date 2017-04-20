@@ -227,6 +227,7 @@ class behat_hooks extends behat_base {
         if (strpos($errorlog, 'behatrun') !== false) {
             $fp = fopen($errorlog, 'w');
             fclose($fp);
+            chmod($errorlog, 0666); // Some developers have invalid setups with different account for behat and web server, this could help.
             self::error_log(''); // Add empty line to make the log more readable.
             self::error_log('Behat suite start: ' . $scope->getSuite()->getName());
         }
