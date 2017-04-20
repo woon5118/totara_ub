@@ -17,7 +17,6 @@ Feature: Activities can be moved between sections
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add the "Recent activity" block
     And I follow "Delete Recent activity block"
     And I press "Yes"
     And I add a "Forum" to section "1" and I fill the form with:
