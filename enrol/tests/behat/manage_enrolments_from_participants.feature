@@ -25,11 +25,11 @@ Feature: Manage enrollments from participants page
   Scenario: Check the participants link when "All partipants" selected
     Given I select "All participants" from the "roleid" singleselect
     When I click on "Edit" "link" in the "region-main" "region"
-    Then I should see "Enrolled users" in the "h2" "css_element"
+    Then I should see "Enrolled users" in the "#region-main" "css_element"
     And the field "Role" matches value "All"
 
   Scenario: Check the participants link when "Student" selected
     Given I select "Student" from the "roleid" singleselect
     When I click on "Edit" "link" in the "region-main" "region"
-    Then I should see "Enrolled users" in the "h2" "css_element"
+    Then I should see "Enrolled users" in the "#region-main" "css_element"
     And the field "Role" matches value "Student"
