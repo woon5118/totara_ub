@@ -186,7 +186,7 @@ Feature: User profile fields can be used via HR Import
     And I set the following fields to these values:
       | Name                        | Dropdown menu test            |
       | Short name                  | dropdownmenutest              |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       Health & Safety
       > 10
