@@ -1393,6 +1393,10 @@ class report_builder_course_expand_form extends moodleform {
         }
 
         foreach ($inlineenrolmentelements as $inlineenrolmentelement) {
+            if ($inlineenrolmentelement->_type == 'passwordunmask') {
+                $inlineenrolmentelement->setType('password');
+            }
+
             $mform->addElement($inlineenrolmentelement);
 
             if ($inlineenrolmentelement->_type == 'header') { // Headers are collapsed by default and we want them open.
