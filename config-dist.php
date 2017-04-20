@@ -115,15 +115,7 @@ $CFG->directorypermissions = 02777;
 //=========================================================================
 // 5. DIRECTORY LOCATION  (most people can just ignore this setting)
 //=========================================================================
-// A very few webhosts use /admin as a special URL for you to access a
-// control panel or something.  Unfortunately this conflicts with the
-// standard location for the Totara admin pages.  You can work around this
-// by renaming the admin directory in your installation, and putting that
-// new name here.  eg "totaraadmin".  This should fix all admin links in Totara.
-// After any change you need to visit your new admin directory
-// and purge all caches.
-
-$CFG->admin = 'admin';
+// The value of $CFG->admin cannot be changed in Totara.
 
 
 //=========================================================================

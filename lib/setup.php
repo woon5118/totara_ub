@@ -183,10 +183,8 @@ if (!isset($CFG->prefix)) {
     $CFG->prefix = '';
 }
 
-// Define admin directory
-if (!isset($CFG->admin)) {   // Just in case it isn't defined in config.php
-    $CFG->admin = 'admin';   // This is relative to the wwwroot and dirroot
-}
+// Totara: custom admin directory not supported!
+$CFG->admin = 'admin';
 
 // Set up some paths.
 $CFG->libdir = $CFG->dirroot .'/lib';
