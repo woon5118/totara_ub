@@ -182,10 +182,12 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
             }
         });
         if (filterlist.length) {
-            this._region.find('[data-region="user-filters"] span').text(filterlist.join(', '));
+            // Totara: Ensure text is only added to the accessibility element.
+            this._region.find('[data-region="user-filters"] span.accesshide').text(filterlist.join(', '));
         } else {
             str.get_string('nofilters', 'mod_assign').done(function(s) {
-                this._region.find('[data-region="user-filters"] span').text(s);
+                // Totara: Ensure text is only added to the accessibility element.
+                this._region.find('[data-region="user-filters"] span.accesshide').text(s);
             }.bind(this)).fail(notification.exception);
         }
 
