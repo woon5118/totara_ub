@@ -246,14 +246,15 @@ class behat_mod_quiz extends behat_question_base {
         $editquiz = $this->escape(get_string('editquiz', 'quiz'));
         $quizadmin = $this->escape(get_string('pluginadministration', 'quiz'));
         $addaquestion = $this->escape(get_string('addaquestion', 'quiz'));
-        $menuxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(@class, ' textmenu')]";
-        $itemxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(@class, ' addquestion ')]";
+        $menuxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(concat(' ', normalize-space(@class), ' '), ' textmenu ')]";
+        $itemxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(concat(' ', normalize-space(@class), ' '), ' addquestion ')]";
 
         $this->execute('behat_general::click_link', $quizname);
 
         $this->execute("behat_navigation::i_navigate_to_node_in", array($editquiz, $quizadmin));
 
         $this->execute("behat_general::i_click_on", array($menuxpath, "xpath_element"));
+        $this->execute("behat_general::i_wait_seconds", array(1));
         $this->execute("behat_general::i_click_on", array($itemxpath, "xpath_element"));
 
         $this->finish_adding_question($questiontype, $questiondata);
