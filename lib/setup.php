@@ -223,6 +223,7 @@ if (defined('BEHAT_SITE_RUNNING') or defined('BEHAT_TEST')) {
 }
 
 // Totara: make sure forbidden settings are disabled.
+$CFG->loginhttps = '0'; // This setting was removed, use https:// in $CFG->wwwroot instead.
 $CFG->pathtounoconv = ''; // Unoconv is not secure for web servers!
 $CFG->enablemobilewebservice = '0'; // Not compatible with Totara.
 
