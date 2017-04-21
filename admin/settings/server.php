@@ -101,7 +101,6 @@ $ADMIN->add('server', $temp);
 
 // "http" settingpage
 $temp = new admin_settingpage('http', new lang_string('http', 'admin'));
-$temp->add(new admin_setting_configcheckbox('slasharguments', new lang_string('slasharguments', 'admin'), new lang_string('configslasharguments', 'admin'), 1));
 $temp->add(new admin_setting_heading('reverseproxy', new lang_string('reverseproxy', 'admin'), '', ''));
 $options = array(
     0 => 'HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR',
