@@ -71,6 +71,10 @@ class behat_forms extends behat_base {
             $buttonnode->focus();
         }
         $buttonnode->press();
+        // Totara: This is a bloody hack, the quiz grading code is abusing windows like crazy, so make sure selenium knows in which window we are!
+        sleep(1);
+        $this->getSession()->switchToWindow(\behat_general::MAIN_WINDOW_NAME);
+        behat_hooks::$forcerestart = true;
     }
 
     /**
