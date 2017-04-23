@@ -793,6 +793,13 @@ $icons = array(
                     'classes' => 'fa-envelope-o',
                 ),
         ),
+    'email-filled' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-envelope',
+                ),
+        ),
     'email-no' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -1307,6 +1314,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-newspaper-o',
+                ),
+        ),
+    'notification' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-bell',
                 ),
         ),
     'objective' =>
