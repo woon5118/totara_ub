@@ -238,7 +238,6 @@ class core_completion_externallib_testcase extends externallib_advanced_testcase
         $completion = new completion_info($course);
 
         $this->setUser($student);
-        $completion::wipe_session_cache();
         completion_criteria_activity::invalidatecache();
         completion_criteria_course::invalidatecache();
 

@@ -735,14 +735,6 @@ function totara_core_uncomplete_course_modules_completion($cm, $completion, $now
 
     // The rest of this function is copied from delete_all_state in lib/completionlib.php.
 
-    // Erase cache data for current user if applicable
-    if (isset($SESSION->completioncache) &&
-        array_key_exists($cm->course, $SESSION->completioncache) &&
-        array_key_exists($cm->id, $SESSION->completioncache[$cm->course])) {
-
-        unset($SESSION->completioncache[$cm->course][$cm->id]);
-    }
-
     // Check if there is an associated course completion criteria
     $criteria = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
     $acriteria = false;
@@ -759,6 +751,10 @@ function totara_core_uncomplete_course_modules_completion($cm, $completion, $now
         $DB->delete_records_select('course_completion_crit_compl', $where, array($cm->course, $acriteria->id));
         $DB->delete_records_select('course_completions', "course = ? AND (rpl = '' OR rpl IS NULL)", array($cm->course));
     }
+
+    // Purge the course completion cache.
+    $cache = cache::make('core', 'completion');
+    $cache->purge();
 }
 
 /**

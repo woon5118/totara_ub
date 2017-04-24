@@ -382,16 +382,6 @@ class completion_info {
     }
 
     /**
-     * Displays the 'Your progress' help icon, if completion tracking is enabled.
-     * Just prints the result of display_help_icon().
-     *
-     * @deprecated since Moodle 2.0 - Use display_help_icon instead.
-     */
-    public function print_help_icon() {
-        print $this->display_help_icon();
-    }
-
-    /**
      * Returns the 'Your progress' help icon, if completion tracking is enabled.
      *
      * @return string HTML code for help icon, or blank if not needed
@@ -546,13 +536,6 @@ class completion_info {
         }
 
         return $aggregation->method;
-    }
-
-    /**
-     * @deprecated since Moodle 2.8 MDL-46290.
-     */
-    public function get_incomplete_criteria() {
-        throw new coding_exception('completion_info->get_incomplete_criteria() is removed.');
     }
 
     /**
@@ -721,6 +704,9 @@ class completion_info {
 
         // Modname hopefully is provided in $cm but just in case it isn't, let's grab it
         if (!isset($cm->modname)) {
+            // If we are here then it cannot possibly be a cm_info class.
+            // We need to populate the modname property so that this looks like a cm_info class...
+            // at least enough to to work here :(
             $cm->modname = $DB->get_field('modules', 'name', array('id'=>$cm->module));
         }
 
@@ -980,6 +966,9 @@ class completion_info {
         $DB->delete_records('course_completion_crit_compl', array('course' => $this->course_id));
         $DB->delete_records('block_totara_stats', array('eventtype' => STATS_EVENT_COURSE_STARTED, 'data2' => $this->course_id));
         $DB->delete_records('block_totara_stats', array('eventtype' => STATS_EVENT_COURSE_COMPLETE, 'data2' => $this->course_id));
+
+        // Difficult to find affected users, just purge all completion cache.
+        $this->get_completion_cache()->purge();
     }
 
     /**
@@ -1045,6 +1034,15 @@ class completion_info {
         $DB->execute($coursesql, $params);
 
         $transaction->allow_commit();
+
+        $cache = $this->get_completion_cache();
+        if (empty($userid)) {
+            // Difficult to find affected users, just purge all completion cache.
+            $cache->purge();
+        } else {
+            $key = $userid . '_' . $this->course->id;
+            $cache->delete($key);
+        }
     }
 
     /**
@@ -1054,19 +1052,12 @@ class completion_info {
      * Used by course reset page.
      */
     public function delete_all_completion_data() {
-        global $DB, $SESSION;
+        global $DB;
 
         // Delete from database.
         $DB->delete_records_select('course_modules_completion',
                 'coursemoduleid IN (SELECT id FROM {course_modules} WHERE course=?)',
                 array($this->course_id));
-
-        // Reset cache for current user.
-        if (isset($SESSION->completioncache) &&
-            array_key_exists($this->course_id, $SESSION->completioncache)) {
-
-            unset($SESSION->completioncache[$this->course_id]);
-        }
 
         // Wipe course completion data too.
         $this->delete_course_completion_data_including_rpl();
@@ -1080,18 +1071,10 @@ class completion_info {
      * @param stdClass|cm_info $cm Activity
      */
     public function delete_all_state($cm) {
-        global $SESSION, $DB;
+        global $DB;
 
         // Delete from database
         $DB->delete_records('course_modules_completion', array('coursemoduleid'=>$cm->id));
-
-        // Erase cache data for current user if applicable
-        if (isset($SESSION->completioncache) &&
-            array_key_exists($cm->course, $SESSION->completioncache) &&
-            array_key_exists($cm->id, $SESSION->completioncache[$cm->course])) {
-
-            unset($SESSION->completioncache[$cm->course][$cm->id]);
-        }
 
         // Check if there is an associated course completion criteria
         $criteria = $this->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
@@ -1109,6 +1092,8 @@ class completion_info {
             $DB->delete_records_select('course_completion_crit_compl', $where, array($this->course_id, $acriteria->id));
             $DB->delete_records_select('course_completions', "course = ? AND (rpl = '' OR rpl IS NULL)", array($this->course_id));
         }
+
+        $this->get_completion_cache()->purge();
     }
 
     /**
@@ -1122,7 +1107,7 @@ class completion_info {
      * Resetting state of manual tickbox has same result as deleting state for
      * it.
      *
-     * @param stcClass|cm_info $cm Activity
+     * @param stdClass|cm_info $cm Activity
      */
     public function reset_all_state($cm) {
         global $DB;
@@ -1139,7 +1124,7 @@ class completion_info {
         }
         $rs->close();
 
-        // Delete all existing state [also clears session cache for current user]
+        // Delete all existing state [also clears MUC cache for current user]
         $this->delete_all_state($cm);
 
         // Merge this with list of planned users (according to roles)
@@ -1162,10 +1147,19 @@ class completion_info {
     }
 
     /**
-     * Obtains completion data for a particular activity and user (from the
-     * session cache if available, or by SQL query)
+     * Returns the core completion cache instance.
      *
-     * @param stcClass|cm_info $cm Activity; only required field is ->id
+     * @return cache_application
+     */
+    protected function get_completion_cache() {
+        return cache::make('core', 'completion');
+    }
+
+    /**
+     * Obtains completion data for a particular activity and user (from the
+     * MUC cache if available, or by SQL query)
+     *
+     * @param stdClass|cm_info $cm Activity; only required field is ->id
      * @param bool $wholecourse If true (default false) then, when necessary to
      *   fill the cache, retrieves information from the entire course not just for
      *   this one activity
@@ -1174,59 +1168,53 @@ class completion_info {
      *   testing and so that it can be called recursively from within
      *   get_fast_modinfo. (Needs only list of all CMs with IDs.)
      *   Otherwise the method calls get_fast_modinfo itself.
-     * @return object Completion data (record from course_modules_completion)
+     * @return stdClass Completion data (record from course_modules_completion)
      */
     public function get_data($cm, $wholecourse = false, $userid = 0, $modinfo = null) {
-        global $USER, $CFG, $SESSION, $DB;
+        global $USER, $DB;
+
+        $completioncache = $this->get_completion_cache();
 
         // Get user ID
         if (!$userid) {
             $userid = $USER->id;
         }
 
-        // Is this the current user?
-        $currentuser = $userid==$USER->id;
-
-        if ($currentuser && is_object($SESSION)) {
-            // Make sure cache is present and is for current user (loginas
-            // changes this)
-            if (!isset($SESSION->completioncache) || $SESSION->completioncacheuserid!=$USER->id) {
-                $SESSION->completioncache = array();
-                $SESSION->completioncacheuserid = $USER->id;
+        // See if requested data is present in cache (use cache for current user only).
+        $usecache = $userid==$USER->id;
+        $cacheddata = array();
+        if ($usecache) {
+            $key = $userid . '_' . $this->course->id;
+            if (!isset($this->course->cacherev)) {
+                $this->course = get_course($this->course_id);
             }
-            // Expire any old data from cache
-            foreach ($SESSION->completioncache as $courseid=>$activities) {
-                if (empty($activities['updated']) || $activities['updated'] < time()-COMPLETION_CACHE_EXPIRY ||
-                    (!$DB->record_exists('course_completions', array('userid' => $USER->id, 'course' => $courseid, 'invalidatecache' => 0))
-                        && $this->is_tracked_user($USER->id))) {
-                    unset($SESSION->completioncache[$courseid]);
-                    $this->invalidatecache($courseid, $USER->id, false);
+            $cacheddata = $completioncache->get($key);
+            if ($cacheddata) {
+                if ($cacheddata['cacherev'] != $this->course->cacherev) {
+                    // Course structure has been changed since the last caching, forget the cache.
+                    $cacheddata = array();
+                } else if (isset($cacheddata[$cm->id])) {
+                    return (object)$cacheddata[$cm->id];
                 }
+            } else {
+                // cache::get returns false if the key is not found.
+                // we need to convert that back to an empty array.
+                $cacheddata = [];
             }
-            // See if requested data is present, if so use cache to get it
-            if (isset($SESSION->completioncache) &&
-                array_key_exists($this->course->id, $SESSION->completioncache) &&
-                array_key_exists($cm->id, $SESSION->completioncache[$this->course->id])) {
-                return (object)$SESSION->completioncache[$this->course->id][$cm->id];
-            }
-        }
-
-        if ($currentuser) {
-            // Rebuilding the cache so set invalidate to false.
-            $this->invalidatecache($this->course->id, $USER->id, false);
         }
 
         // Not there, get via SQL
-        if ($currentuser && $wholecourse) {
+        if ($usecache && $wholecourse) {
             // Get whole course data for cache
-            $alldatabycmc = $DB->get_records_sql("
-    SELECT
-        cmc.*
-    FROM
-        {course_modules} cm
-        INNER JOIN {course_modules_completion} cmc ON cmc.coursemoduleid=cm.id
-    WHERE
-        cm.course=? AND cmc.userid=?", array($this->course->id, $userid));
+            $sql = "SELECT cmc.*
+                      FROM {course_modules} cm
+                INNER JOIN {course_modules_completion} cmc ON cmc.coursemoduleid=cm.id
+                     WHERE cm.course=:courseid AND cmc.userid=:userid";
+            $params = [
+                'courseid' => $this->course->id,
+                'userid' => $userid
+            ];
+            $alldatabycmc = $DB->get_records_sql($sql, $params);
 
             // Reindex by cm id
             $alldata = array();
@@ -1242,37 +1230,14 @@ class completion_info {
                 if (isset($alldata[$othercm->id])) {
                     $data = $alldata[$othercm->id];
                 } else {
-                    // Row not present counts as 'not complete'
-                    $data = new StdClass;
-                    $data->id              = 0;
-                    $data->coursemoduleid  = $othercm->id;
-                    $data->userid          = $userid;
-                    $data->completionstate = COMPLETION_INCOMPLETE;
-                    $data->viewed          = 0;
-                    $data->timemodified    = 0;
-                    $data->timecompleted   = null;
-                    $data->reaggregate     = 0;
-
-                    // TOTARA - Check the criteria in case it should be complete.
-                    $coursemodule = $DB->get_record('course_modules' , array('id' => $othercm->id));
-                    if ($coursemodule && $this->internal_get_state($coursemodule, $userid, $data) != COMPLETION_INCOMPLETE) {
-                        // It isn't incomplete for some reason. Process it now, then re-get the new data.
-                        $this->update_state($coursemodule, COMPLETION_UNKNOWN, $userid, $data);
-                        $newdata = $DB->get_record('course_modules_completion', array('coursemoduleid'=>$othercm->id, 'userid'=>$userid));
-                        if (!empty($newdata)) {
-                            $data = $newdata;
-                        }
-                    }
-                    $data = (array)$data;
+                    $data = (array)$this->get_incomplete_data_object($othercm->id, $userid);
                 }
-                $SESSION->completioncache[$this->course->id][$othercm->id] = $data;
+                $cacheddata[$othercm->id] = $data;
             }
-            $SESSION->completioncache[$this->course->id]['updated'] = time();
 
-            if (!isset($SESSION->completioncache[$this->course->id][$cm->id])) {
+            if (!isset($cacheddata[$cm->id])) {
                 $this->internal_systemerror("Unexpected error: course-module {$cm->id} could not be found on course {$this->course->id}");
             }
-            return (object)$SESSION->completioncache[$this->course->id][$cm->id];
 
         } else {
             // Get single record
@@ -1280,61 +1245,84 @@ class completion_info {
             if ($data) {
                 $data = (array)$data;
             } else {
-                // Row not present counts as 'not complete'
-                $data = new StdClass;
-                $data->id              = 0;
-                $data->coursemoduleid  = $cm->id;
-                $data->userid          = $userid;
-                $data->completionstate = COMPLETION_INCOMPLETE;
-                $data->viewed          = 0;
-                $data->timemodified    = 0;
-                $data->timecompleted   = null;
-                $data->reaggregate     = 0;
-
-                // TOTARA - Check the criteria in case it should be complete.
-                $coursemodule = $DB->get_record('course_modules' , array('id' => $cm->id));
-                if ($coursemodule && $this->internal_get_state($coursemodule, $userid, $data) != COMPLETION_INCOMPLETE) {
-                    // It isn't incomplete for some reason. Process it now, then re-get the new data.
-                    $this->update_state($coursemodule, COMPLETION_UNKNOWN, $userid, $data);
-                    $newdata = $DB->get_record('course_modules_completion', array('coursemoduleid'=>$cm->id, 'userid'=>$userid));
-                    if (!empty($newdata)) {
-                        $data = $newdata;
-                    }
-                }
-                
-                $data = (array)$data;
+                $data = (array)$this->get_incomplete_data_object($cm->id, $userid);
             }
-
-            // Put in cache
-            if ($currentuser) {
-                $SESSION->completioncache[$this->course->id][$cm->id] = $data;
-                // For single updates, only set date if it was empty before
-                if (empty($SESSION->completioncache[$this->course->id]['updated'])) {
-                    $SESSION->completioncache[$this->course->id]['updated'] = time();
-                }
-            }
+            $cacheddata[$cm->id] = $data;
         }
 
-        return (object)$data;
+        if ($usecache) {
+            $cacheddata['cacherev'] = $this->course->cacherev;
+            $completioncache->set($key, $cacheddata);
+        }
+        return (object)$cacheddata[$cm->id];
     }
 
     /**
-     * Sets invalidatecache - if true, the completion cache will be reset in the the user's session
+     * Returns an course_modules_completion data object to represent an incomplete when the user has no current state and
+     * can only be incomplete.
+     *
+     * @param int $cmid
+     * @param int $userid
+     * @return stdClass An incomplete course_modules_completion record.
+     */
+    protected function get_incomplete_data_object($cmid, $userid) {
+        global $DB;
+
+        // This needs to match a record from course_modules_completion.
+        $data = new stdClass;
+        $data->id = 0;
+        $data->coursemoduleid = $cmid;
+        $data->userid = $userid;
+        $data->completionstate = COMPLETION_INCOMPLETE;
+        $data->viewed = 0;
+        $data->timemodified = 0;
+        $data->timecompleted = null;
+        $data->reaggregate = 0;
+
+        // TOTARA - Check the criteria in case it should be complete.
+        $sql = 'SELECT cm.*, m.name AS modname
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module
+                 WHERE cm.id = :cmid';
+        $params = [
+            'cmid' => $cmid
+        ];
+        $coursemodule = $DB->get_record_sql($sql, $params);
+        if (!$coursemodule) {
+            // The course module doesn't exist, this should not happen.
+            // Handling this has been kept as legacy, but should be cleaned up in the future.
+            debugging('Requesting completion data for a course module that does not exist', DEBUG_DEVELOPER);
+            return $data;
+        }
+
+        $state = $this->internal_get_state($coursemodule, $userid, $data);
+        if ($state != COMPLETION_INCOMPLETE) {
+            // Its not incomplete, update the state so that we can return an accurate state.
+            $this->update_state($coursemodule, COMPLETION_UNKNOWN, $userid, $data);
+            $newdata = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cmid, 'userid' => $userid));
+            if (!empty($newdata)) {
+                $data = $newdata;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Invalidates the completion cache.
+     * If both a userid and courseid are passed then the explicit cache entry is deleted.
+     * Otherwise all completion cache entries are deleted.
      *
      * @param int $courseid
      * @param int $userid
-     * @param bool $value true = reset the cache in the session for this course
+     * @param bool $unused
      */
-    public function invalidatecache($courseid = null, $userid = null, $value = false) {
-        global $DB, $USER;
-        if (empty($courseid)) {
-            $courseid = $this->course->id;
-        }
-        if (empty($userid)) {
-            $userid = $USER->id;
-        }
-        if (!empty($courseid) && !empty($userid)) {
-            $DB->set_field('course_completions', 'invalidatecache', $value, array('userid' => $userid, 'course' => $courseid));
+    public function invalidatecache($courseid = null, $userid = null, $unused = null) {
+        $cache = $this->get_completion_cache();
+        if (isset($courseid) && isset($userid)) {
+            $key = $userid . '_' . $this->course->id;
+            $cache->delete($key);
+        } else {
+            $cache->purge();
         }
     }
 
@@ -1348,7 +1336,7 @@ class completion_info {
      * @param stdClass $data Data about completion for that user
      */
     public function internal_set_data($cm, $data) {
-        global $USER, $SESSION, $DB;
+        global $USER, $DB;
 
         $transaction = $DB->start_delegated_transaction();
         if (!$data->id) {
@@ -1366,13 +1354,24 @@ class completion_info {
         $transaction->allow_commit();
 
         $cmcontext = context_module::instance($data->coursemoduleid, MUST_EXIST);
-        $coursecontext = $cmcontext->get_parent_context();
 
-        // Totara: we must update the caches before triggering events because the observers might use the cache.
+        $completioncache = $this->get_completion_cache();
         if ($data->userid == $USER->id) {
-            $SESSION->completioncache[$cm->course][$cm->id] = $data;
+            // Update module completion in user's cache.
+            $cachedata = $completioncache->get($data->userid . '_' . $cm->course);
+            if (!$cachedata || $cachedata['cacherev'] != $this->course->cacherev) {
+                // There is no cache data or the cacherev doesn't match and we need to reset.
+                $cachedata = [
+                    'cacherev' => $this->course->cacherev
+                ];
+            }
+            $cachedata[$cm->id] = $data;
+            $completioncache->set($data->userid . '_' . $cm->course, $cachedata);
             // reset modinfo for user (no need to call rebuild_course_cache())
             get_fast_modinfo($cm->course, 0, true);
+        } else {
+            // Remove another user's completion cache for this course.
+            $completioncache->delete($data->userid . '_' . $cm->course);
         }
 
         // Trigger an event for course module completion changed.
@@ -1688,12 +1687,14 @@ class completion_info {
     }
 
     /**
-     * For testing only. Wipes information cached in user session.
+     * DEPRECATED: For testing only.
+     *
+     * @deprecated since Totara 10, this function should no longer be needed for testing.
      */
     public static function wipe_session_cache() {
-        global $SESSION;
-        unset($SESSION->completioncache);
-        unset($SESSION->completioncacheuserid);
+        debugging('The method \completion_info::wipe_session_cache has been deprecated and will be removed.', DEBUG_DEVELOPER);
+        $cache = cache::make('core', 'completion');
+        $cache->purge();
     }
 
     /**

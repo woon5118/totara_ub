@@ -212,7 +212,7 @@
         <FIELD NAME="reaggregate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="rpl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Totara recognition of prior learning from totara_core"/>
         <FIELD NAME="rplgrade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="Totara recognition of prior learning grade from totara_core"/>
-        <FIELD NAME="invalidatecache" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="invalidatecache" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Deprecated since Totara 10, please do not use"/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Totara status from totara_core"/>
         <FIELD NAME="renewalstatus" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Totara renewal status from totara_core"/>
       </FIELDS>
