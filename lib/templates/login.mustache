@@ -33,6 +33,7 @@
         "instructions": "For full access to this site, you first need to create an account.",
         "loginurl": "http://example.com/stable_master/login/index.php",
         "rememberusername": true,
+        "rememberusernamechecked": true,
         "passwordautocomplete": false,
         "signupurl": "http://localhost/stable_master/login/signup.php",
         "cookieshelpiconformatted": "",
@@ -89,8 +90,8 @@
                 <div class="clearer"><!-- --></div>
                 {{#rememberusername}}
                     <div class="rememberpass">
-                        <input type="checkbox" name="rememberusername" id="rememberusername" value="1" {{#username}}checked="checked"{{/username}} />
-                        <label for="rememberusername">{{#str}} rememberusername, admin {{/str}}</label>
+                        <input type="checkbox" name="rememberusernamechecked" id="rememberusernamechecked" value="1" {{#rememberusernamechecked}}checked="checked"{{/rememberusernamechecked}} />
+                        <label for="rememberusernamechecked">{{#str}} rememberusername, admin {{/str}}</label>
                     </div>
                 {{/rememberusername}}
                 <div class="clearer"><!-- --></div>

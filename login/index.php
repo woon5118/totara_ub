@@ -122,7 +122,7 @@ if ($user !== false or $frm !== false or $errormsg !== '') {
     // TOTARA: keeping form state on incorrect submission (TL-7236)
     if (isset($frm->username)) {
         $SESSION->login_username = $frm->username;
-        $SESSION->login_remember = !empty($frm->rememberusername);
+        $SESSION->login_remember = !empty($frm->rememberusernamechecked);
         if (!$SESSION->login_remember && ((int)$CFG->rememberusername !== 1)) {
             set_moodle_cookie('');
         }
@@ -227,7 +227,7 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
             // auth plugins can temporarily override this from loginpage_hook()
             // do not save $CFG->nolastloggedin in database!
 
-        } else if (empty($CFG->rememberusername) or ($CFG->rememberusername == 2 and empty($frm->rememberusername))) {
+        } else if (empty($CFG->rememberusername) or ($CFG->rememberusername == 2 and empty($frm->rememberusernamechecked))) {
             // no permanent cookies, delete old one if exists
             set_moodle_cookie('');
 
@@ -340,7 +340,7 @@ if (empty($frm->username) && $authsequence[0] != 'shibboleth') {  // See bug 518
 
     // TOTARA: keeping form state on incorrect submission (TL-7236)
     if (isset($SESSION->login_remember)){
-        $frm->rememberusername = $SESSION->login_remember;
+        $frm->rememberusernamechecked = $SESSION->login_remember;
     }
 
     if (isset($SESSION->login_username)){
@@ -352,7 +352,9 @@ if (empty($frm->username) && $authsequence[0] != 'shibboleth') {  // See bug 518
         // returning a username in the line below has always meant remember username checkbox should be checked.
         $frm->username = get_moodle_cookie();
         if (!empty($frm->username)){
+            // We got it from a cookie, so we want it checked.
             $frm->rememberusername = '1';
+            $frm->rememberusernamechecked = 1;
         }
     }
     unset($SESSION->login_remember);
@@ -394,7 +396,7 @@ if (isloggedin() and !isguestuser()) {
     echo $OUTPUT->confirm(get_string('alreadyloggedin', 'error', fullname($USER)), $logout, $continue);
     echo $OUTPUT->box_end();
 } else {
-    $loginform = new \core_auth\output\login($authsequence, $frm->username);
+    $loginform = new \core_auth\output\login($authsequence, $frm);
     $loginform->set_error($errormsg);
     echo $OUTPUT->render($loginform);
 }

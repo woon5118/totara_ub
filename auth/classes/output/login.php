@@ -69,6 +69,8 @@ class login implements renderable, templatable {
     public $passwordautocomplete;
     /** @var bool Whether the username should be remembered. */
     public $rememberusername;
+    /** @var bool Whether the "remember me" option was selected. */
+    public $rememberusernamechecked = false;
     /** @var moodle_url The sign-up URL. */
     public $signupurl;
     /** @var string The user name to pre-fill the form with. */
@@ -78,12 +80,21 @@ class login implements renderable, templatable {
      * Constructor.
      *
      * @param array $authsequence The enabled sequence of authentication plugins.
-     * @param string $username The username to display.
+     * @param stdClass $frm raw data to override defaults.
      */
-    public function __construct(array $authsequence, $username = '') {
+    public function __construct(array $authsequence, $frm=null) {
         global $CFG, $SESSION;
 
-        $this->username = $username;
+        if (is_string($frm)) {
+            // This is a call from Moodle or a Moodle plugin.
+            debugging('Please update your call to new \core_auth\output\login() to pass the data object instead of the username', DEBUG_DEVELOPER);
+            $username = $frm;
+            $frm = new stdClass;
+            $frm->username = $username;
+            unset($username);
+        }
+
+        $this->username = isset($frm->username) ? $frm->username : '';
 
         $this->canloginasguest = $CFG->guestloginbutton and !isguestuser();
         $this->canloginbyemail = !empty($CFG->authloginviaemail);
@@ -92,7 +103,8 @@ class login implements renderable, templatable {
 
         $this->autofocusform = !empty($CFG->loginpageautofocus);
         $this->passwordautocomplete = !empty($CFG->loginpasswordautocomplete);
-        $this->rememberusername = isset($CFG->rememberusername) and $CFG->rememberusername == 2;
+        $this->rememberusername = isset($CFG->rememberusername) && $CFG->rememberusername == 2;
+        $this->rememberusernamechecked = !empty($frm->rememberusernamechecked);
 
         $this->forgotpasswordurl = new moodle_url($CFG->httpswwwroot . '/login/forgot_password.php');
         $this->loginurl = new moodle_url($CFG->httpswwwroot . '/login/index.php');
@@ -150,6 +162,7 @@ class login implements renderable, templatable {
             context_system::instance()->id);
         $data->loginurl = $this->loginurl->out(false);
         $data->rememberusername = $this->rememberusername;
+        $data->rememberusernamechecked = $this->rememberusernamechecked;
         $data->passwordautocomplete = $this->passwordautocomplete;
         $data->signupurl = $this->signupurl->out(false);
         $data->username = $this->username;
