@@ -12,28 +12,17 @@ Feature: Check that the visibility options for the tiles work correctly
       | user2    | Second    | User     | second@example.com | T2       |
       | user3    | Third     | User     | third@example.com  | T3       |
       | user4    | Forth     | User     | forth@example.com  | T4       |
+    And the following "cohorts" exist:
+      | name     | idnumber |
+      | Cohort 1 | CH1      |
+      | Cohort 2 | CH2      |
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | CH1    |
+      | user2 | CH1    |
+      | user2 | CH2    |
+      | user3 | CH2    |
     And I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
-    And I follow "Add new audience"
-    And I set the following fields to these values:
-      | Name         | Test_cohort_name        |
-      | Context      | System                  |
-      | Audiences ID | 222                     |
-      | Description  | Test cohort description |
-    And I press "Save changes"
-    And I add "Admin User (moodle@example.com)" user to "222" cohort members
-    And I add "First User (first@example.com)" user to "222" cohort members
-    And I add "Second User (second@example.com)" user to "222" cohort members
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
-    And I follow "Add new audience"
-    And I set the following fields to these values:
-      | Name         | Test_cohort_name2        |
-      | Context      | System                  |
-      | Audiences ID | 333                     |
-      | Description  | Test cohort description |
-    And I press "Save changes"
-    And I add "Third User (third@example.com)" user to "333" cohort members
-    And I add "Second User (second@example.com)" user to "333" cohort members
     And I am on site homepage
     And I follow "Turn editing on"
     And I add the "Featured Links" block
@@ -57,11 +46,11 @@ Feature: Check that the visibility options for the tiles work correctly
     And I should see "Ruleset aggregation logic"
     And I should see "Ruleset aggregation"
     When I click on "Add audiences" "button"
-    Then I should see "Test_cohort_name"
-    When I follow "Test_cohort_name"
+    Then I should see "Cohort 1"
+    When I click on "Cohort 1" "link"
     And I click on "OK" "button"
     And I wait "1" seconds
-    Then I should see "Test_cohort_name"
+    Then I should see "Cohort 1"
     When I set the "Condition required to view" Totara form field to "User is logged in"
     And I click on "Save changes" "button"
     Then "default description" "link" should exist
@@ -86,11 +75,10 @@ Feature: Check that the visibility options for the tiles work correctly
     And I click on "Expand all" "text"
     And I set the "Define access by audience rules" Totara form field to "1"
     And I click on "Add audiences" "button"
-    And I follow "Test_cohort_name"
+    And I click on "Cohort 1" "link"
     And I click on "OK" "button"
     And I click on "Save changes" "button"
     And I follow "Turn editing off"
-    Then "default description" "link" should exist
     When I log out
     And I log in as "user1"
     And I am on site homepage
@@ -107,8 +95,8 @@ Feature: Check that the visibility options for the tiles work correctly
     And I click on "Expand all" "text"
     And I set the "Define access by audience rules" Totara form field to "1"
     And I click on "Add audiences" "button"
-    And I follow "Test_cohort_name"
-    And I follow "Test_cohort_name2"
+    And I click on "Cohort 1" "link"
+    And I click on "Cohort 2" "link"
     And I click on "OK" "button"
     And I set the "Audience rule aggregation" Totara form field to "All of the audiences above"
     And I click on "Save changes" "button"
@@ -262,12 +250,11 @@ Feature: Check that the visibility options for the tiles work correctly
     And I set the "Condition required to view" Totara form field to "User is site administrator"
     And I set the "Define access by audience rules" Totara form field to "1"
     And I click on "Add audiences" "button"
-    And I follow "Test_cohort_name"
+    And I click on "Cohort 1" "link"
     And I click on "OK" "button"
     And I set the "Ruleset aggregation" Totara form field to "Users matching all of the criteria above can view this feature link"
     And I click on "Save changes" "button"
     And I follow "Turn editing off"
-    Then "default description" "link" should exist
     When I log out
     And I log in as "user1"
     And I am on site homepage
@@ -286,7 +273,7 @@ Feature: Check that the visibility options for the tiles work correctly
     Then "default description" "link" should not exist
 
     Scenario: Tests visibility options are not available on dashboard
-      When I follow "Dashboard"
+      When I click on "Dashboard" in the totara menu
       And I click on "Customise this page" "button"
       And I add the "Featured Links" block
       And I click on "Add Tile" "link"
