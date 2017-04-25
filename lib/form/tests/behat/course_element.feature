@@ -32,7 +32,6 @@ Feature: Test that the course form element works
 
     # Searching for "c" finds all three no-hidden courses.
     And I search for "c" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should see "course1" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "course2" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "course3" in the ".form-autocomplete-suggestions" "css_element"
@@ -41,7 +40,6 @@ Feature: Test that the course form element works
 
     # Searching for "2" finds just course2.
     When I search for "2" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should not see "course1" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "course2" in the ".form-autocomplete-suggestions" "css_element"
     And I should not see "course3" in the ".form-autocomplete-suggestions" "css_element"
@@ -54,7 +52,6 @@ Feature: Test that the course form element works
 
     # Searching for "3" finds just course3, but course2 is already selected.
     When I search for "3" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should not see "course1" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "course2" in the "//div[@id='fitem_id_mappedcourses']" "xpath_element"
     And I should not see "course2" in the ".form-autocomplete-suggestions" "css_element"
@@ -68,7 +65,6 @@ Feature: Test that the course form element works
 
     # Search for all courses contains "o", which is all courses.
     When I search for "o" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should see "course1" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "course2" in the "//div[@id='fitem_id_mappedcourses']" "xpath_element"
     And I should not see "course2" in the ".form-autocomplete-suggestions" "css_element"
@@ -88,8 +84,7 @@ Feature: Test that the course form element works
     And I am on site homepage
     And I click on "frontpagefeedback" "link"
     And I click on "Map feedback to courses" "link"
-    And I set the field "Courses" to "Acceptance"
-    And I wait "1" seconds
+    And I search for "Acceptance" in the "Courses" autocomplete
     Then I should see "Acceptance test site" in the ".form-autocomplete-suggestions" "css_element"
     When I click on ".form-autocomplete-suggestions" "css_element"
     And I press "Save changes"
@@ -104,7 +99,6 @@ Feature: Test that the course form element works
     And I click on "Mapped courses" "link"
     Then I should see "Acceptance test site" in the "//div[@id='fitem_id_mappedcourses']" "xpath_element"
     When I search for "1" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should see "course1" in the ".form-autocomplete-suggestions" "css_element"
     When I click on ".form-autocomplete-suggestions" "css_element"
     And I press "Save changes"
@@ -121,7 +115,6 @@ Feature: Test that the course form element works
 
     # Normal user can't add the site course back.
     When I set the field "Courses" to "Acceptance"
-    And I wait "1" seconds
     Then I should not see "Acceptance test site" in the ".form-autocomplete-suggestions" "css_element"
 
   Scenario: User can use the course form element when the selected course is hidden to them
@@ -131,7 +124,6 @@ Feature: Test that the course form element works
     And I click on "frontpagefeedback" "link"
     And I click on "Map feedback to courses" "link"
     And I search for "4" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should see "course4" in the ".form-autocomplete-suggestions" "css_element"
     When I click on ".form-autocomplete-suggestions" "css_element"
     And I press "Save changes"
@@ -146,7 +138,6 @@ Feature: Test that the course form element works
     And I click on "Mapped courses" "link"
     Then I should see "course4" in the "//div[@id='fitem_id_mappedcourses']" "xpath_element"
     When I search for "1" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should see "course1" in the ".form-autocomplete-suggestions" "css_element"
     When I click on ".form-autocomplete-suggestions" "css_element"
     And I press "Save changes"
@@ -163,5 +154,4 @@ Feature: Test that the course form element works
 
     # Normal user can't add the hidden course back.
     When I search for "4" in the "Courses" autocomplete
-    And I wait "1" seconds
     Then I should not see "course4" in the ".form-autocomplete-suggestions" "css_element"
