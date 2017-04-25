@@ -1042,6 +1042,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $rs = $DB->get_counted_recordset_sql($sql, $params);
                 $rs->close();
             }
+
+            reportbuilder_purge_cache($bigreportid, false);
         }
 
         if ($DB->get_dbfamily() === 'mysql') {

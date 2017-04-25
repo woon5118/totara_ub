@@ -5338,7 +5338,8 @@ class ReportBuilderException extends \Exception { }
  */
 function sql_table_from_select($table, $select, array $params) {
     global $DB;
-    $table = '{' . trim($table, '{}') . '}'; // Make sure this is valid table with correct prefix.
+    $tablename = trim($table, '{}');
+    $table = '{' . $tablename . '}'; // Make sure this is valid table with correct prefix.
     $hashtablename = substr(md5($table), 0, 15);
     switch ($DB->get_dbfamily()) {
         case 'mysql':
@@ -5386,7 +5387,7 @@ function sql_table_from_select($table, $select, array $params) {
             $result = $DB->execute($sql, $params);
             break;
     }
-    $DB->reset_caches();
+    $DB->reset_caches(array($tablename));
 
     if (!$result) {
         return false;
@@ -5394,6 +5395,7 @@ function sql_table_from_select($table, $select, array $params) {
 
     // Create indexes
     $indexcount = 0;
+    $resetcaches = false;
     $fields = $DB->get_records_sql($columnssql);
     foreach ($fields as $field) {
         $hashfieldname = substr(md5($field->$fieldname), 0, 15);
@@ -5431,6 +5433,7 @@ function sql_table_from_select($table, $select, array $params) {
                     $altersql = "ALTER TABLE {$table} ALTER COLUMN {$field->name} NVARCHAR(450)"; //Maximum index size = 900 bytes or 450 unicode chars
                     try {
                         // Attempt to convert field to indexable
+                        $resetcaches = true;
                         $DB->execute($altersql);
                     } catch (dml_write_exception $e) {
                         // Recoverable exception
@@ -5442,6 +5445,7 @@ function sql_table_from_select($table, $select, array $params) {
             case 'postgres':
                 if ($field->data_type == 'unknown') {
                     $altersql = "ALTER TABLE {$table} ALTER COLUMN {$field->column_name} type varchar(255)";
+                    $resetcaches = true;
                     $DB->execute($altersql);
                 }
                 if ($field->data_type == 'text') {
@@ -5451,9 +5455,12 @@ function sql_table_from_select($table, $select, array $params) {
             break;
         }
         $indexcount++;
+        $resetcaches = true;
         $DB->execute($sql);
     }
-    $DB->reset_caches();
+    if ($resetcaches) {
+        $DB->reset_caches(array($tablename));
+    }
 
     return true;
 }

@@ -184,7 +184,8 @@ function ajax_result($success = true, $message = '') {
  */
 function sql_drop_table_if_exists($table) {
     global $DB;
-    $table = $DB->get_prefix() . trim($table, '{}');
+    $tablename = trim($table, '{}');
+    $table = $DB->get_prefix() . $tablename;
     switch ($DB->get_dbfamily()) {
         case 'mssql':
             $sql = "IF OBJECT_ID('dbo.{$table}','U') IS NOT NULL DROP TABLE dbo.{$table}";
@@ -197,7 +198,7 @@ function sql_drop_table_if_exists($table) {
             $sql = "DROP TABLE IF EXISTS \"{$table}\"";
             break;
     }
-    $DB->change_database_structure($sql);
+    $DB->change_database_structure($sql, array($tablename));
     return true;
 }
 
