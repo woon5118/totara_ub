@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2017032700;     // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016052304;       // Requires this Moodle version.
+$plugin->version  = 2017042600;     // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2016120502;       // Requires this Moodle version.
 $plugin->component = 'theme_basis';   // Full name of the plugin (used for diagnostics).
 $plugin->dependencies = array(
     'theme_roots' => 2016092000,
