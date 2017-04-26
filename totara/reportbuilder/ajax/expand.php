@@ -27,7 +27,7 @@
  */
 define('AJAX_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 // Send the correct headers.

@@ -27,7 +27,7 @@
  * Page containing list of saved searches for this report
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/utils.php');
 require_once('report_forms.php');

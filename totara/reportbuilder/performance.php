@@ -29,7 +29,7 @@
 define('REPORTBUIDLER_MANAGE_REPORTS_PAGE', true);
 define('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS', true); // We are setting up report here, do not accept source params.
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');

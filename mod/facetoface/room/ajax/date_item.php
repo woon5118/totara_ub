@@ -23,7 +23,7 @@
 
 define('AJAX_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
+require_once(__DIR__ . '/../../../../config.php');
 
 $timestart = optional_param('timestart', 0, PARAM_INT);
 $timefinish = optional_param('timefinish', 0, PARAM_INT);

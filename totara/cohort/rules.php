@@ -24,7 +24,7 @@
 /**
  * This file displays a page with the list of rules for a dynamic cohort
  */
-require_once(dirname(__FILE__) . '/../../config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/cohort/lib.php');

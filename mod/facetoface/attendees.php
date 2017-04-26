@@ -24,7 +24,7 @@
  * @subpackage facetoface
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');

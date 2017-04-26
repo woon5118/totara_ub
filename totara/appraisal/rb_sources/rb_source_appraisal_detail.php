@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(dirname(__FILE__) . '/rb_source_appraisal.php');
+require_once($CFG->dirroot . '/totara/appraisal/rb_sources/rb_source_appraisal.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 
 class rb_source_appraisal_detail extends rb_source_appraisal {

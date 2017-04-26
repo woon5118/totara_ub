@@ -23,7 +23,7 @@
 
 global $DB, $PAGE;
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(__DIR__ . '/../../config.php');
 
 $section = optional_param('section', 'overview', PARAM_ALPHA);
 $courseid = required_param('courseid', PARAM_INT);

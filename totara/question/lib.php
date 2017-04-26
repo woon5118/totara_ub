@@ -25,7 +25,7 @@
 
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/form/static.php');
-require_once(dirname(__FILE__).'/libforms.php');
+require_once(__DIR__ . '/libforms.php');
 require_once($CFG->libdir.'/ddllib.php');
 
 /**
@@ -93,7 +93,7 @@ class question_manager {
      * @return array
      */
     public static function get_registered_elements($checkEnabledStatus = true) {
-        $dir = dirname(__FILE__).'/field';
+        $dir = __DIR__ . '/field';
         $elemfiles = glob($dir.'/*.class.php');
         $info = array();
         foreach ($elemfiles as $file) {

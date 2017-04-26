@@ -23,7 +23,7 @@
  * @subpackage reportbuilder
  */
 
-require_once(dirname(dirname(dirname(__FILE__)))."/config.php");
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 define('MAX_USERS_PER_PAGE', 1000);

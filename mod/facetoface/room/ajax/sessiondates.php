@@ -23,7 +23,7 @@
 
 define('AJAX_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
+require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 $facetofaceid = required_param('facetofaceid', PARAM_INT); // Necessary when creating new sessions.

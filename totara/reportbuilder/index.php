@@ -21,7 +21,7 @@
  * @package totara_reportbuilder
  */
 
-require_once(dirname(dirname(__DIR__)).'/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 $debug  = optional_param('debug', 0, PARAM_INT);

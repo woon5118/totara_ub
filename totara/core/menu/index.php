@@ -26,7 +26,7 @@
 
 use \totara_core\totara\menu\menu as menu;
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
 
 // Actions to manage categories.

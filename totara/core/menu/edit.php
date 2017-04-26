@@ -24,7 +24,7 @@
  * @author     Oleg Demeshev <oleg.demeshev@totaralms.com>
  */
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/totara/core/menu/edit_form.php');

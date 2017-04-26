@@ -22,7 +22,7 @@
  * @subpackage totara_core
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/core/customicon_form.php');
 require_once($CFG->dirroot .'/totara/core/utils.php');
 require_once($CFG->dirroot .'/lib/formslib.php');

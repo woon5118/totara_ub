@@ -28,7 +28,7 @@
  * Edit evidence
  */
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
+require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once('edit_form.php');

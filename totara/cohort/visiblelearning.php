@@ -24,7 +24,7 @@
 /**
  * This page displays the embedded report for the "visible learning" items for a single cohort
  */
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');

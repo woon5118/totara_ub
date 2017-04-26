@@ -29,8 +29,8 @@
  * Library to construct hierarchies such as competencies, positions, etc
  */
 
-require_once(dirname(dirname(__FILE__)) . '/core/utils.php');
-require_once(dirname(dirname(__FILE__)) . '/customfield/fieldlib.php');
+require_once($CFG->dirroot . '/totara/core/utils.php');
+require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
 /**
  * Export option codes
