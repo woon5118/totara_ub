@@ -3277,6 +3277,7 @@ class lesson extends lesson_base {
             $result = new stdClass;
             $result->newpageid       = optional_param('newpageid', $page->nextpageid, PARAM_INT);
             $result->nodefaultresponse  = true;
+            $result->inmediatejump = false;
         }
 
         if ($result->inmediatejump) {
