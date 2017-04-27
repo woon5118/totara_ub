@@ -391,9 +391,13 @@ class mssql_native_moodle_database extends moodle_database {
             $this->free_result($result);
         }
 
+        // Separate tables cause we're going to be adding to it.
+        $tables = $this->tables;
         // Add the currently available temptables
-        $this->tables = array_merge($this->tables, $this->temptables->get_temptables());
-        return $this->tables;
+        foreach ($this->temptables->get_temptables() as $tablename => $tablenameencoded) {
+            $tables[$tablename] = $tablename;
+        }
+        return $tables;
     }
 
     /**
