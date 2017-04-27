@@ -34,7 +34,7 @@
  * @param int $page 0-based number of page being displayed
  * @return \core_tag\output\tagindex
  */
-function user_get_tagged_cohorts($tag, $exclusivemode = false, $fromctx = 0, $ctx = 0, $rec = 1, $page = 0) {
+function totara_cohort_get_tagged_cohorts($tag, $exclusivemode = false, $fromctx = 0, $ctx = 0, $rec = 1, $page = 0) {
     global $PAGE;
 
     if ($ctx && $ctx != context_system::instance()->id) {
@@ -48,9 +48,16 @@ function user_get_tagged_cohorts($tag, $exclusivemode = false, $fromctx = 0, $ct
     $totalpages = ceil($cohortcount / $perpage);
 
     if ($cohortcount) {
-        $userlist = $tag->get_tagged_items('core', 'cohort', $page * $perpage, $perpage);
-        $renderer = $PAGE->get_renderer('core', 'cohort');
-        $content .= $renderer->user_list($userlist, $exclusivemode);
+        $cohortlist = $tag->get_tagged_items('core', 'cohort', $page * $perpage, $perpage);
+
+        $items = array();
+
+        foreach ($cohortlist as $cohort) {
+            $url = new moodle_url('/cohort/view.php', array('id' => $cohort->id));
+            $items[] = html_writer::link($url, $cohort->name);
+        }
+
+        $content .= html_writer::alist($items);
     }
 
     return new core_tag\output\tagindex($tag, 'core', 'cohort', $content,
