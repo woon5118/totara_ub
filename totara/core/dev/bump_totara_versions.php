@@ -221,7 +221,7 @@ function dev_get_maturity() {
  */
 function dev_is_upstream_file($file) {
     global $CFG;
-    $tag = 'edab0782a354995c60ff2c7874031addb155a49c'; // 3.1.4 - Totara 10
+    $tag = '70fa678586c32a4710c62a59f71d63e02bd9e500'; // 3.2.2 - Totara 10
     $cwd = getcwd();
     chdir($CFG->dirroot);
     $file = substr($file, strlen($CFG->dirroot) +1);

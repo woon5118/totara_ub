@@ -232,10 +232,10 @@ Feature: No visibility of user report source custom field values
     And I log in as "chief"
 
     When I navigate to my "Invisible user report" report
-    Then I should not see "TestCheckbox"
-    And I should not see "TestDate"
-    And I should not see "TestDT"
-    And I should not see "TestMenu"
-    And I should not see "TestTextArea"
-    And I should not see "TestTextField"
+    Then I should see "TestCheckbox"
+    And I should see "TestDate"
+    And I should see "TestDT"
+    And I should see "TestMenu"
+    And I should see "TestTextArea"
+    And I should see "TestTextField"
 
