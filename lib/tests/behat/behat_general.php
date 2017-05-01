@@ -648,8 +648,10 @@ class behat_general extends behat_base {
         // Looking for all the matching nodes without any other descendant matching the
         // same xpath (we are using contains(., ....).
         $xpathliteral = behat_context_helper::escape($text);
+        // 'contains(text(), $xpathliteral)' is required as there could be a hidden child
+        // node containing the text being looked for.
         $xpath = "/descendant-or-self::*[contains(., $xpathliteral)]" .
-            "[count(descendant::*[contains(., $xpathliteral)]) = 0]";
+            "[count(descendant::*[contains(., $xpathliteral)]) = 0 or contains(text(), $xpathliteral)]";
 
         try {
             $nodes = $this->find_all('xpath', $xpath);
