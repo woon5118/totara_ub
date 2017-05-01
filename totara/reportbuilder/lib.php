@@ -3792,11 +3792,13 @@ class reportbuilder {
             return;
         }
 
-        $graph = new \totara_reportbuilder\local\graph($this);
-        if (!$graph->is_valid() && !totara_feature_disabled('reportgraphs')) {
-            $graph = null;
+        $graph = null;
+        if (!totara_feature_disabled('reportgraphs')) {
+            $graph = new \totara_reportbuilder\local\graph($this);
+            if (!$graph->is_valid()) {
+                $graph = null;
+            }
         }
-
         list($sql, $params, $cache) = $this->build_query(false, true);
 
         $tablecolumns = array();
