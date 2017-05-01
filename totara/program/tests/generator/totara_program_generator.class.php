@@ -50,6 +50,17 @@ class totara_program_generator extends component_generator_base {
         global $CFG;
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
+        // Create some completion data for selecting from randomly during the loop.
+        $now = time();
+        $past = date('d/m/Y', $now - (DAYSECS * 14));
+        $future = date('d/m/Y', $now + (DAYSECS * 14));
+        // We can add other completion options here in future. For now a past date, future date and relative to first login.
+        $completionsettings = array(
+            array($past,     0,   null, true),
+            array($future,   0,   null, false),
+            array('3 2', COMPLETION_EVENT_FIRST_LOGIN, null, false),
+        );
+
         // Add 1-$size programs
         // Randomly make some certifications
         for ($p=0; $p < $size; $p++) {
@@ -96,7 +107,13 @@ class totara_program_generator extends component_generator_base {
                 $items = $this->get_assignment_items($assigntypes[$assign], $size);
                 // Assign the items.
                 foreach ($items as $item) {
-                    $exception = $this->assign_to_program($prog->id, $assigntypes[$assign], $item);
+                    $randomcompletion = rand(0, count($completionsettings) - 1);
+                    list($completiontime, $completionevent, $completioninstance, $exceptions) = $completionsettings[$randomcompletion];
+                    $exception = $this->assign_to_program($prog->id, $assigntypes[$assign], $item,
+                        array(
+                            'completiontime' => $completiontime,
+                            'completionevent' => $completionevent,
+                            'completioninstance' => $completioninstance));
                     if ($exception) { $exceptions = true;}
                 }
             }
@@ -501,28 +518,27 @@ class totara_program_generator extends component_generator_base {
     /**
      * Assign users to a program with a random completion date, generating some exceptions.
      *
+     * Prior to Totara 10, this function randomly generated completion times and exceptions. This no longer
+     * happens.
+     *
      * @param int $programid Program id
      * @param int $assignmenttype Assignment type
      * @param int $itemid item to be assigned to the program. e.g Audience, position, organization, individual
-     * @param null $record
-     * @return bool whether this assignment will generate exceptions.
+     * @param null|array $record containing data for the prog_assignment record that will be created.
+     *       Since Totara 10 - random completion criteria is no longer generated when $record is null.
+     * @param bool $updatelearnerassignments - true to run update program user assignments immediately afterwards
+     *       Added in Totara 2.9.19, 9.7, 10
+     * @return void since Totara 10 (previously returned bool for whether not exceptions are generated).
      */
-    public function assign_to_program($programid, $assignmenttype, $itemid, $record = null) {
+    public function assign_to_program($programid, $assignmenttype, $itemid, $record = null, $updatelearnerassignments = false) {
         global $CFG;
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
         // Set completion values.
-        $now = time();
-        $past = date('d/m/Y', $now - (DAYSECS * 14));
-        $future = date('d/m/Y', $now + (DAYSECS * 14));
-        // We can add other completion options here in future. For now a past date, future date and relative to first login.
-        $completionsettings = array(
-            array($past,     0,   null, true),
-            array($future,   0,   null, false),
-            array('3 2', COMPLETION_EVENT_FIRST_LOGIN, null, false),
-        );
-        $randomcompletion = rand(0, count($completionsettings) - 1);
-        list($completiontime, $completionevent, $completioninstance, $exceptions) = $completionsettings[$randomcompletion];
+        $completiontime = (isset($record['completiontime'])) ? $record['completiontime'] : COMPLETION_TIME_NOT_SET;
+        $completionevent = (isset($record['completionevent'])) ? $record['completionevent'] : COMPLETION_EVENT_NONE;
+        $completioninstance = (isset($record['completioninstance'])) ? $record['completioninstance'] : 0;
+        $includechildren = (isset($record['includechildren'])) ? $record['includechildren'] : null;
 
         // Create data.
         $data = new stdClass();
@@ -531,12 +547,16 @@ class totara_program_generator extends component_generator_base {
         $data->completiontime = array($assignmenttype => array($itemid => $completiontime));
         $data->completionevent = array($assignmenttype => array($itemid => $completionevent));
         $data->completioninstance = array($assignmenttype => array($itemid => $completioninstance));
-        $data->includechildren = array ($assignmenttype => array($itemid => 0));
+        $data->includechildren = array ($assignmenttype => array($itemid => $includechildren));
 
         // Assign item to program.
         $assignmenttoprog = prog_assignments::factory($assignmenttype);
         $assignmenttoprog->update_assignments($data, false);
-        return $exceptions;
+
+        if ($updatelearnerassignments) {
+            $program = new program($programid);
+            $program->update_learner_assignments(true);
+        }
     }
 
     public function fix_program_sortorder($categoryid = 0) {

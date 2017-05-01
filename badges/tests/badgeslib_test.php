@@ -503,13 +503,13 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         // Create a program, assign a user to it and mark it as complete.
         $data_generator = $this->getDataGenerator();
+        /** @var totara_program_generator $program_generator */
         $program_generator = $data_generator->get_plugin_generator('totara_program');
         $program1 = $program_generator->create_program();
         $program_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id);
 
         // Prepare the program completion.
         $prog_completion = new stdClass();
-        $prog_completion->id = 0;
         $prog_completion->programid = $program1->id;
         $prog_completion->userid = $this->user->id;
         $prog_completion->status = STATUS_PROGRAM_COMPLETE;
@@ -518,25 +518,31 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $prog_completion->organisationid = 0;
         $prog_completion->positionid = 0;
 
-        // Write the program completion and check it's been created.
+        // Update the program completion and check that was successful.
+        $prog_completion->id = $DB->get_field('prog_completion', 'id',
+            array('programid' => $program1->id, 'userid' => $this->user->id, 'coursesetid' => 0));
         $result = prog_write_completion($prog_completion);
         $this->assertTrue($result);
-        $program_completions = $DB->record_exists('prog_completion', array('programid' => $program1->id, 'userid' => $this->user->id));
+        $program_completions = $DB->record_exists('prog_completion',
+            array('programid' => $program1->id, 'userid' => $this->user->id, 'coursesetid' => 0, 'status' => STATUS_PROGRAM_COMPLETE));
         $this->assertTrue($program_completions);
 
         // Create a second program.
         $program2 = $program_generator->create_program();
-        $program_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id);
+        $program_generator->assign_to_program($program2->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id, null, true);
 
         // Prepare the second program completion.
         $prog_completion2 = clone($prog_completion);
         $prog_completion2->programid = $program2->id;
         $prog_completion2->userid = $this->user->id;
 
-        // Write the second program completion and check it's been created.
+        // Update the program completion and check that was successful.
+        $prog_completion2->id = $DB->get_field('prog_completion', 'id',
+            array('programid' => $program2->id, 'userid' => $this->user->id, 'coursesetid' => 0));
         $result = prog_write_completion($prog_completion2);
         $this->assertTrue($result);
-        $program_completions = $DB->record_exists('prog_completion', array('programid' => $program2->id, 'userid' => $this->user->id));
+        $program_completions = $DB->record_exists('prog_completion',
+            array('programid' => $program2->id, 'userid' => $this->user->id, 'coursesetid' => 0, 'status' => STATUS_PROGRAM_COMPLETE));
         $this->assertTrue($program_completions);
 
         // Save the criteria for the badge.
@@ -568,13 +574,13 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         // Create a program, assign a user to it and mark it as complete.
         $data_generator = $this->getDataGenerator();
+        /** @var totara_program_generator $program_generator */
         $program_generator = $data_generator->get_plugin_generator('totara_program');
         $program1 = $program_generator->create_program();
         $program_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id);
 
         // Prepare the program completion.
         $prog_completion = new stdClass();
-        $prog_completion->id = 0;
         $prog_completion->programid = $program1->id;
         $prog_completion->userid = $this->user->id;
         $prog_completion->status = STATUS_PROGRAM_COMPLETE;
@@ -583,10 +589,13 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $prog_completion->organisationid = 0;
         $prog_completion->positionid = 0;
 
-        // Write the program completion and check it's been created.
+        // Update the program completion and check that was successful.
+        $prog_completion->id = $DB->get_field('prog_completion', 'id',
+            array('programid' => $program1->id, 'userid' => $this->user->id, 'coursesetid' => 0));
         $result = prog_write_completion($prog_completion);
         $this->assertTrue($result);
-        $program_completions = $DB->record_exists('prog_completion', array('programid' => $program1->id, 'userid' => $this->user->id));
+        $program_completions = $DB->record_exists('prog_completion',
+            array('programid' => $program1->id, 'userid' => $this->user->id, 'coursesetid' => 0, 'status' => STATUS_PROGRAM_COMPLETE));
         $this->assertTrue($program_completions);
 
         // Create a second user.
@@ -594,17 +603,20 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         // Create a second program.
         $program2 = $program_generator->create_program();
-        $program_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $program_generator->assign_to_program($program2->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
 
         // Prepare the second program completion.
         $prog_completion2 = clone($prog_completion);
         $prog_completion2->programid = $program2->id;
         $prog_completion2->userid = $user->id;
 
-        // Write the second program completion and check it's been created.
+        // Update the program completion and check that was successful.
+        $prog_completion2->id = $DB->get_field('prog_completion', 'id',
+            array('programid' => $program2->id, 'userid' => $user->id, 'coursesetid' => 0));
         $result = prog_write_completion($prog_completion2);
         $this->assertTrue($result);
-        $program_completions = $DB->record_exists('prog_completion', array('programid' => $program2->id, 'userid' => $user->id));
+        $program_completions = $DB->record_exists('prog_completion',
+            array('programid' => $program2->id, 'userid' => $user->id, 'coursesetid' => 0, 'status' => STATUS_PROGRAM_COMPLETE));
         $this->assertTrue($program_completions);
 
         // Save the criteria for the badge.
@@ -636,13 +648,13 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         // Create a program, assign a user to it and mark it as complete.
         $data_generator = $this->getDataGenerator();
+        /** @var totara_program_generator $program_generator */
         $program_generator = $data_generator->get_plugin_generator('totara_program');
         $program1 = $program_generator->create_program();
         $program_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id);
 
         // Prepare the program completion.
         $prog_completion = new stdClass();
-        $prog_completion->id = 0;
         $prog_completion->programid = $program1->id;
         $prog_completion->userid = $this->user->id;
         $prog_completion->status = STATUS_PROGRAM_COMPLETE;
@@ -651,15 +663,18 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $prog_completion->organisationid = 0;
         $prog_completion->positionid = 0;
 
-        // Write the program completion and check it's been created.
+        // Update the program completion and check that was successful.
+        $prog_completion->id = $DB->get_field('prog_completion', 'id',
+            array('programid' => $program1->id, 'userid' => $this->user->id, 'coursesetid' => 0));
         $result = prog_write_completion($prog_completion);
         $this->assertTrue($result);
-        $program_completions = $DB->record_exists('prog_completion', array('programid' => $program1->id, 'userid' => $this->user->id));
+        $program_completions = $DB->record_exists('prog_completion',
+            array('programid' => $program1->id, 'userid' => $this->user->id, 'coursesetid' => 0, 'status' => STATUS_PROGRAM_COMPLETE));
         $this->assertTrue($program_completions);
 
         // Create a second program. Don't create a completion for this one.
         $program2 = $program_generator->create_program();
-        $program_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id);
+        $program_generator->assign_to_program($program2->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id);
 
         // Save the criteria for the badge.
         $criteria_overall = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_OVERALL, 'badgeid' => $badge->id));
@@ -690,6 +705,7 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         // Create a program, assign a user to it. Don't add a completion for either programs.
         $data_generator = $this->getDataGenerator();
+        /** @var totara_program_generator $program_generator */
         $program_generator = $data_generator->get_plugin_generator('totara_program');
         $program1 = $program_generator->create_program();
         $program_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user->id);
