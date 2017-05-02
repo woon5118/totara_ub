@@ -54,7 +54,7 @@ if ($program->certifid) {
     $component = 'totara_program';
 }
 
-$PAGE->set_context(context_program::instance($program->id));
+$PAGE->set_program($program);
 $PAGE->set_url('/totara/program/view.php', array('id' => $id, 'viewtype' => $viewtype));
 $PAGE->set_pagelayout('noblocks');
 

@@ -50,7 +50,7 @@ require_capability('totara/program:configurecontent', $programcontext);
 $program->check_enabled();
 
 $PAGE->set_url(new moodle_url('/totara/program/edit_content.php', array('id' => $id)));
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 $PAGE->set_title(format_string($program->fullname));
 $PAGE->set_heading(format_string($program->fullname));
 

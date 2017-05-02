@@ -52,7 +52,7 @@ if (!has_capability('totara/program:handleexceptions', $programcontext)) {
 }
 
 $PAGE->set_url($baseurl);
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 $PAGE->set_title(format_string($program->fullname));
 $PAGE->set_heading(format_string($program->fullname));
 

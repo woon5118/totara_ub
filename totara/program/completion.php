@@ -60,7 +60,7 @@ if (!has_capability('totara/program:editcompletion', $programcontext)) {
 
 // Set up page.
 $PAGE->set_url($url);
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 $PAGE->set_title($program->fullname);
 $PAGE->set_heading($program->fullname);
 

@@ -53,7 +53,7 @@ if (!$certification) {
 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
 $url = new moodle_url('/totara/certification/edit_completion.php', array('id' => $id, 'userid' => $userid));
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 
 if ($dismissedexceptions = $program->check_user_for_dismissed_exceptions($userid)) {
     $resetexception = optional_param('resetexception', 0, PARAM_INT);

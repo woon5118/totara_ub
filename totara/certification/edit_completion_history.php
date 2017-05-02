@@ -57,7 +57,7 @@ $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
 $returnurl = new moodle_url('/totara/certification/edit_completion.php',
     array('id' => $id, 'userid' => $userid));
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 
 if ($chid) {
     $thisurl = new moodle_url('/totara/certification/edit_completion_history.php',
@@ -103,8 +103,6 @@ $currentformdata->timewindowopens = $certcomplhistory->timewindowopens;
 $currentformdata->timeexpires = $certcomplhistory->timeexpires;
 $currentformdata->unassigned = $certcomplhistory->unassigned;
 
-// Prepare the form.
-$PAGE->set_context($programcontext);
 // Masquerade as the completion page for the sake of navigation.
 $PAGE->navigation->override_active_url(new moodle_url('/totara/program/completion.php', array('id' => $id)));
 // Add an item to the navbar to make it unique.

@@ -52,7 +52,7 @@ if ($program->is_certif()) {
 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
 $url = new moodle_url('/totara/program/edit_completion.php', array('id' => $id, 'userid' => $userid));
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 
 // Load all the data about the user and program.
 $progcompletion = prog_load_completion($id, $userid, false);

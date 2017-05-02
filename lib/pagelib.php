@@ -95,6 +95,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read theme_config $theme The theme for this page.
  * @property-read string $title The title that should go in the <head> section of the HTML of this page.
  * @property-read moodle_url $url The moodle url object for this page.
+ * @property-read program $program The current program associated with this page. Totara property.
  */
 class moodle_page {
 
@@ -124,6 +125,12 @@ class moodle_page {
      * If not has been provided the front page course is used.
      */
     protected $_course = null;
+
+    /**
+     * @var program A program currently associated with this page.
+     * Unlike $_course, we do just leave this as null if there is no program provided.
+     */
+    protected $_program = null;
 
     /**
      * @var cm_info If this page belongs to a module, this is the cm_info module
@@ -1000,6 +1007,41 @@ class moodle_page {
         } else {
             $this->add_body_class('format-site');
         }
+    }
+
+    /**
+     * TOTARA: Sets the current program. Leave as null if not on a program or certification page.
+     *
+     * Added to enable access to a program's category.
+     *
+     * @param program $program
+     * @throws coding_exception
+     */
+    public function set_program($program) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/program/program.class.php');
+
+        // Not type-hinting in function args because program.class.php may not have been included by that stage.
+        if (!($program instanceof program)) {
+            throw new coding_exception('$program passed to moodle_page::set_program does not look like a proper program object.');
+        }
+
+        $this->ensure_theme_not_set();
+
+        if (!empty($this->_program->id) && $this->_program->id != $program->id) {
+            // Unset the categories if we're updating the program this page is set to.
+            $this->_categories = null;
+        }
+
+        $this->_program = clone($program);
+
+        if (!$this->_context) {
+            $this->set_context(context_program::instance($this->_program->id));
+        }
+    }
+
+    public function magic_get_program() {
+        return $this->_program;
     }
 
     /**
@@ -1889,7 +1931,12 @@ class moodle_page {
             throw new coding_exception('Attempt to get the course category for this page before the course was set.');
         }
         if ($this->_course->category == 0) {
-            $this->_categories = array();
+            // Not using isset as no magic method for it at present.
+            if ($this->program !== null) {
+                $this->load_category($this->program->category);
+            } else {
+                $this->_categories = array();
+            }
         } else {
             $this->load_category($this->_course->category);
         }

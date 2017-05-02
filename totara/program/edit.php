@@ -57,7 +57,7 @@ if ($action == 'edit') {
     $currenttab = 'overview';
 }
 
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 
 customfield_load_data($program, 'program', 'prog');
 

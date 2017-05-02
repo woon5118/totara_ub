@@ -61,7 +61,7 @@ if (!has_capability('totara/certification:configurecertification', $programconte
 }
 
 $PAGE->set_url(new moodle_url('/totara/certification/edit_certification.php', array('id' => $id)));
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 $PAGE->set_title(format_string($program->fullname));
 $PAGE->set_heading(format_string($program->fullname));
 

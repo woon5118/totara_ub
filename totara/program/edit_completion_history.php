@@ -49,7 +49,7 @@ $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 $url = new moodle_url('/totara/program/edit_completion_history.php');
 
 // Prepare the form.
-$PAGE->set_context($programcontext);
+$PAGE->set_program($program);
 $customdata = array(
     'id' => $id,
     'userid' => $userid,
