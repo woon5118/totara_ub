@@ -21,6 +21,211 @@
  */
 
 /**
+ * Rename reportbuilder columns. Using the $type param to constrain the renaming to a single
+ * type is recommended to avoid renaming columns unintentionally.
+ *
+ * @param array $values     An array with data formatted like array($oldname => $newname)
+ * @param string $type      The type constraint, e.g. 'user'
+ */
+function totara_reportbuilder_migrate_column_names($values, $type = '') {
+    global $DB;
+
+    $typesql = '';
+    $params = array();
+    if (!empty($type)) {
+        $typesql = ' AND type = :type';
+        $params['type'] = $type;
+    }
+
+    foreach ($values as $oldname => $newname) {
+        $sql = "UPDATE {report_builder_columns}
+                   SET value = :newname
+                 WHERE value = :oldname
+                       {$typesql}";
+        $params['newname'] = $newname;
+        $params['oldname'] = $oldname;
+
+        $DB->execute($sql, $params);
+    }
+
+    return true;
+}
+
+/**
+ * Map old position columns to the new job_assignment columns.
+ *
+ * @param array $values     An array of the values we are updating the type of
+ * @param string $oldtype   The oldtype
+ * @param string $newtype
+ */
+function totara_reportbuilder_migrate_column_types($values, $oldtype, $newtype) {
+    global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
+
+    list($insql, $params) = $DB->get_in_or_equal($values, SQL_PARAMS_NAMED);
+    $sql = "UPDATE {report_builder_columns}
+               SET type = :newtype
+             WHERE type = :oldtype
+               AND value {$insql}";
+    $params['newtype'] = $newtype;
+    $params['oldtype'] = $oldtype;
+
+    return $DB->execute($sql, $params);
+}
+
+/**
+ * Rename reportbuilder filters. Using the $type param to constrain the renaming to a single
+ * type is recommended to avoid renaming filters unintentionally.
+ *
+ * @param array $values     An array with data formatted like array($oldname => $newname)
+ * @param string $type      The type constraint, e.g. 'user'
+ */
+function totara_reportbuilder_migrate_filter_names($values, $type = '') {
+    global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
+
+    $typesql = '';
+    $params = array();
+    if (!empty($type)) {
+        $typesql = 'AND type = :type';
+        $params['type'] = $type;
+    }
+
+    foreach ($values as $oldname => $newname) {
+        $sql = "UPDATE {report_builder_filters}
+                   SET value = :newname
+                 WHERE value = :oldname
+                       {$typesql}";
+        $params['newname'] = $newname;
+        $params['oldname'] = $oldname;
+
+        $DB->execute($sql, $params);
+    }
+
+    return true;
+}
+
+/**
+ * Map old position filters to the new job_assignment columns.
+ */
+function totara_reportbuilder_migrate_filter_types($values, $oldtype, $newtype) {
+    global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
+
+    list($insql, $params) = $DB->get_in_or_equal($values, SQL_PARAMS_NAMED);
+    $sql = "UPDATE {report_builder_filters}
+               SET type = :newtype
+             WHERE type = :oldtype
+               AND value {$insql}";
+    $params['newtype'] = $newtype;
+    $params['oldtype'] = $oldtype;
+
+    return $DB->execute($sql, $params);
+}
+
+/**
+ * Update the filters in any saved searches, generally used after migrating filter types.
+ */
+function totara_reportbuilder_migrate_saved_search_filters($values, $oldtype, $newtype) {
+    global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
+
+    // Get all saved searches.
+    $savedsearches = $DB->get_records('report_builder_saved');
+
+    // Loop through them all and json_decode
+    foreach ($savedsearches as $saved) {
+        if (empty($saved)) {
+            continue;
+        }
+
+        $search = unserialize($saved->search);
+
+        if (!is_array($search)) {
+            continue;
+        }
+
+        // Check for any filters that will need to be updated.
+        $update = false;
+        foreach ($search as $oldkey => $info) {
+            list($type, $value) = explode('-', $oldkey);
+
+            // NOTE: This isn't quite as generic as the other functions.
+            $value = $value == 'posstartdate' ? 'startdate' : $value;
+            $value = $value == 'posenddate' ? 'enddate' : $value;
+
+            if ($type == $oldtype && in_array($value, array_keys($values))) {
+                $update = true;
+
+                if ($values[$value] == 'allpositions' || $values[$value] == 'allorganisations') {
+                    if (isset($info['recursive']) && !isset($info['children'])) {
+                        $info['children'] = $info['recursive'];
+                        unset($info['recursive']);
+                    } else {
+                        $info['children'] = isset($info['children']) ? $info['children'] : 0;
+                    }
+                    $info['operator'] = isset($info['operator']) ? $info['operator'] : 1;
+                }
+
+                $newkey = "{$newtype}-{$values[$value]}";
+                $search[$newkey] = $info;
+                unset($search[$oldkey]);
+            }
+        }
+
+        if ($update) {
+            // Re encode and update the database.
+            $saved->search = serialize($search);
+            $DB->update_record('report_builder_saved', $saved);
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Map reports default sort columns the to new job_assignment columns.
+ */
+function totara_reportbuilder_migrate_default_sort_columns($values, $oldtype, $newtype) {
+    global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
+
+    foreach ($values as $sort) {
+        $sql = "UPDATE {report_builder}
+                   SET defaultsortcolumn = :newsort
+                 WHERE defaultsortcolumn = :oldsort";
+        $params = array(
+            'oldsort' => $oldtype . '_' . $sort,
+            'newsort' => $newtype . '_' . $sort
+        );
+
+        $DB->execute($sql, $params);
+    }
+
+    return true;
+}
+
+/**
  * Scheduled reports belonging to a user are now deleted when the user gets deleted
  */
 function totara_reportbuilder_delete_scheduled_reports() {
