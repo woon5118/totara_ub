@@ -3439,7 +3439,11 @@ class curl {
         $curl = curl_init($url);
 
         $this->apply_opt($curl, $options);
-        if ($this->cache && $ret = $this->cache->get($this->options)) {
+
+        // Cache options needs to include URL.
+        $cacheoptions = $this->options;
+        $cacheoptions['CURLOPT_URL'] = $url;
+        if ($this->cache && $ret = $this->cache->get($cacheoptions)) {
             return $ret;
         }
 
@@ -3552,7 +3556,7 @@ class curl {
         }
 
         if ($this->cache) {
-            $this->cache->set($this->options, $ret);
+            $this->cache->set($cacheoptions, $ret);
         }
 
         if ($this->debug) {
@@ -3877,6 +3881,7 @@ class curl_cache {
      */
     public function get($param) {
         global $CFG, $USER;
+        sort($param); // Sort to improve reliability.
         $this->cleanup($this->ttl);
         $filename = 'u'.$USER->id.'_'.md5(serialize($param));
         if(file_exists($this->dir.$filename)) {
@@ -3903,6 +3908,7 @@ class curl_cache {
      */
     public function set($param, $val) {
         global $CFG, $USER;
+        sort($param); // Sort to improve reliability.
         $filename = 'u'.$USER->id.'_'.md5(serialize($param));
         $fp = fopen($this->dir.$filename, 'w');
         fwrite($fp, serialize($val));
