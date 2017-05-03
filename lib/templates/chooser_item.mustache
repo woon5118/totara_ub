@@ -33,7 +33,7 @@
         <input type="radio" name="{{paramname}}" id="item_{{id}}" value="{{value}}">
         <span class="modicon">
             {{#icon}}
-                {{>core/pix_icon}}
+                {{#pix}}{{key}}, {{component}}, {{title}}{{/pix}}
             {{/icon}}
         </span>
         <span class="typename">{{label}}</span>
