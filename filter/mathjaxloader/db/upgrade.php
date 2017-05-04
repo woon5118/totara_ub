@@ -82,5 +82,25 @@ function xmldb_filter_mathjaxloader_upgrade($oldversion) {
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2016120500.01) {
+        $httpsurl = get_config('filter_mathjaxloader', 'httpsurl');
+        if ($httpsurl === "https://cdn.mathjax.org/mathjax/2.7-latest/MathJax.js") {
+            set_config('httpsurl', 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js', 'filter_mathjaxloader');
+        }
+
+        $mathjaxconfig = get_config('filter_mathjaxloader', 'mathjaxconfig');
+
+        if (strpos($mathjaxconfig, 'MathJax.Ajax.config.path') !== false) {
+            // Now we need to remove this config again because mathjax 2.7.1 supports the extensions on the CDN.
+            $configtoremove = 'MathJax.Ajax.config.path["Contrib"] = "{wwwroot}/filter/mathjaxloader/contrib";';
+
+            $mathjaxconfig = str_replace($configtoremove, '', $mathjaxconfig);
+
+            set_config('mathjaxconfig', $mathjaxconfig, 'filter_mathjaxloader');
+        }
+
+        upgrade_plugin_savepoint(true, 2016120500.01, 'filter', 'mathjaxloader');
+    }
+
     return true;
 }
