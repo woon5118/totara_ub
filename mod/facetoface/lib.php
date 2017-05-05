@@ -4174,31 +4174,11 @@ function facetoface_get_customfield_value(&$object, $field, $otherid, $table) {
  * @returns array Indexed by field shortnames
  */
 function facetoface_get_customfielddata($sessionid) {
-    global $CFG, $DB;
 
-    $out = array();
-    $session = facetoface_get_session($sessionid);
-
-    $types = array(
-        'sess' => array('prefix' => 'facetofacesession', 'tableprefix' => 'facetoface_session'),
-        'room' => array('prefix' => 'facetofaceroom', 'tableprefix' => 'facetoface_room'),
-    );
-    foreach($types as $type => $def) {
-        $fields  = $DB->get_records($def['tableprefix'] . '_info_field', array(), 'sortorder ASC');
-        foreach ($fields as $field) {
-            require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
-            $newfield = 'customfield_'.$field->datatype;
-            $formfield = new $newfield($field->id, $session, $def['prefix'], $def['tableprefix']);
-
-            if (!$formfield->is_hidden() && !$formfield->is_empty()) {
-                $extradata = array('prefix' => $formfield->prefix, 'itemid' => $formfield->dataid);
-                if ($field->datatype == 'multiselect') {
-                    $extradata['display'] = 'list-text';
-                }
-                $out[$type][$formfield->field->shortname] = $formfield::display_item_data($formfield->data, $extradata);
-            }
-        }
-    }
+    $out = [];
+    $item = (object)['id' => $sessionid];
+    $out['sess'] = customfield_get_data($item, 'facetoface_session', 'facetofacesession', false);
+    $out['room'] = customfield_get_data($item, 'facetoface_room', 'facetofaceroom', false);
     return $out;
 }
 
@@ -4211,27 +4191,12 @@ function facetoface_get_customfielddata($sessionid) {
  * @param string $prefix The prefix of the custom field
  * @param array $options customfield_file::display_item_data requires some additional extradata.
  * @return array Array with the customfield and its associated value
+ *
+ * @deprecated since Totara 10.0
  */
 function facetoface_get_customfield_data($item, $tableprefix, $prefix, $options = array()) {
-    global $CFG, $DB;
-
-    $output = array();
-    $fields = $DB->get_records($tableprefix.'_info_field', array(), 'sortorder ASC');
-    $options = array('prefix' => $prefix, 'extended' => true);
-    foreach ($fields as $field) {
-        require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
-        $newfield = 'customfield_'.$field->datatype;
-        $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
-        if (!$formfield->is_hidden() and !$formfield->is_empty()) {
-            // We need to use the dataid here not the item->id.
-            // \customfield_base::load_data expects $options['itemid'] to be the id of the data record.
-            // This method is not aware of the customfield area.
-            $options['itemid'] = $formfield->dataid;
-            $output[s($formfield->field->fullname)] = $formfield::display_item_data($formfield->data, $options);
-        }
-    }
-
-    return $output;
+    debugging('facetoface_get_customfield_data() is deprecated. Use customfield_get_data() instead.', DEBUG_DEVELOPER);
+    return customfield_get_data($item, $tableprefix, $prefix, true, $options);
 }
 
 function facetoface_update_trainers($facetoface, $session, $form) {

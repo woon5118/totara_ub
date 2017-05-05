@@ -10,3 +10,5 @@ Hook is added for Seminar Sing-up link directly to calendar upcoming events bloc
 Deprecated behat step 'I select to approve "([^"]*)"'. This should be replaced by 'I set the field "Approve <user> for this event" to "1"'
 
 Deprecated function facetoface_eventhandler_role_unassigned_bulk. This function was unused and non-functional.
+
+* facetoface_get_customfield_data function has been deprecated, please use customfield_get_data function instead.

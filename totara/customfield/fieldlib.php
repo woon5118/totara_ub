@@ -438,16 +438,14 @@ class customfield_base {
  * @throws coding_exception
  */
 function customfield_load_data(&$item, $prefix, $tableprefix, $addsuffix = false) {
-    global $CFG, $DB, $TEXTAREA_OPTIONS;
+    global $CFG, $TEXTAREA_OPTIONS;
 
-    $typestr = '';
     $params = array();
     if (isset($item->typeid)) {
-        $typestr = 'typeid = ?';
-        $params[] = $item->typeid;
+        $params['typeid'] = $item->typeid;
     }
 
-    $fields = $DB->get_records_select($tableprefix.'_info_field', $typestr, $params);
+    $fields = customfield_get_fields_definition($tableprefix, $params);
 
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
@@ -486,17 +484,15 @@ function customfield_load_data(&$item, $prefix, $tableprefix, $addsuffix = false
  * @param boolean|false $addsuffix If an item id suffix should be added to the custom field.
  * @throws coding_exception
  */
-function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix, $disableheader = false, $addsuffix = false) {
-    global $DB, $CFG;
+function customfield_definition(&$mform, $item, $prefix, $typeid = 0, $tableprefix, $disableheader = false, $addsuffix = false) {
+    global $CFG;
 
-    $typestr = '';
     $params = array();
-    if (isset($item->typeid)) {
-        $typestr = 'typeid = ?';
-        $params[] = $typeid;
+    if ($typeid != 0) {
+        $params['typeid'] = $typeid;
     }
 
-    $fields = $DB->get_records_select($tableprefix.'_info_field', $typestr, $params, 'sortorder ASC');
+    $fields = customfield_get_fields_definition($tableprefix, $params);
 
     // check first if *any* fields will be displayed
     $display = false;
@@ -521,17 +517,15 @@ function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix
     }
 }
 
-function customfield_definition_after_data(&$mform, $item, $prefix, $typeid=0, $tableprefix) {
-    global $CFG, $DB;
+function customfield_definition_after_data(&$mform, $item, $prefix, $typeid = 0, $tableprefix) {
+    global $CFG;
 
-    $typestr = '';
     $params = array();
     if ($typeid != 0) {
-        $typestr = 'typeid = ?';
-        $params[] = $typeid;
+        $params['typeid'] = $typeid;
     }
 
-    $fields = $DB->get_records_select($tableprefix.'_info_field', $typestr, $params, 'sortorder ASC');
+    $fields = customfield_get_fields_definition($tableprefix, $params);
 
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
@@ -542,18 +536,16 @@ function customfield_definition_after_data(&$mform, $item, $prefix, $typeid=0, $
 }
 
 function customfield_validation($itemnew, $prefix, $tableprefix) {
-    global $CFG, $DB;
+    global $CFG;
 
     $err = array();
 
-    $typestr = '';
     $params = array();
     if (!empty($itemnew->typeid)) {
-        $typestr = 'typeid = ?';
-        $params[] = $itemnew->typeid;
+        $params['typeid'] = $itemnew->typeid;
     }
 
-    $fields = $DB->get_records_select($tableprefix.'_info_field', $typestr, $params);
+    $fields = customfield_get_fields_definition($tableprefix, $params);
 
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
@@ -575,11 +567,11 @@ function customfield_validation($itemnew, $prefix, $tableprefix) {
  * @return list array $err $newdata
  */
 function customfield_validation_filedata($itemnew, $prefix, $tableprefix) {
-    global $CFG, $DB;
+    global $CFG;
 
     $err = array();
 
-    $fields = $DB->get_records($tableprefix.'_info_field');
+    $fields = customfield_get_fields_definition($tableprefix);
 
     foreach ($fields as $field) {
         if (isset($itemnew->{$field->shortname})) {
@@ -606,16 +598,14 @@ function customfield_validation_filedata($itemnew, $prefix, $tableprefix) {
  * @param boolean $addsuffix    Whether the custom fix has an item id suffix added to it.
  */
 function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false, $addsuffix = false) {
-    global $CFG, $DB;
+    global $CFG;
 
-    $typestr = '';
     $params = array();
     if (isset($itemnew->typeid)) {
-        $typestr = 'typeid = ?';
-        $params[] = $itemnew->typeid;
+        $params['typeid'] = $itemnew->typeid;
     }
 
-    $fields = $DB->get_records_select($tableprefix.'_info_field', $typestr, $params);
+    $fields = customfield_get_fields_definition($tableprefix, $params);
 
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
@@ -642,10 +632,10 @@ function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false, $
  * @return array Associate array of field names and data values
  */
 function customfield_get_fields($item, $tableprefix, $prefix) {
-    global $CFG, $DB;
+    global $CFG;
     $out = array();
 
-    $fields = $DB->get_records($tableprefix.'_info_field', array(), 'sortorder ASC');
+    $fields = customfield_get_fields_definition($tableprefix);
 
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
@@ -705,7 +695,8 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
         $data = $field->data;
         switch ($field->datatype) {
             case 'checkbox':
-                $data = ($field->data == 1) ? get_string('yes') : get_string('no');
+                require_once($CFG->dirroot.'/totara/customfield/field/checkbox/field.class.php');
+                $data = \customfield_checkbox::display_item_data($data);
                 break;
             case 'multiselect':
                 $datavalue = json_decode($field->data, true);
@@ -767,10 +758,10 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
  * @return array Associate array of field names and data values
  */
 function customfield_get_data_shortname_key($item, $tableprefix, $prefix) {
-    global $CFG, $DB;
+    global $CFG;
     $out = array();
 
-    $fields = $DB->get_records($tableprefix.'_info_field', array(), 'sortorder ASC');
+    $fields = customfield_get_fields_definition($tableprefix);
 
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
@@ -790,10 +781,10 @@ function customfield_get_data_shortname_key($item, $tableprefix, $prefix) {
  * @return  object
  */
 function customfield_record($id, $tableprefix) {
-    global $CFG, $DB;
+    global $CFG;
     $item = new stdClass();
 
-    $fields = $DB->get_records($tableprefix.'_info_field');
+    $fields = customfield_get_fields_definition($tableprefix);
 
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
