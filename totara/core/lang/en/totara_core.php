@@ -592,6 +592,7 @@ $string['xpercent'] = '{$a}%';
 $string['xpercentcomplete'] = '{$a}% complete';
 $string['xpositions'] = '{$a}\'s Positions';
 $string['xresultsfory'] = '<strong>{$a->count}</strong> results found for "{$a->query}"';
+$string['yesdelete'] = 'Yes, delete';
 
 
 // Deprecated in 9.0.

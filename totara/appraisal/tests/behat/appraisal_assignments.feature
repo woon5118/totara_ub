@@ -106,7 +106,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner Two"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     # And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
@@ -425,7 +425,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner Three"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
 
     # Before cron is run
     When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
@@ -563,7 +563,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner One"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
@@ -743,7 +743,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner Three"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
@@ -791,7 +791,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner One"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
@@ -868,7 +868,7 @@ Feature: Test reported learners in appraisal assignments
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner Three"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
@@ -913,7 +913,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner One"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
@@ -1102,7 +1102,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Learner Two"
     And I click the delete icon for the "Job 1" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"

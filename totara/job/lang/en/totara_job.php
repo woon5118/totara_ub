@@ -50,9 +50,7 @@ $string['choosetempmanager_help'] = 'A temporary manager can be assigned. The as
 Click **Choose temporary manager** to select a temporary manager.
 
 If the name you are looking for does not appear in the list, it might be that the user does not have the necessary rights to act as a temporary manager.';
-$string['confirmdeletejobassignment'] = 'Are you sure you want to delete the following Job Assignment?
-
-{$a}';
+$string['confirmdeletejobassignment'] = '<strong>Permanently delete the "{$a}" job assignment?</strong>';
 $string['currentlyselected'] = 'Currently selected';
 $string['deletejobassignment'] = 'Delete job assignment';
 $string['deletexjobassignment'] = 'Delete {$a} job assignment';
@@ -140,4 +138,8 @@ $string['tempmanagerselectiononlymanagers'] = 'Only staff managers';
 $string['tempmanagersupporttext'] = ' Note, only current team managers can be selected.';
 $string['updatejobassignment'] = 'Update job assignment';
 $string['updatetemporarymanagerstask'] = 'Update temporary managers';
+$string['warningallstafftypeassigned'] = ' {$a->countstaffassigned} will lose their assigned manager and {$a->counttempstaffassigned} will lose their temporary manager.';
+$string['warningstaffaffectednote'] = 'This may result in users being left without a manager in the system.';
+$string['warningstaffassigned'] = ' {$a} will lose their assigned manager.';
+$string['warningtempstaffassigned'] = ' {$a} will lose their temporary manager.';
 $string['xpositions'] = '{$a}\'s Positions';

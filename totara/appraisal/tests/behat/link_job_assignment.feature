@@ -150,7 +150,6 @@ Feature: Link appraisal with an appraisee job assignment.
     And I should see "Appraiser: John Cleese"
     And the "Start" "button" should be enabled
 
-
   Scenario: deleted job assignment details
     When I log in as "bond007"
     And I click on "Latest Appraisal" in the totara menu
@@ -186,7 +185,7 @@ Feature: Link appraisal with an appraisee job assignment.
     And I click on "Add job assignment" "button"
 
     When I click the delete icon for the "Unnamed job assignment (ID: 1)" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     Then I should see "Supposed Salesman, Universal Exports"
     And I should see "Spy, 007 Branch"
     And I should not see "Unnamed job assignment (ID: 1)"
@@ -204,7 +203,6 @@ Feature: Link appraisal with an appraisee job assignment.
     And I should see "Manager: Role currently empty"
     And I should see "Appraiser: Role currently empty"
     And "Start" "button" should not exist
-
 
   Scenario: replaced job assignment details
     When I log in as "bond007"
@@ -234,7 +232,7 @@ Feature: Link appraisal with an appraisee job assignment.
     And I click on "Add job assignment" "button"
 
     When I click the delete icon for the "Unnamed job assignment (ID: 1)" job assignment
-    And I click on "Delete" "button"
+    And I click on "Yes, delete" "button"
     Then I should see "Supposed Salesman, Universal Exports"
     And I should not see "Unnamed job assignment (ID: 1)"
 

@@ -1515,6 +1515,30 @@ class job_assignment {
     }
 
     /**
+     * Gets number of staff users linked to a job assignment.
+     *
+     * @param  int $jobassignmentid
+     * @return int Number of staff users linked to the job assignment
+     */
+    public static function get_count_managed_users($jobassignmentid) {
+        global $DB;
+
+        return $DB->count_records('job_assignment', array('managerjaid' => $jobassignmentid));
+    }
+
+    /**
+     * Gets number of temp staff users linked to a job assignment.
+     *
+     * @param  int $jobassignmentid
+     * @return int Number of temp staff users linked to the job assignment
+     */
+    public static function get_count_temp_managed_users($jobassignmentid) {
+        global $DB;
+
+        return $DB->count_records('job_assignment', array('tempmanagerjaid' => $jobassignmentid));
+    }
+
+    /**
      * Run by cron to automatically remove temporary managers when they expire.
      * Also removes temporary managers who are not currently managers when tempmanagerrestrictselection is turned on.
      * Also removes all temporary managers if enabletempmanagers is turned off.
