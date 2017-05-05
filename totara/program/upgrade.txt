@@ -18,6 +18,7 @@ positions_category, cohorts_category, managers_category, individuals_category).
 This is an abstract method. These changes were applied to this method in its child categories (organisations_category,
 positions_category, cohorts_category, managers_category, individuals_category).
 * totara_program_renderer::display_edit_assignment_form() allowed first argument to be a program instance as well as an id.
+* program::set_timedue added optional parameter $message which overrides the default log message
 
 Deprecations:
 
@@ -25,6 +26,7 @@ Deprecations:
 * prog_assignments::init_assignments() public access has been deprecated, please call prog_assignments::get_assignments() instead.
 * prog_assignments::$assignments public access has been deprecated, please call prog_assignments::get_assignments() instead.
 * prog_content::$coursesets public access has been deprecated, please call prog_content::get_course_sets() instead.
+* user_assignment class has been deprecated, use $program->set_timedue or prog_load_completion() and prog_write_completion() instead.
 
 JavaScript:
 * program_assignment.total_count property has been deprecated. Total program assignment count is no longer used.
