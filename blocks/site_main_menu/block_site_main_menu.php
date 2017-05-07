@@ -130,7 +130,7 @@ class block_site_main_menu extends block_list {
                             continue;
                         }
                         $this->content->items[] = '<a title="'.$strmovefull.'" href="'.$CFG->wwwroot.'/course/mod.php?moveto='.$mod->id.'&amp;sesskey='.sesskey().'">'.
-                            '<img style="height:16px; width:80px; border:0px" src="'.$OUTPUT->pix_url('movehere') . '" alt="'.$strmovehere.'" /></a>';
+                            $OUTPUT->render(new pix_icon('movehere', $strmovehere)) . '</a>';
                         $this->content->icons[] = '';
                     }
                     if ($mod->indent > 0) {
@@ -150,7 +150,7 @@ class block_site_main_menu extends block_list {
 
         if ($ismoving) {
             $this->content->items[] = '<a title="'.$strmovefull.'" href="'.$CFG->wwwroot.'/course/mod.php?movetosection='.$section->id.'&amp;sesskey='.sesskey().'">'.
-                                      '<img style="height:16px; width:80px; border:0px" src="'.$OUTPUT->pix_url('movehere') . '" alt="'.$strmovehere.'" /></a>';
+                                      $OUTPUT->render(new pix_icon('movehere', $strmovehere)) . '</a>';
             $this->content->icons[] = '';
         }
 
