@@ -221,4 +221,14 @@ class block_totara_featured_links extends block_base {
             }
         }
     }
+
+    /**
+     * This returns if this block instance should be displayed with a border.
+     * If this is false then the block should be displayed chromeless.
+     *
+     * @return bool
+     */
+    public function display_with_border_by_default () {
+        return false;
+    }
 }
