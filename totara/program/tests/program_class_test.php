@@ -478,7 +478,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $program1->update_learner_assignments();
         $user16 = $DB->get_record('user', array('id' => $user16->id));
 
-        $expected = '<p>A current completion record exists for this user. However, as the user has been deleted, they are not currently assigned.</p>';
+        $expected = 'The user is not currently assigned. A user cannot have a current completion record unless they are assigned.';
         $returnedreason = $program1->display_completion_record_reason($user11);
         $this->assertEquals($expected, $returnedreason);
 
@@ -1131,6 +1131,127 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     }
 
     /**
+     * Test that completion records are processed correctly when unassigning users.
+     */
+    public function test_unassign_learners_completion_records() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        // Create some users.
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+
+        // Create some certs.
+        $cert1 = $generator->create_certification();
+        $cert2 = $generator->create_certification();
+
+        // Create some programs.
+        $prog1 = $generator->create_program();
+        $prog2 = $generator->create_program();
+
+        // Add the users to the certs.
+        $generator->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
+        $generator->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
+        $generator->assign_to_program($cert2->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
+        $generator->assign_to_program($cert2->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
+
+        // Add the users to the programs.
+        $generator->assign_to_program($prog1->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
+        $generator->assign_to_program($prog1->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
+        $generator->assign_to_program($prog2->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
+        $generator->assign_to_program($prog2->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
+
+        // Mark program 1 as complete.
+        $progcompletion = prog_load_completion($prog1->id, $user1->id);
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timecompleted = 100;
+        $this->assertEquals(array(), prog_get_completion_errors($progcompletion));
+        $this->assertTrue(prog_write_completion($progcompletion));
+
+        // Mark cert 1 as complete.
+        list($certcompletion, $progcompletion) = certif_load_completion($cert1->id, $user1->id);
+        $certcompletion->status = CERTIFSTATUS_COMPLETED;
+        $certcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $certcompletion->certifpath = CERTIFPATH_RECERT;
+        $certcompletion->timecompleted = 100;
+        $certcompletion->timewindowopens = 200;
+        $certcompletion->timeexpires = 300;
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timecompleted = 100;
+        $progcompletion->timedue = 300;
+        $this->assertEquals(array(), certif_get_completion_errors($certcompletion, $progcompletion));
+        $this->assertTrue(certif_write_completion($certcompletion, $progcompletion));
+
+        // Load the current set of data.
+        $expectedcertcompletions = $DB->get_records('certif_completion');
+        $expectedprogcompletions = $DB->get_records('prog_completion');
+
+        // 1) Remove user1 from prog1. Nothing changes because the program is complete.
+        $prog1->unassign_learners(array($user1->id));
+
+        // And check that the expected records match the actual records.
+        $actualcertcompletions = $DB->get_records('certif_completion');
+        $actualprogcompletions = $DB->get_records('prog_completion');
+        $this->assertEquals($expectedcertcompletions, $actualcertcompletions);
+        $this->assertEquals($expectedprogcompletions, $actualprogcompletions);
+
+        // 2) Remove user1 from prog2. The prog_completion should be deleted.
+        $prog2->unassign_learners(array($user1->id));
+
+        // Manually make the same change to the expected data.
+        foreach ($expectedprogcompletions as $key => $progcompletion) {
+            if ($progcompletion->programid == $prog2->id && $progcompletion->userid == $user1->id) {
+                unset($expectedprogcompletions[$key]);
+            }
+        }
+
+        // And check that the expected records match the actual records.
+        $actualcertcompletions = $DB->get_records('certif_completion');
+        $actualprogcompletions = $DB->get_records('prog_completion');
+        $this->assertEquals($expectedcertcompletions, $actualcertcompletions);
+        $this->assertEquals($expectedprogcompletions, $actualprogcompletions);
+
+        // 3) Remove user1 from cert1. Only the certif_completion record is deleted because the program is complete.
+        $cert1->unassign_learners(array($user1->id));
+
+        // Manually make the same change to the expected data.
+        foreach ($expectedcertcompletions as $key => $certcompletion) {
+            if ($certcompletion->certifid == $cert1->certifid && $certcompletion->userid == $user1->id) {
+                unset($expectedcertcompletions[$key]);
+            }
+        }
+
+        // And check that the expected records match the actual records.
+        $actualcertcompletions = $DB->get_records('certif_completion');
+        $actualprogcompletions = $DB->get_records('prog_completion');
+        $this->assertEquals($expectedcertcompletions, $actualcertcompletions);
+        $this->assertEquals($expectedprogcompletions, $actualprogcompletions);
+
+        // 4) Remove user1 from cert2. Both completion records are deleted.
+        $cert2->unassign_learners(array($user1->id));
+
+        // Manually make the same change to the expected data.
+        foreach ($expectedcertcompletions as $key => $certcompletion) {
+            if ($certcompletion->certifid == $cert2->certifid && $certcompletion->userid == $user1->id) {
+                unset($expectedcertcompletions[$key]);
+            }
+        }
+        foreach ($expectedprogcompletions as $key => $progcompletion) {
+            if ($progcompletion->programid == $cert2->id && $progcompletion->userid == $user1->id) {
+                unset($expectedprogcompletions[$key]);
+            }
+        }
+
+        // And check that the expected records match the actual records.
+        $actualcertcompletions = $DB->get_records('certif_completion');
+        $actualprogcompletions = $DB->get_records('prog_completion');
+        $this->assertEquals($expectedcertcompletions, $actualcertcompletions);
+        $this->assertEquals($expectedprogcompletions, $actualprogcompletions);
+    }
+
+    /**
      * Test that assigned users can access and gain enrolment in courses.
      */
     public function test_user_is_assigned() {
@@ -1457,10 +1578,6 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         ]);
         $this->assertEquals(100, $program->get_progress($user->id));
 
-        // Now undo the above.
-        $program->delete_completion_record($user->id, true);
-        $this->assertEquals(0, $program->get_progress($user->id));
-
         // Lets test completing the first course set.
         // Now we want to mark the incomplete user complete in courses in the first courseset.
         $coursesets = $program->get_content()->get_course_sets();
@@ -1479,9 +1596,6 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         // Mark the user as complete in this one course, this should put them into progress.
         $this->mark_user_complete_in_course($user, $course);
         $this->assertFalse($courseset->check_courseset_complete($user->id));
-
-        // Check they are complete, this will mark the user as complete for the first course set.
-        $this->assertEquals(0, $program->get_progress($user->id));
     }
 
     /**
@@ -1579,98 +1693,6 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->assertDebuggingCalled($completedebugging);
         $this->assertTrue($program->is_program_inprogress($user_incomplete->id));
         $this->assertDebuggingCalled($incompletedebugging);
-    }
-
-    /**
-     * Test the delete_completion_record method.
-     */
-    public function test_delete_completion_record() {
-
-        $this->resetAfterTest();
-
-        $courses = [];
-        for ($i = 0; $i < 5; $i++) {
-            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
-        }
-        $this->assertCount(5, $courses);
-
-        $user_complete = $this->data_generator->create_user();
-        $user_incomplete = $this->data_generator->create_user();
-
-        $detail = [
-            'fullname' => 'Testing program fullname',
-            'shortname' => 'Test prog'
-        ];
-        $program = $this->program_generator->create_program($detail);
-        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
-        $this->program_generator->add_courseset_to_program($program->id, 2, 1);
-        $this->program_generator->assign_program($program->id, [$user_complete->id, $user_incomplete->id]);
-
-        // Mark one user as complete.
-        $program->update_program_complete($user_complete->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
-
-        // Mark the other user as started.
-        $program->update_program_complete($user_incomplete->id, [
-            'status' => STATUS_PROGRAM_INCOMPLETE,
-            'timestarted' => time()
-        ]);
-
-        // Now we want to mark the incomplete user complete in courses in the first courseset.
-        $coursesets = $program->get_content()->get_course_sets();
-        $this->assertCount(2, $coursesets);
-        /** @var multi_course_set $courseset */
-        $courseset = reset($coursesets);
-        $this->assertInstanceOf('multi_course_set', $courseset);
-        $courses = $courseset->get_courses();
-        $this->assertCount(1, $courses);
-        foreach ($courses as $course) {
-            $this->mark_user_complete_in_course($user_incomplete, $course);
-        }
-        // Check they are complete, this will mark the user as complete for the first course set.
-        $this->assertTrue($courseset->check_courseset_complete($user_incomplete->id));
-
-        // At this point the complete user is 100% complete and the incomplete user is 50% complete.
-        $this->assertTrue(prog_is_complete($program->id, $user_complete->id));
-        $this->assertEquals(100, $program->get_progress($user_complete->id));
-        $this->assertTrue(prog_is_inprogress($program->id, $user_incomplete->id));
-        $this->assertEquals(50, $program->get_progress($user_incomplete->id));
-
-        // Delete completions but don't force.
-        $this->assertTrue($program->delete_completion_record($user_complete->id));
-        $this->assertTrue($program->delete_completion_record($user_incomplete->id));
-        // This should reset the incomplete user and have no effect on the complete user.
-        $this->assertTrue(prog_is_complete($program->id, $user_complete->id));
-        $this->assertEquals(100, $program->get_progress($user_complete->id));
-        $this->assertFalse(prog_is_inprogress($program->id, $user_incomplete->id));
-        $this->assertEquals(0, $program->get_progress($user_incomplete->id));
-
-        // Now force the deletion for both users.
-        $this->assertTrue($program->delete_completion_record($user_complete->id, true));
-        $this->assertTrue($program->delete_completion_record($user_incomplete->id, true));
-        // Both users should not be back to square one, 0% complete, and not even in progress.
-        $this->assertFalse(prog_is_complete($program->id, $user_complete->id));
-        $this->assertFalse(prog_is_complete($program->id, $user_incomplete->id));
-        $this->assertFalse(prog_is_inprogress($program->id, $user_complete->id));
-        $this->assertFalse(prog_is_inprogress($program->id, $user_incomplete->id));
-        $this->assertEquals(0, $program->get_progress($user_complete->id));
-        $this->assertEquals(0, $program->get_progress($user_incomplete->id));
-
-        // Finally, sneak in one final test, now that the user is not even in progress mark them complete.
-        // Mark one user as complete.
-        $program->update_program_complete($user_complete->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
-        $this->assertTrue(prog_is_complete($program->id, $user_complete->id));
-        $this->assertEquals(100, $program->get_progress($user_complete->id));
-        // And finally forcefully delete it once more.
-        $this->assertTrue($program->delete_completion_record($user_complete->id, true));
-        $this->assertFalse(prog_is_complete($program->id, $user_complete->id));
-        $this->assertFalse(prog_is_inprogress($program->id, $user_complete->id));
-        $this->assertEquals(0, $program->get_progress($user_complete->id));
     }
 
     /**
@@ -2151,16 +2173,15 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->assertCount(4, $options_limited);
         $this->assertCount(5, $options_all);
 
-        $expected_limited = array(
+        $expected = array(
             TIME_SELECTOR_DAYS => 'Day(s)',
             TIME_SELECTOR_WEEKS => 'Week(s)',
             TIME_SELECTOR_MONTHS => 'Month(s)',
             TIME_SELECTOR_YEARS => 'Year(s)',
         );
-        $expected_all = $expected_limited + [TIME_SELECTOR_NOMINIMUM => 'No minimum time'];
-
-        $this->assertSame($expected_limited, $options_limited);
-        $this->assertSame($expected_all, $options_all);
+        $this->assertSame($expected, $options_limited);
+        $expected[TIME_SELECTOR_NOMINIMUM] = 'No minimum time';
+        $this->assertSame($expected, $options_all);
 
     }
 

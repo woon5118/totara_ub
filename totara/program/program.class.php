@@ -350,6 +350,8 @@ class program {
 
 
     /**
+     * @deprecated since Totara 10. Use prog_conditionally_delete_completion instead.
+     *
      * Deletes the completion records for the program for the specified user.
      *
      * @param int $userid
@@ -357,10 +359,13 @@ class program {
      * @return bool Deletion true|Exception
      */
     public function delete_completion_record($userid, $deletecompleted=false) {
+        debugging('certification_event_handler::unassigned() is deprecated, call certif_conditionally_delete_completion directly instead.', DEBUG_DEVELOPER);
+
         global $DB;
 
         if ($deletecompleted === true || !prog_is_complete($this->id, $userid)) {
             $DB->delete_records('prog_completion', array('programid' => $this->id, 'userid' => $userid));
+            prog_log_completion($this->id, $userid, 'Deleted prog_completion in deprecated function program::delete_completion_record');
         }
 
         return true;
@@ -998,7 +1003,6 @@ class program {
             $DB->execute("DELETE FROM {prog_exception} WHERE programid = :programid AND userid " . $userssql,
                 $params);
 
-            $completionstodelete = array();
             $progcompletionlogs = array();
 
             foreach ($userids as $userid) {
@@ -1011,35 +1015,15 @@ class program {
                 $log->timemodified = $now;
                 $progcompletionlogs[] = $log;
 
-                // Check if this program is also part of any of the user's learning plans.
-                if (!$this->assigned_to_users_non_required_learning($userid)) {
-                    // Delete the completion record if the program is not complete.
-                    if (!prog_is_complete($this->id, $userid)) {
-                        $completionstodelete[] = $userid;
-
-                        // Log the deletion.
-                        $log = clone($log);
-                        $log->description = 'Program completion deleted';
-                        $progcompletionlogs[] = $log;
-                    }
+                // Keep, save to history or delete the completion records.
+                if ($this->is_certif()) {
+                    certif_conditionally_delete_completion($this->id, $userid);
+                } else {
+                    prog_conditionally_delete_completion($this->id, $userid);
                 }
             }
 
-            // Delete completion records.
-            if (!empty($completionstodelete)) {
-                list($userssql, $params) = $DB->get_in_or_equal($completionstodelete, SQL_PARAMS_NAMED);
-                $params['programid'] = $this->id;
-                $DB->execute("DELETE FROM {prog_completion} WHERE programid = :programid AND userid " . $userssql,
-                    $params);
-            }
-            unset($completionstodelete);
-
-            // Reset the program assignments object at this point, just in case for any reason it has been initialised.
-            // This function should never reference it, however the event may act upon it, so we need to ensure it is accurate
-            // prior to this.
-            $this->get_assignments()->reset();
-
-            // Record the completion logs.
+            // Record the completion logs relating to the unassignments.
             if (!empty($progcompletionlogs)) {
                 $DB->insert_records_via_batch('prog_completion_log', $progcompletionlogs);
             }
