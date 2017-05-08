@@ -77,6 +77,9 @@ class totara_core_session_testcase extends advanced_testcase {
         ];
 
         $this->assertEquals($expected, totara_convert_notification_to_legacy_array($notification));
+
+        // Deprecated Totara notifications calls.
+        $this->assertDebuggingCalledCount(4);
     }
 
     public function test_totara_notifications() {
@@ -118,6 +121,9 @@ class totara_core_session_testcase extends advanced_testcase {
             'bar' => 24,
         ];
         $this->assertEquals($expected, totara_get_notifications());
+
+        // Deprecated Totara notifications calls.
+        $this->assertDebuggingCalledCount(30);
 
     }
 

@@ -581,6 +581,11 @@ function totara_upgrade_installed_languages() {
  * Currently the options array only supports a 'class' entry for passing as
  * the second parameter to notification()
  *
+ * @deprecated since 10.0 use \core\notification API instead e.g. one of:
+ *             \core\notification::info
+ *             \core\notification::success
+ *             \core\notification::warning
+ *             \core\notification::danger
  * @param string $message Message to display
  * @param string $redirect Url to redirect to (optional)
  * @param array $options An array of options to pass to totara_queue_append (optional)
@@ -588,6 +593,10 @@ function totara_upgrade_installed_languages() {
  * @return void
  */
 function totara_set_notification($message, $redirect = null, $options = array(), $immediatesend = true) {
+
+    $debugmessage  = 'totara_set_notification() has been deprecated since Totara 10.0';
+    $debugmessage .= ' you should use the \core\notification static methods instead e.g. \core\notification::warning()';
+    debugging($debugmessage, DEBUG_DEVELOPER);
 
     // Check options is an array
     if (!is_array($options)) {
@@ -626,6 +635,7 @@ function totara_set_notification($message, $redirect = null, $options = array(),
  *
  * Should be called in the theme's header
  *
+ * @deprecated since 10.0 use \core\notification::fetch() instead.
  * @return  array
  */
 function totara_get_notifications() {
@@ -638,6 +648,9 @@ function totara_get_notifications() {
 
 /**
  * Add an item to a totara session queue
+ *
+ * Note: The notifications queue is only used by deprecated functions since 10.0
+ * as we transition to the \core\notification API.
  *
  * @param   string  $key    Queue key
  * @param   mixed   $data   Data to add to queue
@@ -2480,10 +2493,17 @@ function totara_core_generate_unique_db_value($table, $column, $prefix = null) {
 /**
  * Convert a core\output\notification instance to the legacy array format.
  *
+ * @deprecated since 10.0 This function only exists for compatibility with \core\notifications
+ *             until deprecated totara_notification functions are removed.
  * @param \core\output\notification $notification The templatable to be converted.
+ * @return array
  */
 function totara_convert_notification_to_legacy_array(\core\output\notification $notification) {
     global $OUTPUT;
+
+    $debugmessage  = 'totara_convert_notification_to_legacy() has been deprecated since Totara 10.0';
+    $debugmessage .= ' you should never use it. There is no replacement.';
+    debugging($debugmessage, DEBUG_DEVELOPER);
 
     $type = $notification->get_message_type();
     $variables = $notification->export_for_template($OUTPUT);

@@ -80,6 +80,7 @@ class core_notification_testcase extends advanced_testcase {
      * Test fetching of notifications from the session.
      */
     public function test_fetch() {
+
         // Initially there won't be any notifications.
         $this->assertCount(0, \core\notification::fetch());
 
@@ -87,6 +88,10 @@ class core_notification_testcase extends advanced_testcase {
         \core\notification::success('Notification created');
         $this->assertCount(1, \core\notification::fetch());
         $this->assertCount(0, \core\notification::fetch());
+
+        // Totara: Backwards compatibility with totara_notifications in 10.0
+        // internals of \core\notification include some deprecated functions.
+        $this->assertDebuggingCalled();
     }
 
     /**
@@ -128,6 +133,10 @@ return;
         $closebuttonreflection->setAccessible(true);
 
         $this->assertTrue($closebuttonreflection->getValue($renderable));
+
+        // Totara: Backwards compatibility with totara_notifications in 10.0
+        // internals of \core\notification include some deprecated functions.
+        $this->assertDebuggingCalled();
     }
 
     /**
@@ -169,6 +178,10 @@ return;
         // The totara notification should remain in the queue.
         $this->assertCount(1, $SESSION->notifications);
         $this->assertEquals('Bar', $SESSION->notifications[0]->message);
+
+        // Totara: Backwards compatibility with totara_notifications in 10.0
+        // internals of \core\notification include some deprecated functions.
+        $this->assertDebuggingCalledCount(2);
     }
 
     /**
@@ -254,6 +267,10 @@ return;
         $notifications = \core\notification::fetch();
         $notification = array_pop($notifications);
         $this->assertEquals(\core\output\notification::NOTIFY_INFO, $notification->get_message_type());
+
+        // Totara: Backwards compatibility with totara_notifications in 10.0
+        // internals of \core\notification include some deprecated functions.
+        $this->assertDebuggingCalledCount(36);
     }
 
     /**
@@ -280,6 +297,10 @@ return;
         $exported = $notification->export_for_template($OUTPUT);
 
         $this->assertEquals('', $exported['extraclasses']);
+
+        // Totara: Backwards compatibility with totara_notifications in 10.0
+        // internals of \core\notification include some deprecated functions.
+        $this->assertDebuggingCalledCount(6);
     }
 
 }

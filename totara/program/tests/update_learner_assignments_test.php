@@ -684,6 +684,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         }
 
         $this->check_control_program();
+
+        // Deprecated Totara notifications.
+        $this->assertDebuggingCalled();
     }
 
     /**
