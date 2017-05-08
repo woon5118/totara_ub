@@ -331,7 +331,7 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
     @header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-    echo '<html dir="'.(right_to_left() ? 'rtl' : 'ltr').'">
+    echo '<html dir="'.(right_to_left() ? 'rtl' : 'ltr').'" '. get_html_lang(true) .'>
           <head>
           <link rel="shortcut icon" href="theme/basis/pix/favicon.ico" />';
 
@@ -346,8 +346,10 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
             <div id="page" class="stage'.$config->stage.'">
                 <div id="page-header">
                     <div id="header" class=" clearfix">
-                        <h1 class="headermain">'.get_string('installation','install').'</h1>
-                        <div class="headermenu">&nbsp;</div>
+                        <h1 class="headermain">
+                        <img class="logo img-responsive" src="totara/core/pix/logo.svg" alt="Totara Logo">
+                        '.get_string('installation','install').'</h1>
+                        <div class="totara-navbar-container">&nbsp;</div>
                     </div>
                     <div class="navbar clearfix">
                         <nav class="breadcrumb-nav">
@@ -367,7 +369,7 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
         echo '</div>';
     }
     // main
-    echo '<form id="installform" method="post" action="install.php"><fieldset>';
+    echo '<form id="installform" method="post" action="install.php">';
     foreach ($config as $name=>$value) {
         echo '<input type="hidden" name="'.$name.'" value="'.s($value).'" />';
     }
@@ -384,17 +386,11 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
 function install_print_footer($config, $reload=false) {
     global $CFG, $TOTARA;
 
-    if ($config->stage > INSTALL_WELCOME) {
+    $firststage = $config->stage === INSTALL_WELCOME;
+    if (!$firststage) {
         $first = '<input type="submit" id="previousbutton" name="previous" value="&laquo; '.s(get_string('previous')).'" />';
     } else {
         $first = '<input type="submit" id="previousbutton" name="next" value="'.s(get_string('reload')).'" />';
-        $first .= '<script type="text/javascript">
-//<![CDATA[
-    var first = document.getElementById("previousbutton");
-    first.style.visibility = "hidden";
-//]]>
-</script>
-';
     }
 
     if ($reload) {
@@ -403,15 +399,22 @@ function install_print_footer($config, $reload=false) {
         $next = '<input type="submit" id="nextbutton" class="btn btn-primary" name="next" value="'.s(get_string('next')).' &raquo;" />';
     }
 
-    echo '</fieldset><fieldset id="nav_buttons">'.$first.$next.'</fieldset>';
+    echo '<div id="nav_buttons">'.$first.$next.'</div>';
 
-    $homelink  = '<div class="sitelink">'.
-       '<a title="Totara '. $TOTARA->release .'" href="https://help.totaralms.com/Getting_Started_for_Administrators.htm" onclick="this.target=\'_blank\'">'.
-       '<img src="totara/core/pix/logo.svg" alt="Totara logo" /></a></div>';
+    $homelink  = '<small class="page-footer-poweredby">' . s(get_string('poweredby', 'totara_core')) . '</small>';
 
     echo '</form></div>';
     echo '<div id="page-footer">'.$homelink.'</div>';
-    echo '</div></body></html>';
+    echo '</div></body>';
+    if ($firststage) {
+        echo '<script type="text/javascript">
+//<![CDATA[
+    var first = document.getElementById("previousbutton");
+    first.parentNode.removeChild(first);
+//]]>
+</script>';
+    }
+    echo '</html>';
 }
 
 /**

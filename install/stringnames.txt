@@ -60,6 +60,7 @@ pathswrongadmindir,install
 phpextension,install
 phpversionhelp,install
 phpversion,install
+poweredby,totara_core
 previous,moodle
 reload,moodle
 remotedownloaderror,error

@@ -30,13 +30,7 @@ if (file_exists(__DIR__.'/../config.php')) {
 
 $content = file_get_contents(__DIR__.'/../theme/basis/style/totara.css');
 
-// TODO TL-14169 fix basis style and add more RTL support
-
 $content .= <<<EOF
-
-body {
-    padding: 4px;
-}
 
 .text-ltr {
     direction: ltr !important;
@@ -45,9 +39,14 @@ body {
 .headermain {
     margin: 15px;
 }
+.headermain img {
+    height: 40px;
+    margin: 15px 15px 15px 0;
+    display: inline;
+}
 
 #installdiv {
-    width: 800px;
+    max-width: 1200px;
     margin-left:auto;
     margin-right:auto;
     padding: 5px;
@@ -62,67 +61,47 @@ body {
     padding-bottom: 0.5em;
 }
 
-.stage {
-    margin-top: 2em;
-    margin-bottom: 2em;
-    padding: 25px;
-}
-
-fieldset {
-    text-align:center;
-    border:none;
-}
-
-fieldset .configphp,
-fieldset .alert {
+.configphp {
     text-align: left;
     direction: ltr;
 }
 
-.sitelink {
-    text-align: center;
+.page-footer-poweredby {
+    margin-top: 20px;
 }
 
+.page-footer-poweredby img {
+    height: 10px;
+}
+
+#nav_buttons,
 .fitem {
     clear:both;
-    text-align:left;
     padding: 8px;
+    margin: 0 -15px;
 }
 
 .fitemtitle {
-    float: left;
-    width: 245px;
-    text-align: right;
-}
-html[dir=rtl] .fitemtitle {
-    float: right;
+    display: inline-block;
+    width: 25%;
 }
 label {
-    font-weight: bold;
-    display: inline-block;
     margin: 5px;
 }
 
 .fitemelement {
-    margin-left: 265px;
-}
-html[dir=rtl] .fitemelement {
-    margin-right: 265px;
-    margin-left: 0;
-    direction: ltr;
+    display: inline-block;
+    width: 75%;
 }
 
-.breadcrumb {
-    background-color: #f5f5f5;
+.totara-navbar-container {
+    height: 40px;
 }
+
 .breadcrumb {
     padding: 8px 15px;
     margin: 0 0 20px;
     list-style: none;
-    background-color: #f5f5f5;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
 }
 
 .breadcrumb > li {
@@ -131,9 +110,11 @@ html[dir=rtl] .fitemelement {
     line-height: 20px;
 }
 
-.breadcrumb {
-    background-color: rgb(245, 245, 245);
-    padding: 8px 15px;
+[dir=ltr] #nav_buttons input:first-child {
+    margin-left: 25%;
+}
+[dir=rtl] #nav_buttons input:first-child {
+    margin-right: 25%;
 }
 
 EOF;
