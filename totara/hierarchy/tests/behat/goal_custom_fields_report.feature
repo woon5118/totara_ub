@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @javascript
+@totara @totara_hierarchy @javascript @totara_customfield
 Feature: Verify I can see all appropriate fields in the goal custom fields report source.
 
 Background:
