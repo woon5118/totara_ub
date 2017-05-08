@@ -45,5 +45,13 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017050500, 'totara', 'plan');
     }
 
+    if ($oldversion < 2017051800) {
+        // Rename columns types to type 'plan'.
+        reportbuilder_rename_data('columns', 'dp_course', 'course_completion', 'statusandapproval', 'plan', 'statusandapproval');
+        reportbuilder_rename_data('columns', 'dp_course', 'course', 'status', 'plan', 'coursestatus');
+
+        upgrade_plugin_savepoint(true, 2017051800, 'totara', 'plan');
+    }
+
     return true;
 }
