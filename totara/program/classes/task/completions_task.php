@@ -38,7 +38,7 @@ class completions_task extends \core\task\scheduled_task {
      * Determine whether or not any users have completed any programs
      */
     public function execute() {
-        global $CFG;
+        global $CFG, $DB;
 
         require_once($CFG->dirroot . '/totara/program/lib.php');
         require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
@@ -50,22 +50,47 @@ class completions_task extends \core\task\scheduled_task {
             return false;
         }
 
-        // OK we want to find all programs that have at least one user assigned who has not completed the program already.
-        // Once a user has completed the program we no longer need to check that user. Complete is complete.
-        $programs = \program::get_all_programs_with_incomplete_users();
-        foreach ($programs as $program) {
-            // Get all the users enrolled on this program who have not already completed it.
-            $program_users = $program->get_program_learners(STATUS_PROGRAM_INCOMPLETE);
-            if (empty($program_users)) {
-                continue;
+        // Query to retrive any users who are registered on the program
+        $sql = "SELECT pc.id, pc.programid, pc.userid
+                  FROM {prog_completion} pc
+                 WHERE pc.coursesetid = 0
+                   AND pc.userid IN ( SELECT pua.userid
+                                        FROM {prog_user_assignment} pua
+                                       WHERE pua.programid = pc.programid
+                                         AND pua.userid = pc.userid
+                                         AND pua.exceptionstatus <> :raised
+                                         AND pua.exceptionstatus <> :dismissed
+                                       UNION
+                                      SELECT pln.userid
+                                        FROM {dp_plan_program_assign} ppa
+                                  INNER JOIN {dp_plan} pln
+                                          ON pln.id = ppa.planid
+                                       WHERE pln.userid = pc.userid
+                                         AND ppa.programid = pc.programid
+                                         AND ppa.approved >= :dpappr
+                                         AND pln.status >= :dpstat
+                                    )
+                   AND pc.status = :stat
+              ORDER BY pc.programid";
+
+        $params = array(
+            'raised' => PROGRAM_EXCEPTION_RAISED,
+            'dismissed' => PROGRAM_EXCEPTION_DISMISSED,
+            'dpappr' => DP_APPROVAL_APPROVED,
+            'dpstat' => DP_PLAN_STATUS_APPROVED,
+            'stat' => STATUS_PROGRAM_INCOMPLETE
+        );
+
+        $records = $DB->get_records_sql($sql, $params);
+        $program = null;
+        foreach ($records as $record) {
+            if (empty($program) || $program->id != $record->programid) {
+                $program = new \program($record->programid);
             }
 
-            foreach ($program_users as $userid) {
-                prog_update_completion($userid, $program, null, false);
-            }
+            prog_update_completion($record->userid, $program, null, false);
         }
 
         return true;
     }
 }
-

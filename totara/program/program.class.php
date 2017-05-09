@@ -600,8 +600,13 @@ class program {
                     } else {
                         // This is a new assignment and it might be a future assignment.
 
-                        // No record in prog_user_assignment so we need to make one.
-                        $exceptions = $this->update_exceptions($user->id, $progassignment, $timedue);
+                        // If the user is already complete, or has a timedue, skip checking for time allowence exceptions and carry on with assignments.
+                        if (!empty($progcompletion) && ($progcompletion->status == STATUS_PROGRAM_COMPLETE || $progcompletion->timedue > 0)) {
+                            $exceptions = $this->update_exceptions($user->id, $progassignment, COMPLETION_TIME_NOT_SET);
+                        } else {
+                            $exceptions = $this->update_exceptions($user->id, $progassignment, $timedue);
+                        }
+
                         // Fix the timedue before we put it into the database. Empty includes COMPLETION_TIME_UNKNOWN, null, 0, ''.
                         $timedue = empty($timedue) ? COMPLETION_TIME_NOT_SET : $timedue;
                         $newassignusersbuffer[$user->id] = array('timedue' => $timedue, 'exceptions' => $exceptions);
@@ -624,6 +629,7 @@ class program {
                             $progcompletion->timedue = $timedue; // Updates $allpreviousprogcompletions, for following assignments.
                             $this->set_timedue($user->id, $timedue, 'Due date updated for new program assignment');
                         } // Else no change or decrease, skipped. If we want to allow decrease then it should be added here.
+
                     }
                 } // End user assignments loop.
 
