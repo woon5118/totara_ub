@@ -245,3 +245,20 @@ Feature: Use the reportbuilder date filter
     Then I should not see "Course 17"
     And I should not see "Course 18"
     And I should see "Course 19"
+
+  @javascript
+  Scenario: Report builder date filter validation
+    Given I am on a totara site
+    And I log in as "admin"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Edit this report" "link_or_button"
+    And I switch to "Filters" tab
+    And I set the field "newsidebarfilter" to "Course Start Date"
+    And I press "Save changes"
+    And I follow "View This Report"
+    When I set the following fields to these values:
+      | course-startdatedaysbeforechkbox | 1     |
+      | course-startdatedaysbefore       | 12345 |
+    Then I should see "Maximum of 4 characters"
+    When I set the field "course-startdatedaysbefore" to "1234"
+    Then I should not see "Maximum of 4 characters"

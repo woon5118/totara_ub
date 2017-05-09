@@ -2353,10 +2353,10 @@ require(["core/event", "jquery"], function(Event, $) {
       }
     }
 
-    document.getElementById(\'fitem_' . $elem->_attributes['id'] . '\').addEventListener(\'blur\', function(ev) {
+    document.getElementById(\'' . $elem->_attributes['id'] . '\').addEventListener(\'blur\', function(ev) {
         ' . $valFunc . '
     });
-    document.getElementById(\'fitem_' . $elem->_attributes['id'] . '\').addEventListener(\'change\', function(ev) {
+    document.getElementById(\'' . $elem->_attributes['id'] . '\').addEventListener(\'change\', function(ev) {
         ' . $valFunc . '
     });
 ';
