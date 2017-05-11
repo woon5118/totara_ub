@@ -1445,7 +1445,7 @@ class core_plugin_manager {
                 'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
                 'langimport', 'log', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor',
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
-                'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'usertours', 'xmldb'
+                'uploadcourse', 'uploaduser', 'unsuproles', 'usertours', 'xmldb'
                 // Totara:
                 , 'totara_sync', 'totara_timezonefix', 'sitepolicy'
             ),
