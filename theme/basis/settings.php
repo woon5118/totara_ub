@@ -42,7 +42,7 @@ if ($ADMIN->fulltree) {
     $name = "{$component}/logo";
     $title = new lang_string('logo', $component);
     $description = new lang_string('logodesc', $component);
-    $setting = new admin_setting_configstoredfile($name, $title, $description, 'logo');
+    $setting = new admin_setting_configstoredfile($name, $title, $description, 'logo',0 ,['accepted_types' => 'web_image']);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);
 

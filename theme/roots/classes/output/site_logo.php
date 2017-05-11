@@ -31,7 +31,7 @@ class site_logo implements \renderable, \templatable {
 
     /**
      * Implements export_for_template().
-     * 
+     *
      * @param \renderer_base $output
      * @return array
      */
@@ -43,19 +43,20 @@ class site_logo implements \renderable, \templatable {
             'shortname' => $SITE->shortname,
         );
 
-        $templatecontext['logourl'] = $PAGE->theme->setting_file_url('logo', 'logo');
-        $templateocontext['logoalt'] = get_string('logo', 'admin');
-
         if (!empty($PAGE->theme->settings->logo)) {
             $templatecontext['logourl'] = $PAGE->theme->setting_file_url('logo', 'logo');
-            $templatecontext['logoalt'] = get_string('logo', 'admin');
-        } else {
+        }
+
+        if (empty($templatecontext['logourl'])) {
             $templatecontext['logourl'] = $OUTPUT->pix_url('logo', 'totara_core');
-            $templatecontext['logoalt'] = get_string('totaralogo', 'totara_core');
         }
 
         if (!empty($PAGE->theme->settings->alttext)) {
             $templatecontext['logoalt'] = format_string($PAGE->theme->settings->alttext);
+        }
+
+        if (empty($templatecontext['logoalt'])) {
+            $templatecontext['logoalt'] = get_string('totaralogo', 'totara_core');
         }
 
         if (!empty($PAGE->theme->settings->favicon)) {
