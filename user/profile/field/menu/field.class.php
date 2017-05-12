@@ -64,7 +64,7 @@ class profile_field_menu extends profile_field_base {
             // TOTARA - changed to always use choosedots as it never makes sense to blindly save the first value.
             self::$optionscache[$fieldid][''] = get_string('choosedots');
             foreach ($options as $key => $option) {
-                self::$optionscache[$fieldid][$key] = format_string($option); // Multilang formatting.
+                self::$optionscache[$fieldid][$key] = format_string($option, true, ['context' => context_system::instance()]); // Multilang formatting.
             }
         }
 
