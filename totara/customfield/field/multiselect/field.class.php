@@ -81,6 +81,8 @@ class customfield_multiselect extends customfield_base {
             }
         }
 
+        // If there are more than 8 options then we abandon the single
+        // column display.
         if (count($this->options) > self::MAX_ONE_COLUMN) {
             $this->groupsize = count($this->options);
         } else {
@@ -318,17 +320,19 @@ class customfield_multiselect extends customfield_base {
      * @param   object   instance of the moodleform class
      */
     public function edit_field_set_locked(&$mform) {
-        $groupbasename = 'grp_' . $this->fieldid . '_';
-        if (!$mform->elementExists($groupbasename.'0')) {
+        $groupbasename = 'grp_' . $this->fieldid;
+        $group = $mform->getElement($groupbasename);
+
+        if (empty($group->_elements)) {
             return;
         }
+
+        // If the group is locked then lock all the
+        // items in the group.
         if ($this->is_locked()) {
-            for ($iter = 0; $iter < $this->groupsize; $iter++) {
-                $group = $mform->getElement($groupbasename.$iter);
-                $elems = $group->getElements();
-                foreach ($elems as $elem) {
-                    $elem->freeze();
-                }
+            $elems = $group->_elements;
+            foreach ($elems as $elem) {
+                $elem->freeze();
             }
         }
     }
