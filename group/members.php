@@ -137,8 +137,8 @@ if (!empty($groupinfo)) {
       <?php $groupmembersselector->display(); ?>
     </div>
     <div class="span2 controls">
-      <input name="add" id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" />
-      <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>" title="<?php print_string('remove'); ?>" />
+      <input name="add" id="add" class="btn btn-secondary" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" />
+      <input name="remove" id="remove" class="btn btn-secondary" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>" title="<?php print_string('remove'); ?>" />
     </div>
     <div class="span5">
       <label for="addselect"><?php print_string('potentialmembs', 'group'); ?></label>
@@ -147,7 +147,7 @@ if (!empty($groupinfo)) {
   </div>
   <p><?php echo($strusergroupmembership) ?></p>
   <div id="group-usersummary"></div>
-  <input type="submit" name="cancel" value="<?php print_string('backtogroups', 'group'); ?>" />
+  <input type="submit" name="cancel" class="btn btn-secondary" value="<?php print_string('backtogroups', 'group'); ?>" />
 </form>
 
 <?php
