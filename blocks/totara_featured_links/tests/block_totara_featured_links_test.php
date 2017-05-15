@@ -127,29 +127,6 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
         $this->assertCount(0, $tiles);
     }
 
-    /**
-     * tests that the block instance can be saved
-     */
-    public function test_instance_config_save () {
-        $this->resetAfterTest();
-        $instance = $this->blockgenerator->create_instance();
-        $this->blockgenerator->create_default_tile($instance->id);
-
-        $block = block_instance('totara_featured_links', $instance);
-        $this->assertInstanceOf('block_totara_featured_links', $block);
-
-        $block->instance_create();
-
-        $data = new \stdClass();
-        $data->title = '';
-        $data->size = 'small';
-        $data->manual_id = 'Some_random_id';
-
-        $block->instance_config_save($data);
-
-        $this->assertTrue($block->hide_header());
-    }
-
     public function test_intance_copy() {
         global $DB;
         $this->resetAfterTest();

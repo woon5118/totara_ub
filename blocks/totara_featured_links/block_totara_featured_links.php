@@ -221,19 +221,4 @@ class block_totara_featured_links extends block_base {
             }
         }
     }
-
-    /**
-     * Saves the block data from the form.
-     * saves them to config->data as well as config so that the rendering will use them as they will be loaded back into
-     * the block editing form
-     * @param \stdClass $data
-     * @param bool $nolongerused
-     */
-    public function instance_config_save($data, $nolongerused = false) {
-        $this->config->title = $data->title;
-        $this->config->size = $data->size;
-        $this->config->manual_id = $data->manual_id;
-
-        parent::instance_config_save($this->config);
-    }
 }
