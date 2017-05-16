@@ -123,5 +123,8 @@ urn:mace:organization2:providerID, Example Organization 2, /Shibboleth.sso/WAYF/
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'shibboleth');
     }
 
+    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
     return true;
 }
