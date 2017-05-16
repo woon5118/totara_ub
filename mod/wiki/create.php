@@ -27,14 +27,11 @@ require_once($CFG->dirroot . '/mod/wiki/pagelib.php');
 // 'create' action will create a new page in db, and redirect to
 // page editing page.
 $action = optional_param('action', 'new', PARAM_TEXT);
-// The title of the new page, can be empty
-$title = optional_param('title', get_string('newpage', 'wiki'), PARAM_TEXT);
 $wid = optional_param('wid', 0, PARAM_INT);
 $swid = optional_param('swid', 0, PARAM_INT);
 $group = optional_param('group', 0, PARAM_INT);
 $uid = optional_param('uid', 0, PARAM_INT);
 
-$PAGE->set_url('/mod/wiki/create.php', array('wid' => $wid, 'uid' => $uid, 'title' => $title));
 
 // 'create' action must be submitted by moodle form
 // so sesskey must be checked
@@ -88,6 +85,9 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 
 require_login($course, true, $cm);
 
+// The title of the new page, cannot be empty.
+$title = optional_param('title', get_string('newpage', 'wiki'), PARAM_TEXT);
+$PAGE->set_url('/mod/wiki/create.php', array('wid' => $wid, 'uid' => $uid, 'title' => $title));
 $wikipage = new page_wiki_create($wiki, $subwiki, $cm);
 
 if (!empty($swid)) {
