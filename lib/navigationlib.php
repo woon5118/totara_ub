@@ -2344,7 +2344,7 @@ class global_navigation extends navigation_node {
             // This link doesn't have a unique display for course context so only display it under the user's profile.
             if ($issitecourse && $iscurrentuser && has_capability('moodle/user:manageownfiles', $usercontext)) {
                 $url = new moodle_url('/user/files.php');
-                $usernode->add(get_string('privatefiles'), $url, self::TYPE_SETTING);
+                $usernode->add(get_string('privatefiles'), $url, self::TYPE_SETTING, null, 'privatefiles');
             }
 
             // Add a node to view the users notes if permitted.
@@ -2776,7 +2776,7 @@ class global_navigation extends navigation_node {
             $usercontext = context_user::instance($USER->id);
             if (has_capability('moodle/user:manageownfiles', $usercontext)) {
                 $url = new moodle_url('/user/files.php');
-                $node = $coursenode->add(get_string('privatefiles'), $url, self::TYPE_SETTING);
+                $node = $coursenode->add(get_string('privatefiles'), $url, self::TYPE_SETTING, null, 'privatefiles');
                 $node->display = false;
             }
         }
@@ -4532,7 +4532,7 @@ class settings_navigation extends navigation_node {
             // This link doesn't have a unique display for course context so only display it under the user's profile.
             if ($issitecourse && $iscurrentuser && has_capability('moodle/user:manageownfiles', $usercontext)) {
                 $url = new moodle_url('/user/files.php');
-                $profilenode->add(get_string('privatefiles'), $url, self::TYPE_SETTING);
+                $profilenode->add(get_string('privatefiles'), $url, self::TYPE_SETTING, null, 'privatefiles');
             }
 
             // Add a node to view the users notes if permitted.
