@@ -471,6 +471,3 @@ $string['whydoesusernothavecap'] = 'Why does {$a->fullname} not have capability 
 $string['xroleassignments'] = '{$a}\'s role assignments';
 $string['xuserswiththerole'] = 'Users with the role "{$a->role}"';
 
-// Deprecated in 3.0.
-
-$string['tag:create'] = 'Create new tags';
