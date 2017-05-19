@@ -3,6 +3,125 @@
 
 Totara LMS Changelog
 
+Evergreen 20170519 (22nd May 2017):
+====================================
+
+
+Important:
+
+    TL-12803       Ensured the default run times for scheduled tasks are set correctly
+
+                   The default run times for several scheduled tasks were incorrectly configured
+                   to run every minute during the specified hour, rather than just once per day.
+                   To schedule a task to run once per day at a specific time, both the hour and
+                   minute must be specified. The defaults have now been fixed by changing the
+                   'minutes' from '*' to '0'. Any scheduled tasks that were using the default
+                   schedule have been updated to use the new default. If any of your scheduled
+                   tasks intentionally needed to use the old default schedule, or are not using
+                   the default schedule, you should manually check that they are configured correctly
+                   after running the upgrade.
+
+    TL-14327       "Fileinfo" php extension is now required
+
+                   This was previously required but not enforced by environment checks
+
+    TL-14278       Changed mathjax content delivery network (CDN) from cdn.mathjax.org to cdnjs.cloudflare.com
+
+                   cdn.mathjax.org is being shut down
+
+Security issues:
+
+    TL-14332       Capability moodle/blog:search is checked when blog search is applied in browser url request
+    TL-14331       Users are prevented from editing external blog links.
+    TL-14333       Added sesskey checks to the course overview block
+    TL-14273       Fixed array key and object property name cleaning in fix_utf8() function
+    TL-14258       Improved access control of files used in custom fields
+
+                   Previously inconsistent checks were made when accessing files used in custom fields.
+                   A brand new segment of API has been added to allow each area to accurately validate
+                   access to files used within it, and all custom field areas have been updated to use the new API.
+
+New features:
+
+    TL-13154       New Modal library added
+    TL-13417       User tours can now be created within Totara.
+
+                   These tours are experienced by users upon meeting certain criteria such as
+                   logging in or holding a certain role, and when browsing specific areas of
+                   the site. When encountered they feed the user with information and direct
+                   them through elements on the site, or basic navigation.
+
+Improvements:
+
+    TL-12347       Added a Red-amber-green status column and filter to the certifications report sources
+    TL-12732       Added accessible text to Seminar Room and Asset availability filter types
+    TL-9217        Updated Completion Import tool to use core csv_import_reader class
+    TL-6766        Added a new column to the Appraisal status report source to show roles that haven't completed the current active stage
+    TL-14277       totara_core\jsend now automatically removes invalid utf-8 characters and null bytes from received data
+    TL-14260       Behat no longer gives false failures when text appears in a hidden element and its visible parent element
+    TL-14169       Improved display when installing Totara through the web interface
+    TL-14112       Forced themes in categories will now apply to programs and certifications
+    TL-8318        Added an Enrolment Types column and filter to the Course Completion report source
+    TL-12964       Updated the standard course catalog search to allow single character searches
+
+Bug fixes:
+
+    TL-12786       Fixed error when selecting objectives to review in an appraisal
+
+                   When selecting Objectives to review in an appraisal, there is no longer an
+                   error when there are only objectives from completed Learning Plans. Objectives
+                   from both complete and incomplete Learning Plans are now shown, providing
+                   the objectives are assigned to the learner and approved.
+
+    TL-12609       Refactoring and fixing of custom user profile fields and filters in Reportbuilder
+    TL-12467       Fixed validation when viewing a course as a guest with self enrolment enabled and
+    TL-12415       Fixed the iCalendar cancellation email settings message for Seminars
+    TL-9279        Fixed the display of images in Seminar Room and Asset textarea customfields
+    TL-14342       Ensured Atto drag & drop content images are responsive by default
+    TL-14305       Fixed saving user reports after filtering by position
+    TL-14329       Fixed debugging warning when editing forum post
+    TL-14284       Fixed missing set_url calls within Appraisal review question AJAX scripts
+    TL-14290       Fixed invalid Program due dates in Learning Plans
+
+                   The due date would sometimes show "01/01/1970" rather than being empty. The cause,
+                   and existing data, have been fixed.
+
+    TL-14292       Fixed typo in certificate module
+    TL-14257       Fix report with graph when Enable report builder graphs is disabled
+    TL-14261       Fixed program completion editor not working in some circumstances
+    TL-14264       Fixed RTL CSS inheritance in non-less themes
+
+                   Prior to TL-13909, RTL wasn't being inherited correctly in themes that used LESS
+                   to compile CSS (such as Roots and Basis). TL-13909 introduced a regression where
+                   RTL CSS was not being inherited correctly (as used in Standard Totara Responsive).
+                   The theme stack now checks for a stylesheet with a suffix -rtl.css, and if it exists,
+                   includes it, otherwise includes the standard stylesheet.
+                   (which can use the .dir-rtl body class to specify any RTL specific css)
+
+    TL-14167       Featured Links Block: Fixed spelling of Colour
+    TL-14177       Adding an activity to a course uses font icons
+    TL-14101       Fixed Report builder saved searches for job assignment filters
+
+                   Previously on upgrade to T9 or higher, saved searches using old position assignment
+                   filters were not upgraded, they are now mapped to the corresponding job assignment
+                   filter. There was also an issue creating new saved searches based on some job
+                   assignment fields which has been fixed as part of this patch.
+
+    TL-14046       Made the course list in user profiles take audience visibility into account
+    TL-13931       Fixed JavaScript issue where activity self completion may not work
+    TL-14029       Fixed issues with caching requests using the same CURL connection
+    TL-14241       Fixed the inline help for course and audience options on the Totara Connect add client form
+    TL-13968       Ensured that userids are unique when getting enrolled users
+
+                   This was causing a debugging error when checking permissions of users with multiple roles
+
+    TL-14240       Fixed search tab in appraiser/manager dialog boxes for job assignments report builder filters
+
+Contributions:
+
+    * Kineo UK - TL-14241
+
+
 Evergreen 20170426 (26th April 2017):
 ====================================
 
@@ -1100,7 +1219,7 @@ Improvements:
 Bug fixes:
 
     TL-9982        Improved CSS in Learning plan comments for Roots and Basis themes
-	TL-8375        Fixed issues with audiences in the table for restricting access to a menu item
+    TL-8375        Fixed issues with audiences in the table for restricting access to a menu item
 
                    Added the correct module to the url when rendering the table rows through
                    ajax. Also, when the form is saved, if "Restrict access by audience" is not
