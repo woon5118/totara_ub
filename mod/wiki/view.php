@@ -52,6 +52,7 @@ $action = optional_param('action', '', PARAM_ALPHA);
 $swid = optional_param('swid', 0, PARAM_INT); // Subwiki ID
 
 $PAGE->force_settings_menu();
+$PAGE->set_url('/mod/wiki/view.php', array('id' => $id));
 
 /*
  * Case 0:
