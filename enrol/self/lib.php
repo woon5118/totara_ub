@@ -280,8 +280,8 @@ class enrol_self_plugin extends enrol_plugin {
         global $CFG, $DB, $USER;
 
         if ($checkuserenrolment) {
-            if (isguestuser()) {
-                // Can not enrol guest.
+            if (isguestuser() || !isloggedin()) {
+                // Can not enrol guests or unauthenticated users.
                 return get_string('noguestaccess', 'enrol') . ' ' . html_writer::link(get_login_url(), get_string('login', 'core'), array('class' => 'btn btn-default'));
             }
             // Check if user is already enroled.
