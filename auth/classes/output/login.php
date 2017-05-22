@@ -116,6 +116,10 @@ class login implements renderable, templatable {
             $this->instructions = get_string('loginstepsnone');
         } else if ($CFG->registerauth == 'email' && empty($this->instructions)) {
             $this->instructions = get_string('loginsteps', 'core', 'signup.php');
+        } else if ($CFG->registerauth && empty($this->instructions)) {
+            if (get_string_manager()->string_exists('loginsteps', 'auth_' . $CFG->registerauth)) {
+                $this->instructions = get_string('loginsteps', 'auth_' . $CFG->registerauth, 'signup.php');
+            }
         }
 
         // Identity providers.
