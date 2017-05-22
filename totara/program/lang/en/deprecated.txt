@@ -6,6 +6,7 @@ chosedismissexception,totara_program
 currentlyassigned,totara_program
 dismissandtakenoaction,totara_program
 duplicatecourse,totara_program
+error:info_timedueunknown,totara_program
 learnersassigned,totara_program
 learnersassignedexceptions,totara_program
 overrideandaddprogram,totara_program
