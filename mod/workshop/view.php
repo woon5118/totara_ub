@@ -114,6 +114,9 @@ $output = $PAGE->get_renderer('mod_workshop');
 
 echo $output->header();
 echo $output->heading_with_help(format_string($workshop->name), 'userplan', 'workshop');
+
+echo self_completion_form($cm);
+
 echo $output->heading(format_string($currentphasetitle), 3, null, 'mod_workshop-userplanheading');
 echo $output->render($userplan);
 
