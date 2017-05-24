@@ -248,3 +248,58 @@ Feature: Assign group override
     And I follow "Course 1"
     And I follow "Test assignment name"
     And I should see "This assignment will accept submissions from Wednesday, 1 January 2020, 8:00"
+
+  Scenario: Check correct ordering is made when overriding group with same due date
+    When I follow "Test assignment name"
+    And I navigate to "Edit settings" in current page administration
+    And I set the following fields to these values:
+      | id_duedate_enabled | 1 |
+      | id_allowsubmissionsfromdate_enabled | 0 |
+      | id_cutoffdate_enabled | 0 |
+      | duedate[day]       | 1 |
+      | duedate[month]     | January |
+      | duedate[year]      | 2000 |
+      | duedate[hour]      | 08 |
+      | duedate[minute]    | 00 |
+    And I press "Save and display"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I set the following fields to these values:
+      | Override group     | Group 1 |
+      | id_duedate_enabled | 1       |
+      | duedate[day]       | 1       |
+      | duedate[month]     | January |
+      | duedate[year]      | 2020    |
+      | duedate[hour]      | 08      |
+      | duedate[minute]    | 00      |
+    And I press "Save"
+    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I set the following fields to these values:
+      | Override group     | Group 2 |
+      | id_duedate_enabled | 1       |
+      | duedate[day]       | 1       |
+      | duedate[month]     | January |
+      | duedate[year]      | 2020    |
+      | duedate[hour]      | 08      |
+      | duedate[minute]    | 00      |
+    And I press "Save"
+    And I should see "Group 2" in the ".lastrow" "css_element"
+    And "Move up" "link" should exist in the "Group 2" "table_row"
+    And "Move down" "link" should exist in the "Group 1" "table_row"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I set the following fields to these values:
+      | Override group     | Group 1 |
+      | id_duedate_enabled | 1       |
+      | duedate[day]       | 1       |
+      | duedate[month]     | January |
+      | duedate[year]      | 2020    |
+      | duedate[hour]      | 08      |
+      | duedate[minute]    | 00      |
+    And I press "Save"
+    And I should see "Group 1" in the ".lastrow" "css_element"
+    And "Move up" "link" should exist in the "Group 1" "table_row"
+    And "Move down" "link" should exist in the "Group 2" "table_row"
+    And I log out
