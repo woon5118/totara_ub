@@ -122,6 +122,7 @@ class search_manager_testcase extends advanced_testcase {
         $configs = $search->get_areas_config(array($this->forumpostareaid => $searcharea));
         $this->assertEquals($start, $configs[$this->forumpostareaid]->indexingstart);
         $this->assertEquals($end, $configs[$this->forumpostareaid]->indexingend);
+        $this->assertEquals(false, $configs[$this->forumpostareaid]->partial);
 
         try {
             $fakeareaid = \core_search\manager::generate_areaid('mod_unexisting', 'chihuaquita');
@@ -138,6 +139,7 @@ class search_manager_testcase extends advanced_testcase {
         $this->assertEquals(0, $config[$varname . '_indexingstart']);
         $this->assertEquals(0, $config[$varname . '_indexingend']);
         $this->assertEquals(0, $config[$varname . '_lastindexrun']);
+        $this->assertEquals(0, $config[$varname . '_partial']);
         // No caching.
         $configs = $search->get_areas_config(array($this->forumpostareaid => $searcharea));
         $this->assertEquals(0, $configs[$this->forumpostareaid]->indexingstart);
@@ -158,12 +160,37 @@ class search_manager_testcase extends advanced_testcase {
     }
 
     /**
-     * Tests that documents with modified time in the future are NOT indexed (as this would cause
-     * a problem by preventing it from indexing other documents modified between now and the future
-     * date).
+     * Tests the get_last_indexing_duration method in the base area class.
      */
-    public function test_future_documents() {
+    public function test_get_last_indexing_duration() {
         $this->resetAfterTest();
+
+        $search = testable_core_search::instance();
+
+        $searcharea = $search->get_search_area($this->forumpostareaid);
+
+        // When never indexed, the duration is false.
+        $this->assertSame(false, $searcharea->get_last_indexing_duration());
+
+        // Set the start/end times.
+        list($componentname, $varname) = $searcharea->get_config_var_name();
+        $start = time() - 100;
+        $end = time();
+        set_config($varname . '_indexingstart', $start, $componentname);
+        set_config($varname . '_indexingend', $end, $componentname);
+
+        // The duration should now be 100.
+        $this->assertSame(100, $searcharea->get_last_indexing_duration());
+    }
+
+    /**
+     * Tests that partial indexing works correctly.
+     */
+    public function test_partial_indexing() {
+        global $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
 
         // Create a course and a forum.
         $generator = $this->getDataGenerator();
@@ -176,32 +203,68 @@ class search_manager_testcase extends advanced_testcase {
         $search = testable_core_search::instance();
         $search->index(false, 0);
 
-        // Add 2 discussions to the forum, one of which happend just now, but the other is
-        // incorrectly set to the future.
-        $now = time();
-        $userid = get_admin()->id;
-        $generator->get_plugin_generator('mod_forum')->create_discussion(['course' => $course->id,
-                'forum' => $forum->id, 'userid' => $userid, 'timemodified' => $now,
-                'name' => 'Frog']);
-        $generator->get_plugin_generator('mod_forum')->create_discussion(['course' => $course->id,
-                'forum' => $forum->id, 'userid' => $userid, 'timemodified' => $now + 100,
-                'name' => 'Toad']);
-
-        // Wait for a second so we're not actually on the same second as the forum post (there's a
-        // 1 second overlap between indexing; it would get indexed in both checks below otherwise).
-        $this->waitForSecond();
-
-        // Index.
-        $search->index(false);
-
-        // Check latest time - it should be the same as $now, not the + 100.
         $searcharea = $search->get_search_area($this->forumpostareaid);
         list($componentname, $varname) = $searcharea->get_config_var_name();
-        $this->assertEquals($now, get_config($componentname, $varname . '_lastindexrun'));
+        $this->assertFalse(get_config($componentname, $varname . '_partial'));
+
+        // Add 3 discussions to the forum.
+        $now = time();
+        $generator->get_plugin_generator('mod_forum')->create_discussion(['course' => $course->id,
+                'forum' => $forum->id, 'userid' => $USER->id, 'timemodified' => $now,
+                'name' => 'Frog']);
+        $generator->get_plugin_generator('mod_forum')->create_discussion(['course' => $course->id,
+                'forum' => $forum->id, 'userid' => $USER->id, 'timemodified' => $now + 1,
+                'name' => 'Toad']);
+        $generator->get_plugin_generator('mod_forum')->create_discussion(['course' => $course->id,
+                'forum' => $forum->id, 'userid' => $USER->id, 'timemodified' => $now + 2,
+                'name' => 'Zombie']);
+        time_sleep_until($now + 3);
+
+        // Clear the count of added documents.
+        $search->get_engine()->get_and_clear_added_documents();
+
+        // Make the search engine delay while indexing each document.
+        $search->get_engine()->set_add_delay(1.2);
+
+        // Index with a limit of 2 seconds - it should index 2 of the documents (after the second
+        // one, it will have taken 2.4 seconds so it will stop).
+        $search->index(false, 2);
+        $added = $search->get_engine()->get_and_clear_added_documents();
+        $this->assertCount(2, $added);
+        $this->assertEquals('Frog', $added[0]->get('title'));
+        $this->assertEquals('Toad', $added[1]->get('title'));
+        $this->assertEquals(1, get_config($componentname, $varname . '_partial'));
+
+        // Add a label.
+        $generator->create_module('label', ['course' => $course->id, 'intro' => 'Vampire']);
+
+        // Wait to next second (so as to not reindex the label more than once, as it will now
+        // be timed before the indexing run).
+        $this->waitForSecond();
+
+        // Next index with 1 second limit should do the label and not the forum - the logic is,
+        // if it spent ages indexing an area last time, do that one last on next run.
+        $search->index(false, 1);
+        $added = $search->get_engine()->get_and_clear_added_documents();
+        $this->assertCount(1, $added);
+        $this->assertEquals('Vampire', $added[0]->get('title'));
+
+        // Index again with a 2 second limit - it will redo last post for safety (because of other
+        // things possibly having the same time second), and then do the remaining one. (Note:
+        // because it always does more than one second worth of items, it would actually index 2
+        // posts even if the limit were less than 2.)
+        $search->index(false, 2);
+        $added = $search->get_engine()->get_and_clear_added_documents();
+        $this->assertCount(2, $added);
+        $this->assertEquals('Toad', $added[0]->get('title'));
+        $this->assertEquals('Zombie', $added[1]->get('title'));
+        $this->assertFalse(get_config($componentname, $varname . '_partial'));
 
         // Index again - there should be nothing to index this time.
-        $search->index(false);
-        $this->assertEquals($now, get_config($componentname, $varname . '_lastindexrun'));
+        $search->index(false, 2);
+        $added = $search->get_engine()->get_and_clear_added_documents();
+        $this->assertCount(0, $added);
+        $this->assertFalse(get_config($componentname, $varname . '_partial'));
     }
 
     /**
