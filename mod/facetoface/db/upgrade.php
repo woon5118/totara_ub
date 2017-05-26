@@ -96,6 +96,37 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2016122101, 'facetoface');
     }
 
+    if ($oldversion < 2017052200) {
+        // Updating registrationtimestart and registrationtimefinish with null values to 0.
+        $sql = 'UPDATE {facetoface_sessions}
+                SET registrationtimestart = 0
+                WHERE registrationtimestart IS NULL';
+        $DB->execute($sql);
+
+        $sql = 'UPDATE {facetoface_sessions}
+                SET registrationtimefinish = 0
+                WHERE registrationtimefinish IS NULL';
+        $DB->execute($sql);
+
+        // Changing the default of field registrationtimestart on table facetoface_sessions to 0.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('registrationtimestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'sendcapacityemail');
+
+        // Launch change of default for field registrationtimestart.
+        $dbman->change_field_default($table, $field);
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing the default of field registrationtimefinish on table facetoface_sessions to 0.
+        $field = new xmldb_field('registrationtimefinish', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'registrationtimestart');
+
+        // Launch change of default for field registrationtimefinish.
+        $dbman->change_field_default($table, $field);
+        $dbman->change_field_notnull($table, $field);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2017052200, 'facetoface');
+    }
+
     return true;
 
 }
