@@ -105,18 +105,18 @@ Feature: Complete the example appraisal
     And I click on "Save" "button" in the "Choose goals to review" "totaradialogue"
     And I wait "1" seconds
     Then I should see "Company Goal One"
-    And I should see "Delete Company Goal One"
+    And I should see "Remove Company Goal One"
     And I should see "Company Goal Two"
-    And I should see "Delete Company Goal Two"
+    And I should see "Remove Company Goal Two"
     And I should see "Company Goal Three"
-    And I should see "Delete Company Goal Three"
+    And I should see "Remove Company Goal Three"
     And I should see "Personal Goal One"
-    And I should see "Delete Company Goal One"
+    And I should see "Remove Company Goal One"
     And I should see "Personal Goal Two"
-    And I should see "Delete Company Goal One"
+    And I should see "Remove Company Goal One"
 
     # Check that you can remove a goal that's been added.
-    When I follow "Delete Company Goal Three"
+    When I follow "Remove Company Goal Three"
     Then I should see "Are you sure you want to remove this item?"
     When I press "Yes"
     And I wait "1" seconds
@@ -140,14 +140,14 @@ Feature: Complete the example appraisal
     And I click on "Save" "button" in the "Choose competencies to review" "totaradialogue"
     And I wait "1" seconds
     Then I should see "Competency One (Learner One Learning Plan)"
-    And I should see "Delete Competency One (Learner One Learning Plan)"
+    And I should see "Remove Competency One (Learner One Learning Plan)"
     And I should see "Competency Two (Learner One Learning Plan)"
-    And I should see "Delete Competency Two (Learner One Learning Plan)"
+    And I should see "Remove Competency Two (Learner One Learning Plan)"
     And I should see "Competency Three (Learner One Learning Plan)"
-    And I should see "Delete Competency Three (Learner One Learning Plan)"
+    And I should see "Remove Competency Three (Learner One Learning Plan)"
 
     # Check that you can remove a competency that's been added.
-    When I follow "Delete Competency Three"
+    When I follow "Remove Competency Three (Learner One Learning Plan)"
     Then I should see "Are you sure you want to remove this item?"
     When I press "Yes"
     And I wait "1" seconds
@@ -290,7 +290,7 @@ Feature: Complete the example appraisal
     And I click on "Save" "button" in the "Choose competencies to review" "totaradialogue"
     And I wait "1" seconds
     Then I should see "Competency One (Learner One Learning Plan)"
-    When I click on "Delete" "link"
+    When I click on "Remove" "link"
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
     And I wait "1" seconds
     Then I should not see "Competency One (Learner One Learning Plan)"

@@ -161,12 +161,13 @@ M.totara_review = M.totara_review || {
     totara_question_update: function(response) {
         var responseobj = $($.parseHTML(response));
 
-        var longid = responseobj.find('p').attr('class');
+        var longid = responseobj.find('span').attr('class');
 
         if (typeof longid !== "undefined") {
+            longid = longid.split(' ')[0];
             var thirdunderline = longid.indexOf('_', longid.indexOf('_', longid.indexOf('_') + 1) + 1);
             var shortid = longid.substr(0, thirdunderline);
-            $('#id_' + shortid + '_choosereviewitem').closest('fieldset').after(responseobj.find('fieldset.collapsible'));
+            $('#fitem_id_' + shortid + '_choosereviewitem').after(responseobj.find('div.question-review-item'));
         }
 
         M.totara_review.addActions(longid);
@@ -195,8 +196,8 @@ M.totara_review = M.totara_review || {
     },
 
     addActions: function(id) {
-        $('.' + id).find('a.action-icon.delete').on('click', function() {
-            M.totara_review.modalDelete($(this).attr('href'), $(this).attr('data-reviewitemid'), $(this).closest('fieldset'));
+        $('.' + id).find('.totara-question-review-delete > a').on('click', function() {
+            M.totara_review.modalDelete($(this).attr('href'), $(this).attr('data-reviewitemid'), $(this).closest('#id_question-review-item-' + $(this).attr('data-reviewitemid')));
             return false;
         });
     }
