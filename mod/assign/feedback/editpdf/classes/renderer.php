@@ -112,11 +112,11 @@ class assignfeedback_editpdf_renderer extends plugin_renderer_base {
         if ($widget->readonly) {
             $launcheditorlink = html_writer::tag('a',
                                               get_string('viewfeedbackonline', 'assignfeedback_editpdf'),
-                                              array('id'=>$linkid, 'class'=>'btn', 'href'=>'#'));
+                                              array('id'=>$linkid, 'class'=>'btn btn-default', 'href'=>'#'));
         } else {
             $launcheditorlink = html_writer::tag('a',
                                               get_string('launcheditor', 'assignfeedback_editpdf'),
-                                              array('id'=>$linkid, 'class'=>'btn', 'href'=>'#'));
+                                              array('id'=>$linkid, 'class'=>'btn btn-default', 'href'=>'#'));
         }
         $links = $launcheditorlink;
         $html .= '<input type="hidden" name="assignfeedback_editpdf_haschanges" value="false"/>';

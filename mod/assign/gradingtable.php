@@ -949,7 +949,7 @@ class assign_grading_table extends table_sql implements renderable {
             }
 
             $url = new moodle_url('/mod/assign/view.php', $urlparams);
-            $link = '<a href="' . $url . '" class="btn btn-primary">' . get_string('grade') . '</a>';
+            $link = '<a href="' . $url . '" class="btn btn-default">' . get_string('grade') . '</a>';
             $grade .= $link . $separator;
         }
 

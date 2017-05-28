@@ -21,3 +21,6 @@ information provided here is intended especially for developers.
   for backwards compatibiltiy.
 * When downloading all submissions as a zip each students' files are in a separate folder, are no longer renamed
   and the folder structure is kept intact.
+* Updated HTML to use the standard bootstrap btn-default css class. This affects the mod_assign/attempt_history_chooser,
+  mod_assign/grading_actions templates and assignfeedback_editpdf_renderer::render_assignfeedback_editpdf_widget(),
+  mod_assign_renderer::render_assign_grading_summary() renderers and the assignment grading table.
