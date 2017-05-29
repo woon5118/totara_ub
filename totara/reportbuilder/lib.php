@@ -1637,8 +1637,9 @@ class reportbuilder {
             $key = $option->type . '-' . $option->value;
 
             if ($this->embedobj && $embeddedheading = $this->embedobj->get_embedded_heading($option->type, $option->value)) {
-                // use heading from embedded source
-                $defaultheading = $embeddedheading;
+                // Use heading from embedded source, but do not add the type because embeded report has own default!
+                $out[$key] = format_string($embeddedheading);
+                continue;
             } else {
                 if (isset($option->defaultheading)) {
                     // use default heading
