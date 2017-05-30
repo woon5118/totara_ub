@@ -102,11 +102,9 @@ class rb_source_totaramessages extends rb_base_source {
 
         // Include a join for the user that the message was sent to.
         $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridto', 'userto');
-        $this->add_role_tables_to_joinlist($joinlist, 'msg', 'useridto', 'userto');
 
         // Include some standard joins. Including the user the message was sent from.
         $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridfrom');
-        $this->add_role_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
 
@@ -221,11 +219,9 @@ class rb_source_totaramessages extends rb_base_source {
 
         // Add columns for the user the message was sent to.
         $this->add_user_fields_to_columns($columnoptions, 'userto', 'userto', true);
-        $this->add_role_fields_to_columns($columnoptions, 'userto', 'userto', 'userto', true);
 
         // Include some standard columns. Including the user that the message was sent from.
         $this->add_user_fields_to_columns($columnoptions, 'auser', 'user', true);
-        $this->add_role_fields_to_columns($columnoptions, 'auser', 'user', 'user', false);
         $this->add_job_assignment_fields_to_columns($columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
 
@@ -269,12 +265,10 @@ class rb_source_totaramessages extends rb_base_source {
         );
 
         // Add filters for the user the message was sent to.
-        $this->add_user_fields_to_filters($filteroptions, 'userto', true, 'userto');
-        $this->add_role_fields_to_filters($filteroptions, 'userto', 'userto', 'userto', true);
+        $this->add_user_fields_to_filters($filteroptions, 'userto', true);
 
         // Include some standard filters. Including the user that the message was sent from.
         $this->add_user_fields_to_filters($filteroptions, 'user', true);
-        $this->add_role_fields_to_filters($filteroptions, 'auser', 'user', 'user', true);
         $this->add_job_assignment_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
 
