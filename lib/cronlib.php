@@ -121,8 +121,37 @@ function cron_run() {
     while (!\core\task\manager::static_caches_cleared_since($timenow) &&
            $task = \core\task\manager::get_next_adhoc_task($timenow)) {
 
-        // Emulate normal session - we use admin account by default
-        cron_setup_user();
+        if ($userid = $task->get_userid()) {
+            // This task has a userid specified.
+            if ($user = \core_user::get_user($userid)) {
+                // User found. Check that they are suitable.
+                try {
+                    \core_user::require_active_user($user, true, true);
+                } catch (moodle_exception $e) {
+                    mtrace("User {$userid} cannot be used to run an adhoc task: " . get_class($task) . ". Cancelling task.");
+                    $user = null;
+                }
+            } else {
+                // Unable to find the user for this task.
+                // A user missing in the database will never reappear.
+                mtrace("User {$userid} could not be found for adhoc task: " . get_class($task) . ". Cancelling task.");
+            }
+
+            if (empty($user)) {
+                // A user missing in the database will never reappear so the task needs to be failed to ensure that locks are removed,
+                // and then removed to prevent future runs.
+                // A task running as a user should only be run as that user.
+                \core\task\manager::adhoc_task_failed($task);
+                $DB->delete_records('task_adhoc', ['id' => $task->get_id()]);
+
+                return;
+            }
+
+            cron_setup_user($user);
+        } else {
+            // Emulate normal session - we use admin account by default
+            cron_setup_user();
+        }
 
         mtrace("Execute adhoc task: " . get_class($task));
         cron_trace_time_and_memory();
