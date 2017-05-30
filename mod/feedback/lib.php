@@ -548,7 +548,7 @@ function feedback_get_completion_progress($cm, $userid) {
     $result = array();
 
     if ($feedback->completionsubmit &&
-            $DB->record_exists('feedback_tracking', array('userid' => $userid, 'feedback' => $feedback->id))) {
+            $DB->record_exists('feedback_completed', array('userid' => $userid, 'feedback' => $feedback->id))) {
         $result[] = get_string('submitted', 'feedback');
     }
 

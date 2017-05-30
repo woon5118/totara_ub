@@ -32,6 +32,51 @@ require_once($CFG->dirroot . '/mod/feedback/lib.php');
  */
 class mod_feedback_lib_testcase extends advanced_testcase {
 
+    public function test_feedback_get_completion_progress() {
+        global $DB;
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $feedback = $this->getDataGenerator()->create_module('feedback', ['course' => $course->id, 'completionsubmit' => '1']);
+        list($course, $cm) = get_course_and_cm_from_cmid($feedback->cmid, 'feedback');
+        // This is tragic, but the creation of items is hardwired through mforms, and this style is copied from
+        // the existing event tests found in mod/feedback/tests/events_test.php
+        $item = new stdClass();
+        $item->feedback = $feedback->id;
+        $item->name = 'test';
+        $item->typ = 'numeric';
+        $item->presentation = '0|0';
+        $item->hasvalue = '1';
+        $itemid = $DB->insert_record('feedback_item', $item);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $this->setUser($user);
+
+        $feedbackcompletion = new mod_feedback_completion($feedback, $cm, $course->id);
+        $items = $feedbackcompletion->get_items();
+        $this->assertTrue($feedbackcompletion->is_open());
+        $this->assertFalse($feedbackcompletion->is_already_submitted());
+        $this->assertTrue($feedbackcompletion->can_complete());
+        $this->assertFalse($feedbackcompletion->is_empty());
+        $this->assertCount(1, $items);
+
+        $this->assertSame(array(), feedback_get_completion_progress($cm, $user->id));
+
+        $data = new stdClass;
+        $data->{'numeric_'.$itemid} = '1';
+        $feedbackcompletion->save_response_tmp($data);
+
+        // Its just temp presently.
+        $this->assertFalse($feedbackcompletion->is_already_submitted());
+        $this->assertSame(array(), feedback_get_completion_progress($cm, $user->id));
+
+        // And now commit the save.
+        $feedbackcompletion->save_response();
+        $this->assertTrue($feedbackcompletion->is_already_submitted());
+        $this->assertTrue($feedbackcompletion->can_complete());
+        $this->assertSame(array('Submitted'), feedback_get_completion_progress($cm, $user->id));
+    }
+
     /**
      * Tests for mod_feedback_refresh_events.
      */

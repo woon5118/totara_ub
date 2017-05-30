@@ -247,6 +247,8 @@ $string['sort_by_course'] = 'Sort by course';
 $string['started'] = 'Started';
 $string['startedon'] = 'Started on {$a}';
 $string['subject'] = 'Subject';
+$string['submission'] = 'Submission';
+$string['submitted'] = 'Submitted';
 $string['switch_item_to_not_required'] = 'Set as not required';
 $string['switch_item_to_required'] = 'Set as required';
 $string['template'] = 'Template';
@@ -304,8 +306,6 @@ $string['start'] = 'Start';
 $string['stop'] = 'End';
 
 // Deprecated since Totara 10.
-$string['submission'] = 'Submission';
-$string['submitted'] = 'Submitted';
 $string['generategrade'] = 'Generate Grade';
 $string['generategrade_help'] = 'If you want to use this feedback as a prerequisite for a conditional activity -
 requiring that the feedback must be completed before that conditional activity becomes available -
