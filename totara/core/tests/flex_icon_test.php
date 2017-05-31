@@ -86,7 +86,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $icon = new flex_icon('edit');
         $this->assertInstanceOf('pix_icon', $icon);
         $this->assertSame('flexicon', $icon->pix);
-        $this->assertSame(array('class' => 'smallicon', 'alt' => ''), $icon->attributes);
+        $this->assertSame(array('alt' => '', 'class' => 'smallicon'), $icon->attributes);
         $this->assertSame('core', $icon->component);
 
         $icon = new flex_icon('core|i/edit', array('alt' => 'Alt text', 'classes' => 'xx zz'));
@@ -96,7 +96,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
 
         $icon = new flex_icon('mod_book|chapter', array());
         $this->assertSame('flexicon', $icon->pix);
-        $this->assertSame(array('class' => 'smallicon', 'alt' => ''), $icon->attributes);
+        $this->assertSame(array('alt' => '', 'class' => 'smallicon'), $icon->attributes);
         $this->assertSame('mod_book', $icon->component);
     }
 

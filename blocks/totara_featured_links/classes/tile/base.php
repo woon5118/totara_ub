@@ -801,7 +801,7 @@ abstract class base {
         $action_menu_items[] = new \action_menu_link_secondary(
             new \moodle_url('/blocks/totara_featured_links/edit_tile_content.php',
                 ['blockinstanceid' => $this->blockid, 'tileid' => $this->id, 'return_url' => $PAGE->url->out_as_local_url()]),
-            new flex_icon('edit', ['class' => 'iconsmall', 'title' => '']),
+            new flex_icon('edit'),
             get_string('content_menu_title', 'block_totara_featured_links').'<span class="sr-only">'.get_string('content_menu_title_sr-only', 'block_totara_featured_links',
         $this->get_accessibility_text()['sr-only']). '</span>',
             ['type' => 'edit']);
@@ -809,14 +809,14 @@ abstract class base {
             $action_menu_items[] = new \action_menu_link_secondary(
                 new \moodle_url('/blocks/totara_featured_links/edit_tile_visibility.php',
                     ['blockinstanceid' => $this->blockid, 'tileid' => $this->id, 'return_url' => $PAGE->url->out_as_local_url()]),
-                new flex_icon('hide', ['class' => 'iconsmall', 'title' => '']),
+                new flex_icon('hide'),
                 get_string('visibility_menu_title', 'block_totara_featured_links').'<span class="sr-only">'.get_string('visibility_menu_title_sr-only', 'block_totara_featured_links',
                 $this->get_accessibility_text()['sr-only']).'</span>',
                 ['type' => 'edit_vis']);
         }
         $action_menu_items[] = new \action_menu_link_secondary(
             new \moodle_url('/'),
-            new flex_icon('delete', ['class' => 'iconsmall', 'title' => '']),
+            new flex_icon('delete'),
             get_string('delete_menu_title', 'block_totara_featured_links').'<span class="sr-only">'.get_string('delete_menu_title_sr-only', 'block_totara_featured_links',
                 $this->get_accessibility_text()['sr-only']).'</span>',
             ['type' => 'remove', 'blockid' => $this->blockid, 'tileid' => $this->id]);

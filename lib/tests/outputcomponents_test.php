@@ -112,6 +112,30 @@ class core_outputcomponents_testcase extends advanced_testcase {
         $this->assertSame('Value of custom1', $returned->custom1);
     }
 
+    public function test_create_pix_icon() {
+        $this->resetAfterTest();
+
+        $icon = new pix_icon('delete', 'hello');
+        $this->assertEquals('hello', $icon->attributes['alt']);
+        $this->assertEquals('hello', $icon->attributes['title']);
+
+        $attributes = array('class' => 'activityicon otherclass', 'title' => 'Title text');
+        $icon = new pix_icon('icon', 'Alt text', 'forum', $attributes);
+        $this->assertEquals('Alt text', $icon->attributes['alt']);
+        $this->assertEquals('Title text', $icon->attributes['title']);
+
+        $icon = new pix_icon('delete', '{"alt":"hello"}');
+        $this->assertEquals('hello', $icon->attributes['alt']);
+        $this->assertArrayNotHasKey('title', $icon->attributes);
+
+        $icon = new pix_icon('delete', '{"alt":"hello", "data-id":"x1"}', 'moodle', array('alt' => 'none', 'classes' => 'muppet', 'data-blah' => 'nah'));
+        $this->assertEquals('hello', $icon->attributes['alt']);
+        $this->assertEquals('x1', $icon->attributes['data-id']);
+        $this->assertEquals('muppet', $icon->attributes['classes']);
+        $this->assertEquals('nah', $icon->attributes['data-blah']);
+        $this->assertArrayNotHasKey('title', $icon->attributes);
+    }
+
     public function test_get_url() {
         global $DB, $CFG;
 

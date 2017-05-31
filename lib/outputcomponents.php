@@ -566,26 +566,25 @@ class pix_icon implements renderable, templatable {
         $this->component  = $component;
         $this->attributes = (array)$attributes;
 
+        $altattributes = json_decode($alt, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && $altattributes !== NULL) {
+            $this->attributes = array_merge($this->attributes, $altattributes);
+        } if (!empty($alt) && empty($this->attributes['alt'])) {
+            // legacy mode
+            $this->attributes['alt'] = format_string($alt);
+
+            if (empty($this->attributes['title'])) {
+                $this->attributes['title'] = format_string($alt);
+            }
+        }
+
+        if (!isset($this->attributes['alt'])) {
+            $this->attributes['alt'] = '';
+        }
+
         if (empty($this->attributes['class'])) {
             $this->attributes['class'] = 'smallicon';
-        }
-
-        // If the alt is empty, don't place it in the attributes, otherwise it will override parent alt text.
-        if (!is_null($alt)) {
-            $this->attributes['alt'] = $alt;
-
-            // If there is no title, set it to the attribute.
-            if (!isset($this->attributes['title'])) {
-                $this->attributes['title'] = $this->attributes['alt'];
-            }
-        } else {
-            unset($this->attributes['alt']);
-        }
-
-        if (empty($this->attributes['title'])) {
-            // Remove the title attribute if empty, we probably want to use the parent node's title
-            // and some browsers might overwrite it with an empty title.
-            unset($this->attributes['title']);
         }
     }
 
@@ -623,14 +622,13 @@ class pix_icon implements renderable, templatable {
      * @return array
      */
     public function export_for_pix() {
-        $title = isset($this->attributes['title']) ? $this->attributes['title'] : '';
-        if (empty($title)) {
-            $title = isset($this->attributes['alt']) ? $this->attributes['alt'] : '';
-        }
+        $attributes = json_encode($this->attributes);
+        // Why title?
+        // Because that's how moodle added it (when it was really alt text)
         return [
             'key' => $this->pix,
             'component' => $this->component,
-            'title' => $title
+            'title' => $attributes
         ];
     }
 }
