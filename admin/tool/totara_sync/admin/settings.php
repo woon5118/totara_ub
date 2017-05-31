@@ -56,7 +56,8 @@ if ($data = $form->get_data()) {
 
     save_scheduled_task_from_form($data);
 
-    totara_set_notification(get_string('settingssaved', 'tool_totara_sync'), $PAGE->url, array('class'=>'notifysuccess'));
+    \core\notification::success(get_string('settingssaved', 'tool_totara_sync'));
+    redirect($PAGE->url);
 }
 
 // Set form data.

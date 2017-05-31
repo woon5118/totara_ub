@@ -279,10 +279,9 @@ abstract class rb_base_source {
     public function pre_display_actions() {
         if ($this->needsredirect && isset($this->redirecturl)) {
             if (isset($this->redirectmessage)) {
-                totara_set_notification($this->redirectmessage, $this->redirecturl, array('class' => 'notifymessage'));
-            } else {
-                redirect($this->redirecturl);
+                \core\notification::info($this->redirectmessage);
             }
+            redirect($this->redirecturl);
         }
     }
 

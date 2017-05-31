@@ -94,8 +94,6 @@ if ($mform->is_cancelled()) {
     $scalenew->timemodified = time();
     $scalenew->usermodified = $USER->id;
     $scalenew->description = '';
-    //class to hold totara_set_notification info
-    $notification = new stdClass();
 
     // New scale
     if (empty($scalenew->id)) {
@@ -134,9 +132,7 @@ if ($mform->is_cancelled()) {
         $scalenew = $DB->get_record('comp_scale', array('id' => $scalenew->id));
         \hierarchy_competency\event\scale_created::create_from_instance($scalenew)->trigger();
 
-        $notification->text = 'scaleadded';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$scalenew->id}&amp;prefix=competency";
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = 'scaleadded';
     } else {
         // Existing scale
         $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_scale', $scalenew->id);
@@ -145,13 +141,11 @@ if ($mform->is_cancelled()) {
         $scalenew = $DB->get_record('comp_scale', array('id' => $scalenew->id));
         \hierarchy_competency\event\scale_updated::create_from_instance($scalenew)->trigger();
 
-        $notification->text = 'scaleupdated';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$scalenew->id}&amp;prefix=competency";
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = 'scaleupdated';
     }
-    totara_set_notification(get_string($notification->text, 'totara_hierarchy', $scalenew->name),
-                    $notification->url, $notification->params);
-
+    $notification_url = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', ['prefix' => 'competency', 'id' => $scalenew->id]);
+    \core\notification::success(get_string($notification_text, 'totara_hierarchy', $scalenew->name));
+    redirect($notification_url);
 }
 
 /// Print Page

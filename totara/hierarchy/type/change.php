@@ -82,7 +82,8 @@ $affected_item_count = $DB->count_records_select($shortprefix, $select, $params)
 
 // redirect with a message if there are no items in that type
 if ($affected_item_count == 0) {
-    totara_set_notification(get_string('error:nonefound' . $optype, 'totara_hierarchy'), $returnurl);
+    \core\notification::error(get_string('error:nonefound' . $optype, 'totara_hierarchy'));
+    redirect($returnurl);
 }
 
 ///

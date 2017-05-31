@@ -57,7 +57,7 @@ if (has_capability('moodle/course:manageactivities', $context)) {
     require_once($CFG->dirroot.'/mod/facetoface/notification/lib.php');
     if (facetoface_notification::has_auto_duplicates($seminar->get_id())) {
         $url = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));
-        totara_set_notification(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
+        \core\notification::error(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
     }
 }
 

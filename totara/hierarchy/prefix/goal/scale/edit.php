@@ -91,8 +91,6 @@ if ($mform->is_cancelled()) {
     $scalenew->timemodified = time();
     $scalenew->usermodified = $USER->id;
     $scalenew->description = '';
-    // Class to hold totara_set_notification info.
-    $notification = new stdClass();
 
     // New scale.
     if (empty($scalenew->id)) {
@@ -132,9 +130,7 @@ if ($mform->is_cancelled()) {
         $scalenew = $DB->get_record('goal_scale', array('id' => $scalenew->id));
         \hierarchy_goal\event\scale_created::create_from_instance($scalenew)->trigger();
 
-        $notification->text = 'scaleaddedgoal';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/goal/scale/view.php?id={$scalenew->id}&amp;prefix=goal";
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = 'scaleaddedgoal';
     } else {
         // Existing scale.
         $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
@@ -144,13 +140,12 @@ if ($mform->is_cancelled()) {
         $scalenew = $DB->get_record('goal_scale', array('id' => $scalenew->id));
         \hierarchy_goal\event\scale_updated::create_from_instance($scalenew)->trigger();
 
-        $notification->text = 'scaleupdatedgoal';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/goal/scale/view.php?id={$scalenew->id}&amp;prefix=goal";
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = 'scaleupdatedgoal';
     }
-    totara_set_notification(get_string($notification->text, 'totara_hierarchy', $scalenew->name),
-                    $notification->url, $notification->params);
 
+    $notification_url = new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php', ['prefix' => 'goal', 'id' => $scalenew->id]);
+    \core\notification::success(get_string($notification_text, 'totara_hierarchy', $scalenew->name));
+    redirect($notification_url);
 }
 
 // Print Page.

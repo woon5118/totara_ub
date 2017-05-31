@@ -70,7 +70,8 @@ if ($confirm) {
     $wf = new $class();
 
     if (!$wf->copy_to_db($template->id)) {
-        totara_set_notification(get_string('error:update_workflow_settings', 'totara_plan'), $returnurl);
+        \core\notification::error(get_string('error:update_workflow_settings', 'totara_plan'));
+        redirect($returnurl);
     }
 
     // Add checking to this method
@@ -78,8 +79,8 @@ if ($confirm) {
 
     \totara_plan\event\template_updated::create_from_template($template, 'workflow')->trigger();
 
-    totara_set_notification(get_string('update_workflow_settings', 'totara_plan'), $returnurl, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('update_workflow_settings', 'totara_plan'));
+    redirect($returnurl);
 }
 
 $mform = new dp_template_workflow_form(null,
@@ -142,12 +143,14 @@ if ($fromform = $mform->get_data()) {
             echo $OUTPUT->confirm($changeworkflowconfirm, $changeurl, $returnurl);
         } else {
             //If no change and saving just show notification with no processing
-            totara_set_notification(get_string('update_workflow_settings', 'totara_plan'), $returnurl, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('update_workflow_settings', 'totara_plan'));
+            redirect($returnurl);
         }
     } else {
         // Add checking to this method
         $DB->set_field('dp_template', 'workflow', $workflow, array('id' => $id));
-        totara_set_notification(get_string('update_workflow_settings', 'totara_plan'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('update_workflow_settings', 'totara_plan'));
+        redirect($returnurl);
     }
 
 } else {

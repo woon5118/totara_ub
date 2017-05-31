@@ -126,7 +126,8 @@ if ($fromform = $mform->get_data()) {
         }
     }
 
-    totara_set_notification(get_string('graph_updated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('graph_updated', 'totara_reportbuilder'));
+    redirect($returnurl);
 }
 
 echo $output->header();

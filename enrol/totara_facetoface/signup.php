@@ -67,7 +67,8 @@ $trainerroles = trainer_helper::get_trainer_roles(context_course::instance($cour
 $trainers     = $trainerhelper->get_trainers();
 if ($seminar->get_approvaltype() == seminar::APPROVAL_ROLE) {
     if (empty($trainerroles) || empty($trainers)) {
-        totara_set_notification(get_string('error:missingrequiredrole', 'mod_facetoface'), $returnurl);
+        \core\notification::error(get_string('error:missingrequiredrole', 'mod_facetoface'));
+        redirect($returnurl);
     }
 }
 

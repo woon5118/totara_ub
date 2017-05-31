@@ -52,15 +52,11 @@ if (!$plan->can_approve_plan()) {
     print_error('error:nopermissions', 'totara_plan');
 }
 
-
 // Redirect if plan complete.
 if ($plan->status == DP_PLAN_STATUS_COMPLETE) {
-    totara_set_notification(
-        get_string('plancomplete', 'totara_plan'),
-        $planurl
-    );
+    \core\notification::error(get_string('plancomplete', 'totara_plan'));
+    redirect($planurl);
 }
-
 
 // Get all components.
 $components = $plan->get_components();
@@ -70,10 +66,8 @@ $requested_items = $plan->has_pending_items(null, true, true);
 
 // If no items.
 if (!$requested_items) {
-    totara_set_notification(
-        get_string('noitemsrequiringapproval', 'totara_plan'),
-        $planurl
-    );
+    \core\notification::error(get_string('noitemsrequiringapproval', 'totara_plan'));
+    redirect($planurl);
 }
 
 $require_approval = array();
@@ -107,9 +101,8 @@ if ($submitted && confirm_sesskey()) {
     }
 
     if ($errors) {
-        totara_set_notification(get_string('error:problemapproving', 'totara_plan'));
+        \core\notification::error(get_string('error:problemapproving', 'totara_plan'));
     }
-
     redirect($plan->get_display_url());
 }
 

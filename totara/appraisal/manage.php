@@ -45,8 +45,8 @@ switch ($action) {
         $id = required_param('id', PARAM_INT);
         $appraisal = new appraisal($id);
         if ($appraisal->status == appraisal::STATUS_ACTIVE) {
-            totara_set_notification(get_string('error:appraisalisactive', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:appraisalisactive', 'totara_appraisal'));
+            redirect($returnurl);
         } else {
             $confirm = optional_param('confirm', 0, PARAM_INT);
             if ($confirm == 1) {
@@ -54,8 +54,8 @@ switch ($action) {
                     print_error('confirmsesskeybad', 'error');
                 }
                 $appraisal->delete();
-                totara_set_notification(get_string('deletedappraisal', 'totara_appraisal'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('deletedappraisal', 'totara_appraisal'));
+                redirect($returnurl);
             } else {
                 $stages = appraisal_stage::fetch_appraisal($appraisal->id);
             }
@@ -68,7 +68,8 @@ switch ($action) {
         $id = required_param('id', PARAM_INT);
         $clonedappraisal = appraisal::duplicate_appraisal($id);
         $returnurl = new moodle_url('/totara/appraisal/general.php', array('id' => $clonedappraisal->id));
-        totara_set_notification(get_string('appraisalcloned', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('appraisalcloned', 'totara_appraisal'));
+        redirect($returnurl);
         break;
 }
 

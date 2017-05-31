@@ -303,8 +303,7 @@ if ($mform->is_cancelled()) {
             );
 
             $url = new moodle_url('/totara/feedback360/request.php', $params);
-
-            totara_set_notification(get_string('nochangestobemade', 'totara_feedback360'), $url, array('class' => 'notifysuccess'));
+            redirect($url);
         }
     } else if ($action == 'confirm') {
         // Update the timedue in the user_assignment.
@@ -359,7 +358,8 @@ if ($mform->is_cancelled()) {
             $successstr = get_string('requestupdatedsuccessfully', 'totara_feedback360');
         }
         $returnurl = new moodle_url('/totara/feedback360/index.php', array('userid' => $userid));
-        totara_set_notification($successstr, $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success($successstr);
+        redirect($returnurl);
     } else {
         print_error('error:unrecognisedaction', 'totara_feedback360', null, $action);
     }

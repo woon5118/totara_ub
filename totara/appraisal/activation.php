@@ -52,8 +52,8 @@ switch ($action) {
             }
             try {
                 $appraisal->activate();
-                totara_set_notification(get_string('appraisalactivated', 'totara_appraisal', format_string($appraisal->name)),
-                    new moodle_url('/totara/appraisal/manage.php'), array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('appraisalactivated', 'totara_appraisal', format_string($appraisal->name)));
+                redirect(new moodle_url('/totara/appraisal/manage.php'));
             }
             catch (ddl_change_structure_exception $e) {
                 if (strstr($e->debuginfo, 'Row size too large') !== false) {
@@ -79,11 +79,11 @@ switch ($action) {
             if ($formdata) {
                 $appraisal->close($formdata);
                 if (isset($formdata->sendalert) && $formdata->sendalert) {
-                    totara_set_notification(get_string('appraisalclosedalertoncron', 'totara_appraisal', format_string($appraisal->name)),
-                                 new moodle_url('/totara/appraisal/manage.php'), array('class' => 'notifysuccess'));
+                    \core\notification::success(get_string('appraisalclosedalertoncron', 'totara_appraisal', format_string($appraisal->name)));
+                    redirect(new moodle_url('/totara/appraisal/manage.php'));
                 } else {
-                    totara_set_notification(get_string('appraisalclosed', 'totara_appraisal', format_string($appraisal->name)),
-                                 new moodle_url('/totara/appraisal/manage.php'), array('class' => 'notifysuccess'));
+                    \core\notification::success(get_string('appraisalclosed', 'totara_appraisal', format_string($appraisal->name)));
+                    redirect(new moodle_url('/totara/appraisal/manage.php'));
                 }
             } else {
                 redirect(new moodle_url('/totara/appraisal/manage.php'));

@@ -66,7 +66,8 @@ if ($dismissedexceptions = $program->check_user_for_dismissed_exceptions($userid
         $urlparams = array('id' => $id, 'userid' => $userid);
         $redirecturl = new moodle_url('/totara/certification/edit_completion.php', $urlparams);
 
-        totara_set_notification(get_string('exceptionoverridden', 'totara_program'), $redirecturl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('exceptionoverridden', 'totara_program'));
+        redirect($redirecturl);
     }
 }
 
@@ -78,16 +79,14 @@ if ($deletehistory && !$dismissedexceptions) {
     // Validate that the record to be deleted matches the certification and user.
     $params = array('id' => $chid, 'certifid' => $program->certifid, 'userid' => $userid);
     if (!$DB->record_exists('certif_completion_history', $params)) {
-        totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-            $url,
-            array('class' => 'notifyproblem'));
+        \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+        redirect($url);
     }
 
     certif_delete_completion_history($chid, 'Completion history manually deleted');
 
-    totara_set_notification(get_string('completionhistorydeleted', 'totara_program'),
-        $url,
-        array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('completionhistorydeleted', 'totara_program'));
+    redirect($url);
 }
 
 // Load all the data about the user and certification.
@@ -127,8 +126,8 @@ if ($certcompletion && $progcompletion && empty($exceptions) && !$dismissedexcep
 
     // Process any actions submitted.
     if ($editform->is_cancelled()) {
-        totara_set_notification(get_string('completionupdatecancelled', 'totara_program'), $url,
-            array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('completionupdatecancelled', 'totara_program'));
+        redirect($url);
     }
 
     $confirm = "";
@@ -136,9 +135,8 @@ if ($certcompletion && $progcompletion && empty($exceptions) && !$dismissedexcep
     if ($submitted = $editform->get_data()) {
         // Validate the form and display any problems.
         if ($submitted->state == CERTIFCOMPLETIONSTATE_INVALID) {
-            totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-                $url,
-                array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+            redirect($url);
         }
 
         list($newcertcompletion, $newprogcompletion) = certif_process_submitted_edit_completion($submitted);
@@ -146,9 +144,8 @@ if ($certcompletion && $progcompletion && empty($exceptions) && !$dismissedexcep
         $errors = certif_get_completion_errors($newcertcompletion, $newprogcompletion);
 
         if ($newstate == CERTIFCOMPLETIONSTATE_INVALID || !empty($errors)) {
-            totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-                $url,
-                array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+            redirect($url);
         }
 
         if (!empty($submitted->savechanges)) {
@@ -191,14 +188,11 @@ if ($certcompletion && $progcompletion && empty($exceptions) && !$dismissedexcep
                 );
                 $event->trigger();
 
-                totara_set_notification(get_string('completionchangessaved', 'totara_program'),
-                    $url,
-                    array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('completionchangessaved', 'totara_program'));
             } else {
-                totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-                    $url,
-                    array('class' => 'notifyproblem'));
+                \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
             }
+            redirect($url);
         }
     }
 

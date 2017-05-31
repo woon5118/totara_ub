@@ -77,7 +77,8 @@ if ($delete && $cohort->id && $canedit) {
         totara_unset_role_assignments_cohort($roles, $cohort->id, $memberids);
 
         $result = cohort_delete_cohort($cohort);
-        totara_set_notification(get_string('successfullydeleted', 'totara_cohort'), $returnurl->out(), array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('successfullydeleted', 'totara_cohort'));
+        redirect($returnurl->out());
     }
 
     $yesurl = new moodle_url('/cohort/view.php', array('id'=>$cohort->id, 'delete'=>1, 'confirm'=>1,'sesskey'=>sesskey()));
@@ -98,14 +99,11 @@ if ($clone && $cohort->id && $canedit) {
     if ($confirm && confirm_sesskey()) {
         $result = totara_cohort_clone_cohort($cohort->id);
         if ($result) {
-            $successurl = new moodle_url($CFG->wwwroot.'/cohort/view.php', array('id'=>$result));
-            totara_set_notification(
-                get_string('successfullycloned', 'totara_cohort'),
-                $successurl->out(),
-                array('class' => 'notifysuccess')
-            );
+            \core\notification::success(get_string('successfullycloned', 'totara_cohort'));
+            redirect(new moodle_url($CFG->wwwroot.'/cohort/view.php', array('id' => $result)));
         } else {
-            totara_set_notification(get_string('failedtoclone', 'totara_cohort'), $returnurl->out());
+            \core\notification::error(get_string('failedtoclone', 'totara_cohort'));
+            redirect($returnurl);
         }
     }
     $yesurl = new moodle_url($CFG->wwwroot.'/cohort/view.php', array('id'=>$cohort->id, 'clone'=>1, 'confirm'=>1, 'sesskey'=>sesskey()));

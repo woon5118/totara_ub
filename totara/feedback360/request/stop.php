@@ -81,7 +81,8 @@ if (!empty($confirmation)) {
         $success = get_string('cancelrequestsuccess', 'totara_feedback360');
 
         feedback360::cancel_user_assignment($userformid, $asmanager);
-        totara_set_notification($success, $ret_url, array('class' => 'notifysuccess'));
+        \core\notification::success($success);
+        redirect($ret_url);
     } else {
         print_error('validationfailed', 'totara_feedback360');
     }

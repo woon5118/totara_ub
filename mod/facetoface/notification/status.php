@@ -58,4 +58,5 @@ $notification->status = (int)$status == 1 ? 1 : 0;
 $notification->update();
 
 $url = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));
-totara_set_notification(get_string('notificationsaved', 'facetoface'), $url, array('class' => 'notifysuccess'));
+\core\notification::success(get_string('notificationsaved', 'facetoface'));
+redirect($url);

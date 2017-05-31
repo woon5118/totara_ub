@@ -198,13 +198,14 @@ class attendees_message extends \moodleform {
             }
             \mod_facetoface\event\message_sent::create_from_session($seminarevent, $context, 'messageusers')->trigger();
             $returnurl = new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s));
-            totara_set_notification($message, $returnurl, array('class' => 'notifysuccess'));
+            \core\notification::success($message);
+            redirect($returnurl);
         }
 
         if ($emailerrors) {
-            $message = get_string('xmessagesfailed', 'facetoface', $emailerrors);
             $baseurl = new \moodle_url('/mod/facetoface/attendees/messageusers.php', array('s' => $s));
-            totara_set_notification($message, $baseurl);
+            \core\notification::error(get_string('xmessagesfailed', 'facetoface', $emailerrors));
+            redirect($baseurl);
         }
     }
 }

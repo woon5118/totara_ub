@@ -70,8 +70,8 @@ if ($confirm == 1) {
         // Left here to allow for clients with custom event observers on this event
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'scheduled')->trigger();
 
-        totara_set_notification(get_string('deletedscheduledreport', 'totara_reportbuilder', format_string($reportname)),
-                                $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('deletedscheduledreport', 'totara_reportbuilder', format_string($reportname)));
+        redirect($returnurl);
     }
 }
 /// Display page

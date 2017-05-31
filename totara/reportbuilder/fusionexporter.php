@@ -119,9 +119,9 @@ if (empty($errors)) {
 
     $brtag = html_writer::empty_tag('br');
     $errordetails = implode($brtag, $errormessages);
-    $url = $report->report_url();
 
-    totara_set_notification(get_string('error:fusionexport', 'gradeexport_fusion', format_string($errordetails)), $url);
+    \core\notification::error(get_string('error:fusionexport', 'gradeexport_fusion', format_string($errordetails)));
+    redirect($report->report_url());
 }
 
 

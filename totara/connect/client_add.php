@@ -36,12 +36,11 @@ $form = new totara_connect_form_client_add();
 
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/totara/connect/index.php'));
-
 } else if ($data = $form->get_data()) {
-    if (\totara_connect\util::add_client($data)) {
+    if (util::add_client($data)) {
         redirect(new moodle_url('/totara/connect/index.php'));
     }
-    totara_set_notification(get_string('errorclientadd', 'totara_connect'), null);
+    \core\notification::error(get_string('errorclientadd', 'totara_connect'));
 }
 
 echo $OUTPUT->header();

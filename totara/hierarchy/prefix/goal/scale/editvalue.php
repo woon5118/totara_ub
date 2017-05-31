@@ -116,8 +116,6 @@ if ($valueform->is_cancelled()) {
     }
 
     // Save.
-    // Class to hold totara_set_notification info.
-    $notification = new stdClass();
     if ($valuenew->id == 0) {
         // New scale value.
         unset($valuenew->id);
@@ -130,11 +128,7 @@ if ($valueform->is_cancelled()) {
         $valuenew = $DB->get_record('goal_scale_values', array('id' => $valuenew->id));
         \hierarchy_goal\event\scale_value_created::create_from_instance($valuenew)->trigger();
 
-        $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
-        $notification->text = 'scalevalueadded';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
-        $notification->params = array('class' => 'notifysuccess');
-
+        $notification_text = 'scalevalueadded';
     } else {
         // Updating scale value.
         $valuenew = file_postupdate_standard_editor($valuenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
@@ -143,13 +137,11 @@ if ($valueform->is_cancelled()) {
         $valuenew = $DB->get_record('goal_scale_values', array('id' => $valuenew->id));
         \hierarchy_goal\event\scale_value_updated::create_from_instance($valuenew)->trigger();
 
-        $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
-        $notification->text = 'scalevalueupdatedgoal';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = 'scalevalueupdatedgoal';
     }
-    totara_set_notification(get_string($notification->text, 'totara_hierarchy', format_string($valuenew->name)),
-                        $notification->url, $notification->params);
+
+    \core\notification::success(get_string($notification_text, 'totara_hierarchy', format_string($valuenew->name)));
+    redirect(new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php', ['id' => $valuenew->scaleid, 'prefix' => 'goal']));
 }
 
 // Display page header.

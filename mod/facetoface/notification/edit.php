@@ -152,7 +152,8 @@ if ($form->is_cancelled()) {
         // Explicitly remove the clone, we don't want anyone to use it after this.
         unset($clonedata);
     }
-    totara_set_notification(get_string('notificationsaved', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('notificationsaved', 'facetoface'));
+    redirect($redirectto);
 }
 
 $pagetitle = format_string($facetoface->name);

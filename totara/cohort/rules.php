@@ -99,7 +99,8 @@ if (!$cohort->cohorttype == cohort::TYPE_DYNAMIC) {
 }
 
 if ($approved and confirm_sesskey()) {
-    totara_set_notification(get_string('rulesapprovesuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('rulesapprovesuccess', 'totara_cohort'));
+    redirect($url->out());
 }
 
 $rulesets = $DB->get_records('cohort_rulesets', array('rulecollectionid' => $cohort->draftcollectionid), 'sortorder');
@@ -146,12 +147,12 @@ if (($data = data_submitted()) && confirm_sesskey()) {
             \core\task\manager::queue_adhoc_task($adhoctask);
 
             // Redirect and notify.
-            totara_set_notification(get_string('rulesapproveadhocsuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
-
+            \core\notification::success(get_string('rulesapproveadhocsuccess', 'totara_cohort'));
+            redirect($url->out());
         } else {
             \core\session\manager::write_close();
             \totara_cohort\task\sync_dynamic_cohort_task::sync_cohort($cohort, null);
-            // NOTE: totara_set_notification() does not work after session is closed!
+            // NOTE: notifications do not work after session is closed!
             redirect(new moodle_url($url, array('approved' => 1, 'sesskey' => sesskey())));
         }
     }
@@ -160,12 +161,12 @@ if (($data = data_submitted()) && confirm_sesskey()) {
             print_error('error:couldnotcancelchanges', 'totara_cohort');
         }
         // Set notification.
-        totara_set_notification(get_string('rulescancelsuccess', 'totara_cohort'), $url->out());
+        \core\notification::error(get_string('rulescancelsuccess', 'totara_cohort'));
+        redirect($url);
     }
 }
 
 if ($formdata = $mform->get_data()) {
-    
     // Update the cohort operator?
     if (isset($formdata->cohortoperator) && $formdata->cohortoperator <> $cohort->rulesetoperator) {
         totara_cohort_update_operator($cohort->id, $cohort->id, COHORT_OPERATOR_TYPE_COHORT, $formdata->cohortoperator);
@@ -178,7 +179,8 @@ if ($formdata = $mform->get_data()) {
             }
         }
     }
-    totara_set_notification(get_string('rulesupdatesuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('rulesupdatesuccess', 'totara_cohort'));
+    redirect($url->out());
 
     // Regenerate the form so that it'll show the correct values for all the operators.
     // (We need to do this because we're showing all the operators as static items, which

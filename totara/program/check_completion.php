@@ -84,9 +84,8 @@ if ($fixkey) {
             $url = new moodle_url('/totara/certification/edit_completion.php', array('id' => $progid, 'userid' => $userid));
         }
     }
-    totara_set_notification(get_string('completionchangessaved', 'totara_program'),
-        $url,
-        array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('completionchangessaved', 'totara_program'));
+    redirect($url);
 }
 
 // Set up the page.

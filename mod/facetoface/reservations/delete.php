@@ -47,13 +47,13 @@ if ($confirm) {
             $signups = \mod_facetoface\reservations::delete($seminarevent, $managerid);
             \mod_facetoface\signup_helper::update_attendees($seminarevent);
 
-            $message = get_string('managerreservationdeleted', 'mod_facetoface');
             $url = new moodle_url('/mod/facetoface/view.php', ['f' => $seminarevent->get_facetoface()]);
-            totara_set_notification($message, $url, ['class' => 'notifysuccess']);
+            \core\notification::success(get_string('managerreservationdeleted', 'mod_facetoface'));
+            redirect($url);
         } catch (moodle_exception $e) {
-            $message = get_string('managerreservationdeletionfailed', 'mod_facetoface');
             $url = new moodle_url('/mod/facetoface/reservations/manage.php', ['s' => $sid]);
-            totara_set_notification($message, $url, ['class' => 'notifyproblem']);
+            \core\notification::error(get_string('managerreservationdeletionfailed', 'mod_facetoface'));
+            redirect($url);
         }
     }
 }

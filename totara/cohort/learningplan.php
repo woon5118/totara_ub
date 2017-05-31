@@ -93,8 +93,8 @@ if ($data = $form->get_data()) {
         $adhoctask->set_component('totara_cohort');
         \core\task\manager::queue_adhoc_task($adhoctask);
 
-        totara_set_notification(get_string('saved', 'totara_cohort'), null, array('class' => 'notifysuccess'));
-        totara_set_notification(get_string('taskplanswillbecreated', 'totara_cohort'), null, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('saved', 'totara_cohort'));
+        \core\notification::success(get_string('taskplanswillbecreated', 'totara_cohort'));
     }
 }
 

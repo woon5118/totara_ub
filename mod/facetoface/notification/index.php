@@ -109,7 +109,7 @@ foreach ($notifications as $note) {
     }
 }
 if ($foundduplicates) {
-    totara_set_notification(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
+    \core\notification::error(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
 }
 // Detect missing default notifications.
 $defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0];

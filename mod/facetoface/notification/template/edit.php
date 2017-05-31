@@ -108,7 +108,8 @@ if ($form->is_cancelled()) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_facetoface', 'notificationtpl', array(), $cacheoptions);
     $cache->delete('oldnotifications');
 
-    totara_set_notification(get_string('notificationtemplatesaved', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('notificationtemplatesaved', 'facetoface'));
+    redirect($redirectto);
 }
 
 $url = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));

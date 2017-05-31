@@ -54,7 +54,8 @@ if ($request->status == \auth_approved\request::STATUS_REJECTED) {
 }
 if ($request->status == \auth_approved\request::STATUS_APPROVED) {
     // Somebody managed to approve it in the meantime.
-    totara_set_notification(get_string('errorprocessedinterim', 'auth_approved', $request->email), $returnurl);
+    \core\notification::error(get_string('errorprocessedinterim', 'auth_approved', $request->email));
+    redirect($returnurl);
     die;
 }
 
@@ -72,10 +73,11 @@ if ($data = $form->get_data()) {
     $success = \auth_approved\request::reject_request($data->requestid, $data->custommessage);
     $returnurl = \auth_approved\util::get_report_url($reportid);
     if ($success) {
-        totara_set_notification(get_string('successreject', 'auth_approved', $request->email), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('successreject', 'auth_approved', $request->email));
     } else {
-        totara_set_notification(get_string('errorreject', 'auth_approved', $request->email), $returnurl);
+        \core\notification::error(get_string('errorreject', 'auth_approved', $request->email));
     }
+    redirect($returnurl);
 }
 
 echo $OUTPUT->header();

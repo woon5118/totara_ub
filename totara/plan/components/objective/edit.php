@@ -126,11 +126,11 @@ if ($deleteyes) {
     if (!$component->delete_objective($objectiveid)) {
         print_error('error:objectivedeleted', 'totara_plan');
     } else {
-        totara_set_notification(get_string('objectivedeleted', 'totara_plan'), $objallurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('objectivedeleted', 'totara_plan'));
+        redirect($objallurl);
     }
 } else if ($deleteno) {
     redirect($objallurl);
-
 } else if ($mform->is_cancelled()) {
 
     if ($action == 'add') {
@@ -196,7 +196,8 @@ if ($deleteyes) {
         }
         $notification = get_string('objectiveupdated', 'totara_plan');
     }
-    totara_set_notification($notification, $objviewurl, array('class' => 'notifysuccess'));
+    \core\notification::success($notification);
+    redirect($objviewurl);
 }
 
 ///

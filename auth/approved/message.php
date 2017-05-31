@@ -62,10 +62,11 @@ if ($data = $form->get_data()) {
 
     $success = \auth_approved\request::send_message($requestid, $data->messagesubject, $data->messagebody);
     if ($success) {
-        totara_set_notification(get_string('successmessage', 'auth_approved', $request->email), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('successmessage', 'auth_approved', $request->email));
     } else {
-        totara_set_notification(get_string('errormessage', 'auth_approved', $request->email), $returnurl);
+        \core\notification::error(get_string('errormessage', 'auth_approved', $request->email));
     }
+    redirect($returnurl);
 }
 
 echo $OUTPUT->header();

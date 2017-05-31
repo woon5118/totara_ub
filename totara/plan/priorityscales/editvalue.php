@@ -128,9 +128,8 @@ if ($valueform->is_cancelled()) {
 
     \totara_plan\event\priority_scale_updated::create_from_scale($scale)->trigger();
 
-    totara_set_notification($notification,
-                            "$CFG->wwwroot/totara/plan/priorityscales/view.php?id={$valuenew->priorityscaleid}",
-                            array('class' => 'notifysuccess'));
+    \core\notification::success($notification);
+    redirect("$CFG->wwwroot/totara/plan/priorityscales/view.php?id={$valuenew->priorityscaleid}");
 }
 // Display page header
 echo $OUTPUT->header();

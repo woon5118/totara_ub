@@ -86,7 +86,8 @@ $affected_item_count = $DB->count_records_select($shortprefix, $select, array_me
 
 // Redirect with a message if there are no items of the type to be changed.
 if ($affected_item_count == 0) {
-    totara_set_notification(get_string('error:nonefound'. $optype, 'totara_hierarchy'), $returnurl);
+    \core\notification::error(get_string('error:nonefound'. $optype, 'totara_hierarchy'));
+    redirect($returnurl);
 }
 
 // Lists the number of items with one or more custom field data record belonging to each type.
@@ -151,13 +152,14 @@ if ($changeform->is_cancelled()) {
         }
         if (!empty($errors)) {
             foreach ($errors as $field => $val) {
-                totara_set_notification("$field : " . $val);
+                \core\notification::error("$field : " . $val);
             }
             $a = new stdClass();
             $a->from = $typename;
             $a->to = $newtypename;
             $DB->force_transaction_rollback();
-            totara_set_notification(get_string('error:couldnotreclassify' . $optype, 'totara_hierarchy', $a), "$CFG->wwwroot/totara/hierarchy/index.php?prefix=$prefix");
+            \core\notification::error(get_string('error:couldnotreclassify' . $optype, 'totara_hierarchy', $a));
+            redirect("$CFG->wwwroot/totara/hierarchy/index.php?prefix=$prefix");
         }
     }
 
@@ -171,9 +173,8 @@ if ($changeform->is_cancelled()) {
         $a = new stdClass();
         $a->from = $typename;
         $a->to = $newtypename;
-        totara_set_notification(get_string('error:couldnotreclassify' . $optype,
-            'totara_hierarchy', $a),
-            "$CFG->wwwroot/totara/hierarchy/type/index.php?prefix=$prefix");
+        \core\notification::error(get_string('error:couldnotreclassify' . $optype, 'totara_hierarchy', $a));
+        redirect("$CFG->wwwroot/totara/hierarchy/type/index.php?prefix=$prefix");
     }
     $transaction->allow_commit();
 
@@ -189,9 +190,8 @@ if ($changeform->is_cancelled()) {
     $a->from = $typename;
     $a->to = $newtypename;
 
-    totara_set_notification(get_string('reclassifysuccess' . $optype, 'totara_hierarchy', $a),
-        $returnurl, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('reclassifysuccess' . $optype, 'totara_hierarchy', $a));
+    redirect($returnurl);
 }
 
 // Generate / display page.

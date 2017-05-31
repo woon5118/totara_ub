@@ -237,12 +237,14 @@ if ($mform->is_cancelled()) {
 if ($fromform = $mform->get_data()) {
 
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
 
     if (!isset($fromform->reportid) || !isset($fromform->format) || !isset($fromform->frequency)) {
         $noticekey = ($newreport) ? 'error:addscheduledreport' : 'error:updatescheduledreport';
-        totara_set_notification(get_string($noticekey, 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string($noticekey, 'totara_reportbuilder'));
+        redirect($returnurl);
     }
 
     $subject = new stdClass();
@@ -360,7 +362,8 @@ if ($fromform = $mform->get_data()) {
     }
 
     $noticekey = ($newreport) ? 'addedscheduledreport' : 'updatescheduledreport';
-    totara_set_notification(get_string($noticekey, 'totara_reportbuilder'), $myreportsurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string($noticekey, 'totara_reportbuilder'));
+    redirect($myreportsurl);
 }
 
 if ($newreport) {

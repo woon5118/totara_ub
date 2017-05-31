@@ -69,10 +69,10 @@ final class reject extends base {
         }
 
         if ($rejected) {
-            totara_set_notification(get_string('successrejectbulk', 'auth_approved', $rejected), null, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('successrejectbulk', 'auth_approved', $rejected));
         }
         if ($errors) {
-            totara_set_notification(get_string('errorrejectbulk', 'auth_approved', $errors), null);
+            \core\notification::error(get_string('errorrejectbulk', 'auth_approved', $errors));
         }
 
         redirect($this->report->get_current_url());

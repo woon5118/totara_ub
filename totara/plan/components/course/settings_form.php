@@ -183,6 +183,7 @@ function dp_course_component_process_settings_form($fromform, $id) {
                 }
             }
         }
-        $transaction->allow_commit();
-        totara_set_notification(get_string('update_course_settings', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
+    $transaction->allow_commit();
+    \core\notification::success(get_string('update_course_settings', 'totara_plan'));
+    redirect($currenturl);
 }

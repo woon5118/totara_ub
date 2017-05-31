@@ -200,9 +200,8 @@ if ($action == 'pages') {
                     $appraisal->save_answers($answers, $roleassignment, false);
                     $returnurl = new moodle_url('/totara/appraisal/myappraisal.php', array('role' => $role,
                         'subjectid' => $subjectid, 'appraisalid' => $appraisalid, 'action' => $action, 'pageid' => $pageid));
-                    totara_set_notification(get_string('progresssaved', 'totara_appraisal'), $returnurl,
-                            array('class' => 'notifysuccess'));
-
+                    \core\notification::success(get_string('progresssaved', 'totara_appraisal'));
+                    redirect($returnurl);
                 } else {
                     $savebuttonpushed = ($answers->submitaction == 'savechanges' ||
                                          $answers->submitaction == 'next' ||
@@ -212,7 +211,8 @@ if ($action == 'pages') {
                     $pageislocked = $page->is_locked($roleassignment);
 
                     if (!$formisvalid) {
-                        totara_set_notification(get_string('error:submitteddatainvalid', 'totara_appraisal'));
+                        // Really this should be moved into the form validation code and then validation made to fail in this situation.
+                        \core\notification::error(get_string('error:submitteddatainvalid', 'totara_appraisal'));
                     } else if ($savebuttonpushed && !$pageislocked && $formisvalid && !$formiscancelled) {
                         // Save valid data.
                         if ($appraisal->save_answers($answers, $roleassignment)) {
@@ -226,16 +226,16 @@ if ($action == 'pages') {
                                 // Notify and go to the stages page.
                                 $returnurl = new moodle_url('/totara/appraisal/myappraisal.php', array('role' => $role,
                                     'subjectid' => $subjectid, 'appraisalid' => $appraisalid, 'action' => 'stages'));
-                                totara_set_notification(get_string('stagecompleted', 'totara_appraisal'), $returnurl,
-                                    array('class' => 'notifysuccess'));
+                                \core\notification::success(get_string('stagecompleted', 'totara_appraisal'));
+                                redirect($returnurl);
 
                             } else if ($answers->submitaction == 'savechanges') {
                                 // Notify and stay on page.
                                 $returnurl = new moodle_url('/totara/appraisal/myappraisal.php', array('role' => $role,
                                     'subjectid' => $subjectid, 'appraisalid' => $appraisalid, 'action' => $action,
                                     'pageid' => $pageid));
-                                totara_set_notification(get_string('changessaved', 'totara_appraisal'), $returnurl,
-                                    array('class' => 'notifysuccess'));
+                                \core\notification::success(get_string('changessaved', 'totara_appraisal'));
+                                redirect($returnurl);
                             }
                         }
                     }
@@ -269,11 +269,8 @@ else if ($action == totara_appraisal_constants::ACTION_ASSIGN_JOB) {
         'appraisalid' => $appraisalid,
         'action' => 'stages'
     ];
-    totara_set_notification(
-        get_string('jobassignmentselected', 'totara_appraisal'),
-        new moodle_url(totara_appraisal_constants::URL_MYAPPRAISAL, $urlparams),
-        array('class' => 'notifysuccess')
-    );
+    \core\notification::success(get_string('jobassignmentselected', 'totara_appraisal'));
+    redirect(new moodle_url(totara_appraisal_constants::URL_MYAPPRAISAL, $urlparams));
 }
 
 // Include JS file.

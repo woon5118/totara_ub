@@ -66,7 +66,8 @@ if ($confirm) {
     foreach ($defaultnotifications as $default) {
         $default->save();
     }
-    totara_set_notification(get_string('notificationssuccessfullyreset', 'facetoface'), $url, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('notificationssuccessfullyreset', 'facetoface'));
+    redirect($url);
 }
 
 $heading   = get_string('restoremissingdefaultnotifications', 'facetoface');

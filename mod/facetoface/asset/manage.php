@@ -67,8 +67,8 @@ if ($action === 'delete') {
     $asset->delete();
     unset($asset);
 
-    totara_set_notification(get_string('assetdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('assetdeleted', 'facetoface'));
+    redirect($redirectto);
 } else if ($action === 'show') {
     if (empty($id)) {
         print_error('error:assetdoesnotexist', 'facetoface', $returnurl);
@@ -79,8 +79,8 @@ if ($action === 'delete') {
     $asset->show();
     $asset->save();
 
-    totara_set_notification(get_string('assetshown', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('assetshown', 'facetoface'));
+    redirect($redirectto);
 } else if ($action === 'hide') {
     if (empty($id)) {
         print_error('error:assetdoesnotexist', 'facetoface', $returnurl);
@@ -91,7 +91,8 @@ if ($action === 'delete') {
     $asset->hide();
     $asset->save();
 
-    totara_set_notification(get_string('assethidden', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('assethidden', 'facetoface'));
+    redirect($redirectto);
 }
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);

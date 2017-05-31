@@ -49,7 +49,8 @@ if ($form->is_cancelled()) {
 if ($data = $form->get_data()) {
     $asset = \mod_facetoface\asset_helper::save($data);
     $message = $id ? get_string('assetcreatesuccess', 'facetoface') : get_string('assetupdatesuccess', 'facetoface');
-    totara_set_notification($message, $assetlisturl, array('class' => 'notifysuccess'));
+    \core\notification::success($message);
+    redirect($assetlisturl);
 }
 
 $url = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));

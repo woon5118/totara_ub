@@ -48,7 +48,8 @@ $result = \auth_connect\util::sync_users($server) && $result;
 $result = \auth_connect\util::sync_user_collections($server) && $result;
 
 if ($result) {
-    totara_set_notification(get_string('serversynced', 'auth_connect'), new moodle_url('/auth/connect/index.php'), array('class'=>'notifysuccess'));
+    \core\notification::success(get_string('serversynced', 'auth_connect'));
 } else {
-    totara_set_notification(get_string('serversyncerror', 'auth_connect'), new moodle_url('/auth/connect/index.php'));
+    \core\notification::error(get_string('serversyncerror', 'auth_connect'));
 }
+redirect(new moodle_url('/auth/connect/index.php'));

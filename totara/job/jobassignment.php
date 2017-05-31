@@ -233,7 +233,7 @@ if ($submitted = $form->get_data()) {
         if ($validmanager && $validmanager->deleted != 0) {
             $a = new stdClass();
             $a->username = $validmanager->username;
-            totara_set_notification(get_string('error:managerdeleted', 'totara_job', $a), null, array('class' => 'notifynotice'));
+            \core\notification::info(get_string('error:managerdeleted', 'totara_job', $a));
         } else {
             // Check the job assignment.
             if (!empty($submitted->managerjaid)) {
@@ -266,7 +266,7 @@ if ($submitted = $form->get_data()) {
         if ($validtempmanager && $validtempmanager->deleted != 0) {
             $a = new stdClass();
             $a->username = $validtempmanager->username;
-            totara_set_notification(get_string('error:managerdeleted', 'totara_job', $a), null, array('class' => 'notifynotice'));
+            \core\notification::info(get_string('error:managerdeleted', 'totara_job', $a));
         } else {
             // Check the job assignment.
             if (!empty($submitted->tempmanagerjaid)) {
@@ -299,7 +299,7 @@ if ($submitted = $form->get_data()) {
         if ($validappraiser && $validappraiser->deleted != 0) {
             $a = new stdClass();
             $a->username = $validappraiser->username;
-            totara_set_notification(get_string('error:appraiserdeleted','totara_hierarchy', $a), null, array('class' => 'notifynotice'));
+            \core\notification::info(get_string('error:appraiserdeleted', 'totara_hierarchy', $a));
         } else {
             $data->appraiserid = $submitted->appraiserid;
         }
@@ -317,10 +317,8 @@ if ($submitted = $form->get_data()) {
     }
 
     // Display success message
-    totara_set_notification(get_string('jobassignmentsaved','totara_job'),
-        new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id)),
-        array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('jobassignmentsaved', 'totara_job'));
+    redirect(new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id)));
 }
 
 // Log

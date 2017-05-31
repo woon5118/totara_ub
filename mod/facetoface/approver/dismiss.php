@@ -41,4 +41,5 @@ require_capability('mod/facetoface:editevents', $context);
 \mod_facetoface\approver::dismiss($seminar);
 
 $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $fid));
-totara_set_notification(get_string('dismissedwarning', 'mod_facetoface'), $returnurl, array('class' => 'notifysuccess'));
+\core\notification::success(get_string('dismissedwarning', 'mod_facetoface'));
+redirect($returnurl);

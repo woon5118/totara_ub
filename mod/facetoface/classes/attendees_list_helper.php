@@ -98,7 +98,8 @@ final class attendees_list_helper {
             foreach ($attendeestoadd as $attendeetoadd) {
                 $userdata = $list->get_user_data($attendeetoadd->id);
                 if (empty($userdata['jobassignmentid'])) {
-                    totara_set_notification(get_string('error:nojobassignmentselectedlist', 'mod_facetoface'), $currenturl);
+                    \core\notification::error(get_string('error:nojobassignmentselectedlist', 'mod_facetoface'));
+                    redirect($currenturl);
                 }
             }
         }
@@ -354,7 +355,7 @@ final class attendees_list_helper {
         if (!empty($errors)) {
             $errors = array_unique($errors);
             foreach ($errors as $error) {
-                totara_set_notification($error, null, array('class' => 'notifyproblem'));
+                \core\notification::error($error);
             }
         } else {
             $list->set_all_user_data($addusers);
@@ -434,16 +435,16 @@ final class attendees_list_helper {
 
         // Check for data.
         if (empty($addusers)) {
-            totara_set_notification(get_string('error:nodatasupplied', 'mod_facetoface'), null, array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:nodatasupplied', 'mod_facetoface'));
         } else if (!empty($notfound)) {
             $notfoundlist = implode(', ', $notfound);
-            totara_set_notification(get_string($errstr, 'mod_facetoface', $notfoundlist), null, array('class' => 'notifyproblem'));
+            \core\notification::error(get_string($errstr, 'mod_facetoface', $notfoundlist));
         } else if (!empty($validationerrors)) {
             $validationerrorcount = count($validationerrors);
             $validationnotification = get_string('xerrorsencounteredduringimport', 'mod_facetoface', $validationerrorcount);
             $validationnotification .= ' '. \html_writer::link('#', get_string('viewresults', 'mod_facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
             $list->set_validaton_results($validationerrors);
-            totara_set_notification($validationnotification, null, array('class' => 'notifyproblem'));
+            \core\notification::error($validationnotification);
         } else {
             $list->set_user_ids($userstoadd);
             $list->set_form_data($data);
@@ -619,10 +620,10 @@ final class attendees_list_helper {
         $errors         = $results[1];
         $result_message = '';
 
-        $noticeclass = 'notifysuccess';
+        $noticetype = \core\notification::SUCCESS;
         // Generate messages
         if ($errors) {
-            $noticeclass = 'notifyproblem';
+            $noticetype = \core\notification::ERROR;
             $result_message .= get_string($type.'attendeeserror', 'facetoface') . ' - ';
 
             if (count($errors) == 1 && is_string($errors[0])) {
@@ -642,7 +643,7 @@ final class attendees_list_helper {
         }
 
         if ($result_message != '') {
-            totara_set_notification($result_message, null, array('class' => $noticeclass));
+            \core\notification::add($result_message, $noticetype);
         }
     }
 }

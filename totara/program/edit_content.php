@@ -147,7 +147,8 @@ $contenteditform = new program_content_edit_form($currenturl, array('program'=>$
 //$contenteditform->_form->updateAttributes(array('class' => ''));
 
 if ($contenteditform->is_cancelled()) {
-    totara_set_notification(get_string('programupdatecancelled', 'totara_program'), $overviewurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('programupdatecancelled', 'totara_program'));
+    redirect($overviewurl);
 }
 
 // if the form has not been submitted, fill in the saved values and defaults
@@ -172,7 +173,8 @@ if ($data = $contenteditform->get_data()) {
 
         // Save program content
         if (!$programcontent->save_content()) {
-            totara_set_notification(get_string('programupdatefail', 'totara_program'), $currenturl);
+            \core\notification::error(get_string('programupdatefail', 'totara_program'));
+            redirect($currenturl);
         } else {
             $coursesetids = array();
             $coursesets = $programcontent->get_course_sets();
@@ -191,8 +193,8 @@ if ($data = $contenteditform->get_data()) {
             $DB->update_record('prog', $prog_update);
 
             if (isset($data->savechanges) || $submitdata) {
-                totara_set_notification(get_string('programcontentsaved', 'totara_program'),
-                    'edit_content.php?id='.$id, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('programcontentsaved', 'totara_program'));
+                redirect('edit_content.php?id=' . $id);
             }
         }
     }

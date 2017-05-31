@@ -50,7 +50,8 @@ if (!$can_manage || !$canapproveobjective) {
 
 if ($confirm) {
     if (!confirm_sesskey()) {
-        totara_set_notification(get_string('confirmsesskeybad','error'), $returnurl);
+        \core\notification::error(get_string('confirmsesskeybad','error'));
+        redirect($returnurl);
     }
 
     $todb = new stdClass();
@@ -63,8 +64,8 @@ if ($confirm) {
 
     $DB->update_record('dp_plan_objective', $todb);
     //@todo send notifications/emails
-    totara_set_notification(get_string('request'.$action, 'totara_plan'), $returnurl, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('request' . $action, 'totara_plan'));
+    redirect($returnurl);
 }
 
 $fullname = $plan->name;

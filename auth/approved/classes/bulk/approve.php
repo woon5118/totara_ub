@@ -68,10 +68,10 @@ final class approve extends base {
         }
 
         if ($approved) {
-            totara_set_notification(get_string('successapprovebulk', 'auth_approved', $approved), null, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('successapprovebulk', 'auth_approved', $approved));
         }
         if ($errors) {
-            totara_set_notification(get_string('errorapprovebulk', 'auth_approved', $errors), null);
+            \core\notification::error(get_string('errorapprovebulk', 'auth_approved', $errors));
         }
 
         redirect($this->report->get_current_url());

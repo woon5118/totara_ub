@@ -54,7 +54,8 @@ if ($form->is_cancelled()) {
 
 if ($fromform = $form->get_data()) {
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
 
     $fromform = file_postupdate_standard_editor($fromform, 'description', array(), null);
@@ -66,8 +67,8 @@ if ($fromform = $form->get_data()) {
 
     $continueurl = new moodle_url('/totara/reportbuilder/restrictions/edit_recordstoview.php', array('id' => $restriction->id));
     $string = empty($fromform->id) ? 'restrictioncreated' : 'restrictionupdated';
-    totara_set_notification(get_string($string, 'totara_reportbuilder', $restriction->name),
-            $continueurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string($string, 'totara_reportbuilder', $restriction->name));
+    redirect($continueurl);
 }
 
 echo $output->edit_restriction_header($restriction, 'general');

@@ -918,7 +918,7 @@ final class attendees_helper {
                 $output .= html_writer::tag('li', $errmsg);
             }
             $output .= html_writer::end_tag('ul');
-            totara_set_notification($output);
+            \core\notification::error($output);
         }
         return $baseurl;
     }

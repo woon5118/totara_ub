@@ -83,9 +83,8 @@ if ($hierarchy->delete_framework()) {
     $eventclass = "\\hierarchy_{$prefix}\\event\\framework_deleted";
     $eventclass::create_from_instance($framework)->trigger();
 
-    totara_set_notification(get_string($prefix.'deletedframework', 'totara_hierarchy', $framework->fullname), "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=$prefix", array('class' => 'notifysuccess'));
+    \core\notification::success(get_string($prefix.'deletedframework', 'totara_hierarchy', $framework->fullname));
 } else {
-    totara_set_notification(get_string($prefix.'error:deletedframework', 'totara_hierarchy', $framework->fullname), "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=$prefix");
+    \core\notification::error(get_string($prefix.'error:deletedframework', 'totara_hierarchy', $framework->fullname));
 }
-
-echo $OUTPUT->footer();
+redirect(new moodle_url('/totara/hierarchy/framework/index.php', ['prefix' => $prefix]));

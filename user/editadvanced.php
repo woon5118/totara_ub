@@ -80,7 +80,7 @@ if ($id == -1) {
 } else {
     // Editing existing user.
     if (!has_capability('moodle/user:update', $systemcontext)) {
-        totara_set_notification(get_string('error:userprofilecapability', 'totara_core'));
+        \core\notification::error(get_string('error:userprofilecapability', 'totara_core'));
         $redirecturl = new moodle_url('/user/profile.php', ['id' => $id]);
         redirect($redirecturl);
     }

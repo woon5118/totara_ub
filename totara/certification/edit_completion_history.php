@@ -55,8 +55,7 @@ if (!$certification) {
 
 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
-$returnurl = new moodle_url('/totara/certification/edit_completion.php',
-    array('id' => $id, 'userid' => $userid));
+$returnurl = new moodle_url('/totara/certification/edit_completion.php', ['id' => $id, 'userid' => $userid]);
 $PAGE->set_program($program);
 
 if ($chid) {
@@ -67,9 +66,8 @@ if ($chid) {
     $certcomplhistory = $DB->get_record('certif_completion_history', array('id' => $chid));
 
     if (empty($certcomplhistory) || $userid != $certcomplhistory->userid || $program->certifid != $certcomplhistory->certifid) {
-        totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-            $returnurl,
-            array('class' => 'notifyproblem'));
+        \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+        redirect($returnurl);
     }
 } else {
     $thisurl = new moodle_url('/totara/certification/edit_completion_history.php',
@@ -125,8 +123,8 @@ $editform = new certif_edit_completion_history_form($thisurl, $editformcustomdat
 
 // Process any actions submitted.
 if ($editform->is_cancelled()) {
-    totara_set_notification(get_string('completionupdatecancelled', 'totara_program'), $returnurl,
-        array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('completionupdatecancelled', 'totara_program'));
+    redirect($returnurl);
 }
 
 if ($submitted = $editform->get_data() and isset($submitted->savechanges)) {
@@ -135,9 +133,8 @@ if ($submitted = $editform->get_data() and isset($submitted->savechanges)) {
     $errors = certif_get_completion_errors($certcomplhistory, null);
 
     if ($newstate == CERTIFCOMPLETIONSTATE_INVALID || !empty($errors)) {
-        totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-            $thisurl,
-            array('class' => 'notifyproblem'));
+        \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+        redirect($thisurl);
     }
 
     if ($certcomplhistory->id) {
@@ -146,13 +143,11 @@ if ($submitted = $editform->get_data() and isset($submitted->savechanges)) {
         $message = 'Completion history manually created';
     }
     if (certif_write_completion_history($certcomplhistory, $message)) {
-        totara_set_notification(get_string('completionchangessaved', 'totara_program'),
-            $returnurl,
-            array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('completionchangessaved', 'totara_program'));
+        redirect($returnurl);
     } else {
-        totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-            $thisurl,
-            array('class' => 'notifyproblem'));
+        \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+        redirect($thisurl);
     }
 }
 

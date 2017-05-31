@@ -89,7 +89,8 @@ class totara_sync_source_org_database extends totara_sync_source_org {
             setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'},
                 $data->{'database_dbuser'}, $data->{'database_dbpass'}, array('dbport' => $data->{'database_dbport'}));
         } catch (Exception $e) {
-            totara_set_notification(get_string('cannotconnectdbsettings', 'tool_totara_sync'), qualified_me());
+            \core\notification::error(get_string('cannotconnectdbsettings', 'tool_totara_sync'));
+            redirect(qualified_me());
         }
 
         $this->set_config('database_dbtype', $data->{'database_dbtype'});

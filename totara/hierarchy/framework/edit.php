@@ -118,7 +118,8 @@ if ($frameworkform->is_cancelled()) {
 
         $notification->text = 'updatedframework';
     }
-    totara_set_notification(get_string($prefix.$notification->text, 'totara_hierarchy', format_string($frameworknew->fullname)), "$CFG->wwwroot/totara/hierarchy/framework/index.php?prefix=$prefix", array('class' => 'notifysuccess'));
+    \core\notification::success(get_string($prefix.$notification->text, 'totara_hierarchy', format_string($frameworknew->fullname)));
+    redirect("$CFG->wwwroot/totara/hierarchy/framework/index.php?prefix=$prefix");
 }
 
 // Display page header.

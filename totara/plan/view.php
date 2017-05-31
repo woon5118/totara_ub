@@ -74,7 +74,8 @@ $plan = file_prepare_standard_editor($plan, 'description', $TEXTAREA_OPTIONS, $T
 $form = new plan_edit_form($currenturl, array('plan' => $plan, 'action' => $action));
 
 if ($form->is_cancelled()) {
-    totara_set_notification(get_string('planupdatecancelled', 'totara_plan'), $viewurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('planupdatecancelled', 'totara_plan'));
+    redirect($viewurl);
 }
 
 // Handle form submits
@@ -97,7 +98,8 @@ if ($data = $form->get_data()) {
             print_error('error:nopermissions', 'totara_plan');
         }
         if ($plan->delete()) {
-            totara_set_notification(get_string('plandeletesuccess', 'totara_plan', $plan->name), "{$CFG->wwwroot}/totara/plan/index.php?userid={$plan->userid}", array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('plandeletesuccess', 'totara_plan', $plan->name));
+            redirect(new moodle_url('/totara/plan/index.php', ['userid' => $plan->userid]));
         }
     } else if (isset($data->deleteno)) {
         redirect($viewurl);
@@ -113,10 +115,11 @@ if ($data = $form->get_data()) {
         if ($plan->set_status(DP_PLAN_STATUS_COMPLETE, DP_PLAN_REASON_MANUAL_COMPLETE)) {
             \totara_plan\event\plan_completed::create_from_plan($plan)->trigger();
             $plan->send_completion_alert();
-            totara_set_notification(get_string('plancompletesuccess', 'totara_plan', $plan->name), $viewurl, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('plancompletesuccess', 'totara_plan', $plan->name));
         } else {
-            totara_set_notification(get_string('plancompletefail', 'totara_plan', $plan->name), $viewurl);
+            \core\notification::error(get_string('plancompletefail', 'totara_plan', $plan->name));
         }
+        redirect($viewurl);
     } else if (isset($data->completeno)) {
         redirect($viewurl);
     } else if (isset($data->submitbutton)) {
@@ -128,7 +131,8 @@ if ($data = $form->get_data()) {
         $DB->update_record('dp_plan', $data);
         $plan = new development_plan($data->id);
         \totara_plan\event\plan_updated::create_from_plan($plan)->trigger();
-        totara_set_notification(get_string('planupdatesuccess', 'totara_plan'), $viewurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('planupdatesuccess', 'totara_plan'));
+        redirect($viewurl);
     }
 
     // Reload plan to reflect any changes

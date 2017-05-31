@@ -48,7 +48,8 @@ if ($data = $form->get_data()) {
     // Save source-specific config
     $source->config_save($data);
 
-    totara_set_notification(get_string('settingssaved', 'tool_totara_sync'), $FULLME, array('class'=>'notifysuccess'));
+    \core\notification::success(get_string('settingssaved', 'tool_totara_sync'));
+    redirect($FULLME);
 }
 
 /// Set form data

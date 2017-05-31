@@ -120,8 +120,9 @@ if ($itemform->is_cancelled()) {
     $itemnew = $hierarchy->process_additional_item_form_fields($itemnew);
 
     // Save
-    // Class to hold totara_set_notification info.
-    $notification = new stdClass();
+    $notificationtype = \core\notification::ERROR;
+    $notificationtext = 'added';
+    $notificationurl = new moodle_url('/totara/hierarchy/item/view.php', ['prefix' => $prefix]);
 
     if ($itemnew->id == 0) {
         // Add New item
@@ -130,13 +131,11 @@ if ($itemform->is_cancelled()) {
             $itemnew = file_postupdate_standard_editor($itemnew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix, $itemnew->id);
             $DB->set_field($shortprefix, 'description', $itemnew->description, array('id' => $itemnew->id));
 
-            $notification->text = 'added';
-            $notification->url = "{$CFG->wwwroot}/totara/hierarchy/item/view.php?prefix=$prefix&id={$updateditem->id}";
-            $notification->params = array('class' => 'notifysuccess');
+            $notificationurl->param('id', $updateditem->id);
+            $notificationtype = \core\notification::SUCCESS;
         } else {
-            $notification->text = 'error:add';
-            $notification->url = "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix";
-            $notification->params = array();
+            $notificationtext = 'error:add';
+            $notificationurl = new moodle_url('/totara/hierarchy/item/index.php', ['prefix' => $prefix]);
         }
     } else {
         // Update existing item
@@ -149,21 +148,22 @@ if ($itemform->is_cancelled()) {
         customfield_save_data($itemnew, $prefix, $shortprefix.'_type');
         $transaction->allow_commit();
 
-        $notification->text = 'updated';
-        $notification->url = "{$CFG->wwwroot}/totara/hierarchy/item/view.php?prefix=$prefix&id={$itemnew->id}";
-        $notification->params = array('class' => 'notifysuccess');
+        $notificationtext = 'updated';
+        $notificationurl->param('id', $itemnew->id);
+        $notificationtype = \core\notification::SUCCESS;
     }
 
     $itemnew = $DB->get_record($shortprefix, array('id' => $itemnew->id));
-    if ($notification->text === 'added') {
+    if ($notificationtext === 'added') {
         $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_created";
         $eventclass::create_from_instance($itemnew)->trigger();
-    } if ($notification->text === 'updated') {
+    } else if ($notificationtext === 'updated') {
         $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_updated";
         $eventclass::create_from_instance($itemnew)->trigger();
     }
 
-    totara_set_notification(get_string($notification->text . $prefix, 'totara_hierarchy', format_string($itemnew->fullname)), $notification->url, $notification->params);
+    \core\notification::add(get_string($notificationtext . $prefix, 'totara_hierarchy', format_string($itemnew->fullname)), $notificationtype);
+    redirect($notificationurl);
 }
 
 $PAGE->navbar->add(format_string($framework->fullname), new moodle_url('/totara/hierarchy/index.php', array('prefix' => $prefix, 'frameworkid' => $framework->id)));

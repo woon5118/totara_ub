@@ -125,8 +125,8 @@ if ($deleteflag && $deleteconfirmed) {
 
     evidence_delete($item->id);
 
-    totara_set_notification(get_string('evidencedeleted', 'totara_plan'),
-        $indexurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('evidencedeleted', 'totara_plan'));
+    redirect($indexurl);
 }
 
 $mform = new plan_evidence_edit_form(
@@ -156,8 +156,7 @@ if ($data = $mform->get_data()) {
         $item = $DB->get_record('dp_plan_evidence', array('id' => $data->id), '*', MUST_EXIST);
         \totara_plan\event\evidence_created::create_from_instance($item)->trigger();
 
-        totara_set_notification(get_string('evidenceadded', 'totara_plan'), $itemurl, array('class' => 'notifysuccess'));
-
+        \core\notification::success(get_string('evidenceadded', 'totara_plan'));
     } else {
         // Update a record.
         $DB->update_record('dp_plan_evidence', $data);
@@ -168,9 +167,9 @@ if ($data = $mform->get_data()) {
         $item = $DB->get_record('dp_plan_evidence', array('id' => $data->id), '*', MUST_EXIST);
         \totara_plan\event\evidence_updated::create_from_instance($item)->trigger();
 
-        totara_set_notification(get_string('evidenceupdated', 'totara_plan'), $itemurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('evidenceupdated', 'totara_plan'));
     }
-
+    redirect($itemurl);
 } else if ($mform->is_cancelled()) {
     if ($action == 'add') {
         redirect($indexurl);

@@ -63,11 +63,11 @@ if ($form->is_cancelled()) {
 
     if (reportbuilder_delete_report($id)) {
         \totara_reportbuilder\event\report_deleted::create_from_report($report, $report->embedded)->trigger();
-        totara_set_notification(get_string($type . 'report', 'totara_reportbuilder'), $CFG->wwwroot . $returnurl, array('class' => 'notifysuccess'));
-
+        \core\notification::success(get_string($type . 'report', 'totara_reportbuilder'));
     } else {
-        totara_set_notification(get_string('no' . $type . 'report', 'totara_reportbuilder'), $CFG->wwwroot . $returnurl);
+        \core\notification::error(get_string('no' . $type . 'report', 'totara_reportbuilder'));
     }
+    redirect($CFG->wwwroot . $returnurl);
 }
 
 echo $output->header();

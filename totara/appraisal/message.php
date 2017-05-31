@@ -80,7 +80,8 @@ switch ($action) {
                 }
             }
             $msg->save();
-            totara_set_notification(get_string('messagesaved', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('messagesaved', 'totara_appraisal'));
+            redirect($returnurl);
         } else if (!$form->is_submitted()) {
             // Load form.
             $data = new stdClass();
@@ -125,11 +126,10 @@ switch ($action) {
         $confirm = optional_param('confirm', 0, PARAM_INT);
         if ($messageid && $confirm) {
             appraisal_message::delete($messageid);
-            totara_set_notification(get_string('messagedeleted', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('messagedeleted', 'totara_appraisal'));
+            redirect($returnurl);
         }
         break;
-
 }
 
 $output = $PAGE->get_renderer('totara_appraisal');

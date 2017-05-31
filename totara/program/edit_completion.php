@@ -79,7 +79,8 @@ if ($dismissedexceptions = $program->check_user_for_dismissed_exceptions($userid
         $urlparams = array('id' => $id, 'userid' => $userid);
         $redirecturl = new moodle_url('/totara/program/edit_completion.php', $urlparams);
 
-        totara_set_notification(get_string('exceptionoverridden', 'totara_program'), $redirecturl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('exceptionoverridden', 'totara_program'));
+        redirect($redirecturl);
     }
 }
 
@@ -112,9 +113,8 @@ if ($progcompletion && empty($exceptions) && !$dismissedexceptions) {
         // Validate that the record to be deleted matches the program and user.
         $params = array('id' => $chid, 'programid' => $id, 'userid' => $userid);
         if (!$DB->record_exists('prog_completion_history', $params)) {
-            totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-                $url,
-                array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+            redirect($url);
         }
 
         $DB->delete_records('prog_completion_history', array('id' => $chid));
@@ -126,9 +126,8 @@ if ($progcompletion && empty($exceptions) && !$dismissedexceptions) {
             'Completion history deleted, ID: ' . $chid
         );
 
-        totara_set_notification(get_string('completionhistorydeleted', 'totara_program'),
-            $url,
-            array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('completionhistorydeleted', 'totara_program'));
+        redirect($url);
 
     } else if ($submitted = $editform->get_data() and !empty($submitted->savechanges)) {
         $newprogcompletion = prog_process_submitted_edit_completion($submitted);
@@ -153,14 +152,11 @@ if ($progcompletion && empty($exceptions) && !$dismissedexceptions) {
             );
             $event->trigger();
 
-            totara_set_notification(get_string('completionchangessaved', 'totara_program'),
-                $url,
-                array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('completionchangessaved', 'totara_program'));
         } else {
-            totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-                $url,
-                array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
         }
+        redirect($url);
     }
 
     // Init form core js.

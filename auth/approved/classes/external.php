@@ -155,7 +155,7 @@ class auth_approved_external extends external_api {
         foreach ($rs as $manager) {
             $fullname = fullname($manager);
             if (!empty($manager->jobtitle)) {
-                $fullname .= ' - ' . format_string($manager->jobtitle);
+                $fullname .= ' - ' . format_string($manager->jobtitle, true, array('context' => context_system::instance()));
             } else if (!empty($manager->jobidnumber)) {
                 $fullname .= ' - ' . get_string('jobassignmentdefaultfullname', 'totara_job', $manager->jobidnumber);
             }

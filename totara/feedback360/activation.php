@@ -47,16 +47,16 @@ switch ($action) {
         if (empty($errors) && $confirm) {
             require_sesskey();
             $feedback360->activate();
-            totara_set_notification(get_string('feedback360activated', 'totara_feedback360', $feedback360->name),
-                         new moodle_url('/totara/feedback360/manage.php'), array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('feedback360activated', 'totara_feedback360', $feedback360->name));
+            redirect(new moodle_url('/totara/feedback360/manage.php'));
         }
     break;
     case 'close':
         if ($confirm) {
             require_sesskey();
             $feedback360->close();
-            totara_set_notification(get_string('feedback360closed', 'totara_feedback360', $feedback360->name),
-                         new moodle_url('/totara/feedback360/manage.php'), array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('feedback360closed', 'totara_feedback360', $feedback360->name));
+            redirect(new moodle_url('/totara/feedback360/manage.php'));
         }
     break;
 }

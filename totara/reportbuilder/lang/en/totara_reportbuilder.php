@@ -354,6 +354,7 @@ $string['error:propertyxmustbesetiny'] = 'Property "{$a->property}" must be set 
 $string['error:reportcacheinitialize'] = 'Cache is disabled for this report';
 $string['error:reportgraphsdisabled'] = 'Report Builder graphs are not enabled on this site.';
 $string['error:savedsearchnotdeleted'] = 'Saved search could not be deleted';
+$string['error:search_column_not_deleted'] = 'Search column could not be deleted';
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
 $string['error:updatescheduledreport'] = 'Error updating Scheduled Report';
 $string['excelformat'] = 'Excel format';

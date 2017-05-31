@@ -134,9 +134,8 @@ if ($mform->is_cancelled()) {
         $notification = get_string('objectivescaleupdated', 'totara_plan', format_string($objectivenew->name));
     }
 
-    totara_set_notification($notification,
-        "$CFG->wwwroot/totara/plan/objectivescales/view.php?id={$objectivenew->id}",
-        array('class' => 'notifysuccess'));
+    \core\notification::success($notification);
+    redirect("$CFG->wwwroot/totara/plan/objectivescales/view.php?id={$objectivenew->id}");
 }
 
 /// Print Page

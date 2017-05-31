@@ -73,7 +73,9 @@ if ($formdata = $mform->get_data()) {
     } else {
         $url = "$CFG->wwwroot/$CFG->admin/register.php";
     }
-    totara_set_notification(get_string('totararegistrationsaved', 'totara_core'), $url, array('class' => 'notifysuccess'));
+
+    \core\notification::success(get_string('totararegistrationsaved', 'totara_core'));
+    redirect($url);
 }
 
 // Print headings.

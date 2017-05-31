@@ -81,7 +81,8 @@ if ($delete) {
         $transaction->allow_commit();
 
         \totara_plan\event\priority_scale_updated::create_from_scale($priority)->trigger();
-        totara_set_notification(get_string('deletedpriorityscalevalue', 'totara_plan', format_string($value->name)), $CFG->wwwroot.'/totara/plan/priorityscales/view.php?id='.$priority->id, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('deletedpriorityscalevalue', 'totara_plan', format_string($value->name)));
+        redirect($CFG->wwwroot.'/totara/plan/priorityscales/view.php?id='.$priority->id);
 
     } else {
         $returnurl = new moodle_url('/totara/plan/priorityscales/view.php', array('id' => $priority->id));
@@ -179,7 +180,7 @@ if ($default) {
     $s->defaultid = $default;
 
     $DB->update_record('dp_priority_scale', $s);
-    totara_set_notification(get_string('priorityscaledefaultupdated', 'totara_plan'), null, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('priorityscaledefaultupdated', 'totara_plan'));
     // Fetch the update scale record so it'll show up to the user.
     $priority = $DB->get_record('dp_priority_scale', array('id' => $id));
 }

@@ -133,8 +133,8 @@ if ($isexternaluser) {
 }
 
 if (!$respassignment) {
-    totara_set_notification(get_string('feedback360notfound', 'totara_feedback360'),
-            new moodle_url('/totara/feedback360/index.php'), array('class' => 'notifyproblem'));
+    \core\notification::error(get_string('feedback360notfound', 'totara_feedback360'));
+    redirect(new moodle_url('/totara/feedback360/index.php'));
 }
 
 // Set up the page.
@@ -209,10 +209,11 @@ if ($form->is_submitted() && !$respassignment->is_completed()) {
             $respassignment->complete();
             $message = get_string('feedbacksubmitted', 'totara_feedback360');
         }
-        totara_set_notification($message, $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success($message);
+        redirect($returnurl);
     }
     if ($answers->action == 'submit' && !$formisvalid) {
-        totara_set_notification(get_string('error:submitform', 'totara_feedback360'), null, array('class' => 'notifyproblem'));
+        \core\notification::error(get_string('error:submitform', 'totara_feedback360'));
     }
 } else if (!$preview) {
     $form->set_data($feedback360->get_answers($respassignment));

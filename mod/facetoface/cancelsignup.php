@@ -112,7 +112,8 @@ if ($fromform = $mform->get_data()) { // Form submitted.
             }
         }
 
-        totara_set_notification($message, $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success($message);
+        redirect($returnurl);
     } else {
         $failures = $signup->get_failures(user_cancelled::class);
         throw new coding_exception("Could not cancel user signup.", implode("\n", $failures));

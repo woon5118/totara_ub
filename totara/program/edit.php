@@ -171,10 +171,9 @@ $detailsform = new program_edit_form($currenturl,
                         'post', '', array('name'=>'form_prog_details'));
 
 if ($detailsform->is_cancelled()) {
-    totara_set_notification(get_string('programupdatecancelled', 'totara_program'), $viewurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('programupdatecancelled', 'totara_program'));
+    redirect($viewurl);
 }
-
-
 
 // Handle form submits
 if ($data = $detailsform->get_data()) {
@@ -256,7 +255,8 @@ if ($data = $detailsform->get_data()) {
         $dataevent = array('id' => $program->id, 'other' => $other);
         $event = \totara_program\event\program_updated::create_from_data($dataevent)->trigger();
 
-        totara_set_notification(get_string('programdetailssaved', 'totara_program'), $nexturl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('programdetailssaved', 'totara_program'));
+        redirect($nexturl);
     }
 
     // Reload program to reflect any changes.

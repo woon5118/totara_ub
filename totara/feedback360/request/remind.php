@@ -194,7 +194,8 @@ if (!empty($confirmation)) {
 
         // Redirect.
         $success = get_string('reminderssent', 'totara_feedback360', format_string($feedback->name));
-        totara_set_notification($success, $ret_url, array('class' => 'notifysuccess'));
+        \core\notification::success($success);
+        redirect($ret_url);
     }
 }
 

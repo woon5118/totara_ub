@@ -47,7 +47,8 @@ $stage = new appraisal_stage($stageid);
 $output = $PAGE->get_renderer('totara_appraisal');
 $returnurl = new moodle_url('/totara/appraisal/stage.php', array('id' => $stageid));
 if (!appraisal::is_draft($stage->appraisalid)) {
-    totara_set_notification(get_string('error:appraisalnotdraft', 'totara_appraisal'), $returnurl);
+    \core\notification::error(get_string('error:appraisalnotdraft', 'totara_appraisal'));
+    redirect($returnurl);
 }
 
 switch($action) {
@@ -61,21 +62,24 @@ switch($action) {
             echo 'success';
             return;
         }
-        totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+        redirect($returnurl);
         break;
     case 'posup':
         if (!confirm_sesskey()) {
             print_error('confirmsesskeybad', 'error');
         }
         appraisal_page::reorder($id, $page->sortorder - 1);
-        totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+        redirect($returnurl);
         break;
     case 'posdown':
         if (!confirm_sesskey()) {
             print_error('confirmsesskeybad', 'error');
         }
         appraisal_page::reorder($id, $page->sortorder + 1);
-        totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+        redirect($returnurl);
         break;
     case 'move':
         if (!confirm_sesskey()) {
@@ -88,12 +92,13 @@ switch($action) {
             echo 'success';
             return;
         }
-        totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+        redirect($returnurl);
         break;
     case 'delete':
         if ($page->id < 1) {
-            totara_set_notification(get_string('error:pagenotfound', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:pagenotfound', 'totara_appraisal'));
+            redirect($returnurl);
         }
         $appraisal = new appraisal($stage->appraisalid);
         if ($appraisal->status == appraisal::STATUS_DRAFT) {
@@ -107,12 +112,12 @@ switch($action) {
                     echo 'success';
                     return;
                 }
-                totara_set_notification(get_string('deletedpage', 'totara_appraisal'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('deletedpage', 'totara_appraisal'));
+                redirect($returnurl);
             }
         } else {
-            totara_set_notification(get_string('error:appraisalmustdraft', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:appraisalmustdraft', 'totara_appraisal'));
+            redirect($returnurl);
         }
         $output = $PAGE->get_renderer('totara_appraisal');
         echo $output->confirm_delete_page($page->id, $page->appraisalstageid);
@@ -130,8 +135,12 @@ switch($action) {
             }
             $page->set($fromform)->save();
 
-            totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifysuccess'));
+            if (is_ajax_request($_SERVER)) {
+                ajax_result();
+                return;
+            }
+            \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+            redirect($returnurl);
         }
 
         echo $mform->display();

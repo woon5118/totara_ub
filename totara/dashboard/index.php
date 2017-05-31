@@ -66,7 +66,7 @@ $PAGE->set_url('/totara/dashboard/index.php', $params);
 if (!$id) {
     $header = $SITE->shortname. ': ' . get_string('dashboard', 'totara_dashboard');
     $PAGE->set_context(context_user::instance($USER->id));
-    totara_set_notification(get_string('noavailabledashboards', 'totara_dashboard'));
+    \core\notification::error(get_string('noavailabledashboards', 'totara_dashboard'));
 } else {
     $dashboard = new totara_dashboard($id);
     $userpageid = $dashboard->get_user_pageid($userid);
@@ -100,7 +100,8 @@ if (!$id) {
             set_user_preference('user_home_page_preference', HOMEPAGE_TOTARA_DASHBOARD);
             set_user_preference('user_home_totara_dashboard_id', $id);
             $url = new moodle_url('/totara/dashboard/index.php', array('id' => $id));
-            totara_set_notification(get_string('userhomepagechanged', 'totara_dashboard'), $url, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('userhomepagechanged', 'totara_dashboard'));
+            redirect($url);
         }
         $newhomeurl = new moodle_url('/totara/dashboard/index.php', array('setdefaulthome' => 1, 'id' => $id, 'sesskey' => sesskey()));
         $PAGE->settingsnav->add(get_string('makedashboardmyhomepage', 'totara_dashboard'), $newhomeurl, navigation_node::TYPE_SETTING);

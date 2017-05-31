@@ -72,7 +72,8 @@ if ($data = $mform->get_data()) {
     $link->displaypos = $DB->count_records('block_quicklinks', $params) > 0 ? $DB->get_field('block_quicklinks', 'MAX(displaypos)+1', $params) : 0;
 
     $DB->insert_record('block_quicklinks', $link);
-    totara_set_notification(get_string('newlinkadded', 'block_totara_quicklinks'), $baseurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('newlinkadded', 'block_totara_quicklinks'));
+    redirect($baseurl);
 }
 
 // Process any actions.
@@ -82,7 +83,8 @@ if ($blockaction == 'delete' && confirm_sesskey()) {
     $links = block_quicklinks_get_links($blockinstanceid);
     $links = array_keys($links);
     block_quicklinks_reorder_links($links, $blockinstanceid);
-    totara_set_notification(get_string('linkdeleted', 'block_totara_quicklinks'), $baseurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('linkdeleted', 'block_totara_quicklinks'));
+    redirect($baseurl);
 }
 
 if ($blockaction == 'moveup' && confirm_sesskey()) {

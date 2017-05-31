@@ -332,7 +332,8 @@ class dp_course_component extends dp_base_component {
 
         if ($delete && $confirm) {
             if (!confirm_sesskey()) {
-                totara_set_notification(get_string('confirmsesskeybad', 'error'), $currenturl);
+                \core\notification::error(get_string('confirmsesskeybad', 'error'));
+                redirect($currenturl);
             }
 
             // Load item
@@ -356,8 +357,8 @@ class dp_course_component extends dp_base_component {
                 $params = array('planid' => $this->plan->id, 'component' => $this->component, 'itemid' => $delete);
                 $DB->delete_records('dp_plan_evidence_relation', $params);
 
-                totara_set_notification(get_string('canremoveitem', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
-
+                \core\notification::success(get_string('canremoveitem', 'totara_plan'));
+                redirect($currenturl);
             } else {
                 print_error('error:couldnotunassignitem', 'totara_plan');
             }
@@ -986,12 +987,14 @@ class dp_course_component extends dp_base_component {
 
                     // Do not create notification or redirect if ajax request
                     if (!$ajax) {
-                        totara_set_notification(get_string('coursesupdated', 'totara_plan').$issuesnotification, $currenturl, array('class' => 'notifysuccess'));
+                        \core\notification::success(get_string('coursesupdated', 'totara_plan') . $issuesnotification);
+                        redirect($currenturl);
                     }
                 } else {
                     // Do not create notification or redirect if ajax request
                     if (!$ajax) {
-                        totara_set_notification(get_string('coursesnotupdated', 'totara_plan'), $currenturl);
+                        \core\notification::error(get_string('coursesnotupdated', 'totara_plan'));
+                        redirect($currenturl);
                     }
                 }
             }

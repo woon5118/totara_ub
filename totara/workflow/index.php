@@ -43,18 +43,12 @@ if ($action && $managercomponent && $manager && $workflowcomponent && $workflow)
     $workflow = $classname::instance();
     if ($action == 'enable') {
         $workflow->enable();
-        totara_set_notification(
-            get_string('workflowxenabled', 'totara_workflow', $workflow->get_name()),
-            $PAGE->url,
-            ['class' => 'notifysuccess']
-        );
+        \core\notification::success(get_string('workflowxenabled', 'totara_workflow', $workflow->get_name()));
+        redirect($PAGE->url);
     } else if ($action == 'disable') {
         $workflow->disable();
-        totara_set_notification(
-            get_string('workflowxdisabled', 'totara_workflow', $workflow->get_name()),
-            $PAGE->url,
-            ['class' => 'notifysuccess']
-        );
+        \core\notification::success(get_string('workflowxdisabled', 'totara_workflow', $workflow->get_name()));
+        redirect($PAGE->url);
     } else {
         print_error('error:invalidaction', 'totara_workflow', '', $action);
     }

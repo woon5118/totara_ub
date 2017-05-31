@@ -77,7 +77,7 @@ foreach ($notifications as $note) {
 if ($notification->type != MDL_F2F_NOTIFICATION_AUTO || $autonotifications[$notification->conditiontype] > 1) {
     // Delete the notification and associated sent and history records.
     $notification->delete();
-    totara_set_notification(get_string('notificationdeleted', 'facetoface'), $url, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('notificationdeleted', 'facetoface'));
 }
 
 redirect($url);

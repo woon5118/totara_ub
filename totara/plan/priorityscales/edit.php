@@ -131,9 +131,8 @@ if ($mform->is_cancelled()) {
         $notification = get_string('priorityscaleupdated', 'totara_plan', format_string($prioritynew->name));
     }
 
-    totara_set_notification($notification,
-        "$CFG->wwwroot/totara/plan/priorityscales/view.php?id={$prioritynew->id}",
-        array('class' => 'notifysuccess'));
+    \core\notification::success($notification);
+    redirect("$CFG->wwwroot/totara/plan/priorityscales/view.php?id={$prioritynew->id}");
 }
 
 /// Print Page

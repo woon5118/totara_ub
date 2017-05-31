@@ -214,7 +214,10 @@ function facetoface_add_instance($facetoface) {
             $message .= $missingtemplate . html_writer::empty_tag('br');
         }
 
-        totara_set_notification($message);
+        // It should work fine when executed through the primary interface,
+        // but it'll be a lucky draw in cases such as via ajax requests, and unit tests etc.
+        // We might want to reconsider how we handle missing notification templates in the future.
+        \core\notification::error($message);
     }
 
     return $facetoface->id;

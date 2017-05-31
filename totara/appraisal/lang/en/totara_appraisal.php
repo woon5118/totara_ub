@@ -52,7 +52,7 @@ $string['appraisal:viewownappraisals'] = 'View own appraisals';
 $string['appraisal:viewallappraisals'] = 'View full details of all appraisals';
 $string['appraisal:printownappraisals'] = 'Print own appraisals';
 $string['appraisal'] = 'Appraisal';
-$string['appraisalcreated'] = 'Appraisal Created';
+$string['appraisalcreated'] = 'Appraisal created';
 $string['appraisals'] = 'Appraisals';
 $string['appraisalactivated'] = 'Appraisal {$a} activated';
 $string['appraisalactivenochangesallowed'] = 'This appraisal is active, no changes can be made to learner assignments';
@@ -84,7 +84,7 @@ $string['appraisalstaticlastwarning'] = 'Activating this appraisal will disable 
     have configured.';
 $string['appraisaldynamiclastwarning'] = 'Activating this appraisal will disable changes to all stages, pages and questions.
     It will make the appraisal available to those users and send out any messages you have configured.';
-$string['appraisalupdated'] = 'Appraisal Updated';
+$string['appraisalupdated'] = 'Appraisal updated';
 $string['asroleappraiser'] = 'As Appraiser';
 $string['asrolelearner'] = 'My Appraisals';
 $string['asrolemanager'] = 'As Manager';

@@ -62,10 +62,8 @@ if (!empty($deleteid)) {
 
         \totara_plan\event\evidence_type_deleted::create_from_type($item)->trigger();
 
-        totara_set_notification(get_string('deletedevidencetype', 'totara_plan',
-                format_string($item->name)),
-                $indexurl,
-                array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('deletedevidencetype', 'totara_plan', format_string($item->name)));
+        redirect($indexurl);
     } else {
         $deletemsg = get_string('deletecheckevidencetype', 'totara_plan');
         if (dp_evidence_type_is_used($deleteid)) {

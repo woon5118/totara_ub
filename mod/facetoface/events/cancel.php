@@ -81,7 +81,8 @@ if ($fromform = $mform->get_data()) {
     }
 
     $message = get_string('bookingsessioncancelled', 'facetoface');
-    totara_set_notification($message, $returnurl, array('class' => 'notifysuccess'));
+    \core\notification::success($message);
+    redirect($returnurl);
 }
 
 echo $OUTPUT->header();

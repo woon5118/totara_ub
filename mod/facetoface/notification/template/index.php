@@ -88,7 +88,8 @@ if ($delete) {
     $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_facetoface', 'notificationtpl', array(), $cacheoptions);
     $cache->delete('oldnotifications');
 
-    totara_set_notification(get_string('notificationtemplatedeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('notificationtemplatedeleted', 'facetoface'));
+    redirect($redirectto);
 }
 
 if ($restore) {
@@ -106,7 +107,8 @@ if ($restore) {
         die;
     }
     $affectedrows = facetoface_notification_restore_missing_template($conditiontype);
-    totara_set_notification(get_string('notificationtemplaterestored', 'facetoface', $affectedrows), $redirectto, ['class' => 'notifysuccess']);
+    \core\notification::success(get_string('notificationtemplaterestored', 'facetoface', $affectedrows));
+    redirect($redirectto);
 }
 
 // Header

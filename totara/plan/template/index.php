@@ -64,8 +64,8 @@ if ($show) {
 if ($hide) {
     if ($template = $DB->get_record('dp_template', array('id' => $hide))) {
         if ($template->isdefault == 1) {
-            $message = get_string('cannothidedefault', 'totara_plan');
-            totara_set_notification($message, new moodle_url('/totara/plan/template/index.php'));
+            \core\notification::error(get_string('cannothidedefault', 'totara_plan'));
+            redirect(new moodle_url('/totara/plan/template/index.php'));
         }
         $visible = 0;
         $DB->set_field('dp_template', 'visible', $visible, array('id' => $template->id));
@@ -143,17 +143,20 @@ if ($delete && $confirm) {
         $DB->delete_records('dp_permissions',           array('templateid' => $delete));
 
         $transaction->allow_commit();
-        totara_set_notification(get_string('deletedp', 'totara_plan'), new moodle_url('/totara/plan/template/index.php'), array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('deletedp', 'totara_plan'));
+        redirect(new moodle_url('/totara/plan/template/index.php'));
     }
 } else if ($delete) {
     $template = $DB->get_record('dp_template', array('id' => $delete));
 
     if ($DB->count_records('dp_plan', array('templateid' => $template->id)) > 0) {
-        totara_set_notification(get_string('cannotdelete_inuse', 'totara_plan'), $CFG->wwwroot.'/totara/plan/template/index.php');
+        \core\notification::error(get_string('cannotdelete_inuse', 'totara_plan'));
+        redirect($CFG->wwwroot.'/totara/plan/template/index.php');
     }
 
     if ($template->isdefault == 1) {
-        totara_set_notification(get_string('cannotdeletetemplate_default', 'totara_plan'), new moodle_url('/totara/plan/template/index.php'));
+        \core\notification::error(get_string('cannotdeletetemplate_default', 'totara_plan'));
+        redirect(new moodle_url('/totara/plan/template/index.php'));
     }
 
     echo $OUTPUT->header();
@@ -191,7 +194,8 @@ if ($fromform = $mform->get_data()) {
         if ($newtemplateid) {
             redirect(new moodle_url('/totara/plan/template/general.php', array('id' => $newtemplateid)));
         } else {
-            totara_set_notification($error, $CFG->wwwroot . '/totara/plan/template/index.php');
+            \core\notification::error($error);
+            redirect($CFG->wwwroot . '/totara/plan/template/index.php');
         }
     }
 }

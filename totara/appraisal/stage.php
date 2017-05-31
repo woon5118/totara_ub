@@ -70,13 +70,14 @@ switch ($action) {
                 print_error('confirmsesskeybad', 'error');
             }
             if (empty($fromform->submitbutton)) {
-                totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_appraisal'), $returnurl);
+                \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_appraisal'));
+                redirect($returnurl);
             }
             if (!empty($fromform->timedue)) {
                 // Set date to end-of-day.
                 $fromform->timedue += ((int)$fromform->timedue > 0 ? (DAYSECS - 1) : 0);
                 if ($fromform->timedue < time()) {
-                    totara_set_notification(get_string('error:completebyinvalid', 'totara_appraisal'));
+                    \core\notification::error(get_string('error:completebyinvalid', 'totara_appraisal'));
                     break;
                 }
             }
@@ -104,14 +105,14 @@ switch ($action) {
                 }
             }
 
-            totara_set_notification(get_string('stageupdated', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('stageupdated', 'totara_appraisal'));
+            redirect($returnurl);
         }
         break;
     case 'delete':
         if ($stage->id < 1) {
-            totara_set_notification(get_string('error:stagenotfound', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:stagenotfound', 'totara_appraisal'));
+            redirect($returnurl);
         }
         if ($isdraft) {
             $confirm = optional_param('confirm', 0, PARAM_INT);
@@ -120,12 +121,12 @@ switch ($action) {
                     print_error('confirmsesskeybad', 'error');
                 }
                 $stage->delete();
-                totara_set_notification(get_string('deletedstage', 'totara_appraisal'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('deletedstage', 'totara_appraisal'));
+                redirect($returnurl);
             }
         } else {
-            totara_set_notification(get_string('error:appraisalmustdraft', 'totara_appraisal'), $returnurl,
-                    array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:appraisalmustdraft', 'totara_appraisal'));
+            redirect($returnurl);
         }
         break;
     default:

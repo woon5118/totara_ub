@@ -72,15 +72,17 @@ if ($mform->is_cancelled()) {
 
     $error = '';
     $items_to_add = hierarchy::construct_items_to_add($formdata, $error);
+    $url = new moodle_url('/totara/hierarchy/index.php', ['prefix' => $prefix, 'frameworkid' => $frameworkid, 'page' => $page]);
     if (!$items_to_add) {
-        totara_set_notification(get_string('bulkaddfailed', 'totara_hierarchy', $error), "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&amp;frameworkid={$frameworkid}&amp;page={$page}");
+        \core\notification::error(get_string('bulkaddfailed', 'totara_hierarchy', $error));
     }
 
     if ($new_ids = $hierarchy->add_multiple_hierarchy_items($formdata->parentid, $items_to_add, $frameworkid)) {
-        totara_set_notification(get_string('bulkaddsuccess', 'totara_hierarchy', count($new_ids)), "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&amp;frameworkid={$frameworkid}&amp;page={$page}", array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('bulkaddsuccess', 'totara_hierarchy', count($new_ids)));
     } else {
-        totara_set_notification(get_string('bulkaddfailed', 'totara_hierarchy'), "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&amp;frameworkid={$frameworkid}&amp;page={$page}");
+        \core\notification::error(get_string('bulkaddfailed', 'totara_hierarchy'));
     }
+    redirect($url);
 }
 
 $PAGE->navbar->add(get_string("{$prefix}frameworks", 'totara_hierarchy'), new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => $prefix)));

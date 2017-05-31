@@ -107,11 +107,9 @@ if ($data = data_submitted() && $canupdate) {
         }
 
         if ($deletions) {
-            totara_set_notification(get_string('selectedlinkedcompetenciesremovedfromcourse', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
-        } else {
-            redirect($currenturl);
+            \core\notification::success(get_string('selectedlinkedcompetenciesremovedfromcourse', 'totara_plan'));
         }
-        die();
+        redirect($currenturl);
     }
 
     if ($action === 'removelinkedevidence' && !$plan->is_complete()) {

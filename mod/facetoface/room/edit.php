@@ -49,7 +49,8 @@ if ($form->is_cancelled()) {
 if ($data = $form->get_data()) {
     $room = \mod_facetoface\room_helper::save($data);
     $message = $id ? get_string('roomupdatesuccess', 'facetoface') : get_string('roomcreatesuccess', 'facetoface');
-    totara_set_notification($message, $roomlisturl, array('class' => 'notifysuccess'));
+    \core\notification::success($message);
+    redirect($roomlisturl);
 }
 
 if ($id == 0) {

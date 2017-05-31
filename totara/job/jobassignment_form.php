@@ -518,7 +518,7 @@ class job_assignment_form extends moodleform {
         }
 
         if (!empty($result)) {
-            totara_set_notification(get_string('error:positionvalidationfailed', 'totara_job'));
+            \core\notification::error(get_string('error:positionvalidationfailed', 'totara_job'));
         }
 
         return $result;

@@ -54,13 +54,14 @@ if (data_submitted() && confirm_sesskey() && (!empty($extensionsselceted))) {
         $update_extension_count = $total;
         if ($total == 0 && $update_fail_count == 0) {
             redirect('manageextensions.php');
-        } elseif ($update_fail_count == $update_extension_count && $update_fail_count > 0) {
-            totara_set_notification(get_string('updateextensionfailall', 'totara_program'), 'manageextensions.php?userid='.$userid);
-        } elseif ($update_fail_count > 0) {
-            totara_set_notification(get_string('updateextensionfailcount', 'totara_program', $update_fail_count), 'manageextensions.php?userid='.$userid);
+        } else if ($update_fail_count == $update_extension_count && $update_fail_count > 0) {
+            \core\notification::error(get_string('updateextensionfailall', 'totara_program'));
+        } else if ($update_fail_count > 0) {
+            \core\notification::error(get_string('updateextensionfailcount', 'totara_program', $update_fail_count));
         } else {
-            totara_set_notification(get_string('updateextensionsuccess', 'totara_program'), 'manageextensions.php?userid='.$userid, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('updateextensionsuccess', 'totara_program'));
         }
+        redirect('manageextensions.php?userid=' . $userid);
     }
 }
 

@@ -59,7 +59,8 @@ $list = new bulk_list($listid);
 // Selected users.
 $userlist = $list->get_user_ids();
 if (empty($userlist)) {
-    totara_set_notification(get_string('updateattendeesunsuccessful', 'facetoface'), $returnurl);
+    \core\notification::success(get_string('updateattendeesunsuccessful', 'mod_facetoface'));
+    redirect($returnurl);
 }
 
 $isnotificationactive = facetoface_is_notification_active(MDL_F2F_CONDITION_BOOKING_CONFIRMATION, $seminar->get_id(), true);

@@ -84,8 +84,8 @@ $customdata = array('certification' => $certification, 'timeallowance' => $timea
 $form = new edit_certification_form($currenturl, $customdata, 'post', '', array('name'=>'form_certif_details'));
 
 if ($form->is_cancelled()) {
-    totara_set_notification(get_string('programupdatecancelled', 'totara_program'), $overviewurl,
-                                                                                array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('programupdatecancelled', 'totara_program'));
+    redirect($overviewurl);
 }
 
 // This is where we validate and check the submitted data before saving it.
@@ -102,11 +102,9 @@ if ($data = $form->get_data()) {
         // Trigger event.
         $event = \totara_certification\event\certification_updated::create_from_instance($program)->trigger();
 
-        totara_set_notification(get_string('certificationdetailssaved', 'totara_certification'),
-                new moodle_url('/totara/certification/edit_certification.php', array('id' => $program->id)),
-                array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('certificationdetailssaved', 'totara_certification'));
+        redirect(new moodle_url('/totara/certification/edit_certification.php', array('id' => $program->id)));
     }
-
 }
 
 // Display.

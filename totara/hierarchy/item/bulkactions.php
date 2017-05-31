@@ -212,23 +212,20 @@ if ($confirmdelete) {
         $a = new stdClass();
         $a->num = count($unique_ids);
         $a->items = $items;
-        $message = get_string('xitemsdeleted', 'totara_hierarchy', $a);
-        totara_set_notification($message, $returnurl,
-            array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('xitemsdeleted', 'totara_hierarchy', $a));
+        redirect($returnurl);
     } else if ($deletecount == 0) {
-        $message = get_string('error:nonedeleted', 'totara_hierarchy', $items);
-        totara_set_notification($message, $formurl);
+        \core\notification::error(get_string('error:nonedeleted', 'totara_hierarchy', $items));
+        redirect($formurl);
     } else {
         $a = new stdClass();
         $a->actually_deleted = $deletecount;
         $a->marked_for_deletion = count($unique_ids);
         $a->items = $items;
-        $message = get_string('error:somedeleted', 'totara_hierarchy', $a);
-        totara_set_notification($message, $returnurl);
+        \core\notification::error(get_string('error:somedeleted', 'totara_hierarchy', $a));
+        redirect($returnurl);
     }
-
 }
-
 
 // confirm item move
 if ($confirmmove && $newparent !== false) {
@@ -246,7 +243,8 @@ if ($confirmmove && $newparent !== false) {
             $status = $status && $hierarchy->move_hierarchy_item($item_to_move, $frameworkid, $newparent);
         }
         if (!$status) {
-            totara_set_notification(get_string('error:failedbulkmove', 'totara_hierarchy'), $formurl);
+            \core\notification::error(get_string('error:failedbulkmove', 'totara_hierarchy'));
+            redirect($formurl);
         }
         $transaction->allow_commit();
 
@@ -259,8 +257,8 @@ if ($confirmmove && $newparent !== false) {
     $a->items = ($a->num == 1) ? strtolower(get_string($prefix, 'totara_hierarchy')) :
         strtolower(get_string($prefix . 'plural', 'totara_hierarchy'));
 
-    totara_set_notification(get_string('xitemsmoved', 'totara_hierarchy', $a),
-        $returnurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('xitemsmoved', 'totara_hierarchy', $a));
+    redirect($returnurl);
 }
 
 $PAGE->navbar->add(get_string("{$prefix}frameworks", 'totara_hierarchy'), new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => $prefix)));
@@ -280,8 +278,8 @@ if ($mform->is_cancelled()) {
     // items added
     if (isset($formdata->add_items)) {
         if (!isset($formdata->available)) {
-
-            totara_set_notification(get_string('error:noitemsselected', 'totara_hierarchy'), $formurl);
+            \core\notification::error(get_string('error:noitemsselected', 'totara_hierarchy'));
+            redirect($formurl);
         }
         // add selected items to the SESSION, and redirect back to page
         // only include the parent as all children are automatically included
@@ -296,7 +294,8 @@ if ($mform->is_cancelled()) {
     // items removed
     if (isset($formdata->remove_items)) {
         if (!isset($formdata->selected)) {
-            totara_set_notification(get_string('error:noitemsselected', 'totara_hierarchy'), $formurl);
+            \core\notification::error(get_string('error:noitemsselected', 'totara_hierarchy'));
+            redirect($formurl);
         }
         // remove selected items to the SESSION, and redirect back to page
         foreach ($formdata->selected as $removed_item) {
@@ -339,7 +338,8 @@ if ($mform->is_cancelled()) {
             echo $OUTPUT->header();
             echo $hierarchy->delete_bulk_confirmation_modal($unique_ids, $formurl, $USER->sesskey, $OUTPUT);
         } else {
-            totara_set_notification(get_string('error:noitemsselected', 'totara_hierarchy'), $formurl);
+            \core\notification::error(get_string('error:noitemsselected', 'totara_hierarchy'));
+            redirect($formurl);
         }
 
         echo $OUTPUT->footer();
@@ -351,7 +351,8 @@ if ($mform->is_cancelled()) {
         $unique_ids = $hierarchy->get_items_excluding_children($all_selected_item_ids);
 
         if (count($unique_ids) <= 0) {
-            totara_set_notification(get_string('error:noitemsselected', 'totara_hierarchy'), $formurl);
+            \core\notification::error(get_string('error:noitemsselected', 'totara_hierarchy'));
+            redirect($formurl);
         }
 
         $invalidmove = false;
@@ -378,7 +379,8 @@ if ($mform->is_cancelled()) {
         }
 
         if ($invalidmove) {
-            totara_set_notification($message, $formurl);
+            \core\notification::error($message);
+            redirect($formurl);
         } else {
             echo $OUTPUT->header();
             $strmove = $hierarchy->get_move_message($unique_ids, $newparent);

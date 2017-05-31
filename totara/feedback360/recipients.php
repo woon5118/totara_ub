@@ -51,11 +51,13 @@ if ($mform->is_cancelled()) {
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_feedback360'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_feedback360'));
+        redirect($returnurl);
     }
     $feedback360->recipients = $fromform->recipients;
     $feedback360->save();
-    totara_set_notification(get_string('recipientsupdated', 'totara_feedback360'), $returnurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('recipientsupdated', 'totara_feedback360'));
+    redirect($returnurl);
 } else {
     $mform->set_data($feedback360->get());
 }

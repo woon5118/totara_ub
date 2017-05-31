@@ -666,7 +666,8 @@ class dp_objective_component extends dp_base_component {
             if ($this->plan->reviewing_pending) {
                 return true;
             } else if (!$ajax) {
-                totara_set_notification(get_string('objectivesupdated', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('objectivesupdated', 'totara_plan'));
+                redirect($currenturl);
             }
         }
 

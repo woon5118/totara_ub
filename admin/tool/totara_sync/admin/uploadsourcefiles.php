@@ -70,8 +70,8 @@ if ($data = $form->get_data()) {
         $fs->delete_area_files($draft_context->id, 'user', 'draft', $draftid);
     }
 
-    totara_set_notification(get_string('uploadsuccess', 'tool_totara_sync'), $FULLME,
-        array('class'=>'notifysuccess'));
+    \core\notification::success(get_string('uploadsuccess', 'tool_totara_sync'));
+    redirect($FULLME);
 }
 
 

@@ -62,7 +62,7 @@ if ($form->is_cancelled()) {
     foreach ($filetypes as $ft) {
         $formdata = file_postupdate_standard_filemanager($data, $ft, $options, $PAGE->context, $component, $ft, 0);
     }
-    totara_set_notification(get_string('successuploadicon', 'totara_core'), null, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('successuploadicon', 'totara_core'));
 }
 
 echo $OUTPUT->header();

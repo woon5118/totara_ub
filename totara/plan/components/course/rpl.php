@@ -83,7 +83,8 @@ if ($mform->is_cancelled()) {
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_plan'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_plan'));
+        redirect($returnurl);
     }
 
     $rpl = $fromform->rpl;
@@ -115,13 +116,9 @@ if ($fromform = $mform->get_data()) {
         $completion->delete();
     }
 
-    totara_set_notification(
-        get_string('rplupdated', 'totara_plan'),
-        $returnurl,
-        array('class' => 'notifysuccess')
-    );
+    \core\notification::success(get_string('rplupdated', 'totara_plan'));
+    redirect($returnurl);
 }
-
 
 $fullname = $plan->name;
 $pagetitle = format_string(get_string('learningplan', 'totara_plan').': '.$fullname);

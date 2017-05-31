@@ -62,13 +62,15 @@ if ($mform->is_cancelled()) {
 if ($fromform = $mform->get_data()) {
 
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_plan'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_plan'));
+        redirect($returnurl);
     }
     if (update_general_settings($id, $fromform)) {
-        totara_set_notification(get_string('update_general_settings', 'totara_plan'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('update_general_settings', 'totara_plan'));
     } else {
-        totara_set_notification(get_string('error:update_general_settings', 'totara_plan'), $returnurl);
+        \core\notification::error(get_string('error:update_general_settings', 'totara_plan'));
     }
+    redirect($returnurl);
 }
 
 $PAGE->navbar->add(format_string($template->fullname));

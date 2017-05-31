@@ -46,9 +46,8 @@ if ($mform->is_cancelled()) {
 if ($fromform = $mform->get_data()) {
 
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(
-            get_string('error:unknownbuttonclicked', 'totara_reportbuilder'),
-            $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
     // create new record here
     $todb = new stdClass();

@@ -78,8 +78,8 @@ if ($delete) {
         $transaction->allow_commit();
 
         \totara_plan\event\objective_scale_updated::create_from_scale($objective)->trigger();
-        totara_set_notification(get_string('deletedobjectivescalevalue', 'totara_plan', format_string($objective->name)), $CFG->wwwroot.'/totara/plan/objectivescales/view.php?id='.$objective->id, array('class' => 'notifysuccess'));
-
+        \core\notification::success(get_string('deletedobjectivescalevalue', 'totara_plan', format_string($objective->name)));
+        redirect($CFG->wwwroot . '/totara/plan/objectivescales/view.php?id=' . $objective->id);
     } else {
         $returnurl = new moodle_url('/totara/plan/objectivescales/view.php', array('id' => $objective->id));
         $deleteurl = new moodle_url('/totara/plan/objectivescales/view.php', array('id' => $objective->id, 'delete' => $delete, 'confirm' => '1', 'sesskey' => sesskey()));
@@ -176,7 +176,7 @@ if ($default) {
 
     $DB->update_record('dp_objective_scale', $s);
 
-    totara_set_notification(get_string('objectivescaledefaultupdated', 'totara_plan'), null, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('objectivescaledefaultupdated', 'totara_plan'));
     // Fetch the update scale record so it'll show up to the user.
     $objective = $DB->get_record('dp_objective_scale', array('id' => $id));
 }

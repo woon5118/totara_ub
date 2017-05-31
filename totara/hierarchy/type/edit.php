@@ -140,9 +140,6 @@ if ($typeform->is_cancelled()) {
 } else if ($typenew = $typeform->get_data()) {
     $typenew->timemodified = time();
     $typenew->usermodified = $USER->id;
-    // Class to hold totara_set_notification info.
-    $notification = new stdClass();
-    $notification->url = $returnurl;
 
     // New type.
     if ($typenew->id == 0) {
@@ -159,8 +156,7 @@ if ($typeform->is_cancelled()) {
         $eventname = "\\hierarchy_{$prefix}\\event\\type_created";
         $eventname::create_from_instance($typenew)->trigger();
 
-        $notification->text = $prefix . 'createtype';
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = $prefix . 'createtype';
 
     // Existing type.
     } else {
@@ -174,12 +170,12 @@ if ($typeform->is_cancelled()) {
         $eventname = "\\hierarchy_{$prefix}\\event\\type_updated";
         $eventname::create_from_instance($typenew)->trigger();
 
-        $notification->text = $prefix . 'updatetype';
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = $prefix . 'updatetype';
     }
-    totara_set_notification(get_string($notification->text, 'totara_hierarchy', $typenew->fullname), $notification->url, $notification->params);
-}
 
+    \core\notification::success(get_string($notification_text, 'totara_hierarchy', $typenew->fullname));
+    redirect($returnurl);
+}
 
 /// Display page header
 $PAGE->navbar->add(get_string("{$prefix}types", 'totara_hierarchy'), $returnurl);

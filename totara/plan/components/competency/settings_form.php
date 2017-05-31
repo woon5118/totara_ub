@@ -217,5 +217,6 @@ function dp_competency_component_process_settings_form($fromform, $id) {
         }
     }
     $transaction->allow_commit();
-    totara_set_notification(get_string('update_competency_settings', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('update_competency_settings', 'totara_plan'));
+    redirect($currenturl);
 }

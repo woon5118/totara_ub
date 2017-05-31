@@ -101,8 +101,8 @@ if ($delete && !empty($resp_assignment)) {
 
     \totara_feedback360\event\request_deleted::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
 
-    totara_set_notification(get_string('feedback360requestdeleted', 'totara_feedback360'), $returnurl,
-            array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('feedback360requestdeleted', 'totara_feedback360'));
+    redirect($returnurl);
 } else {
     // Display confirmation page.
     echo $OUTPUT->header();

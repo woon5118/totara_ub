@@ -124,7 +124,8 @@ class grade_export_fusion extends grade_export {
             $errordetails = implode($brtag, $errormessages);
             $url = new moodle_url('/grade/report/grader/index.php', array('id' => $this->course->id));
 
-            totara_set_notification(get_string('error:fusionexport', 'gradeexport_fusion', format_string($errordetails)), $url);
+            \core\notification::error(get_string('error:fusionexport', 'gradeexport_fusion', format_string($errordetails)));
+            redirect($url);
         }
 
         $table = $oauth->table_by_name($this->tablename, true);

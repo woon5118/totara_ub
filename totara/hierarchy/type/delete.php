@@ -105,9 +105,8 @@ if ($deleteresult === true) {
     $eventclass = "\\hierarchy_{$prefix}\\event\\type_deleted";
     $eventclass::create_from_instance($type)->trigger();
 
-    totara_set_notification(get_string($prefix.'deletedtype', 'totara_hierarchy', $type->fullname),
-        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix={$prefix}&class={$class}", array('class' => 'notifysuccess'));
+    \core\notification::success(get_string($prefix . 'deletedtype', 'totara_hierarchy', $type->fullname));
 } else {
-    totara_set_notification(get_string($prefix.'error:deletedtype', 'totara_hierarchy', $type->fullname),
-        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix={$prefix}&class={$class}");
+    \core\notification::error(get_string($prefix . 'error:deletedtype', 'totara_hierarchy', $type->fullname));
 }
+redirect(new moodle_url('/totara/hierarchy/type/index.php', ['class' => $class, 'prefix' => $prefix]));

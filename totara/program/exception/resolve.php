@@ -89,8 +89,7 @@ unset($_SESSION['exceptions_removed']);
 $_SESSION['exceptions_resolved'] = true; // set a flag to indicate that issues have been resolved
 
 if (count($failed_ids) == 0) {
-    totara_set_notification(get_string('successfullyresolvedexceptions', 'totara_program'), null, array('class' => 'notifysuccess'));
-}
-else {
-    totara_set_notification(get_string('failedtoresolve', 'totara_program') . ': ' . implode(', ', $failed_ids));
+    \core\notification::success(get_string('successfullyresolvedexceptions', 'totara_program'));
+} else {
+    \core\notification::error(get_string('failedtoresolve', 'totara_program') . ': ' . implode(', ', $failed_ids));
 }

@@ -50,7 +50,8 @@ if ($mform->is_cancelled()) {
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_dashboard'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_dashboard'));
+        redirect($returnurl);
     }
 
     if (!confirm_sesskey()) {
@@ -59,7 +60,8 @@ if ($fromform = $mform->get_data()) {
 
     $dashboard->set_from_form($fromform)->save();
 
-    totara_set_notification(get_string('dashboardsaved', 'totara_dashboard'), $returnurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('dashboardsaved', 'totara_dashboard'));
+    redirect($returnurl);
 }
 
 if ($id == 0) {

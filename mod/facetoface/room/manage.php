@@ -72,8 +72,8 @@ if ($action === 'delete') {
     $room->delete();
     unset($room);
 
-    totara_set_notification(get_string('roomdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('roomdeleted', 'facetoface'));
+    redirect($redirectto);
 } else if ($action === 'show') {
     if (empty($id)) {
         print_error('error:roomdoesnotexist', 'facetoface', $returnurl);
@@ -88,8 +88,8 @@ if ($action === 'delete') {
     $room->show();
     $room->save();
 
-    totara_set_notification(get_string('roomshown', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('roomshown', 'facetoface'));
+    redirect($redirectto);
 } else if ($action === 'hide') {
     if (empty($id)) {
         print_error('error:roomdoesnotexist', 'facetoface', $returnurl);
@@ -104,7 +104,8 @@ if ($action === 'delete') {
     $room->hide();
     $room->save();
 
-    totara_set_notification(get_string('roomhidden', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('roomhidden', 'facetoface'));
+    redirect($redirectto);
 }
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);

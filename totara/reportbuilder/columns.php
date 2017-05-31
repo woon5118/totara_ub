@@ -57,10 +57,11 @@ $advoptions = $report->src->get_all_advanced_column_options();
 if ($h !== null && isset($cid)) {
     if ($report->showhide_column($cid, $h)) {
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
-        totara_set_notification(get_string('column_vis_updated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('column_vis_updated', 'totara_reportbuilder'));
     } else {
-        totara_set_notification(get_string('error:column_vis_not_updated', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:column_vis_not_updated', 'totara_reportbuilder'));
     }
+    redirect($returnurl);
 }
 
 // delete column
@@ -68,10 +69,11 @@ if ($d and $cid) {
     if ($confirm and confirm_sesskey()) {
         if ($report->delete_column($cid)) {
             \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
-            totara_set_notification(get_string('column_deleted', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('column_deleted', 'totara_reportbuilder'));
         } else {
-            totara_set_notification(get_string('error:column_not_deleted', 'totara_reportbuilder'), $returnurl);
+            \core\notification::error(get_string('error:column_not_deleted', 'totara_reportbuilder'));
         }
+        redirect($returnurl);
     }
     echo $output->header();
 
@@ -87,10 +89,11 @@ if ($d and $cid) {
 if ($m and $cid and confirm_sesskey()) {
     if ($report->move_column($cid, $m)) {
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
-        totara_set_notification(get_string('column_moved', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('column_moved', 'totara_reportbuilder'));
     } else {
-        totara_set_notification(get_string('error:column_not_moved', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:column_not_moved', 'totara_reportbuilder'));
     }
+    redirect($returnurl);
 }
 
 // Form definition.
@@ -102,7 +105,8 @@ if ($mform->is_cancelled()) {
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
     if (totara_reportbuilder_build_columns($fromform, $report, $allowedadvanced, $grouped)) {
         reportbuilder_set_status($id);
@@ -111,11 +115,12 @@ if ($fromform = $mform->get_data()) {
         $report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
 
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
-        totara_set_notification(get_string('columns_updated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('columns_updated', 'totara_reportbuilder'));
+        redirect($returnurl);
     } else {
-        totara_set_notification(get_string('error:columns_not_updated', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:columns_not_updated', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
-
 }
 
 echo $output->header();

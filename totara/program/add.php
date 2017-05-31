@@ -278,7 +278,8 @@ if ($data = $form->get_data()) {
         );
         $event->trigger();
 
-      totara_set_notification($successmsg, $viewurl, array('class' => 'notifysuccess'));
+        \core\notification::success($successmsg);
+        redirect($viewurl);
     }
 }
 

@@ -60,12 +60,11 @@ if ($form->is_cancelled()) {
 
     if (reportbuilder_clone_report($report, get_string('clonenamepattern', 'totara_reportbuilder', $origname))) {
         \totara_reportbuilder\event\report_cloned::create_from_report($report)->trigger();
-        totara_set_notification(get_string('clonecompleted', 'totara_reportbuilder'), $CFG->wwwroot . $returnurl,
-                array('class' => 'notifysuccess'));
-
+        \core\notification::success(get_string('clonecompleted', 'totara_reportbuilder'));
     } else {
-        totara_set_notification(get_string('clonefailed', 'totara_reportbuilder'), $CFG->wwwroot . $returnurl);
+        \core\notification::error(get_string('clonefailed', 'totara_reportbuilder'));
     }
+    redirect($CFG->wwwroot . $returnurl);
 }
 
 echo $output->header();

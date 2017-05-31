@@ -95,7 +95,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                 $import_deleted_old = $source->get_config('import_deleted');
                 if ($import_deleted_new != $import_deleted_old) {
                     $source->set_config('import_deleted', $import_deleted_new);
-                    totara_set_notification(get_string('checkconfig', 'tool_totara_sync', $url->out()), null, array('class'=>'notifynotice alert alert-warning'));
+                    \core\notification::warning(get_string('checkconfig', 'tool_totara_sync', $url->out()));
                 }
             }
         }

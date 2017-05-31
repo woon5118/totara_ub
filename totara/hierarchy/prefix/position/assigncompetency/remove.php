@@ -87,7 +87,8 @@ if ($delete) {
 
     \hierarchy_position\event\competency_unassigned::create_from_instance($snapshot)->trigger();
 
-    totara_set_notification(get_string('positiondeletedassignedcompetency', 'totara_hierarchy'), $returnurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('positiondeletedassignedcompetency', 'totara_hierarchy'));
+    redirect($returnurl);
 } else {
     /// Display page
     echo $OUTPUT->header();

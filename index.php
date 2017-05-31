@@ -96,7 +96,8 @@ if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
             require_sesskey();
             set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
             $url = new moodle_url('/');
-            totara_set_notification(get_string('userhomepagechanged', 'totara_dashboard'), $url, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('userhomepagechanged', 'totara_dashboard'));
+            redirect($url);
         }
         $newhomeurl = new moodle_url('/', array('setdefaulthome' => 1, 'sesskey' => sesskey()));
         $PAGE->settingsnav->add(get_string('makesitemyhomepage', 'totara_dashboard'), $newhomeurl, navigation_node::TYPE_SETTING);

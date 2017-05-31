@@ -402,7 +402,8 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $result = $this->validate_totara_facetoface_sid($facetofaces[$session->facetoface], $sessions[$sid], $selfapprovaltc);
                 if ($result !== true) {
                     // Show error and redirect.
-                    totara_set_notification($result, $returnurl);
+                    \core\notification::error($result);
+                    redirect($returnurl);
                 }
             }
 
@@ -450,17 +451,20 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $returnurl = new moodle_url('/');
         }
 
-        $cssclass = 'notifymessage';
         if ($enrol) {
             $this->enrol_user($instance, $USER->id, $instance->roleid, $timestart, $timeend);
-            $cssclass = 'notifysuccess';
+            \core\notification::success($message);
             // Send welcome message.
             if ($instance->customint4) {
                 $this->email_welcome_message($instance, $USER);
             }
+        } else {
+            \core\notification::info($message);
         }
 
-        totara_set_notification($message, $returnurl, array('class' => $cssclass), false);
+        if (!empty($returnurl)) {
+            redirect($returnurl);
+        }
         return $enrol;
     }
 

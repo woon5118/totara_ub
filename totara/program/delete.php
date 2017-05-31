@@ -103,5 +103,6 @@ if ($program->delete()) {
     }
     $viewtype = ($program->certifid ? 'certification' : 'program');
     $notification_url = "{$CFG->wwwroot}/totara/program/index.php?categoryid={$category}&amp;viewtype={$viewtype}";
-    totara_set_notification(get_string('programdeletesuccess', 'totara_program', $program->fullname), $notification_url, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('programdeletesuccess', 'totara_program', $program->fullname));
+    redirect($notification_url);
 }

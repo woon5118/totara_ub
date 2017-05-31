@@ -94,11 +94,8 @@ if ($mform->is_cancelled()) {
         \totara_plan\event\evidence_type_updated::create_from_type($data)->trigger();
     }
 
-    totara_set_notification(get_string('evidencetype'.$action, 'totara_plan',
-            format_string(stripslashes($data->name))),
-        new moodle_url('/totara/plan/evidencetypes/index.php'),
-        array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('evidencetype'.$action, 'totara_plan', format_string(stripslashes($data->name))));
+    redirect(new moodle_url('/totara/plan/evidencetypes/index.php'));
 }
 
 // Print Page

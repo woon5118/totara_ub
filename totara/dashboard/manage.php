@@ -57,8 +57,8 @@ switch ($action) {
                 'original' => $dashboard->name,
                 'clone' => $clone->name
             );
-            totara_set_notification(get_string('dashboardclonesuccess', 'totara_dashboard', $args), $returnurl,
-                array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('dashboardclonesuccess', 'totara_dashboard', $args));
+            redirect($returnurl);
         }
         break;
     case 'delete':
@@ -66,8 +66,8 @@ switch ($action) {
         if ($confirm) {
             require_sesskey();
             $dashboard->delete($id);
-            totara_set_notification(get_string('dashboarddeletesuccess', 'totara_dashboard'), $returnurl,
-                    array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('dashboarddeletesuccess', 'totara_dashboard'));
+            redirect($returnurl);
         }
         break;
     case 'up':
@@ -85,8 +85,8 @@ switch ($action) {
         if ($confirm) {
             require_sesskey();
             $dashboard->reset_all();
-            totara_set_notification(get_string('dashboardresetsuccess', 'totara_dashboard'), $returnurl,
-                    array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('dashboardresetsuccess', 'totara_dashboard'));
+            redirect($returnurl);
         }
         break;
 }

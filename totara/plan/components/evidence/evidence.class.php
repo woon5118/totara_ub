@@ -158,8 +158,8 @@ class dp_evidence_relation {
                 // Remove them
                 $this->update_linked_evidence($keepids);
 
-                totara_set_notification(get_string('selectedlinkedevidenceremovedfrom'.$this->componentname, 'totara_plan'),
-                        $currenturl, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('selectedlinkedevidenceremovedfrom' . $this->componentname, 'totara_plan'));
+                redirect($currenturl);
             }
         }
 

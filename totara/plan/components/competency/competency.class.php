@@ -288,7 +288,8 @@ class dp_competency_component extends dp_base_component {
 
         if ($delete && $confirm) {
             if (!confirm_sesskey()) {
-                totara_set_notification(get_string('confirmsesskeybad', 'error'), $currenturl);
+                \core\notification::error(get_string('confirmsesskeybad', 'error'));
+                redirect($currenturl);
             }
             $sql = "SELECT c.id, c.fullname FROM {comp} c INNER JOIN {dp_plan_competency_assign} ca ON ca.competencyid = c.id WHERE ca.id = ?";
             $component = $DB->get_record_sql($sql, array($delete));
@@ -313,9 +314,11 @@ class dp_competency_component extends dp_base_component {
                 $params = array('planid' => $this->plan->id, 'component' => $this->component, 'itemid' => $delete);
                 $DB->delete_records('dp_plan_evidence_relation', $params);
 
-                totara_set_notification(get_string('canremoveitem', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('canremoveitem', 'totara_plan'));
+                redirect($currenturl);
             } else {
-                totara_set_notification(get_string('cannotremoveitem', 'totara_plan'), $currenturl);
+                \core\notification::error(get_string('cannotremoveitem', 'totara_plan'));
+                redirect($currenturl);
             }
         }
     }
@@ -1153,12 +1156,14 @@ class dp_competency_component extends dp_base_component {
 
                     // Do not create notification or redirect if ajax request
                     if (!$ajax) {
-                        totara_set_notification(get_string('competenciesupdated', 'totara_plan').$issuesnotification, $currenturl, array('class' => 'notifysuccess'));
+                        \core\notification::success(get_string('competenciesupdated', 'totara_plan') . $issuesnotification);
+                        redirect($currenturl);
                     }
                 } else {
                     // Do not create notification or redirect if ajax request
                     if (!$ajax) {
-                        totara_set_notification(get_string('error:competenciesupdated', 'totara_plan'), $currenturl);
+                        \core\notification::error(get_string('error:competenciesupdated', 'totara_plan'));
+                        redirect($currenturl);
                     }
                 }
             }

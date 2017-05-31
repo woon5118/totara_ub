@@ -59,8 +59,8 @@ $form = new prog_edit_completion_history_form($url, $customdata, 'post', '', arr
 // Process any actions submitted.
 if ($form->is_cancelled()) {
     $url = new moodle_url('/totara/program/edit_completion.php', array('id' => $id, 'userid' => $userid));
-    totara_set_notification(get_string('completionupdatecancelled', 'totara_program'), $url,
-        array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('completionupdatecancelled', 'totara_program'));
+    redirect($url);
 }
 
 if ($submitted = $form->get_data() and isset($submitted->savechanges)) {
@@ -69,9 +69,8 @@ if ($submitted = $form->get_data() and isset($submitted->savechanges)) {
     if ($chid) {
         // Verify that the chid to be updated belongs to the specified user and program.
         if (!$DB->record_exists('prog_completion_history', array('id' => $chid, 'programid' => $id, 'userid' => $userid))) {
-            totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-                $url,
-                array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:impossibledatasubmitted', 'totara_program'));
+            redirect($url);
         }
 
         $updatedrecord = new stdClass();
@@ -110,9 +109,8 @@ if ($submitted = $form->get_data() and isset($submitted->savechanges)) {
         );
     }
 
-    totara_set_notification(get_string('completionchangessaved', 'totara_program'),
-        $url,
-        array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('completionchangessaved', 'totara_program'));
+    redirect($url);
 }
 
 // Masquerade as the completion page for the sake of navigation.

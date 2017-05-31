@@ -150,10 +150,9 @@ if ($data = data_submitted() && $canupdate && !$plan->is_complete()) {
             }
 
             if ($deletions) {
-                totara_set_notification(get_string('selectedlinkedcoursesremovedfromcompetency', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
-            } else {
-                redirect($currenturl);
+                \core\notification::success(get_string('selectedlinkedcoursesremovedfromcompetency', 'totara_plan'));
             }
+            redirect($currenturl);
             break;
 
         case 'removelinkedevidence' :

@@ -51,7 +51,8 @@ if ($mform->is_cancelled()) {
 if ($fromform = $mform->get_data()) {
 
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
     reportbuilder_set_status($id);
     reportbuilder_update_access($id, $fromform);
@@ -60,7 +61,8 @@ if ($fromform = $mform->get_data()) {
     $report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
 
     \totara_reportbuilder\event\report_updated::create_from_report($report, 'access')->trigger();
-    totara_set_notification(get_string('reportupdated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('reportupdated', 'totara_reportbuilder'));
+    redirect($returnurl);
 }
 
 echo $output->header();

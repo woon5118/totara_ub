@@ -111,14 +111,15 @@ if (!empty($approve)) {
         $a = new stdClass;
         $a->name = $plan->name;
         $a->user = fullname($USER);
-        totara_set_notification(get_string('planapprovedby', 'totara_plan', $a), $referer, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('planapprovedby', 'totara_plan', $a));
+        redirect($referer);
     } else {
         if (empty($ajax)) {
-            totara_set_notification(get_string('nopermission', 'totara_plan'), $referer, array('class' => 'notifysuccess'));
+            \core\notification::error(get_string('nopermission', 'totara_plan'));
+            redirect($referer);
         }
     }
 }
-
 
 ///
 /// Decline
@@ -131,14 +132,15 @@ if (!empty($decline)) {
         $a = new stdClass;
         $a->name = $plan->name;
         $a->user = fullname($USER);
-        totara_set_notification(get_string('plandeclinedby', 'totara_plan', $a), $referer, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('plandeclinedby', 'totara_plan', $a));
+        redirect($referer);
     } else {
         if (empty($ajax)) {
-            totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
+            \core\notification::error(get_string('nopermission', 'totara_plan'));
+            redirect($referer);
         }
     }
 }
-
 
 // Learner activates their own learning plan.
 if (!empty($activate)) {
@@ -146,12 +148,13 @@ if (!empty($activate)) {
         $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE, null);
         \totara_plan\event\approval_approved::create_from_plan($plan)->trigger();
         $plan->send_activated_alert();
-        totara_set_notification(get_string('planactivated', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('planactivated', 'totara_plan', $plan->name));
+        redirect($referer);
     } else if (empty($ajax)) {
-        totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
+        \core\notification::error(get_string('nopermission', 'totara_plan'));
+        redirect($referer);
     }
 }
-
 
 ///
 /// Approval request
@@ -185,14 +188,17 @@ if (!empty($approvalrequest)) {
                     }
                 }
                 else {
-                    totara_set_notification(get_string('nomanager', 'totara_plan'), $referer);
+                    \core\notification::error(get_string('nomanager', 'totara_plan'));
+                    redirect($referer);
                 }
             }
-            totara_set_notification(get_string('approvalrequestsent', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('approvalrequestsent', 'totara_plan', $plan->name));
+            redirect($referer);
             // @todo: send approval request email to relevant user(s)
         } else {
             if (empty($ajax)) {
-                totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
+                \core\notification::error(get_string('nopermission', 'totara_plan'));
+                redirect($referer);
             }
         }
     }
@@ -202,7 +208,8 @@ if (!empty($approvalrequest)) {
         // Check this is the owner of the plan
         if ($plan->role !== 'learner') {
             if (empty($ajax)) {
-                totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
+                \core\notification::error(get_string('nopermission', 'totara_plan'));
+                redirect($referer);
             }
         }
 
@@ -214,11 +221,13 @@ if (!empty($approvalrequest)) {
                     $plan->send_manager_item_approval_request($unapproved);
                 }
             } else {
-                totara_set_notification(get_string('nomanager', 'totara_plan'), $referer);
+                \core\notification::error(get_string('nomanager', 'totara_plan'));
+                redirect($referer);
             }
 
             if (empty($ajax)) {
-                totara_set_notification(get_string('approvalrequestsent', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('approvalrequestsent', 'totara_plan', $plan->name));
+                redirect($referer);
             }
 
         }
@@ -269,11 +278,13 @@ if (!empty($delete)) {
                 $a->manager = fullname($manager);
                 $plan->send_alert_to_learner($manager, 'learningplan-remove', 'plan-remove-learner-short', 'plan-remove-learner-long', $a);
             }
-            totara_set_notification(get_string('plandeletesuccess', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('plandeletesuccess', 'totara_plan', $plan->name));
+            redirect($referer);
         }
     } else {
         if (empty($ajax)) {
-            totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
+            \core\notification::error(get_string('nopermission', 'totara_plan'));
+            redirect($referer);
         }
     }
 }
@@ -304,11 +315,13 @@ if (!empty($complete)) {
             $plan->set_status(DP_PLAN_STATUS_COMPLETE, DP_PLAN_REASON_MANUAL_COMPLETE);
             \totara_plan\event\plan_completed::create_from_plan($plan)->trigger();
             $plan->send_completion_alert();
-            totara_set_notification(get_string('plancompletesuccess', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('plancompletesuccess', 'totara_plan', $plan->name));
+            redirect($referer);
         }
     } else {
         if (empty($ajax)) {
-            totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
+            \core\notification::error(get_string('nopermission', 'totara_plan'));
+            redirect($referer);
         }
     }
 }
@@ -339,10 +352,12 @@ if (!empty($reactivate)) {
 
             // Reactivate plan
             if (!$plan->reactivate_plan($new_date)) {
-                totara_set_notification(get_string('planreactivatefail', 'totara_plan', $plan->name), $referer);
+                \core\notification::error(get_string('planreactivatefail', 'totara_plan', $plan->name));
+                redirect($referer);
             } else {
                  \totara_plan\event\plan_reactivated::create_from_plan($plan)->trigger();
-                totara_set_notification(get_string('planreactivatesuccess', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('planreactivatesuccess', 'totara_plan', $plan->name));
+                redirect($referer);
             }
         }
 
@@ -358,11 +373,13 @@ if (!empty($reactivate)) {
 
     } else {
         if (empty($ajax)) {
-            totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
+            \core\notification::error(get_string('nopermission', 'totara_plan'));
+            redirect($referer);
         }
     }
 }
 
 if (empty($ajax)) {
-    totara_set_notification(get_string('error:incorrectparameters', 'totara_plan'), $referer);
+    \core\notification::error(get_string('error:incorrectparameters', 'totara_plan'));
+    redirect($referer);
 }

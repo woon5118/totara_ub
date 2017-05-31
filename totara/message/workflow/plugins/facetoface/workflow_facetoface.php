@@ -47,10 +47,10 @@ class totara_message_workflow_facetoface extends totara_message_workflow_plugin_
         $signup = \mod_facetoface\signup::create($userid, $seminarevent);
         if ($signup->can_switch(booked::class, waitlist::class, requestedadmin::class)) {
             $signup->switch_state(booked::class, waitlist::class, requestedadmin::class);
-            totara_set_notification(get_string('attendancerequestsupdated', 'mod_facetoface'), null, ['class' => 'notifysuccess']);
+            \core\notification::success(get_string('attendancerequestsupdated', 'mod_facetoface'));
         } else {
             $errors = $signup->get_failures(booked::class, waitlist::class, requestedadmin::class);
-            totara_set_notification(current($errors), null, ['class' => 'notifyproblem']);
+            \core\notification::error(current($errors));
             return false;
         }
 
@@ -86,11 +86,11 @@ class totara_message_workflow_facetoface extends totara_message_workflow_plugin_
             // Return false here for the compability with the old behaviour, no point to sending email if the target,
             // user is not able to switch state.
             $errors = $signup->get_failures(declined::class);
-            totara_set_notification(current($errors), null, ['class' => 'notifyproblem']);
+            \core\notification::error(current($errors));
             return false;
         }
         $signup->switch_state(declined::class);
-        totara_set_notification(get_string('attendancerequestsupdated', 'mod_facetoface'), null, ['class' => 'notifysuccess']);
+        \core\notification::success(get_string('attendancerequestsupdated', 'mod_facetoface'));
 
         // issue notification that registration has been declined
         return $this->acceptreject_notification($userid, $facetoface, $session, 'status_declined');

@@ -50,11 +50,12 @@ if (!$template = $DB->get_record('dp_template', array('id' => $id))) {
 $returnurl = $CFG->wwwroot . '/totara/plan/template/components.php?id=' . $id;
 
 if ($save) {
-    if (update_plan_component_name('componentname', $id)) {
-        totara_set_notification(get_string('update_components_settings', 'totara_plan'), $returnurl, array('class' => 'notifysuccess'));
+    if (update_plan_component_name('componentname', $id)) { // TODO: This function doesn't exist.
+        \core\notification::success(get_string('update_components_settings', 'totara_plan'));
     } else {
-        totara_set_notification(get_string('error:update_components_settings', 'totara_plan'), $returnurl);
+        \core\notification::error(get_string('error:update_components_settings', 'totara_plan'));
     }
+    redirect($returnurl);
 }
 
 if ((!empty($moveup) or !empty($movedown))) {

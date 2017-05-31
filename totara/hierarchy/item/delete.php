@@ -87,11 +87,9 @@ if (!confirm_sesskey()) {
 }
 
 if ($hierarchy->delete_hierarchy_item($item->id)) {
-
-    totara_set_notification(get_string('deleted'.$prefix, 'totara_hierarchy', format_string($item->fullname)),
-        "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&frameworkid={$item->frameworkid}&page={$page}",
-        array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('deleted'.$prefix, 'totara_hierarchy', format_string($item->fullname)));
 } else {
-    totara_set_notification(get_string($prefix.'error:deletedframework', 'totara_hierarchy', format_string($item->fullname)),
-        "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&frameworkid={$item->frameworkid}&page={$page}");
+    \core\notification::error(get_string($prefix.'error:deletedframework', 'totara_hierarchy', format_string($item->fullname)));
 }
+$urlparams = ['frameworkid' => $item->frameworkid, 'prefix' => $prefix, 'page' => $page];
+redirect(new moodle_url('/totara/hierarchy/index.php', $urlparams));

@@ -51,11 +51,8 @@ if ($data = $form->get_data()) {
         ['element' => $element->get_name(), 'source' => $data->{'source_' . $element->get_name()}]
     );
 
-    totara_set_notification(
-        get_string('settingssavedlinktosource', 'tool_totara_sync', $sourceurl->out()),
-        $FULLME,
-        ['class' => 'notifysuccess']
-    );
+    \core\notification::success(get_string('settingssavedlinktosource', 'tool_totara_sync', $sourceurl->out()));
+    redirect($FULLME);
 }
 
 $currentvalues = get_config($element->get_classname());

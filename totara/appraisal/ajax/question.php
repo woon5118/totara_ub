@@ -69,8 +69,8 @@ if (is_ajax_request($_SERVER)) {
 $isdraft = appraisal::is_draft($stage->appraisalid);
 if (!$isdraft) {
     if (!in_array($action, array('', 'edit'))) {
-        totara_set_notification(get_string('error:appraisalnotdraft', 'totara_appraisal'), $returnurl);
-        return;
+        \core\notification::error(get_string('error:appraisalnotdraft', 'totara_appraisal'));
+        redirect($returnurl);
     }
 } else if (!in_array($action, array('', 'edit', 'delete')) && !confirm_sesskey()) {
     print_error('confirmsesskeybad', 'error');
@@ -119,15 +119,18 @@ switch ($action) {
         if (is_ajax_request($_SERVER)) {
             return;
         }
-        totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+        redirect($returnurl);
         break;
     case 'posup':
         appraisal_question::reorder($id, $question->sortorder - 1);
-        totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+        redirect($returnurl);
         break;
     case 'posdown':
         appraisal_question::reorder($id, $question->sortorder + 1);
-        totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+        redirect($returnurl);
         break;
     case 'move':
         switch (required_param('type', PARAM_ALPHA)) {
@@ -139,8 +142,8 @@ switch ($action) {
                     echo 'success';
                     return;
                 }
-                totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+                redirect($returnurl);
                 break;
             case 'stage':
                 $stageid = required_param('target', PARAM_INT);
@@ -161,8 +164,8 @@ switch ($action) {
                     echo 'success';
                     return;
                 }
-                totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+                redirect($returnurl);
                 break;
             default:
                 return;
@@ -171,9 +174,8 @@ switch ($action) {
         break;
     case 'delete':
         if ($question->id < 1) {
-            totara_set_notification(get_string('error:elementnotfound', 'totara_question'), $returnurl,
-                    array('class' => 'notifyproblem'));
-            return;
+            \core\notification::error(get_string('error:elementnotfound', 'totara_question'));
+            redirect($returnurl);
         }
 
         $confirm = optional_param('confirm', 0, PARAM_INT);
@@ -186,8 +188,8 @@ switch ($action) {
                 echo 'success';
                 return;
             }
-            totara_set_notification(get_string('deletedquestion', 'totara_question'), $returnurl,
-                    array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('deletedquestion', 'totara_question'));
+            redirect($returnurl);
         }
         break;
     case 'edit':
@@ -232,8 +234,8 @@ switch ($action) {
                 ajax_result();
                 return;
             } else {
-                totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('pageupdated', 'totara_appraisal'));
+                redirect($returnurl);
             }
         } else {
             $meditform->set_data($question->get(true));

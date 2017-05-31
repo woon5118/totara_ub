@@ -122,10 +122,9 @@ if ($data = data_submitted()) {
     $event->trigger();
 
     if (isset($data->savechanges)) {
-        totara_set_notification(get_string('programassignmentssaved', 'totara_program'), 'edit_assignments.php?id='.$id,
-                                                                                        array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('programassignmentssaved', 'totara_program'));
+        redirect('edit_assignments.php?id=' . $id);
     }
-
 }
 
 $currenturl = qualified_me();

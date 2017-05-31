@@ -60,7 +60,8 @@ if (!$notification = new facetoface_notification(array('id' => $id), true)) {
 }
 
 if ($notification->type == MDL_F2F_NOTIFICATION_AUTO) {
-    totara_set_notification(get_string('error:notificationnocopy', 'facetoface'), $url, array('class' => 'notifyproblem'));
+    \core\notification::error(get_string('error:notificationnocopy', 'facetoface'));
+    redirect($url);
 }
 
 $id = 0;
@@ -70,5 +71,5 @@ $notification->status = 0;
 $id = $notification->insert();
 
 $url = new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $facetoface->id, 'id' => $id));
-totara_set_notification(get_string('copynotificationcreated', 'facetoface'), $url, array('class' => 'notifysuccess'));
-
+\core\notification::success(get_string('copynotificationcreated', 'facetoface'));
+redirect($url);

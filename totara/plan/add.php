@@ -117,16 +117,15 @@ if ($data = $form->get_data()) {
         }
         $data = file_postupdate_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_plan', 'dp_plan', $data->id);
         $DB->set_field('dp_plan', 'description', $data->description, array('id' => $data->id));
-        $viewurl = "{$CFG->wwwroot}/totara/plan/view.php?id={$newid}";
         \totara_plan\event\plan_created::create_from_plan($plan)->trigger();
 
         // Free memory
         unset($plan);
 
-        totara_set_notification(get_string('plancreatesuccess', 'totara_plan'), $viewurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('plancreatesuccess', 'totara_plan'));
+        redirect(new moodle_url('/totara/plan/view.php', ['id' => $newid]));
     }
 }
-
 
 ///
 /// Display

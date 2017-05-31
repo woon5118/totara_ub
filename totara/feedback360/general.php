@@ -52,7 +52,8 @@ if ($mform->is_cancelled()) {
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_feedback360'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_feedback360'));
+        redirect($returnurl);
     }
 
     $todb = new stdClass();
@@ -71,12 +72,12 @@ if ($fromform = $mform->get_data()) {
     $feedback360->save();
 
     if ($id > 0) {
-        totara_set_notification(get_string('feedback360updated', 'totara_feedback360'), $returnurl,
-                array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('feedback360updated', 'totara_feedback360'));
+        redirect($returnurl);
     } else {
         $stageurl = new moodle_url('/totara/feedback360/general.php', array('id' => $feedback360->id));
-        totara_set_notification(get_string('feedback360updated', 'totara_feedback360'), $stageurl,
-                array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('feedback360updated', 'totara_feedback360'));
+        redirect($stageurl);
     }
 }
 

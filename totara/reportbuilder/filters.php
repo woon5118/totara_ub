@@ -112,23 +112,26 @@ $PAGE->requires->js_init_call('M.totara_reportbuilderfilters.init', $args, false
 // Delete fields or columns.
 if ($d and $confirm) {
     if (!confirm_sesskey()) {
-        totara_set_notification(get_string('error:bad_sesskey', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:bad_sesskey', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
     if (isset($fid)) {
         if ($report->delete_filter($fid)) {
             \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
-            totara_set_notification(get_string('filterdeleted', 'totara_reportbuilder'), $returnurl,
-                array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('filterdeleted', 'totara_reportbuilder'));
+            redirect($returnurl);
         } else {
-            totara_set_notification(get_string('error:filter_not_deleted', 'totara_reportbuilder'), $returnurl);
+            \core\notification::error(get_string('error:filter_not_deleted', 'totara_reportbuilder'));
+            redirect($returnurl);
         }
     } else if (isset($searchcolumnid)) {
         if ($report->delete_search_column($searchcolumnid)) {
             \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
-            totara_set_notification(get_string('searchcolumndeleted', 'totara_reportbuilder'), $returnurl,
-                array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('searchcolumndeleted', 'totara_reportbuilder'));
+            redirect($returnurl);
         } else {
-            totara_set_notification(get_string('error:search_column_not_deleted', 'totara_reportbuilder'), $returnurl);
+            \core\notification::error(get_string('error:search_column_not_deleted', 'totara_reportbuilder'));
+            redirect($returnurl);
         }
     }
 }
@@ -171,9 +174,11 @@ if ($d) {
 if ($m && isset($fid)) {
     if ($report->move_filter($fid, $m)) {
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
-        totara_set_notification(get_string('filtermoved', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('filtermoved', 'totara_reportbuilder'));
+        redirect($returnurl);
     } else {
-        totara_set_notification(get_string('error:filter_not_moved', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:filter_not_moved', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
 }
 
@@ -200,12 +205,12 @@ if ($fromform = $mform->get_data()) {
         $report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
 
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
-        totara_set_notification(get_string('filters_updated', 'totara_reportbuilder'), $returnurl,
-            array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('filters_updated', 'totara_reportbuilder'));
+        redirect($returnurl);
     } else {
-        totara_set_notification(get_string('error:filters_not_updated', 'totara_reportbuilder'), $returnurl);
+        \core\notification::error(get_string('error:filters_not_updated', 'totara_reportbuilder'));
+        redirect($returnurl);
     }
-
 }
 
 echo $output->header();

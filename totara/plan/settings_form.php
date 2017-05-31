@@ -97,58 +97,59 @@ function development_plan_build_settings_form(&$mform, $customdata) {
  * @return  void
  */
 function development_plan_process_settings_form($fromform, $id) {
-    global $CFG, $DP_AVAILABLE_ROLES, $DB;
+    global $DP_AVAILABLE_ROLES, $DB;
 
     $currenturl = new moodle_url('/totara/plan/template/advancedworkflow.php', array('id' => $id, 'component' => 'plan'));
-        $transaction = $DB->start_delegated_transaction();
+    $transaction = $DB->start_delegated_transaction();
 
-        // process plan settings here
-        $currentworkflow = $DB->get_field('dp_template', 'workflow', array('id' => $id));
-        if ($currentworkflow != 'custom') {
-            $template_update = new stdClass();
-            $template_update->id = $id;
-            $template_update->workflow = 'custom';
-            $DB->update_record('dp_template', $template_update);
+    // process plan settings here
+    $currentworkflow = $DB->get_field('dp_template', 'workflow', array('id' => $id));
+    if ($currentworkflow != 'custom') {
+        $template_update = new stdClass();
+        $template_update->id = $id;
+        $template_update->workflow = 'custom';
+        $DB->update_record('dp_template', $template_update);
 
-            if ($template = $DB->get_record('dp_template', array('id' => $id))) {
-                \totara_plan\event\template_updated::create_from_template($template, 'plan')->trigger();
+        if ($template = $DB->get_record('dp_template', array('id' => $id))) {
+            \totara_plan\event\template_updated::create_from_template($template, 'plan')->trigger();
+        }
+    }
+    $todb = new stdClass();
+    $todb->templateid = $id;
+    $todb->manualcomplete = $fromform->manualcomplete;
+    $todb->autobyitems = $fromform->autobyitems;
+    $todb->autobyplandate = $fromform->autobyplandate;
+    if ($plansettings = $DB->get_record('dp_plan_settings', array('templateid' => $id))) {
+        //update
+        $todb->id = $plansettings->id;
+        $DB->update_record('dp_plan_settings', $todb);
+    } else {
+        //insert
+        $DB->insert_record('dp_plan_settings', $todb);
+    }
+    foreach (development_plan::$permissions as $action => $requestable) {
+        foreach ($DP_AVAILABLE_ROLES as $role) {
+            $permission_todb = new stdClass();
+            $permission_todb->templateid = $id;
+            $permission_todb->component = 'plan';
+            $permission_todb->action = $action;
+            $permission_todb->role = $role;
+            $temp = $action . $role;
+            $permission_todb->value = $fromform->$temp;
+            $sql = "SELECT * FROM {dp_permissions} WHERE templateid = ? AND component = ? AND action = ? AND role = ?";
+            $params = array($id, 'plan', $action, $role);
+            if ($permission_setting = $DB->get_record_sql($sql, $params, IGNORE_MISSING)) {
+                //update
+                $permission_todb->id = $permission_setting->id;
+                $DB->update_record('dp_permissions', $permission_todb);
+            } else {
+                //insert
+                $DB->insert_record('dp_permissions', $permission_todb);
             }
         }
-        $todb = new stdClass();
-        $todb->templateid = $id;
-        $todb->manualcomplete = $fromform->manualcomplete;
-        $todb->autobyitems = $fromform->autobyitems;
-        $todb->autobyplandate = $fromform->autobyplandate;
-        if ($plansettings = $DB->get_record('dp_plan_settings', array('templateid' => $id))) {
-            //update
-            $todb->id = $plansettings->id;
-            $DB->update_record('dp_plan_settings', $todb);
-        } else {
-            //insert
-            $DB->insert_record('dp_plan_settings', $todb);
-        }
-        foreach (development_plan::$permissions as $action => $requestable) {
-            foreach ($DP_AVAILABLE_ROLES as $role) {
-                $permission_todb = new stdClass();
-                $permission_todb->templateid = $id;
-                $permission_todb->component = 'plan';
-                $permission_todb->action = $action;
-                $permission_todb->role = $role;
-                $temp = $action . $role;
-                $permission_todb->value = $fromform->$temp;
-                $sql = "SELECT * FROM {dp_permissions} WHERE templateid = ? AND component = ? AND action = ? AND role = ?";
-                $params = array($id, 'plan', $action, $role);
-                if ($permission_setting = $DB->get_record_sql($sql, $params, IGNORE_MISSING)) {
-                    //update
-                    $permission_todb->id = $permission_setting->id;
-                    $DB->update_record('dp_permissions', $permission_todb);
-                } else {
-                    //insert
-                    $DB->insert_record('dp_permissions', $permission_todb);
-                }
-            }
-        }
-        $transaction->allow_commit();
+    }
+    $transaction->allow_commit();
 
-    totara_set_notification(get_string('update_plan_settings', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
+    \core\notification::success(get_string('update_plan_settings', 'totara_plan'));
+    redirect($currenturl);
 }

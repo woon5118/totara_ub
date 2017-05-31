@@ -778,7 +778,7 @@ class reportbuilder {
      */
     public function debug($level = 1, $return = false) {
         global $OUTPUT;
-        if (!is_siteadmin()) {
+        if (!is_siteadmin() && !debugging()) {
             return '';
         }
         list($sql, $params) = $this->build_query(false, true);
@@ -5417,7 +5417,6 @@ class reportbuilder {
             $source = implode('-', array($column->type, $column->value));
             $datasources = json_decode($graphseries, true);
             if (in_array($source, $datasources)) {
-                totara_set_notification(get_string('error:graphdeleteseries', 'totara_reportbuilder'));
                 return false;
             }
         }

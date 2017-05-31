@@ -60,24 +60,25 @@ switch ($action) {
         if (is_ajax_request($_SERVER)) {
             return;
         }
-        totara_set_notification(get_string('feedback360updated', 'totara_feedback360'), $returnurl,
-                array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('feedback360updated', 'totara_feedback360'));
+        redirect($returnurl);
+        break;
     case 'posup':
         feedback360_question::reorder($question->id, $question->sortorder - 1);
-        totara_set_notification(get_string('feedback360updated', 'totara_feedback360'), $returnurl,
-                array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('feedback360updated', 'totara_feedback360'));
+        redirect($returnurl);
         break;
     case 'posdown':
         feedback360_question::reorder($question->id, $question->sortorder + 1);
-        totara_set_notification(get_string('feedback360updated', 'totara_feedback360'), $returnurl,
-                array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('feedback360updated', 'totara_feedback360'));
+        redirect($returnurl);
         break;
     case 'edit':
         if ($mnewform->is_submitted()) {
             $newelement = $mnewform->get_data();
             if (!$newelement) {
-                totara_set_notification(get_string('error:choosedatatype', 'totara_question'), $returnurl,
-                        array('class' => 'notifyproblem'));
+                \core\notification::error(get_string('error:choosedatatype', 'totara_question'));
+                redirect($returnurl);
             }
         }
 
@@ -101,8 +102,8 @@ switch ($action) {
                 ajax_result();
                 return;
             } else {
-                totara_set_notification(get_string('contentupdated', 'totara_feedback360'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('contentupdated', 'totara_feedback360'));
+                redirect($returnurl);
             }
         } else {
             $meditform->set_data($question->get(true));
@@ -110,9 +111,8 @@ switch ($action) {
         break;
     case 'delete':
         if ($question->id < 1) {
-            totara_set_notification(get_string('error:elementnotfound', 'totara_question'), $returnurl,
-                    array('class' => 'notifyproblem'));
-            return;
+            \core\notification::error(get_string('error:elementnotfound', 'totara_question'));
+            redirect($returnurl);
         }
         $confirm = optional_param('confirm', 0, PARAM_INT);
         if ($confirm == 1) {
@@ -121,8 +121,8 @@ switch ($action) {
                 echo 'success';
                 return;
             }
-            totara_set_notification(get_string('deletedquestion', 'totara_question'), $returnurl,
-                    array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('deletedquestion', 'totara_question'));
+            redirect($returnurl);
         }
         break;
     case 'clone':

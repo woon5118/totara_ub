@@ -50,12 +50,12 @@ switch ($action) {
             if ($confirm == 1) {
                 require_sesskey();
                 $feedback360->delete();
-                totara_set_notification(get_string('deletedfeedback360', 'totara_feedback360'), $returnurl,
-                        array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('deletedfeedback360', 'totara_feedback360'));
+                redirect($returnurl);
             }
         } else {
-            totara_set_notification(get_string('error:feedback360isactive', 'totara_feedback360'), $returnurl,
-                    array('class' => 'notifyproblem'));
+            \core\notification::error(get_string('error:feedback360isactive', 'totara_feedback360'));
+            redirect($returnurl);
         }
         break;
     case 'copy':
@@ -65,9 +65,8 @@ switch ($action) {
 
         $returnurl = new moodle_url('/totara/feedback360/general.php', array('id' => $cloned_feedback360_id));
 
-        totara_set_notification(get_string('feedback360cloned', 'totara_feedback360'), $returnurl,
-                array('class' => 'notifysuccess'));
-
+        \core\notification::success(get_string('feedback360cloned', 'totara_feedback360'));
+        redirect($returnurl);
         break;
 }
 

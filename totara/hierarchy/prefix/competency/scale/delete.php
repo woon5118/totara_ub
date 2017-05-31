@@ -104,4 +104,5 @@ $transaction->allow_commit();
 \hierarchy_competency\event\scale_deleted::create_from_instance($scale)->trigger();
 
 // redirect
-totara_set_notification(get_string('deletedcompetencyscale', 'totara_hierarchy', format_string($scale->name)), $CFG->wwwroot . '/totara/hierarchy/framework/index.php?prefix=competency', array('class' => 'notifysuccess'));
+\core\notification::success(get_string('deletedcompetencyscale', 'totara_hierarchy', format_string($scale->name)));
+redirect($CFG->wwwroot . '/totara/hierarchy/framework/index.php?prefix=competency');

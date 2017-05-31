@@ -73,7 +73,8 @@ $trainerroles = trainer_helper::get_trainer_roles(context_course::instance($cour
 $trainers     = $helper->get_trainers();
 if ($seminar->get_approvaltype() == seminar::APPROVAL_ROLE) {
     if (empty($trainerroles) || empty($trainers)) {
-        totara_set_notification(get_string('error:missingrequiredrole', 'mod_facetoface'), $returnurl);
+        \core\notification::error(get_string('error:missingrequiredrole', 'mod_facetoface'));
+        redirect($returnurl);
     }
 }
 
@@ -136,12 +137,12 @@ if ($fromform = $mform->get_data()) {
         // Notification.
         $state = $signup->get_state();
         $message = $state->get_message();
-        $cssclass = 'notifymessage';
+        $notificationtype = \core\notification::INFO;
 
         // There may be lots of factors that will prevent confirmation message to appear at user mailbox
         // but in most cases this will be true:
         if ($state instanceof signup\state\booked) {
-            $cssclass = 'notifysuccess';
+            $notificationtype = \core\notification::SUCCESS;
             if (!$signup->get_skipusernotification() && $fromform->notificationtype != MDL_F2F_NONE) {
                 $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') .
                     get_string('confirmationsent', 'mod_facetoface');
@@ -153,10 +154,11 @@ if ($fromform = $mform->get_data()) {
         reset($failures);
         $message = current($failures);
 
-        $cssclass = 'notifyerror';
+        $notificationtype = \core\notification::ERROR;
     }
 
-    totara_set_notification($message, $returnurl, ['class' => $cssclass]);
+    \core\notification::add($message, $notificationtype);
+    redirect($returnurl);
 }
 
 echo $OUTPUT->header();

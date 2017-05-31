@@ -143,7 +143,7 @@ switch ($action) {
             if (in_array($source, $datasources)) {
                 $result->success = false;
                 $result->noalert = true;
-                totara_set_notification(get_string('error:graphdeleteseries', 'totara_reportbuilder'));
+                \core\notification::error(get_string('error:graphdeleteseries', 'totara_reportbuilder'));
                 break;
             }
         }

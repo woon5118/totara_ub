@@ -46,7 +46,8 @@ $canapprovecompetency = $component->get_setting('updatecompetency') == DP_PERMIS
 
 if ($confirm) {
     if (!confirm_sesskey()) {
-        totara_set_notification(get_string('confirmsesskeybad','error'), $returnurl);
+        \core\notification::error(get_string('confirmsesskeybad','error'));
+        redirect($returnurl);
     }
     if (!$canapprovecompetency) {
         // no permission to complete the action
@@ -63,8 +64,8 @@ if ($confirm) {
 
     $DB->update_record('dp_plan_competency_assign', $todb);
     //@todo send notifications/emails
-    totara_set_notification(get_string('request'.$action, 'totara_plan'), $returnurl, array('class' => 'notifysuccess'));
-
+    \core\notification::success(get_string('request' . $action, 'totara_plan'));
+    redirect($returnurl);
 }
 
 $fullname = $plan->name;

@@ -265,7 +265,8 @@ class dp_program_component extends dp_base_component {
 
         if ($delete && $confirm) {
             if (!confirm_sesskey()) {
-                totara_set_notification(get_string('confirmsesskeybad', 'error'), $currenturl);
+                \core\notification::error(get_string('confirmsesskeybad', 'error'));
+                redirect($currenturl);
             }
 
             // Load item
@@ -281,7 +282,8 @@ class dp_program_component extends dp_base_component {
             if ($this->unassign_item($deleteitem)) {
                 \totara_plan\event\component_deleted::create_from_component(
                     $this->plan, 'program', $deleteitem->id, $deleteitem->fullname)->trigger();
-                totara_set_notification(get_string('canremoveitem', 'totara_plan'), $currenturl, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('canremoveitem', 'totara_plan'));
+                redirect($currenturl);
             } else {
                 print_error('error:couldnotunassignitem', 'totara_plan');
             }
@@ -502,7 +504,8 @@ class dp_program_component extends dp_base_component {
 
                 // Do not create notification or redirect if ajax request
                 if (!$ajax) {
-                    totara_set_notification(get_string('programsupdated', 'totara_plan').$issuesnotification, $currenturl, array('class' => 'notifysuccess'));
+                    \core\notification::success(get_string('programsupdated', 'totara_plan') . $issuesnotification);
+                    redirect($currenturl);
                 }
             }
         }

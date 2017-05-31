@@ -133,7 +133,8 @@ if ($valueform->is_cancelled()) {
 
     \totara_plan\event\objective_scale_updated::create_from_scale($scale)->trigger();
 
-    totara_set_notification($notification, "$CFG->wwwroot/totara/plan/objectivescales/view.php?id={$valuenew->objscaleid}", array('class' => 'notifysuccess'));
+    \core\notification::success($notification);
+    redirect("$CFG->wwwroot/totara/plan/objectivescales/view.php?id={$valuenew->objscaleid}");
 }
 
 // Display page header

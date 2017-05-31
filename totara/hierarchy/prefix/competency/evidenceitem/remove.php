@@ -119,4 +119,5 @@ $item->delete($competency);
 
 $message = get_string('removed'.$hierarchy->prefix.'evidenceitem', 'totara_hierarchy', format_string($compname .' ('. $item->get_type().')'));
 
-totara_set_notification($message, $return, array('class' => 'notifysuccess'));
+\core\notification::success($message);
+redirect($return);

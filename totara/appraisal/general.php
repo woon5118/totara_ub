@@ -52,7 +52,8 @@ if ($mform->is_cancelled()) {
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_appraisal'), $returnurl);
+        \core\notification::error(get_string('error:unknownbuttonclicked', 'totara_appraisal'));
+        redirect($returnurl);
     }
 
     if (!confirm_sesskey()) {
@@ -70,12 +71,13 @@ if ($fromform = $mform->get_data()) {
     $appraisal->description = $todb->description;
     $appraisal->save();
 
-    if ($id < 0) {
-        totara_set_notification(get_string('appraisalcreated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+    $stageurl = new moodle_url('/totara/appraisal/stage.php', array('appraisalid' => $appraisal->id));
+    if ($id == 0) {
+        \core\notification::success(get_string('appraisalcreated', 'totara_appraisal'));
     } else {
-        $stageurl = new moodle_url('/totara/appraisal/stage.php', array('appraisalid' => $appraisal->id));
-        totara_set_notification(get_string('appraisalupdated', 'totara_appraisal'), $stageurl, array('class' => 'notifysuccess'));
+        \core\notification::success(get_string('appraisalupdated', 'totara_appraisal'));
     }
+    redirect($stageurl);
 }
 
 $title = $PAGE->title . ': ' . $appraisal->name;

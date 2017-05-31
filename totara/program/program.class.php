@@ -392,8 +392,7 @@ class program {
             // If there are too many previous users then defer processing until next cron run.
             $rawprevioususerassignmentscount = $DB->count_records('prog_user_assignment', array('programid' => $this->id));
             if ($rawprevioususerassignmentscount > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
-                totara_set_notification(get_string('programassignmentsdeferred', 'totara_program'), null,
-                    array('class' => 'notifynotice'));
+                \core\notification::info(get_string('programassignmentsdeferred', 'totara_program'));
                 $DB->set_field('prog', 'assignmentsdeferred', 1, array('id' => $this->id));
                 $this->assignmentsdeferred = 1;
                 return PROG_UPDATE_ASSIGNMENTS_DEFERRED;
@@ -451,8 +450,7 @@ class program {
                     // If too many users should be assigned then defer processing until next cron run.
                     $cumulativeshouldbeusercount += count($progassignment->shouldbeusers);
                     if ($cumulativeshouldbeusercount > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
-                        totara_set_notification(get_string('programassignmentsdeferred', 'totara_program'), null,
-                            array('class' => 'notifynotice'));
+                        \core\notification::info(get_string('programassignmentsdeferred', 'totara_program'));
                         $DB->set_field('prog', 'assignmentsdeferred', 1, array('id' => $this->id));
                         $this->assignmentsdeferred = 1;
                         return PROG_UPDATE_ASSIGNMENTS_DEFERRED;

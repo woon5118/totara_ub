@@ -65,7 +65,8 @@ switch($action) {
         $actionstr = get_string('copynotificationconfirm', 'facetoface', format_string($notification->title));
         break;
     default:
-        totara_set_notification(get_string('error:notificationdoesnotexist', 'facetoface'), $url, array('class' => 'notifyproblem'));
+        \core\notification::error(get_string('error:notificationdoesnotexist', 'facetoface'));
+        redirect($url);
 }
 
 $actionurl->param('id', $id);

@@ -119,8 +119,6 @@ if ($valueform->is_cancelled()) {
     }
 
     // Save
-    //class to hold totara_set_notification info
-    $notification = new stdClass();
     // New scale value
     if ($valuenew->id == 0) {
         unset($valuenew->id);
@@ -132,23 +130,19 @@ if ($valueform->is_cancelled()) {
         $valuenew = $DB->get_record('comp_scale_values', array('id' => $valuenew->id));
         \hierarchy_competency\event\scale_value_created::create_from_instance($valuenew)->trigger();
 
-        $notification->text = 'scalevalueadded';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$valuenew->scaleid}&amp;prefix=competency";
-        $notification->params = array('class' => 'notifysuccess');
-
-    // Updating scale value
+        $notification_text = 'scalevalueadded';
     } else {
+        // Updating scale value
         $valuenew = file_postupdate_standard_editor($valuenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_scale_values', $valuenew->id);
         $DB->update_record('comp_scale_values', $valuenew);
         $valuenew = $DB->get_record('comp_scale_values', array('id' => $valuenew->id));
         \hierarchy_competency\event\scale_value_updated::create_from_instance($valuenew)->trigger();
 
-        $notification->text = 'scalevalueupdated';
-        $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$valuenew->scaleid}&amp;prefix=competency";
-        $notification->params = array('class' => 'notifysuccess');
+        $notification_text = 'scalevalueupdated';
     }
-    totara_set_notification(get_string($notification->text, 'totara_hierarchy', format_string($valuenew->name)),
-                        $notification->url, $notification->params);
+
+    \core\notification::success(get_string($notification_text, 'totara_hierarchy', format_string($valuenew->name)));
+    redirect(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', ['id' => $valuenew->scaleid, 'prefix' => 'competency']));
 }
 
 // Display page header

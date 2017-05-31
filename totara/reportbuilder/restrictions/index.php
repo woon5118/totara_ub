@@ -60,21 +60,21 @@ if ($action && $restriction->id) {
 
         case 'activate':
             $restriction->activate();
-            totara_set_notification(get_string('restrictionactivated', 'totara_reportbuilder', $restriction->name),
-                $returnurl, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('restrictionactivated', 'totara_reportbuilder', $restriction->name));
+            redirect($returnurl);
             break;
 
         case 'deactivate':
             $restriction->deactivate();
-            totara_set_notification(get_string('restrictiondeactivated', 'totara_reportbuilder', $restriction->name),
-                $returnurl, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('restrictiondeactivated', 'totara_reportbuilder', $restriction->name));
+            redirect($returnurl);
             break;
 
         case 'delete':
             if ($confirm) {
                 $restriction->delete();
-                totara_set_notification(get_string('restrictiondeleted', 'totara_reportbuilder', $restriction->name),
-                    $returnurl, array('class' => 'notifysuccess'));
+                \core\notification::success(get_string('restrictiondeleted', 'totara_reportbuilder', $restriction->name));
+                redirect($returnurl);
             }
             break;
     }

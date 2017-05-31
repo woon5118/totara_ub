@@ -108,7 +108,7 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
             $instance->roleid = parent::get_config('roleid');
             parent::enrol_user($instance, $USER->id, $instance->roleid);
 
-            totara_set_notification($OUTPUT->container(get_string('nowenrolled', 'enrol_totara_learningplan', $course->fullname), 'plan_box'), null, array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('nowenrolled', 'enrol_totara_learningplan', $course->fullname));
         } else {
             // this isn't an approved course in their learning plan or learning plan isn't approved
             $link = $OUTPUT->action_link(new moodle_url('/totara/plan/index.php', array('userid' => $USER->id)), get_string('learningplan', 'enrol_totara_learningplan'));
@@ -147,7 +147,8 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
             parent::enrol_user($instance, $USER->id, $instance->roleid);
 
             $viewurl = new moodle_url('/course/view.php', array('id' => $course->id));
-            totara_set_notification(get_string('nowenrolled', 'enrol_totara_learningplan', $course->fullname), $viewurl->out(), array('class' => 'notifysuccess'));
+            \core\notification::success(get_string('nowenrolled', 'enrol_totara_learningplan', $course->fullname));
+            redirect($viewurl->out());
         }
         return false;
     }

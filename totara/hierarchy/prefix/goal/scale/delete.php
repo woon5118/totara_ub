@@ -105,5 +105,5 @@ $transaction->allow_commit();
 \hierarchy_goal\event\scale_deleted::create_from_instance($scale)->trigger();
 
 // Redirect.
-totara_set_notification(get_string('deletedgoalscale', 'totara_hierarchy', format_string($scale->name)),
-    $CFG->wwwroot . '/totara/hierarchy/framework/index.php?prefix=goal', array('class' => 'notifysuccess'));
+\core\notification::success(get_string('deletedgoalscale', 'totara_hierarchy', format_string($scale->name)));
+redirect($CFG->wwwroot . '/totara/hierarchy/framework/index.php?prefix=goal');

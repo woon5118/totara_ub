@@ -67,11 +67,13 @@ $deleteurl = new moodle_url('/totara/hierarchy/prefix/goal/scale/deletevalue.php
 
 // Can't delete if the scale is in use.
 if (goal_scale_is_used($value->scaleid)) {
-    totara_set_notification(get_string('error:nodeletescalevalueinuse', 'totara_hierarchy'), $returnurl);
+    \core\notification::error(get_string('error:nodeletescalevalueinuse', 'totara_hierarchy'));
+    redirect($returnurl);
 }
 
 if ($value->id == $scale->defaultid) {
-    totara_set_notification(get_string('error:nodeletegoalscalevaluedefault', 'totara_hierarchy'), $returnurl);
+    \core\notification::error(get_string('error:nodeletegoalscalevaluedefault', 'totara_hierarchy'));
+    redirect($returnurl);
 }
 
 if (!$delete) {
@@ -91,16 +93,18 @@ if (!$delete) {
 //
 
 if ($delete != md5($value->timemodified)) {
-    totara_set_notification(get_string('error:checkvariable', 'totara_hierarchy'), $returnurl);
+    \core\notification::error(get_string('error:checkvariable', 'totara_hierarchy'));
+    redirect($returnurl);
 }
 
 if (!confirm_sesskey()) {
-    totara_set_notification(get_string('confirmsesskeybad', 'error'), $returnurl);
+    \core\notification::error(get_string('confirmsesskeybad', 'error'));
+    redirect($returnurl);
 }
 
 $DB->delete_records('goal_scale_values', array('id' => $value->id));
 
 \hierarchy_goal\event\scale_value_deleted::create_from_instance($value)->trigger();
 
-totara_set_notification(get_string('deletedgoalscalevalue', 'totara_hierarchy', format_string($value->name)),
-    $returnurl, array('class' => 'notifysuccess'));
+\core\notification::success(get_string('deletedgoalscalevalue', 'totara_hierarchy', format_string($value->name)));
+redirect($returnurl);
