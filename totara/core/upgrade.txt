@@ -30,7 +30,3 @@ change calendar_dynamic_content class in totara/core/classes/watcher/calendar_dy
 and create {modulename_hook} as sample
  # mod/facetoface/classes/hook/calendar_dynamic_content.php
  # mod/facetoface/watcher/seminar_calendar_dynamic_content.php
-
-* totara_set_notification() has been deprecated, please use \core\notification methods instead e.g. \core\notification::success()
-* totara_get_notifications() has been deprecated, please use \core\notification::fetch() instead
-* totara_convert_notification_to_legacy_array() is deprecated. It was added this version to support Totara notifications during deprecation.

@@ -101,8 +101,6 @@ class notification implements \renderable, \templatable {
     protected $extraclasses = array();
 
     /**
-     * @deprecated since 10.0 This property only exists for compatibility with \core\notifications
-     *             until deprecated totara_notification functions are removed.
      * @var array $totara_customdata Legacy support for Totara notification 'options'.
      */
     protected $totara_customdata = [];
@@ -110,9 +108,6 @@ class notification implements \renderable, \templatable {
     /**
      * Totara: Map legacy types to class constants.
      *
-     *
-     * @deprecated since 10.0 This property only exists for compatibility with \core\notifications
-     *             until deprecated totara_notification functions are removed.
      * @var array
      */
     protected static $legacymapping = [
@@ -240,15 +235,10 @@ class notification implements \renderable, \templatable {
      * method is not used to render notifications from the queue which
      * (in Totara) may also have legacy class-string style type.
      *
-     * @deprecated since 10.0 This method only exists for compatibility with \core\notifications
-     *             until deprecated totara_notification functions are removed.
      * @param string|null $typestring
      * @return mixed
      */
     public static function resolve_legacy_type($typestring) {
-        $debugmessage  = '\core\output\notification::resolve_legacy_type() has been deprecated since Totara 10.0';
-        $debugmessage .= ' and should never be used. There is no alternative method.';
-        debugging($debugmessage, DEBUG_DEVELOPER);
 
         // None was set.
         if ($typestring === null) {
@@ -290,15 +280,10 @@ class notification implements \renderable, \templatable {
      * classes so that they may still be applied to the instance
      * for backwards compatibility.
      *
-     * @deprecated since 10.0 This method only exists for compatibility with \core\notifications
-     *             until deprecated totara_notification functions are removed.
      * @param string|null $typestring A string of classes.
      * @return array
      */
     public static function preserve_custom_classes($typestring) {
-        $debugmessage  = '\core\output\notification::preserve_custom_classes() has been deprecated since Totara 10.0';
-        $debugmessage .= ' and should never be used. There is no alternative method.';
-        debugging($debugmessage, DEBUG_DEVELOPER);
 
         // It's possible no type is set.
         if ($typestring === null) {
@@ -314,29 +299,19 @@ class notification implements \renderable, \templatable {
 
 
     /**
-     * @deprecated since 10.0 This method only exists for compatibility with \core\notifications
-     *             until deprecated totara_notification functions are removed.
      * @param array $customdata
      */
     public function set_totara_customdata($customdata) {
-        $debugmessage  = '\core\output\notification::set_totara_customdata() has been deprecated since Totara 10.0';
-        $debugmessage .= ' and should never be used. There is no alternative method.';
-        debugging($debugmessage, DEBUG_DEVELOPER);
         $this->totara_customdata = $customdata;
 
         return $this;
     }
 
     /**
-     * @deprecated since 10.0 This method only exists for compatibility with \core\notifications
-     *             until deprecated totara_notification functions are removed.
      * @param array $customdata
      * @return array
      */
     public function get_totara_customdata() {
-        $debugmessage  = '\core\output\notification::get_totara_customdata() has been deprecated since Totara 10.0';
-        $debugmessage .= ' and should never be used. There is no alternative method.';
-        debugging($debugmessage, DEBUG_DEVELOPER);
         return $this->totara_customdata;
     }
 
