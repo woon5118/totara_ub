@@ -122,8 +122,24 @@ class facetoface_notification extends data_object {
         'templateid' => 0
     );
 
+    // Required table fields.
+    public $id;
+
     public $type;
 
+    public $title;
+
+    public $body;
+
+    public $courseid;
+
+    public $facetofaceid;
+
+    public $timemodified;
+
+    public $usermodified;
+
+    // Optional table fields.
     public $conditiontype;
 
     public $scheduleunit;
@@ -136,29 +152,17 @@ class facetoface_notification extends data_object {
 
     public $managerprefix;
 
-    public $title;
-
-    public $body;
-
     public $booked;
 
     public $waitlisted;
 
     public $cancelled;
 
-    public $courseid;
-
-    public $facetofaceid;
-
     public $templateid;
 
     public $status;
 
     public $issent;
-
-    public $timemodified;
-
-    public $usermodified;
 
     private $_event;
 
@@ -2608,4 +2612,41 @@ function facetoface_notification_get_templates_with_old_placeholders() {
     $cache->set('oldnotifications', $oldnotifcations);
 
     return $oldnotifcations;
+}
+
+/**
+ * Remove all whitespaces, new lines, <br> html tags
+ *
+ * @param $string
+ * @return string
+ */
+function facetoface_prepare_match($string) {
+    $string = preg_replace('/\s*\s+/S', '', $string);
+    $string = str_replace("\n", '', $string);
+    $string = preg_replace("#<br\s*/?>#i", "", $string);
+    return $string;
+}
+
+/**
+ * Compare 2 notifications by tile, body and mangerprefix
+ *
+ * @param $data1 stdClass updated activity notification
+ * @param $data2 stdClass default notification template
+ * @return bool
+ */
+function facetoface_notification_match($data1, $data2) {
+
+    $title1 = facetoface_prepare_match($data1->title);
+    $title2 = facetoface_prepare_match($data2->title);
+
+    $body1 = facetoface_prepare_match($data1->body);
+    $body2 = facetoface_prepare_match($data2->body);
+
+    $managerprefix1 = facetoface_prepare_match($data1->managerprefix);
+    $managerprefix2 = facetoface_prepare_match($data2->managerprefix);
+
+    if ($title1 != $title2 || $body1 != $body2 || $managerprefix1 != $managerprefix2) {
+        return false;
+    }
+    return true;
 }

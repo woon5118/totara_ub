@@ -29,12 +29,6 @@ require_once($CFG->dirroot.'/mod/facetoface/notification/lib.php');
 
 $update = required_param('update', PARAM_INT);
 $display = optional_param('display', '', PARAM_ALPHANUM);
-$deactivate = optional_param('deactivate', 0, PARAM_INT);
-$activate = optional_param('activate', 0, PARAM_INT);
-$delete = optional_param('delete', 0, PARAM_INT);
-$confirm = optional_param('confirm', 0, PARAM_BOOL);
-$restoredefaults = optional_param('restoredefaults', 0, PARAM_BOOL);
-
 
 if (!$cm = get_coursemodule_from_id('facetoface', $update)) {
     print_error('error:incorrectcoursemoduleid', 'facetoface');
@@ -44,6 +38,10 @@ if (!$course = $DB->get_record("course", array('id' => $cm->course))) {
     print_error('error:coursemisconfigured', 'facetoface');
 }
 
+require_login($course, true, $cm); // needed to setup proper $COURSE
+$context = context_module::instance($cm->id);
+require_capability('moodle/course:manageactivities', $context);
+
 if (!$facetoface = $DB->get_record('facetoface', array('id' => $cm->instance))) {
     print_error('error:incorrectcoursemodule', 'facetoface');
 }
@@ -51,17 +49,10 @@ if (!$facetoface = $DB->get_record('facetoface', array('id' => $cm->instance))) 
 $url = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));
 $PAGE->set_url($url);
 
-$redirectto = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $update));
-
 if ($display !== '' && !in_array($display, array(MDL_F2F_NOTIFICATION_MANUAL, MDL_F2F_NOTIFICATION_SCHEDULED, MDL_F2F_NOTIFICATION_AUTO))) {
-    redirect($redirectto);
+    redirect($url);
     die();
 }
-
-require_login($course, true, $cm); // needed to setup proper $COURSE
-$context = context_module::instance($cm->id);
-require_capability('moodle/course:manageactivities', $context);
-
 
 // Get all notifications.
 $notifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id), 'title,type');
@@ -83,148 +74,41 @@ foreach ($notifications as $note) {
         $foundduplicates = true;
     }
 }
-
-// Check for actions
-if ($deactivate || $activate) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
-    $id = max($deactivate, $activate);
-    $notification = new facetoface_notification(array('id' => $id), true);
-    if (!$notification->id) {
-        print_error('error:notificationdoesnotexist', 'facetoface');
-    }
-
-    $notification->status = $deactivate ? 0 : 1;
-    $notification->update();
-
-    redirect($redirectto);
-}
-
-// Check if we are deleting
-if ($delete && $confirm) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
-    $notification = new facetoface_notification(array('id' => $delete), true);
-    if (!$notification->id) {
-        print_error('error:notificationdoesnotexist', 'facetoface');
-    }
-
-    // If its not an auto notification OR if it is but there are duplicates allow the notification to be deleted.
-    if ($notification->type != MDL_F2F_NOTIFICATION_AUTO || $autonotifications[$notification->conditiontype] > 1) {
-        // Delete the notification and associated sent and history records.
-        $notification->delete();
-        totara_set_notification(get_string('notificationdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
-    }
-
-    totara_set_notification(get_string('error:notificationnonduplicate', 'facetoface'), $redirectto);
-}
-
-if ($restoredefaults && $confirm) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
-    // Get all current notifications.
-    $currentnotifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id));
-
-    // Recreate all default notifications.
-    $defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0];
-
-    // Remove all defaults that exist already.
-    foreach ($currentnotifications as $current) {
-        unset($defaultnotifications[$current->conditiontype]);
-    }
-
-    // Create missing defaults.
-    foreach ($defaultnotifications as $default) {
-        $default->save();
-    }
-
-    totara_set_notification(get_string('notificationssuccessfullyreset', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
-}
-
-$streditinga = get_string('editinga', 'moodle', 'facetoface');
-$strmodulenameplural = get_string('modulenameplural', 'facetoface');
-
 if ($foundduplicates) {
-    $url = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));
     totara_set_notification(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
 }
 
-$PAGE->set_pagelayout('standard');
-$PAGE->set_title($streditinga);
-$PAGE->set_heading(format_string($SITE->fullname));
-echo $OUTPUT->header();
-
-$icon = '<img src="'.$OUTPUT->pix_url('/facetoface/icon') . '" alt=""/>';
-
-
-// Print delete confirmation page
-if ($delete) {
-    $notification = new facetoface_notification(array('id' => $delete), true);
-    if (!$notification->id) {
-        print_error('error:notificationdoesnotexist', 'facetoface');
-    }
-
-    $confirmurl = clone($redirectto);
-    $confirmurl->param('delete', $delete);
-    $confirmurl->param('sesskey', sesskey());
-    $confirmurl->param('confirm', '1');
-    echo $OUTPUT->confirm(get_string('deletenotificationconfirm', 'facetoface', format_string($notification->title)), $confirmurl, $redirectto);
-    echo $OUTPUT->footer($course);
-    unset($confirmurl);
-    die();
-}
-
-// Print reset confirmation page
-if ($restoredefaults) {
-    $f2fname = $facetoface->name;
-
-    $confirmurl = clone($redirectto);
-    $confirmurl->param('restoredefaults', $restoredefaults);
-    $confirmurl->param('sesskey', sesskey());
-    $confirmurl->param('confirm', '1');
-
-    echo $OUTPUT->heading(get_string('restoremissingdefaultnotifications', 'facetoface'));
-    echo $OUTPUT->confirm(get_string('restoremissingdefaultnotificationsconfirm', 'facetoface', format_string($f2fname)), $confirmurl, $redirectto);
-    echo $OUTPUT->footer($course);
-    unset($confirmurl);
-    die();
-
-}
-
-$heading = get_string('notifications', 'facetoface');
 $report_data = array(
     'display'       => $display,
     'update'        => $update,
     'facetofaceid'  => $facetoface->id
 );
 
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(get_string('editinga', 'moodle', 'facetoface'));
+$PAGE->set_heading(format_string($SITE->fullname));
+echo $OUTPUT->header();
+
+$heading = get_string('notifications', 'facetoface');
 echo $OUTPUT->heading_with_help($heading, 'notifications', 'facetoface');
 
 // Detect missing default notifications.
 $defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0];
-
 foreach ($notifications as $note) {
     unset($defaultnotifications[$note->conditiontype]);
 }
-
 if (!empty($defaultnotifications)) {
     $message = get_string('missingdefaultnotifications', 'facetoface', count($defaultnotifications));
-    $addmissingdefaulturl = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id, 'restoredefaults' => 1));
+    $addmissingdefaulturl = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id));
     $link = html_writer::link($addmissingdefaulturl, get_string('missingdefaultsfix', 'facetoface'));
     echo $OUTPUT->notification($message . ' ' . $link, 'notifymessage');
 }
 
 $str_edit = get_string('edit', 'moodle');
-$str_active = get_string('setactive', 'facetoface');
-$str_inactive = get_string('setinactive', 'facetoface');
-$str_duplicate = get_string('duplicate');
+$str_copy = get_string('copynotification', 'facetoface');
 $str_delete = get_string('delete');
+$str_active = get_string('setactive', 'facetoface');
+$str_inactive  = get_string('setinactive', 'facetoface');
 $str_warn_icon = $OUTPUT->pix_icon('i/warning', get_string('notificationduplicatesmessage', 'facetoface'), 'moodle');
 
 $columns = array();
@@ -297,18 +181,18 @@ foreach ($notifications as $note) {
     $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $facetoface->id, 'id' => $note->id)), new pix_icon('t/edit', $str_edit));
 
     if ($note->status == 1) {
-        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/index.php', array('update' => $update, 'deactivate' => $note->id, 'sesskey' => sesskey())), new pix_icon('t/hide', $str_inactive));
+        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/status.php', array('update' => $update, 'id' => $note->id, 'status' => '0', 'sesskey' => sesskey())), new pix_icon('t/hide', $str_inactive));
     } else {
-        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/index.php', array('update' => $update, 'activate' => $note->id, 'sesskey' => sesskey())), new pix_icon('t/show', $str_active));
+        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/status.php', array('update' => $update, 'id' => $note->id, 'status' => '1', 'sesskey' => sesskey())), new pix_icon('t/show', $str_active));
     }
 
     if ($note->type != MDL_F2F_NOTIFICATION_AUTO) {
-        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $facetoface->id, 'id' => $note->id, 'duplicate' => '1')), new pix_icon('t/copy', $str_duplicate));
+        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/confirm.php', array('update' => $update, 'id' => $note->id, 'action' => 'copy', 'sesskey' => sesskey())), new pix_icon('t/copy', $str_copy));
     }
 
     // If its not an auto notification OR if it is but there are duplicates allow the notification to be deleted.
     if ($note->type != MDL_F2F_NOTIFICATION_AUTO || $autonotifications[$note->conditiontype] > 1) {
-        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/index.php', array('update' => $update, 'delete' => $note->id, 'sesskey' => sesskey())), new pix_icon('t/delete', $str_delete));
+        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/confirm.php', array('update' => $update, 'id' => $note->id, 'action' => 'delete', 'sesskey' => sesskey())), new pix_icon('t/delete', $str_delete));
     }
 
     $row[] = implode(' ', $buttons);

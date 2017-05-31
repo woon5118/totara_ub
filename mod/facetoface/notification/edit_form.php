@@ -31,21 +31,20 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 class mod_facetoface_notification_form extends moodleform {
 
     function definition() {
-        global $CFG;
+
         $mform =& $this->_form;
 
-        $editoroptions = $this->_customdata['editoroptions'];
-
         $notification = $this->_customdata['notification'];
+
         $isfrozen = $notification->is_frozen();
 
-        $mform->addElement('hidden', 'id', $this->_customdata['id']);
+        $mform->addElement('hidden', 'id', (int)$notification->id);
         $mform->setType('id', PARAM_INT);
 
         // If frozen, display details at top
         // Hide scheduling/recipient selectors for automatic notifications
         if ($isfrozen || $notification->type == MDL_F2F_NOTIFICATION_AUTO) {
-            $html = '';
+
             $description = $notification->get_condition_description();
             $recipients = $notification->get_recipient_description();
 
