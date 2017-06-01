@@ -101,10 +101,8 @@ class notification {
      */
     public static function fetch() {
 
-        // Totara: Moved and extended fetch internals to fetch_filter()
-        // to avoid duplication of code. In this instance the filter
-        // always returns true as we want all notifications returned.
-        return self::fetch_filter(function($item) { return true; });
+        // Totara: Moved and extended fetch internals to fetch_filter() to avoid duplication of code.
+        return self::fetch_filter(null);
     }
 
     /**
@@ -188,6 +186,7 @@ class notification {
      * a flag so that core/notifications JavaScript can identify
      * which notification data it should not process.
      *
+     * @deprecated since Totara 13
      * @param string $message
      * @param string $level One of the notification type constants e.g.
      *                      \core\output\notification::NOTIFY_SUCCESS
@@ -196,13 +195,22 @@ class notification {
      *              going forward. Existing customisations may be relying on this data.
      */
     public static function add_totara_legacy($message, $level = null, $customdata = array()) {
-        $data = [
-            'message' => $message,
-            'type' => $level,
-            'totara' => true,
-        ];
+        // Intentionally no debugging notice, all functions calling this function already output debugging notices.
+        $type = output\notification::normalise_type($level, null);
+        if ($type === null) {
+            list($type, $extraclasses) = output\notification::normalise_classes_to_type_and_classes($level, null);
+            if (isset($customdata['class'])) {
+                $customdata['class'] .= ' ' . join(' ', $extraclasses);
+            } else {
+                $customdata['class'] = join(' ', $extraclasses);
+            }
+        }
 
-        self::add_to_session_queue((object)array_merge($customdata, $data));
+        $customdata['message'] = $message;
+        $customdata['type'] = $type;
+        $customdata['totara'] = true;
+
+        self::add_to_session_queue((object)$customdata);
     }
 
     /**
@@ -215,7 +223,7 @@ class notification {
      * functionalty which calls this via core/notification::fetchNotifications()
      * (see implementation of totara_fetch_as_array() in this class).
      *
-     * @param \Closure $filterfunction A function by which to filter fetched notifications.
+     * @param \Closure|null $filterfunction A function by which to filter fetched notifications or null if no filtering is required.
      * @return array Filtered notifications from the stack.
      */
     protected static function fetch_filter($filterfunction) {
@@ -226,7 +234,10 @@ class notification {
         }
 
         // Filter results.
-        $notifications = array_filter($SESSION->notifications, $filterfunction);
+        $notifications = $SESSION->notifications;
+        if (is_callable($filterfunction)) {
+            $notifications = array_filter($notifications, $filterfunction);
+        }
 
         // Remove filtered from the queue taking advantage of the
         // fact objects are assigned by reference to compare equality.
@@ -258,24 +269,27 @@ class notification {
             // then attempt to determine the type based on legacy
             // classnames. The type property may actually be a
             // string of classes or could even be null.
-            if (isset($notification->totara) && $notification->totara === true) {
-                $classes = \core\output\notification::preserve_custom_classes($notification->type);
-                $type = \core\output\notification::resolve_legacy_type($notification->type);
-                $notification->type = $type;
+            if (isset($notification->totara) && $notification->totara === true && isset($notification->class)) {
+                $classes = explode(' ', $notification->class);
             }
 
             // Support customdata for backwards-compatibility with totara_set_notification / totara_get_notification.
             $customdata = array_filter((array)$notification, function($key) {
-                return !(in_array($key, ['message', 'type', 'totara']));
+                return !(in_array($key, ['message', 'type', 'totara', 'class']));
             }, ARRAY_FILTER_USE_KEY);
 
-            $renderable = (new \core\output\notification($notification->message, $notification->type))
-                // Totara: Legacy notifications compatibility.
-                ->set_extra_classes($classes)
-                // Totara: Queued notifications should be dismissable.
-                ->set_show_closebutton(true)
+            $renderable = new output\notification($notification->message, $notification->type);
+            // Totara: Legacy notifications compatibility.
+            $renderable->set_extra_classes($classes);
+            // Totara: Queued notifications should be dismissable.
+            $renderable->set_show_closebutton(true);
+
+            // This is empty most of the time, YAY!
+            if (!empty($customdata)) {
                 // Totara: Support 'options' customdata for backwards compatibility only.
-                ->set_totara_customdata($customdata);
+                // This has been deprecated and internally throws a debugging notice.
+                $renderable->set_totara_customdata($customdata);
+            }
 
             $renderables[] = $renderable;
         }

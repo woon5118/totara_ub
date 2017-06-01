@@ -27,6 +27,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+require_once($CFG->dirroot . '/totara/core/deprecatedlib.php');
+
 define('PUBLIC_KEY_PATH', $CFG->dirroot . '/totara_public.pem');
 define('TOTARA_SHOWFEATURE', 1);
 define('TOTARA_HIDEFEATURE', 2);
@@ -585,127 +587,6 @@ function totara_upgrade_installed_languages() {
         $info = implode($delimiter, $notice_error);
         echo $OUTPUT->notification($info, 'notifyproblem');
     }
-}
-
-/**
- * Save a notification message for displaying on the subsequent page view
- *
- * Optionally supply a url for redirecting to before displaying the message
- * and/or an options array.
- *
- * Currently the options array only supports a 'class' entry for passing as
- * the second parameter to notification()
- *
- * @param string $message Message to display
- * @param string $redirect Url to redirect to (optional)
- * @param array $options An array of options to pass to totara_queue_append (optional)
- * @param bool $immediatesend If set to true the notification is immediately sent
- * @return void
- */
-function totara_set_notification($message, $redirect = null, $options = array(), $immediatesend = true) {
-
-    // Check options is an array
-    if (!is_array($options)) {
-        print_error('error:notificationsparamtypewrong', 'totara_core');
-    }
-
-    $data = [];
-    $data['message'] = $message;
-    $data['class'] = isset($options['class']) ? $options['class'] : null;
-    // Add anything apart from 'classes' from the options object.
-    $data['customdata'] = array_filter($options, function($key) {
-        return !($key === 'class');
-    }, ARRAY_FILTER_USE_KEY);
-
-    // Add to notifications queue
-    totara_queue_append('notifications', $data);
-
-    // Redirect if requested
-    if ($redirect !== null) {
-        // Cancel redirect for AJAX scripts.
-        if (is_ajax_request($_SERVER)) {
-            if (!$immediatesend) {
-                ajax_result(true);
-            } else {
-                ajax_result(true, totara_queue_shift('notifications'));
-            }
-        } else {
-            redirect($redirect);
-        }
-        exit();
-    }
-}
-
-/**
- * Return an array containing any notifications in $SESSION
- *
- * Should be called in the theme's header
- *
- * @return  array
- */
-function totara_get_notifications() {
-
-    $notifications = \core\notification::fetch();
-
-    // Ensure notifications are in the format Totara expects from this function.
-    return array_map('totara_convert_notification_to_legacy_array', $notifications);
-}
-
-/**
- * Add an item to a totara session queue
- *
- * @param   string  $key    Queue key
- * @param   mixed   $data   Data to add to queue
- * @return  void
- */
-function totara_queue_append($key, $data) {
-    global $SESSION;
-
-    // Since TL-11584 / MDL-30811
-    if ($key === 'notifications') {
-        \core\notification::add_totara_legacy($data['message'], $data['class'], $data['customdata']);
-        return;
-    }
-
-    if (!isset($SESSION->totara_queue)) {
-        $SESSION->totara_queue = array();
-    }
-
-    if (!isset($SESSION->totara_queue[$key])) {
-        $SESSION->totara_queue[$key] = array();
-    }
-
-    $SESSION->totara_queue[$key][] = $data;
-}
-
-
-/**
- * Return part or all of a totara session queue
- *
- * @param   string  $key    Queue key
- * @param   boolean $all    Flag to return entire session queue (optional)
- * @return  mixed
- */
-function totara_queue_shift($key, $all = false) {
-    global $SESSION;
-
-    // Value to return if no items in queue
-    $return = $all ? array() : null;
-
-    // Check if an items in queue
-    if (empty($SESSION->totara_queue) || empty($SESSION->totara_queue[$key])) {
-        return $return;
-    }
-
-    // If returning all, grab all and reset queue
-    if ($all) {
-        $return = $SESSION->totara_queue[$key];
-        $SESSION->totara_queue[$key] = array();
-        return $return;
-    }
-
-    // Otherwise pop oldest item from queue
-    return array_shift($SESSION->totara_queue[$key]);
 }
 
 /**
@@ -2101,22 +1982,6 @@ function totara_core_generate_unique_db_value($table, $column, $prefix = null) {
         $exists = $DB->record_exists($table, array($column => $name));
     }
     return $name;
-}
-
-/**
- * Convert a core\output\notification instance to the legacy array format.
- *
- * @param \core\output\notification $notification The templatable to be converted.
- */
-function totara_convert_notification_to_legacy_array(\core\output\notification $notification) {
-    global $OUTPUT;
-
-    $type = $notification->get_message_type();
-    $variables = $notification->export_for_template($OUTPUT);
-
-    $data = [ 'message' => $variables['message'], 'class' => trim($type . ' ' . $variables['extraclasses'])];
-
-    return array_merge($notification->get_totara_customdata(), $data);
 }
 
 /**

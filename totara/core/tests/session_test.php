@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Yuliya Bozhko <yuliya.bozhko@totaralms.com>
- * @package totara
- * @subpackage totaracore
+ * @package totara_core
  */
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
@@ -39,22 +38,29 @@ class totara_core_session_testcase extends advanced_testcase {
 
         // Test totara_queue_append.
         $key = $queue_key_data[0];
-        totara_queue_append($key, $queue_data[$key]);
+        totara_queue_append($key, $queue_data[$key]); // Deprecated.
+        self::assertDebuggingCalled('totara_queue_append() has been deprecated due to disuse.');
         $this->assertEquals($SESSION->totara_queue[$key][0], $queue_data[$key]);
 
         $key = $queue_key_data[1];
-        totara_queue_append($key, $queue_data[$key][0]);
-        totara_queue_append($key, $queue_data[$key][1]);
+        totara_queue_append($key, $queue_data[$key][0]); // Deprecated.
+        self::assertDebuggingCalled('totara_queue_append() has been deprecated due to disuse.');
+        totara_queue_append($key, $queue_data[$key][1]); // Deprecated.
+        self::assertDebuggingCalled('totara_queue_append() has been deprecated due to disuse.');
         $this->assertSame($SESSION->totara_queue[$key], $queue_data[$key]);
 
         // Test totara_queue_shift.
         $key = $queue_key_data[0];
-        $this->assertEquals(totara_queue_shift($key), $queue_data[$key]);
-        $this->assertNull(totara_queue_shift($key));
+        $this->assertEquals(totara_queue_shift($key), $queue_data[$key]); // Deprecated.
+        self::assertDebuggingCalled('totara_queue_shift() has been deprecated due to disuse.');
+        $this->assertNull(totara_queue_shift($key)); // Deprecated.
+        self::assertDebuggingCalled('totara_queue_shift() has been deprecated due to disuse.');
 
         $key = $queue_key_data[1];
-        $this->assertSame(totara_queue_shift($key, true), $queue_data[$key]);
-        $this->assertEquals(totara_queue_shift($key, true), array());
+        $this->assertSame(totara_queue_shift($key, true), $queue_data[$key]); // Deprecated.
+        self::assertDebuggingCalled('totara_queue_shift() has been deprecated due to disuse.');
+        $this->assertEquals(totara_queue_shift($key, true), array()); // Deprecated.
+        self::assertDebuggingCalled('totara_queue_shift() has been deprecated due to disuse.');
     }
 
     /**
@@ -67,7 +73,7 @@ class totara_core_session_testcase extends advanced_testcase {
             'class' => \core\output\notification::NOTIFY_ERROR,
         ];
 
-        $this->assertEquals($expected, totara_convert_notification_to_legacy_array($notification));
+        $this->assertEquals($expected, totara_convert_notification_to_legacy_array($notification)); // Deprecated.
 
         $notification = (new \core\output\notification('Foo', \core\output\notification::NOTIFY_SUCCESS))
             ->set_extra_classes(['one', 'two', 'three']);
@@ -76,17 +82,28 @@ class totara_core_session_testcase extends advanced_testcase {
             'class' => \core\output\notification::NOTIFY_SUCCESS . ' one two three',
         ];
 
-        $this->assertEquals($expected, totara_convert_notification_to_legacy_array($notification));
+        $this->assertEquals($expected, totara_convert_notification_to_legacy_array($notification)); // Deprecated.
     }
 
     public function test_totara_notifications() {
-
         $this->resetAfterTest();
 
         // Test notifications without options.
-        totara_set_notification('Foo');
-        totara_set_notification('Bar', null, ['class' => 'foo notifysuccess']);
-        totara_set_notification('Baz', null, ['class' => 'foo bar notifymessage baz']);
+        totara_set_notification('Foo'); // Deprecated.
+        self::assertDebuggingCalled([
+            'totara_set_notification() has been deprecated, please use redirect() or \core\notification::*() instead.',
+            'totara_queue_append() has been deprecated due to disuse.'
+            ]);
+        totara_set_notification('Bar', null, ['class' => 'foo notifysuccess']); // Deprecated.
+        self::assertDebuggingCalled([
+            'totara_set_notification() has been deprecated, please use redirect() or \core\notification::*() instead.',
+            'totara_queue_append() has been deprecated due to disuse.'
+        ]);
+        totara_set_notification('Baz', null, ['class' => 'foo bar notifymessage baz']); // Deprecated.
+        self::assertDebuggingCalled([
+            'totara_set_notification() has been deprecated, please use redirect() or \core\notification::*() instead.',
+            'totara_queue_append() has been deprecated due to disuse.'
+        ]);
         $expected = [];
         $expected[] = [
             'class' => \core\output\notification::NOTIFY_ERROR,
@@ -100,11 +117,20 @@ class totara_core_session_testcase extends advanced_testcase {
             'class' => \core\output\notification::NOTIFY_INFO . ' foo bar baz',
             'message' => 'Baz',
         ];
-        $this->assertEquals($expected, totara_get_notifications());
+        self::assertEquals($expected, totara_get_notifications()); // Deprecated.
+        self::assertDebuggingCalled('totara_get_notifications() has been deprecated, please use \core\notification::fetch() instead.');
 
         // Test notifications with arbitrary options.
-        totara_set_notification('What larks, Pip', null, ['option1' => 7]);
-        totara_set_notification('Another message', null, ['class' => 'notifymessage', 'foo' => 'This is an option!', 'bar' => 24]);
+        totara_set_notification('What larks, Pip', null, ['option1' => 7]); // Deprecated.
+        self::assertDebuggingCalled([
+            'totara_set_notification() has been deprecated, please use redirect() or \core\notification::*() instead.',
+            'totara_queue_append() has been deprecated due to disuse.'
+        ]);
+        totara_set_notification('Another message', null, ['class' => 'notifymessage', 'foo' => 'This is an option!', 'bar' => 24]); // Deprecated.
+        self::assertDebuggingCalled([
+            'totara_set_notification() has been deprecated, please use redirect() or \core\notification::*() instead.',
+            'totara_queue_append() has been deprecated due to disuse.'
+        ]);
         $expected = [];
         $expected[] = [
             'class' => \core\output\notification::NOTIFY_ERROR,
@@ -117,8 +143,20 @@ class totara_core_session_testcase extends advanced_testcase {
             'foo' => 'This is an option!',
             'bar' => 24,
         ];
-        $this->assertEquals($expected, totara_get_notifications());
-
+        self::assertEquals($expected, totara_get_notifications()); // Deprecated.
+        $messages = self::getDebuggingMessages();
+        self::assertCount(3, $messages);
+        self::resetDebugging();
+        $expected = [
+            'totara_get_notifications() has been deprecated, please use \core\notification::fetch() instead.',
+            'The use of custom data in notifications has been deprecated since Totara 13 and should no longer be used.',
+            'The use of custom data in notifications has been deprecated since Totara 13 and should no longer be used.',
+        ];
+        $actual = [];
+        foreach ($messages as $message) {
+            $actual[] = $message->message;
+        }
+        self::assertSame($expected, $actual);
     }
 
 }

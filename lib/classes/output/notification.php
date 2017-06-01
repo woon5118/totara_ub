@@ -101,6 +101,7 @@ class notification implements \renderable, \templatable {
     protected $extraclasses = array();
 
     /**
+     * @deprecated since Totara 13.
      * @var array $totara_customdata Legacy support for Totara notification 'options'.
      */
     protected $totara_customdata = [];
@@ -108,7 +109,8 @@ class notification implements \renderable, \templatable {
     /**
      * Totara: Map legacy types to class constants.
      *
-     * @var array
+     * @deprecated since Totara 13. Please use \core\output\notification::normalise_type instead.
+     * @var string[]
      */
     protected static $legacymapping = [
         'notifyproblem'   => self::NOTIFY_ERROR,
@@ -228,6 +230,93 @@ class notification implements \renderable, \templatable {
     }
 
     /**
+     * Normalises the given type to ensure it is accurate.
+     *
+     * @since Totara 13
+     * @param string $type
+     * @param mixed $default What to return if the type cannot be normalised.
+     * @return mixed|string
+     */
+    public static function normalise_type($type, $default = self::NOTIFY_SUCCESS) {
+        if (!is_string($type) || empty($type)) {
+            return $default;
+        }
+
+        $knowntypes = [
+            self::NOTIFY_SUCCESS,
+            self::NOTIFY_INFO,
+            self::NOTIFY_WARNING,
+            self::NOTIFY_ERROR,
+        ];
+        if (in_array($type, $knowntypes)) {
+            return $type;
+        }
+
+        $legacytypemappings = [
+            'notifyproblem'     => self::NOTIFY_ERROR,
+            'notifytiny'        => self::NOTIFY_ERROR,
+            'notifyerror'       => self::NOTIFY_ERROR,
+            'notifysuccess'     => self::NOTIFY_SUCCESS,
+            'notifymessage'     => self::NOTIFY_INFO,
+            'notifyredirect'    => self::NOTIFY_INFO,
+            'redirectmessage'   => self::NOTIFY_INFO,
+        ];
+        if (isset($legacytypemappings[$type])) {
+            return $legacytypemappings[$type];
+        }
+
+        return $default;
+    }
+
+    /**
+     * Normalises the given class string returning the notification type and additional classes.
+     *
+     * Please note that this is strongly discouraged, really it is just guessing.
+     * When working with notifications please always use the official API.
+     *
+     * @since Totara 13
+     * @internal
+     * @param string $classes
+     * @param string $default
+     * @return array
+     */
+    public static function normalise_classes_to_type_and_classes($classes, $default = self::NOTIFY_SUCCESS) {
+        $extraclasses = [];
+        $type = $default;
+
+        if (!is_string($classes) || empty($classes)) {
+            return [$type, $extraclasses];
+        }
+
+        $normalised = notification::normalise_type($classes, null);
+        if ($normalised !== null) {
+            $type = $normalised;
+        } else {
+            // It's not a single match. Let's explode it and try that.
+            $classes = explode(' ', trim($classes));
+            $typefound = false;
+            foreach ($classes as $class) {
+                if (empty($class)) {
+                    continue;
+                }
+                if ($typefound) {
+                    $extraclasses[] = $class;
+                    continue;
+                }
+                $normalised = notification::normalise_type($class, null);
+                if ($normalised === null) {
+                    $extraclasses[] = $class;
+                } else {
+                    $type = $normalised;
+                    $typefound = true; // We only want to take the first matching class as the type.
+                }
+            }
+        }
+
+        return [$type, $extraclasses];
+    }
+
+    /**
      * Given a string of classes attempt to map to a type class constant.
      *
      * This method supports TL-11584 / MDL-30811. Note that the core
@@ -235,39 +324,18 @@ class notification implements \renderable, \templatable {
      * method is not used to render notifications from the queue which
      * (in Totara) may also have legacy class-string style type.
      *
+     * @deprecated since Totara 13. This method only exists for compatibility with \core\notifications
+     *             until deprecated totara_notification functions are removed.
      * @param string|null $typestring
      * @return mixed
      */
     public static function resolve_legacy_type($typestring) {
-
-        // None was set.
-        if ($typestring === null) {
-            return null;
-        }
-
-        $classconstants = [self::NOTIFY_SUCCESS, self::NOTIFY_INFO, self::NOTIFY_WARNING, self::NOTIFY_ERROR];
-
-        // If it's a class constant already then we don't need to do anything.
-        if (in_array($typestring, $classconstants)) {
-            return $typestring;
-        }
-
-        $classes = array_map('trim', explode(' ', $typestring));
-        foreach($classes as $class) {
-            // If there are more than one just return the first match.
-            if (array_key_exists($class, self::$legacymapping)) {
-                return self::$legacymapping[$class];
-            }
-
-            // Also check if a class constant has been added to the array of classes.
-            if (in_array($class, $classconstants)) {
-                return $class;
-            }
-        }
-
-        // The default value of type to the constructor.
-        return null;
-
+        debugging(
+            __METHOD__ . ' has been deprecated since Totara 13 and should never be used. There is no alternative method.',
+            DEBUG_DEVELOPER
+        );
+        list($type, $additionalclasses) = self::normalise_classes_to_type_and_classes($typestring, null);
+        return $type;
     }
 
     /**
@@ -280,38 +348,42 @@ class notification implements \renderable, \templatable {
      * classes so that they may still be applied to the instance
      * for backwards compatibility.
      *
+     * @deprecated since Totara 13. This method only exists for compatibility with \core\notifications
+     *             until deprecated totara_notification functions are removed.
      * @param string|null $typestring A string of classes.
      * @return array
      */
     public static function preserve_custom_classes($typestring) {
-
-        // It's possible no type is set.
-        if ($typestring === null) {
-            return array();
-        }
-
-        // Everything including legacy types.
-        $allclasses = array_map('trim', explode(' ', $typestring));
-
-        // Return everything apart from the legacy types.
-        return array_diff($allclasses, array_keys(self::$legacymapping));
+        debugging(
+            __METHOD__ . ' has been deprecated since Totara 13 and should never be used. There is no alternative method.',
+            DEBUG_DEVELOPER
+        );
+        list($type, $additionalclasses) = self::normalise_classes_to_type_and_classes($typestring, null);
+        return $additionalclasses;
     }
 
-
     /**
+     * Sets some customdata for Totara on this notification.
+     *
+     * @deprecated since Totara 13
      * @param array $customdata
+     * @return notification
      */
     public function set_totara_customdata($customdata) {
+        debugging('The use of custom data in notifications has been deprecated since Totara 13 and should no longer be used.', DEBUG_DEVELOPER);
         $this->totara_customdata = $customdata;
-
         return $this;
     }
 
     /**
-     * @param array $customdata
+     * Returns any customdata set on this notification.
+     *
+     * @deprecated since Totara 13
      * @return array
      */
     public function get_totara_customdata() {
+        // Intentionally does not call debugging. Debugging is called when setting the customdata and when calling totara_get_notifications.
+        // Calling it here would just be spamming debugging notices.
         return $this->totara_customdata;
     }
 

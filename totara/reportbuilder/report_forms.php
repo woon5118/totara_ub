@@ -1464,6 +1464,7 @@ class report_builder_toolbar_search_form extends moodleform {
 
 class report_builder_course_expand_form extends moodleform {
     public function definition() {
+        global $OUTPUT;
 
         $mform = $this->_form;
 
@@ -1482,19 +1483,9 @@ class report_builder_course_expand_form extends moodleform {
         $action = isset($this->_customdata['action']) ? $this->_customdata['action'] : '';
         $url = isset($this->_customdata['url']) ? $this->_customdata['url'] : '';
 
-        if (!empty($inlineenrolmentelements)) {
-            $notices = totara_get_notifications();
-            $noticeshtml = '';
-            foreach ($notices as $notice) {
-                if (isset($notice['class'])) {
-                    $notice['class'] = array('notifynotice');
-                }
-                $noticeshtml .= html_writer::tag(
-                    'div',
-                    clean_text($notice['message']),
-                    array('class' => renderer_base::prepare_classes($notice['class']))
-                );
-            }
+        if (is_array($inlineenrolmentelements) && !empty($inlineenrolmentelements)) {
+            /** @var core_renderer $OUTPUT */
+            $noticeshtml = $OUTPUT->course_content_header_notifications();
             $mform->addElement('static', 'notifications', $noticeshtml);
         }
 

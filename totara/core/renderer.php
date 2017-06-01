@@ -473,22 +473,12 @@ class totara_core_renderer extends plugin_renderer_base {
 
     /**
      * Displaying notices at top of page
+     *
+     * @deprecated since Totara 13
      */
     public function totara_notifications() {
-        $output = '';
-        // Display notifications set with totara_set_notification()
-        $notices = totara_get_notifications();
-        foreach ($notices as $notice) {
-            if (isset($notice['class'])) {
-                $output .= $this->output->notification($notice['message'], $notice['class']);
-            } else {
-                $output .= $this->output->notification($notice['message']);
-            }
-        }
-
-        $data = new stdClass();
-        $data->content = $output;
-        return $this->render_from_template('totara_core/totara_notifications', $data);
+        debugging('\totara_core_renderer::totara_notifications has been deprecated, please call \core_renderer::course_content_header_notifications instead', DEBUG_DEVELOPER);
+        return $this->output->course_content_header_notifications();
     }
 
     /**

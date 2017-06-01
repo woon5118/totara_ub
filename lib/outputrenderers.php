@@ -2496,47 +2496,11 @@ EOD;
      * @return string the HTML to output.
      */
     public function notification($message, $type = null) {
-        $typemappings = [
-            // Valid types.
-            'success'           => \core\output\notification::NOTIFY_SUCCESS,
-            'info'              => \core\output\notification::NOTIFY_INFO,
-            'warning'           => \core\output\notification::NOTIFY_WARNING,
-            'error'             => \core\output\notification::NOTIFY_ERROR,
 
-            // Legacy types mapped to current types.
-            'notifyproblem'     => \core\output\notification::NOTIFY_ERROR,
-            'notifytiny'        => \core\output\notification::NOTIFY_ERROR,
-            'notifyerror'       => \core\output\notification::NOTIFY_ERROR,
-            'notifysuccess'     => \core\output\notification::NOTIFY_SUCCESS,
-            'notifymessage'     => \core\output\notification::NOTIFY_INFO,
-            'notifyredirect'    => \core\output\notification::NOTIFY_INFO,
-            'redirectmessage'   => \core\output\notification::NOTIFY_INFO,
-        ];
-
+        // Totara: Normalise the type, which due to historical reasons may be space separated CSS classes.
         $extraclasses = [];
-
         if ($type) {
-            if (strpos($type, ' ') === false) {
-                // No spaces in the list of classes, therefore no need to loop over and determine the class.
-                if (isset($typemappings[$type])) {
-                    $type = $typemappings[$type];
-                } else {
-                    // The value provided did not match a known type. It must be an extra class.
-                    $extraclasses = [$type];
-                }
-            } else {
-                // Identify what type of notification this is.
-                $classarray = explode(' ', self::prepare_classes($type));
-
-                // Separate out the type of notification from the extra classes.
-                foreach ($classarray as $class) {
-                    if (isset($typemappings[$class])) {
-                        $type = $typemappings[$class];
-                    } else {
-                        $extraclasses[] = $class;
-                    }
-                }
-            }
+            list($type, $extraclasses) = \core\output\notification::normalise_classes_to_type_and_classes($type, null);
         }
 
         $notification = new \core\output\notification($message, $type);

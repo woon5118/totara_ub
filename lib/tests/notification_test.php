@@ -282,4 +282,139 @@ return;
         $this->assertEquals('', $exported['extraclasses']);
     }
 
+    /**
+     * Tests \core\output\notification::normalise_type()
+     */
+    public function test_normalise_type() {
+        // Test the known types.
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type(\core\output\notification::NOTIFY_SUCCESS));
+        self::assertEquals(\core\output\notification::NOTIFY_ERROR, \core\output\notification::normalise_type(\core\output\notification::NOTIFY_ERROR));
+        self::assertEquals(\core\output\notification::NOTIFY_INFO, \core\output\notification::normalise_type(\core\output\notification::NOTIFY_INFO));
+        self::assertEquals(\core\output\notification::NOTIFY_WARNING, \core\output\notification::normalise_type(\core\output\notification::NOTIFY_WARNING));
+
+        // Test that mappings from the navigation item match to the output\notification item.
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type(\core\notification::SUCCESS));
+        self::assertEquals(\core\output\notification::NOTIFY_ERROR, \core\output\notification::normalise_type(\core\notification::ERROR));
+        self::assertEquals(\core\output\notification::NOTIFY_INFO, \core\output\notification::normalise_type(\core\notification::INFO));
+        self::assertEquals(\core\output\notification::NOTIFY_WARNING, \core\output\notification::normalise_type(\core\notification::WARNING));
+
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type(''));
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type(null));
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type(true));
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type(false));
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type('nonsense'));
+        self::assertEquals(\core\output\notification::NOTIFY_SUCCESS, \core\output\notification::normalise_type('success error'));
+
+        self::assertEquals('', \core\output\notification::normalise_type('nonsense', ''));
+        self::assertEquals(null, \core\output\notification::normalise_type('nonsense', null));
+        self::assertEquals(true, \core\output\notification::normalise_type('nonsense', true));
+        self::assertEquals(false, \core\output\notification::normalise_type('nonsense', false));
+        self::assertEquals('monkey', \core\output\notification::normalise_type('nonsense', 'monkey'));
+        self::assertEquals('info warning', \core\output\notification::normalise_type('success error', 'info warning'));
+    }
+
+    /**
+     * Tests \core\output\notification::normalise_classes_to_type_and_classes()
+     */
+    public function test_normalise_classes_to_type_and_classes() {
+        // Test the known types.
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\output\notification::NOTIFY_SUCCESS)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_ERROR, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\output\notification::NOTIFY_ERROR)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_INFO, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\output\notification::NOTIFY_INFO)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_WARNING, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\output\notification::NOTIFY_WARNING)
+        );
+
+        // Test that mappings from the navigation item match to the output\notification item.
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\notification::SUCCESS)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_ERROR, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\notification::ERROR)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_INFO, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\notification::INFO)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_WARNING, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(\core\notification::WARNING)
+        );
+
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, []],
+            \core\output\notification::normalise_classes_to_type_and_classes('')
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(null)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(true)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, []],
+            \core\output\notification::normalise_classes_to_type_and_classes(false)
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, ['nonsense']],
+            \core\output\notification::normalise_classes_to_type_and_classes('nonsense')
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, ['error']],
+            \core\output\notification::normalise_classes_to_type_and_classes('success error')
+        );
+
+        self::assertEquals(
+            ['', ['nonsense']],
+            \core\output\notification::normalise_classes_to_type_and_classes('nonsense', '')
+        );
+        self::assertEquals(
+            [null, ['nonsense']],
+            \core\output\notification::normalise_classes_to_type_and_classes('nonsense', null)
+        );
+        self::assertEquals(
+            [true, ['nonsense']],
+            \core\output\notification::normalise_classes_to_type_and_classes('nonsense', true)
+        );
+        self::assertEquals(
+            [false, ['nonsense']],
+            \core\output\notification::normalise_classes_to_type_and_classes('nonsense', false)
+        );
+        self::assertEquals(
+            ['monkey', ['nonsense']],
+            \core\output\notification::normalise_classes_to_type_and_classes('nonsense', 'monkey')
+        );
+        self::assertEquals(
+            ['success', ['error']],
+            \core\output\notification::normalise_classes_to_type_and_classes('success error', 'info warning')
+        );
+
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, ['foo', 'error']],
+            \core\output\notification::normalise_classes_to_type_and_classes('foo success error')
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, ['foo', 'error']],
+            \core\output\notification::normalise_classes_to_type_and_classes('  foo  success  error  ')
+        );
+        self::assertEquals(
+            [\core\output\notification::NOTIFY_SUCCESS, ['one', 'two', 'three', 'four', 'five']],
+            \core\output\notification::normalise_classes_to_type_and_classes('one two three four five')
+        );
+    }
+
 }

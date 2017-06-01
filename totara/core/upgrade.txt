@@ -34,6 +34,15 @@ information provided here is intended especially for developers.
 * totara_core\masthead_menu::export_for_template now outputs totara_core|home instead of home (as provided by the basis theme)
 * Added moodle_database::recommends_counted_recordset() which should be overridden for databases where performance
   testing shows that counted recordsets perform better than two simple queries.
+* Deprecated custom notification handling.
+  The following functions have been deprecated as part of this:
+    - Function: totara_get_notifications() (alternative method: \core\notification::fetch())
+    - Function: totara_set_notification() (alternative: redirect or \core\notification::*())
+    - Function: totara_convert_notification_to_legacy_array() (no alternative)
+    - Function: totara_queue_append() (no alternative)
+    - Function: totara_queue_shift() (no alternative)
+    - Method: \core\notification::add_totara_legacy() (no alternative)
+    - Method: \totara_core_renderer::totara_notifications() (alternative method: \core_renderer::course_content_header_notifications())
 
 === 12.0 ===
 

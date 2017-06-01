@@ -3130,6 +3130,8 @@ function redirect($url, $message='', $delay=null, $messagetype = \core\output\no
 
     if (!empty($message)) {
         if (!$debugdisableredirect && !headers_sent()) {
+            // Totara: Normalise the message type.
+            $messagetype = \core\output\notification::normalise_type($messagetype, null);
             // A message has been provided, and the headers have not yet been sent.
             // Display the message as a notification on the subsequent page.
             \core\notification::add($message, $messagetype);
