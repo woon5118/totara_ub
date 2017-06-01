@@ -7,3 +7,6 @@ information provided here is intended for developers.
   display function (\totara_certification\rb\display\certif_status) to use this class
   $this->usedcomponents[] = 'totara_certification'; must be set in the constructor for
   report source.
+* certif_create_completion added third optional parameter $message which will be added to the start of relevant logs
+* certif_create_completion now creates the prog_completion record when the record is missing, rather than giving an error
+* certif_create_completion now deletes "expired" certif_completion_history records when they are used to reassign a user
