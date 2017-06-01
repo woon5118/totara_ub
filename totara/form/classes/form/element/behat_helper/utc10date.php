@@ -41,7 +41,7 @@ class utc10date extends text {
      * @throws \Behat\Mink\Exception\ExpectationException
      */
     public function set_value($value) {
-        $value = $this->normalise_value_pre_set($value);
+        $value = static::normalise_value_pre_set($value);
         if (!$this->context->running_javascript()) {
             // If JS is not running this is practically just a plain text field.
             parent::set_value($value);
@@ -70,48 +70,46 @@ class utc10date extends text {
     /**
      * Normalises the given value prior to setting it.
      *
-     * @throws ExpectationException
      * @param string $value
      * @return string
      */
-    protected function normalise_value_pre_set($value) {
-        if (trim($value) === '') {
+    public static function normalise_value_pre_set($value) {
+        $value = trim($value);
+
+        if ($value === '') {
             return '';
         }
+
         // Only YYYY-MM-DD and variation with spaces or slashes are accepted.
-        $regex = '#^(?P<year>\d{2,4})[\-/ ](?P<month>\d{1,2})[\-/ ](?P<day>\d{1,2})$#';
-        if (!preg_match($regex, trim($value), $matches)) {
-            throw new ExpectationException('Invalid utc10date value provided, it should be YYYY-MM-DD, "'.$value.'"', $this->context->getSession());
+        $regexdate = '#^(?P<year>\d{2,4})[\-/ ](?P<month>\d{1,2})[\-/ ](?P<day>\d{1,2})$#';
+        // The internal must start with +P or -P.
+        $regexinterval = '/^([+-])(P(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(\d+H)?(\d+M)?(\d+S)?)?)$/';
+
+        if (preg_match($regexinterval, $value, $matches)) {
+            $date = new \DateTime();
+            $interval = new \DateInterval($matches[2]);
+            if ($matches[1] === '+') {
+                $date->add($interval);
+            } else {
+                $date->sub($interval);
+            }
+
+        } else if (preg_match($regexdate, $value, $matches)) {
+            $year = (int)$matches['year'];
+            $month = (int)$matches['month'];
+            $day = (int)$matches['day'];
+
+            if ($year < 99) {
+                $year += 2000;
+            }
+
+            $date = new \DateTime();
+            $date->setDate($year, $month, $day);
+
+        } else {
+            throw new \coding_exception('Invalid utc10date value provided, it should be YYYY-MM-DD date or relative +/- P interval, "'.$value.'"');
         }
-        $year = (int)$matches['year'];
-        $month = (int)$matches['month'];
-        $day = (int)$matches['day'];
 
-        if ($year < 99) {
-            $year += 2000;
-        }
-
-        $year = $this->stringify_date_digit($year, 4);
-        $month = $this->stringify_date_digit($month);
-        $day = $this->stringify_date_digit($day);
-
-        return "{$year}-{$month}-{$day}";
+        return $date->format('Y-m-d');
     }
-
-    /**
-     * Takes a value and converts it to a string of the expected length.
-     *
-     * @param int $value
-     * @param int $length
-     * @return string
-     */
-    protected function stringify_date_digit($value, $length = 2) {
-        $value = (string)$value;
-        $valuelen = strlen($value);
-        if ($valuelen < $length) {
-            $value = str_pad($value, $length, '0', STR_PAD_LEFT);
-        }
-        return $value;
-    }
-
 }

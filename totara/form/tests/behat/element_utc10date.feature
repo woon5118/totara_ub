@@ -175,3 +175,24 @@ Feature: Totara form utc10date element tests
     And "hiddenif_required_b" row "Value" column of "form_results" table should contain "«951732000 (2000/02/28)»"
     And "form_select" row "Value" column of "form_results" table should contain "«totara_form\form\testform\element_utc10date»"
     And "submitbutton" row "Value" column of "form_results" table should contain "«1»"
+
+  Scenario: Test relative date in utc10date elements in Totara forms without javascript
+    When I select "Basic utc10date element [totara_form\form\testform\element_utc10date]" from the "Test form" singleselect
+    Then I should see "Form: Basic utc10date element"
+    And I should see "There are required fields in this form marked"
+    When I set the following Totara form fields to these values:
+      | Basic utc10date | +P1D |
+      | Required basic utc10date | -P1D |
+    And I press "Save changes"
+    Then I should see "The form has been submit"
+
+  @javascript
+  Scenario: Test relative date in utc10date elements in Totara forms with javascript
+    When I select "Basic utc10date element [totara_form\form\testform\element_utc10date]" from the "Test form" singleselect
+    Then I should see "Form: Basic utc10date element"
+    And I should see "There are required fields in this form marked"
+    When I set the following Totara form fields to these values:
+      | Basic utc10date | +P1D |
+      | Required basic utc10date | -P1D |
+    And I press "Save changes"
+    Then I should see "The form has been submit"

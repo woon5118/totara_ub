@@ -189,4 +189,48 @@ class totara_form_element_utc10date_testcase extends advanced_testcase {
         );
         $this->assertSame($expected, $data);
     }
+
+    public function test_behat_normalise_value_pre_set() {
+        global $CFG;
+        require_once("$CFG->dirroot/totara/form/classes/form/element/behat_helper/base.php");
+        require_once("$CFG->dirroot/totara/form/classes/form/element/behat_helper/text.php");
+        require_once("$CFG->dirroot/totara/form/classes/form/element/behat_helper/utc10date.php");
+
+        $this->assertSame('2017-12-23', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('2017/12/23'));
+        $this->assertSame('2017-12-23', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('2017-12-23'));
+        $this->assertSame('2017-12-23', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('2017 12 23'));
+        $this->assertSame('2017-12-23', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('17/12/23'));
+        $this->assertSame('1975-01-01', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set(' 1975/1/1 '));
+
+        $tomorrow = new \DateTime();
+        $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
+        $yesterday = new \DateTime();
+        $yesterday = $yesterday->sub(new \DateInterval('P1D'));
+
+        $someday = new \DateTime();
+        $someday->add(new \DateInterval('P1Y2M10DT2H30M'));
+
+        $this->assertSame($tomorrow->format('Y-m-d'), \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('+P1D'));
+        $this->assertSame($tomorrow->format('Y-m-d'), \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set(' +P1D '));
+        $this->assertSame($yesterday->format('Y-m-d'), \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('-P1D'));
+        $this->assertSame($someday->format('Y-m-d'), \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('+P1Y2M10DT2H30M'));
+
+        try {
+            \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('2017*12*23');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        try {
+            \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('P1D');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        try {
+            \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('+P1X');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+    }
 }
