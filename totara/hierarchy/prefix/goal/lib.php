@@ -172,9 +172,9 @@ class goal extends hierarchy {
 
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/assign/lib.php');
 
-        // Set up some variables.
+        /** @var totara_hierarchy_renderer $renderer */
         $renderer = $PAGE->get_renderer('totara_hierarchy');
-        $can_assign = has_capability('totara/hierarchy:managegoalassignments', context_system::instance());
+        $can_manage = has_capability('totara/hierarchy:managegoalassignments', context_system::instance());
         $assignclass = new totara_assign_goal('goal', $item);
         $options = array(
             "" => get_string('assigngroup', 'totara_hierarchy'),
@@ -193,13 +193,13 @@ class goal extends hierarchy {
         // Put an empty line between the goal table and assignments table.
         echo html_writer::empty_tag('br');
 
-        // Display the assignments table.
-        echo html_writer::start_tag('div', array('class' => 'list-assigned'));
-        echo $renderer->goal_view_assignments($item, $can_assign, $assignments);
-        echo html_writer::end_tag('div');
+        if ($can_manage) {
+            // Display the assignments table. This was moved into the can_manage check in Totara 10.
+            echo html_writer::start_tag('div', array('class' => 'list-assigned'));
+            echo $renderer->goal_view_assignments($item, $can_manage, $assignments);
+            echo html_writer::end_tag('div');
 
-        // Display the assignments selector.
-        if ($can_assign) {
+            // Display the assignments selector.
             echo html_writer::label(get_string('assigngroup', 'totara_hierarchy'), 'menugroupselector', true, array('class' => 'sr-only'));
             echo html_writer::select($options, 'groupselector', null, null,
                     array('class' => 'group_selector', 'data-itemid' => $item->id));
