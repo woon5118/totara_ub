@@ -8,6 +8,9 @@ information provided here is intended especially for developers.
 * updated totara/core/templates/totara_search.mustache
 * totara/core/templates/totara_search.mustache context object has changed, the property ->alt has been deprecated
 * updated totara/core/templates/course_progress_bar.mustache
+* totara/core/templates/report_list.mustache context object has changed, the property ->report_list[]->name is no
+    longer sanitised (as it sanitised in the template and in the flex/pix templates);
+* updated totara_core_renderer::report_list_export_for_template()
 
 Hook is added for Seminar Sing-up link directly to calendar upcoming events block
 # calendar_upcoming_event class in totara/core/classes/hook/calendar_upcoming_event.php
