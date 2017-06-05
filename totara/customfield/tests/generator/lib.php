@@ -115,6 +115,7 @@ class totara_customfield_generator extends testing_data_generator {
             $data->id = 0;
             $data->datatype = 'multiselect';
             $data->fullname = $name;
+            $data->shortname = isset($options['shortname']) ? $options['shortname'] : $name;
             $data->description = '';
             $data->defaultdata = '';
             $data->forceunique = 0;

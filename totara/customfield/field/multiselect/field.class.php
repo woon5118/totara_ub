@@ -145,17 +145,21 @@ class customfield_multiselect extends customfield_base {
             return $syncitem;
         }
 
-        $value = $syncitem->$fieldname;
+        $values = str_getcsv($syncitem->$fieldname, ",", "'");
+        $selected = array();
 
-        // Now get the corresponding option for that value.
-        foreach ($this->options as $key => $option) {
-            if ($option['option'] == $value) {
-                $selected = array($key => $option);
+        foreach ($values as $value) {
+            $value = trim($value);
+            // Now get the corresponding option for that value.
+            foreach ($this->options as $key => $option) {
+                if ($option['option'] == $value) {
+                    $selected[$key] = $option;
+                }
             }
         }
 
         // If no matching option is found set it to empty.
-        if (!isset($selected)) {
+        if (empty($selected)) {
             $selected = NULL;
         }
 
