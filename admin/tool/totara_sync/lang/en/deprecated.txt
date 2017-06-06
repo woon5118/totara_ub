@@ -1,4 +1,5 @@
 cannotcreateuserassignments,tool_totara_sync
+checkuserconfig,tool_totara_sync
 posenddate,tool_totara_sync
 posstartdate,tool_totara_sync
 posstartdateafterenddate,tool_totara_sync

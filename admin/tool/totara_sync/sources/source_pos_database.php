@@ -37,6 +37,9 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
         $this->config->import_frameworkidnumber = "1";
         $this->config->import_timemodified = "1";
 
+        $this->config->import_deleted = (isset($this->element->config->sourceallrecords) &&
+            $this->element->config->sourceallrecords == 0) ? "1" : "0";
+
         // Display required db table columns
         $fieldmappings = array();
 

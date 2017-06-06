@@ -44,6 +44,7 @@ abstract class totara_sync_source_org extends totara_sync_source {
             'idnumber',
             'fullname',
             'shortname',
+            'deleted',
             'description',
             'frameworkidnumber',
             'parentidnumber',
@@ -108,6 +109,9 @@ abstract class totara_sync_source_org extends totara_sync_source {
             $name = 'import_'.$f;
             if (in_array($f, array('idnumber', 'fullname', 'frameworkidnumber', 'timemodified'))) {
                 $mform->addElement('hidden', $name, '1');
+                $mform->setType($name, PARAM_INT);
+            } else if ($f == 'deleted') {
+                $mform->addElement('hidden', $name, $this->config->$name);
                 $mform->setType($name, PARAM_INT);
             } else {
                 $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
@@ -190,6 +194,10 @@ abstract class totara_sync_source_org extends totara_sync_source {
         $table->add_field('typeidnumber', XMLDB_TYPE_CHAR, '100');
         $table->add_field('customfields', XMLDB_TYPE_TEXT, 'big');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null);
+        if (!empty($this->config->import_deleted)) {
+            $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        }
+
 
         /// Add keys
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));

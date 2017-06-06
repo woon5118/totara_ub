@@ -169,6 +169,7 @@ class tool_totara_sync_org_csv_emptyfields_setting_testcase extends advanced_tes
 
         );
         $this->config = array(
+            'sourceallrecords' => '1',
             'allow_create' => '1',
             'allow_delete' => '1',
             'allow_update' => '1',

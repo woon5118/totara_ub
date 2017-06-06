@@ -95,7 +95,7 @@ class behat_tool_totara_sync extends behat_base {
 
         // Check all the important settings have a value so we can connect to the database.
         foreach ($dbconfig as $setting => $value) {
-            if (empty($value) && $setting != 'dbport') {
+            if (empty($value) && ($setting != 'dbport' && $setting != 'dbpass')) {
                 throw new PendingException("HR Import database test configuration '{$setting}' could not be determined ('').");
             }
         }
@@ -157,6 +157,7 @@ class behat_tool_totara_sync extends behat_base {
 
                 // Define the default columns.
                 $table->add_field('fullname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
+                $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
                 $table->add_field('frameworkidnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
                 $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
 

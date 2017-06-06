@@ -43,5 +43,14 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016122300, 'tool', 'totara_sync');
     }
 
+    // Set default for new 'sourceallrecords' setting for Organisations and Positions.
+    if ($oldversion < 2017060800) {
+        // Set source all records to 1 to preserve current behaviour in upgrades.
+        set_config('sourceallrecords', '1', 'totara_sync_element_pos');
+        set_config('sourceallrecords', '1', 'totara_sync_element_org');
+
+        upgrade_plugin_savepoint(true, 2017060800, 'tool', 'totara_sync');
+    }
+
     return true;
 }

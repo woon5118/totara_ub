@@ -92,7 +92,7 @@ $string['forcepwchange'] = 'Force password change for new users';
 $string['forcepwchangedesc'] = 'If "yes" new users have their password set but are forced to change it on first login. <br /><strong>Note:</strong> Users with generated passwords will be forced to change them on first login regardless of this configuration option.';
 $string['undeletepwreset'] = 'Reset passwords for undeleted users';
 $string['undeletepwresetdesc'] = 'If "yes" and if a password is not specified in the import then undeleted users will have their passwords reset, will receive an email with the new password and will be forced to reset their password when first logging in';
-$string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
+$string['checkconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
 $string['allowedactions'] = 'Allowed HR Import actions';
 $string['create'] = 'Create';
 $string['delete'] = 'Delete';
@@ -229,6 +229,7 @@ $string['couldnotcreateclonetable'] = 'could not create clone table, aborting...
 $string['sanitycheckfailed'] = 'sanity check failed, aborting...';
 $string['cannotdeletex'] = 'cannot delete {$a} (might already be deleted)';
 $string['deletedx'] = 'deleted {$a}';
+$string['deletefieldmissingnotallrecords'] = 'The delete field is missing, this is a required field if the file does not contain all records';
 $string['suspendeduserx'] = 'suspended {$a}';
 $string['frameworkxnotfound'] = 'framework {$a} not found...';
 $string['parentxnotfound'] = 'parent {$a} not found...';
@@ -394,6 +395,7 @@ $string['eventsynccompleted'] = 'HR Import completed';
 
 // Deprecated.
 $string['cannotcreateuserassignments'] = 'cannot create user assignments (user: {$a})';
+$string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
 $string['posenddate'] = 'Position end date';
 $string['posstartdate'] = 'Position start date';
 $string['posstartdateafterenddate'] = 'Position start date must not be later than end date for user {$a->idnumber}';

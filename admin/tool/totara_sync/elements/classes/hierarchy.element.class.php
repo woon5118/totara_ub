@@ -51,6 +51,9 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
     }
 
     function config_form(&$mform) {
+        $mform->addElement('selectyesno', 'sourceallrecords', get_string('sourceallrecords', 'tool_totara_sync'));
+        $mform->setDefault('sourceallrecords', 0);
+        $mform->addElement('static', 'sourceallrecordsdesc', '', get_string('sourceallrecordsdesc', 'tool_totara_sync'));
 
         // Empty CSV field setting.
         $emptyfieldopt = array(
@@ -72,6 +75,8 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
     }
 
     function config_save($data) {
+        $this->set_config('sourceallrecords', $data->sourceallrecords);
+
         // Only set this config is we get some data. Vaiid values are 0 and 1, but if set
         // to null it can be used to determine whether CSV or database sync is being used.
         if (isset($data->csvsaveemptyfields)) {
@@ -83,6 +88,23 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
         $this->set_config('allow_create', !empty($data->allow_create));
         $this->set_config('allow_update', !empty($data->allow_update));
         $this->set_config('allow_delete', !empty($data->allow_delete));
+
+        $sourcename = 'source_' . $this->get_name();
+
+        if (!empty($data->$sourcename)) {
+            $source = $this->get_source($data->$sourcename);
+            // Build link to source config.
+            $url = new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php', array('element' => $this->get_name(), 'source' => $source->get_name()));
+            if ($source->has_config()) {
+                // Set import_deleted and warn if necessary.
+                $import_deleted_new = ($data->sourceallrecords == 0) ? '1' : '0';
+                $import_deleted_old = $source->get_config('import_deleted');
+                if ($import_deleted_new != $import_deleted_old) {
+                    $source->set_config('import_deleted', $import_deleted_new);
+                    totara_set_notification(get_string('checkconfig', 'tool_totara_sync', $url->out()), null, array('class'=>'notifynotice alert alert-warning'));
+                }
+            }
+        }
     }
 
     function sync() {
@@ -105,33 +127,78 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             throw new totara_sync_exception($elname, "{$elname}sync", 'sanitycheckfailed');
         }
 
-        // Create/update items - exclude obsolete/unmodified items
-        $sql = "SELECT s.*
-                  FROM {{$synctable}} s
-                 WHERE s.idnumber NOT IN
-                        (SELECT ii.idnumber
-                           FROM {{$elname}} ii
-                LEFT OUTER JOIN {{$synctable_clone}} ss ON (ii.idnumber = ss.idnumber)
-                          WHERE (ii.totarasync=1 AND ss.idnumber IS NULL)
-                             OR ss.timemodified = ii.timemodified
-                        )";
+        // Make sure the required deleted column is present if necessary.
+        $synctablecolumns = $DB->get_columns($synctable);
+        $deletedcolumnpresent = isset($synctablecolumns['deleted']);
 
-        $rs = $DB->get_recordset_sql($sql);
-
-        $iscsvimport = substr(get_class($this->get_source()), -4) === '_csv';
-        $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
-
-        foreach ($rs as $item) {
-            $this->sync_item($item, $synctable, $saveemptyfields);
+        if ($this->config->sourceallrecords == 0 && !$deletedcolumnpresent) {
+            throw new totara_sync_exception($elname, "{$elname}sync", 'deletefieldmissingnotallrecords');
         }
-        $rs->close();
 
-        /// Delete obsolete items
+        // Create/update items
+        if ($this->config->sourceallrecords == 1) {
+            // If source contains all records then create/update
+            // all records excluding obsolete/unmodified ones.
+            $sql = "SELECT s.*
+                      FROM {{$synctable}} s
+                     WHERE s.idnumber NOT IN
+                            (
+                                SELECT ii.idnumber
+                                  FROM {{$elname}} ii
+                       LEFT OUTER JOIN {{$synctable_clone}} ss ON ii.idnumber = ss.idnumber
+                                 WHERE (ii.totarasync = 1 AND ss.idnumber IS NULL)
+                                    OR ss.timemodified = ii.timemodified
+                            )";
+        } else if ($this->config->sourceallrecords = 0 && $deletedcolumnpresent) {
+            // If the source doesn't contain all records then we don't
+            // want to create/update ones marked as deleted.
+            // Note that the deleted column should always be present.
+            $sql = "SELECT s.*
+                      FROM {{$synctable}} s
+                     WHERE s.idnumber NOT IN
+                           (
+                                SELECT ii.idnumber
+                                  FROM {{$elname}} ii
+                       LEFT OUTER JOIN {{$synctable_clone}} ss ON (ii.idnumber = ss.idnumber)
+                                 WHERE (ii.totarasync = 1 AND ss.idnumber IS NULL AND ss.deleted = 1)
+                                    OR ss.timemodified = ii.timemodified
+                          )";
+        }
+
+        if (isset($sql)) {
+            $rs = $DB->get_recordset_sql($sql);
+
+            $iscsvimport = substr(get_class($this->get_source()), -4) === '_csv';
+            $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
+
+            foreach ($rs as $item) {
+                $this->sync_item($item, $synctable, $saveemptyfields);
+            }
+            $rs->close();
+        }
+
+        /// Delete items.
         if (!empty($this->config->allow_delete)) {
-            $sql = "SELECT i.id, i.idnumber
-                      FROM {{$elname}} i
-           LEFT OUTER JOIN {{$synctable}} s ON i.idnumber = s.idnumber
-                     WHERE i.totarasync=1 AND s.idnumber IS NULL";
+            if ($this->config->sourceallrecords == 1) {
+                // If the source contains all records then we delete
+                // any items that don't exist in the source.
+                $sql = "SELECT i.id, i.idnumber
+                          FROM {{$elname}} i
+               LEFT OUTER JOIN {{$synctable}} s ON i.idnumber = s.idnumber
+                         WHERE i.totarasync = 1
+                           AND s.idnumber IS NULL";
+            } else {
+                // If the deleted column is present then we delete items
+                // marked as deleted.
+                if ($deletedcolumnpresent) {
+                    $sql = "SELECT i.id, i.idnumber
+                              FROM {{$elname}} i
+                   LEFT OUTER JOIN {{$synctable}} s ON i.idnumber = s.idnumber
+                             WHERE i.totarasync = 1
+                               AND s.deleted = 1";
+                }
+            }
+
             $rs = $DB->get_recordset_sql($sql);
 
             foreach ($rs as $r) {
