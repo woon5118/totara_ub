@@ -19,6 +19,11 @@ This is an abstract method. These changes were applied to this method in its chi
 positions_category, cohorts_category, managers_category, individuals_category).
 * totara_program_renderer::display_edit_assignment_form() allowed first argument to be a program instance as well as an id.
 * program::set_timedue added optional parameter $message which overrides the default log message
+* program::display_completion_record_reason now ignores the second parameter
+* program::display_completion_record_reason now only returns the reasons a user might have a completion record, regardless
+of whether or not a completion record exists.
+* totara_program_renderer::get_completion_checker_results has been changed - the $data parameter now requires
+  fulllist, aggregatelist and totalcount.
 
 Deprecations:
 
