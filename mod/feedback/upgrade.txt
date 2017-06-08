@@ -28,3 +28,4 @@ information provided here is intended especially for developers.
   * feedback_is_feedback_in_sitecourse_map()
   * feedback_clean_up_sitecourse_map()
   * feedback_print_numeric_option_list()
+* Function feedback_set_tmp_values is not deprecated anymore.
