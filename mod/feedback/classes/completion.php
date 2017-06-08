@@ -517,7 +517,7 @@ class mod_feedback_completion extends mod_feedback_structure {
      */
     protected function find_last_completed() {
         global $USER, $DB;
-        if (isloggedin() || isguestuser()) {
+        if (!isloggedin() || isguestuser()) {
             // Not possible to retrieve completed feedback for guests.
             return false;
         }
@@ -529,7 +529,15 @@ class mod_feedback_completion extends mod_feedback_structure {
         if ($this->get_courseid()) {
             $params['courseid'] = $this->get_courseid();
         }
-        $this->completed = $DB->get_record('feedback_completed', $params);
+
+        // TOTARA: prior to Totara 10, multiple feedback_completed records were allowed. We don't record time completed,
+        // So our best attempt to  get the last completed record is by ordering by timemodified.
+        if ($records = $DB->get_records('feedback_completed', $params, 'timemodified DESC')) {
+            $this->completed =  reset($records);
+        } else {
+            $this->completed = false;
+        }
+
         return $this->completed;
     }
 
