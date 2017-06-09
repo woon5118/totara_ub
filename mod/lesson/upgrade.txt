@@ -2,6 +2,8 @@ This files describes API changes in the lesson code.
 
 === 13.0 ===
 
+* External function mod_lesson_external::get_user_attempt() now returns the full page object inside each answerpages.
+
 === 12.0 ===
 
 * lesson::callback_on_view() has an additional optional parameter $redirect default to true.
