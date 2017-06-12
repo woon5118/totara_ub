@@ -191,9 +191,11 @@ if ($type === 'editor') {
         }
     }
 
-    // The lock is still held, and the sheet still does not exist.
-    // Compile the CSS content.
-    $csscontent = $theme->get_css_content($rtl);
+    // Older IEs require smaller chunks.
+    if (!$csscontent = $theme->get_css_cached_content()) {
+        $csscontent = $theme->get_css_content();
+        $theme->set_css_content_cache($csscontent);
+    }
 
     $relroot = preg_replace('|^http.?://[^/]+|', '', $CFG->wwwroot);
     if (!empty($slashargument)) {
