@@ -96,7 +96,7 @@ if ($mform->is_cancelled()) {
 
     totara_set_notification(get_string('evidencetype'.$action, 'totara_plan',
             format_string(stripslashes($data->name))),
-        new moodle_url('/totara/plan/evidencetypes/view.php', array('id' => $data->id)),
+        new moodle_url('/totara/plan/evidencetypes/index.php'),
         array('class' => 'notifysuccess'));
 
 }
