@@ -1221,7 +1221,7 @@ class core_plugin_manager {
                 'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'lti', 'manual', 'mnet',
                 'nntp', 'nologin', 'none', 'pam', 'pop3', 'shibboleth', 'webservice'
                 // Totara
-            , 'gauth', 'connect',
+                , 'gauth', 'connect', 'approved'
             ),
 
             'availability' => array(
