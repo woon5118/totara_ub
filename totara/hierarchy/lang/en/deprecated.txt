@@ -13,6 +13,8 @@ chooseappraiser_help,totara_hierarchy
 choosemanager_help,totara_hierarchy
 chooseorganisation_help,totara_hierarchy
 chooseposition_help,totara_hierarchy
+competencyevidencetimecompleted,totara_hierarchy
+competencyevidencetimecompleted_help,totara_hierarchy
 error:managerdeleted,totara_hierarchy
 error:startafterfinish,totara_hierarchy
 error:userownmanager,totara_hierarchy

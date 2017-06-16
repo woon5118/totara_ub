@@ -229,8 +229,6 @@ $string['competencyevidenceorganisation_help'] = 'This option records the organi
 $string['competencyevidenceposition'] = 'Evidence Position';
 $string['competencyevidenceposition_help'] = 'This option records the position the user was in at the time they completed the item of competency evidence. In most cases this will be the same as the user\'s current role. As users change roles over time this allows a record to be kept of the role they were in at time of completion. This is an optional field.';
 $string['competencyevidenceproficiency_help'] = 'This field records whether or not the user is deemed to be proficient at the assigned competency. The options that appear in the pulldown depend on the competency scale assigned to the chosen competency, so the competency must be selected before this field can be modified. A proficiency must be set to add or update a competency evidence record.';
-$string['competencyevidencetimecompleted'] = 'Time Evidence Completed';
-$string['competencyevidencetimecompleted_help'] = 'A record of when the competency evidence was completed.';
 $string['competencyevidenceuser'] = 'Competency Evidence User';
 $string['competencyevidenceuser_help'] = 'The user whom this item of competency evidence is assigned. It is not possible to reassign an item of competency evidence to a different user. If you have sufficient permissions you can create a new item of competency evidence for a user by clicking the button on the user\'s My Records page. You can also edit evidence for that user by finding the record in the report and clicking the edit icon.';
 $string['competencyfeatureplural'] = 'Competencies';
@@ -1324,3 +1322,7 @@ $string['userpositiondetails'] = 'User position details';
 $string['typeaspirational'] = 'Aspirational position';
 $string['mygoals'] = 'My Goals';
 $string['goalnotescalevalueentry'] = 'One value per line - from most completed to least';
+
+// Deprecated in 10.
+$string['competencyevidencetimecompleted'] = 'Time Evidence Completed';
+$string['competencyevidencetimecompleted_help'] = 'A record of when the competency evidence was completed.';

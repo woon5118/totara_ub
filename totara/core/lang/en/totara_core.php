@@ -531,7 +531,6 @@ $string['teammembers'] = 'Team Members';
 $string['teammembers_text'] = 'All members of your team are shown below.';
 $string['template'] = 'Template';
 $string['tempmanager'] = 'Temporary manager';
-$string['timecompleted'] = 'Time completed';
 $string['timezoneinvalid'] = 'Invalid timezone: {$a}';
 $string['timezoneuser'] = 'User timezone';
 $string['toggletotarasync'] = 'Toggle HR Import';
@@ -651,3 +650,4 @@ $string['updatetemporarymanagerstask'] = 'Update temporary managers';
 
 $string['mysqlneedsbarracuda'] = 'Advanced Totara features require InnoDB Barracuda storage format';
 $string['mysqlneedsfilepertable'] = 'Advanced Totara features require InnoDB File-Per-Table mode to be enabled';
+$string['timecompleted'] = 'Time completed';
