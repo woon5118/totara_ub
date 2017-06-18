@@ -711,10 +711,10 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         foreach ($expecteduserenrolments as $key => $userenrolment) {
             if (in_array($userenrolment->userid, array($user3->id, $user4->id))) {
                 // Users 3 and 4 will be unsuspended from both courses.
-                $expecteduserenrolments[$key]->status = ENROL_USER_ACTIVE;
+                $expecteduserenrolments[$key]->status = (string)ENROL_USER_ACTIVE;
             } else if (in_array($userenrolment->userid, array($user5->id, $user6->id))) {
                 // Users 5 and 6 will be suspended from both courses.
-                $expecteduserenrolments[$key]->status = ENROL_USER_SUSPENDED;
+                $expecteduserenrolments[$key]->status = (string)ENROL_USER_SUSPENDED;
             }
         }
 
@@ -723,6 +723,8 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->assertCount(16, $actualuserenrolments);
         foreach ($actualuserenrolments as $actualuserenrolment) {
             $expecteduserenrolment = $expecteduserenrolments[$actualuserenrolment->id];
+            unset($expecteduserenrolment->timemodified);
+            unset($actualuserenrolment->timemodified);
             $this->assertEquals($expecteduserenrolment, $actualuserenrolment);
         }
     }
@@ -826,10 +828,10 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         foreach ($expecteduserenrolments as $key => $userenrolment) {
             if (in_array($userenrolment->userid, array($user3->id, $user4->id))) {
                 // Users 3 and 4 will be unsuspended from both courses.
-                $expecteduserenrolments[$key]->status = ENROL_USER_ACTIVE;
+                $expecteduserenrolments[$key]->status = (string)ENROL_USER_ACTIVE;
             } else if (in_array($userenrolment->userid, array($user5->id, $user6->id))) {
                 // Users 5 and 6 will be suspended from both courses.
-                $expecteduserenrolments[$key]->status = ENROL_USER_SUSPENDED;
+                $expecteduserenrolments[$key]->status = (string)ENROL_USER_SUSPENDED;
             }
         }
 
@@ -838,6 +840,8 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->assertCount(16, $actualuserenrolments);
         foreach ($actualuserenrolments as $actualuserenrolment) {
             $expecteduserenrolment = $expecteduserenrolments[$actualuserenrolment->id];
+            unset($expecteduserenrolment->timemodified);
+            unset($actualuserenrolment->timemodified);
             $this->assertEquals($expecteduserenrolment, $actualuserenrolment);
         }
     }
