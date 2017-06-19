@@ -1,4 +1,4 @@
-@totara_hierarchy @totara_hierarchy_goals @totara @javascript
+@totara @totara_hierarchy @totara_hierarchy_goals @totara_customfield @javascript
 Feature: Verify creation and use of personal goal types and custom fields.
 
 Background:

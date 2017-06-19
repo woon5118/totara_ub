@@ -583,7 +583,7 @@ function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false, $
 
     $fields = customfield_get_fields_definition($tableprefix, $params);
     foreach ($fields as $field) {
-        $formfield = customfield_get_field_instance($itemnew, $field, $tableprefix, $prefix);
+        $formfield = customfield_get_field_instance($itemnew, $field, $tableprefix, $prefix, $addsuffix);
         if ($sync) {
             $itemnew = $formfield->sync_data_preprocess($itemnew);
         }
