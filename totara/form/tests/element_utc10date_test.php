@@ -191,11 +191,6 @@ class totara_form_element_utc10date_testcase extends advanced_testcase {
     }
 
     public function test_behat_normalise_value_pre_set() {
-        global $CFG;
-        require_once("$CFG->dirroot/totara/form/classes/form/element/behat_helper/base.php");
-        require_once("$CFG->dirroot/totara/form/classes/form/element/behat_helper/text.php");
-        require_once("$CFG->dirroot/totara/form/classes/form/element/behat_helper/utc10date.php");
-
         $this->assertSame('2017-12-23', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('2017/12/23'));
         $this->assertSame('2017-12-23', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('2017-12-23'));
         $this->assertSame('2017-12-23', \totara_form\form\element\behat_helper\utc10date::normalise_value_pre_set('2017 12 23'));

@@ -9,12 +9,23 @@ Feature: Totara form utc10date element tests
     And I navigate to the Totara test form
     And I should see "Form acceptance testing page"
 
-  Scenario: Test basic utc10date elements in Totara forms
+  Scenario: Test basic utc10date elements in Totara forms without JavaScript
     When I select "Basic utc10date element [totara_form\form\testform\element_utc10date]" from the "Test form" singleselect
     Then I should see "Form: Basic utc10date element"
+    And I should see the following Totara form fields having these values:
+      | Basic utc10date                    |            |
+      | Required basic utc10date           |            |
+      | utc10date with current data        | 2016/03/07 |
+      | Frozen utc10date with current data | 2016/06/23 |
+    And I should see the "Empty frozen utc10date" Totara form field is frozen
+    And I should see the "Frozen utc10date with current data" Totara form field is frozen
+    And I should see "There are required fields in this form marked"
 
     When I set the following Totara form fields to these values:
-      | Basic utc10date | 2015-07-26 |
+      | Basic utc10date          | 2015-07-26 |
+      | Required basic utc10date | 2018-09-09 |
+    And I should see the following Totara form fields having these values:
+      | Basic utc10date          | 2015-07-26 |
       | Required basic utc10date | 2018-09-09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
@@ -37,10 +48,21 @@ Feature: Totara form utc10date element tests
   Scenario: Test required utc10date elements in Totara forms with JavaScript enabled
     When I select "Basic utc10date element [totara_form\form\testform\element_utc10date]" from the "Test form" singleselect
     Then I should see "Form: Basic utc10date element"
+    And I should see the following Totara form fields having these values:
+      | Basic utc10date                    |            |
+      | Required basic utc10date           |            |
+      | utc10date with current data        | 2016/03/07 |
+      | Frozen utc10date with current data | 2016/06/23 |
+    And I should see the "Empty frozen utc10date" Totara form field is frozen
+    And I should see the "Frozen utc10date with current data" Totara form field is frozen
     And I should see "There are required fields in this form marked"
+
     When I set the following Totara form fields to these values:
-      | Basic utc10date | 2015/07/26 |
-      | Required basic utc10date | 2018/09/09 |
+      | Basic utc10date          | 2015-07-26 |
+      | Required basic utc10date | 2018-09-09 |
+    And I should see the following Totara form fields having these values:
+      | Basic utc10date          | 2015-07-26 |
+      | Required basic utc10date | 2018-09-09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
     And "utc10date_basic" row "Value" column of "form_results" table should contain "«1437904800 (2015/07/26)»"

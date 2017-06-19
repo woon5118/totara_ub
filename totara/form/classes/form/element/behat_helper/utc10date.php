@@ -53,11 +53,10 @@ class utc10date extends text {
         if ($this->context->running_javascript() && !$text->isVisible()) {
             throw new ExpectationException('Attempting to change a ' . $this->mytype . ' that is not visible', $this->context->getSession());
         }
-        $value = addslashes($value);
         $id = $this->node->getAttribute('data-element-id');
         $js  = 'var e, t;';
-        $js .= 'e = document.getElementById("'.$id.'");';
-        $js .= 'e.value = "' . $value . '";';
+        $js .= 'e = document.getElementById(' . json_encode($id) . ');';
+        $js .= 'e.value = ' . json_encode($value) . ';';
         $this->context->getSession()->executeScript($js);
 
         // Trigger the onchange event as triggered when selecting a real value.
@@ -65,6 +64,18 @@ class utc10date extends text {
             $text->getXPath(),
             "Syn.trigger('change', {}, {{ELEMENT}})"
         );
+    }
+
+    /**
+     * Returns the value of the input.
+     *
+     * @return string
+     */
+    protected function get_value() {
+        $value = parent::get_value();
+        // Remove the trailing seconds.
+        $value = preg_replace('/\d{1,2}:\d{1,2}(:\d{1,2})?$/', '', $value);
+        return $value;
     }
 
     /**
@@ -76,7 +87,7 @@ class utc10date extends text {
     public static function normalise_value_pre_set($value) {
         $value = trim($value);
 
-        if ($value === '') {
+        if ($value === '' or $value === '0') {
             return '';
         }
 
@@ -111,5 +122,22 @@ class utc10date extends text {
         }
 
         return $date->format('Y-m-d');
+    }
+
+    /**
+     * Asserts the field has expected value.
+     *
+     * @param string $expectedvalue
+     * @return void
+     */
+    public function assert_value($expectedvalue) {
+        $value = self::normalise_value_pre_set($this->get_value());
+        $expected = self::normalise_value_pre_set($expectedvalue);
+
+        if ($expected == $value) {
+            return;
+        }
+
+        throw new ExpectationException("Totara form {$this->mytype} element '{$this->locator}' does not match expected value: {$expectedvalue}", $this->context->getSession());
     }
 }

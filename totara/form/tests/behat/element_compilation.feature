@@ -16,8 +16,8 @@ Feature: Totara form element compilation tests
 
     When I press "Save changes"
     Then I should see "The form has been submit"
-    And "checkbox" row "Value" column of "form_results" table should contain "«empty»"
-    And "checkboxes" row "Value" column of "form_results" table should contain "«[ ]»"
+#    And "checkbox" row "Value" column of "form_results" table should contain "«empty»"
+#    And "checkboxes" row "Value" column of "form_results" table should contain "«[ ]»"
     And "datetime" row "Value" column of "form_results" table should contain "«--null--»"
     And "editor" row "Value" column of "form_results" table should contain "«»"
     And "email" row "Value" column of "form_results" table should contain "«»"
@@ -40,8 +40,8 @@ Feature: Totara form element compilation tests
     Then I should see "Form: Compilation of elements"
 
     When I set the following Totara form fields to these values:
-      | Checkbox          | 1                    |
-      | Checkboxes        | Yes,2                |
+#      | Checkbox          | 1                    |
+#      | Checkboxes        | Yes,No               |
       | Date and time     | 1985-03-07 22:05     |
       | Editor            | I am some rich text  |
       | Email             | admin@example.com    |
@@ -53,13 +53,13 @@ Feature: Totara form element compilation tests
       | Tel               | *123                 |
       | Text              | Test 123             |
       | Textarea          | Take off your shoes  |
-      | UTC10 Date          | 1985-03-07           |
-      | URL               | http://totaralms.com |
-      | Yes or No         | Yes                    |
+      | UTC10 Date        | 1985-03-07           |
+      | Web URL           | http://totaralms.com |
+      | Yes or No         | Yes                  |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "checkbox" row "Value" column of "form_results" table should contain "«checked»"
-    And "checkboxes" row "Value" column of "form_results" table should contain "«[ '1' , '2' ]»"
+#    And "checkbox" row "Value" column of "form_results" table should contain "«checked»"
+#    And "checkboxes" row "Value" column of "form_results" table should contain "«[ '1' , '0' ]»"
     And "datetime" row "Value" column of "form_results" table should contain "«479052300 (1985/03/07 22:05 Australia/Perth)»"
     And "editor" row "Value" column of "form_results" table should contain "«I am some rich text»"
     And "email" row "Value" column of "form_results" table should contain "«admin@example.com»"
@@ -111,7 +111,7 @@ Feature: Totara form element compilation tests
 
     When I set the following Totara form fields to these values:
       | Checkbox          | 1                    |
-      | Checkboxes        | Yes,2                |
+      | Checkboxes        | Yes,No               |
       | Date and time     | 1985-03-07 22:05     |
       | Editor            | I am some rich text  |
       | Email             | admin@example.com    |
@@ -123,13 +123,13 @@ Feature: Totara form element compilation tests
       | Tel               | *123                 |
       | Text              | Test 123             |
       | Textarea          | Take off your shoes  |
-      | URL               | http://totaralms.com |
-      | UTC10 Date          | 1985-03-07           |
+      | Web URL           | http://totaralms.com |
+      | UTC10 Date        | 1985-03-07           |
       | Yes or No         | 1                    |
     And I press "Save changes"
     Then I should see "The form has been submit"
     And "checkbox" row "Value" column of "form_results" table should contain "«checked»"
-    And "checkboxes" row "Value" column of "form_results" table should contain "«[ '1' , '2' ]»"
+    And "checkboxes" row "Value" column of "form_results" table should contain "«[ '1' , '0' ]»"
     And "datetime" row "Value" column of "form_results" table should contain "«479052300 (1985/03/07 22:05 Australia/Perth)»"
     And "editor" row "Value" column of "form_results" table should contain "«I am some rich text»"
     And "email" row "Value" column of "form_results" table should contain "«admin@example.com»"
