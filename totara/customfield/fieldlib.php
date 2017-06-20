@@ -485,7 +485,7 @@ function customfield_load_data(&$item, $prefix, $tableprefix, $addsuffix = false
 function customfield_definition(&$mform, $item, $prefix, $typeid = 0, $tableprefix, $disableheader = false, $addsuffix = false) {
 
     $params = array();
-    if ($typeid != 0) {
+    if (isset($item->typeid)) {
         $params['typeid'] = $typeid;
     }
 
