@@ -5024,11 +5024,16 @@ abstract class rb_base_source {
             $column_options['extracontext'] = (array)$record;
             $column_options['addtypetoheading'] = $addtypetoheading;
             $column_options['displayfunc'] = 'userfield_' . $record->datatype;
-            if ($jointable === '{user}') {
-                $column_options['extrafields'] = array('userid' => "{$basejoin}.id");
-            } else {
-                $column_options['extrafields'] = array('userid' => "{$joinname}.userid");
+
+            if ($record->visible != PROFILE_VISIBLE_ALL) {
+                // If the field is not visible to all we need the userid to enable visibility checks.
+                if ($jointable === '{user}') {
+                    $column_options['extrafields'] = array('userid' => "{$basejoin}.id");
+                } else {
+                    $column_options['extrafields'] = array('userid' => "{$joinname}.userid");
+                }
             }
+
             if ($record->visible == PROFILE_VISIBLE_NONE) {
                 // If profile field isn't available to everyone require a capability to display the column.
                 $column_options['capability'] = 'moodle/user:viewalldetails';
