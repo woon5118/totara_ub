@@ -87,7 +87,8 @@ $PAGE->set_url($url);
 $calendar = new calendar_information(0, 0, 0, $time);
 
 if ($courseid != SITEID && !empty($courseid)) {
-    $course = $DB->get_record('course', array('id' => $courseid));
+    // Course ID must be valid and existing.
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $courses = array($course->id => $course);
     $issite = false;
     navigation_node::override_active_url(new moodle_url('/course/view.php', array('id' => $course->id)));
@@ -97,7 +98,7 @@ if ($courseid != SITEID && !empty($courseid)) {
     $issite = true;
 }
 
-require_course_login($course);
+require_login($course, false);
 
 $calendar->prepare_for_view($course, $courses);
 
