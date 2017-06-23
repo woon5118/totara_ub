@@ -961,6 +961,8 @@ $string['releasenoteslink'] = 'For information about this version of Totara, ple
 $string['register'] = 'Register your site';
 $string['registration'] = 'Registration';
 $string['registrationwarning'] = 'Your site is not yet registered.';
+$string['registrationwarningcontactadmin'] = 'Your site is not yet registered. Please notify your administrator.';
+$string['releasenoteslink'] = 'For information about this version of Totara, please see the online <a target="_blank" href="{$a}">Release Notes</a>';
 $string['rememberusername'] = 'Remember username';
 $string['rememberusername_desc'] = 'Enable if you want to store permanent cookies with usernames during user login. Permanent cookies may be considered a privacy issue if used without consent.';
 $string['reportsmanage'] = 'Manage reports';
