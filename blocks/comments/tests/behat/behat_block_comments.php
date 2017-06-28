@@ -106,7 +106,7 @@ class behat_block_comments extends behat_base {
         $deleteicon->click();
 
         // Wait for the animation to finish, in theory is just 1 sec, adding 4 just in case.
-        $this->getSession()->wait(4 * 1000, false);
+        $this->getSession()->wait(4 * 1000);
     }
 
 }

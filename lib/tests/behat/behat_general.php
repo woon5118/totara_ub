@@ -152,7 +152,7 @@ class behat_general extends behat_base {
 
         // Wait until the URL change is executed.
         if ($this->running_javascript()) {
-            $this->getSession()->wait($waittime * 1000, false);
+            $this->getSession()->wait($waittime * 1000);
 
         } else if (!empty($url)) {
             // We redirect directly as we can not wait for an automatic redirection.
@@ -277,7 +277,7 @@ class behat_general extends behat_base {
         \behat_hooks::set_step_readonly(true);
 
         if ($this->running_javascript()) {
-            $this->getSession()->wait($seconds * 1000, false);
+            $this->getSession()->wait($seconds * 1000);
         } else {
             sleep($seconds);
         }
