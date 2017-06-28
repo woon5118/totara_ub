@@ -87,16 +87,14 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $db_table = isset($this->config->{'database_dbtable'}) ? $this->config->{'database_dbtable'} : false;
 
         if (!$db_table) {
-            $description = get_string('dbconnectiondetails', 'tool_totara_sync');
-        } else {
-            $db_table = $this->config->{'database_dbtable'};
-            $dbstruct = implode(', ', $dbstruct);
-            $description = get_string('tablemustincludexdb', 'tool_totara_sync', $db_table);
-            $description .= html_writer::empty_tag('br') . html_writer::tag('pre', $dbstruct);
-            $description .= $deletedwarning;
+            $mform->addElement('html', html_writer::tag('p',get_string('dbconnectiondetails', 'tool_totara_sync')));
         }
 
-        $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $description), array('class' => 'informationbox')));
+        $dbstruct = implode(', ', $dbstruct);
+        $description = html_writer::tag('p', get_string('tablemustincludexdb', 'tool_totara_sync'));
+        $description .= html_writer::tag('p', $dbstruct);
+
+        $mform->addElement('html', $description);
 
         // Empty or null field info.
         if ($db_table) {

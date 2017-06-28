@@ -196,7 +196,7 @@ $string['dbtestconnectfail'] = 'Failed to connect to database';
 
 $string['dbconnectiondetails'] = 'Please enter database connection details.';
 $string['selectfieldsdb'] = 'Please select some fields to import by checking the boxes below.';
-$string['tablemustincludexdb'] = 'The table "{$a}" must contain the following fields:';
+$string['tablemustincludexdb'] = 'The database table must contain the following fields:';
 
 $string['databaseemptynullinfo'] = 'The use of empty strings in your external database will delete the field\'s value in your site. Null values in your external database will leave the field\'s current value in your site.';
 
