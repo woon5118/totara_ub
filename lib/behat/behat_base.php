@@ -753,7 +753,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         $start = time();
 
         $jscode = '
-            return function() {
+            return (function() {
                 if (typeof M === "undefined") {
                     if (document.readyState === "complete") {
                         return "";
@@ -767,7 +767,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 } else {
                     return "incomplete";
                 }
-            }();';
+            }());';
 
         // We don't use behat_base::spin() here as we don't want to end up with an exception
         // if the page & JSs don't finish loading properly.
