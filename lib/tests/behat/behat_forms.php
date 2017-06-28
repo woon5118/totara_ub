@@ -171,14 +171,22 @@ class behat_forms extends behat_base {
                 return;
             }
 
-            // Funny thing about this, with findAll() we specify a pattern and each element matching the pattern is added to the array
-            // with of xpaths with a [0], [1]... sufix, but when we click on an element it does not matches the specified xpath
-            // anymore (now is a "Show less..." link) so [1] becomes [0], that's why we always click on the first XPath match,
-            // will be always the next one.
-            $iterations = count($showmores);
-            for ($i = 0; $i < $iterations; $i++) {
-                $showmores[0]->click();
-                \behat_hooks::set_step_readonly(false);
+            if ($this->getSession()->getDriver() instanceof \DMore\ChromeDriver\ChromeDriver) {
+                // Chrome Driver produces unique xpaths for each element.
+                foreach ($showmores as $showmore) {
+                    $showmore->click();
+                    \behat_hooks::set_step_readonly(false);
+                }
+            } else {
+                // Funny thing about this, with findAll() we specify a pattern and each element matching the pattern
+                // is added to the array with of xpaths with a [0], [1]... sufix, but when we click on an element it
+                // does not matches the specified xpath anymore (now is a "Show less..." link) so [1] becomes [0],
+                // that's why we always click on the first XPath match, will be always the next one.
+                $iterations = count($showmores);
+                for ($i = 0; $i < $iterations; $i++) {
+                    $showmores[0]->click();
+                    \behat_hooks::set_step_readonly(false);
+                }
             }
 
         } catch (ElementNotFoundException $e) {
