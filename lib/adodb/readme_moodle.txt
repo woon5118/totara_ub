@@ -28,5 +28,6 @@ Our changes:
  * MDL-52286 Added muting erros in ADORecordSet::__destruct().
    Check if fixed upstream during the next upgrade and remove this note.
  * Replaced create_function() with normal functions
+ * TL-14768 Added fix in ADODB_mssqlnative::_connect() to ensure that host and port are separated by ,
 
 skodak, iarenaza, moodler, stronk7, abgreeve, lameze
