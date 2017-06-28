@@ -477,10 +477,14 @@ class ADODB_mssqlnative extends ADOConnection {
 		$connectionInfo["Database"]=$argDatabasename;
 		$connectionInfo["UID"]=$argUsername;
 		$connectionInfo["PWD"]=$argPassword;
-		
+
 		foreach ($this->connectionParameters as $parameter=>$value)
 		    $connectionInfo[$parameter] = $value;
-		
+
+		// Totara: Replacing host:port with host,port here as the hostname and port comes from more generic functions
+		// and we don't want to add db specific code there
+		$argHostname = preg_replace('/^(.*):(\d+)$/', '${1},${2}', $argHostname);
+
 		if ($this->debug) ADOConnection::outp("<hr>connecting... hostname: $argHostname params: ".var_export($connectionInfo,true));
 		//if ($this->debug) ADOConnection::outp("<hr>_connectionID before: ".serialize($this->_connectionID));
 
