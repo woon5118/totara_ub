@@ -356,6 +356,28 @@ class rb_source_dp_objective extends rb_base_source {
                 )
         );
 
+        $columnoptions[] = new rb_column_option(
+            'objective',
+            'timecreated',
+            get_string('objtimecreated', 'rb_source_dp_objective'),
+            'base.timecreated',
+            array(
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'objective',
+            'timemodified',
+            get_string('objtimemodified', 'rb_source_dp_objective'),
+            'base.timemodified',
+            array(
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp'
+            )
+        );
+
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
 
@@ -402,6 +424,26 @@ class rb_source_dp_objective extends rb_base_source {
                 'duedate',
                 get_string('objduedate', 'rb_source_dp_objective'),
                 'date'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'objective',
+            'timecreated',
+            get_string('objtimecreated', 'rb_source_dp_objective'),
+            'date',
+            array(
+                'includenotset' => true,
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'objective',
+            'timemodified',
+            get_string('objtimemodified', 'rb_source_dp_objective'),
+            'date',
+            array(
+                'includenotset' => true,
+            )
         );
 
         $filteroptions[] = new rb_filter_option(

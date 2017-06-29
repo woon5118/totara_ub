@@ -172,6 +172,7 @@ if ($deleteyes) {
         $record->duedate = !empty($data->duedate) ? $data->duedate : null;
         $record->scalevalueid = $data->scalevalueid;
         $record->approved = $component->approval_status_after_update();
+        $record->timemodified = time();
 
         $DB->update_record('dp_plan_objective', $record);
 

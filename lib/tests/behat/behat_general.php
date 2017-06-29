@@ -637,6 +637,22 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Checks that an element contains specified date (as read by strtotime) in the given format (as used by userdate).
+     *
+     * @Then /^I should see date "(?P<date_string>(?:[^"]|\\")*)" formatted "(?P<format_string>(?:[^"]|\\")*)" in the "(?P<element_string>(?:[^"]|\\")*)" "(?P<text_selector_string>[^"]*)"$/
+     * @throws ExpectationException
+     * @param string $datestring
+     * @param string $formatstring
+     * @param string $element Element we look in.
+     * @param string $selectortype The type of element where we are looking in.
+     */
+    public function i_should_see_date_formatted_in_the($datestring, $formatstring, $element, $selectortype) {
+        $date = strtotime($datestring);
+        $text = userdate($date, $formatstring);
+        $this->assert_element_contains_text($text, $element, $selectortype);
+    }
+
+    /**
      * Checks, that page contains specified text. It also checks if the text is visible when running Javascript tests.
      *
      * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)"$/

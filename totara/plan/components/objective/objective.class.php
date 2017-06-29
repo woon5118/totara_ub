@@ -568,6 +568,7 @@ class dp_objective_component extends dp_base_component {
             $transaction = $DB->start_delegated_transaction();
 
             foreach ($stored_records as $itemid => $record) {
+                $record->timemodified = time();
                 $DB->update_record('dp_plan_objective', $record);
                 if (isset($record->scalevalueid)) {
                     $scale_value_record = $DB->get_record('dp_objective_scale_value', array('id' => $record->scalevalueid));
@@ -763,6 +764,7 @@ class dp_objective_component extends dp_base_component {
         $rec->duedate = $duedate;
         $rec->scalevalueid = $scalevalueid ? $scalevalueid : $DB->get_field('dp_objective_scale', 'defaultid', array('id' => $this->get_setting('objectivescale')));
         $rec->approved = $this->approval_status_after_update();
+        $rec->timecreated = time();
 
         $rec->id = $DB->insert_record('dp_plan_objective', $rec);
 

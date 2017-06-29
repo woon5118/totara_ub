@@ -53,5 +53,24 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017051800, 'totara', 'plan');
     }
 
+    if ($oldversion < 2017070600) {
+
+        // Add a timecreated field.
+        $table = new xmldb_table('dp_plan_objective');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add a timemodified field.
+        $table = new xmldb_table('dp_plan_objective');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2017070600, 'totara', 'plan');
+    }
+
     return true;
 }
