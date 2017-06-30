@@ -81,11 +81,6 @@ function tool_totara_sync_run() {
     $configured = true;
     $problemstext = array();
 
-    $fileaccess = get_config('totara_sync', 'fileaccess');
-    if ($fileaccess == FILE_ACCESS_DIRECTORY && !$filesdir = get_config('totara_sync', 'filesdir')) {
-        $configured = false;
-        $problemstext[] = get_string('nofilesdir', 'tool_totara_sync');
-    }
     // Check enabled sync element objects
     $elements = totara_sync_get_elements(true);
     if (empty($elements)) {
@@ -99,6 +94,10 @@ function tool_totara_sync_run() {
             if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
                 $configured = false;
                 $problemstext[] = get_string('sourcenotfound', 'tool_totara_sync', $elnametext);
+            }
+            if (strstr($sourceclass, 'csv') && get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY && !get_config('totara_sync', 'filesdir')) {
+                $configured = false;
+                $problemstext[] = get_string('nofilesdir', 'tool_totara_sync');
             }
             //check source has configs - note get_config returns an object
             if ($sourceclass) {
