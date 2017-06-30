@@ -49,6 +49,10 @@ trait block_testing {
      */
     protected function create_user_report_with_graph() {
         global $DB, $USER;
+
+        // We want total counts here, we'll be testing that later.
+        set_config('allowtotalcount', 1, 'totara_reportbuilder');
+
         $DB->set_field('user', 'country', 'NZ', ['country' => '']);
         $this->getDataGenerator()->create_user(['country' => 'NZ']);
         $this->getDataGenerator()->create_user(['country' => 'NZ']);
@@ -57,7 +61,7 @@ trait block_testing {
         $this->getDataGenerator()->create_user(['country' => 'US']);
         $this->getDataGenerator()->create_user(['country' => 'AU']);
 
-        $rid = $this->create_report('user', 'Test user report 1');
+        $rid = $this->create_report('user', 'Test user report 1', true);
         $report = new \reportbuilder($rid, null, false, null, null, true);
         // First up delete all columns.
         $this->add_column($report, 'user', 'username', null, 'countdistinct', null, 0);
