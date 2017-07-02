@@ -3,20 +3,23 @@ Feature: Verify course reminder capability.
 Background:
     Given I am on a totara site
     And the following "users" exist:
-        | username | firstname | lastname | email                |
-        | student1 | Student1  | Student1 | student1@example.com |
-        | student2 | Student2  | Student2 | student2@example.com |
-        | manager1 | Manager1  | Manager1 | manager1@example.com |
+        | username       | firstname | lastname | email                      |
+        | student1       | Student1  | Student1 | student1@example.com       |
+        | student2       | Student2  | Student2 | student2@example.com       |
+        | manager1       | Manager1  | Manager1 | manager1@example.com       |
+        | editingtrainer | Editing   | Trainer  | editingtrainer@example.com |
     And the following "courses" exist:
         | fullname | shortname | format |
         | Course 1 | C1        | topics |
     And the following "course enrolments" exist:
-        | user      | course | role    |
-        | student1  | C1     | student |
-        | student2  | C1     | student |
+        | user           | course | role           |
+        | student1       | C1     | student        |
+        | student2       | C1     | student        |
+        | editingtrainer | C1     | editingteacher |
     And the following "system role assigns" exist:
-        | user     | role    |
-        | manager1 | manager |
+        | user           | role           |
+        | manager1       | manager        |
+        | editingtrainer | editingteacher |
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -57,3 +60,26 @@ Scenario: Verify a Site Manager cannot access Reminders when access is removed.
   And I follow "Course 1"
   Then I should not see "Reminders"
   And I log out
+
+@javascript
+Scenario: Verify Editing Trainer can access Reminders.
+
+    Given I log in as "editingtrainer"
+    And I click on "Find Learning" in the totara menu
+    When I follow "Course 1"
+    Then I should not see "Reminders"
+    And I log out
+
+    And I log in as "admin"
+    And I set the following system permissions of "Editing Trainer" role:
+        | capability                    | permission |
+        | moodle/course:managereminders | Allow      |
+        | moodle/course:update          | Prevent    |
+    And I log out
+
+    And I log in as "editingtrainer"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    When I navigate to "Reminders" node in "Course administration"
+    Then I should see "Edit course reminders"
+    And I log out
