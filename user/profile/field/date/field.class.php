@@ -118,4 +118,13 @@ class profile_field_date extends profile_field_base {
             $user->{$this->inputname} = userdate($this->data, get_string('strftimedate', 'langconfig'), 'UTC');
         }
     }
+
+    /**
+     * Check if the field data is considered empty
+     *
+     * @return boolean
+     */
+    public function is_empty() {
+        return empty($this->data);
+    }
 }

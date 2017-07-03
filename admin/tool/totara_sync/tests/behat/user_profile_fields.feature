@@ -72,7 +72,7 @@ Feature: User profile fields can be used via HR Import
 
     # Create a user text input custom field set as unique.
     When I set the following fields to these values:
-      | datatype   | textarea |
+      | datatype | text |
     And I set the following fields to these values:
       | Name                        | Unique textinput test |
       | Short name                  | textinputtest         |

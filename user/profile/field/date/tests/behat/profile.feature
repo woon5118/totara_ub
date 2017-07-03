@@ -5,10 +5,10 @@ Feature: Test date user profile field
   I need to go to profile and set date
 
   @javascript
-  Scenario: Defining date user profiel field
+  Scenario: Defining date user profile field
     Given the following "users" exist:
-      | username | firstname | lastname | email |
-      | student1 | Student | 1 | student1@example.com |
+      | username | firstname | lastname | email                |
+      | student1 | Student   | 1        | student1@example.com |
     When I log in as "admin"
     And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
     And I set the field "Create a new profile field:" to "Date (no timezone)"
@@ -22,8 +22,8 @@ Feature: Test date user profile field
     When I log in as "student1"
     And I click on "Student 1" "link"
     And I click on "Profile" "link"
-    And I should see "Day of birth" in the ".profile_tree" "css_element"
-    And I should see "Date not set" in the ".profile_tree" "css_element"
+    And I should not see "Day of birth" in the ".profile_tree" "css_element"
+    And I should not see "Date not set" in the ".profile_tree" "css_element"
     And I click on "Edit profile" "link"
     And I expand all fieldsets
     And I set the field "id_profile_field_bday_enabled" to "1"
