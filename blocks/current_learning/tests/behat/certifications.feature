@@ -10,16 +10,18 @@ Feature: User certifications and their courses appear correctly in the current l
       | username | firstname | lastname | email |
       | user001 | fn_001 | ln_001 | user001@example.com |
     And the following "courses" exist:
-      | fullname         | shortname | format | enablecompletion | completionstartonenrol |
-      | Certify Course 1 | CC1       | topics | 1                | 1                      |
-      | Certify Course 2 | CC2       | topics | 1                | 1                      |
-      | Recertify Course | RC1       | topics | 1                | 1                      |
+      | fullname           | shortname | format | enablecompletion | completionstartonenrol |
+      | Certify Course 1   | CC1       | topics | 1                | 1                      |
+      | Certify Course 2   | CC2       | topics | 1                | 1                      |
+      | Recertify Course 1 | RC1       | topics | 1                | 1                      |
+      | Recertify Course 2 | RC2       | topics | 1                | 1                      |
     And I log in as "admin"
     And I set the following administration settings values:
       | menulifetime | 0 |
     And I set self completion for "Certify Course 1" in the "Miscellaneous" category
     And I set self completion for "Certify Course 2" in the "Miscellaneous" category
-    And I set self completion for "Recertify Course" in the "Miscellaneous" category
+    And I set self completion for "Recertify Course 1" in the "Miscellaneous" category
+    And I set self completion for "Recertify Course 2" in the "Miscellaneous" category
     And I click on "Certifications" in the totara menu
     And I press "Create Certification"
     And I set the following fields to these values:
@@ -46,7 +48,8 @@ Feature: User certifications and their courses appear correctly in the current l
     # Add recert CS.
     And I click on "addcontent_rc" "button" in the "#programcontent_rc" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
-    And I click on "Recertify Course" "link" in the "addmulticourse" "totaradialogue"
+    And I click on "Recertify Course 1" "link" in the "addmulticourse" "totaradialogue"
+    And I click on "Recertify Course 2" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
     And I press "Save changes"
     And I click on "Save all changes" "button"
@@ -72,7 +75,8 @@ Feature: User certifications and their courses appear correctly in the current l
     And I toggle "Test Certification" in the current learning block
     And I should see "Certify Course 1" in "Test Certification" within the current learning block
     And I should see "Certify Course 2" in "Test Certification" within the current learning block
-    And I should not see "Recertify Course" in "Test Certification" within the current learning block
+    And I should not see "Recertify Course 1" in "Test Certification" within the current learning block
+    And I should not see "Recertify Course 2" in "Test Certification" within the current learning block
 
     # Complete Certify Course 1.
     When I click on "Certify Course 1" "link"
@@ -84,7 +88,8 @@ Feature: User certifications and their courses appear correctly in the current l
     Then I should not see "Test Certification" in the "Current Learning" "block"
     And I should not see "Certify Course 1" in the "Current Learning" "block"
     And I should not see "Certify Course 2" in the "Current Learning" "block"
-    And I should not see "Recertify Course" in the "Current Learning" "block"
+    And I should not see "Recertify Course 1" in the "Current Learning" "block"
+    And I should not see "Recertify Course 2" in the "Current Learning" "block"
 
     # Push user to recert and check block contents.
     When I wind back certification dates by 5 months
@@ -94,7 +99,8 @@ Feature: User certifications and their courses appear correctly in the current l
     And I toggle "Test Certification" in the current learning block
     And I should not see "Certify Course 1" in "Test Certification" within the current learning block
     And I should not see "Certify Course 2" in "Test Certification" within the current learning block
-    And I should see "Recertify Course" in "Test Certification" within the current learning block
+    And I should see "Recertify Course 1" in "Test Certification" within the current learning block
+    And I should see "Recertify Course 2" in "Test Certification" within the current learning block
 
     # Add manual enrolment for the user.
     And I log out
@@ -112,6 +118,7 @@ Feature: User certifications and their courses appear correctly in the current l
     # The certification should still contain the correct content.
     And I should see "Test Certification" in the "Current Learning" "block"
     And I toggle "Test Certification" in the current learning block
-    And I should see "Recertify Course" in "Test Certification" within the current learning block
+    And I should see "Recertify Course 1" in "Test Certification" within the current learning block
+    And I should see "Recertify Course 2" in "Test Certification" within the current learning block
     And I should not see "Certify Course 1" in "Test Certification" within the current learning block
     And I should not see "Certify Course 2" in "Test Certification" within the current learning block

@@ -135,12 +135,31 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
      * @param stdClass $data A course object
      */
     protected function map_learning_item_record_data(\stdClass $data) {
+        global $CFG, $USER;
+
         $this->id = $data->id;
         $this->fullname = $data->fullname;
         $this->shortname = $data->shortname;
         $this->description = $data->summary;
         $this->description_format = FORMAT_HTML; // Programs do not store a format we can use here.
-        $this->url_view = new \moodle_url('/totara/program/view.php', array('id' => $this->id));
+
+        $course = $this->is_single_course();
+        if ($course) {
+            // Do audience visibility checks.
+            $coursecontext = \context_course::instance($course->id);
+            $canview = is_enrolled($coursecontext, $this->user->id) || totara_course_is_viewable($course->id, $this->user->id);
+            if ($canview) {
+                $this->url_view = new \moodle_url('/course/view.php', array('id' => $course->id));
+            } else if (!empty($CFG->audiencevisibility) && $course->audiencevisible != COHORT_VISIBLE_NOUSERS) {
+                $params = array('id' => $this->program->id, 'cid' => $course->id, 'userid' => $this->user->id, 'sesskey' => $USER->sesskey);
+                $this->url_view = new \moodle_url('/totara/program/required.php', $params);
+            } else {
+                // This is a single course program but something isn't right... so show the normal program link.
+                $this->url_view = new \moodle_url('/totara/program/view.php', array('id' => $this->id));
+            }
+        } else {
+            $this->url_view = new \moodle_url('/totara/program/view.php', array('id' => $this->id));
+        }
     }
 
     /**
@@ -312,6 +331,17 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
         }
 
         return $record;
+    }
+
+    /**
+     * Find out if this is a single course program.
+     *
+     * @return bool If a proram is a single course program
+     */
+    public function is_single_course() {
+        $this->ensure_program_loaded();
+
+        return $this->program->is_single_course($this->user->id);
     }
 
     /**

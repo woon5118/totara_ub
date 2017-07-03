@@ -71,4 +71,55 @@ class behat_current_learning_block extends behat_base {
         $this->execute('behat_general::assert_element_not_contains_text', array($course, $xpath, 'xpath_element'));
     }
 
+    /**
+     * Check if the icon for a row has the expected hover text.
+     *
+     * @Given /^the current learning block learning type icon text is "([^"]*)" for the "([^"]*)"$/
+     */
+    public function the_current_learning_block_icon_text_is($text, $program) {
+        $program_xpath = behat_context_helper::escape($program);
+        $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
+        $row = $this->find(
+            'xpath',
+            $xpath,
+            new \Behat\Mink\Exception\ExpectationException('Could not find item row for "'.$program.'" in the current learning block' . $xpath, $this->getSession())
+        );
+
+        $xpath = "//*[@data-toggle='tooltip']";
+        $node = $row->find(
+            'xpath',
+            $xpath,
+            new \Behat\Mink\Exception\ExpectationException('Could not find icon for "'.$program.'" in the current learning block' . $xpath, $this->getSession())
+        );
+        $titletext = $node->getAttribute('data-original-title');
+        if ($titletext !== $text) {
+            throw new \Behat\Mink\Exception\ExpectationException('Hover text for "'.$program.'" in the current learning block "'.$titletext.'" does not match expected "'.$text.'"', $this->getSession());
+        }
+    }
+
+    /**
+     * Check that the item is not togglable.
+     *
+     * @Given /^I should not be able to toggle "([^"]*)" row within the current learning block$/
+     */
+    public function i_should_not_be_able_to_toggle_row($program) {
+        $program_xpath = behat_context_helper::escape($program);
+        $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
+        $row = $this->find(
+            'xpath',
+            $xpath,
+            new \Behat\Mink\Exception\ExpectationException('Could not find item row for "'.$program.'" in the current learning block' . $xpath, $this->getSession())
+        );
+
+        $expandiconxpath = "//*[@class[contains(.,'expand-collapse-icon-wrap')]]";
+
+        try {
+            $this->find('xpath', $expandiconxpath, false, $row, self::REDUCED_TIMEOUT);
+        } catch (\Behat\Mink\Exception\ElementNotFoundException $e) {
+            // Yay not found.
+            return;
+        }
+
+        throw new \Behat\Mink\Exception\ExpectationException("\"$program\" row in current learning block was togglable", $this->getSession());
+    }
 }

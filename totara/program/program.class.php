@@ -1088,6 +1088,27 @@ class program {
     }
 
     /**
+     * Function to determine if this program only contains a single course.
+     *
+     * @return false|course
+     */
+    public function is_single_course($userid) {
+        // Count coursesets, if more than one then return false
+        $certifpath = get_certification_path_user($this->certifid, $userid);
+
+        $coursesets = $this->get_content()->get_course_sets_path($certifpath);
+        if (count($coursesets) == 1) {
+            $courseset = reset($coursesets);
+
+            if (count($courseset->courses) == 1) {
+                return reset($courseset->courses);
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Calulates the date on which a program will be due for a learner when it
      * is first assigned based on the assignment record through which the user
      * is being assigned to the program.

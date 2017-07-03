@@ -1170,4 +1170,75 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
         $this->assertEquals(1, $resultset->completecount);
         $this->assertEquals(1, $resultset->unvailablecount);
     }
+
+    function test_is_single_course_true() {
+        $this->resetAfterTest(true);
+
+        // Setup program content.
+        $progcontent = new prog_content($this->program1->id);
+        $progcontent->add_set(CONTENTTYPE_MULTICOURSE);
+
+        $coursesets = $progcontent->get_course_sets();
+
+        $coursedata = new stdClass();
+        $coursedata->{$coursesets[0]->get_set_prefix() . 'courseid'} = $this->course1->id;
+        $progcontent->add_course(1, $coursedata);
+
+        // Do some more setup.
+        $coursesets[0]->nextsetoperator = NEXTSETOPERATOR_OR;
+
+        // Set completion type.
+        $coursesets[0]->completiontype = COMPLETIONTYPE_ALL;
+
+        // Set certifpath.
+        $coursesets[0]->certifpath = CERTIFPATH_STD;
+
+        // Save the sets
+        $coursesets[0]->save_set();
+
+        // Assign the user to the program.
+        $this->program_generator->assign_program($this->program1->id, array($this->user1->id));
+
+        // Get the program and process the coursesets.
+        $program_item = \totara_program\user_learning\item::one($this->user1->id, $this->program1->id);
+
+        $this->assertEquals($program_item->is_single_course()->fullname, $this->course1->fullname);
+        $this->assertEquals($program_item->is_single_course()->id, $this->course1->id);
+    }
+
+    function test_is_single_course_false() {
+        $this->resetAfterTest(true);
+
+        // Setup program content.
+        $progcontent = new prog_content($this->program1->id);
+        $progcontent->add_set(CONTENTTYPE_MULTICOURSE);
+
+        $coursesets = $progcontent->get_course_sets();
+
+        $coursedata = new stdClass();
+        $coursedata->{$coursesets[0]->get_set_prefix() . 'courseid'} = $this->course1->id;
+        $progcontent->add_course(1, $coursedata);
+        $coursedata->{$coursesets[0]->get_set_prefix() . 'courseid'} = $this->course2->id;
+        $progcontent->add_course(1, $coursedata);
+
+        // Do some more setup.
+        $coursesets[0]->nextsetoperator = NEXTSETOPERATOR_AND;
+
+        // Set completion type.
+        $coursesets[0]->completiontype = COMPLETIONTYPE_ALL;
+
+        // Set certifpath.
+        $coursesets[0]->certifpath = CERTIFPATH_STD;
+
+        // Save the sets
+        $coursesets[0]->save_set();
+
+        // Assign the user to the program.
+        $this->program_generator->assign_program($this->program1->id, array($this->user1->id));
+
+        // Get the program and process the coursesets.
+        $program_item = \totara_program\user_learning\item::one($this->user1->id, $this->program1->id);
+
+        $this->assertFalse($program_item->is_single_course());
+    }
 }
