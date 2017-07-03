@@ -81,8 +81,8 @@ $string['currentusersmatching'] = 'Current matching users \'{$a}\'';
 $string['delete'] = 'Delete';
 $string['deletedfeedback360'] = 'Successfully Deleted Feedback';
 $string['deletefeedback360s'] = 'Delete Feedback - {$a}';
-$string['deletefeedback360questions'] = 'And all related questions';
-$string['deletefeedback360assignments'] = 'And all related assignments';
+$string['deletefeedback360conformation'] = 'Are you sure you want to delete {$a}?';
+$string['deletefeedback360responses'] = 'All content will be permanently deleted including {$a} completed responses.';
 $string['description'] = 'Description';
 $string['description_help'] = 'When a feedback description is created the information displays after feedback name';
 $string['draft'] = 'Draft';
@@ -348,6 +348,8 @@ $string['you'] = 'You';
 
 
 // Deprecated since Totara 10
+$string['deletefeedback360questions'] = 'And all related questions';
+$string['deletefeedback360assignments'] = 'And all related assignments';
 $string['feedback360selectform'] = 'Select the type of feedback you want to receive:';
 $string['feedback360selectform_help'] = 'This is the form the users will have to fill in and submit as your feedback, click the preview link next to the name to see the form.';
 $string['newrequest'] = 'New Feedback Request';

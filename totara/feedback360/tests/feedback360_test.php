@@ -95,15 +95,9 @@ class feedback360_test extends feedback360_testcase {
 
         // Check deleting of de-activated feedback.
         $fdbck2->set_status(feedback360::STATUS_CLOSED);
-        try {
-            $fdbck2->delete();
-            $this->fail('Exception expected if feedback locked');
-        } catch (moodle_exception $e) {
-            $this->assertSame('You cannot make changes to an assignment module instance which is locked', $e->getMessage());
-        }
+        $fdbck2->delete();
         $list3 = feedback360::get_manage_list();
-        $this->assertCount(1, $list3);
-        $this->assertArrayHasKey($fdbck2->id, $list3);
+        $this->assertCount(0, $list3);
     }
 
     public function test_activate() {
@@ -446,6 +440,47 @@ class feedback360_test extends feedback360_testcase {
         $this->assertObjectHasAttribute($field1, $fromdb);
         $this->assertEquals('Test1', $fromdb->$field1);
         $this->assertEquals('Test2', $fromdb->$field2);
+    }
+
+    public function test_count_completed_answers() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+        list($fdbck, $users, $quests) = $this->prepare_feedback_with_users(1, 2);
+        $fdbck->activate();
+        $user = current($users);
+        $user1ass = $DB->get_record('feedback360_user_assignment', array('feedback360id' => $fdbck->id, 'userid' => $user->id));
+
+        $respuser = $this->getDataGenerator()->create_user();
+        feedback360_responder::update_system_assignments(array($respuser->id), array(), $user1ass->id, time());
+        $response = feedback360_responder::by_user($respuser->id, $fdbck->id, $user->id);
+
+        $respuser2 = $this->getDataGenerator()->create_user();
+        feedback360_responder::update_system_assignments(array($respuser2->id), array(), $user1ass->id, time());
+        $response2 = feedback360_responder::by_user($respuser2->id, $fdbck->id, $user->id);
+
+        $field1 = 'data_'.$quests['Text1']->id.'_'.$response->id;
+        $field2 = 'data_'.$quests['Text2']->id.'_'.$response->id;
+        $formdata = new stdClass();
+        $formdata->$field1 = 'Test1';
+        $formdata->$field2 = 'Test2';
+
+        $field1_2 = 'data_'.$quests['Text1']->id.'_'.$response2->id;
+        $field2_2 = 'data_'.$quests['Text2']->id.'_'.$response2->id;
+        $formdata_2 = new stdClass();
+        $formdata_2->$field1_2 = 'Test1';
+        $formdata_2->$field2_2 = 'Test2';
+
+        $saved = $fdbck->save_answers($formdata, $response);
+        $this->assertTrue($saved);
+        $saved = $fdbck->save_answers($formdata_2, $response2);
+        $this->assertTrue($saved);
+
+        $this->assertEquals(0, $fdbck->count_completed_answers());
+        $response->complete(time());
+        $this->assertEquals(1, $fdbck->count_completed_answers());
+        $response2->complete(time());
+        $this->assertEquals(2, $fdbck->count_completed_answers());
     }
 
 
