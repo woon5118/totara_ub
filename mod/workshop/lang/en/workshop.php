@@ -31,12 +31,10 @@ $string['allocationdone'] = 'Allocation done';
 $string['allocationerror'] = 'Allocation error';
 $string['allocationconfigured'] = 'Allocation configured';
 $string['allowedfiletypesforoverallfeedback'] = 'Feedback attachment allowed file types';
-$string['allowedfiletypesforoverallfeedback_help'] = 'Feedback attachment allowed file types can be restricted by entering a comma-separated list of file extensions, for example; MP4, MP3, PNG, JPG. If the field is left empty, then all file types are allowed.';
+$string['allowedfiletypesforoverallfeedback_help'] = 'Feedback attachment file types can be restricted by providing a list of allowed file types. If the field is left empty, then all file types are allowed.';
 $string['allowedfiletypesforoverallfeedback_link'] = 'Workshop';
 $string['allowedfiletypesforsubmission'] = 'Submission attachment allowed file types';
-$string['allowedfiletypesforsubmission_help'] = 'Submission attachment allowed file types can be restricted by entering a comma-separated list of file extensions, for example; PNG, JPG, JPEG, GIF. If the field is left empty, then all file types are allowed.
-
-Additional supported file extensions can be configured in the server administration';
+$string['allowedfiletypesforsubmission_help'] = 'Submission attachment file types can be restricted by providing a list of allowed file types. If the field is left empty, then all file types are allowed.';
 $string['allowedfiletypesforsubmission_link'] = 'Workshop';
 $string['allsubmissions'] = 'All submissions ({$a})';
 $string['alreadygraded'] = 'Already graded';
@@ -109,7 +107,6 @@ $string['editingsubmission'] = 'Editing submission';
 $string['editsubmission'] = 'Edit submission';
 $string['err_multiplesubmissions'] = 'While editing this form, another version of the submission has been saved. Multiple submissions per user are not allowed.';
 $string['err_removegrademappings'] = 'Unable to remove the unused grade mappings';
-$string['err_unknownfileextension'] = 'Unknown file extension: {$a}';
 $string['err_wrongfileextension'] = 'Some files ({$a->wrongfiles}) cannot be uploaded. Only file types {$a->whitelist} are allowed.';
 $string['evaluategradeswait'] = 'Please wait until the assessments are evaluated and the grades are calculated';
 $string['evaluation'] = 'Grading evaluation';
@@ -373,3 +370,6 @@ $string['yoursubmission'] = 'Your submission';
 
 // Deprecated since Moodle 3.1.
 $string['yourassessment'] = 'Your assessment';
+
+// Deprecated since Moodle 3.4.
+$string['err_unknownfileextension'] = 'Unknown file extension: {$a}';
