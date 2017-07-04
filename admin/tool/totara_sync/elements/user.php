@@ -47,10 +47,11 @@ class totara_sync_element_user extends totara_sync_element {
     function set_customfieldsdb() {
         global $DB;
 
-        $rs = $DB->get_recordset('user_info_field', array(), '', 'id,shortname,datatype,required,defaultdata,locked,forceunique,param1');
+        $rs = $DB->get_recordset('user_info_field', array(), '', 'id,shortname,datatype,required,defaultdata,locked,forceunique,param1,param3');
         if ($rs->valid()) {
             foreach ($rs as $r) {
                 $this->customfieldsdb['customfield_'.$r->shortname]['id'] = $r->id;
+                $this->customfieldsdb['customfield_'.$r->shortname]['datatype'] = $r->datatype;
                 $this->customfieldsdb['customfield_'.$r->shortname]['required'] = $r->required;
                 $this->customfieldsdb['customfield_'.$r->shortname]['forceunique'] = $r->forceunique;
                 $this->customfieldsdb['customfield_'.$r->shortname]['default'] = $r->defaultdata;
@@ -59,6 +60,10 @@ class totara_sync_element_user extends totara_sync_element {
                     // Set all options to lower case to match values to options without case sensitivity.
                     $options = explode("\n", core_text::strtolower($r->param1));
                     $this->customfieldsdb['customfield_'.$r->shortname]['menu_options'] = $options;
+                }
+
+                if ($r->datatype == 'datetime') {
+                    $this->customfieldsdb['customfield_'.$r->shortname]['includetime'] = $r->param3;
                 }
             }
         }
@@ -1336,14 +1341,14 @@ class totara_sync_element_user extends totara_sync_element {
     }
 
     /**
-     * Ensure options from menu of choices are valid
+     * Ensure custom field values are valid.
      *
      * @param string $synctable sync table name
      *
      * @return array with invalid ids from synctable for options that do not exist in the database
      */
     public function validate_custom_fields($synctable) {
-        global $DB;
+        global $CFG, $DB;
 
         $params = empty($this->config->sourceallrecords) ? array('deleted' => 0) : array();
         $invalidids = array();
@@ -1372,8 +1377,20 @@ class totara_sync_element_user extends totara_sync_element {
                             $this->addlog(get_string('optionxnotexist', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'option' => $value, 'fieldname' => $name)), 'warn', 'checksanity');
                             $forcewarning = true;
                         }
-                    } else if ($this->customfieldsdb[$name]['forceunique'] && $value !== '') {
-                        // Note: Skipping this for menu custom fields as the UI does not enforce uniqueness for them.
+                    }
+
+                    if ($this->customfieldsdb[$name]['forceunique'] && $value !== '') {
+
+                        // Convert the date to UTC noon so that it covers the same day in most timezones.
+                        // This method is used in core profile fields code to check for date uniqueness.
+                        if ($this->customfieldsdb[$name]['datatype'] == 'date') {
+                            // We need to keep the original value to present in in the error log if
+                            // the date is already in use.
+                            $original_value = $value;
+                            $date = userdate($value, '%Y-%m-%d', 'UTC');
+                            $date = explode('-', $date);
+                            $value = make_timestamp($date[0], $date[1], $date[2], 12, 0, 0, 'UTC');
+                        }
 
                         $sql = "SELECT uid.data
                                   FROM {user} usr
@@ -1387,7 +1404,19 @@ class totara_sync_element_user extends totara_sync_element {
                         // If the value already exists in the database then flag an error. If not, record
                         // it in unique_fields to later verify that it's not duplicated in the sync data.
                         if ($cfdata) {
-                            $this->addlog(get_string('fieldduplicated', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'fieldname' => $name, 'value' => $value)), 'error', 'checksanity');
+                            // The date can be imported in different formats so present the error in
+                            // a way the user can identify it in their import data.
+                            if ($this->customfieldsdb[$name]['datatype'] == 'date' || $this->customfieldsdb[$name]['datatype'] == 'datetime') {
+                                $date = date($CFG->csvdateformat, $value);
+                                $timestamp = isset($original_value) ? $original_value : $value;
+
+                                $this->addlog(get_string('fieldduplicateddate', 'tool_totara_sync',
+                                    array('idnumber' => $r->idnumber, 'fieldname' => $name, 'date' => $date, 'timestamp' => $timestamp)), 'error', 'checksanity');
+                            } else {
+                                $this->addlog(get_string('fieldduplicated', 'tool_totara_sync',
+                                    array('idnumber' => $r->idnumber, 'fieldname' => $name, 'value' => $value)), 'error', 'checksanity');
+                            }
+
                             $invalidids[] = intval($r->id);
                             break;
                         } else {

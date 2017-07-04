@@ -291,6 +291,7 @@ $string['invalidauthxforuserx'] = 'invalid authentication plugin {$a->auth} for 
 $string['optionxnotexist'] = 'Option \'{$a->option}\' does not exist for {$a->fieldname} field. Please check user {$a->idnumber}';
 $string['fieldrequired'] = '{$a->fieldname} is a required field and must have a value. Please check user {$a->idnumber}';
 $string['fieldduplicated'] = 'The value \'{$a->value}\' for {$a->fieldname} is a duplicate of existing data and must be unique. Skipped user {$a->idnumber}';
+$string['fieldduplicateddate'] = 'The date of {$a->date} ({$a->timestamp}) for {$a->fieldname} is a duplicate of existing data and must be unique. Skipped user {$a->idnumber}';
 $string['fieldmustbeunique'] = 'The value \'{$a->value}\' for {$a->fieldname} is duplicated in the uploaded data and must be unique. Skipped user {$a->idnumber}';
 $string['nosourceconfigured'] = 'No source configured, please set configuration <a href=\'{$a}\'>here</a>';
 $string['duplicateuserswithidnumberx'] = 'Duplicate users with idnumber {$a->idnumber}. Skipped user {$a->idnumber}';

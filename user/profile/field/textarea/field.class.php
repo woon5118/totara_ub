@@ -93,6 +93,21 @@ class profile_field_textarea extends profile_field_base {
         return format_text($this->data, $this->dataformat, array('overflowdiv' => true));
     }
 
+    /**
+     * Validate the form field from profile page.
+     *
+     * @param stdClass $usernew
+     * @return string contains error message otherwise null
+     */
+    public function edit_validate_field($usernew) {
+        // Make sure we're using the right value for the text.
+        if (is_array($usernew->{$this->inputname}) && isset($usernew->{$this->inputname}['text'])) {
+            $usernew->{$this->inputname} = $usernew->{$this->inputname}['text'];
+        }
+
+        return parent::edit_validate_field($usernew);
+    }
+
 }
 
 

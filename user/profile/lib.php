@@ -186,34 +186,23 @@ class profile_field_base {
         $errors = array();
         // Get input value.
         if (isset($usernew->{$this->inputname})) {
-            if (is_array($usernew->{$this->inputname}) && isset($usernew->{$this->inputname}['text'])) {
-                $value = $usernew->{$this->inputname}['text'];
-            } else {
-                $value = $usernew->{$this->inputname};
-            }
+            $value = $usernew->{$this->inputname};
         } else {
             $value = '';
         }
 
         // Check for uniqueness of data if required.
         if ($this->is_unique() && ($value !== '')) {
-            $data = $DB->get_records_sql('
-                    SELECT id, userid
+            $sql = 'SELECT id, userid
                       FROM {user_info_data}
-                     WHERE fieldid = ?
-                       AND ' . $DB->sql_compare_text('data', 255) . ' = ' . $DB->sql_compare_text('?', 255),
-                    array($this->field->id, $value));
+                     WHERE fieldid = :fieldid
+                       AND userid != :userid
+                       AND ' . $DB->sql_compare_text('data', 255) . ' = ' . $DB->sql_compare_text(':value', 255);
+            $params = array('fieldid' => $this->field->id, 'userid' => $usernew->id, 'value' => $value);
+            $data = $DB->get_records_sql($sql, $params);
+
             if ($data) {
-                $existing = false;
-                foreach ($data as $v) {
-                    if ($v->userid == $usernew->id) {
-                        $existing = true;
-                        break;
-                    }
-                }
-                if (!$existing) {
-                    $errors[$this->inputname] = get_string('valuealreadyused');
-                }
+                $errors[$this->inputname] = get_string('valuealreadyused');
             }
         }
         return $errors;
