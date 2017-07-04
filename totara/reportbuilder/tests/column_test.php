@@ -976,5 +976,26 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             $message .= "Join name {$join->name} is invalid, it cannot be any SQL reserved word!\n";
             $this->assertArrayNotHasKey($join->name, $reserved, $message);
         }
+
+        // Test filters are compatible with caching.
+        if ($src->cacheable) {
+            foreach ($src->filteroptions as $filteroption) {
+                if (isset($filteroption->filteroptions['cachingcompatible'])) {
+                    // Developer says they know, no need to test!
+                    continue;
+                }
+                if (empty($filteroption->field)) {
+                    // The filter is using column info to get the field data.
+                    continue;
+                }
+                if (reportbuilder::get_single_item($src->requiredcolumns, $filteroption->type, $filteroption->value)) {
+                    $this->fail("Filter '{$filteroption->type}-{$filteroption->value}' in '{$sourcename}' has custom field and is colliding with required column, you need to add 'cachingcompatible' to filter options");
+                }
+                if (reportbuilder::get_single_item($src->columnoptions, $filteroption->type, $filteroption->value)) {
+                    // TODO: uncomment following after TL-14793 lands
+                    //$this->fail("Filter '{$filteroption->type}-{$filteroption->value}' in '{$sourcename}' has custom field and is colliding with column option, you need to add 'cachingcompatible' to filter options");
+                }
+            }
+        }
     }
 }
