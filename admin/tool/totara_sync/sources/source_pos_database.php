@@ -234,6 +234,11 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
             $dbrow['parentidnumber'] = isset($dbrow['parentidnumber']) && $dbrow['parentidnumber'] !== '' ? $dbrow['parentidnumber'] : '';
             $dbrow['parentidnumber'] = $dbrow['parentidnumber'] === $dbrow['idnumber'] ? '' : $dbrow['parentidnumber'];
 
+            // Treat nulls in the 'deleted' database column as not deleted.
+            if (!empty($this->config->import_deleted)) {
+                $dbrow['deleted'] = empty($dbrow['deleted']) ? 0 : $dbrow['deleted'];
+            }
+
             if ($this->config->{'import_typeidnumber'} == '0') {
                 unset($dbrow['typeidnumber']);
             } else {
