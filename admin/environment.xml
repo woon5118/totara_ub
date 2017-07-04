@@ -7,8 +7,8 @@
       </FEEDBACK>
     </UNICODE>
     <DATABASE level="required">
-      <VENDOR name="mariadb" version="5.5.31" />
-      <VENDOR name="mysql" version="5.5.31" />
+      <VENDOR name="mariadb" version="10.2.6" />
+      <VENDOR name="mysql" version="5.7.11" />
       <VENDOR name="postgres" version="9.2" />
       <VENDOR name="mssql" version="11.0" />
     </DATABASE>
@@ -87,10 +87,7 @@
       </PHP_EXTENSION>
       <PHP_EXTENSION name="xmlreader" level="required">
       </PHP_EXTENSION>
-      <PHP_EXTENSION name="intl" level="optional">
-        <FEEDBACK>
-          <ON_CHECK message="intlrecommended" />
-        </FEEDBACK>
+      <PHP_EXTENSION name="intl" level="required">
       </PHP_EXTENSION>
       <PHP_EXTENSION name="json" level="required">
       </PHP_EXTENSION>
