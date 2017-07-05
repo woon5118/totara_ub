@@ -79,6 +79,10 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         );
 
         // Re-run saved searched migration for the job assignments update.
+        // NOTE: this function contains code specific to the migration
+        // from 2.9 to 9.0 for multiple jobs. DO NOT USE this function
+        // for generic saved search migrations, use
+        // {@link totara_reportbuilder_migrate_saved_searches()} instead.
         totara_reportbuilder_migrate_saved_search_filters($filters, $oldtype, 'job_assignment');
 
         // Reportbuilder savepoint reached.
@@ -90,6 +94,10 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         reportbuilder_rename_data('filters', '*', 'cohort', 'usercohortids', 'user', 'usercohortids');
 
         // Update filter names in saved searches.
+        // NOTE: this function contains code specific to the migration
+        // from 2.9 to 9.0 for multiple jobs. DO NOT USE this function
+        // for generic saved search migrations, use
+        // {@link totara_reportbuilder_migrate_saved_searches()} instead.
         totara_reportbuilder_migrate_saved_search_filters(array('usercohortids' => 'usercohortids'), 'cohort', 'user');
 
         upgrade_plugin_savepoint(true, 2017052200, 'totara', 'reportbuilder');
@@ -108,6 +116,37 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
 
         // Reportbuilder savepoint reached.
         upgrade_plugin_savepoint(true, 2017063000, 'totara', 'reportbuilder');
+    }
+
+    if ($oldversion < 2017070500) {
+
+        // Update filter to match updated code.
+        reportbuilder_rename_data('filters', '*', 'job_assignment', 'allstartdates', 'job_assignment', 'allstartdatesfilter');
+        reportbuilder_rename_data('filters', '*', 'job_assignment', 'allenddates', 'job_assignment', 'allenddatesfilter');
+        // Fix saved searches.
+        totara_reportbuilder_migrate_saved_searches('*', 'job_assignment', 'allstartdates', 'job_assignment', 'allstartdatesfilter');
+        totara_reportbuilder_migrate_saved_searches('*', 'job_assignment', 'allenddates', 'job_assignment', 'allenddatesfilter');
+
+        // Update active datetime job custom fields.
+        $posfields = $DB->get_records('pos_type_info_field', array('hidden' => '0', 'datatype' => 'datetime'));
+        foreach ($posfields as $field) {
+            $oldname = "pos_custom_{$field->id}";
+            // Update filter to match updated code.
+            reportbuilder_rename_data('filters', '*', 'job_assignment', $oldname, 'job_assignment', $oldname.'filter');
+            // Fix saved searches.
+            totara_reportbuilder_migrate_saved_searches('*', 'job_assignment', $oldname, 'job_assignment', $oldname.'filter');
+        }
+        $orgfields = $DB->get_records('org_type_info_field', array('hidden' => '0', 'datatype' => 'datetime'));
+        foreach ($orgfields as $field) {
+            $oldname = "org_custom_{$field->id}";
+            // Update filter to match updated code.
+            reportbuilder_rename_data('filters', '*', 'job_assignment', $oldname, 'job_assignment', $oldname.'filter');
+            // Fix saved searches.
+            totara_reportbuilder_migrate_saved_searches('*', 'job_assignment', $oldname, 'job_assignment', $oldname.'filter');
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2017070500, 'totara', 'reportbuilder');
     }
 
     return true;
