@@ -134,5 +134,29 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017072000, 'totara', 'core');
     }
 
+    if ($oldversion < 2017082302) {
+
+        // Define field totarasync to be added to job_assignment.
+        $table = new xmldb_table('job_assignment');
+        $field = new xmldb_field('totarasync', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sortorder');
+
+        // Conditionally launch add field totarasync.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // If we've just added this field, we'll be setting it to 1 for all job assignments
+            // belonging to users who have the totarasync field on their user records set to 1.
+            $ids = $DB->get_fieldset_select('user', 'id', 'totarasync = 1');
+            $idsets = array_chunk($ids, $DB->get_max_in_params());
+            foreach ($idsets as $idset) {
+                list($insql, $inparams) = $DB->get_in_or_equal($idset);
+                $DB->set_field_select('job_assignment', 'totarasync', 1, 'userid '. $insql, $inparams);
+            }
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2017082302, 'totara', 'core');
+    }
+
     return true;
 }

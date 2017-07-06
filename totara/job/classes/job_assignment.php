@@ -56,6 +56,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read int tempmanagerexpirydate   optional
  * @property-read int appraiserid             optional
  * @property-read int sortorder               automatic (set when job assignment is created, modified by functions)
+ * @property-read int totarasync              optional (defaults to zero, should be set to 1 if updates via HR Import are desired)
  *
  * @package totara_job
  */
@@ -202,6 +203,13 @@ class job_assignment {
     private $sortorder;
 
     /**
+     * Whether or not this can be updated via HR Import. 1 means that it can.
+     *
+     * @var int
+     */
+    private $totarasync = 0;
+
+    /**
      * Create instance of a job_assignment.
      *
      * @param \stdClass $record as returned by get_record('job_assignment', ...)
@@ -286,6 +294,9 @@ class job_assignment {
         } else {
             $this->appraiserid = null;
         }
+        if (!empty($record->totarasync)) {
+            $this->totarasync = $record->totarasync;
+        }
     }
 
     /**
@@ -313,7 +324,7 @@ class job_assignment {
         foreach ($data as $key => $value) {
             if (!in_array($key, array('userid', 'fullname', 'shortname', 'idnumber', 'description', 'description_editor',
                                       'positionid', 'organisationid', 'startdate', 'enddate', 'managerjaid',
-                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid'))) {
+                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync'))) {
                 throw new exception('Invalid field specified when creating new job assignment');
             }
         }
@@ -537,7 +548,7 @@ class job_assignment {
         } else if (in_array($name, array('id', 'userid', 'shortname', 'idnumber', 'timecreated', 'timemodified', 'usermodified',
                                          'positionid', 'positionassignmentdate', 'organisationid', 'startdate', 'enddate',
                                          'managerjaid', 'managerjapath', 'tempmanagerjaid', 'tempmanagerexpirydate',
-                                         'appraiserid', 'sortorder'))) {
+                                         'appraiserid', 'sortorder', 'totarasync'))) {
             return $this->$name;
 
         } else {
@@ -556,7 +567,7 @@ class job_assignment {
         $getproperties = array('id', 'userid', 'shortname', 'idnumber', 'timecreated', 'timemodified', 'usermodified',
             'positionid', 'positionassignmentdate', 'organisationid', 'startdate', 'enddate',
             'managerjaid', 'managerjapath', 'tempmanagerjaid', 'tempmanagerexpirydate',
-            'appraiserid', 'sortorder');
+            'appraiserid', 'sortorder', 'totarasync');
         $getproperties[] = 'description';
         $getproperties[] = 'description_editor';
         $getproperties[] = 'managerid';
@@ -600,6 +611,7 @@ class job_assignment {
         $data->tempmanagerexpirydate  = $this->tempmanagerexpirydate;
         $data->appraiserid            = $this->appraiserid;
         $data->sortorder              = $this->sortorder;
+        $data->totarasync             = $this->totarasync;
 
         return $data;
     }
@@ -623,7 +635,7 @@ class job_assignment {
         foreach ($data as $key => $value) {
             if (!in_array($key, array('fullname', 'shortname', 'idnumber', 'description', 'description_editor', 'positionid',
                                       'organisationid', 'startdate', 'enddate', 'managerjaid',
-                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid'))) {
+                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync'))) {
                 throw new exception("Invalid field specified when updating job_assignment (not allowed or doesn't exist).");
             }
         }

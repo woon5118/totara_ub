@@ -118,6 +118,12 @@ function tool_totara_sync_run() {
     }
 
     $status = true;
+
+    // Sort according to weighting.
+    usort($elements, function($a, $b) {
+        return $a->syncweighting - $b->syncweighting;
+    });
+
     foreach ($elements as $element) {
         try {
             if (!method_exists($element, 'sync')) {

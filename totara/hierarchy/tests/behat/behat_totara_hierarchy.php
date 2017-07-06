@@ -257,6 +257,7 @@ class behat_totara_hierarchy extends behat_base {
             'tempmanager', // Username.
             'tempmanagerjaidnumber', // String.
             'tempmanagerexpirydate', // Unix datetime
+            'totarasync',
         );
 
         $data = $table->getHash();

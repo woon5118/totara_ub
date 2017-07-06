@@ -29,6 +29,20 @@ abstract class totara_sync_element {
     public $config;
 
     /**
+     * @var int
+     * Determines whether an element's sync() should be run before or after others.
+     * Lower values are run first. Leave at 0 if ordering does not matter.
+     */
+    public $syncweighting = 0;
+
+    /**
+     * @var totara_sync_source
+     *
+     * Subclass of totara_sync_source.
+     */
+    public $source;
+
+    /**
      * Returns the element's name to be used for construction of classes, etc.
      *
      * To be implemented in child classes
@@ -106,28 +120,33 @@ abstract class totara_sync_element {
     function get_source($sourceclass=null) {
         global $CFG;
 
-        $elname = $this->get_name();
+        if (empty($this->source)) {
 
-        if (empty($sourceclass)) {
-            // Get enabled source
-            if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
-                throw new totara_sync_exception($elname, 'getsource', 'nosourceenabled');
+            $elname = $this->get_name();
+
+            if (empty($sourceclass)) {
+                // Get enabled source
+                if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
+                    throw new totara_sync_exception($elname, 'getsource', 'nosourceenabled');
+                }
             }
+            $sourcefilename = str_replace('totara_sync_', '', $sourceclass);
+
+            $sourcefile = $CFG->dirroot . '/admin/tool/totara_sync/sources/' . $sourcefilename . '.php';
+            if (!file_exists($sourcefile)) {
+                throw new totara_sync_exception($elname, 'getsource', 'sourcefilexnotfound', $sourcefile);
+            }
+
+            require_once($sourcefile);
+
+            if (!class_exists($sourceclass)) {
+                throw new totara_sync_exception($elname, 'getsource', 'sourceclassxnotfound', $sourceclass);
+            }
+
+            $this->source = new $sourceclass;
         }
-        $sourcefilename = str_replace('totara_sync_' ,'', $sourceclass);
 
-        $sourcefile = $CFG->dirroot.'/admin/tool/totara_sync/sources/'.$sourcefilename.'.php';
-        if (!file_exists($sourcefile)) {
-            throw new totara_sync_exception($elname, 'getsource', 'sourcefilexnotfound', $sourcefile);
-        }
-
-        require_once($sourcefile);
-
-        if (!class_exists($sourceclass)) {
-            throw new totara_sync_exception($elname, 'getsource', 'sourceclassxnotfound', $sourceclass);
-        }
-
-       return new $sourceclass;
+        return $this->source;
     }
 
     /**
@@ -197,6 +216,7 @@ abstract class totara_sync_element {
      * Set element config value
      */
     function set_config($name, $value) {
+        $this->config->{$name} = $value;
         return set_config($name, $value, $this->get_classname());
     }
 }

@@ -27,6 +27,7 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 
 abstract class totara_sync_source {
     protected $config;
+    protected $fields;
 
     /**
      * The temp table name to be used for holding data from external source
@@ -97,7 +98,7 @@ abstract class totara_sync_source {
 
         // Ensure child class specified temptablename
         if (!isset($this->temptablename)) {
-            throw totara_sync_exception($this->get_element_name, 'setup', 'error',
+            throw new totara_sync_exception($this->get_element_name, 'setup', 'error',
                 'Programming error - source class for ' . $this->get_name() .
                 ' needs to specify temptablename in constructor');
         }
@@ -116,7 +117,15 @@ abstract class totara_sync_source {
      * Method for setting source plugin config settings
      */
     function set_config($name, $value) {
-        return set_config($name, $value, $this->get_name());
+        if (set_config($name, $value, $this->get_name())) {
+            if (!is_object($this->config)) {
+                $this->config = get_config($this->get_name());
+            } else {
+                $this->config->{$name} = $value;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -238,5 +247,9 @@ abstract class totara_sync_source {
                 }
             }
         }
+    }
+
+    public function is_importing_field($fieldname) {
+        return !empty($this->config->{"import_" . $fieldname});
     }
 }

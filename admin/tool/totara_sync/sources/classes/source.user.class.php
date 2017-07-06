@@ -77,22 +77,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'auth',
             'password',
             'suspended',
-            'jobassignmentidnumber',
-            'jobassignmentfullname',
-            'jobassignmentstartdate',
-            'jobassignmentenddate',
-            'orgidnumber',
-            'posidnumber',
-            'manageridnumber',
         );
-        if (!empty($this->element->config->linkjobassignmentidnumber)) {
-            $this->fields[] = 'managerjobassignmentidnumber';
-        }
-        $this->fields[] = 'appraiseridnumber';
-
-        // We need to be able to disable the position hierarchy fields if required so keep a copy of them separate.
-        // This is currently only posidnumber.
-        $this->positionfields = array ('posidnumber');
 
         // Custom fields
         $this->customfields = array();
@@ -147,13 +132,6 @@ abstract class totara_sync_source_user extends totara_sync_source {
             } else if ($f == 'deleted') {
                 $mform->addElement('hidden', $name, $this->config->$name);
                 $mform->setType($name, PARAM_INT);
-            } else if (in_array($f, $this->positionfields)) {
-                if (totara_feature_disabled('positions')) {
-                    $mform->addElement('hidden', $name, '0');
-                    $mform->setType($name, PARAM_INT);
-                } else {
-                    $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
-                }
             } else {
                 $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
                 if (in_array($f, array('country'))) {
@@ -161,26 +139,6 @@ abstract class totara_sync_source_user extends totara_sync_source {
                 }
             }
         }
-
-        if (!empty($this->element->config->linkjobassignmentidnumber)) {
-            $jobassignmentrelatedfields = array(
-                'jobassignmentfullname',
-                'jobassignmentstartdate',
-                'jobassignmentenddate',
-                'orgidnumber',
-                'posidnumber',
-                'manageridnumber',
-                'managerjobassignmentidnumber',
-                'appraiseridnumber'
-            );
-            foreach ($jobassignmentrelatedfields as $field) {
-                $mform->disabledIf('import_' . $field, 'import_jobassignmentidnumber', 'notchecked');
-            }
-        }
-
-        // Manager's job assignment can only be set if manageridnumber is set.
-        $mform->disabledIf('import_managerjobassignmentidnumber', 'import_manageridnumber', 'notchecked');
-        $mform->disabledIf('import_managerjobassignmentidnumber', 'import_manageridnumber', 'checked');
 
         foreach ($this->customfieldtitles as $field => $name) {
             $mform->addElement('checkbox', 'import_'.$field, $name);
@@ -192,14 +150,8 @@ abstract class totara_sync_source_user extends totara_sync_source {
 
         foreach ($this->fields as $f) {
             $name = 'fieldmapping_' . $f;
-
-            if (in_array($f, $this->positionfields) && totara_feature_disabled('positions')) {
-                $mform->addElement('hidden', $name, '0');
-                $mform->setType($name, PARAM_INT);
-            } else {
-                $mform->addElement('text', $name, $f);
-                $mform->setType($name, PARAM_TEXT);
-            }
+            $mform->addElement('text', $name, $f);
+            $mform->setType($name, PARAM_TEXT);
         }
 
         foreach ($this->customfields as $key => $f) {
@@ -209,11 +161,6 @@ abstract class totara_sync_source_user extends totara_sync_source {
     }
 
     function config_save($data) {
-        if (!empty($this->element->config->linkjobassignmentidnumber) && !empty($data->import_manageridnumber)) {
-            $data->import_managerjobassignmentidnumber = 1;
-        } else {
-            $data->import_managerjobassignmentidnumber = 0;
-        }
 
         foreach ($this->fields as $f) {
             $this->set_config('import_'.$f, !empty($data->{'import_'.$f}));
@@ -318,33 +265,6 @@ abstract class totara_sync_source_user extends totara_sync_source {
         if (!empty($this->config->import_address)) {
             $table->add_field('address', XMLDB_TYPE_CHAR, '255');
         }
-        if (!empty($this->config->import_jobassignmentidnumber)) {
-            $table->add_field('jobassignmentidnumber', XMLDB_TYPE_CHAR, '100');
-        }
-        if (!empty($this->config->import_jobassignmentfullname)) {
-            $table->add_field('jobassignmentfullname', XMLDB_TYPE_CHAR, '255');
-        }
-        if (!empty($this->config->import_jobassignmentstartdate)) {
-            $table->add_field('jobassignmentstartdate', XMLDB_TYPE_CHAR, '20');
-        }
-        if (!empty($this->config->import_jobassignmentenddate)) {
-            $table->add_field('jobassignmentenddate', XMLDB_TYPE_CHAR, '20');
-        }
-        if (!empty($this->config->import_orgidnumber)) {
-            $table->add_field('orgidnumber', XMLDB_TYPE_CHAR, '100');
-        }
-        if (!empty($this->config->import_posidnumber)) {
-            $table->add_field('posidnumber', XMLDB_TYPE_CHAR, '100');
-        }
-        if (!empty($this->config->import_manageridnumber)) {
-            $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '100');
-        }
-        if (!empty($this->config->import_managerjobassignmentidnumber)) {
-            $table->add_field('managerjobassignmentidnumber', XMLDB_TYPE_CHAR, '100');
-        }
-        if (!empty($this->config->import_appraiseridnumber)) {
-            $table->add_field('appraiseridnumber', XMLDB_TYPE_CHAR, '100');
-        }
         if (!empty($this->config->import_auth)) {
             $table->add_field('auth', XMLDB_TYPE_CHAR, '20');
         }
@@ -370,21 +290,6 @@ abstract class totara_sync_source_user extends totara_sync_source {
         }
         if (!empty($this->config->import_email)) {
             $table->add_index('email', XMLDB_INDEX_NOTUNIQUE, array('email'));
-        }
-        if (!empty($this->config->import_jobassignmentidnumber)) {
-            $table->add_index('jobassignmentidnumber', XMLDB_INDEX_NOTUNIQUE, array('jobassignmentidnumber'));
-        }
-        if (!empty($this->config->import_orgidnumber)) {
-            $table->add_index('orgidnumber', XMLDB_INDEX_NOTUNIQUE, array('orgidnumber'));
-        }
-        if (!empty($this->config->import_posidnumber)) {
-            $table->add_index('posidnumber', XMLDB_INDEX_NOTUNIQUE, array('posidnumber'));
-        }
-        if (!empty($this->config->import_manageridnumber)) {
-            $table->add_index('manageridnumber', XMLDB_INDEX_NOTUNIQUE, array('manageridnumber'));
-        }
-        if (!empty($this->config->import_appraiseridnumber)) {
-            $table->add_index('appraiseridnumber', XMLDB_INDEX_NOTUNIQUE, array('appraiseridnumber'));
         }
 
         /// Create and truncate the table

@@ -304,6 +304,10 @@ if ($submitted = $form->get_data()) {
         }
     }
 
+    if (isset($submitted->totarasync)) {
+        $data->totarasync = $submitted->totarasync;
+    }
+
     if ($jobassignment) {
         $jobassignment->update($data);
     } else {

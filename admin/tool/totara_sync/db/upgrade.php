@@ -52,5 +52,16 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017060800, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2017081600) {
+        $previouslylinkedonjobassignmentidnumber = get_config('totara_sync_element_user', 'previouslylinkedonjobassignmentidnumber');
+        set_config('previouslylinkedonjobassignmentidnumber', $previouslylinkedonjobassignmentidnumber, 'totara_sync_element_jobassignment');
+        $linkjobassignmentidnumber = get_config('totara_sync_element_user', 'linkjobassignmentidnumber');
+        set_config('updateidnumbers', !$linkjobassignmentidnumber, 'totara_sync_element_jobassignment');
+        unset_config('previouslylinkedonjobassignmentidnumber', 'totara_sync_element_user');
+        unset_config('linkjobassignmentidnumber', 'totara_sync_element_user');
+
+        upgrade_plugin_savepoint(true, 2017081600, 'tool', 'totara_sync');
+    }
+
     return true;
 }

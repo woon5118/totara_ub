@@ -371,6 +371,11 @@ class job_assignment_form extends moodleform {
             $mform->addHelpButton('tempmanagerexpirydate', 'tempmanagerexpirydate', 'totara_job');
         }
 
+        if (get_config('totara_sync', "element_jobassignment_enabled")) {
+            $mform->addElement('advcheckbox', 'totarasync', get_string('totarasync', 'tool_totara_sync'));
+            $mform->addHelpButton('totarasync', 'totarasync', 'tool_totara_sync');
+        }
+
         if ($jobassignment) {
             $this->add_action_buttons(true, get_string('updatejobassignment', 'totara_job'));
         } else {

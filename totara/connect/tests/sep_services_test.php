@@ -323,6 +323,7 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
             'positionassignmentdate' => $ja1a->positionassignmentdate,
             'organisationid' => $ja1a->organisationid,
             'sortorder' => $ja1a->sortorder,
+            'totarasync' => '0',
         );
         $this->assertSame($expected, (array)$result['data']['users'][1]->jobs[0]);
         $expected = array(
@@ -340,6 +341,7 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
             'positionassignmentdate' => $ja1b->positionassignmentdate,
             'organisationid' => $ja1b->organisationid,
             'sortorder' => $ja1b->sortorder,
+            'totarasync' => '0',
         );
         $this->assertSame($expected, (array)$result['data']['users'][1]->jobs[1]);
         $expected = array(
@@ -357,6 +359,7 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
             'positionassignmentdate' => $ja2->positionassignmentdate,
             'organisationid' => $ja2->organisationid,
             'sortorder' => $ja2->sortorder,
+            'totarasync' => '0',
         );
         $this->assertSame($expected, (array)$result['data']['users'][2]->jobs[0]);
     }

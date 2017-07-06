@@ -33,9 +33,11 @@ $string['totara_sync:setfileaccess'] = 'Set HR Import file access';
 $string['totara_sync:manageuser'] = 'Manage HR Import users';
 $string['totara_sync:manageorg'] = 'Manage HR Import organisations';
 $string['totara_sync:managepos'] = 'Manage HR Import positions';
+$string['totara_sync:managejobassignment'] = 'Manage HR Import job assignments';
 $string['totara_sync:uploaduser'] = 'Upload HR Import users';
 $string['totara_sync:uploadorg'] = 'Upload HR Import organisations';
 $string['totara_sync:uploadpos'] = 'Upload HR Import positions';
+$string['totara_sync:uploadjobassignment'] = 'Upload HR Import job assignments';
 $string['totara_sync:deletesynclog'] = 'Clear the HR Import Logs';
 $string['settingssaved'] = 'Settings saved';
 $string['elementenabled'] = 'Element enabled';
@@ -70,22 +72,14 @@ $string['removeitemsdesc'] = 'Specify what to do with internal items during HR I
 
 // User
 $string['displayname:user'] = 'User';
-$string['error:linkjobassignmentmismatch'] = '<strong>Warning:</strong> Import set to link to first job assignment, but previous import linked to job assignment id number. This indicates a problem with your HR Import configuration, please contact your site administrator.';
 $string['settings:user'] = 'User element settings';
 $string['deleted'] = 'Deleted';
-$string['deletednotforjobassign'] = '<strong>Warning:</strong> the "{$a}" field applies to deleting users. Do not set its value to 1 when you only intend to delete a job assignment.';
 $string['sourceallrecords'] = 'Source contains all records';
 $string['sourceallrecordsdesc'] = 'Does the source provide all HR Import records, everytime <strong>OR</strong> are only records that need to be updated/deleted provided? If "No" (only records to be updated/deleted), then the source must use the <strong>"delete" flag</strong>.';
 $string['allowduplicatedemails'] = 'Allow duplicate emails';
 $string['allowduplicatedemailsdesc'] = 'If "Yes" duplicated emails are allowed from the source. If "No" only unique emails are allowed.';
 $string['defaultemailaddress'] = 'Default Email Address';
 $string['emailsettingsdesc'] = 'If duplicate emails are allowed you can set a default email address that will be used when creating/updating users with a blank or invalid email. If duplicates are not allowed every user must have a unique email, if they do not they will be skipped.';
-$string['linkjobassignmentidnumber'] = 'Link job assignments';
-$string['linkjobassignmentidnumberfalse'] = 'to the user\'s first job assignment';
-$string['linkjobassignmentidnumbertrue'] = 'using the user\'s job assignment ID number';
-$string['linkjobassignmentidnumberdesc'] = 'If job assignment data is provided in the import, it will be linked to existing job assignment records using this method. If linking to the user\'s first job assignment, only one job assignment record can be provided in the import for each user.<br>
-<br>
-Note that the first time an import is performed \'using the user\'s job assignment ID number\' setting, this will become permanently set and the setting will be removed from this form. Make sure that you import job assignment ID Numbers by linking \'to the user\'s first job assignment\' before changing this option.';
 $string['ignoreexistingpass'] = 'Only import new users\' passwords';
 $string['ignoreexistingpassdesc'] = 'If "Yes" passwords are only updated for new users, if "No" all users\' passwords are updated';
 $string['forcepwchange'] = 'Force password change for new users';
@@ -99,6 +93,15 @@ $string['delete'] = 'Delete';
 $string['keep'] = 'Keep';
 $string['update'] = 'Update';
 
+// Job assignment
+$string['displayname:jobassignment'] = 'Job assignment';
+$string['settings:jobassignment'] = 'Job assignment element settings';
+$string['previouslylinkedmismatch'] = '<strong>Warning:</strong> Import set to update job assignment ID numbers, but previous import has been completed with that setting off. This indicates a problem with your HR Import configuration, please contact your site administrator.';
+$string['updateidnumbers'] = 'Update ID numbers';
+$string['updateidnumbersdesc'] = 'If set to \'Yes\', only one job assignment record can be provided in the import for each user, and this will be applied to the user\'s first job assignment (where sort order equals 1) and the ID number will be updated.<br>
+If set to \'No\', imported data will be applied to any existing job assignments where the id number matches.<br>
+<br>
+Note: The first time an import is performed with this option set to \'No\', this will become permanently set and the setting will no longer appear in this form.';
 
 ///
 /// Sources
@@ -155,11 +158,6 @@ $string['phone1'] = 'Phone 1';
 $string['phone2'] = 'Phone 2';
 $string['address'] = 'Address';
 $string['orgidnumber'] = 'Organisation';
-$string['jobassignmentidnumber'] = 'Job assignment ID number';
-$string['jobassignmentidnumberrequired'] = 'Job assignment ID number must be included when providing other job assignment fields';
-$string['jobassignmentfullname'] = 'Job assignment full name';
-$string['jobassignmentenddate'] = 'Job assignment end date';
-$string['jobassignmentstartdate'] = 'Job assignment start date';
 $string['posidnumber'] = 'Position';
 $string['manageridnumber'] = 'Manager';
 $string['managerjobassignmentidnumber'] = 'Manager\'s job assignment';
@@ -175,6 +173,36 @@ $string['csvimportfilestructinfo'] = 'The current config requires a CSV file wit
 $string['shortname'] = 'Shortname';
 $string['parentidnumber'] = 'Parent';
 $string['typeidnumber'] = 'Type';
+
+// Job assignment
+$string['appraiserxnotexistjobassignment'] = 'User \'{$a->appraiseridnumber}\' does not exist and was set to be assigned as appraiser. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['createdjobassignmentx'] = 'Created job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['deletedjobassignmentx'] = 'Deleted job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['displayname:totara_sync_source_jobassignment_csv'] = 'CSV';
+$string['displayname:totara_sync_source_jobassignment_database'] = 'External Database';
+$string['duplicateentriesjobassignment'] = 'Multiple entries found for job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'. No updates made to this job assignment.';
+$string['emptymanagerjobassignmentidnumber'] = 'Missing manager\'s job assignment id number for assigning manager \'{$a->manageridnumber}\'. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['enddate'] = 'End date';
+$string['fullname'] = 'Full name';
+$string['invaliddateformatjobassignment'] = 'Invalid date format for field \'{$a->field}\' for job assignment with id number \'{$a->idnumber}\' for user \'{$a->useridnumber}\'. Values for this field will not be added/updated.';
+$string['jobassignmentsyncdisabled'] = 'Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\' as the HR Import setting for that job assignment is disabled.';
+$string['managementloop'] = 'Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\' as creating it would generate a circular management structure.';
+$string['manager'] = 'Manager';
+$string['managerxhasnojobassignment'] = 'User \'{$a->manageridnumber}\' does not have a job assignment and was set to be assigned as manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['managerjaxnotexistjobassignment'] = 'Job assignment \'{$a->managerjobassignmentidnumber}\' for manager \'{$a->manageridnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['managerxnotexistjobassignment'] = 'User \'{$a->manageridnumber}\' does not exist and was set to be assigned as manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['missingrequiredfieldjobassignment'] = 'Some records are missing their idnumber and/or useridnumber. These records were skipped.';
+$string['multiplejobsdisablednocreate'] ='Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['orgxnotexistjobassignment'] = 'Organisation \'{$a->orgidnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['posxnotexistjobassignment'] = 'Position \'{$a->posidnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['selfassignedmanagerjobassignment'] = 'User \'{$a->useridnumber}\' cannot be their own manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['selfassignedappraiserjobassignment'] = 'User \'{$a->useridnumber}\' cannot be their own appraiser. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['settings:totara_sync_source_jobassignment_csv'] = 'Job assignment - CSV source settings';
+$string['settings:totara_sync_source_jobassignment_database'] = 'Job assignment - external database source settings';
+$string['startdate'] = 'Start date';
+$string['startafterendjobassignment'] = 'Start date cannot be later than end date. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['updatedjobassignmentx'] = 'Updated job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['willcreateduplicatejobidnumber'] = 'User \'{$a->useridnumber}\' has another job assignment with the same idnumber as what is being updated. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 
 // Database sources
 $string['dbtype'] = 'Database type';
@@ -204,9 +232,6 @@ $string['databaseemptynullinfo'] = 'The use of empty strings in your external da
 ///
 /// Log messages
 ///
-$string['jobassignmentidnumberemptyx'] = 'Job assignment id number cannot be empty. Skipped job assignment for user {$a->idnumber}';
-$string['multiplejobassignmentsdisabledmanagerx'] = 'Tried to create a manager\'s job assignment but multiple job assignments site setting is disabled and the manager already has a different job assignment. Skipped job assignment for user {$a->idnumber}';
-$string['multiplejobassignmentsdisabledx'] = 'Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment for user {$a->idnumber}';
 $string['syncnotconfiguredsummary'] = 'HR Import is not configured properly. Please, fix the issues before running: {$a}';
 $string['syncnotconfigured'] = 'HR Import is not configured properly. Please, fix the issues before running.';
 $string['temptableprepfail'] = 'temp table preparation failed';
@@ -258,19 +283,11 @@ $string['cannotsetuserpassword'] = 'cannot set user password (user:{$a})';
 $string['cannotsetuserpasswordnoauthsupport'] = 'cannot set user password (user:{$a}), auth plugin does not support password changes';
 $string['updateduserx'] = 'updated user {$a}';
 $string['reviveduserx'] = 'revived user {$a}';
-$string['cannotimportjobassignments'] = 'Cannot create job assignment (user: {$a})';
 $string['cannotreviveuserx'] = 'cannot revive user {$a}';
 $string['createduserx'] = 'created user {$a}';
 $string['cannotcreateuserx'] = 'cannot create user {$a}';
 $string['invalidauthforuserx'] = 'invalid authentication plugin {$a}';
 $string['invalidauthxforuserx'] = 'invalid authentication plugin {$a->auth} for user {$a->idnumber}';
-$string['jobassignmentstartdateafterenddate'] = 'Job assignment start date must not be later than end date for user {$a->idnumber}';
-$string['orgxnotexist'] = 'Organisation {$a->orgidnumber} does not exist. Skipped user {$a->idnumber}';
-$string['posxnotexist'] = 'Position {$a->posidnumber} does not exist. Skipped user {$a->idnumber}';
-$string['managerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped user {$a->idnumber}';
-$string['appraiserxnotexist'] = 'Appraiser {$a->appraiseridnumber} does not exist. Skipped user {$a->idnumber}';
-$string['selfassignedmanagerx'] = 'User {$a->idnumber} cannot be their own manager. Skipped user {$a->idnumber}';
-$string['selfassignedappraiserx'] = 'User {$a->idnumber} cannot be their own appraiser. Skipped user {$a->idnumber}';
 $string['optionxnotexist'] = 'Option \'{$a->option}\' does not exist for {$a->fieldname} field. Please check user {$a->idnumber}';
 $string['fieldrequired'] = '{$a->fieldname} is a required field and must have a value. Please check user {$a->idnumber}';
 $string['fieldduplicated'] = 'The value \'{$a->value}\' for {$a->fieldname} is a duplicate of existing data and must be unique. Skipped user {$a->idnumber}';
@@ -299,12 +316,6 @@ $string['invalidcaseusernamex'] = 'User {$a->idnumber} has a username, \'{$a->us
 $string['nosynctablemethodforsourcex'] = 'Source {$a} has no get_sync_table method. This needs to be fixed by a programmer.';
 $string['sourcefilexnotfound'] = 'Source file {$a} not found.';
 $string['sourceclassxnotfound'] = 'Source class {$a} not found. This must be fixed by a programmer.';
-$string['managerassignmanagerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassignwoidnumberx'] = 'Manager idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassignwojaidx'] = 'Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassigncanthavejaid'] = 'Manager\'s job assignment idnumber can only be provided if linking by idnumber (invalid configuration)';
-$string['managerassignmissingmanagerjobx'] = 'Manager\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassignmissingjobx'] = 'User\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
 $string['nosourceenabled'] = 'No source enabled for this element.';
 $string['usersyncdisabled'] = 'Skipped user {$a->idnumber} as their HR Import setting is disabled.';
 
@@ -394,10 +405,42 @@ $string['csvencoding'] = 'CSV file encoding';
 // Event.
 $string['eventsynccompleted'] = 'HR Import completed';
 
-// Deprecated.
-$string['cannotcreateuserassignments'] = 'cannot create user assignments (user: {$a})';
-$string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
+// Deprecated since 9.0
 $string['posenddate'] = 'Position end date';
 $string['posstartdate'] = 'Position start date';
 $string['posstartdateafterenddate'] = 'Position start date must not be later than end date for user {$a->idnumber}';
 $string['postitle'] = 'Position title';
+
+// Deprecated since 10.0
+$string['appraiserxnotexist'] = 'Appraiser {$a->appraiseridnumber} does not exist. Skipped user {$a->idnumber}';
+$string['cannotcreateuserassignments'] = 'cannot create user assignments (user: {$a})';
+$string['cannotimportjobassignments'] = 'Cannot create job assignment (user: {$a})';
+$string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
+$string['deletednotforjobassign'] = '<strong>Warning:</strong> the "{$a}" field applies to deleting users. Do not set its value to 1 when you only intend to delete a job assignment.';
+$string['error:linkjobassignmentmismatch'] = '<strong>Warning:</strong> Import set to link to first job assignment, but previous import linked to job assignment id number. This indicates a problem with your HR Import configuration, please contact your site administrator.';
+$string['jobassignmentidnumber'] = 'Job assignment ID number';
+$string['jobassignmentidnumberrequired'] = 'Job assignment ID number must be included when providing other job assignment fields';
+$string['jobassignmentfullname'] = 'Job assignment full name';
+$string['jobassignmentenddate'] = 'Job assignment end date';
+$string['jobassignmentstartdate'] = 'Job assignment start date';
+$string['jobassignmentidnumberemptyx'] = 'Job assignment id number cannot be empty. Skipped job assignment for user {$a->idnumber}';
+$string['jobassignmentstartdateafterenddate'] = 'Job assignment start date must not be later than end date for user {$a->idnumber}';
+$string['linkjobassignmentidnumber'] = 'Link job assignments';
+$string['linkjobassignmentidnumberfalse'] = 'to the user\'s first job assignment';
+$string['linkjobassignmentidnumbertrue'] = 'using the user\'s job assignment ID number';
+$string['linkjobassignmentidnumberdesc'] = 'If job assignment data is provided in the import, it will be linked to existing job assignment records using this method. If linking to the user\'s first job assignment, only one job assignment record can be provided in the import for each user.<br>
+<br>
+Note that the first time an import is performed \'using the user\'s job assignment ID number\' setting, this will become permanently set and the setting will be removed from this form. Make sure that you import job assignment ID Numbers by linking \'to the user\'s first job assignment\' before changing this option.';
+$string['managerassignmanagerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped manager assignment for user {$a->idnumber}';
+$string['managerassignwoidnumberx'] = 'Manager idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
+$string['managerassignwojaidx'] = 'Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
+$string['managerassigncanthavejaid'] = 'Manager\'s job assignment idnumber can only be provided if linking by idnumber (invalid configuration)';
+$string['managerassignmissingmanagerjobx'] = 'Manager\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
+$string['managerassignmissingjobx'] = 'User\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
+$string['managerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped user {$a->idnumber}';
+$string['multiplejobassignmentsdisabledmanagerx'] = 'Tried to create a manager\'s job assignment but multiple job assignments site setting is disabled and the manager already has a different job assignment. Skipped job assignment for user {$a->idnumber}';
+$string['multiplejobassignmentsdisabledx'] = 'Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment for user {$a->idnumber}';
+$string['orgxnotexist'] = 'Organisation {$a->orgidnumber} does not exist. Skipped user {$a->idnumber}';
+$string['posxnotexist'] = 'Position {$a->posidnumber} does not exist. Skipped user {$a->idnumber}';
+$string['selfassignedmanagerx'] = 'User {$a->idnumber} cannot be their own manager. Skipped user {$a->idnumber}';
+$string['selfassignedappraiserx'] = 'User {$a->idnumber} cannot be their own appraiser. Skipped user {$a->idnumber}';

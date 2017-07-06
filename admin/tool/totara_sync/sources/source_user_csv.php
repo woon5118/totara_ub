@@ -93,22 +93,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         }
         unset($fcount);
 
-        if (empty($this->config->import_deleted)) {
-            $deletedwarning = '';
-        } else {
-            // If the deleted field is present, we need to warn that the deleted field only applies
-            // to user records, not job assignments.
-            if (isset($fieldmappings['deleted'])) {
-                // We'll use the mapped field for deleted if it's been defined.
-                $a = $fieldmappings['deleted'];
-            } else {
-                $a = 'deleted';
-            }
-            $deletedwarning = get_string('deletednotforjobassign', 'tool_totara_sync', $a);
-        }
-
         $delimiter = $this->config->delimiter;
-        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct)) . $deletedwarning;
+        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct));
         $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $info, array('class' => "informationbox"))));
 
         // Empty field info.
@@ -287,11 +273,6 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 // Disabled or mapped fields can be ignored
                 continue;
             }
-            // Disable posidnumber completely if Posiition hierarchies are disabled.
-            if ($f == 'posidnumber' && totara_feature_disabled('positions')) {
-                unset($this->config->import_posidnumber);
-                continue;
-            }
             if (!in_array($f, $fields)) {
                 throw new totara_sync_exception($this->get_element_name(), 'importdata', 'csvnotvalidmissingfieldx', $f);
             }
@@ -359,29 +340,6 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow['timemodified']), true);
                 if ($parsed_date) {
                     $dbrow['timemodified'] = $parsed_date;
-                }
-            }
-
-            $datefields = array('jobassignmentstartdate', 'jobassignmentenddate');
-            foreach ($datefields as $datefield) {
-                if (!empty($csvrow[$datefield])) {
-                    // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
-                    $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow[$datefield]), true);
-                    if ($parsed_date) {
-                        $dbrow[$datefield] = $parsed_date;
-                    } elseif (!is_numeric($dbrow[$datefield])) {
-                        // Bad date format.
-                        if (empty($dbrow['idnumber'])) {
-                            $msg = get_string('invaliddateformatforfield', 'tool_totara_sync', $datefield);
-                        } else {
-                            $msg = get_string('invaliddateformatforfieldforuser', 'tool_totara_sync',
-                                array('field' => $datefield, 'user' => $dbrow['idnumber']));
-                        }
-                        totara_sync_log($this->get_element_name(), $msg, 'warn', 'updateusers', false);
-
-                        // Set date to null. We don't want to unset as this will stop the Assignment being added.
-                        $dbrow[$datefield] = null;
-                    }
                 }
             }
 
