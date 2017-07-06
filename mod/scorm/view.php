@@ -186,7 +186,8 @@ if (!$canlaunch) {
 }
 
 if ($canlaunch && !empty($forcejs)) {
-    echo $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "forcejavascriptmessage");
+    $message = $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "container forcejavascriptmessage");
+    echo html_writer::tag('noscript', $message);
 }
 
 if ($canlaunch && $scorm->popup == 1) {
