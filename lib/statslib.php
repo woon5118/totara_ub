@@ -1159,8 +1159,9 @@ function stats_get_parameters($time,$report,$courseid,$mode,$roleid=0) {
         // Totara: roleid may = 0, in which case we append nothing to 'statsreads' etc.
         $rolename = '';
         if ($roleid) {
-            $role = $DB->get_record('role', array('id' => $roleid));
-            $rolename = role_get_name($role, context_course::instance($courseid));
+            if ($role = $DB->get_record('role', ['id' => $roleid])) {
+                $rolename = role_get_name($role, context_course::instance($courseid));
+            }
         }
         $param->line1 = $rolename . get_string('statsreads');
         $param->line2 = $rolename . get_string('statswrites');
