@@ -25,7 +25,8 @@ Feature: Verify different delimiters can be handled in Totara Sync
 
     When I navigate to "Organisation" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | CSV |
+      | Source                      | CSV |
+      | Source contains all records | Yes |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -59,7 +60,8 @@ Feature: Verify different delimiters can be handled in Totara Sync
 
     When I navigate to "Organisation" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | CSV |
+      | Source                      | CSV |
+      | Source contains all records | Yes |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -93,7 +95,8 @@ Feature: Verify different delimiters can be handled in Totara Sync
 
     When I navigate to "Position" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | CSV |
+      | Source                      | CSV |
+      | Source contains all records | Yes |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -128,7 +131,8 @@ Feature: Verify different delimiters can be handled in Totara Sync
 
     When I navigate to "Position" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | CSV |
+      | Source                      | CSV |
+      | Source contains all records | Yes |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -162,7 +166,8 @@ Feature: Verify different delimiters can be handled in Totara Sync
 
     When I navigate to "User" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | CSV |
+      | Source                      | CSV |
+      | Source contains all records | Yes |
     And I press "Save changes"
     Then I should see "Settings saved"
 

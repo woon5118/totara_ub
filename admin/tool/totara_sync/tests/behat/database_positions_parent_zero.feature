@@ -29,7 +29,8 @@ Feature: Verify that parentid is set correctly for position database import.
 
     When I navigate to "Position" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | External Database |
+      | Source                      | External Database |
+      | Source contains all records | Yes               |
     And I press "Save changes"
     Then I should see "Settings saved"
 

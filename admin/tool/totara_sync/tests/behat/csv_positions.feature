@@ -55,7 +55,8 @@ Feature: Use customfields in HR import position upload
     And I "Enable" the "Position" HR Import element
     And I navigate to "Position" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | CSV |
+      | Source                      | CSV |
+      | Source contains all records | Yes |
     And I press "Save changes"
     And I navigate to "CSV" node in "Site administration > HR Import > Sources > Position"
     And I set the following fields to these values:
