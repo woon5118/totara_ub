@@ -209,5 +209,23 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017072700, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2017090500) {
+        $filters = array(
+            'allpositionidnumbers', 'allpositiontypes', 'allposframeids', 'allposframenames', 'allposframeidnumbers',
+            'allorganisationidnumbers', 'allorganisationtypes', 'allorgframeids', 'allorgframenames', 'allorgframeidnumbers',
+            'allmanageridnumbers', 'allmanagerunobsemails', 'allmanagerobsemails',
+        );
+
+        foreach($filters as $fname) {
+            // Update filter to match updated code.
+            reportbuilder_rename_data('filters', '*', 'job_assignment', $fname, 'job_assignment', $fname . 'filter');
+            // Fix saved searches.
+            totara_reportbuilder_migrate_saved_searches('*', 'job_assignment', $fname, 'job_assignment', $fname . 'filter');
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2017090500, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

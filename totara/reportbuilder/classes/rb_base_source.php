@@ -4607,34 +4607,98 @@ abstract class rb_base_source {
             $userjoin                                                          // $joins string | array
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allpositionidnumbers',                                         // value
-            get_string('usersposidnumberall', 'totara_reportbuilder'),      // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allpositionnamesfilter',
+            get_string('usersposnameall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'p.fullname',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {pos} p ON p.id = ja.positionid
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allpositiontypes',                                             // value
-            get_string('userspostypeall', 'totara_reportbuilder'),          // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allpositionidnumbersfilter',
+            get_string('usersposidnumberall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'p.idnumber',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {pos} p ON p.id = ja.positionid
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allposframeids',                                               // value
-            get_string('usersposframeidall', 'totara_reportbuilder'),       // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allpositiontypesfilter',
+            get_string('userspostypeall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'pt.fullname',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {pos} p ON p.id = ja.positionid
+                                        JOIN {pos_type} pt ON p.typeid = pt.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allposframenames',                                             // value
-            get_string('usersposframenameall', 'totara_reportbuilder'),     // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allposframeidsfilter',
+            get_string('usersposframeidall', 'totara_reportbuilder'),
+            'correlated_subquery_number',
+            array(
+                'searchfield' => 'pf.id',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {pos} p ON p.id = ja.positionid
+                                        JOIN {pos_framework} pf ON p.frameworkid = pf.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allposframeidnumbers',                                         // value
-            get_string('usersposframeidnumberall', 'totara_reportbuilder'), // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allposframenamesfilter',
+            get_string('usersposframenameall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'pf.fullname',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {pos} p ON p.id = ja.positionid
+                                        JOIN {pos_framework} pf ON p.frameworkid = pf.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
+        );
+        $filteroptions[] = new rb_filter_option(
+            'job_assignment',
+            'allposframeidnumbersfilter',
+            get_string('usersposframeidnumberall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'pf.idnumber',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {pos} p ON p.id = ja.positionid
+                                        JOIN {pos_framework} pf ON p.frameworkid = pf.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
 
         // Organisation field filters.
@@ -4652,34 +4716,98 @@ abstract class rb_base_source {
             $userjoin                                                          // $joins string | array
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allorganisationidnumbers',                                     // value
-            get_string('usersorgidnumberall', 'totara_reportbuilder'),      // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allorganisationnamesfilter',
+            get_string('usersorgnameall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'o.fullname',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {org} o ON o.id = ja.organisationid
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allorganisationtypes',                                         // value
-            get_string('usersorgtypeall', 'totara_reportbuilder'),          // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allorganisationidnumbersfilter',
+            get_string('usersorgidnumberall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'o.idnumber',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {org} o ON o.id = ja.organisationid
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allorgframeids',                                               // value
-            get_string('usersorgframeidall', 'totara_reportbuilder'),       // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allorganisationtypesfilter',
+            get_string('usersorgtypeall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'ot.fullname',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {org} o ON o.id = ja.organisationid
+                                        JOIN {org_type} ot ON o.typeid = ot.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allorgframenames',                                             // value
-            get_string('usersorgframenameall', 'totara_reportbuilder'),     // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allorgframeidsfilter',
+            get_string('usersorgframeidall', 'totara_reportbuilder'),
+            'correlated_subquery_number',
+            array(
+                'searchfield' => 'of.id',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {org} o ON o.id = ja.organisationid
+                                        JOIN {org_framework} of ON o.frameworkid = of.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allorgframeidnumbers',                                         // value
-            get_string('usersorgframeidnumberall', 'totara_reportbuilder'), // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allorgframenamesfilter',
+            get_string('usersorgframenameall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'of.fullname',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {org} o ON o.id = ja.organisationid
+                                        JOIN {org_framework} of ON o.frameworkid = of.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
+        );
+        $filteroptions[] = new rb_filter_option(
+            'job_assignment',
+            'allorgframeidnumbersfilter',
+            get_string('usersorgframeidnumberall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'of.idnumber',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {org} o ON o.id = ja.organisationid
+                                        JOIN {org_framework} of ON o.frameworkid = of.id
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
 
         // Manager field filters.
@@ -4698,26 +4826,56 @@ abstract class rb_base_source {
             $userjoin                                                          // $joins string | array
         );
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allmanageridnumbers',                                          // value
-            get_string('usersmanageridnumberall', 'totara_reportbuilder'),  // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allmanageridnumbersfilter',
+            get_string('usersmanageridnumberall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'u.idnumber',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {job_assignment} mja ON mja.id = ja.managerjaid
+                                        JOIN {user} u ON u.id = mja.userid
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
         $canview = !empty($CFG->showuseridentity) && in_array('email', explode(',', $CFG->showuseridentity));
         $canview |= has_capability('moodle/site:config', context_system::instance());
         if ($canview) {
             $filteroptions[] = new rb_filter_option(
-                'job_assignment',                                                   // type
-                'allmanagerunobsemails',                                            // value
-                get_string('usersmanagerunobsemailall', 'totara_reportbuilder'),    // label
-                'text'                                                              // filtertype
+                'job_assignment',
+                'allmanagerunobsemailsfilter',
+                get_string('usersmanagerunobsemailall', 'totara_reportbuilder'),
+                'correlated_subquery_text',
+                array(
+                    'searchfield' => 'u.email',
+                    'subquery' => "EXISTS(SELECT 'x'
+                                            FROM {job_assignment} ja
+                                            JOIN {job_assignment} mja ON mja.id = ja.managerjaid
+                                            JOIN {user} u ON u.id = mja.userid
+                                           WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+                ),
+                "{$userjoin}.{$userfield}",
+                $userjoin
             );
         }
         $filteroptions[] = new rb_filter_option(
-            'job_assignment',                                               // type
-            'allmanagerobsemails',                                          // value
-            get_string('usersmanagerobsemailall', 'totara_reportbuilder'),  // label
-            'text'                                                          // filtertype
+            'job_assignment',
+            'allmanagerobsemailsfilter',
+            get_string('usersmanagerobsemailall', 'totara_reportbuilder'),
+            'correlated_subquery_text',
+            array(
+                'searchfield' => 'u.email',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {job_assignment} ja
+                                        JOIN {job_assignment} mja ON mja.id = ja.managerjaid
+                                        JOIN {user} u ON u.id = mja.userid
+                                       WHERE ja.userid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$userjoin}.{$userfield}",
+            $userjoin
         );
 
         // Appraiser field filters.
