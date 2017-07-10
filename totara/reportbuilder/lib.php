@@ -1,6 +1,4 @@
 <?php
-use Behat\Behat\Exception\Exception;
-
 /*
  * This file is part of Totara LMS
  *
@@ -3859,8 +3857,13 @@ class reportbuilder {
                 $reportdb = $this->get_report_db();
                 $this->set_full_count($reportdb->count_records_sql($sql, $params));
             } catch (dml_read_exception $e) {
-                $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
-                print_error('error:problemobtainingreportdata', 'totara_reportbuilder', '', $debuginfo);
+                // We are wrapping this exception to provide a more user friendly error message.
+                if ($this->is_cached()) {
+                    $message = 'error:problemobtainingcachedreportdata';
+                } else {
+                    $message = 'error:problemobtainingreportdata';
+                }
+                print_error($message, 'totara_reportbuilder', $e->getMessage(), $e->debuginfo);
             }
         }
         return $this->_fullcount;
@@ -3887,8 +3890,13 @@ class reportbuilder {
                 $reportdb = $this->get_report_db();
                 $this->set_filtered_count($reportdb->count_records_sql($sql, $params));
             } catch (dml_read_exception $e) {
-                $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
-                print_error('error:problemobtainingcachedreportdata', 'totara_reportbuilder', '', $debuginfo);
+                // We are wrapping this exception to provide a more user friendly error message.
+                if ($this->is_cached()) {
+                    $message = 'error:problemobtainingcachedreportdata';
+                } else {
+                    $message = 'error:problemobtainingreportdata';
+                }
+                print_error($message, 'totara_reportbuilder', '', $e->getMessage(), $e->debuginfo);
             }
         }
         return $this->_filteredcount;
@@ -4231,14 +4239,13 @@ class reportbuilder {
 
         } catch (dml_read_exception $e) {
 
-            // We are masking this exception to provide a user readable exception.
+            // We are wrapping this exception to provide a more user friendly error message.
             if ($this->is_cached()) {
                 $message = 'error:problemobtainingcachedreportdata';
             } else {
                 $message = 'error:problemobtainingreportdata';
             }
-            $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
-            throw new moodle_exception($message, 'totara_reportbuilder', '', null, $debuginfo);
+            throw new moodle_exception($message, 'totara_reportbuilder', '', $e->getMessage(), $e->debuginfo);
 
         }
 
