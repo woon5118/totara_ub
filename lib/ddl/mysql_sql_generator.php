@@ -349,6 +349,8 @@ class mysql_sql_generator extends sql_generator {
                     }
                     $sqlarr[$i] .= " DEFAULT COLLATE $collation $rowformat";
                 }
+                // Totara: MariaDB 10.2 and MySQL 8 do not like compressed format for temp tables.
+                $sqlarr[$i] = str_replace('ROW_FORMAT=Compressed', 'ROW_FORMAT=Dynamic', $sqlarr[$i]);
             }
         }
 
