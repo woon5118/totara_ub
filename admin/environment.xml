@@ -161,9 +161,6 @@
         </FEEDBACK>
       </CUSTOM_CHECK>
       <CUSTOM_CHECK file="lib/upgradelib.php" function="check_mysql_large_prefix" level="required">
-        <FEEDBACK>
-          <ON_ERROR message="unsupporteddblargeprefix" />
-        </FEEDBACK>
       </CUSTOM_CHECK>
     </CUSTOM_CHECKS>
   </TOTARA>

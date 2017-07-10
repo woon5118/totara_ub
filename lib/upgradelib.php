@@ -2273,6 +2273,17 @@ function check_mysql_large_prefix(environment_results $result) {
         $charset = $DB->get_charset();
         if ($charset === 'utf8mb4') {
             if (!$DB->is_large_prefix_enabled()) {
+                $result->setFeedbackStr('unsupporteddblargeprefix');
+                $result->setStatus(false);
+                return $result;
+            }
+            $result->setStatus(true);
+            return $result;
+        } else {
+            // Totara: we want large prefix for Report builder caching!
+            $result->setLevel('optional');
+            if (!$DB->is_large_prefix_enabled()) {
+                $result->setFeedbackStr('unsupporteddblargeprefix');
                 $result->setStatus(false);
                 return $result;
             }
