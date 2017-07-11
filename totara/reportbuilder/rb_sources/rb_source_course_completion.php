@@ -580,7 +580,10 @@ class rb_source_course_completion extends rb_base_source {
                 'course_completion',
                 'enrolltype',
                 get_string('courseenroltypes', 'totara_reportbuilder'),
-                'text'
+                'text',
+                array(
+                    'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
+                )
             ),
         );
 

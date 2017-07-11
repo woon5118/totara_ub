@@ -1045,19 +1045,16 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             $DB->delete_records('report_builder_filters', array('reportid' => $rb->_id, 'type' => $filter->type, 'value' => $filter->value));
         }
 
-        // TODO: skip some sources until TL-14821 gets fixed
-        if ($sourcename !== 'course_completion_by_org' and $sourcename !== 'course_completion') {
-            // Now genrate the cache table and run the query.
-            $this->enable_caching($bigreportid);
-            $rb = new reportbuilder($bigreportid);
-            if ($rb->cache) {
-                list($sql, $params, $cacheschedule) = $rb->build_query(false, true, true);
-                $rs = $DB->get_counted_recordset_sql($sql, $params);
-                $rs->close();
-            }
-
-            reportbuilder_purge_cache($bigreportid, false);
+        // Now generate the cache table and run the query.
+        $this->enable_caching($bigreportid);
+        $rb = new reportbuilder($bigreportid);
+        if ($rb->cache) {
+            list($sql, $params, $cacheschedule) = $rb->build_query(false, true, true);
+            $rs = $DB->get_counted_recordset_sql($sql, $params);
+            $rs->close();
         }
+
+        reportbuilder_purge_cache($bigreportid, false);
 
         if ($DB->get_dbfamily() === 'mysql') {
             $DB->execute("SET sort_buffer_size=$prevsbs");
