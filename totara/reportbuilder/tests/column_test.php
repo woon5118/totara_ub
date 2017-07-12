@@ -1023,6 +1023,19 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             }
         }
 
+        if ($DB->get_dbfamily() === 'mysql') {
+            if ($sourcename === 'facetoface_sessions') {
+                // This source has way too many columns for MySQL when using 4byte unicode collations,
+                // we need to drop some basic columns and related filters.
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'fullname'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'namelink'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'namelinkicon'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'email'));
+                $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'fullname'));
+                $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'email'));
+            }
+        }
+
         // Remove all filters that are not compatible with caching.
         foreach ($rb->filters as $filter) {
             /** @var rb_filter_type $filter */
