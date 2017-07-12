@@ -3,6 +3,7 @@
     <TOTARA version="10" requires="9">
         <CUSTOM_CHECKS>
             <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_check"/>
+            <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_read_committed_snapshot"/>
         </CUSTOM_CHECKS>
     </TOTARA>
 </COMPATIBILITY_MATRIX>
