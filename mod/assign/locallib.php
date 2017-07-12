@@ -2324,7 +2324,7 @@ class assign {
                 $uniqueid = 0;
                 if ($submission->blindmarking && !$submission->revealidentities) {
                     if (empty($submission->recordid)) {
-                        $uniqueid = self::get_uniqueid_for_user_static($submission->assignment, $user->id);
+                        $uniqueid = self::get_uniqueid_for_user_static($submission->assignment, $grader->id);
                     } else {
                         $uniqueid = $submission->recordid;
                     }
