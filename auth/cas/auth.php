@@ -29,7 +29,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/auth/ldap/auth.php');
-require_once($CFG->dirroot.'/auth/cas/CAS/CAS.php');
+// Totara: do not dare to include the CAS library here!!!
 
 /**
  * CAS authentication plugin.
@@ -184,6 +184,9 @@ class auth_plugin_cas extends auth_plugin_ldap {
      */
     function connectCAS() {
         global $CFG;
+        // Totara: include CAS library only when really necessary!!!!
+        require_once($CFG->dirroot.'/auth/cas/CAS/CAS.php');
+
         static $connected = false;
 
         if (!$connected) {
