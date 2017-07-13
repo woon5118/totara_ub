@@ -693,12 +693,12 @@ class cache implements cache_loader {
      * For stores that don't support key tests this functionality is mimicked by using the equivalent get method.
      * Just one more reason you should not use these methods unless you have a very good reason to do so.
      *
+     * NOTE: second parameter $tryloadifpossible was removed in Totara 10
+     *
      * @param string|int $key
-     * @param bool $tryloadifpossible If set to true, the cache doesn't contain the key, and there is another cache loader or
-     *      data source then the code will try load the key value from the next item in the chain.
      * @return bool True if the cache has the requested key, false otherwise.
      */
-    public function has($key, $tryloadifpossible = false) {
+    public function has($key) {
         if ($this->static_acceleration_has($key)) {
             // Hoorah, that was easy. It exists in the static acceleration array so we definitely have it.
             return true;
@@ -720,17 +720,11 @@ class cache implements cache_loader {
             // Either no TTL is set of the store supports its handling natively.
             $has = $this->store->has($parsedkey);
         }
-        if (!$has && $tryloadifpossible) {
-            if ($this->loader !== false) {
-                $result = $this->loader->get($parsedkey);
-            } else if ($this->datasource !== null) {
-                $result = $this->datasource->load_for_cache($key);
-            }
-            $has = ($result !== null);
-            if ($has) {
-                $this->set($key, $result);
-            }
+
+        if (func_num_args() > 1) {
+            debugging('Parameter $tryloadifpossible was removed from has() method', DEBUG_DEVELOPER);
         }
+
         return $has;
     }
 
@@ -2074,12 +2068,12 @@ class cache_session extends cache {
      * For stores that don't support key tests this functionality is mimicked by using the equivalent get method.
      * Just one more reason you should not use these methods unless you have a very good reason to do so.
      *
+     * NOTE: second parameter $tryloadifpossible was removed in Totara 10
+     *
      * @param string|int $key
-     * @param bool $tryloadifpossible If set to true, the cache doesn't contain the key, and there is another cache loader or
-     *      data source then the code will try load the key value from the next item in the chain.
      * @return bool True if the cache has the requested key, false otherwise.
      */
-    public function has($key, $tryloadifpossible = false) {
+    public function has($key) {
         $this->check_tracked_user();
         $parsedkey = $this->parse_key($key);
         $store = $this->get_store();
@@ -2099,18 +2093,11 @@ class cache_session extends cache {
             /* @var cache_store|cache_is_key_aware $store */
             $has = $store->has($parsedkey);
         }
-        if (!$has && $tryloadifpossible) {
-            $result = null;
-            if ($this->get_loader() !== false) {
-                $result = $this->get_loader()->get($parsedkey);
-            } else if ($this->get_datasource() !== null) {
-                $result = $this->get_datasource()->load_for_cache($key);
-            }
-            $has = ($result !== null);
-            if ($has) {
-                $this->set($key, $result);
-            }
+
+        if (func_num_args() > 1) {
+            debugging('Parameter $tryloadifpossible was removed from has() method', DEBUG_DEVELOPER);
         }
+
         return $has;
     }
 

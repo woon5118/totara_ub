@@ -538,7 +538,9 @@ class core_cache_testcase extends advanced_testcase {
         // It won't be there yet.
         $this->assertFalse($cache->has('Test'));
         // It should load it ;).
-        $this->assertTrue($cache->has('Test', true));
+        $this->assertDebuggingNotCalled();
+        $this->assertFalse($cache->has('Test', true)); // Totara: the second parameter was removed!
+        $this->assertDebuggingCalled();
 
         // Purge it to be sure.
         $this->assertTrue($cache->purge());
