@@ -2465,7 +2465,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         if (!empty($search['search'])) {
             // Search programs that have specified words in their names/summaries.
             $searchterms = preg_split('|\s+|', trim($search['search']), 0, PREG_SPLIT_NO_EMPTY);
-            $searchterms = array_filter($searchterms, create_function('$v', 'return strlen($v) > 1;'));
+            $searchterms = array_filter($searchterms, function($v) {return strlen($v) > 1;});
             $programlist = prog_get_programs_search($searchterms, 'p.sortorder ASC', 0, 9999999, $totalcount, $type);
             self::sort_records($programlist, $sortfields);
             $records = array_slice($programlist, $offset, $limit, true);

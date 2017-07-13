@@ -81,7 +81,7 @@ if (!empty($selected)) {
 }
 
 $contextids = array_filter($context->get_parent_context_ids(true),
-    create_function('$a', 'return has_capability("moodle/cohort:view", context::instance_by_id($a));'));
+    function($a) {return has_capability("moodle/cohort:view", context::instance_by_id($a));});
 list($contextssql, $params) = $DB->get_in_or_equal($contextids);
 
 $sql = "SELECT *

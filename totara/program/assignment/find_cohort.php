@@ -44,7 +44,7 @@ $selectedids = totara_prog_removed_selected_ids($programid, $selected, $removed,
 
 // Get cohorts.
 $contextids = array_filter($context->get_parent_context_ids(true),
-    create_function('$a', 'return has_capability("moodle/cohort:view", context::instance_by_id($a));'));
+    function($a) {return has_capability("moodle/cohort:view", context::instance_by_id($a));});
 list($contextssql, $params) = $DB->get_in_or_equal($contextids, SQL_PARAMS_QM, 'param', true);
 
 $sql = "SELECT id, name, idnumber FROM {cohort} WHERE contextid {$contextssql}";

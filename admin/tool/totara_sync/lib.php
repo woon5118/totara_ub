@@ -408,7 +408,7 @@ function totara_sync_notify() {
     $logcount = count($logitems);
     $sitename = get_site();
     $sitename = format_string($sitename->fullname);
-    $notifytypes_str = array_map(create_function('$type', "return get_string(\$type.'plural', 'tool_totara_sync');"), $notifytypes);
+    $notifytypes_str = array_map(function($type) {return get_string($type.'plural', 'tool_totara_sync');}, $notifytypes);
     $subject = get_string('notifysubject', 'tool_totara_sync', $sitename);
 
     $a = new stdClass();

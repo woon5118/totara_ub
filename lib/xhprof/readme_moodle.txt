@@ -37,3 +37,5 @@ TODO:
 20110318 - MDL-26891 - Eloy Lafuente (stronk7): Implemented earlier profiling runs
 20130621 - MDL-39733 - Eloy Lafuente (stronk7): Export & import of profiling runs
 20160721 - MDL-55292 - Russell Smith (mr-russ): Add support for tideways profiler collection for PHP7
+
+TL-14971 - replaced deprecated create_function()

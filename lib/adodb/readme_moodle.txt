@@ -27,5 +27,6 @@ Our changes:
  * Removed random seed initialization from lib/adodb/adodb.inc.php:216 (see 038f546 and MDL-41198).
  * MDL-52286 Added muting erros in ADORecordSet::__destruct().
    Check if fixed upstream during the next upgrade and remove this note.
+ * Replaced create_function() with normal functions
 
 skodak, iarenaza, moodler, stronk7, abgreeve, lameze

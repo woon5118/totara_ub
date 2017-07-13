@@ -345,7 +345,7 @@ switch ($searchtype) {
             }
         }
         $contextids = array_filter($context->get_parent_context_ids(true),
-            create_function('$a', 'return has_capability("moodle/cohort:view", context::instance_by_id($a));'));
+            function($a) {return has_capability("moodle/cohort:view", context::instance_by_id($a));});
         $equal = true;
         if (!isset($instanceid) && $contextids) {
             // User passed capability check, search through entire cohort including all contextids.

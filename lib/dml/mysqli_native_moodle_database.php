@@ -1836,14 +1836,14 @@ class mysqli_native_moodle_database extends moodle_database {
         $rv = "SELECT $falias.".
             preg_replace('/,/', ','.$falias.'.', $fields).
             " FROM ($selects[0]) $falias";
+        $fields = preg_split('/,/', $fields);
         for ($i = 1; $i < count($selects); $i++) {
             $alias = 'intsctal'.($aliascnt++);
-            $rv .= " JOIN (".$selects[$i].") $alias ON ".
-                join(' AND ',
-                    array_map(
-                        create_function('$a', 'return "'.$falias.'.$a = '.$alias.'.$a";'),
-                        preg_split('/,/', $fields))
-                );
+            $ons = array();
+            foreach ($fields as $f) {
+                $ons[] = "$falias.$f = $alias.$f";
+            }
+            $rv .= " JOIN (".$selects[$i].") $alias ON ". join(' AND ', $ons);
         }
         return $rv;
     }

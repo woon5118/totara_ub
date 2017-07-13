@@ -815,8 +815,8 @@ class prog_content {
                 // This is so annoying, we should never use the likes of create_function.
                 // However we can be sure it is safe, absolutely no content at all comes from the user.
                 // It is entirely generated from hard coded strings in the foreach above.
-                $completionoptional = create_function('', "return {$completionoptional};");
-                if ($completionoptional()) {
+                // HACK ALERT: this IS eval(), do not obscure it by using deprecated create_function() !
+                if (eval("return {$completionoptional};")) {
                     unset($courseset_groups[$key]);
                 }
             }

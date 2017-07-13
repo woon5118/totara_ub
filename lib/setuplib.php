@@ -1112,9 +1112,8 @@ function workaround_max_input_vars() {
         return;
     }
 
-    $delim = '&';
-    $fun = create_function('$p', 'return implode("'.$delim.'", $p);');
-    $chunks = array_map($fun, array_chunk(explode($delim, $str), $max));
+    $fun = function($p) {return implode('&', $p);};
+    $chunks = array_map($fun, array_chunk(explode('&', $str), $max));
 
     // Clear everything from existing $_POST array, otherwise it might be included
     // twice (this affects array params primarily).
