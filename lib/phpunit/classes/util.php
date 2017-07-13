@@ -245,7 +245,13 @@ class phpunit_util extends testing_util {
         if (class_exists('totara_core\jsend', false)) {
             \totara_core\jsend::set_phpunit_testdata(null);
         }
-        session_id(''); // Totara Connect fakes the sid in tests.
+        if (session_id() !== '') {
+            // Totara Connect fakes the sid in tests.
+            if (session_status() == PHP_SESSION_ACTIVE) {
+                session_destroy();
+            }
+            session_id('');
+        }
 
         // Check if report builder has been loaded and if so reset the source object cache.
         // Don't autoload here - it won't work.

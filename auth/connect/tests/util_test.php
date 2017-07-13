@@ -3062,7 +3062,11 @@ class auth_connect_util_testcase extends advanced_testcase {
         $ssotoken = sha1('fogpigfd');
         $sid = md5('xxxzfzfdz');
 
-        session_id($sid);
+        @session_id($sid);
+        if ($sid !== session_id()) {
+            $this->markTestSkipped('This PHP does not support changing of session id from CLI');
+        }
+
         $this->setUser(null);
         jsend::set_phpunit_testdata(array(array('status' => 'success', 'data' => $serveruser)));
 
@@ -3162,7 +3166,12 @@ class auth_connect_util_testcase extends advanced_testcase {
         $sid3 = md5('zzz');
 
         $this->set_auth_enabled(true);
-        session_id($sid1);
+
+        @session_id($sid1);
+        if ($sid1 !== session_id()) {
+            $this->markTestSkipped('This PHP does not support changing of session id from CLI');
+        }
+
         $this->setUser(null);
 
         // Valid first.
