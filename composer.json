@@ -16,7 +16,7 @@
         "behat/behat": "3.2.*",
         "totara/behat-extension": "@dev",
 
-        "php": ">=5.6.5 <7.2",
+        "php": ">=5.6.5 <7.3",
         "ext-iconv": "*",
         "ext-mbstring": "*",
         "ext-curl": "*",
