@@ -3787,12 +3787,12 @@ class reportbuilder {
         $wheresql = (count($where) > 0) ? "WHERE " . implode("\n    AND ", $where) . "\n" : '';
 
         $groupsql = '';
-        if (count($group) > 0 && !$allgrouped) {
+        if ($group && !$allgrouped) {
             $groupsql = ' GROUP BY ' . implode(', ', $group) . ' ';
         }
 
         $havingsql = '';
-        if (count($having) > 0) {
+        if ($having) {
             $havingsql = ' HAVING ' . implode(' AND ', $having) . "\n";
         }
 

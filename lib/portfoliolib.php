@@ -1241,7 +1241,7 @@ function portfolio_rewrite_pluginfile_url_callback($contextid, $component, $file
     // Navigates to the node.
     $xpath = new DOMXPath($dom);
     $nodes = $xpath->query('/html/body/child::*');
-    if (empty($nodes) || count($nodes) > 1) {
+    if (empty($nodes) || $nodes->length > 1) {
         // Unexpected sequence, none or too many nodes.
         return $matches;
     }

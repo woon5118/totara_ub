@@ -73,7 +73,7 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
     public static function assertNotTag($matcher, $actual, $message = '', $ishtml = true) {
         $dom = PHPUnit_Util_XML::load($actual, $ishtml);
         $tags = self::findNodes($dom, $matcher, $ishtml);
-        $matched = count($tags) > 0 && $tags[0] instanceof DOMNode;
+        $matched = isset($tags[0]) && $tags[0] instanceof DOMNode; // Totara: count is slow and cannot be used on false!
         self::assertFalse($matched, $message);
     }
 

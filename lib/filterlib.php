@@ -1489,7 +1489,10 @@ function filter_remove_duplicates($linkarray) {
  * @param array $ignoretags            an array of saved strings useful to rebuild the original text (in/out)
  **/
 function filter_save_ignore_tags(&$text, $filterignoretagsopen, $filterignoretagsclose, &$ignoretags) {
-
+    if ($ignoretags === null) {
+        // Totara: initialise arrays properly to allow count()
+        $ignoretags = array();
+    }
     // Remove everything enclosed by the ignore tags from $text
     foreach ($filterignoretagsopen as $ikey=>$opentag) {
         $closetag = $filterignoretagsclose[$ikey];
