@@ -5046,15 +5046,26 @@ class progress_bar implements renderable, templatable {
     }
 
     /**
+     * Set the progress of the bar
+     *
+     * @param int $percent the progress of the task
+     */
+    public function set_progress($percent) {
+        $this->percent = max(min($percent, 100), 0);
+    }
+
+    /**
      * Export for template.
      *
      * @param  renderer_base $output The renderer.
      * @return array
      */
     public function export_for_template(renderer_base $output) {
+
         return [
             'id' => $this->html_id,
             'width' => $this->width,
+            'progress' => $this->percent,
         ];
     }
 }

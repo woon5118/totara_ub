@@ -2091,6 +2091,7 @@ $string['trainer'] = 'Trainer';
 $string['trainerdescription'] = 'Responsible for delivering training of learners, but may not alter activities.';
 $string['editingtrainer'] = 'Editing Trainer';
 $string['editingtrainerdescription'] = 'Responsible for delivering training of learners, and can alter activities';
+$string['xpercent'] = '{$a}%';
 
 // Deprecated since Moodle 3.1.
 $string['filetoolarge'] = 'is too large to upload';

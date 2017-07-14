@@ -22,13 +22,16 @@
     Example context (json):
     {
         "id": "progressbar_test",
-        "width": "500"
+        "width": 0,
+        "progress": 1
     }
 }}
-<div class="progressbar_container" style="width: {{width}}px;" id="{{id}}">
+<div class="progressbar_container"{{#width}} style="width: {{width}}px;"{{/width}} id="{{id}}">
     <h2 id="{{id}}_status"></h2>
     <div class="progress progress-striped active">
-        <div id="{{id}}_bar" class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">&nbsp;</div>
+        <div id="{{id}}_bar" class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{progress}}" style="width:{{progress}}%">
+            <span class="progressbar__text">{{#str}}xpercent, core, {{progress}}{{/str}}</span>
+        </div>
     </div>
     <p id="{{id}}_estimate"></p>
 </div>
@@ -41,13 +44,62 @@
         statusIndicator = document.getElementById('{{id}}_status'),
         estimateIndicator = document.getElementById('{{id}}_estimate');
 
+    /**
+     * Updates visibility of heading and estimate if they're empty
+     */
+    function checkText() {
+        if (statusIndicator.textContent === '') {
+            statusIndicator.style.display = 'none';
+        } else {
+            statusIndicator.style.display = '';
+        }
+
+        if (estimateIndicator.textContent === '') {
+            estimateIndicator.style.display = 'none';
+        } else {
+            estimateIndicator.style.display = '';
+        }
+    }
+
+    /**
+     * Updates display of progress bar text based on the size of the text
+     */
+    function checkInvert() {
+        var progressBarText = progressBar.getElementsByClassName('progressbar__text')[0];
+        var margin = document.dir === "ltr" ? 'margin-left' : 'margin-right';
+        if (progressBar.clientWidth <= parseInt(getComputedStyle(progressBarText).width, 10)) {
+            el.classList.add('progress-invert');
+            pb = progressBar;
+            progressBarText.style[margin] = progressBar.clientWidth + 'px'
+        } else {
+            el.classList.remove('progress-invert');
+            progressBarText.style[margin] = 0;
+        }
+    }
+
+    checkText();
+    checkInvert();
+
     el.addEventListener('update', function(e) {
         var msg = e.detail.message,
             percent = e.detail.percent,
             estimate = e.detail.estimate;
 
         statusIndicator.textContent = msg;
-        progressBar.textContent = '' + percent + '%';
+        if (typeof require === 'function') {
+            // requireJS has been loaded - get the appropriate string
+            require(['core/str'], function (strlib) {
+                strlib.get_string('xpercent', 'core', percent).done(function (str) {
+                    progressBar.getElementsByClassName('progressbar__text')[0].textContent = str;
+                    checkInvert();
+                })
+            })
+        } else {
+            // requireJS is not available
+            progressBar.getElementsByClassName('progressbar__text')[0].textContent = percent + '%';
+            checkInvert();
+        }
+
         if (percent === 100) {
             el.classList.add('progress-success');
             estimateIndicator.textContent = '';
@@ -59,8 +111,13 @@
             }
             el.classList.remove('progress-success');
         }
+
+        checkText();
         progressBar.setAttribute('aria-valuenow', percent);
-        progressBar.setAttribute('style', 'width: ' + percent + '%');
+        progressBar.style.width = percent + '%';
     });
+
+    progressBar.addEventListener('transitionend', checkInvert);
+    progressBar.addEventListener('transitioncancel', checkInvert);
 })();
 </script>
