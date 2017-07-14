@@ -169,14 +169,12 @@ class mysqli_native_moodle_database extends moodle_database {
 
         // Look for current engine of our config table (the first table that gets created),
         // so that we create all tables with the same engine.
-        $sql = "SELECT engine
-                  FROM INFORMATION_SCHEMA.TABLES
-                 WHERE table_schema = DATABASE() AND table_name = '{$this->prefix}config'";
+        $sql = "SHOW TABLE STATUS WHERE name = '{$this->prefix}config'";
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
         $this->query_end($result);
         if ($rec = $result->fetch_assoc()) {
-            $engine = $rec['engine'];
+            $engine = $rec['Engine'];
         }
         $result->close();
 
@@ -258,14 +256,12 @@ class mysqli_native_moodle_database extends moodle_database {
 
         // Look for current collation of our config table (the first table that gets created),
         // so that we create all tables with the same collation.
-        $sql = "SELECT collation_name
-                  FROM INFORMATION_SCHEMA.COLUMNS
-                 WHERE table_schema = DATABASE() AND table_name = '{$this->prefix}config' AND column_name = 'value'";
+        $sql = "SHOW TABLE STATUS WHERE Name = '{$this->prefix}config'";
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
         $this->query_end($result);
         if ($rec = $result->fetch_assoc()) {
-            $collation = $rec['collation_name'];
+            $collation = $rec['Collation'];
             if (strpos($collation, $charset . '_') !== 0) {
                 // We cannot continue, admin needs to fix config.php!
                 throw new moodle_exception("Unexpected collation '{$collation}' detected in the config table, admin needs to add it to config.php dbcollation setting and verify all existing database tables");
@@ -317,12 +313,16 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return string row_format name or null if not known or table does not exist.
      */
     public function get_row_format($table = null) {
+        $info = $this->get_server_info();
+        if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0', '>')) {
+            // Totara: MySQL 8 supports only new file formats.
+            return 'Barracuda';
+        }
+
         $rowformat = null;
         if (isset($table)) {
             $table = $this->mysqli->real_escape_string($table);
-            $sql = "SELECT row_format
-                      FROM INFORMATION_SCHEMA.TABLES
-                     WHERE table_schema = DATABASE() AND table_name = '{$this->prefix}$table'";
+            $sql = "SHOW TABLE STATUS WHERE Name = '{$this->prefix}$table'";
         } else {
             $sql = "SHOW VARIABLES LIKE 'innodb_file_format'";
         }
@@ -331,7 +331,7 @@ class mysqli_native_moodle_database extends moodle_database {
         $this->query_end($result);
         if ($rec = $result->fetch_assoc()) {
             if (isset($table)) {
-                $rowformat = $rec['row_format'];
+                $rowformat = $rec['Row_format'];
             } else {
                 $rowformat = $rec['Value'];
             }
@@ -357,7 +357,10 @@ class mysqli_native_moodle_database extends moodle_database {
         $engine = strtolower($this->get_dbengine());
         $info = $this->get_server_info();
 
-        if (version_compare($info['version'], '5.5.0') < 0) {
+        if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0', '>')) {
+            // Totara: MySQL 8 supports only new file formats.
+            $this->compressedrowformatsupported = ($engine === 'innodb' or $engine === 'xtradb');
+        } else if (version_compare($info['version'], '5.5.0') < 0) {
             // MySQL 5.1 is not supported here because we cannot read the file format.
             $this->compressedrowformatsupported = false;
 
@@ -385,6 +388,12 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return bool True if on otherwise false.
      */
     public function is_file_per_table_enabled() {
+        $info = $this->get_server_info();
+        if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0' ,'>')) {
+            // Totara: MySQL 8 supports only new file formats.
+            return true;
+        }
+
         if ($filepertable = $this->get_record_sql("SHOW VARIABLES LIKE 'innodb_file_per_table'")) {
             if ($filepertable->value == 'ON') {
                 return true;
@@ -399,6 +408,12 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return bool True if on otherwise false.
      */
     public function is_large_prefix_enabled() {
+        $info = $this->get_server_info();
+        if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0', '>')) {
+            // Totara: MySQL 8 supports only new file formats.
+            return true;
+        }
+
         if ($largeprefix = $this->get_record_sql("SHOW VARIABLES LIKE 'innodb_large_prefix'")) {
             if ($largeprefix->value == 'ON') {
                 return true;
@@ -467,20 +482,13 @@ class mysqli_native_moodle_database extends moodle_database {
     public function diagnose() {
         $sloppymyisamfound = false;
         $prefix = str_replace('_', '\\_', $this->prefix);
-        $sql = "SELECT COUNT('x')
-                  FROM INFORMATION_SCHEMA.TABLES
-                 WHERE table_schema = DATABASE()
-                       AND table_name LIKE BINARY '$prefix%'
-                       AND Engine = 'MyISAM'";
+        $sql = "SHOW TABLE STATUS WHERE Name LIKE BINARY '$prefix%' AND Engine = 'MyISAM'";
         $this->query_start($sql, null, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
         $this->query_end($result);
         if ($result) {
-            if ($arr = $result->fetch_assoc()) {
-                $count = reset($arr);
-                if ($count) {
-                    $sloppymyisamfound = true;
-                }
+            if ($result->num_rows) {
+                $sloppymyisamfound = true;
             }
             $result->close();
         }
@@ -701,12 +709,7 @@ class mysqli_native_moodle_database extends moodle_database {
 
         $structure = array();
 
-        $sql = "SELECT column_name, data_type, character_maximum_length, numeric_precision,
-                       numeric_scale, is_nullable, column_type, column_default, column_key, extra
-                  FROM information_schema.columns
-                 WHERE table_name = '" . $this->prefix.$table . "'
-                       AND table_schema = '" . $this->dbname . "'
-              ORDER BY ordinal_position";
+        $sql = "SHOW COLUMNS FROM {$this->prefix}{$table}";
         $this->query_start($sql, null, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
         $this->query_end(true); // Don't want to throw anything here ever. MDL-30147
@@ -715,89 +718,11 @@ class mysqli_native_moodle_database extends moodle_database {
             return array();
         }
 
-        if ($result->num_rows > 0) {
-            // standard table exists
-            while ($rawcolumn = $result->fetch_assoc()) {
-                $info = (object)$this->get_column_info((object)$rawcolumn);
-                $structure[$info->name] = new database_column_info($info);
-            }
-            $result->close();
-
-        } else {
-            // temporary tables are not in information schema, let's try it the old way
-            $result->close();
-            $sql = "SHOW COLUMNS FROM {$this->prefix}$table";
-            $this->query_start($sql, null, SQL_QUERY_AUX);
-            $result = $this->mysqli->query($sql);
-            $this->query_end(true);
-            if ($result === false) {
-                return array();
-            }
-            while ($rawcolumn = $result->fetch_assoc()) {
-                $rawcolumn = (object)array_change_key_case($rawcolumn, CASE_LOWER);
-                $rawcolumn->column_name              = $rawcolumn->field; unset($rawcolumn->field);
-                $rawcolumn->column_type              = $rawcolumn->type; unset($rawcolumn->type);
-                $rawcolumn->character_maximum_length = null;
-                $rawcolumn->numeric_precision        = null;
-                $rawcolumn->numeric_scale            = null;
-                $rawcolumn->is_nullable              = $rawcolumn->null; unset($rawcolumn->null);
-                $rawcolumn->column_default           = $rawcolumn->default; unset($rawcolumn->default);
-                $rawcolumn->column_key               = $rawcolumn->key; unset($rawcolumn->default);
-
-                if (preg_match('/(enum|varchar)\((\d+)\)/i', $rawcolumn->column_type, $matches)) {
-                    $rawcolumn->data_type = $matches[1];
-                    $rawcolumn->character_maximum_length = $matches[2];
-
-                } else if (preg_match('/([a-z]*int[a-z]*)\((\d+)\)/i', $rawcolumn->column_type, $matches)) {
-                    $rawcolumn->data_type = $matches[1];
-                    $rawcolumn->numeric_precision = $matches[2];
-                    $rawcolumn->max_length = $rawcolumn->numeric_precision;
-
-                    $type = strtoupper($matches[1]);
-                    if ($type === 'BIGINT') {
-                        $maxlength = 18;
-                    } else if ($type === 'INT' or $type === 'INTEGER') {
-                        $maxlength = 9;
-                    } else if ($type === 'MEDIUMINT') {
-                        $maxlength = 6;
-                    } else if ($type === 'SMALLINT') {
-                        $maxlength = 4;
-                    } else if ($type === 'TINYINT') {
-                        $maxlength = 2;
-                    } else {
-                        // This should not happen.
-                        $maxlength = 0;
-                    }
-                    if ($maxlength < $rawcolumn->max_length) {
-                        $rawcolumn->max_length = $maxlength;
-                    }
-
-                } else if (preg_match('/(decimal)\((\d+),(\d+)\)/i', $rawcolumn->column_type, $matches)) {
-                    $rawcolumn->data_type = $matches[1];
-                    $rawcolumn->numeric_precision = $matches[2];
-                    $rawcolumn->numeric_scale = $matches[3];
-
-                } else if (preg_match('/(double|float)(\((\d+),(\d+)\))?/i', $rawcolumn->column_type, $matches)) {
-                    $rawcolumn->data_type = $matches[1];
-                    $rawcolumn->numeric_precision = isset($matches[3]) ? $matches[3] : null;
-                    $rawcolumn->numeric_scale = isset($matches[4]) ? $matches[4] : null;
-
-                } else if (preg_match('/([a-z]*text)/i', $rawcolumn->column_type, $matches)) {
-                    $rawcolumn->data_type = $matches[1];
-                    $rawcolumn->character_maximum_length = -1; // unknown
-
-                } else if (preg_match('/([a-z]*blob)/i', $rawcolumn->column_type, $matches)) {
-                    $rawcolumn->data_type = $matches[1];
-
-                } else {
-                    $rawcolumn->data_type = $rawcolumn->column_type;
-                }
-
-                $info = $this->get_column_info($rawcolumn);
-                $structure[$info->name] = new database_column_info($info);
-            }
-            $result->close();
+        while ($rawcolumn = $result->fetch_assoc()) {
+            $info = $this->get_column_info((object)$rawcolumn);
+            $structure[$info->name] = new database_column_info($info);
         }
+        $result->close();
 
         if ($usecache) {
             if ($this->temptables->is_temptable($table)) {
@@ -816,15 +741,19 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return stdClass standardised colum info
      */
     private function get_column_info(stdClass $rawcolumn) {
-        $rawcolumn = (object)$rawcolumn;
+        preg_match('/^([a-z]+)(\((.+)\))?( unsigned)?/', $rawcolumn->Type, $matches);
+        $type = strtolower($matches[1]);
+        $precision = isset($matches[3]) ? $matches[3] : '';
+        $unsigned = isset($matches[4]);
+
         $info = new stdClass();
-        $info->name           = $rawcolumn->column_name;
-        $info->type           = $rawcolumn->data_type;
-        $info->meta_type      = $this->mysqltype2moodletype($rawcolumn->data_type);
-        $info->default_value  = $rawcolumn->column_default;
-        $info->has_default    = !is_null($rawcolumn->column_default);
-        $info->not_null       = ($rawcolumn->is_nullable === 'NO');
-        $info->primary_key    = ($rawcolumn->column_key === 'PRI');
+        $info->name           = $rawcolumn->Field;
+        $info->type           = $type;
+        $info->meta_type      = $this->mysqltype2moodletype($type);
+        $info->default_value  = $rawcolumn->Default;
+        $info->has_default    = !is_null($rawcolumn->Default);
+        $info->not_null       = ($rawcolumn->Null === 'NO');
+        $info->primary_key    = ($rawcolumn->Key === 'PRI');
         $info->binary         = false;
         $info->unsigned       = null;
         $info->auto_increment = false;
@@ -832,7 +761,8 @@ class mysqli_native_moodle_database extends moodle_database {
         $info->scale          = null;
 
         if ($info->meta_type === 'C') {
-            $info->max_length = $rawcolumn->character_maximum_length;
+            $info->max_length = $precision;
+            $info->max_length = $precision;
 
         } else if ($info->meta_type === 'I') {
             if ($info->primary_key) {
@@ -840,44 +770,39 @@ class mysqli_native_moodle_database extends moodle_database {
                 $info->unique    = true;
             }
             // Return number of decimals, not bytes here.
-            $info->max_length    = $rawcolumn->numeric_precision;
-            if (preg_match('/([a-z]*int[a-z]*)\((\d+)\)/i', $rawcolumn->column_type, $matches)) {
-                $type = strtoupper($matches[1]);
-                if ($type === 'BIGINT') {
-                    $maxlength = 18;
-                } else if ($type === 'INT' or $type === 'INTEGER') {
-                    $maxlength = 9;
-                } else if ($type === 'MEDIUMINT') {
-                    $maxlength = 6;
-                } else if ($type === 'SMALLINT') {
-                    $maxlength = 4;
-                } else if ($type === 'TINYINT') {
-                    $maxlength = 2;
-                } else {
-                    // This should not happen.
-                    $maxlength = 0;
-                }
-                // It is possible that display precision is different from storage type length,
-                // always use the smaller value to make sure our data fits.
-                if ($maxlength < $info->max_length) {
-                    $info->max_length = $maxlength;
-                }
+            $info->max_length    = $precision;
+            if ($type === 'bigint') {
+                $maxlength = 18;
+            } else if ($type === 'int' or $type === 'integer') {
+                $maxlength = 9;
+            } else if ($type === 'mediumint') {
+                $maxlength = 6;
+            } else if ($type === 'smallint') {
+                $maxlength = 4;
+            } else if ($type === 'tinyint') {
+                $maxlength = 2;
+            } else {
+                // This should not happen.
+                $maxlength = 2;
             }
-            $info->unsigned      = (stripos($rawcolumn->column_type, 'unsigned') !== false);
-            $info->auto_increment= (strpos($rawcolumn->extra, 'auto_increment') !== false);
+            // It is possible that display precision is different from storage type length,
+            // always use the smaller value to make sure our data fits.
+            if ($maxlength < $info->max_length) {
+                $info->max_length = $maxlength;
+            }
+
+            $info->unsigned      = $unsigned;
+            $info->auto_increment= (strpos($rawcolumn->Extra, 'auto_increment') !== false);
 
         } else if ($info->meta_type === 'N') {
-            $info->max_length    = $rawcolumn->numeric_precision;
-            $info->scale         = $rawcolumn->numeric_scale;
-            $info->unsigned      = (stripos($rawcolumn->column_type, 'unsigned') !== false);
+            $parts = explode(',', $precision);
+            $info->max_length    = (int)$parts[0];
+            $info->scale         = isset($parts[1]) ? (int)$parts[1] : 0;
+            $info->unsigned      = $unsigned;
 
         } else if ($info->meta_type === 'X') {
-            if ("$rawcolumn->character_maximum_length" === '4294967295') { // watch out for PHP max int limits!
-                // means maximum moodle size for text column, in other drivers it may also mean unknown size
-                $info->max_length = -1;
-            } else {
-                $info->max_length = $rawcolumn->character_maximum_length;
-            }
+            // We do not really know what are the limits.
+            $info->max_length    = -1;
             $info->primary_key   = false;
 
         } else if ($info->meta_type === 'B') {
@@ -1629,6 +1554,17 @@ class mysqli_native_moodle_database extends moodle_database {
         // Totara: Future MySQL versions will have case and accent sensitive collations, for now just look for the _bin versions.
         $bincollate = $this->get_charset() . '_bin';
 
+        $dbcollation = $this->get_dbcollation();
+        if (strpos($dbcollation, '_as_cs') !== false) {
+            // Totara: admin configured MySQL 8 properly!
+            if ($casesensitive) {
+                return "$fieldname $equalop $param";
+            }
+            $col = ($accentsensitive ? '_as' : '_ai') . '_ci';
+            $collation = str_replace('_as_cs', $col, $dbcollation);
+            return "$fieldname COLLATE $collation $equalop $param";
+        }
+
         if ($casesensitive) {
             // Current MySQL versions do not support case sensitive and accent insensitive.
             return "$fieldname COLLATE $bincollate $equalop $param";
@@ -1680,6 +1616,17 @@ class mysqli_native_moodle_database extends moodle_database {
         $bincollate = $this->get_charset() . '_bin';
 
         $LIKE = $notlike ? 'NOT LIKE' : 'LIKE';
+
+        $dbcollation = $this->get_dbcollation();
+        if (strpos($dbcollation, '_as_cs') !== false) {
+            // Totara: admin configured MySQL 8 properly!
+            if ($casesensitive) {
+                return "$fieldname $LIKE $param ESCAPE '$escapechar'";
+            }
+            $col = ($accentsensitive ? '_as' : '_ai') . '_ci';
+            $collation = str_replace('_as_cs', $col, $dbcollation);
+            return "$fieldname $LIKE $param COLLATE $collation ESCAPE '$escapechar'";
+        }
 
         if ($casesensitive) {
             // Current MySQL versions do not support case sensitive and accent insensitive.
