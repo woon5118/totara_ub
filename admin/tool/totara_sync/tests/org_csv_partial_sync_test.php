@@ -211,5 +211,37 @@ class tool_totara_sync_org_partial_sync_testcase extends advanced_testcase {
         $this->assertSame($this->org_data4['fullname'], $organisations['4']->fullname);
         $this->assertArrayNotHasKey('2', $organisations);
     }
+
+    public function test_parial_sync_update_records() {
+        global $DB;
+
+        $extraimportfields = array(
+            'import_deleted' => '1'
+        );
+
+        // Set the config.
+        $config = array_merge($this->configcsv, $this->importfields(), $extraimportfields);
+        $this->set_config($config, 'totara_sync_source_org_csv');
+        $config = array_merge($this->config, array('sourceallrecords' => 0));
+        $this->set_config($config, 'totara_sync_element_org');
+
+        // Import file that doesn't contain all records,
+        // the missing records should be removed.
+        $data = file_get_contents(__DIR__ . '/fixtures/org_partial_sync_3.csv');
+        $filepath = $this->filedir . '/csv/ready/org.csv';
+        file_put_contents($filepath, $data);
+
+        $this->assertCount(4, $DB->get_records('org', array('frameworkid' => $this->org_framework_data1['id']))); // Initially we should have 4 users.
+        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+
+        $organisations = $DB->get_records('org', array('frameworkid' => $this->org_framework_data1['id']));
+        $this->assertCount(3, $organisations); // After the sync we should have 3 organisations.
+
+        // Check the records that exist are the ones we expect and the update has been made correctly.
+        $this->assertEquals('Organisation 1 Updated', $organisations['1']->fullname);
+        $this->assertSame('Organisation 3', $organisations['3']->fullname);
+        $this->assertSame('Organisation 4', $organisations['4']->fullname);
+        $this->assertArrayNotHasKey('2', $organisations);
+    }
 }
 

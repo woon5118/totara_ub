@@ -149,7 +149,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                                  WHERE (ii.totarasync = 1 AND ss.idnumber IS NULL)
                                     OR ss.timemodified = ii.timemodified
                             )";
-        } else if ($this->config->sourceallrecords = 0 && $deletedcolumnpresent) {
+        } else if ($this->config->sourceallrecords == 0 && $deletedcolumnpresent) {
             // If the source doesn't contain all records then we don't
             // want to create/update ones marked as deleted.
             // Note that the deleted column should always be present.

@@ -211,5 +211,38 @@ class tool_totara_sync_pos_partial_sync_testcase extends advanced_testcase {
         $this->assertSame($this->pos_data4['fullname'], $positions['4']->fullname);
         $this->assertArrayNotHasKey('2', $positions);
     }
+
+
+    public function test_parial_sync_update_records() {
+        global $DB;
+
+        $extraimportfields = array(
+            'import_deleted' => '1'
+        );
+
+        // Set the config.
+        $config = array_merge($this->configcsv, $this->importfields(), $extraimportfields);
+        $this->set_config($config, 'totara_sync_source_pos_csv');
+        $config = array_merge($this->config, array('sourceallrecords' => 0));
+        $this->set_config($config, 'totara_sync_element_pos');
+
+        // Import file that doesn't contain all records,
+        // the missing records should be removed.
+        $data = file_get_contents(__DIR__ . '/fixtures/pos_partial_sync_3.csv');
+        $filepath = $this->filedir . '/csv/ready/pos.csv';
+        file_put_contents($filepath, $data);
+
+        $this->assertCount(4, $DB->get_records('pos', array('frameworkid' => $this->pos_framework_data1['id']))); // Initially we should have 4 users.
+        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+
+        $positions = $DB->get_records('pos', array('frameworkid' => $this->pos_framework_data1['id']));
+        $this->assertCount(3, $positions); // After the sync we should have 3 positions.
+
+        // Check the records that exist are the ones we expect and the update has been made successfully.
+        $this->assertEquals('Position 1 Updated', $positions['1']->fullname);
+        $this->assertSame('Position 3', $positions['3']->fullname);
+        $this->assertSame('Position 4', $positions['4']->fullname);
+        $this->assertArrayNotHasKey('2', $positions);
+    }
 }
 
