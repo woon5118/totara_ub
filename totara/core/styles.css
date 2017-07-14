@@ -24,20 +24,19 @@ img.totara_progress_bar_medium {
     height: 12px;
     background: transparent url('[[pix:totara_core|progress-icons]]') no-repeat;
 }
-
-.dir-rtl span.coursecompletionstatus span {
+.dir-rtl .coursecompletionstatus {
     background-image: url('[[pix:totara_core|progress-icons-rtl]]');
 }
 
-span.coursecompletionstatus span.completion-inprogress {
+.coursecompletionstatus.completion-inprogress {
     background-position: 0 -12px;
 }
 
-span.coursecompletionstatus span.completion-complete {
+.coursecompletionstatus.completion-complete {
     background-position: 0 -24px;
 }
 
-span.coursecompletionstatus span.completion-completeviarpl {
+.coursecompletionstatus.completion-completeviarpl {
     background-position: 0 -24px;
 }
 
