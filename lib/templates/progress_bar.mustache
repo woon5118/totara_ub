@@ -19,11 +19,28 @@
 
     Progress bar.
 
+    Classes required for JS (in this template):
+    * progressbar__text. Contains the readable text.
+
+    Data attributes required for JS:
+    * popover.id if a popover element is supplied to this object
+
+    Context variables required for this template:
+    * id string The HTML id of this component. This has a default value supplied by the supporting class.
+        This is required for JavaScript to work correctly
+    * progress integer How much of the progress bar should be filled (as a percentage)
+
     Example context (json):
     {
         "id": "progressbar_test",
         "width": 0,
-        "progress": 1
+        "progress": 1,
+        "popover": {
+          "title": "title",
+          "contentraw": "blah blah blah",
+          "contenttemplate": "",
+          "contenttemplatecontext": false
+        }
     }
 }}
 <div class="progressbar_container"{{#width}} style="width: {{width}}px;"{{/width}} id="{{id}}">
@@ -33,6 +50,7 @@
             <span class="progressbar__text">{{#str}}xpercent, core, {{progress}}{{/str}}</span>
         </div>
     </div>
+    {{#popover}}{{> core/popover}}{{/popover}}
     <p id="{{id}}_estimate"></p>
 </div>
 

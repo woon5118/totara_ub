@@ -4500,6 +4500,8 @@ class progress_bar implements renderable, templatable {
     private $lastupdate = 0;
     /** @var int when did we start printing this */
     private $time_start = 0;
+    /** @var \core\output\popover Popover for this component */
+    private $popover = null;
 
     /**
      * Constructor
@@ -4656,6 +4658,15 @@ class progress_bar implements renderable, templatable {
     }
 
     /**
+     * Adds a popover element to this action
+     *
+     * @param \core\output\popover Popover to add
+     */
+    public function add_popover(\core\output\popover $popover) {
+        $this->popover = $popover;
+    }
+
+    /**
      * Export for template.
      *
      * @param  renderer_base $output The renderer.
@@ -4663,11 +4674,17 @@ class progress_bar implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
 
-        return [
+        $returnval = [
             'id' => $this->html_id,
             'width' => $this->width,
             'progress' => $this->percent,
         ];
+
+        if ($this->popover instanceof \core\output\popover) {
+            $returnval['popover'] = $this->popover->export_for_template($output);
+        }
+
+        return $returnval;
     }
 
     /**

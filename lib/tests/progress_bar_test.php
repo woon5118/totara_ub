@@ -32,6 +32,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use core\output\popover;
+
 global $CFG;
 require_once($CFG->libdir . '/outputcomponents.php');
 
@@ -86,5 +88,32 @@ require_once($CFG->libdir . '/outputcomponents.php');
         // large value
         $progress_bar->set_progress(5000);
         $this->assertEquals($progress_bar->export_for_template($OUTPUT)['progress'], 100);
+    }
+
+    public function test_popover_integration() {
+        global $OUTPUT;
+
+        $content = 'Hi there';
+        $title = 'my title';
+
+        $popover = popover::create_from_text($content, $title);
+
+        $progress_bar = new progress_bar('abc', 0);
+        $progress_bar->set_progress(10);
+        $progress_bar->add_popover($popover);
+
+        $expected = array(
+            'id' => 'abc',
+            'width' => 0,
+            'progress' => 10,
+            'popover' => array(
+                'contenttemplate' => false,
+                'contenttemplatecontext' => false,
+                'title' => $title,
+                'contentraw' => $content
+            )
+        );
+
+        $this->assertSame($expected, $progress_bar->export_for_template($OUTPUT));
     }
  }
