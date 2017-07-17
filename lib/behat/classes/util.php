@@ -48,11 +48,6 @@ class behat_util extends testing_util {
     const BEHATSITENAME = "Acceptance test site";
 
     /**
-     * @var array Files to skip when resetting dataroot folder
-     */
-    protected static $datarootskiponreset = array('.', '..', 'behat', 'behattestdir.txt');
-
-    /**
      * @var array Files to skip when dropping dataroot folder
      */
     protected static $datarootskipondrop = array('.', '..', 'lock');
@@ -74,7 +69,9 @@ class behat_util extends testing_util {
             behat_error(BEHAT_EXITCODE_INSTALLED);
         }
 
-        // New dataroot.
+        // Torara: Empty dataroot and initialise it.
+        self::drop_dataroot();
+        testing_initdataroot($CFG->dataroot, 'behat');
         self::reset_dataroot();
 
         $options = array();
@@ -103,12 +100,7 @@ class behat_util extends testing_util {
         // Some more Totara tricks.
         $DB->set_field('task_scheduled', 'disabled', 1, array('component' => 'tool_langimport')); // No cron lang updates in behat.
 
-        // Totara: Add behat filesystem repository to eliminate problematic file uploads in behat.
-        mkdir("$CFG->dataroot/repository/behat", 02777, true);
-
-        // We need to keep the installed dataroot filedir files.
-        // So each time we reset the dataroot before running a test, the default files are still installed.
-        self::save_original_data_files();
+        // Totara: there is no need to save filedir files, we do not delete them in tests!
 
         $frontpagesummary = new admin_setting_special_frontpagedesc();
         $frontpagesummary->write_setting(self::BEHATSITENAME);
@@ -174,7 +166,6 @@ class behat_util extends testing_util {
             throw new coding_exception('This method can be only used by Behat CLI tool');
         }
 
-        self::reset_dataroot();
         self::drop_database(true);
         self::drop_dataroot();
     }
@@ -185,13 +176,13 @@ class behat_util extends testing_util {
     public static function drop_dataroot() {
         global $CFG;
 
-        // As behat directory is now created under default $CFG->behat_dataroot_parent, so remove the whole dir.
-        if ($CFG->behat_dataroot !== $CFG->behat_dataroot_parent) {
-            remove_dir($CFG->behat_dataroot, false);
-        } else {
+        if ($CFG->behat_dataroot === $CFG->behat_dataroot_parent) {
             // It should never come here.
             throw new moodle_exception("Behat dataroot should not be same as parent behat data root.");
         }
+
+        // As behat directory is now created under default $CFG->behat_dataroot_parent, so remove the whole dir.
+        remove_dir($CFG->dataroot, false);
     }
 
     /**
@@ -376,6 +367,23 @@ class behat_util extends testing_util {
      */
     public final static function get_test_file_path() {
         return behat_command::get_parent_behat_dir() . '/test_environment_enabled.txt';
+    }
+
+    /**
+     * Purge dataroot directory
+     * @static
+     * @return void
+     */
+    public static function reset_dataroot() {
+        global $CFG;
+
+        // Totara: Clear file status cache to make sure we know about all files.
+        clearstatcache();
+
+        parent::reset_dataroot();
+
+        // Totara: Add behat filesystem repository to eliminate problematic file uploads in behat.
+        mkdir("$CFG->dataroot/repository/behat", 02777, true);
     }
 
     /**

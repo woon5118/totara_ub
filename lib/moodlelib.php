@@ -9420,7 +9420,9 @@ function remove_dir($dir, $contentonly=false) {
     // TOTARA: This is our version of remove_dir, its much safer than Moodle's version.
 
     // First up clear stats cache, we need all ops to be accurate.
-    clearstatcache();
+    if (!PHPUNIT_TEST) {
+        clearstatcache();
+    }
 
     if (!file_exists($dir)) {
         // Nothing to do.
@@ -9511,7 +9513,9 @@ function remove_dir($dir, $contentonly=false) {
     }
 
     // Clear the stat cache once more now that the directory has been deleted.
-    clearstatcache();
+    if (!PHPUNIT_TEST) {
+        clearstatcache();
+    }
 
     // It doesn't hurt to have it twice, and having it after clearstatcache is good.
     // This will also ensure the directory exists should something be relying upon it.
