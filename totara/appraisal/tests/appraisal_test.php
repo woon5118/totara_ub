@@ -602,7 +602,7 @@ class appraisal_test extends appraisal_testcase {
         // and occasionally, PHPUnit runs so fast that the timestamp is updated
         // in the same second it was created. Thus, there is a sleep() here to
         // stop the test from failing further down.
-        sleep(1);
+        $this->waitForSecond();
         $user1ja->update($jobroleupdates);
 
         // User1 should now be missing roles except learner and team lead. Note
@@ -786,7 +786,7 @@ class appraisal_test extends appraisal_testcase {
         // and occasionally, PHPUnit runs so fast that the timestamp is updated
         // in the same second it was created. Thus, there is a sleep() here to
         // stop the test from failing further down.
-        sleep(1);
+        $this->waitForSecond();
         $user1ja->update(array('managerjaid' => $manager2ja->id, 'appraiserid' => $appraiser2->id));
 
         // There should be no missing roles.
@@ -1087,7 +1087,7 @@ class appraisal_test extends appraisal_testcase {
         // and occasionally, PHPUnit runs so fast that the timestamp is updated
         // in the same second it was created. Thus, there is a sleep() here to
         // stop the test from failing further down.
-        sleep(1);
+        $this->waitForSecond();
         $user1ja->update($jobroleupdates);
 
         // Simulate a cron run.
@@ -1209,7 +1209,7 @@ class appraisal_test extends appraisal_testcase {
         // and occasionally, PHPUnit runs so fast that the timestamp is updated
         // in the same second it was created. Thus, there is a sleep() here to
         // stop the test from failing further down.
-        sleep(1);
+        $this->waitForSecond();
         $user1ja->update($jobroleupdates);
 
         // Simulate a cron run.
@@ -1327,7 +1327,7 @@ class appraisal_test extends appraisal_testcase {
         // and occasionally, PHPUnit runs so fast that the timestamp is updated
         // in the same second it was created. Thus, there is a sleep() here to
         // stop the test from failing further down.
-        sleep(1);
+        $this->waitForSecond();
         $user1ja->update($jobroleupdates);
 
         // Simulate a cron run.
@@ -1458,7 +1458,7 @@ class appraisal_test extends appraisal_testcase {
         // and occasionally, PHPUnit runs so fast that the timestamp is updated
         // in the same second it was created. Thus, there is a sleep() here to
         // stop the test from failing further down.
-        sleep(1);
+        $this->waitForSecond();
         $user1ja->update($jobroleupdates);
 
         // Simulate a cron run.

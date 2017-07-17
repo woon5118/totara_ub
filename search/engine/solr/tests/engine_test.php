@@ -177,7 +177,7 @@ class search_solr_engine_testcase extends advanced_testcase {
         $this->assertTrue($this->search->index());
 
         // Not anymore as everything was already added.
-        sleep(1);
+        $this->waitForSecond(); // Totara: wait for the next second only.
         $this->assertFalse($this->search->index());
 
         $this->generator->create_record();
@@ -219,9 +219,9 @@ class search_solr_engine_testcase extends advanced_testcase {
         $this->assertCount(0, $this->search->search($querydata));
         $querydata->q = 'message';
 
-        sleep(1);
+        $this->waitForSecond(); // Totara: wait for the next second only.
         $beforeadding = time();
-        sleep(1);
+        $this->waitForSecond(); // Totara: wait for the next second only.
         $this->generator->create_record();
         $this->search->index();
 
