@@ -176,7 +176,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_cancel_requests() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         list($fdbck, $users) = $this->prepare_feedback_with_users(2);
         $fdbck->activate();
         $respuser = $this->getDataGenerator()->create_user();
@@ -200,7 +199,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_cancel_resp_assignment() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         list($fdbck, $users) = $this->prepare_feedback_with_users();
         $fdbck->activate();
         $respuser = $this->getDataGenerator()->create_user();
@@ -237,7 +235,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_cancel_user_assignment() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         list($fdbck, $users) = $this->prepare_feedback_with_users(2);
         $fdbck->activate();
         $user1 = current($users);
@@ -268,7 +265,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_anon_cancel_user_assignment() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         list($fdbck, $users) = $this->prepare_feedback_with_users(2, 1, true);
         $fdbck->activate();
         $user1 = current($users);
@@ -334,7 +330,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_get_available_forms() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         // Create 2 feedbacks for 3 users.
         list($fdbck1, $users) = $this->prepare_feedback_with_users(3);
         list($fdbck2) = $this->prepare_feedback_with_users($users);
@@ -414,7 +409,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_postupdate_answers() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         list($fdbck, $users, $quests) = $this->prepare_feedback_with_users(1, 2);
         $fdbck->activate();
         $user = current($users);
@@ -441,7 +435,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_prepare_answers() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         list($fdbck, $users, $quests) = $this->prepare_feedback_with_users(1, 2);
         $fdbck->activate();
         $user = current($users);
@@ -469,7 +462,6 @@ class feedback360_test extends feedback360_testcase {
     public function test_save_answers() {
         global $DB;
         $this->resetAfterTest();
-        $this->preventResetByRollback();
         list($fdbck, $users, $quests) = $this->prepare_feedback_with_users(1, 2);
         $fdbck->activate();
         $user = current($users);

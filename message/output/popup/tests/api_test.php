@@ -47,7 +47,6 @@ class message_popup_api_testcase extends advanced_testcase {
      * This is executed before running any test in this file.
      */
     public function setUp() {
-        $this->preventResetByRollback(); // Messaging is not compatible with transactions.
         $this->messagesink = $this->redirectMessages();
         $this->resetAfterTest();
     }
