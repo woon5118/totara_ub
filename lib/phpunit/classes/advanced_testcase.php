@@ -497,6 +497,7 @@ abstract class advanced_testcase extends base_testcase {
      */
     public static function tearDownAfterClass() {
         self::resetAllData();
+        parent::tearDownAfterClass();
     }
 
 

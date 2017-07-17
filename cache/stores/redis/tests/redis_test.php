@@ -59,13 +59,25 @@ class cachestore_redis_test extends cachestore_tests {
             $this->markTestSkipped('Could not test cachestore_redis. Requirements are not met.');
         }
         parent::setUp();
+        cache_factory::instance(true);
+        cache_factory::reset();
+        cache_config_testing::create_default_configuration();
     }
+
     protected function tearDown() {
         if ($this->store instanceof cachestore_redis) {
             $this->store->purge();
         }
         $this->store = null;
         parent::tearDown();
+    }
+
+    /**
+     * Final task is to reset the cache system
+     */
+    public static function tearDownAfterClass() {
+        cache_factory::reset();
+        parent::tearDownAfterClass();
     }
 
     /**
