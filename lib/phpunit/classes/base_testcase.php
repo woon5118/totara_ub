@@ -38,6 +38,13 @@
  */
 abstract class base_testcase extends PHPUnit_Framework_TestCase {
     // @codingStandardsIgnoreStart
+
+    /** @var float tracks the total time waiting for the next second */
+    protected $totalwaitforsecond;
+
+    /** @var int last start of class testing */
+    static $lastclassstarttime = null;
+
     // Following code is legacy code from phpunit to support assertTag
     // and assertNotTag.
 
@@ -568,6 +575,75 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
         }
 
         return str_replace('  ', ' ', $result);
+    }
+
+    /**
+     * @internal
+     * @return string
+     */
+    public static function get_profiling_filepath_method() {
+        global $DB;
+        return __DIR__ . '/../../../phpunit_profile_methods_' . $DB->get_dbfamily() . '.csv';
+    }
+
+    /**
+     * @internal
+     * @return string
+     */
+    public static function get_profiling_filepath_class() {
+        global $DB;
+        return __DIR__ . '/../../../phpunit_profile_classes_' . $DB->get_dbfamily() . '.csv';
+    }
+
+    public function runBare() {
+        if (!defined('PHPUNIT_PROFILING')) {
+            parent::runBare();
+            return;
+        }
+
+        static $fp = null;
+        if ($fp === null) {
+            $filepath = self::get_profiling_filepath_method();
+            @unlink($filepath);
+            $fp = fopen($filepath, 'w+');
+            // The file handle will get closed automatically at the end when phpunit terminates.
+            fputcsv($fp, array('execution time', 'waiting time', 'memory increase', 'method', 'class'));
+        }
+
+        $startmemory = memory_get_usage();
+
+        $this->totalwaitforsecond = 0;
+        $timestart = microtime(true);
+        parent::runBare();
+        $totaltime = microtime(true) - $timestart;
+
+        $name = $this->getName(true);
+        $classname = get_class($this);
+        $memdiff = memory_get_usage() - $startmemory;
+
+        fputcsv($fp, array(number_format($totaltime, 2), number_format($this->totalwaitforsecond, 2), $memdiff, $name, $classname));
+    }
+
+    public static function tearDownAfterClass() {
+        if (!defined('PHPUNIT_PROFILING')) {
+            parent::tearDownAfterClass();
+            return;
+        }
+
+        if (self::$lastclassstarttime === null) {
+            @unlink(self::get_profiling_filepath_class());
+            // Static variables do not work here, let's use static property instead.
+            self::$lastclassstarttime = filectime(self::get_profiling_filepath_method());
+        }
+
+        $totaltime = microtime(true) - self::$lastclassstarttime;
+        $classname = get_called_class();
+
+        $fp = fopen(self::get_profiling_filepath_class(), 'a+');
+        fputcsv($fp, array(number_format($totaltime, 2), $classname));
+        fclose($fp);
+
+        self::$lastclassstarttime = microtime(true);
     }
 
     // @codingStandardsIgnoreEnd

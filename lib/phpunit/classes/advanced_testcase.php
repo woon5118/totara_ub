@@ -668,5 +668,7 @@ abstract class advanced_testcase extends base_testcase {
             echo "usleep() does NOT work: $prevtime >= $now !!!";
             sleep(1);
         }
+
+        $this->totalwaitforsecond += (microtime(true) - $timestart);
     }
 }
