@@ -46,7 +46,7 @@ $string['filterdate'] = 'Date filter';
 $string['filterdate_help'] = 'This filter allows you to filter information from:
 
 * before and / or after given dates,
-* a number of daye before or after today,
+* a number of days before or after today,
 * list any records where no date is set.';
 $string['filternumber'] = 'Number filter';
 $string['filternumber_help'] = '
