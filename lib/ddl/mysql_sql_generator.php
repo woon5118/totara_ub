@@ -91,13 +91,17 @@ class mysql_sql_generator extends sql_generator {
     /** Maximum size of InnoDB row in Antelope file format */
     const ANTELOPE_MAX_ROW_SIZE = 8126;
 
+    /** @var array cache of snapshot table infos for PHPUnit */
+    private $snapshottables = null;
+
     /**
      * Reset a sequence to the id field of a table.
      *
      * @param xmldb_table|string $table name of table or the table object.
+     * @param int $offset the next id offset
      * @return array of sql statements
      */
-    public function getResetSequenceSQL($table) {
+    public function getResetSequenceSQL($table, $offset = 0) {
 
         if ($table instanceof xmldb_table) {
             $tablename = $table->getName();
@@ -107,7 +111,7 @@ class mysql_sql_generator extends sql_generator {
 
         // From http://dev.mysql.com/doc/refman/5.0/en/alter-table.html
         $value = (int)$this->mdb->get_field_sql('SELECT MAX(id) FROM {'.$tablename.'}');
-        $value++;
+        $value = $value + 1 + (int)$offset;
         return array("ALTER TABLE $this->prefix$tablename AUTO_INCREMENT = $value");
     }
 
@@ -1104,5 +1108,164 @@ class mysql_sql_generator extends sql_generator {
             'YEAR_MONTH',
             'ZEROFILL',
         ];
+    }
+
+    /**
+     * Does table with this fullname exist?
+     *
+     * Note that standard db prefix is not used here because
+     * the test snapshots must use non-colliding table names.
+     *
+     * @param string $fulltablename
+     * @return bool
+     */
+    private function general_table_exists($fulltablename) {
+        $status = $this->mdb->get_record_sql("SHOW TABLE STATUS WHERE Name = ?", array($fulltablename));
+        return !empty($status);
+    }
+
+    /**
+     * Store full database snapshot.
+     */
+    public function snapshot_create() {
+        $this->mdb->transactions_forbidden();
+        $prefix = $this->mdb->get_prefix();
+
+        if (strpos('ss_', $prefix) === 0) {
+            throw new coding_exception('Detected incorrect db prefix, cannot snapshot database due to potential data loss!');
+        }
+
+        if ($this->general_table_exists('ss_config')) {
+            throw new coding_exception('Detected ss_config table, cannot snapshot database due to potential data loss!');
+        }
+
+        $sqls = array();
+        $sqls[] = "DROP TABLE IF EXISTS ss_tables_{$prefix}";
+        $sqls[] = "CREATE TABLE ss_tables_{$prefix} (
+                      tablename VARCHAR(64) NOT NULL,
+                      nextid INTEGER NULL,
+                      records INTEGER NOT NULL,
+                      modifications INTEGER NOT NULL
+                    )";
+        $sqls[] = "CREATE UNIQUE INDEX ss_tables_{$prefix}_idx ON ss_tables_{$prefix} (tablename)";
+        $this->mdb->change_database_structure($sqls, null);
+
+        $sqls = array();
+        $tables = $this->mdb->get_tables(false);
+        foreach ($tables as $tablename => $unused) {
+            $status = $this->mdb->get_record_sql("SHOW TABLE STATUS WHERE name = ?", array($prefix.$tablename));
+            $records = $this->mdb->count_records($tablename);
+            $sql = "INSERT INTO ss_tables_{$prefix} (tablename, nextid, records, modifications) VALUES (?, ?, ?, 0)";
+            $this->mdb->execute($sql, array($prefix.$tablename, $status->auto_increment, $records));
+
+            $sqls[] = "DROP TABLE IF EXISTS ss_t_{$prefix}{$tablename}";
+            if ($records > 0) {
+                $sqls[] = "CREATE TABLE ss_t_{$prefix}{$tablename} (LIKE {$prefix}{$tablename})";
+                $sqls[] = "INSERT INTO ss_t_{$prefix}{$tablename} SELECT * FROM {$prefix}{$tablename}";
+            }
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_insert_{$prefix}{$tablename}";
+            $sqls[] = "CREATE TRIGGER ss_insert_{$prefix}{$tablename} AFTER INSERT ON {$prefix}{$tablename} FOR EACH ROW
+                       UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_update_{$prefix}{$tablename}";
+            $sqls[] = "CREATE TRIGGER ss_update_{$prefix}{$tablename} AFTER UPDATE ON {$prefix}{$tablename} FOR EACH ROW
+                       UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_delete_{$prefix}{$tablename}";
+            $sqls[] = "CREATE TRIGGER ss_delete_{$prefix}{$tablename} AFTER DELETE ON {$prefix}{$tablename} FOR EACH ROW
+                       UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
+        }
+        $this->mdb->change_database_structure($sqls, null);
+
+        $this->snapshottables = null;
+    }
+
+    /**
+     * Rollback the database to initial snapshot state.
+     */
+    public function snapshot_rollback() {
+        $this->mdb->transactions_forbidden();
+        $prefix = $this->mdb->get_prefix();
+
+        $sqls = array();
+
+        // Drop known temporary tables.
+        $temptables = $this->temptables->get_temptables();
+        foreach ($temptables as $temptable => $rubbish) {
+            $this->temptables->delete_temptable($temptable);
+            $sqls[] = "DROP TEMPORARY TABLE IF EXISTS {$prefix}{$temptable}";
+        }
+
+        // Reset modified tables.
+        $infos = $this->mdb->get_records_sql("SELECT * FROM ss_tables_{$prefix} WHERE modifications = 1");
+        foreach ($infos as $info) {
+            $sqls[] = "TRUNCATE TABLE {$info->tablename}";
+            if ($info->records > 0) {
+                $sqls[] = "INSERT INTO {$info->tablename} SELECT * FROM ss_t_{$info->tablename}";
+            }
+        }
+        $sqls[] = "UPDATE ss_tables_{$prefix} SET modifications = 0 WHERE modifications = 1";
+
+        if (!PHPUNIT_TEST or !$this->snapshottables) {
+            $this->snapshottables = $this->mdb->get_records_sql("SELECT tablename, nextid, records FROM ss_tables_{$prefix} ORDER BY tablename");
+        }
+        $rs = $this->mdb->get_recordset_sql("SHOW TABLE STATUS WHERE Name LIKE ?", array($this->mdb->sql_like_escape($prefix) . '%'));
+        foreach ($rs as $info) {
+            if (!isset($this->snapshottables[$info->name])) {
+                // Delete extra tables.
+                $sqls[] = "DROP TABLE {$info->name}";
+                continue;
+            }
+            $expected = $this->snapshottables[$info->name];
+            if ($info->auto_increment != $expected->nextid) {
+                // Reset auto_increment if changed.
+                $sqls[] = "ALTER TABLE {$info->name} AUTO_INCREMENT = {$expected->nextid}";
+            }
+        }
+        $rs->close();
+
+        if ($sqls) {
+            $this->mdb->change_database_structure($sqls);
+        }
+    }
+
+    /**
+     * Read config value from database snapshot.
+     *
+     * @param string $name
+     * @return string|false the setting value or false if not found or snapshot missing
+     */
+    public function snapshot_get_config_value($name) {
+        $prefix = $this->mdb->get_prefix();
+        $configtable = "ss_t_{$prefix}config";
+
+        if (!$this->general_table_exists($configtable)) {
+            return false;
+        }
+
+        $sql = "SELECT value FROM {$configtable} WHERE name = ?";
+        return $this->mdb->get_field_sql($sql, array($name));
+    }
+
+    /**
+     * Remove all snapshot related database data and structures.
+     */
+    public function snapshot_drop() {
+        $prefix = $this->mdb->get_prefix();
+        $tablestable = "ss_tables_{$prefix}";
+        if (!$this->general_table_exists($tablestable)) {
+            return;
+        }
+
+        $sqls = array();
+        $rs = $this->mdb->get_recordset_sql("SELECT * FROM ss_tables_{$prefix}");
+        foreach ($rs as $info) {
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_insert_{$info->tablename}";
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_update_{$info->tablename}";
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_delete_{$info->tablename}";
+            $sqls[] = "DROP TABLE IF EXISTS ss_t_{$info->tablename} CASCADE";
+        }
+        $rs->close();
+        $sqls[] = "DROP TABLE IF EXISTS {$tablestable} CASCADE";
+
+        $this->mdb->change_database_structure($sqls);
     }
 }

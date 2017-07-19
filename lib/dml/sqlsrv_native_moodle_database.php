@@ -1034,26 +1034,47 @@ class sqlsrv_native_moodle_database extends moodle_database {
         }
 
         if ($returnid) {
-            $id = $this->sqlsrv_fetch_id();
-            return $id;
+            return (int)$this->get_field_sql('SELECT SCOPE_IDENTITY()');
         } else {
             return true;
         }
     }
 
     /**
-     * Get the ID of the current action
+     * Find out the identity information for given table.
      *
-     * @return mixed ID
+     * @param string $tablename
+     * @return array ($identityvalue, $columnvalue, $nextid), or empty array on error
      */
-    private function sqlsrv_fetch_id() {
-        $query_id = sqlsrv_query($this->sqlsrv, 'SELECT SCOPE_IDENTITY()');
-        if ($query_id === false) {
-            $dberr = $this->get_last_error();
-            return false;
+    public function get_identity_info($tablename) {
+        // Use direct db access to get the server message reliably.
+        $result = sqlsrv_query($this->sqlsrv, "DBCC CHECKIDENT ('{$this->prefix}{$tablename}', NORESEED);");
+        if ($result === false) {
+            return array();
         }
-        $row = $this->sqlsrv_fetchrow($query_id);
-        return (int)$row[0];
+        $info = sqlsrv_errors();
+        sqlsrv_free_stmt($result);
+        if (!is_array($info)) {
+            return array();
+        }
+        foreach ($info as $data) {
+            if ($data['code'] == 7998) {
+                if (preg_match("/current identity value '([^']+)', current column value '([^']+)'/", $data['message'], $matches)) {
+                    $identityvalue = $matches[1];
+                    $columnvalue = $matches[2];
+                    if ($identityvalue === 'NULL') {
+                        // Identity is the seed - future value of the first record inserted into the table.
+                        $nextid = (int)$this->get_field_sql("SELECT IDENT_CURRENT(?)", array($this->prefix.$tablename));
+                    } else {
+                        // Something was already inserted, identity value is supposed to be already taken.
+                        $nextid = (int)$identityvalue + 1;
+                    }
+                    return array($identityvalue, $columnvalue, $nextid);
+                }
+            }
+        }
+        // We should never get here, if we do phpunit will most likely fail in some weird way...
+        return array();
     }
 
     /**

@@ -5746,8 +5746,10 @@ class core_dml_testcase extends database_driver_testcase {
 
         // The get_records() method generates 2 queries the first time is called
         // as it is fetching the table structure.
+        $initreads = $DB->perf_get_reads();
+        $initwrites = $DB->perf_get_writes();
         $whatever = $DB->get_records($tablename, array('id' => '1'));
-        $this->assertEquals($initreads + 3, $DB->perf_get_reads());
+        $this->assertEquals($initreads + 2, $DB->perf_get_reads());
         $this->assertEquals($initwrites, $DB->perf_get_writes());
 
         // The elapsed time is counted.
@@ -5756,37 +5758,46 @@ class core_dml_testcase extends database_driver_testcase {
         $previousqueriestime = $lastqueriestime;
 
         // Only 1 now, it already fetched the table columns.
+        $initreads = $DB->perf_get_reads();
+        $initwrites = $DB->perf_get_writes();
         $whatever = $DB->get_records($tablename);
-        $this->assertEquals($initreads + 4, $DB->perf_get_reads());
+        $this->assertEquals($initreads + 1, $DB->perf_get_reads());
 
         // And only 1 more from now.
+        $initreads = $DB->perf_get_reads();
+        $initwrites = $DB->perf_get_writes();
         $whatever = $DB->get_records($tablename);
-        $this->assertEquals($initreads + 5, $DB->perf_get_reads());
+        $this->assertEquals($initreads + 1, $DB->perf_get_reads());
 
-        // Inserts counts as writes.
-
+        // Inserts must increase writes.
+        $initreads = $DB->perf_get_reads();
+        $initwrites = $DB->perf_get_writes();
         $rec1 = new stdClass();
         $rec1->fieldvalue = 11;
         $rec1->id = $DB->insert_record($tablename, $rec1);
         $this->assertEquals($initwrites + 1, $DB->perf_get_writes());
-        $this->assertEquals($initreads + 5, $DB->perf_get_reads());
+        $this->assertGreaterThanOrEqual($initreads, $DB->perf_get_reads());
 
         // The elapsed time is counted.
         $lastqueriestime = $DB->perf_get_queries_time();
         $this->assertGreaterThanOrEqual($previousqueriestime, $lastqueriestime);
         $previousqueriestime = $lastqueriestime;
 
+        $initreads = $DB->perf_get_reads();
+        $initwrites = $DB->perf_get_writes();
         $rec2 = new stdClass();
         $rec2->fieldvalue = 22;
         $rec2->id = $DB->insert_record($tablename, $rec2);
-        $this->assertEquals($initwrites + 2, $DB->perf_get_writes());
+        $this->assertEquals($initwrites + 1, $DB->perf_get_writes());
+        $this->assertGreaterThanOrEqual($initreads, $DB->perf_get_reads());
 
         // Updates counts as writes.
-
+        $initreads = $DB->perf_get_reads();
+        $initwrites = $DB->perf_get_writes();
         $rec1->fieldvalue = 111;
         $DB->update_record($tablename, $rec1);
-        $this->assertEquals($initwrites + 3, $DB->perf_get_writes());
-        $this->assertEquals($initreads + 5, $DB->perf_get_reads());
+        $this->assertEquals($initwrites + 1, $DB->perf_get_writes());
+        $this->assertEquals($initreads, $DB->perf_get_reads());
 
         // The elapsed time is counted.
         $lastqueriestime = $DB->perf_get_queries_time();

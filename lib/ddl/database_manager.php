@@ -103,9 +103,10 @@ class database_manager {
     /**
      * Reset a sequence to the id field of a table.
      * @param string|xmldb_table $table Name of table.
+     * @param int $offset the next id offset
      * @throws ddl_exception thrown upon reset errors.
      */
-    public function reset_sequence($table) {
+    public function reset_sequence($table, $offset = 0) {
         if (!is_string($table) and !($table instanceof xmldb_table)) {
             throw new ddl_exception('ddlunknownerror', NULL, 'incorrect table parameter!');
         } else {
@@ -118,11 +119,42 @@ class database_manager {
 
         // Do not test if table exists because it is slow
 
-        if (!$sqlarr = $this->generator->getResetSequenceSQL($table)) {
+        if (!$sqlarr = $this->generator->getResetSequenceSQL($table, $offset)) {
             throw new ddl_exception('ddlunknownerror', null, 'table reset sequence sql not generated');
         }
 
         $this->execute_sql_arr($sqlarr, array($tablename));
+    }
+
+    /**
+     * Reset sequences for all tables.
+     *
+     * The offset step is used to randomise new insert ids in tests,
+     * this helps with detection of coding errors.
+     *
+     * @since Totara 10.0
+     *
+     * @param int $offsetstart the sequence offset for the first table
+     * @param int $offsetstep the extra offset for each next table
+     */
+    public function reset_all_sequences($offsetstart = 0, $offsetstep = 0) {
+
+        $sqlarr = array();
+        $offset = $offsetstart;
+        $tables = $this->mdb->get_tables(false);
+        ksort($tables);
+        foreach ($tables as $table => $unused) {
+            $columns = $this->mdb->get_columns($table, false);
+            if (!isset($columns['id']) or !$columns['id']->auto_increment) {
+                continue;
+            }
+            $sqlarr = array_merge($sqlarr, $this->generator->getResetSequenceSQL($table, $offset));
+            $offset = $offset + $offsetstep;
+        }
+
+        if ($sqlarr) {
+            $this->execute_sql_arr($sqlarr, null);
+        }
     }
 
     /**
@@ -1095,5 +1127,44 @@ class database_manager {
         }
 
         return $errors;
+    }
+
+    /**
+     * Store full database snapshot.
+     *
+     * @since Totara 10.0
+     */
+    public function snapshot_create() {
+        $this->generator->snapshot_create();
+    }
+
+    /**
+     * Rollback the database to initial snapshot state.
+     *
+     * @since Totara 10.0
+     */
+    public function snapshot_rollback() {
+        $this->generator->snapshot_rollback();
+    }
+
+    /**
+     * Read config value from database snapshot.
+     *
+     * @since Totara 10.0
+     *
+     * @param string $name
+     * @return string|false the setting value or false if not found or snapshot missing
+     */
+    public function snapshot_get_config_value($name) {
+        return $this->generator->snapshot_get_config_value($name);
+    }
+
+    /**
+     * Remove all snapshot related database data and structures.
+     *
+     * @since Totara 10.0
+     */
+    public function snapshot_drop() {
+        $this->generator->snapshot_drop();
     }
 }

@@ -148,8 +148,18 @@ class behat_util extends testing_util {
         // Set noreplyaddress to an example domain, as it should be valid email address and test site can be a localhost.
         set_config('noreplyaddress', 'noreply@example.com');
 
+        // Totara: purge log tables to speed up DB resets.
+        $DB->delete_records('config_log');
+        $DB->delete_records('log_display');
+        $DB->delete_records('upgrade_log');
+
+        // Totara: there is no need to save filedir files, we do not delete them in tests!
+
         // Keeps the current version of database and dataroot.
         self::store_versions_hash();
+
+        // Unfortunately we cannot randomise the new id numbers yet, there are still some sloppy totara tests that rely on hardcoded ids!
+        $DB->get_manager()->reset_all_sequences(0, 0);
 
         // Stores the database contents for fast reset.
         self::store_database_state();

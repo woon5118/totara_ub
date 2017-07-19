@@ -899,7 +899,6 @@ class mssql_native_moodle_database extends moodle_database {
             $params = (array)$params;
         }
 
-        $returning = "";
         $isidentity = false;
 
         if ($customsequence) {
@@ -926,9 +925,6 @@ class mssql_native_moodle_database extends moodle_database {
 
         } else {
             unset($params['id']);
-            if ($returnid) {
-                $returning = "OUTPUT inserted.id";
-            }
         }
 
         if (empty($params)) {
@@ -939,30 +935,14 @@ class mssql_native_moodle_database extends moodle_database {
         $qms    = array_fill(0, count($params), '?');
         $qms    = implode(',', $qms);
 
-        $sql = "INSERT INTO {" . $table . "} ($fields) $returning VALUES ($qms)";
+        $sql = "INSERT INTO {" . $table . "} ($fields) VALUES ($qms)";
 
         list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
         $rawsql = $this->emulate_bound_params($sql, $params);
 
         $this->query_start($sql, $params, SQL_QUERY_INSERT);
         $result = mssql_query($rawsql, $this->mssql);
-        // Expected results are:
-        //     - true: insert ok and there isn't returned information.
-        //     - false: insert failed and there isn't returned information.
-        //     - resource: insert executed, need to look for returned (output)
-        //           values to know if the insert was ok or no. Posible values
-        //           are false = failed, integer = insert ok, id returned.
-        $end = false;
-        if (is_bool($result)) {
-            $end = $result;
-        } else if (is_resource($result)) {
-            $end = mssql_result($result, 0, 0); // Fetch 1st column from 1st row.
-        }
-        $this->query_end($end); // End the query with the calculated $end.
-
-        if ($returning !== "") {
-            $params['id'] = $end;
-        }
+        $this->query_end($result);
         $this->free_result($result);
 
         if ($customsequence) {
@@ -978,11 +958,32 @@ class mssql_native_moodle_database extends moodle_database {
             }
         }
 
-        if (!$returnid) {
+        if ($returnid) {
+            return (int)$this->get_field_sql('SELECT SCOPE_IDENTITY()');
+        } else {
             return true;
         }
+    }
 
-        return (int)$params['id'];
+    /**
+     * Find out the identity information for given table.
+     *
+     * @param string $tablename
+     * @return array ($identityvalue, $columnvalue, $nextid), or empty array on error
+     */
+    public function get_identity_info($tablename) {
+        // This is just a bloody guesswork!
+        $identity = $this->get_field_sql("SELECT IDENT_CURRENT(?)", array($this->prefix.$tablename));
+        if ($identity === null) {
+            return array();
+        }
+
+        $maxid = $this->get_field_sql("SELECT MAX(id) FROM {{$tablename}}");
+        if (!$maxid) {
+            return array('NULL', 'NULL', $identity);
+        }
+
+        return array($identity, $maxid, (int)$identity + 1);
     }
 
     /**

@@ -676,8 +676,13 @@ class pgsql_native_moodle_database extends moodle_database {
             $sql = implode("\n;\n", $sql);
         }
         if (!$this->is_transaction_started()) {
-            // It is better to do all or nothing, this helps with recovery...
-            $sql = "BEGIN ISOLATION LEVEL SERIALIZABLE;\n$sql\n; COMMIT";
+            if (PHPUNIT_TEST) {
+                // We do not care about recovery on the test sites, we want the best performance!
+                $sql = "BEGIN ISOLATION LEVEL READ COMMITTED;\n$sql\n; COMMIT";
+            } else {
+                // It is better to do all or nothing, this helps with recovery...
+                $sql = "BEGIN ISOLATION LEVEL SERIALIZABLE;\n$sql\n; COMMIT";
+            }
         }
 
         try {

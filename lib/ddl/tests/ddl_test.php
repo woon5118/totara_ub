@@ -1811,7 +1811,7 @@ class core_ddl_testcase extends database_driver_testcase {
 
         $record = (object)array('id'=>666, 'course'=>10);
         $DB->import_record('testtable', $record);
-        $DB->delete_records('testtable'); // This delete performs one TRUNCATE.
+        $DB->delete_records('testtable'); // Totara: This delete does NOT perform TRUNCATE.
 
         $dbman->reset_sequence($table); // Using xmldb object.
         $this->assertEquals(1, $DB->insert_record('testtable', (object)array('course'=>13)));
@@ -1827,6 +1827,28 @@ class core_ddl_testcase extends database_driver_testcase {
         $DB->import_record('testtable', $record);
         $dbman->reset_sequence($tablename); // Using string.
         $this->assertEquals(667, $DB->insert_record('testtable', (object)array('course'=>13)));
+
+        // Totara: test our offset parameter.
+
+        $DB->delete_records('testtable');
+        $dbman->reset_sequence($table, 0);
+        $this->assertEquals(1, $DB->insert_record('testtable', (object)array('course'=>5)));
+        $dbman->reset_sequence($table, 1);
+        $this->assertEquals(3, $DB->insert_record('testtable', (object)array('course'=>6)));
+        $dbman->reset_sequence($table, 5);
+        $this->assertEquals(9, $DB->insert_record('testtable', (object)array('course'=>7)));
+
+        $DB->delete_records('testtable');
+        $dbman->reset_sequence($table, 1);
+        $this->assertEquals(2, $DB->insert_record('testtable', (object)array('course'=>6)));
+
+        $DB->delete_records('testtable');
+        $dbman->reset_sequence($table, 2);
+        $this->assertEquals(3, $DB->insert_record('testtable', (object)array('course'=>6)));
+
+        $DB->delete_records('testtable');
+        $dbman->reset_sequence($table, 5);
+        $this->assertEquals(6, $DB->insert_record('testtable', (object)array('course'=>6)));
 
         $dbman->drop_table($table);
     }

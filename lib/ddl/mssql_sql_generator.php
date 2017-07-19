@@ -90,29 +90,45 @@ class mssql_sql_generator extends sql_generator {
      * Reset a sequence to the id field of a table.
      *
      * @param xmldb_table|string $table name of table or the table object.
+     * @param int $offset the next id offset
      * @return array of sql statements
      */
-    public function getResetSequenceSQL($table) {
+    public function getResetSequenceSQL($table, $offset = 0) {
 
         if (is_string($table)) {
             $table = new xmldb_table($table);
         }
+        $tablename = $this->getTableName($table);
 
-        $value = (int)$this->mdb->get_field_sql('SELECT MAX(id) FROM {'. $table->getName() . '}');
+        $value = (int)$this->mdb->get_field_sql("SELECT MAX(id) FROM {$tablename}");
+
+        if ($value === 0 and get_class($this->mdb) === 'mssql_native_moodle_database') {
+            // There is no way to find current identity number via mssql driver
+            // because we do not know if there were any records inserted into the table,
+            // so let's do the old nasty hack that resets everything including the seed value.
+            $this->mdb->execute("TRUNCATE TABLE {$tablename}");
+        }
+
+        $identityinfo = $this->mdb->get_identity_info($table->getName());
+
         $sqls = array();
 
-        // MSSQL has one non-consistent behavior to create the first identity value, depending
-        // if the table has been truncated or no. If you are really interested, you can find the
-        // whole description of the problem at:
-        //     http://www.justinneff.com/archive/tag/dbcc-checkident
-        if ($value == 0) {
-            // truncate to get consistent result from reseed
-            $sqls[] = "TRUNCATE TABLE " . $this->getTableName($table);
-            $value = 1;
+        $value = $value + $offset;
+        if (!$identityinfo) {
+            debugging('Reading of current identity information failed for table: ' . $table->getName());
+            $value = $value + 1;
+        } else if ($identityinfo[0] === 'NULL') {
+            $value = $value + 1;
         }
 
         // From http://msdn.microsoft.com/en-us/library/ms176057.aspx
-        $sqls[] = "DBCC CHECKIDENT ('" . $this->getTableName($table) . "', RESEED, $value)";
+        $sqls[] = "DBCC CHECKIDENT ('{$tablename}', RESEED, {$value})";
+
+        if (get_class($this->mdb) === 'mssql_native_moodle_database') {
+            // Method get_identity_info might have returned bogus info, so make sure we will never get id duplicate.
+            $sqls[] = "DBCC CHECKIDENT ('{$tablename}', RESEED)";
+        }
+
         return $sqls;
     }
 
@@ -879,5 +895,164 @@ class mssql_sql_generator extends sql_generator {
         );
         $reserved_words = array_map('strtolower', $reserved_words);
         return $reserved_words;
+    }
+
+    /**
+     * Does table with this fullname exist?
+     *
+     * Note that standard db prefix is not used here because
+     * the test snapshots must use non-colliding table names.
+     *
+     * @param string $fulltablename
+     * @return bool
+     */
+    private function general_table_exists($fulltablename) {
+        return $this->mdb->record_exists_sql(
+            "SELECT 'x'
+               FROM INFORMATION_SCHEMA.TABLES
+              WHERE table_name = ? AND table_type = 'BASE TABLE'", array($fulltablename));
+    }
+
+    /**
+     * Store full database snapshot.
+     */
+    public function snapshot_create() {
+        $this->mdb->transactions_forbidden();
+        $prefix = $this->mdb->get_prefix();
+
+        if (strpos('ss_', $prefix) === 0) {
+            throw new coding_exception('Detected incorrect db prefix, cannot snapshot database due to potential data loss!');
+        }
+
+        if ($this->general_table_exists('ss_config')) {
+            throw new coding_exception('Detected ss_config table, cannot snapshot database due to potential data loss!');
+        }
+
+        $sqls = array();
+        $sqls[] = "DROP TABLE IF EXISTS ss_tables_{$prefix}";
+        $sqls[] = "CREATE TABLE ss_tables_{$prefix} (
+                      tablename VARCHAR(64) NOT NULL,
+                      nextid INTEGER NOT NULL,
+                      records INTEGER NOT NULL,
+                      modifications INTEGER NOT NULL,
+                      columnlist TEXT NOT NULL
+                    )";
+        $sqls[] = "CREATE UNIQUE INDEX ss_tables_{$prefix}_idx ON ss_tables_{$prefix} (tablename)";
+        $this->mdb->change_database_structure($sqls, null);
+
+        $sqls = array();
+        $tables = $this->mdb->get_tables(false);
+        foreach ($tables as $tablename => $unused) {
+            $records = $this->mdb->count_records($tablename, array());
+            $identity = $this->mdb->get_identity_info($tablename);
+            if (!$identity) {
+                $nextid = 0;
+            } else {
+                $nextid = $identity[2];
+            }
+            $columns = $this->mdb->get_records_sql("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{$prefix}{$tablename}'");
+            $columnlist = implode(',', array_keys($columns));
+            $sql = "INSERT INTO ss_tables_{$prefix} (tablename, nextid, records, modifications,columnlist) VALUES (?, ?, ?, 0, ?)";
+            $this->mdb->execute($sql, array($prefix.$tablename, $nextid, $records, $columnlist));
+
+            $sqls[] = "DROP TABLE IF EXISTS ss_t_{$prefix}{$tablename}";
+            if ($records > 0) {
+                $sqls[] = "SELECT * INTO ss_t_{$prefix}{$tablename} FROM {$prefix}{$tablename}";
+            }
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_trigger_{$prefix}{$tablename}";
+            $sqls[] = "CREATE TRIGGER ss_trigger_{$prefix}{$tablename} ON {$prefix}{$tablename} AFTER INSERT, UPDATE, DELETE AS
+                       UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
+        }
+        if ($sqls) {
+            $this->mdb->change_database_structure($sqls, null);
+        }
+    }
+
+    /**
+     * Rollback the database to initial snapshot state.
+     */
+    public function snapshot_rollback() {
+        $this->mdb->transactions_forbidden();
+        $prefix = $this->mdb->get_prefix();
+
+        $sqls = array();
+
+        // Drop known temporary tables.
+        $temptables = $this->temptables->get_temptables();
+        foreach ($temptables as $temptable => $rubbish) {
+            $this->temptables->delete_temptable($temptable);
+            $sqls[] = "DROP TABLE IF EXISTS #{$prefix}{$temptable}";
+        }
+
+        // Reset modified tables.
+        $infos = $this->mdb->get_records_sql("SELECT * FROM ss_tables_{$prefix} WHERE modifications = 1");
+        foreach ($infos as $info) {
+            $sqls[] = "TRUNCATE TABLE {$info->tablename}";
+            if ($info->nextid > 0) {
+                $sqls[] = "DBCC CHECKIDENT ('{$info->tablename}', RESEED, {$info->nextid})";
+            }
+            if ($info->records > 0) {
+                $sqls[] = "SET IDENTITY_INSERT {$info->tablename} ON";
+                $sqls[] = "INSERT INTO {$info->tablename} ({$info->columnlist}) SELECT {$info->columnlist} FROM ss_t_{$info->tablename}";
+                $sqls[] = "SET IDENTITY_INSERT {$info->tablename} OFF";
+            }
+        }
+        $sqls[] = "UPDATE ss_tables_{$prefix} SET modifications = 0 WHERE modifications = 1";
+
+        // Delete extra tables.
+        $escapedprefix = $this->mdb->sql_like_escape($prefix);
+        $rs = $this->mdb->get_recordset_sql(
+            "SELECT sch.table_name
+               FROM INFORMATION_SCHEMA.TABLES sch
+          LEFT JOIN ss_tables_{$prefix} ss ON ss.tablename = sch.table_name
+              WHERE sch.table_name LIKE '{$escapedprefix}%' ESCAPE '\\' AND sch.table_type = 'BASE TABLE' AND ss.tablename IS NULL");
+        foreach ($rs as $info) {
+            $sqls[] = "DROP TABLE {$info->table_name}";
+        }
+        $rs->close();
+
+        if ($sqls) {
+            $this->mdb->change_database_structure($sqls);
+        }
+    }
+
+    /**
+     * Read config value from database snapshot.
+     *
+     * @param string $name
+     * @return string|false the setting value or false if not found or snapshot missing
+     */
+    public function snapshot_get_config_value($name) {
+        $prefix = $this->mdb->get_prefix();
+        $configtable = "ss_t_{$prefix}config";
+
+        if (!$this->general_table_exists($configtable)) {
+            return false;
+        }
+
+        $sql = "SELECT value FROM {$configtable} WHERE name = ?";
+        return $this->mdb->get_field_sql($sql, array($name));
+    }
+
+    /**
+     * Remove all snapshot related database data and structures.
+     */
+    public function snapshot_drop() {
+        $prefix = $this->mdb->get_prefix();
+        $tablestable = "ss_tables_{$prefix}";
+        if (!$this->general_table_exists($tablestable)) {
+            return;
+        }
+
+        $sqls = array();
+        $rs = $this->mdb->get_recordset_sql("SELECT * FROM ss_tables_{$prefix}");
+        foreach ($rs as $info) {
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_trigger_{$info->tablename}";
+            $sqls[] = "DROP TABLE IF EXISTS ss_t_{$info->tablename}";
+        }
+        $rs->close();
+        $sqls[] = "DROP TABLE IF EXISTS {$tablestable}";
+
+        $this->mdb->change_database_structure($sqls);
     }
 }

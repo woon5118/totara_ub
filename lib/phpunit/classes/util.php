@@ -254,6 +254,7 @@ class phpunit_util extends testing_util {
         // Check if report builder has been loaded and if so reset the source object cache.
         // Don't autoload here - it won't work.
         if (class_exists('reportbuilder', false)) {
+            reportbuilder::reset_caches();
             reportbuilder::reset_source_object_cache();
         }
 
@@ -373,6 +374,7 @@ class phpunit_util extends testing_util {
         }
 
         // refresh data in all tables, clear caches, etc.
+        self::$lastdbwrites = null;
         self::reset_all_data();
 
         if (self::$cachefactory) {
@@ -523,10 +525,27 @@ class phpunit_util extends testing_util {
         set_config('enableblogs', 1);
         $DB->delete_records('user_preferences', array()); // Totara admin site page default.
 
+        // Totara: purge log tables to speed up DB resets.
+        $DB->delete_records('config_log');
+        $DB->delete_records('log_display');
+        $DB->delete_records('upgrade_log');
+
         // Totara: there is no need to save filedir files, we do not delete them in tests!
 
         // Store version hash in the database and in a file.
         self::store_versions_hash();
+
+        // Reset the sequences so that insert in each table returns different 'id' values.
+        if (defined('PHPUNIT_SEQUENCE_START')) {
+            // NOTE: this constant can only be defined in config.php, not in phpunit.xml!
+            $offsetstart = (int)PHPUNIT_SEQUENCE_START;
+        } else {
+            // Start a sequence between 100000 and 199000 to ensure each call to init produces
+            // different ids in the database.  This reduces the risk that hard coded values will
+            // end up being placed in phpunit test code.
+            $offsetstart = 100000 + mt_rand(0, 99) * 1000;
+        }
+        $DB->get_manager()->reset_all_sequences($offsetstart, 1000);
 
         // Store database data and structure.
         self::store_database_state();
@@ -567,16 +586,8 @@ class phpunit_util extends testing_util {
                 $suites .= $suite;
             }
         }
-        // Start a sequence between 100000 and 199000 to ensure each call to init produces
-        // different ids in the database.  This reduces the risk that hard coded values will
-        // end up being placed in phpunit or behat test code.
-        $sequencestart = 100000 + mt_rand(0, 99) * 1000;
 
         $data = preg_replace('|<!--@plugin_suites_start@-->.*<!--@plugin_suites_end@-->|s', $suites, $data, 1);
-        $data = str_replace(
-            '<const name="PHPUNIT_SEQUENCE_START" value=""/>',
-            '<const name="PHPUNIT_SEQUENCE_START" value="' . $sequencestart . '"/>',
-            $data);
 
         $result = false;
         if (is_writable($CFG->dirroot)) {

@@ -73,9 +73,10 @@ class postgres_sql_generator extends sql_generator {
      * Reset a sequence to the id field of a table.
      *
      * @param xmldb_table|string $table name of table or the table object.
+     * @param int $offset the next id offset
      * @return array of sql statements
      */
-    public function getResetSequenceSQL($table) {
+    public function getResetSequenceSQL($table, $offset = 0) {
 
         if ($table instanceof xmldb_table) {
             $tablename = $table->getName();
@@ -85,8 +86,26 @@ class postgres_sql_generator extends sql_generator {
 
         // From http://www.postgresql.org/docs/7.4/static/sql-altersequence.html
         $value = (int)$this->mdb->get_field_sql('SELECT MAX(id) FROM {'.$tablename.'}');
-        $value++;
+        $value = $value + 1 + (int)$offset;
         return array("ALTER SEQUENCE $this->prefix{$tablename}_id_seq RESTART WITH $value");
+    }
+
+    /**
+     * Given one correct xmldb_table, returns the SQL statements
+     * to create it (inside one array).
+     *
+     * @param xmldb_table $xmldb_table An xmldb_table instance.
+     * @return array An array of SQL statements, starting with the table creation SQL followed
+     * by any of its comments, indexes and sequence creation SQL statements.
+     */
+    public function getCreateTableSQL($xmldb_table) {
+        $sqlarr = parent::getCreateTableSQL($xmldb_table);
+        if ((defined('PHPUNIT_UTIL') and PHPUNIT_UTIL) or (defined('BEHAT_UTIL') and BEHAT_UTIL)) {
+            // We do not care about data recovery on the test sites when server crashes,
+            // the performance is more important!
+            $sqlarr = preg_replace('/^CREATE TABLE/', "CREATE UNLOGGED TABLE", $sqlarr);
+        }
+        return $sqlarr;
     }
 
     /**
@@ -99,7 +118,7 @@ class postgres_sql_generator extends sql_generator {
     public function getCreateTempTableSQL($xmldb_table) {
         $this->temptables->add_temptable($xmldb_table->getName());
         $sqlarr = $this->getCreateTableSQL($xmldb_table);
-        $sqlarr = preg_replace('/^CREATE TABLE/', "CREATE TEMPORARY TABLE", $sqlarr);
+        $sqlarr = preg_replace('/^CREATE (UNLOGGED )?TABLE/', "CREATE TEMPORARY TABLE", $sqlarr);
         return $sqlarr;
     }
 
@@ -621,5 +640,104 @@ class postgres_sql_generator extends sql_generator {
         ];
         $reserved_words = array_map('strtolower', $reserved_words);
         return $reserved_words;
+    }
+
+    /**
+     * Does table with this fullname exist?
+     *
+     * Note that standard db prefix is not used here because
+     * the test snapshots must use non-colliding table names.
+     *
+     * @param string $fulltablename
+     * @return bool
+     */
+    private function general_table_exists($fulltablename) {
+        $sql = "SELECT 'x'
+                  FROM pg_catalog.pg_class c
+                  JOIN pg_catalog.pg_namespace AS ns ON ns.oid = c.relnamespace
+                 WHERE c.relkind = 'r' AND ns.nspname = current_schema() AND c.relname = :tablename";
+        return $this->mdb->record_exists_sql($sql, array('tablename' => $fulltablename));
+    }
+
+    /**
+     * Store full database snapshot.
+     */
+    public function snapshot_create() {
+        $this->mdb->transactions_forbidden();
+        $prefix = $this->mdb->get_prefix();
+
+        if (strpos('ss_', $prefix) === 0) {
+            throw new coding_exception('Detected incorrect db prefix, cannot snapshot database due to potential data loss!');
+        }
+
+        if ($this->general_table_exists('ss_config')) {
+            throw new coding_exception('Detected ss_config table, cannot snapshot database due to potential data loss!');
+        }
+
+        $sql = file_get_contents(__DIR__ . '/snapshot_postgresql_template.sql');
+        $sql = str_replace('phpu_', $prefix, $sql);
+        $sql = str_replace('phpu\_', $this->mdb->sql_like_escape($prefix), $sql);
+        $this->mdb->change_database_structure($sql, null);
+        $this->mdb->change_database_structure("SELECT ss_create_{$prefix}();", null);
+    }
+
+    /**
+     * Rollback the database to initial snapshot state.
+     */
+    public function snapshot_rollback() {
+        $this->mdb->transactions_forbidden();
+        $prefix = $this->mdb->get_prefix();
+
+        $sqls = array();
+        $temptables = $this->temptables->get_temptables();
+        foreach ($temptables as $temptable => $rubbish) {
+            $this->temptables->delete_temptable($temptable);
+            $sqls[] = "DROP TABLE IF EXISTS {$prefix}{$temptable}";
+        }
+
+        $sqls[] = "select ss_reset_{$prefix}()";
+
+        $this->mdb->change_database_structure($sqls);
+    }
+
+    /**
+     * Read config value from database snapshot.
+     *
+     * @param string $name
+     * @return string|false the setting value or false if not found or snapshot missing
+     */
+    public function snapshot_get_config_value($name) {
+        $prefix = $this->mdb->get_prefix();
+        $configtable = "ss_t_{$prefix}config";
+        if (!$this->general_table_exists($configtable)) {
+            return false;
+        }
+        $sql = "SELECT value FROM {$configtable} WHERE name = :name";
+        return $this->mdb->get_field_sql($sql, array('name' => $name));
+    }
+
+    /**
+     * Remove all snapshot related database data and structures.
+     */
+    public function snapshot_drop() {
+        $prefix = $this->mdb->get_prefix();
+        $tablestable = "ss_tables_{$prefix}";
+        if (!$this->general_table_exists($tablestable)) {
+            return;
+        }
+
+        $sqls = array();
+        $rs = $this->mdb->get_recordset_sql("SELECT * FROM ss_tables_{$prefix}");
+        foreach ($rs as $info) {
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_trigger_{$info->tablename} ON {$info->tablename} CASCADE";
+            $sqls[] = "DROP TABLE IF EXISTS ss_t_{$info->tablename} CASCADE";
+        }
+        $rs->close();
+        $sqls[] = "DROP FUNCTION IF EXISTS ss_trigger_{$prefix}() CASCADE";
+        $sqls[] = "DROP FUNCTION IF EXISTS ss_create_{$prefix}() CASCADE";
+        $sqls[] = "DROP FUNCTION IF EXISTS ss_reset_{$prefix}() CASCADE";
+        $sqls[] = "DROP TABLE IF EXISTS {$tablestable} CASCADE";
+
+        $this->mdb->change_database_structure($sqls);
     }
 }

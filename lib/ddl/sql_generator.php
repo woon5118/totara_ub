@@ -1265,9 +1265,10 @@ abstract class sql_generator {
      * Reset a sequence to the id field of a table.
      *
      * @param xmldb_table|string $table name of table or the table object.
+     * @param int $offset the next id offset
      * @return array of sql statements
      */
-    public abstract function getResetSequenceSQL($table);
+    public abstract function getResetSequenceSQL($table, $offset = 0);
 
     /**
      * Given one correct xmldb_table, returns the SQL statements
@@ -1407,5 +1408,44 @@ abstract class sql_generator {
         $s = str_replace("\0","\\\0", $s);
         $s = str_replace("'",  "\\'", $s);
         return $s;
+    }
+
+    /**
+     * Store full database snapshot.
+     *
+     * @since Totara 10.0
+     */
+    public function snapshot_create() {
+        throw new coding_exception('generator does not support snapshots');
+    }
+
+    /**
+     * Rollback the database to initial snapshot state.
+     *
+     * @since Totara 10.0
+     */
+    public function snapshot_rollback() {
+        throw new coding_exception('generator does not support snapshots');
+    }
+
+    /**
+     * Read config value from database snapshot.
+     *
+     * @since Totara 10.0
+     *
+     * @param string $name
+     * @return string|false the setting value or false if not found or snapshot missing
+     */
+    public function snapshot_get_config_value($name) {
+        throw new coding_exception('generator does not support snapshots');
+    }
+
+    /**
+     * Remove all snapshot related database data and structures.
+     *
+     * @since Totara 10.0
+     */
+    public function snapshot_drop() {
+        throw new coding_exception('generator does not support snapshots');
     }
 }

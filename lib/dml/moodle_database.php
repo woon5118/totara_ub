@@ -434,14 +434,7 @@ abstract class moodle_database {
             case SQL_QUERY_UPDATE:
             case SQL_QUERY_STRUCTURE:
                 $this->writes++;
-            default:
-                if ((PHPUNIT_TEST) || (defined('BEHAT_TEST') && BEHAT_TEST) ||
-                    defined('BEHAT_SITE_RUNNING')) {
-
-                    // Set list of tables that are updated.
-                    require_once(__DIR__.'/../testing/classes/util.php');
-                    testing_util::set_table_modified_by_sql($sql);
-                }
+                break;
         }
 
         $this->print_debug($sql, $params);
@@ -2067,11 +2060,7 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function delete_records($table, array $conditions=null) {
-        // truncate is drop/create (DDL), not transactional safe,
-        // so we don't use the shortcut within them. MDL-29198
-        if (is_null($conditions) && empty($this->transactions)) {
-            return $this->execute("TRUNCATE TABLE {".$table."}");
-        }
+        // Totara: TRUNCATE is not compatible with triggers in some databases, do not use it at all in normal code!
         list($select, $params) = $this->where_clause($table, $conditions);
         return $this->delete_records_select($table, $select, $params);
     }

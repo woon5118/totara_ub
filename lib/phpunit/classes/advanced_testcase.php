@@ -36,9 +36,6 @@ abstract class advanced_testcase extends base_testcase {
     /** @var bool automatically reset everything? null means log changes */
     private $resetAfterTest;
 
-    /** @var moodle_transaction */
-    private $testdbtransaction;
-
     /** @var int timestamp used for current time asserts */
     private $currenttimestart;
 
@@ -66,15 +63,6 @@ abstract class advanced_testcase extends base_testcase {
     final public function runBare() {
         global $DB;
 
-        if (phpunit_util::$lastdbwrites != $DB->perf_get_writes()) {
-            // this happens when previous test does not reset, we can not use transactions
-            $this->testdbtransaction = null;
-
-        } else if ($DB->get_dbfamily() === 'postgres' or $DB->get_dbfamily() === 'mssql') {
-            // database must allow rollback of DDL, so no mysql here
-            $this->testdbtransaction = $DB->start_delegated_transaction();
-        }
-
         try {
             $this->setCurrentTimeStart();
             parent::runBare();
@@ -101,34 +89,14 @@ abstract class advanced_testcase extends base_testcase {
             throw $e;
         }
 
-        if (!$this->testdbtransaction or $this->testdbtransaction->is_disposed()) {
-            $this->testdbtransaction = null;
-        }
-
         if ($this->resetAfterTest === true) {
-            if ($this->testdbtransaction) {
-                $DB->force_transaction_rollback();
-                phpunit_util::reset_all_database_sequences();
-                phpunit_util::$lastdbwrites = $DB->perf_get_writes(); // no db reset necessary
-            }
             self::resetAllData(null);
 
         } else if ($this->resetAfterTest === false) {
-            if ($this->testdbtransaction) {
-                $this->testdbtransaction->allow_commit();
-            }
             // keep all data untouched for other tests
 
         } else {
             // reset but log what changed
-            if ($this->testdbtransaction) {
-                try {
-                    $this->testdbtransaction->allow_commit();
-                } catch (dml_transaction_exception $e) {
-                    self::resetAllData();
-                    throw new coding_exception('Invalid transaction state detected in test '.$this->getName());
-                }
-            }
             self::resetAllData(true);
         }
 
@@ -201,16 +169,15 @@ abstract class advanced_testcase extends base_testcase {
     protected function loadDataSet(PHPUnit_Extensions_Database_DataSet_IDataSet $dataset) {
         global $DB;
 
-        $structure = phpunit_util::get_tablestructure();
-
         foreach($dataset->getTableNames() as $tablename) {
             $table = $dataset->getTable($tablename);
             $metadata = $dataset->getTableMetaData($tablename);
             $columns = $metadata->getColumns();
 
-            $doimport = false;
-            if (isset($structure[$tablename]['id']) and $structure[$tablename]['id']->auto_increment) {
-                $doimport = in_array('id', $columns);
+            $doimport = in_array('id', $columns);
+            if ($doimport) {
+                $dbcolumns = $DB->get_columns($tablename, true);
+                $doimport = (isset($dbcolumns['id']) and $dbcolumns['id']->auto_increment);
             }
 
             for($r=0; $r<$table->getRowCount(); $r++) {
@@ -228,19 +195,14 @@ abstract class advanced_testcase extends base_testcase {
     }
 
     /**
-     * Call this method from test if you want to make sure that
-     * the resetting of database is done the slow way without transaction
-     * rollback.
+     * Do not call this method any more, transactions are not
+     * used for test environment rollback any more.
      *
-     * This is useful especially when testing stuff that is not compatible with transactions.
+     * @deprecated since Totara 10
      *
      * @return void
      */
     public function preventResetByRollback() {
-        if ($this->testdbtransaction and !$this->testdbtransaction->is_disposed()) {
-            $this->testdbtransaction->allow_commit();
-            $this->testdbtransaction = null;
-        }
     }
 
     /**
