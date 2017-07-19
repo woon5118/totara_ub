@@ -1152,6 +1152,7 @@ class core_plugin_manager {
             'theme_kiwifruitresponsive',
             'theme_customtotararesponsive',
             'theme_standardtotararesponsive',
+            'auth_gauth',
 
             // Moodle merge removals - we do not want these!
             'block_lp',
@@ -1221,7 +1222,7 @@ class core_plugin_manager {
                 'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'lti', 'manual', 'mnet',
                 'nntp', 'nologin', 'none', 'pam', 'pop3', 'shibboleth', 'webservice'
                 // Totara
-                , 'gauth', 'connect', 'approved'
+                , 'connect', 'approved'
             ),
 
             'availability' => array(
