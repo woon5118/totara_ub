@@ -267,7 +267,7 @@ class rb_source_totaramessages extends rb_base_source {
 
         // Include some standard filters. Including the user that the message was sent from.
         $this->add_user_fields_to_filters($filteroptions, 'user', true);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions, 'msg', 'useridfrom'); // Note these relate to the sender.
 
         return $filteroptions;
     }

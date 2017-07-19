@@ -432,7 +432,7 @@ class rb_source_competency_evidence extends rb_base_source {
         );
         // include some standard filters
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
 
         return $filteroptions;
     }

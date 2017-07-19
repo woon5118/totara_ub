@@ -190,7 +190,7 @@ class rb_source_course_completion_all extends rb_base_source {
         }
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
         $this->add_course_fields_to_filters($filteroptions);
 
         return $filteroptions;

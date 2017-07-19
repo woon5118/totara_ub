@@ -289,7 +289,7 @@ class rb_source_scorm extends rb_base_source {
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
         $this->add_core_tag_fields_to_filters('core', 'course', $filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
 

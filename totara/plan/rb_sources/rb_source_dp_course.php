@@ -543,7 +543,7 @@ class rb_source_dp_course extends rb_base_source {
         );
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
         $this->add_cohort_course_fields_to_filters($filteroptions);
 
         return $filteroptions;

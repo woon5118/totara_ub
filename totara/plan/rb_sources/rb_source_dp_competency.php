@@ -554,7 +554,7 @@ from
         );
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
 
         return $filteroptions;
     }
