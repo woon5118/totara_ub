@@ -98,8 +98,8 @@
         <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="facesessdate_sessta_ix" UNIQUE="true" FIELDS="sessionid,timestart"/>
-        <INDEX NAME="facesessdate_sesfin_ix" UNIQUE="true" FIELDS="sessionid,timefinish"/>
+        <INDEX NAME="facesessdate_sessta_ix" UNIQUE="true" FIELDS="sessionid, timestart"/>
+        <INDEX NAME="facesessdate_sesfin_ix" UNIQUE="true" FIELDS="sessionid, timefinish"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="facetoface_signups" COMMENT="User signups for events">

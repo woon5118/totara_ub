@@ -8,7 +8,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="frameworkid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
@@ -132,7 +132,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="visible" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="hidecustomfields" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
@@ -151,7 +151,7 @@
     <TABLE NAME="comp_relations" COMMENT="Tracks relationships between competencies">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="id1" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="id2" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -163,7 +163,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="defaultid" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
@@ -189,9 +189,9 @@
     <TABLE NAME="comp_scale_values" COMMENT="The individual values that make up a competency scale">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="name" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="scaleid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numericscore" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -208,9 +208,9 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="frameworkid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="fullname" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="fullname" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="visible" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="competencycount" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -242,7 +242,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -259,29 +259,29 @@
     <TABLE NAME="comp_type_info_data" COMMENT="Stores custom field data related to competencies">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="data" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="competencyid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-         <KEY NAME="comptypeinfodata_fie_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="comp_type_info_field" REFFIELDS="id"/>
-         <KEY NAME="comptypeinfodata_com_fk" TYPE="foreign" FIELDS="competencyid" REFTABLE="comp" REFFIELDS="id"/>
+        <KEY NAME="comptypeinfodata_fie_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="comp_type_info_field" REFFIELDS="id"/>
+        <KEY NAME="comptypeinfodata_com_fk" TYPE="foreign" FIELDS="competencyid" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="comp_type_info_data_param" COMMENT="Custom competencies fields data parameters">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            <KEY NAME="comptypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="comp_type_info_data" REFFIELDS="id"/>
-        </KEYS>
-        <INDEXES>
-            <INDEX NAME="comptypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
-        </INDEXES>
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="comptypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="comp_type_info_data" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="comptypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="comp_type_info_field" COMMENT="Stores the custom fields for each competency type">
       <FIELDS>
@@ -289,18 +289,18 @@
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="datatype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="locked" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="required" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="forceunique" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="defaultdata" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param1" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param2" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param3" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param4" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param5" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="defaultdata" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param5" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fullname" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -313,7 +313,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="frameworkid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="visible" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
@@ -360,7 +360,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -379,7 +379,7 @@
     <TABLE NAME="pos_relations" COMMENT="Tracks relationships between positions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="id1" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="id2" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -391,7 +391,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -410,7 +410,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="positionid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="data" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -419,18 +419,18 @@
       </KEYS>
     </TABLE>
     <TABLE NAME="pos_type_info_data_param" COMMENT="Custom positions fields data parameters">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            <KEY NAME="postypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="pos_type_info_data" REFFIELDS="id"/>
-        </KEYS>
-        <INDEXES>
-            <INDEX NAME="postypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
-        </INDEXES>
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="postypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="pos_type_info_data" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="postypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="pos_type_info_field" COMMENT="Stores the custom fields for each position type">
       <FIELDS>
@@ -438,18 +438,18 @@
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="datatype" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="locked" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="required" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="forceunique" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="defaultdata" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param1" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param2" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param3" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param4" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param5" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="defaultdata" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param5" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fullname" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -461,7 +461,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="frameworkid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
@@ -507,7 +507,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="visible" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="hidecustomfields" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
@@ -526,7 +526,7 @@
     <TABLE NAME="org_relations" COMMENT="Tracks relationships between organisations">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="id1" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="id2" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -540,7 +540,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -557,7 +557,7 @@
     <TABLE NAME="org_type_info_data" COMMENT="Stores custom field data related to organisations">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="data" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="organisationid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -571,18 +571,18 @@
       </INDEXES>
     </TABLE>
     <TABLE NAME="org_type_info_data_param" COMMENT="Custom organisations fields data parameters">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            <KEY NAME="orgtypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="org_type_info_data" REFFIELDS="id"/>
-        </KEYS>
-        <INDEXES>
-            <INDEX NAME="orgtypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
-        </INDEXES>
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="orgtypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="org_type_info_data" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="orgtypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="org_type_info_field" COMMENT="Stores the custom fields for each organisation type">
       <FIELDS>
@@ -590,18 +590,18 @@
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="datatype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="locked" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="required" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="forceunique" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="defaultdata" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param1" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param2" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param3" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param4" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param5" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="defaultdata" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param5" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fullname" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -613,7 +613,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="frameworkid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
@@ -636,7 +636,7 @@
         <KEY NAME="goal_typ_fk" TYPE="foreign" FIELDS="typeid" REFTABLE="goal_type" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-          <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid"/>
+        <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="goal_framework" COMMENT="A collection of goals">
@@ -644,7 +644,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="visible" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="hidecustomfields" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
@@ -664,7 +664,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="defaultid" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
@@ -691,9 +691,9 @@
     <TABLE NAME="goal_scale_values" COMMENT="The individual values that make up a goal scale">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="name" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="scaleid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numericscore" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -728,7 +728,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -742,7 +742,7 @@
     <TABLE NAME="goal_type_info_data" COMMENT="Stores custom field data related to goals">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="data" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="goalid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -753,18 +753,18 @@
       </KEYS>
     </TABLE>
     <TABLE NAME="goal_type_info_data_param" COMMENT="Custom organisations fields data parameters">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            <KEY NAME="goaltypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="goal_type_info_data" REFFIELDS="id"/>
-        </KEYS>
-        <INDEXES>
-            <INDEX NAME="goaltypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
-        </INDEXES>
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="goaltypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="goal_type_info_data" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="goaltypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="goal_type_info_field" COMMENT="Stores the custom fields for each goal type">
       <FIELDS>
@@ -772,18 +772,18 @@
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="datatype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="locked" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="required" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="forceunique" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="defaultdata" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param1" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param2" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param3" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param4" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param5" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="defaultdata" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param5" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fullname" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -857,7 +857,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="targetdate" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="scaleid" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="scalevalueid" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>

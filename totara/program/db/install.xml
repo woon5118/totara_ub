@@ -12,8 +12,8 @@
         <FIELD NAME="fullname" TYPE="char" LENGTH="254" NOTNULL="false" DEFAULT="" SEQUENCE="false"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" DEFAULT="" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" DEFAULT="" SEQUENCE="false"/>
-        <FIELD NAME="summary" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="endnote" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="summary" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="endnote" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="availablefrom" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="availableuntil" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -238,23 +238,23 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-         <KEY NAME="proginfodata_fie_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="prog_info_field" REFFIELDS="id"/>
-         <KEY NAME="proginfodata_com_fk" TYPE="foreign" FIELDS="programid" REFTABLE="prog" REFFIELDS="id"/>
+        <KEY NAME="proginfodata_fie_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="prog_info_field" REFFIELDS="id"/>
+        <KEY NAME="proginfodata_com_fk" TYPE="foreign" FIELDS="programid" REFTABLE="prog" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="prog_info_data_param" COMMENT="Custom programs fields data parameters">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            <KEY NAME="proginfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="prog_info_data" REFFIELDS="id"/>
-        </KEYS>
-        <INDEXES>
-            <INDEX NAME="proginfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
-        </INDEXES>
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="proginfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="prog_info_data" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="proginfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="prog_info_field" COMMENT="Stores the custom fields for each program type">
       <FIELDS>

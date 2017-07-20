@@ -344,6 +344,9 @@ class xmldb_structure extends xmldb_object {
         }
         $o.= '</XMLDB>';
 
+        // TOTARA: All files should end with a newline.
+        $o .= "\n";
+
         return $o;
     }
 

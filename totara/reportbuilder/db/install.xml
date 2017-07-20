@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="totara/reportbuilder/db" VERSION="20170630" COMMENT="XMLDB file for Report Builder Totara module"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
     <TABLE NAME="report_builder" COMMENT="Each report has an entry here">
@@ -14,7 +14,7 @@
         <FIELD NAME="cache" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If set to 1, report will be generated once per scheduled period and cached. Users will see only cached results"/>
         <FIELD NAME="accessmode" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Controls how access to the report is determined"/>
         <FIELD NAME="contentmode" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Controls how the content of the report is determined"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the report"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the report"/>
         <FIELD NAME="recordsperpage" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="40" SEQUENCE="false" COMMENT="Number of records to show on a single page of results for this report"/>
         <FIELD NAME="defaultsortcolumn" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the column (type_value) to use to initially sort the report"/>
         <FIELD NAME="defaultsortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="4" SEQUENCE="false" COMMENT="Integer representing the direction that default sorting should be done"/>
@@ -60,8 +60,8 @@
         <FIELD NAME="maxrecords" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="500" SEQUENCE="false" COMMENT="Maximum of records used in a graph?"/>
         <FIELD NAME="category" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="none,reversed or name of one column"/>
         <FIELD NAME="legend" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name of one column, used when axis are reversed"/>
-        <FIELD NAME="series" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Series info encoded in json format"/>
-        <FIELD NAME="settings" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Custom graph configuration in INI format"/>
+        <FIELD NAME="series" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Series info encoded in json format"/>
+        <FIELD NAME="settings" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Custom graph configuration in INI format"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="udpated when graph changes"/>
       </FIELDS>
       <KEYS>
@@ -118,7 +118,7 @@
         <FIELD NAME="reportid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the report this saved search belongs to"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User who saved the search"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="A name describing the saved search"/>
-        <FIELD NAME="search" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Serialized data containing the search details"/>
+        <FIELD NAME="search" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialized data containing the search details"/>
         <FIELD NAME="ispublic" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If none zero, the saved search is visible to all users, not just the creator"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="udpated when saved changes"/>
       </FIELDS>
@@ -233,7 +233,7 @@
       <INDEXES>
         <INDEX NAME="idx_schedule_extuser" UNIQUE="true" FIELDS="scheduleid, email"/>
       </INDEXES>
-      </TABLE>
+    </TABLE>
     <TABLE NAME="report_builder_cache" COMMENT="Storing details of scheduled reports caching">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -257,126 +257,126 @@
     </TABLE>
     <TABLE NAME="report_builder_global_restriction" COMMENT="Global Report Restrictions">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the global report restriction"/>
-          <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-          <FIELD NAME="allrecords" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="True means no restrictions"/>
-          <FIELD NAME="allusers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="True means this restriction can be used by all users"/>
-          <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the global report restriction"/>
+        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="allrecords" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="True means no restrictions"/>
+        <FIELD NAME="allusers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="True means this restriction can be used by all users"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_cohort_record" COMMENT="Cohorts that restricted users can see">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="cohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="cohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="cohortid" TYPE="foreign" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="cohortid" TYPE="foreign" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_org_record" COMMENT="Organisations that restricted users can see">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="orgid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="orgid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="orgid" TYPE="foreign" FIELDS="orgid" REFTABLE="org" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="orgid" TYPE="foreign" FIELDS="orgid" REFTABLE="org" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_pos_record" COMMENT="Positions that restricted users can see">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="posid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="posid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="posid" TYPE="foreign" FIELDS="posid" REFTABLE="pos" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="posid" TYPE="foreign" FIELDS="posid" REFTABLE="pos" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_user_record" COMMENT="Individual users that restricted users can see">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderrecordid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderrecordid" TYPE="foreign" FIELDS="reportbuilderrecordid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_cohort_user" COMMENT="Restricted cohorts that will see only allowed records">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="cohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="cohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="cohortid" TYPE="foreign" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="cohortid" TYPE="foreign" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_org_user" COMMENT="Restricted organisations that will see only allowed records">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="orgid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="orgid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="orgid" TYPE="foreign" FIELDS="orgid" REFTABLE="org" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="orgid" TYPE="foreign" FIELDS="orgid" REFTABLE="org" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_pos_user" COMMENT="Restricted positions that will see only allowed records">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="posid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="posid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="includechildren" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="posid" TYPE="foreign" FIELDS="posid" REFTABLE="pos" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="posid" TYPE="foreign" FIELDS="posid" REFTABLE="pos" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="reportbuilder_grp_user_user" COMMENT="Restricted individual users that will see only allowed records">
       <FIELDS>
-          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-          <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportbuilderuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-          <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
-          <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="reportbuilderuserid" TYPE="foreign" FIELDS="reportbuilderuserid" REFTABLE="report_builder_global_restriction" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>
