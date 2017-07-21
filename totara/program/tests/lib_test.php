@@ -411,6 +411,7 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         // Mark just course2 incomplete. The others must not be marked incomplete, so that if mark_complete causes the
         // other programs to be reaggregated then they will also be marked complete and cause the assertions to fail.
         $DB->set_field('course_completions', 'timecompleted', 0, array('course' => $course2->id));
+        cache::make('core', 'coursecompletion')->purge();
 
         // Run the funciton and check that only program2 and program3 were marked complete.
         $completion = new completion_completion(array('userid' => $user->id, 'course' => $course2->id));

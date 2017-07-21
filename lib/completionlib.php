@@ -1043,6 +1043,8 @@ class completion_info {
             $key = $userid . '_' . $this->course->id;
             $cache->delete($key);
         }
+        // Difficult to find affected users, just purge all completion cache.
+        cache::make('core', 'coursecompletion')->purge();
     }
 
     /**
@@ -1094,6 +1096,8 @@ class completion_info {
         }
 
         $this->get_completion_cache()->purge();
+        // Difficult to find affected users, just purge all completion cache.
+        cache::make('core', 'coursecompletion')->purge();
     }
 
     /**

@@ -130,6 +130,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $coursecompletion->reaggregate = 0;
         $coursecompletion->status = COMPLETION_STATUS_COMPLETE;
         $DB->update_record('course_completions', $coursecompletion);
+        cache::make('core', 'coursecompletion')->purge();
 
         // User 6 is already missing their non-zero record.
         $sql = "DELETE FROM {prog_completion}
