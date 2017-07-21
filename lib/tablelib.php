@@ -125,6 +125,12 @@ class flexible_table {
      */
     private $prefs = array();
 
+    /** @var $sheettitle */
+    protected $sheettitle;
+
+    /** @var $filename */
+    protected $filename;
+
     /**
      * List of column indexes that constitute the "comparison" key for each row.
      */
@@ -185,7 +191,7 @@ class flexible_table {
         } else if (is_null($this->exportclass) && !empty($this->download)) {
             $this->exportclass = new table_dataformat_export_format($this, $this->download);
             if (!$this->exportclass->document_started()) {
-                $this->exportclass->start_document($this->filename);
+                $this->exportclass->start_document($this->filename, $this->sheettitle);
             }
         }
         return $this->exportclass;
@@ -1778,11 +1784,14 @@ class table_dataformat_export_format extends table_default_export_format_parent 
      * Start document
      *
      * @param string $filename
+     * @param string $sheettitle
      */
-    public function start_document($filename) {
-        $this->filename = $filename;
+    public function start_document($filename, $sheettitle) {
         $this->documentstarted = true;
         $this->dataformat->set_filename($filename);
+        $this->dataformat->send_http_headers();
+        $this->dataformat->set_sheettitle($sheettitle);
+        $this->dataformat->start_output();
     }
 
     /**
@@ -1792,7 +1801,6 @@ class table_dataformat_export_format extends table_default_export_format_parent 
      */
     public function start_table($sheettitle) {
         $this->dataformat->set_sheettitle($sheettitle);
-        $this->dataformat->send_http_headers();
     }
 
     /**
@@ -1802,7 +1810,11 @@ class table_dataformat_export_format extends table_default_export_format_parent 
      */
     public function output_headers($headers) {
         $this->columns = $headers;
-        $this->dataformat->write_header($headers);
+        if (method_exists($this->dataformat, 'write_header')) {
+            $this->dataformat->write_header($headers);
+        } else {
+            $this->dataformat->start_sheet($headers);
+        }
     }
 
     /**
@@ -1819,15 +1831,19 @@ class table_dataformat_export_format extends table_default_export_format_parent 
      * Finish export
      */
     public function finish_table() {
-        $this->dataformat->write_footer($this->columns);
+        if (method_exists($this->dataformat, 'write_footer')) {
+            $this->dataformat->write_footer($this->columns);
+        } else {
+            $this->dataformat->close_sheet($this->columns);
+        }
     }
 
     /**
      * Finish download
      */
     public function finish_document() {
-        exit;
+        $this->dataformat->close_output();
+        exit();
     }
-
 }
 
