@@ -702,8 +702,8 @@ class core_badges_renderer extends plugin_renderer_base {
 
             }
 
-            $style = 'alert alert-warning generalbox statusbox ' . ($badge->is_active() ? 'active' : 'inactive');
-            return $this->output->box($message, $style);
+            // Render from template as opposed to using $OUTPUT->notification otherwise the button will not be displayed
+            return $this->render_from_template('core/notification_warning', array('message' => $message));
         }
 
         return null;
