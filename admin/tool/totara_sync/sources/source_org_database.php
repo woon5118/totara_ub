@@ -193,14 +193,26 @@ class totara_sync_source_org_database extends totara_sync_source_org {
             }
         }
 
-        // Check that all fields exists in database
-        foreach ($fields as $field) {
+        // Check the table exists in the database.
+        $tables = $database_connection->get_tables();
+        if (!in_array($db_table, $tables)) {
+            $this->addlog(get_string('dbmissingtablex', 'tool_totara_sync', $db_table), 'error', 'importdata');
+            return false;
+        }
+
+        // Check that all fields exists in database.
+        $missingcolumns = array();
+        foreach ($fields as $f) {
             try {
-                $database_connection->get_field_sql("SELECT $field from $db_table", array(), IGNORE_MULTIPLE);
+                $database_connection->get_field_sql("SELECT $f from $db_table", array(), IGNORE_MULTIPLE);
             } catch (Exception $e) {
-                $this->addlog(get_string('dbmissingcolumnx', 'tool_totara_sync', $field), 'error', 'importdata');
-                return false;
+                $missingcolumns[] = $f;
             }
+        }
+        if (!empty($missingcolumns)) {
+            $missingcolumnsstr = implode(', ', $missingcolumns);
+            $this->addlog(get_string('dbmissingcolumnx', 'tool_totara_sync', $missingcolumnsstr), 'error', 'importdata');
+            return false;
         }
 
         unset($fieldmappings);

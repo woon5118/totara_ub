@@ -189,7 +189,8 @@ $string['dbdateformat_help'] = 'Used to specify the date format for the database
 
 $string['databaseconnectfail'] = 'Failed to connect to database';
 $string['cannotconnectdbsettings'] = 'Cannot connect to database, please check settings';
-$string['dbmissingcolumnx'] = 'Remote database table does not contain field "{$a}"';
+$string['dbmissingcolumnx'] = 'Remote database table does not contain field(s) "{$a}"';
+$string['dbmissingtablex'] = 'Remote database table "{$a}" does not exist';
 $string['dbtestconnection'] = 'Test database connection';
 $string['dbtestconnectsuccess'] = 'Successfully connected to database';
 $string['dbtestconnectfail'] = 'Failed to connect to database';
