@@ -750,8 +750,14 @@ class mysqli_native_moodle_database extends moodle_database {
         $info->name           = $rawcolumn->Field;
         $info->type           = $type;
         $info->meta_type      = $this->mysqltype2moodletype($type);
-        $info->default_value  = $rawcolumn->Default;
-        $info->has_default    = !is_null($rawcolumn->Default);
+        // Totara: MariaDB 10.2.7 stared to add quotes around strings the same way as PG, but unfortunately it uses NULL string incorrectly there.
+        if ($rawcolumn->Default === 'NULL' or $rawcolumn->Default === null) {
+            $info->default_value  = null;
+            $info->has_default = false;
+        } else {
+            $info->default_value = trim($rawcolumn->Default, "'");
+            $info->has_default = true;
+        }
         $info->not_null       = ($rawcolumn->Null === 'NO');
         $info->primary_key    = ($rawcolumn->Key === 'PRI');
         $info->binary         = false;
