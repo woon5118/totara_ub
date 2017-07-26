@@ -35,9 +35,7 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url('/' . $CFG->admin . '/tool/totara_sync/admin/synclog.php');
 
-if ($CFG->forcelogin) {
-    require_login();
-}
+require_login();
 
 /** @var totara_reportbuilder_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_reportbuilder');

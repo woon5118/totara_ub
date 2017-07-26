@@ -55,6 +55,10 @@ if (!$id) {
     if ($context->contextlevel == CONTEXT_SYSTEM) {
         admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
     } else {
+        // We call require_login here instead of admin_externalpage_setup because we need the capability checks to be made
+        // in the category context, not the system context.
+        // Actual access checks will be made by rb_cohort_members_embedded::is_capable when the report is constructed.
+        require_login();
         $PAGE->set_heading($COURSE->fullname);
         $PAGE->set_pagelayout('report');
         $PAGE->set_url($url);

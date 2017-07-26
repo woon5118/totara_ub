@@ -29,13 +29,13 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
-$context = context_system::instance();
-
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // export format
 $debug  = optional_param('debug', 0, PARAM_INT); // Debug level.
 
-$PAGE->set_context($context);
+// We need to check permissions before we don anything else with reports.
+$url = new moodle_url('/totara/cohort/orphanreport.php', array('format' => $format, 'debug' => $debug));
+admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
 
 // Verify global restrictions.
 $shortname = 'cohort_orphaned_users';
@@ -51,9 +51,6 @@ if($format!='') {
 }
 
 $report->include_js();
-
-$url = new moodle_url('/totara/cohort/orphanreport.php', array('format' => $format, 'debug' => $debug));
-admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
 
 \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
