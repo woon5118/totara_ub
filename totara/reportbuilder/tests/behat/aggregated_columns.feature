@@ -55,7 +55,7 @@ Feature: Test unrestricted user columns can be added and viewed by the admin
     And I press "Save changes"
     And I click on "Save all changes" "button"
     And I wait "1" seconds
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
 
   Scenario: View aggregated fields in the program overview report
     Given I set the field "Report Name" to "Overview Report"

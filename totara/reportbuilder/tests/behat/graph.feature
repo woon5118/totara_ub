@@ -14,7 +14,7 @@ Feature: Graphs in Report buidler
 
   @javascript
   Scenario: Enable and disable graph in Report builder
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | Custom User report |
       | Source      | User               |

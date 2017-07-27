@@ -35,4 +35,15 @@ $capabilities = array(
         )
     ),
 
+// Ability to edit, reset and manage embedded report builder reports
+'totara/reportbuilder:manageembeddedreports' => array(
+        'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS | RISK_CONFIG,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'totara/reportbuilder:managereports',
+    ),
+
 );

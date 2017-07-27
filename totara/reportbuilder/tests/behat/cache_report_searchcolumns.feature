@@ -10,7 +10,7 @@ Feature: Caching works as expected when adding search columns
       | Enable report caching | 1 |
 
   Scenario:
-    Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Custom Course Report"
     And I set the field "Source" to "Courses"
     And I press "Create report"
@@ -25,7 +25,7 @@ Feature: Caching works as expected when adding search columns
     And I should not see "Not cached yet"
 
   Scenario:
-    Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Custom Seminar Sessions Report"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"
@@ -40,7 +40,7 @@ Feature: Caching works as expected when adding search columns
     And I should not see "Not cached yet"
 
   Scenario:
-    Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Custom Audience Report"
     And I set the field "Source" to "Audiences"
     And I press "Create report"

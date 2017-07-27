@@ -62,7 +62,7 @@ if ($fromform = $mform->get_data()) {
 echo $output->header();
 
 echo $output->container_start('reportbuilder-navlinks');
-echo $output->view_all_reports_link() . ' | ';
+echo $output->view_all_reports_link($report->embedded) . ' | ';
 echo $output->view_report_link($report->report_url());
 echo $output->container_end();
 

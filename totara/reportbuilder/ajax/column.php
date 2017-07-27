@@ -34,7 +34,6 @@ $PAGE->set_context(context_system::instance());
 
 /// Check access
 require_login();
-require_capability('totara/reportbuilder:managereports', context_system::instance());
 require_sesskey();
 
 /// Get params
@@ -43,6 +42,9 @@ $reportid = required_param('id', PARAM_INT);
 
 // Make sure the report actually exists.
 $rawreport = $DB->get_record('report_builder', array('id' => $reportid), '*', MUST_EXIST);
+
+$capability = $rawreport->embedded ? 'totara/reportbuilder:manageembeddedreports' : 'totara/reportbuilder:managereports';
+require_capability($capability, context_system::instance());
 
 $result = new stdClass();
 

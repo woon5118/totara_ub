@@ -71,5 +71,5 @@ Feature: Test Team menu item
     Then I should not see "Team" in the "#totaramenutable" "css_element"
     And I should not see "Team" in the totara menu
 
-    When I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     Then I should not see "Team Members (View)"

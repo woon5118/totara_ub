@@ -46,7 +46,7 @@ Feature: The Certification Completion report displays correctly for a learner.
       | tstcert | user002 |
 
     # Add Certification Completion report so we can check the status.
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Certification Completion Report"
     And I set the field "Source" to "Certification Completion"
     And I press "Create report"

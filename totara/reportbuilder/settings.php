@@ -85,5 +85,12 @@ $ADMIN->add('totara_reportbuilder', new admin_externalpage('rbmanageglobalrestri
     new moodle_url('/totara/reportbuilder/restrictions/index.php'), array('totara/reportbuilder:managereports'), empty($CFG->enableglobalrestrictions)));
 
 // Add links to report builder reports.
-$ADMIN->add('totara_reportbuilder', new admin_externalpage('rbmanagereports', new lang_string('managereports','totara_reportbuilder'),
+$ADMIN->add('totara_reportbuilder', new admin_externalpage('rbmanagereports', new lang_string('manageuserreports','totara_reportbuilder'),
             new moodle_url('/totara/reportbuilder/index.php'), array('totara/reportbuilder:managereports')));
+
+$ADMIN->add('totara_reportbuilder', new admin_externalpage('rbmanageembeddedreports', new lang_string('manageembeddedreports','totara_reportbuilder'),
+            new moodle_url('/totara/reportbuilder/manageembeddedreports.php'), array('totara/reportbuilder:manageembeddedreports')));
+
+
+$ADMIN->add('totara_reportbuilder', new admin_externalpage('rbcreatereport', new lang_string('createreport','totara_reportbuilder'),
+            new moodle_url('/totara/reportbuilder/create.php'), array('totara/reportbuilder:managereports')));

@@ -118,7 +118,7 @@ Background:
   And I click on "Audience 1" "link" in the "Assign a group to restriction" "totaradialogue"
   And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
 
-  And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+  And I navigate to "Create report" node in "Site administration > Reports > Report builder"
   And I set the following fields to these values:
     | Report Name | Record of Learning: Competencies report |
     | Source      | Record of Learning: Competencies        |

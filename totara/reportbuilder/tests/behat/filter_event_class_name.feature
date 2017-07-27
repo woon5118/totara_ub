@@ -26,7 +26,7 @@ Feature: Event Name Site Logs report filter
     When I add "Self enrolment" enrolment method with:
       | Custom instance name | Self enrolment |
 
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | Site Logs |
       | Source      | Site Logs |

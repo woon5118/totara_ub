@@ -399,7 +399,7 @@ class reportbuilder {
         if ($embed) {
             if (defined('REPORTBUIDLER_MANAGE_REPORTS_PAGE')) {
                 // The is_capable is intended for report viewing only!
-                require_capability('totara/reportbuilder:managereports', context_system::instance());
+                require_capability('totara/reportbuilder:manageembeddedreports', context_system::instance());
                 if (!method_exists($embed, 'is_capable')) {
                     debugging("Missing is_capable() method in embedded report {$embed->fullname}", DEBUG_DEVELOPER);
                 }
@@ -4493,8 +4493,8 @@ class reportbuilder {
     function edit_button() {
         global $OUTPUT;
         $context = context_system::instance();
-        // TODO what capability should be required here?
-        if (has_capability('totara/reportbuilder:managereports', $context)) {
+        $capability = $this->embedded ? 'totara/reportbuilder:manageembeddedreports' : 'totara/reportbuilder:managereports';
+        if (has_capability($capability, $context)) {
             return $OUTPUT->single_button(new moodle_url('/totara/reportbuilder/general.php', array('id' => $this->_id)), get_string('editthisreport', 'totara_reportbuilder'), 'get');
         } else {
             return '';

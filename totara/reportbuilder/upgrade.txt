@@ -34,3 +34,5 @@ information provided here is intended especially for developers.
 * add_tag_fields_to_columns, add_tag_fields_to_filters and add_tag_tables_to_joinlist have all been deprecated and
   replaced with add_core_fields_to_columns, add_core_tag_fields_to_filters and add_core_tag_tables_to_joinlist
   done to match the new tag collections.
+
+* view_all_reports_link() renderer method now requires argument $embedded

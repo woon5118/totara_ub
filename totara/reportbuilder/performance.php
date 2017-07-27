@@ -37,8 +37,10 @@ require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 $id = required_param('id', PARAM_INT); // report id
+$rawreport = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
 
-admin_externalpage_setup('rbmanagereports');
+$adminpage = $rawreport->embedded ? 'rbmanageembeddedreports' : 'rbmanagereports';
+admin_externalpage_setup($adminpage);
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
@@ -96,7 +98,7 @@ if ($fromform = $mform->get_data()) {
 echo $output->header();
 
 echo $output->container_start('reportbuilder-navlinks');
-echo $output->view_all_reports_link() . ' | ';
+echo $output->view_all_reports_link($report->embedded) . ' | ';
 echo $output->view_report_link($report->report_url());
 echo $output->container_end();
 

@@ -28,7 +28,7 @@ Feature: Test unrestricted user columns can be added and viewed by the admin
       | user5  | P1       | 1        | user4    |
       | user6  | P1       | 1        | user4    |
     And I log in as "admin"
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | User report |
       | Source      | User        |

@@ -31,11 +31,16 @@ require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 // Check access.
 require_sesskey();
 require_login();
-require_capability('totara/reportbuilder:managereports', context_system::instance());
 
 // Get params.
 $action = required_param('action', PARAM_ALPHA);
 $reportid = required_param('id', PARAM_INT);
+
+// Make sure the report actually exists.
+$rawreport = $DB->get_record('report_builder', array('id' => $reportid), '*', MUST_EXIST);
+
+$capability = $rawreport->embedded ? 'totara/reportbuilder:manageembeddedreports' : 'totara/reportbuilder:managereports';
+require_capability($capability, context_system::instance());
 
 switch ($action) {
     case 'add':

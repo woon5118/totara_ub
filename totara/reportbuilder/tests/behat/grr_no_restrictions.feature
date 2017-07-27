@@ -18,7 +18,7 @@ Feature: Create global report no restrictions
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
     And I press "Save changes"
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | User report |
       | Source      | User        |

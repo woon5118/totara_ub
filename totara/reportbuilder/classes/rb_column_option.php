@@ -158,8 +158,9 @@ class rb_column_option {
      *
      * If set, only users with the specified capability at the site context will
      * see this column. For other users it will not be displayed.
+     * If an array is passed, the column will be shown if the user holds *any* of the specified capabilities.
      * @access public
-     * @var string
+     * @var string|array
      */
     public $capability;
 

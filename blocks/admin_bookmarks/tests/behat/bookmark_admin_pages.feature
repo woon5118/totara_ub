@@ -40,28 +40,28 @@ Feature: Add a bookmarks to an admin pages
     Given I log in as "admin"
 
     # Sessions report
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     And I follow "Seminars: View and manage sessions"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
     Then I should see "Sessions report" in the "Admin bookmarks" "block"
 
     # Events report
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     And I follow "Seminars: View and manage events"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
     Then I should see "Events report" in the "Admin bookmarks" "block"
 
     # Rooms report
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     And I follow "Seminars: Manage rooms"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
     Then I should see "Rooms" in the "Admin bookmarks" "block"
 
     # Assets report
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     And I follow "Seminars: Manage assets"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"

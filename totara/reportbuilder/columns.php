@@ -37,7 +37,10 @@ $h = optional_param('h', null, PARAM_TEXT); // show/hide
 $cid = optional_param('cid', null, PARAM_INT); //column id
 $confirm = optional_param('confirm', 0, PARAM_INT); // confirm delete
 
-admin_externalpage_setup('rbmanagereports');
+$rawreport = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
+
+$adminpage = $rawreport->embedded ? 'rbmanageembeddedreports' : 'rbmanagereports';
+admin_externalpage_setup($adminpage);
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
@@ -114,7 +117,7 @@ if ($fromform = $mform->get_data()) {
 echo $output->header();
 
 echo $output->container_start('reportbuilder-navlinks');
-echo $output->view_all_reports_link() . ' | ';
+echo $output->view_all_reports_link($report->embedded) . ' | ';
 echo $output->view_report_link($report->report_url());
 echo $output->container_end();
 

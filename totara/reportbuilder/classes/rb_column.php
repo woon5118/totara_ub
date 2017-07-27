@@ -174,8 +174,9 @@ class rb_column {
      *
      * If set, only users with the specified capability at the site context will
      * see this column. For other users it will not be displayed.
+     * If an array is passed, the column will be shown if the user holds *any* of the specified capabilities.
      * @access public
-     * @var string
+     * @var string|array
      */
     public $capability;
 
@@ -594,8 +595,14 @@ class rb_column {
 
         // don't display column if capability is required and user doesn't have it
         $context = context_system::instance();
-        if (isset($this->capability) && !has_capability($this->capability, $context)) {
-            return false;
+        if (isset($this->capability)) {
+            // If multiple capabilities passed, show if
+            // they have any of them.
+            if (is_array($this->capability)) {
+                return has_any_capability($this->capability, $context);
+            } else {
+                return has_capability($this->capability, $context);
+            }
         }
 
         return true;

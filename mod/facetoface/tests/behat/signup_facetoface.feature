@@ -118,7 +118,7 @@ Feature: Sign up to a seminar
     And I log out
 
     And I log in as "admin"
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | Other sign-ups   |
       | Source      | Seminar Sign-ups |

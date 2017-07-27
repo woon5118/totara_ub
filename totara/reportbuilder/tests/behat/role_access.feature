@@ -25,7 +25,7 @@ Feature: Test role access restrictions in Reportbuilder
       | usercreator | coursecreator | System       |           |
       | usermanager | manager       | System       |           |
     And I log in as "admin"
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Some User Report"
     And I set the field "Source" to "User"
     And I press "Create report"

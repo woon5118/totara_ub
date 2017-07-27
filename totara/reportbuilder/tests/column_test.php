@@ -573,6 +573,11 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     protected $tool_customlang_components_data = array('id' => 1, 'name' => 'totara', 'version' => '1985031400');
 
+    // NOTE: Do not add more data above - you can now avoid core changes by defining the
+    // {@link phpunit_column_test_add_data()} method in your source instead.
+    // See totara/reportbuilder/rb_sources/rb_source_reports.php for an example.
+
+
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         global $DB;
@@ -911,6 +916,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             // The answer here depends on if the column we are testing.
             $expectedcount = $src->phpunit_column_test_expected_count($columnoption);
             $this->assertEquals($expectedcount, $rb->get_full_count(), $message);
+
+            // Remove the report again so reports report source gets expected count.
+            $DB->delete_records('report_builder_columns', ['reportid' => $reportid]);
+            $DB->delete_records('report_builder', ['id' => $reportid]);
         }
 
         $sortorder = 1;

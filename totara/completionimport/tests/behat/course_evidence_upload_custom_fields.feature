@@ -99,7 +99,7 @@ Feature: Verify course completion data with custom fields can be successfully up
 
   Scenario: Verify a successful course evidence upload expecting default custom field values to be used and visible in the import report.
     Given I log in as "admin"
-    When I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     And I click on "Settings" "link" in the "Completion import: Course status" "table_row"
     And I follow "Columns"
     And I set the field "newcolumns" to "Date completed"

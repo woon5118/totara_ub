@@ -108,11 +108,13 @@ function cachenow_showresult($status, $message) {
 
 $context = context_system::instance();
 require_login();
-require_capability('totara/reportbuilder:managereports', context_system::instance());
 $PAGE->set_context($context);
 
 $reportid = required_param('reportid', PARAM_INT);
 $report = new reportbuilder($reportid);
+
+$capability = $report->embedded ? 'totara/reportbuilder:manageembeddedreports' : 'totara/reportbuilder:managereports';
+require_capability($capability, context_system::instance());
 
 // Check that report is cached
 $success = false;

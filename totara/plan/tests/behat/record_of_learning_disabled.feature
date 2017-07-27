@@ -12,7 +12,7 @@ Feature: Check Record of Learning feature visibility
     Then I should see "Record of Learning" in the "#totaramenutable" "css_element"
     And I should see "Record of Learning" in the totara menu
 
-    When I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     Then I should see "Record of Learning: Certifications" in the ".generaltable" "css_element"
     And I should see "Record of Learning: Competencies" in the ".generaltable" "css_element"
     And I should see "Record of Learning: Courses" in the ".generaltable" "css_element"
@@ -45,7 +45,7 @@ Feature: Check Record of Learning feature visibility
     Then I should not see "Record of Learning" in the "#totaramenutable" "css_element"
     And I should not see "Record of Learning" in the totara menu
 
-    When I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
     Then I should not see "Record of Learning: Certifications" in the ".generaltable" "css_element"
     And I should not see "Record of Learning: Competencies" in the ".generaltable" "css_element"
     And I should not see "Record of Learning: Courses" in the ".generaltable" "css_element"

@@ -223,7 +223,7 @@ Feature: Add a seminar with select position
     And I log out
 
     And I log in as "admin"
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "F2F sessions"
     And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"

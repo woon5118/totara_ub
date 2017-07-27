@@ -173,7 +173,7 @@ Feature: Full visibility of user report source custom field values
 
 
   Scenario: rb_source_user_customfield000: view report with full custom field visibility as various users
-    Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Full visibility user report"
     And I set the field "Source" to "User"
     And I press "Create report"

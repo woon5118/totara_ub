@@ -22,7 +22,7 @@ Feature: Cohort report filter
 
   Scenario: Test cohort report builder filter
     Given I log in as "admin"
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | User report  |
       | Source      | User         |

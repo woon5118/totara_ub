@@ -146,7 +146,7 @@ Feature: Global report restrictions multiple interactions
     And I wait "1" seconds
     And I follow "All Restrictions"
 
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | User report |
       | Source      | User        |

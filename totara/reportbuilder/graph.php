@@ -39,8 +39,10 @@ if (totara_feature_disabled('reportgraphs')) {
 $PAGE->requires->yui_module('moodle-totara_reportbuilder-graphicalreporting', 'M.reportbuilder.graphicalreport.init');
 
 $id = required_param('reportid', PARAM_INT);
+$rawreport = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
 
-admin_externalpage_setup('rbmanagereports');
+$adminpage = $rawreport->embedded ? 'rbmanageembeddedreports' : 'rbmanagereports';
+admin_externalpage_setup($adminpage);
 
 /** @var totara_reportbuilder_renderer|core_renderer $output */
 $output = $PAGE->get_renderer('totara_reportbuilder');
@@ -128,7 +130,7 @@ if ($fromform = $mform->get_data()) {
 echo $output->header();
 
 echo $output->container_start('reportbuilder-navlinks');
-echo $output->view_all_reports_link() . ' | ';
+echo $output->view_all_reports_link($report->embedded) . ' | ';
 echo $output->view_report_link($report->report_url());
 echo $output->container_end();
 

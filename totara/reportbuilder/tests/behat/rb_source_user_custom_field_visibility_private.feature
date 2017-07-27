@@ -173,7 +173,7 @@ Feature: Per user visibility of user report source custom field values
 
 
   Scenario: rb_source_user_customfield001: view report with custom field per user visibility as various users
-    Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Per user visibility user report"
     And I set the field "Source" to "User"
     And I press "Create report"

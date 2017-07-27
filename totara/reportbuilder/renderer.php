@@ -345,6 +345,18 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Output report delete confirmation message
+     * @param reportbuilder $report Original report instance
+     * @return string
+     */
+    public function confirm_delete(reportbuilder $report) {
+        $type = empty($report->embedded) ? 'delete' : 'reload';
+
+        $out = html_writer::tag('p', get_string('reportconfirm' . $type, 'totara_reportbuilder', $report->fullname));
+        return $out;
+    }
+
+    /**
      * Output report clone confirmation message
      * @param reportbuilder $report Original report instance
      * @return string
@@ -373,13 +385,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $info->properties = $strpropertylist;
 
         $out .= html_writer::tag('p', get_string('clonedescrhtml', 'totara_reportbuilder', $info));
-        $buttons = array();
-        $buttons[] = $this->output->single_button(new moodle_url('/totara/reportbuilder/clone.php',
-                array('confirm' => 1, 'id' => $report->_id)),
-                get_string('clone', 'totara_reportbuilder'), 'post');
-        $buttons[] = $this->output->single_button(new moodle_url('/totara/reportbuilder/index.php'),
-                get_string('cancel', 'moodle'), 'get');
-        $out .= html_writer::tag('div', implode(' ', $buttons), array('class' => 'buttons'));
+
         return $out;
     }
     /**
@@ -619,7 +625,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                 $notice = $this->container(get_string('cachegenstarted','totara_reportbuilder', $time), 'notifynotice clearfix');
             } else if ($status == RB_CACHE_FLAG_CHANGED) {
                 $context = context_system::instance();
-                if ($report->_id > 0 && has_capability('totara/reportbuilder:managereports', $context)) {
+                $capability = $report->embedded ? 'totara/reportbuilder:manageembeddedreports' : 'totara/reportbuilder:managereports';
+                if ($report->_id > 0 && has_capability($capability, $context)) {
                     $button = html_writer::start_tag('div', array('class' => 'boxalignright rb-genbutton'));
                     $button .= $this->cachenow_button($report->_id);
                     $button .= html_writer::end_tag('div');
@@ -676,11 +683,14 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      *
      * Used when editing a single report
      *
+     * @param boolean $embedded True to link to embedded reports, false to link to user reports.
+     *
      * @return string The HTML for the link
      */
-    public function view_all_reports_link() {
-        $url = new moodle_url('/totara/reportbuilder/');
-        return '&laquo; ' . html_writer::link($url, get_string('allreports', 'totara_reportbuilder'));
+    public function view_all_reports_link($embedded = false) {
+        $string = $embedded ? 'allembeddedreports' : 'alluserreports';
+        $url = $embedded ? new moodle_url('/totara/reportbuilder/manageembeddedreports.php') : new moodle_url('/totara/reportbuilder/');
+        return '&laquo; ' . html_writer::link($url, get_string($string, 'totara_reportbuilder'));
     }
 
     /**

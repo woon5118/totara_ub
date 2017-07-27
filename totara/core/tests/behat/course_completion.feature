@@ -92,7 +92,7 @@ Feature: Users completion of courses
     And I navigate to "Completions archive" node in "Course administration"
     And I press "Continue"
     And I press "Continue"
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Historic Completions Report"
     And I set the field "Source" to "Course Completion Including History"
     And I press "Create report"
