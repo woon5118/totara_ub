@@ -201,5 +201,13 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017071300, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2017072700) {
+        // Rename competency timecompleted columns to timemodified since that's what they are displaying.
+        totara_reportbuilder_migrate_column_names(array('completeddate' => 'timemodified'), 'competency_evidence');
+        totara_reportbuilder_migrate_filter_names(array('completeddate' => 'timemodified'), 'competency_evidence');
+
+        upgrade_plugin_savepoint(true, 2017072700, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

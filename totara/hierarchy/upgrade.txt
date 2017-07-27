@@ -24,3 +24,5 @@ The following files have been deprecated and should no longer be linked to:
 * totara/hierarchy/prefix/competency/template/lib.php has been deprecated and should no longer be included anywhere.
 * totara_hierarchy_renderer::mygoals_company_table() has changed adding a label for goal status
 * totara_hierarchy_renderer::mygoals_personal_table() has changed adding a label for goal status
+
+* Added an optional timeproficient column to mdl_comp_record and mdl_comp_record_history which can be used to record when a user becomes proficient in a competency
