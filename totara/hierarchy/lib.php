@@ -1736,6 +1736,16 @@ class hierarchy {
         $olditem = $DB->get_record($this->shortprefix, array('id' => $itemid));
 
         if ($newitem->parentid != $olditem->parentid || $newitem->frameworkid != $olditem->frameworkid) {
+            // Check that the framework id is valid.
+            if ($newitem->frameworkid != $olditem->frameworkid) {
+                $DB->get_record($this->shortprefix.'_framework', array('id' => $newitem->frameworkid), '*', MUST_EXIST);
+            }
+
+            // Check that the parentid is valid if its not empty.
+            if (!empty($newitem->parentid) && $newitem->parentid != $olditem->parentid) {
+                $DB->get_record($this->shortprefix, array('id' => $newitem->parentid), '*', MUST_EXIST);
+            }
+
             // The item is being moved - first update item without changing parent or framework, then move afterwards.
             $oldparentid = $olditem->parentid;
             $newparentid = $newitem->parentid;
@@ -1767,7 +1777,14 @@ class hierarchy {
             $newparentid = isset($newparentid) ? $newparentid : 0;  // top-level
             $newframeworkid = isset($newframeworkid) ? $newframeworkid : $updateditem->frameworkid;  // same framework
             // Move it.
-            $this->move_hierarchy_item($updateditem, $newframeworkid, $newparentid);
+            $success = $this->move_hierarchy_item($updateditem, $newframeworkid, $newparentid);
+
+            if (!$success) {
+                if ($usetransaction && $DB->is_transaction_started()) {
+                    $e = new moodle_exception('There was a problem updating hierarchy item');
+                    $transaction->rollback($e);
+                }
+            }
         }
         // Get a new copy of the updated item from the db.
         $updateditem = $DB->get_record($this->shortprefix, array('id' => $itemid));
