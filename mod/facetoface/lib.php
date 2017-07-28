@@ -1940,6 +1940,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             s.id AS sessionid,
             u.*,
             f.course AS courseid,
+            f.selectjobassignmentonsignup,
             ss.grade,
             sign.timecreated,
             su.jobassignmentid
@@ -2185,12 +2186,17 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                 }
 
                 $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
-                if (!empty($selectjobassignmentonsignupglobal)) {
-                    $jobassignment = \totara_job\job_assignment::get_with_id($attendee->jobassignmentid);
-                    if ($jobassignment->userid != $attendee->userid) {
-                        // Error!!!
+                $selectjobassignmentonsignupsession = $sessionsignups[$attendee->sessionid][$attendee->id]->selectjobassignmentonsignup;
+                if (!empty($selectjobassignmentonsignupglobal) && !empty($selectjobassignmentonsignupsession)) {
+                    if (!empty($attendee->jobassignmentid)) {
+                        $jobassignment = \totara_job\job_assignment::get_with_id($attendee->jobassignmentid);
+                        if ($jobassignment == null || $jobassignment->userid != $attendee->id) {
+                            // Error!!!
+                        }
+                        $label = position::job_position_label($jobassignment);
+                    } else {
+                        $label = '';
                     }
-                    $label = position::job_position_label($jobassignment);
                     $worksheet->write_string($i, $j++, $label);
                 }
                 $worksheet->write_string($i,$j++,$attendee->grade);
