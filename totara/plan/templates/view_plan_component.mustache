@@ -55,17 +55,17 @@
 {{#edit_objective}}
 <div class="add-linked-course">
     <div class="{{class}}">
-        <form{{#formattributes}} {{name}}="{{value}}"{{/formattributes}}>
+        <form action="{{url}}" method="{{method}}">
         <div>
-            {{#inputitems}}
-                <input{{#attributes}} {{name}}="{{value}}"{{/attributes}} />
-            {{/inputitems}}
+            {{#params}}
+                <input type="hidden" name="{{name}}" value="{{value}}">
+            {{/params}}
+            <input type="submit" id="{{id}}" name="submitbutton" class="submitbutton" value="{{label}}">
         </div>
         </form>
     </div>
 </div>
 {{/edit_objective}}
-
 {{#has_extra_information}}
 <ul class="planiteminfobox">
     {{#extras}}
