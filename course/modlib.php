@@ -61,6 +61,9 @@ function add_moduleinfo($moduleinfo, $course, $mform = null) {
     $newcm->instance         = 0; // Not known yet, will be updated later (this is similar to restore code).
     $newcm->visible          = $moduleinfo->visible;
     $newcm->visibleold       = $moduleinfo->visible;
+    if (isset($moduleinfo->visibleoncoursepage)) {
+        $newcm->visibleoncoursepage = $moduleinfo->visibleoncoursepage;
+    }
     if (isset($moduleinfo->cmidnumber)) {
         $newcm->idnumber         = $moduleinfo->cmidnumber;
     }
