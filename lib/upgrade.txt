@@ -290,7 +290,7 @@ information provided here is intended especially for developers.
   and alt attributes will be the third parameter.
 * Removed accesslib private functions: load_course_context(), load_role_access_by_context(), dedupe_user_access() (MDL-49398).
 * Internal "accessdata" structure format has changed to improve ability to perform role definition caching (MDL-49398).
->>>>>>> eca87a764a9c... TL-15781 / MDL-49398 accesslib: Simplify role definition loading and cache
+* user_can_view_profile() now also checks the moodle/user:viewalldetails capability.
 
 === 9.2 ===
 
