@@ -1,5 +1,8 @@
 This file describes API changes for 'theme_roots'.
 
+=== 10.0 ===
+
+* Ensured body and link text colour contrast ratio is at least 3:1 (WCAG 2.0 A compliant)
 
 === 9.2 ===
 
