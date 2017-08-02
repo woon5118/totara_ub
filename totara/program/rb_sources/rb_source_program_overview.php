@@ -314,18 +314,14 @@ class rb_source_program_overview extends rb_base_source {
                 'program_completion',
                 'progress',
                 get_string('programcompletionprogress', 'rb_source_program_overview'),
-                $DB->sql_concat_join(
-                    "'|'",
-                    array(
-                        $DB->sql_cast_2char('prog_courseset.id'),
-                        $DB->sql_cast_2char("prog_completion.status")
-                    )
-                ),
+                '1',
                 array(
                     'displayfunc' => 'program_completion_progress',
-                    'grouping' => 'comma_list',
-                    'joins' => 'prog_completion',
                     'nosort' => true,
+                    'extrafields' => array(
+                        'programid' => "base.programid",
+                        'userid' => "base.userid"
+                    )
                 )
             );
         }
@@ -798,7 +794,15 @@ class rb_source_program_overview extends rb_base_source {
     }
 
     function rb_display_program_completion_progress($status, $row, $isexport = false) {
-        global $PAGE;
+        global $CFG, $PAGE;
+
+        if (!empty($row->programid) && !empty($row->userid)) {
+            // If the extra fields are provided then use the same behaviour as the RoL:Programs report.
+            require_once($CFG->dirroot . '/totara/program/lib.php');
+            return prog_display_progress($row->programid, $row->userid, CERTIFPATH_STD, $isexport);
+        }
+
+        debugging('rb_source_program_overview->rb_display_program_completion_progress() requires programid and userid extrafield to produce accurate results', DEBUG_DEVELOPER);
 
         $completions = array();
         $tempcompletions = explode(', ', $status);
