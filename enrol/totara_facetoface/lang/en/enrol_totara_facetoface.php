@@ -103,6 +103,7 @@ $string['signuppersessionresult'] = '{$a->facetoface}: {$a->message}';
 $string['status'] = 'Enable existing enrolments';
 $string['status_desc'] = 'Enable seminar enrolment method in new courses.';
 $string['status_help'] = 'If disabled all existing seminar direct enrolments are suspended and new users can not enrol.';
+$string['task_process_expirations'] = 'Process and notify expired Seminar enrolments';
 $string['totara_facetoface:config'] = 'Configure Seminar Direct enrolment instances';
 $string['totara_facetoface:manage'] = 'Manage Seminar Direct enrolled users';
 $string['totara_facetoface:unenrol'] = 'Unenrol Seminar Direct enrolment users from course';

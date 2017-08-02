@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Andrew Hancox <andrewdchancox@googlemail.com> on behalf of Synergy Learning
- * @package totara
- * @subpackage enrol_totara_facetoface
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @package enrol_totara_facetoface
  */
 
 /**
- * Face-to-Face Direct enrolment plugin version specification
+ * Enrol Totara Seminar tasks.
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2017080200;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120502;       // Requires this Moodle version.
-$plugin->component = 'enrol_totara_facetoface';      // Full name of the plugin (used for diagnostics).
+$tasks = array(
+    array(
+        'classname' => 'enrol_totara_facetoface\task\process_expirations',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);

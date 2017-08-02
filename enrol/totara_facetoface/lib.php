@@ -857,16 +857,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
     }
 
     /**
-     * Enrol totara_facetoface cron support.
-     * @return void
-     */
-    public function cron() {
-        $trace = new text_progress_trace();
-        $this->sync($trace, null);
-        $this->send_expiry_notifications($trace);
-    }
-
-    /**
      * Sync all meta course links.
      *
      * @param progress_trace $trace
