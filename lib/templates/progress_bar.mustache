@@ -67,7 +67,7 @@
     function checkInvert() {
         var progressBarText = progressBar.getElementsByClassName('progressbar__text')[0];
         var margin = document.dir === "ltr" ? 'margin-left' : 'margin-right';
-        if (progressBar.clientWidth <= parseInt(getComputedStyle(progressBarText).width, 10)) {
+        if (progressBar.clientWidth <= parseInt(getComputedStyle(progressBarText).width, 10) || progressBarText.textContent == '0%') {
             el.classList.add('progress-invert');
             pb = progressBar;
             progressBarText.style[margin] = progressBar.clientWidth + 'px'

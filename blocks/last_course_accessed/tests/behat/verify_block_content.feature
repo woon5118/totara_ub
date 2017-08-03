@@ -1,4 +1,4 @@
-@totara @block @block_last_course_accessed @javascript
+@totara @block @block_last_course_accessed @totara_courseprogressbar @javascript
 Feature: Verify the LCA block content displays the correct information.
 
   Background:
@@ -33,7 +33,7 @@ Feature: Verify the LCA block content displays the correct information.
     Then I should see "Course 1" in the "Last Course Accessed" "block"
     And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     # The admin should not see a progress bar as they're not enrolled on the course.
-    And I should not see "Not yet started" in the "Last Course Accessed" "block"
+    And I should see "Not tracked" in the "Last Course Accessed" "block"
 
     When I click on "Find Learning" in the totara menu
     And I follow "Course 2"
@@ -44,7 +44,7 @@ Feature: Verify the LCA block content displays the correct information.
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     # The admin should not see a progress bar as they're not enrolled on the course.
-    And I should not see "Not yet started" in the "Last Course Accessed" "block"
+    And I should see "Not tracked" in the "Last Course Accessed" "block"
 
   Scenario: Verify a learner sees the correct information and sees the progress bar when enrolled on a course.
 
@@ -82,7 +82,8 @@ Feature: Verify the LCA block content displays the correct information.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 1" in the "Last Course Accessed" "block"
     And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
-    And I should see "Not yet started" in the "Last Course Accessed" "block"
+    And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
+    And I should see "No criteria" in the "Last Course Accessed" "block"
 
     When I click on "Find Learning" in the totara menu
     And I follow "Course 2"
@@ -92,7 +93,8 @@ Feature: Verify the LCA block content displays the correct information.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
-    And I should see "Not yet started" in the "Last Course Accessed" "block"
+    And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
+    And I should see "0%" in the "Last Course Accessed" "block"
 
     When I click on "Find Learning" in the totara menu
     And I follow "Course 2"
@@ -101,13 +103,13 @@ Feature: Verify the LCA block content displays the correct information.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
-    And I should see "Complete" in the "Last Course Accessed" "block"
+    And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
+    And I should see "100%" in the "Last Course Accessed" "block"
 
   Scenario: Verify a learner sees the correct information when an activity is accessed directly by-passing the main course page.
 
     Given I log in as "admin"
-
-    # Create an activity on course 2.
+    # Create activities on course 2.
     And I click on "Find Learning" in the totara menu
     And I follow "Course 2"
     And I turn editing mode on
@@ -117,6 +119,28 @@ Feature: Verify the LCA block content displays the correct information.
       | Page content        | Believe it or not, this is a test page! |
       | Completion tracking | 2                                       |
       | Require view        | 1                                       |
+
+    And I add a "Page" to section "1" and I fill the form with:
+      | Name                | Second Page                             |
+      | Description         | -                                       |
+      | Page content        | And yet another test page!              |
+      | Completion tracking | 2                                       |
+      | Require view        | 1                                       |
+
+    And I add a "Page" to section "1" and I fill the form with:
+      | Name                | Last Page                               |
+      | Description         | -                                       |
+      | Page content        | Last test page!                         |
+      | Completion tracking | 2                                       |
+      | Require view        | 1                                       |
+
+    # Set course completion on course 2.
+    Then I navigate to "Course completion" node in "Course administration"
+    And I expand all fieldsets
+    And I click on "criteria_activity_value[1]" "checkbox"
+    And I click on "criteria_activity_value[2]" "checkbox"
+    And I click on "criteria_activity_value[3]" "checkbox"
+    And I press "Save changes"
 
     # Visit the course.
     When I click on "Find Learning" in the totara menu
@@ -153,7 +177,8 @@ Feature: Verify the LCA block content displays the correct information.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
-    And I should see "Not yet started" in the "Last Course Accessed" "block"
+    And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
+    And I should see "33%" in the "Last Course Accessed" "block"
 
   Scenario: Verify a learner sees the correct information in My Learning when having not visited a course during a login session.
 

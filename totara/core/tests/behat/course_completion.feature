@@ -1,4 +1,4 @@
-@totara @course @completion @javascript
+@totara @course @completion @totara_courseprogressbar @javascript
 Feature: Users completion of courses
   In order to view a course
   As a user
@@ -120,23 +120,30 @@ Feature: Users completion of courses
     And I click on "Option 1" "radio"
     And I press "Save my choice"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "In progress"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 50%      |
+      | Course 2      | 0%       |
 
     When I click on "Course 1" "link"
     And I click on "Activity Two" "link"
     And I click on "Option 2" "radio"
     And I press "Save my choice"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete"
-    And I should see "In progress"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 50%      |
 
     When I click on "Course 2" "link"
     And I click on "Activity Three" "link"
     And I click on "Option 3" "radio"
     And I press "Save my choice"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete"
-    And I should not see "In progress"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 100%     |
 
     When I log out
     And I log in as "user002"
@@ -146,7 +153,9 @@ Feature: Users completion of courses
     And I click on "Option 1" "radio"
     And I press "Save my choice"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "In progress"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 50%      |
 
     # Thats the instant functionality done, now unlock and reaggregate to test cron functionality.
     When I log out
@@ -162,14 +171,17 @@ Feature: Users completion of courses
     When I log out
     And I log in as "user001"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete"
-    And I should not see "In progress"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 100%     |
 
     When I log out
     And I log in as "user002"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete"
-    And I should not see "In progress"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
 
   @javascript
   Scenario: Test completion of another course criteria when admin completes for learner
@@ -178,8 +190,10 @@ Feature: Users completion of courses
       | user002 | C2     | student |
     And I log in as "user002"
     And I click on "Record of Learning" in the totara menu
-    Then I should not see "Complete" in the "Course 1" "table_row"
-    And I should not see "In progress" in the "Course 2" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 0%       |
+      | Course 2      | 0%       |
     And I log out
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
@@ -189,5 +203,7 @@ Feature: Users completion of courses
     And I log out
     And I log in as "user002"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
-    And I should see "In progress" in the "Course 2" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 50%      |

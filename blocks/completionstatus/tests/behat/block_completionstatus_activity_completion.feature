@@ -1,4 +1,4 @@
-@block @block_completionstatus
+@block @block_completionstatus @totara_courseprogressbar
 Feature: Enable Block Completion in a course using activity completion
   In order to view the completion block in a course
   As a teacher
@@ -20,7 +20,7 @@ Feature: Enable Block Completion in a course using activity completion
       | activity | course | idnumber | name           | intro                 |
       | page     | C1     | page1    | Test page name | Test page description |
 
-  Scenario: Add the block to a the course and check the block correctly shows the user not yet started
+  Scenario: Add the block to a course and check the block correctly shows the user not yet started
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on

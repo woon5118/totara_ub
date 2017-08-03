@@ -947,6 +947,7 @@ function import_course($importname, $importtime) {
             $completion->reaggregate = 0;
             $completion->userid = $course->userid;
             $completion->course = $course->courseid;
+
             // Create block_totara_stats records
             $stat = new stdClass();
             $stat->userid = $course->userid;

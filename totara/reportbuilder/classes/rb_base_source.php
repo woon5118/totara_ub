@@ -1168,7 +1168,7 @@ abstract class rb_base_source {
 
                 list($statusdpsql, $statusdpparams) = $this->get_dp_status_sql($userid, $courseid);
                 $statusdp = $DB->get_record_sql($statusdpsql, $statusdpparams);
-                $progress = totara_display_course_progress_icon($userid, $courseid,
+                $progress = totara_display_course_progress_bar($userid, $courseid,
                     $statusdp->course_completion_statusandapproval);
                 // Highlight if the item has not yet been approved.
                 if ($statusdp->approved == DP_APPROVAL_UNAPPROVED

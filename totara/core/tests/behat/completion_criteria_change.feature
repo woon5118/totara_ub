@@ -1,4 +1,4 @@
-@totara @totara_core
+@totara @totara_core @totara_courseprogressbar
 Feature: Test reaggregating completion data when changing course completion settings
   In order to test course completion settings
   I must log in as admin and configure the courses
@@ -97,9 +97,11 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I click on "Not completed: Assignment 3. Select to mark as complete." "link"
     # Confirm the status of the courses for user1.
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
-    And I should see "Complete" in the "Course 2" "table_row"
-    And I should see "Complete" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 100%     |
+      | Course 3      | 100%     |
     # Complete all three assignments (but not manual self completion) as user2.
     Then I log out
     And I log in as "user2"
@@ -114,9 +116,11 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I click on "Not completed: Assignment 3. Select to mark as complete." "link"
     # Confirm the status of the courses for user2.
     When I click on "Record of Learning" in the totara menu
-    Then I should see "In progress" in the "Course 1" "table_row"
-    And I should see "In progress" in the "Course 2" "table_row"
-    And I should see "Complete" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 50%      |
+      | Course 2      | 50%      |
+      | Course 3      | 100%     |
     # Complete manual self completion (but not assignments) as user3.
     Then I log out
     And I log in as "user3"
@@ -132,8 +136,11 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I should see "You have already marked yourself as complete in this course"
     # Confirm the status of the courses for user3.
     When I click on "Record of Learning" in the totara menu
-    Then I should see "In progress" in the "Course 1" "table_row"
-    And I should see "In progress" in the "Course 2" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 50%      |
+      | Course 2      | 50%      |
+      | Course 3      | 0%       |
     And "#plan_courses #plan_courses_r2 span" "css_element" should not exist
     # For course 1, unlock with delete and remove Manual self completion. Assignment completion will reaggregate.
     Then I log out
@@ -163,22 +170,29 @@ Feature: Test reaggregating completion data when changing course completion sett
     Then I log out
     And I log in as "user1"
     When I click on "Record of Learning" in the totara menu
-    Then I should see "Not yet started" in the "Course 1" "table_row"
-    And I should see "Not yet started" in the "Course 2" "table_row"
-    And I should see "Complete" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 0%       |
+      | Course 2      | 0%       |
+      | Course 3      | 100%     |
     # Confirm the status of the courses for user2. Cron hasn't been run yet, so no reaggregation has occurred.
     Then I log out
     And I log in as "user2"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Not yet started" in the "Course 1" "table_row"
-    And I should see "Not yet started" in the "Course 2" "table_row"
-    And I should see "Complete" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 0%       |
+      | Course 2      | 0%       |
+      | Course 3      | 100%     |
     # Confirm the status of the courses for user3. Cron hasn't been run yet, so no reaggregation has occurred.
     Then I log out
     And I log in as "user3"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Not yet started" in the "Course 1" "table_row"
-    And I should see "Not yet started" in the "Course 2" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 0%       |
+      | Course 2      | 0%       |
+      | Course 3      | 0%       |
     And "#plan_courses #plan_courses_r2 span" "css_element" should not exist
     # Run cron to cause reaggregation.
     Then I run the "\core\task\completion_regular_task" task
@@ -186,20 +200,26 @@ Feature: Test reaggregating completion data when changing course completion sett
     Then I log out
     And I log in as "user1"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
-    And I should see "In progress" in the "Course 2" "table_row"
-    And I should see "Complete" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 50%      |
+      | Course 3      | 100%     |
     # Confirm the status of the courses for user2.
     Then I log out
     And I log in as "user2"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
-    And I should see "In progress" in the "Course 2" "table_row"
-    And I should see "Complete" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 50%      |
+      | Course 3      | 100%     |
     # Confirm the status of the courses for user3.
     Then I log out
     And I log in as "user3"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Not yet started" in the "Course 1" "table_row"
-    And I should see "Not yet started" in the "Course 2" "table_row"
-    And I should see "Not yet started" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 0%       |
+      | Course 2      | 0%       |
+      | Course 3      | 0%       |

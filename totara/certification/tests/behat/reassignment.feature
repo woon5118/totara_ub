@@ -1,4 +1,4 @@
-@totara @totara_certification @javascript
+@totara @totara_certification @totara_courseprogressbar @javascript
 Feature: User reassignment to a certification
   In order to view a certification
   As a user
@@ -552,7 +552,7 @@ Feature: User reassignment to a certification
       And I click on "Complete course" "link"
       And I click on "Yes" "button"
       And I click on "Record of Learning" in the totara menu
-      Then I should see "Complete" in the "Certify Course" "table_row"
+      Then I should see "100%" in the "Certify Course" "table_row"
       And I switch to "Certifications" tab
       And I should see "Certified" in the "Reassign Tests" "table_row"
 
@@ -664,7 +664,7 @@ Feature: User reassignment to a certification
       And I click on "Complete course" "link"
       And I click on "Yes" "button"
       And I click on "Record of Learning" in the totara menu
-      Then I should see "Complete" in the "Certify Course" "table_row"
+      Then I should see "100%" in the "Certify Course" "table_row"
 
       # Reassign & Run certification update task.
       When I log out

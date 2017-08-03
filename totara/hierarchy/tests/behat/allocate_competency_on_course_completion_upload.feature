@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_competency @javascript
+@totara @totara_hierarchy @totara_hierarchy_competency @totara_courseprogressbar @javascript
 Feature: Verify competencies completion status is updated when the associated course completions happen before the competency creation
 
   Background:
@@ -148,11 +148,16 @@ Scale 1
       And I log in as "learner1"
       And I click on "Record of Learning" in the totara menu
       And I switch to "Courses" tab
-    Then "Complete via rpl" "link" should exist in the "Course 1" "table_row"
-      And "Not yet started" "link" should exist in the "Course 2" "table_row"
+    # Complete via rpl will be shown in the popover once it is available
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 0%       |
     When I switch to "Competencies" tab
-    Then I should see "Scale 1" in the "Bob's Learning Plan" "table_row"
-      And I log out
+    Then the following should exist in the "plan_competencies" table:
+      | Plan                 | Status   |
+      | Bob's Learning Plan  | Scale 1  |
+    And I log out
 
   Scenario: Verify that competency status is updated after some course completion with completion date set to today
     # Upload course completion for course 1 with today's date
@@ -173,11 +178,16 @@ Scale 1
     When I log in as "learner1"
       And I click on "Record of Learning" in the totara menu
       And I switch to "Courses" tab
-    Then "Complete via rpl" "link" should exist in the "Course 1" "table_row"
-      And "Complete via rpl" "link" should exist in the "Course 2" "table_row"
+    # Complete via rpl will be shown in the popover once it is available
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 100%     |
     When I switch to "Competencies" tab
-    Then I should see "Scale 3" in the "Bob's Learning Plan" "table_row"
-      And I log out
+    Then the following should exist in the "plan_competencies" table:
+      | Plan                 | Status   |
+      | Bob's Learning Plan  | Scale 3  |
+    And I log out
 
   Scenario: Verify that competency status is updated after some course completion with completion date set to last month
     # Upload course completion for course 1 with today's date
@@ -198,11 +208,16 @@ Scale 1
     When I log in as "learner1"
       And I click on "Record of Learning" in the totara menu
       And I switch to "Courses" tab
-    Then "Complete via rpl" "link" should exist in the "Course 1" "table_row"
-      And "Complete via rpl" "link" should exist in the "Course 2" "table_row"
+    # Complete via rpl will be shown in the popover once it is available
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 100%     |
     When I switch to "Competencies" tab
-    Then I should see "Scale 3" in the "Bob's Learning Plan" "table_row"
-      And I log out
+    Then the following should exist in the "plan_competencies" table:
+      | Plan                 | Status   |
+      | Bob's Learning Plan  | Scale 3  |
+    And I log out
 
   Scenario: Verify that competency status is updated when competency criteria is changed
     # Upload course completion for course 1 with today's date
@@ -217,11 +232,16 @@ Scale 1
     When I log in as "learner1"
       And I click on "Record of Learning" in the totara menu
       And I switch to "Courses" tab
-    Then "Complete via rpl" "link" should exist in the "Course 1" "table_row"
-      And "Not yet started" "link" should exist in the "Course 2" "table_row"
+    # Complete via rpl will be shown in the popover once it is available
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 0%       |
     When I switch to "Competencies" tab
-    Then I should see "Scale 1" in the "Bob's Learning Plan" "table_row"
-      And I log out
+    Then the following should exist in the "plan_competencies" table:
+      | Plan                 | Status   |
+      | Bob's Learning Plan  | Scale 1  |
+    And I log out
 
     When I log in as "admin"
       And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
@@ -236,8 +256,13 @@ Scale 1
     When I log in as "learner1"
       And I click on "Record of Learning" in the totara menu
       And I switch to "Courses" tab
-    Then "Complete via rpl" "link" should exist in the "Course 1" "table_row"
-      And "Not yet started" "link" should exist in the "Course 2" "table_row"
+    # Complete via rpl will be shown in the popover once it is available
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 0%       |
     When I switch to "Competencies" tab
-    Then I should see "Scale 3" in the "Bob's Learning Plan" "table_row"
-      And I log out
+    Then the following should exist in the "plan_competencies" table:
+      | Plan                 | Status   |
+      | Bob's Learning Plan  | Scale 3  |
+    And I log out

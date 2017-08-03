@@ -1,4 +1,4 @@
-@totara @totara_plan @javascript
+@totara @totara_plan @totara_courseprogressbar @javascript
 Feature: Check visibility of courses in Record of Learning for unenrolled users
   Courses that I am unenrolled from but have made progress in
   As a learner
@@ -56,7 +56,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "learner1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Course 1"
-    And I should see "In progress" in the "Course 1" "table_row"
+    And I should see "50%" in the "Course 1" "table_row"
 
   Scenario: Unenrolled learner can see in-progress course in rol when course visibility is set to Hide
     And I log in as "learner1"
@@ -79,7 +79,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "learner1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Course 1"
-    And I should see "In progress" in the "Course 1" "table_row"
+    And I should see "50" in the "Course 1" "table_row"
 
   Scenario: Unenrolled learner can see in-progress course in rol when audience visibility is set to All users
     And I log in as "learner1"
@@ -102,7 +102,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "learner1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Course 1"
-    And I should see "In progress" in the "Course 1" "table_row"
+    And I should see "50%" in the "Course 1" "table_row"
 
   Scenario: Unenrolled learner can see in-progress course in rol when audience visibility is set to Enrolled users only
     And I log in as "learner1"
@@ -125,7 +125,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "learner1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Course 1"
-    And I should see "In progress" in the "Course 1" "table_row"
+    And I should see "50%" in the "Course 1" "table_row"
 
   Scenario: Unenrolled learner can see in-progress course in rol when audience visibility is set to No users
     And I log in as "learner1"
@@ -148,7 +148,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "learner1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Course 1"
-    And I should see "In progress" in the "Course 1" "table_row"
+    And I should see "50%" in the "Course 1" "table_row"
 
   Scenario: Unenrolled learner cannot see course with no progress in rol when course visibility is set to Show
     And I log in as "admin"
@@ -249,7 +249,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "learner1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Course 1"
-    And I should see "Complete" in the "Course 1" "table_row"
+    And I should see "100%" in the "Course 1" "table_row"
 
   Scenario: Unenrolled learner can see complete course in rol when audience visibility is set to No users
     And I log in as "learner1"
@@ -274,4 +274,4 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "learner1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Course 1"
-    And I should see "Complete" in the "Course 1" "table_row"
+    And I should see "100%" in the "Course 1" "table_row"

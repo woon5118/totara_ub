@@ -1,4 +1,4 @@
-@totara @totara_completion_upload @javascript @_file_upload
+@totara @totara_completion_upload @totara_courseprogressbar @javascript @_file_upload
 Feature: Verify course completion data can be successfully uploaded.
 
   Background:
@@ -42,7 +42,7 @@ Feature: Verify course completion data can be successfully uploaded.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
-    Then I should see "Complete via rpl" in the "Course 1" "table_row"
+    Then I should see "100%" in the "Course 1" "table_row"
 
   Scenario: Verify a successful course completion with no courseidnumber.
     Given I log in as "admin"
@@ -56,7 +56,7 @@ Feature: Verify course completion data can be successfully uploaded.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
-    Then I should see "Complete via rpl" in the "Course 1" "table_row"
+    Then I should see "100%" in the "Course 1" "table_row"
 
   Scenario: Verify an course completion with no completiondate fails.
     Given I log in as "admin"
@@ -94,7 +94,7 @@ Feature: Verify course completion data can be successfully uploaded.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
-    Then I should see "Complete via rpl" in the "Course 1" "table_row"
+    Then I should see "100%" in the "Course 1" "table_row"
 
     When I follow "Other Evidence"
     And I click on "Completed course : thisisevidence" "link" in the "tbody" "css_element"
@@ -129,7 +129,7 @@ Feature: Verify course completion data can be successfully uploaded.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
-    Then I should see "Complete via rpl" in the "Course 1" "table_row"
+    Then I should see "100%" in the "Course 1" "table_row"
 
     When I follow "Other Evidence"
     And I click on "Completed course : thisisevidence" "link" in the "tbody" "css_element"

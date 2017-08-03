@@ -79,10 +79,11 @@ class block_totara_recent_learning extends block_base {
                 $id = $course->id;
                 $name = format_string($course->fullname);
                 $status = array_key_exists($id, $completions) ? $completions[$id]->status : null;
-                $completion = totara_display_course_progress_icon($USER->id, $course->id, $status);
+                $completion = totara_display_course_progress_bar($USER->id, $course->id, $status);
                 $link = html_writer::link(new moodle_url('/course/view.php', array('id' => $id)), $name, array('title' => $name));
                 $cell1 = new html_table_cell($link);
                 $cell1->attributes['class'] = 'course';
+                $cell1->attributes['width'] = '80%';
                 $cell2 = new html_table_cell($completion);
                 $cell2->attributes['class'] = 'status';
                 $table->data[] = new html_table_row(array($cell1, $cell2));

@@ -310,6 +310,13 @@ class completion_info {
     private $criteria;
 
     /**
+     * Course progress aggregation information
+     * @since Totara 10
+     * @var \totara_core\progressinfo
+     */
+    private $progressinfo;
+
+    /**
      * Return array of aggregation methods
      * @return array
      */
@@ -319,6 +326,21 @@ class completion_info {
             COMPLETION_AGGREGATION_ANY => get_string('any', 'completion'),
         );
     }
+
+    /**
+     * Return array containing detail on completion criteria types that may have multiple requirements
+     *
+     * @since Totara 10
+     * @return array
+     */
+    public static function get_multi_activity_criteria() {
+        return array(
+            COMPLETION_CRITERIA_TYPE_ACTIVITY => 'moduleinstance',
+            COMPLETION_CRITERIA_TYPE_COURSE => 'courseinstance',
+            COMPLETION_CRITERIA_TYPE_ROLE => 'role'
+        );
+    }
+
 
     /**
      * Constructs with course details.
@@ -489,7 +511,8 @@ class completion_info {
             );
 
             // Load criteria from database.
-            $records = (array)$DB->get_records('course_completion_criteria', $params, 'criteriatype ASC');
+            // Sort by criteriatype first, then to get reliable sort results.
+            $records = (array)$DB->get_records('course_completion_criteria', $params, 'criteriatype ASC, role ASC');
 
             // Order records so activities are in the same order as they appear on the course view page.
             if ($records) {
@@ -984,6 +1007,8 @@ class completion_info {
 
         // Difficult to find affected users, just purge all completion cache.
         $this->get_completion_cache()->purge();
+        // Purge progressinfo cache also
+        $this->get_progressinfo_cache()->purge();
     }
 
     /**
@@ -1052,14 +1077,18 @@ class completion_info {
 
         $cache = $this->get_completion_cache();
         if (empty($userid)) {
-            // Difficult to find affected users, just purge all completion cache.
+            // Difficult to find affected users, just purge all completion and progressinfo caches.
             $cache->purge();
+            $this->get_progressinfo_cache()->purge();
         } else {
             $key = $userid . '_' . $this->course->id;
             $cache->delete($key);
+
+            $this->mark_progressinfo_stale($userid);
         }
         // Difficult to find affected users, just purge all completion cache.
         cache::make('core', 'coursecompletion')->purge();
+
     }
 
     /**
@@ -1111,8 +1140,9 @@ class completion_info {
         }
 
         $this->get_completion_cache()->purge();
-        // Difficult to find affected users, just purge all completion cache.
+        // Difficult to find affected users, just purge all completion caches.
         cache::make('core', 'coursecompletion')->purge();
+        $this->get_progressinfo_cache()->purge();
     }
 
     /**
@@ -1172,6 +1202,36 @@ class completion_info {
      */
     protected function get_completion_cache() {
         return cache::make('core', 'completion');
+    }
+
+    /**
+     * Returns the progressinfo cache.
+     * @since Totara 10
+     * @return cache_application
+     */
+    private function get_progressinfo_cache() {
+        return cache::make('totara_core', 'completion_progressinfo');
+    }
+
+    /**
+     * Returns the string to use for progressinfo cache keys.
+     * @since Totara 10
+     * @param int $userid
+     * @return string
+     */
+    private function get_progressinfo_cache_key($userid) {
+        return "{$this->course_id}_{$userid}";
+    }
+
+    /**
+     * Marks the progressinfo cache stale for this entry
+     * @since Totara 10
+     * @param int $userid
+     */
+    public function mark_progressinfo_stale($userid) {
+        $cache = $this->get_progressinfo_cache();
+        $key = $this->get_progressinfo_cache_key($userid);
+        $cache->delete($key);
     }
 
     /**
@@ -1327,9 +1387,9 @@ class completion_info {
     }
 
     /**
-     * Invalidates the completion cache.
+     * Invalidates the completion caches.
      * If both a userid and courseid are passed then the explicit cache entry is deleted.
-     * Otherwise all completion cache entries are deleted.
+     * Otherwise all completion cache and progressinfo cache entries are deleted.
      *
      * @param int $courseid
      * @param int $userid
@@ -1340,8 +1400,11 @@ class completion_info {
         if (isset($courseid) && isset($userid)) {
             $key = $userid . '_' . $this->course->id;
             $cache->delete($key);
+            // Invalidate progressinfo_cache entry as well
+            $this->mark_progressinfo_stale($userid);
         } else {
             $cache->purge();
+            $this->get_progressinfo_cache()->purge();
         }
     }
 
@@ -1392,6 +1455,7 @@ class completion_info {
             // Remove another user's completion cache for this course.
             $completioncache->delete($data->userid . '_' . $cm->course);
         }
+        $this->mark_progressinfo_stale($data->userid);
 
         // Trigger an event for course module completion changed.
         $event = \core\event\course_module_completion_updated::create(array(
@@ -1804,5 +1868,133 @@ class completion_info {
         }
 
         return false;
+    }
+
+
+    /**
+     * Build progress aggregation information hierarchy
+     *
+     * The root node represents the course.
+     * The following level contains a node for each type of activity for which criteria
+     * was specified.
+     * Criteria types that may itself have multiple criteria (e.g. activities, courses, roles),
+     * will have child nodes representing each individual criteria of the specific type.
+     *
+     * @since Totara 10
+     */
+    private function build_progressinfo() {
+        global $CFG, $DB;
+
+        $agg_method = \totara_core\progressinfo::AGGREGATE_ANY;
+        if ($this->get_aggregation_method() == COMPLETION_AGGREGATION_ALL) {
+            $agg_method = \totara_core\progressinfo::AGGREGATE_ALL;
+        }
+        $progressinfo = \totara_core\progressinfo::from_data($agg_method);
+
+        if (!$this->is_enabled()) {
+            return $progressinfo;
+        }
+
+        $multi_activity_criteria = self::get_multi_activity_criteria();
+
+        $completioncriteria = $this->get_criteria();
+
+        // Retrieve progress and weight for all completion criteria
+        foreach ($completioncriteria as $criteria) {
+
+            // For courses, customdata is added to allow us to get completion summary
+            // information without the need to re-read the full completion structure
+            $customdata = null;
+            switch ($criteria->criteriatype) {
+
+                case COMPLETION_CRITERIA_TYPE_DATE:
+                    $customdata = ['date' => userdate($criteria->timeend, '%d %m %y', null, false)];
+                    break;
+
+                case COMPLETION_CRITERIA_TYPE_DURATION:
+                    $customdata = ['duration' => get_string('xdays', 'completion', ceil($criteria->enrolperiod / (60*60*24)))];
+                    break;
+
+                case COMPLETION_CRITERIA_TYPE_GRADE:
+                    $customdata = ['grade' => format_float($criteria->gradepass, $CFG->grade_decimalpoints)];
+                    break;
+
+                case COMPLETION_CRITERIA_TYPE_ROLE:
+                    // Customdata for roles will eventually contain the names of all required roles - handled later in the function
+                    $role = $DB->get_record('role', array('id' => $criteria->role));
+                    if (!$role) {
+                        $customdata = ['roles' => get_string('roleidnotfound', 'completion', $criteria->role)];
+                    } else {
+                        $customdata = ['roles' => role_get_name($role)];
+                    }
+                    break;
+            }
+
+            // Only add if this criteriatype not yet added
+            $key = $criteria->criteriatype;
+
+            if (!$progressinfo->criteria_exist($key)) {
+                if (array_key_exists($key, $multi_activity_criteria)) {
+
+                    $agg_method = \totara_core\progressinfo::AGGREGATE_ANY;
+                    if ($this->get_aggregation_method($key) == COMPLETION_AGGREGATION_ALL) {
+                        $agg_method = \totara_core\progressinfo::AGGREGATE_ALL;
+                    }
+                    $critinfo = $progressinfo->add_criteria($key, $agg_method, 0, 0, $customdata);
+
+                    // unset customdata as it has already been added for types with multiple criteria
+                    $customdata = null;
+                } else {
+                    // For single criteria - add to top level
+                    $critinfo = $progressinfo;
+                }
+            } else {
+                $critinfo = $progressinfo->get_criteria($key);
+                // Update customdata for roles - other existing info would have customdata from time of creation
+                if ($key == COMPLETION_CRITERIA_TYPE_ROLE) {
+                    // Append this rolename to the customdata
+                    $rolecustomdata = $critinfo->get_customdata();
+                    // It should have a customdata['roles'], but handle all cases
+                    if (isset($rolecustomdata['roles'])) {
+                        $rolecustomdata['roles'] = $rolecustomdata['roles'] . ', ' . $customdata['roles'];
+                    } else {
+                        $rolecustomdata['roles'] = $customdata['roles'];
+                    }
+                    $critinfo->set_customdata($rolecustomdata);
+                }
+
+                $customdata = null;
+            }
+
+            if ($critinfo) {
+                if (array_key_exists($criteria->criteriatype, $multi_activity_criteria)) {
+                    $criteriatype = $multi_activity_criteria[$criteria->criteriatype];
+                    $type = $criteria->{$criteriatype};
+                } else {
+                    $type = $criteria->criteriatype;;
+                }
+
+                if (!$critinfo->criteria_exist($type)) {
+                    $agg_method = \totara_core\progressinfo::AGGREGATE_ALL;
+                    $critinfo->add_criteria($type, $agg_method, $criteria->get_weight(), 0, $customdata);
+                }
+            }
+        }
+
+        return $progressinfo;
+    }
+
+    /**
+     * Return the progress aggregation information structure
+     *
+     * @since Totara 10
+     * @return \totara_core\progressinfo
+     */
+    public function get_progressinfo() {
+        if (empty($this->progressinfo)) {
+            $this->progressinfo = $this->build_progressinfo();
+        }
+
+        return $this->progressinfo;
     }
 }

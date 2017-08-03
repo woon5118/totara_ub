@@ -777,7 +777,7 @@ class dp_course_component extends dp_base_component {
      * @return string $out display markup
      */
     function display_status_as_progress_bar($item) {
-        return totara_display_course_progress_icon($this->plan->userid, $item->courseid, $item->coursecompletion);
+        return totara_display_course_progress_bar($this->plan->userid, $item->courseid, $item->coursecompletion);
     }
 
 

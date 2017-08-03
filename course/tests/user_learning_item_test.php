@@ -74,6 +74,7 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
         $this->completion_generator->enable_completion_tracking($this->course5);
         $this->completion_generator->enable_completion_tracking($this->course6);
 
+        // Add criteria for some courses
         $this->user1 = $this->generator->create_user(array('fullname' => 'user1'));
     }
 
@@ -155,6 +156,9 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
         $progress_canbecompleted = new ReflectionProperty('core_course\user_learning\item', 'progress_canbecompleted');
         $progress_canbecompleted->setAccessible(true);
 
+        $progress_hascompletioncriteria = new ReflectionProperty('core_course\user_learning\item', 'progress_hascompletioncriteria');
+        $progress_hascompletioncriteria->setAccessible(true);
+
         $progress_percentage = new ReflectionProperty('core_course\user_learning\item', 'progress_percentage');
         $progress_percentage->setAccessible(true);
 
@@ -163,6 +167,7 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
 
         // Check they are all empty.
         $this->assertEmpty($progress_canbecompleted->getValue($learning_items));
+        $this->assertEmpty($progress_hascompletioncriteria->getValue($learning_items));
         $this->assertEmpty($progress_percentage->getValue($learning_items));
         $this->assertEmpty($progress_summary->getValue($learning_items));
 
@@ -176,8 +181,9 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
 
         // We should have some values this time (even if there is no progress).
         $this->assertTrue($progress_canbecompleted->getValue($learning_items));
+        $this->assertFalse($progress_hascompletioncriteria->getValue($learning_items));
         $this->assertEquals(0, $progress_percentage->getValue($learning_items));
-        $this->assertEquals('Not yet started', $progress_summary->getValue($learning_items));
+        $this->assertEquals('No criteria', $progress_summary->getValue($learning_items));
     }
 
     public function test_export_for_template() {

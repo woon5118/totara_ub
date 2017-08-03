@@ -1,4 +1,4 @@
-@totara @totara_program
+@totara @totara_program @totara_courseprogressbar
 Feature: Users completion of programs and coursesets
   In order to view a program
   As a user
@@ -76,15 +76,15 @@ Feature: Users completion of programs and coursesets
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
     Then I should see "0%" program progress
-    And I should see "Complete" in the "Course 1" "table_row"
+    And I should see "100%" in the "Course 1" "table_row"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
     Then I should see "50%" program progress
-    And I should see "Complete" in the "Course 1" "table_row"
-    And I should see "Complete" in the "Course 2" "table_row"
+    And I should see "100%" in the "Course 1" "table_row"
+    And I should see "100%" in the "Course 2" "table_row"
 
     When I click on "Course 3" "link"
     And I click on "Complete course" "link"
@@ -313,13 +313,13 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
+    Then I should see "100%" in the "Course 1" "table_row"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "Complete" in the "Course 2" "table_row"
+    Then I should see "100%" in the "Course 2" "table_row"
 
     When I click on "Record of Learning" in the totara menu
     And I click on "Completion Program Tests" "link"
@@ -353,13 +353,13 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
+    Then I should see "100%" in the "Course 1" "table_row"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "Complete" in the "Course 2" "table_row"
+    Then I should see "100%" in the "Course 2" "table_row"
 
     # Finally check completion for the user.
     When I click on "Course 3" "link"
@@ -489,13 +489,13 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
+    Then I should see "100%" in the "Course 1" "table_row"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "Complete" in the "Course 2" "table_row"
+    Then I should see "100%" in the "Course 2" "table_row"
 
     # Finally check completion for the user.
     When I click on "Course 3" "link"

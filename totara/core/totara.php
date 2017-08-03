@@ -700,6 +700,7 @@ function totara_queue_shift($key, $all = false) {
  *
  * Optionally with a link to the user's profile if they have the correct permissions
  *
+ * @deprecated since Totara 10.0
  * @access  public
  * @param   $userid     int
  * @param   $courseid   int
@@ -707,8 +708,22 @@ function totara_queue_shift($key, $all = false) {
  * @return  string
  */
 function totara_display_course_progress_icon($userid, $courseid, $status) {
-    global $PAGE, $COMPLETION_STATUS;
+    debugging('The function totara_display_course_progress_icon has been deprecated since 10.0. Please use totara_display_course_progress_bar.', DEBUG_DEVELOPER);
+    return totara_display_course_progress_bar($userid, $courseid, $status);
+}
 
+/**
+ *  Calls module renderer to return markup for displaying a progress bar for a user's course progress
+ *
+ * @param int $userid User id
+ * @param int $courseid Course id
+ * @param int $status COMPLETION_STATUS_ constant
+ * @return string
+ */
+function totara_display_course_progress_bar($userid, $courseid, $status) {
+    global $PAGE;
+
+    /** @var totara_core_renderer $renderer */
     $renderer = $PAGE->get_renderer('totara_core');
     $content = $renderer->course_progress_bar($userid, $courseid, $status);
     return $content;

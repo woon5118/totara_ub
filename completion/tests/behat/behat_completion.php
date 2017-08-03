@@ -271,5 +271,12 @@ class behat_completion extends behat_base {
                 $DB->insert_record('course_completions', $params);
             }
         }
+
+        // Purge the completion caches
+        $cache = cache::make('core', 'coursecompletion');
+        $cache->purge();
+
+        $cache = cache::make('totara_core', 'completion_progressinfo');
+        $cache->purge();
     }
 }

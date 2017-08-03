@@ -103,7 +103,7 @@ class block_last_course_accessed extends block_base {
 
         // Build the data object for the template.
         $templateobject = new stdClass();
-        $templateobject->course_url = (string) new moodle_url('/course/view.php', array('id' => $courseid));
+        $templateobject->course_url = (string) new moodle_url('/course/view.php', array('id' => $course->id));
         $templateobject->course_name = format_string($course->fullname, true, $context);
         $templateobject->last_accessed = $last_accessed;
 
@@ -117,12 +117,11 @@ class block_last_course_accessed extends block_base {
         }
 
         // Get the renderer so we can render templates.
+        /** @var totara_core_renderer $renderer */
         $renderer = $this->page->get_renderer('totara_core');
 
         // If there's no status, there's no completion data, so no progress bar.
-        if ($course->status) {
-            $templateobject->progress_bar = $renderer->course_progress_bar($USER->id, $courseid, $course->status);
-        }
+        $templateobject->progress = $renderer->export_course_progress_for_template($USER->id, $courseid, $course->status);
 
         // Get the block content from the template.
         $this->content->text = $renderer->render_from_template('block_last_course_accessed/block', $templateobject);

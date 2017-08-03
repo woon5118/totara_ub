@@ -1,4 +1,4 @@
-@report @report_completion @totara
+@report @report_completion @totara @totara_courseprogressbar
 Feature: Completion report rpl
   If cousrse completion via RPL is set or removed, the course status needs to be adjusted accordingly
 
@@ -37,8 +37,8 @@ Feature: Completion report rpl
     # Check student completion status
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
-    And I follow "Complete via rpl"
-    Then I should see "Complete via rpl"
+    # Completionstatus detail have been deprecated. Will be replaced by information in the progressbar popover
+    Then I should see "100%" in the "Course 1" "table_row"
     And I log out
 
     # Delete RPL
@@ -52,8 +52,8 @@ Feature: Completion report rpl
     # Check student completion status
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
-    And I follow "Not yet started"
-    Then I should see "Not completed"
+    # Completionstatus detail have been deprecated. Will be replaced by information in the progressbar popover
+    Then I should see "0%" in the "Course 1" "table_row"
 
   @javascript
   Scenario: Course status is set correctly when RPL is set then deleted, with one learner activity completed
@@ -79,8 +79,8 @@ Feature: Completion report rpl
     # Check student completion status
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
-    And I follow "Complete via rpl"
-    Then I should see "Complete via rpl"
+    # Completionstatus detail have been deprecated. Will be replaced by information in the progressbar popover
+    Then I should see "100%" in the "Course 1" "table_row"
     And I log out
 
     # Delete RPL
@@ -94,5 +94,5 @@ Feature: Completion report rpl
     # Check student completion status
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
-    And I follow "In progress"
-    Then I should see "Not completed"
+    # Completionstatus detail have been deprecated. Will be replaced by information in the progressbar popover
+    Then I should see "0%" in the "Course 1" "table_row"

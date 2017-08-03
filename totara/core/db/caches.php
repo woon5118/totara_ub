@@ -39,4 +39,13 @@ $definitions = array(
         'staticacceleration' => true,
         'staticaccelerationsize' => 10
     ),
+
+    // Cache for completion progressinfo
+    'completion_progressinfo' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 10
+    )
 );

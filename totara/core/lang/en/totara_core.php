@@ -56,6 +56,7 @@ $string['bookings'] = 'Bookings';
 $string['bookingsfor'] = 'Bookings for ';
 $string['browse'] = 'Browse';
 $string['browsecategories'] = 'Browse Categories';
+$string['cachedef_completion_progressinfo'] = 'Completion progressinfo cache';
 $string['cachedef_flex_icons'] = 'Flex icons';
 $string['cachedef_hookwatchers'] = 'Hook watchers';
 $string['calendar'] = 'Calendar';

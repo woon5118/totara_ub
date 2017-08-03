@@ -139,7 +139,7 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return  string html to display
      */
     public function display_course_progress_icon($userid, $courseid, $status) {
-        debugging("display_course_progress_icon has been deprecated. Use course_progress_icon instead", DEBUG_DEVELOPER);
+        debugging("display_course_progress_icon has been deprecated. Use course_progress_bar instead", DEBUG_DEVELOPER);
         return $this->course_progress_bar($userid, $courseid, $status);
     }
 
@@ -157,25 +157,50 @@ class totara_core_renderer extends plugin_renderer_base {
     public function course_progress_bar($userid, $courseid, $status) {
         global $COMPLETION_STATUS;
 
-        if (!isset($status) || !array_key_exists($status, $COMPLETION_STATUS)) {
-            return '';
-        }
-
         // Display the course progress bar.
+        $data = $this->export_course_progress_for_template($userid, $courseid, $status);
+        return $this->output->render_from_template('totara_core/course_progress_bar', $data);
+    }
+
+    /**
+    * Returns exported template data for displaying a progress bar of a user's course progress
+    *
+    * @access  public
+    * @param   $userid     int
+    * @param   $courseid   int
+    * @param   $status     int     COMPLETION_STATUS_ constant
+    * @return  string stdClass with exported template data
+    */
+    public function export_course_progress_for_template($userid, $courseid, $status) {
+        global $COMPLETION_STATUS, $OUTPUT;
+
         $data = new stdClass();
-        $data->statusclass = $COMPLETION_STATUS[$status];
-        $data->statustext = get_string($COMPLETION_STATUS[$status], 'completion');
-        if (completion_can_view_data($userid, $courseid)) {
-            $course = new stdClass();
-            $course->id = $courseid;
-            $info = new completion_info($course);
-            if ($info->user_has_completion_status($userid)) {
-                $data->href = (string) new moodle_url('/blocks/completionstatus/details.php',
-                                                            array('course' => $courseid, 'user' => $userid));
-            }
+
+        if (!isset($status) || !array_key_exists($status, $COMPLETION_STATUS)){
+            $data->statustext = get_string('statusnottracked', 'completion');
+            return $data;
         }
 
-        return $this->output->render_from_template('totara_core/course_progress_bar', $data);
+        // If there is no completion criteria and status != 'complete' and status != 'completeviarpl', show 'no criteria'
+        if (!completion_criteria::course_has_criteria($courseid) && $status != COMPLETION_STATUS_COMPLETE && $status != COMPLETION_STATUS_COMPLETEVIARPL) {
+            $data->statustext = get_string('statusnocriteria', 'completion');
+            return $data;
+        }
+
+        $completion = new completion_completion(['userid' => $userid, 'course' => $courseid]);
+        $data->statustext = get_string($COMPLETION_STATUS[$status], 'completion');
+
+        // TODO: Need to get a better way to get the width right
+        $pbar = new \static_progress_bar('', '70');
+        $pbar->set_progress((string)$completion->get_progressinfo()->get_percentagecomplete());
+        $data->pbar = $pbar->export_for_template($OUTPUT);
+
+        // Get the popover detail on required completion criteria
+        if (completion_can_view_data($userid, $courseid)) {
+            $data->detail = $completion->export_completion_criteria_for_template();
+        }
+
+        return $data;
     }
 
     /**

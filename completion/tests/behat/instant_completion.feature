@@ -1,4 +1,4 @@
-@core @core_completion @totara @instant_completion
+@core @core_completion @totara @instant_completion @totara_courseprogressbar
 Feature: Instant completion
   In order to test instant completion
   As a teacher
@@ -171,9 +171,14 @@ Feature: Instant completion
     When I log out
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete" in the "Course 1" "table_row"
-    And  I should see "Complete" in the "Course 2" "table_row"
-    And  I should see "Complete" in the "Course 3" "table_row"
+    Then the following should exist in the "plan_courses" table:
+      | Course Title  | Progress |
+      | Course 1      | 100%     |
+      | Course 2      | 100%     |
+      | Course 3      | 100%     |
+    Then I should see "100%" in the "Course 1" "table_row"
+    And  I should see "100%" in the "Course 2" "table_row"
+    And  I should see "100%" in the "Course 3" "table_row"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Program1" "link"
     Then I should see "100%" program progress

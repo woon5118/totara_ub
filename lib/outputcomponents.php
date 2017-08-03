@@ -4914,7 +4914,7 @@ class progress_bar implements renderable, templatable {
      * @param bool $autostart Whether to start the progress bar right away.
      */
     public function __construct($htmlid = '', $width = 500, $autostart = false) {
-        if (!CLI_SCRIPT and (!defined('NO_OUTPUT_BUFFERING') || !NO_OUTPUT_BUFFERING)) {
+        if (!$this->is_static() && !CLI_SCRIPT and (!defined('NO_OUTPUT_BUFFERING') || !NO_OUTPUT_BUFFERING)) {
             debugging('progress_bar used without setting NO_OUTPUT_BUFFERING.', DEBUG_DEVELOPER);
         }
 
@@ -5071,5 +5071,30 @@ class progress_bar implements renderable, templatable {
             'width' => $this->width,
             'progress' => $this->percent,
         ];
+    }
+
+    /**
+     * Is this a static progress bar
+     *
+     * @return bool
+     */
+    function is_static() {
+        return false;
+    }
+}
+
+/**
+ * Static progress bar class.
+ *
+ * Manages the display of a static progress bar.
+ */
+class static_progress_bar extends progress_bar {
+    /**
+     * Is this a static progress bar
+     *
+     * @return bool
+     */
+    function is_static() {
+        return true;
     }
 }

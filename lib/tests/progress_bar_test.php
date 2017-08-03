@@ -39,7 +39,7 @@ require_once($CFG->libdir . '/outputcomponents.php');
 
     public function test_instantiation() {
         global $OUTPUT;
-        $progress_bar = new progress_bar('abc', 0);
+        $progress_bar = new static_progress_bar('abc', 0);
         $expected = array(
             'id' => 'abc',
             'width' => 0,
@@ -48,7 +48,7 @@ require_once($CFG->libdir . '/outputcomponents.php');
 
         $this->assertSame($expected, $progress_bar->export_for_template($OUTPUT));
 
-        $progress_bar = new progress_bar('abc');
+        $progress_bar = new static_progress_bar('abc');
         $expected = array(
             'id' => 'abc',
             'width' => 500,
@@ -60,9 +60,9 @@ require_once($CFG->libdir . '/outputcomponents.php');
 
     public function test_id_generation() {
         global $OUTPUT;
-        $pb1 = new progress_bar();
+        $pb1 = new static_progress_bar();
         $pb1 = $pb1->export_for_template($OUTPUT);
-        $pb2 = new progress_bar();
+        $pb2 = new static_progress_bar();
         $pb2 = $pb2->export_for_template($OUTPUT);
 
         $this->assertNotEquals($pb1['id'], $pb2['id']);
