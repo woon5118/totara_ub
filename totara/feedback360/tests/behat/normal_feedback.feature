@@ -58,7 +58,7 @@ Feature: Normal feedback
 
     And I log in as "user1"
     And I click on "360° Feedback" in the totara menu
-    And I press "Request Feedback"
+    And I click on "Request Feedback" "button" in the "Normal feedback" "table_row"
     And I press "Add user(s)"
     And I click on "User Two" "link" in the "Add user(s)" "totaradialogue"
     And I click on "User Three" "link" in the "Add user(s)" "totaradialogue"
@@ -74,7 +74,7 @@ Feature: Normal feedback
     And I should see "User Five"
     And I should see "User Six"
     When I press "Confirm"
-    Then I should see "0 Responses (out of 5)" in the "Normal feedback" "table_row"
+    Then I should see "0 out of 5" in the "Normal feedback" "table_row"
     And I log out
 
     And I log in as "user2"
@@ -96,7 +96,7 @@ Feature: Normal feedback
   Scenario: Check responses are shown
     Given I log in as "user1"
     And I click on "360° Feedback" in the totara menu
-    Then I should see "2 Responses (out of 5)" in the "Normal feedback" "table_row"
+    Then I should see "2 out of 5" in the "Normal feedback" "table_row"
     When I follow "Normal feedback"
     Then I should see "View Response" in the "User Two" "table_row"
     And I should see "Not Completed" in the "User Three" "table_row"
@@ -128,7 +128,7 @@ Feature: Normal feedback
     Then I should see "Cancel existing requests for:"
     And I should see "User Three"
     When I press "Confirm"
-    Then I should see "2 Responses (out of 4)" in the "Normal feedback" "table_row"
+    Then I should see "2 out of 4" in the "Normal feedback" "table_row"
     When I follow "Normal feedback"
     Then I should see "View Response" in the "User Two" "table_row"
     And I should see "Not Completed" in the "User Four" "table_row"
@@ -153,7 +153,7 @@ Feature: Normal feedback
     When I press "Update"
     Then I should see "User Seven"
     When I press "Confirm"
-    Then I should see "2 Responses (out of 6)" in the "Normal feedback" "table_row"
+    Then I should see "2 out of 6" in the "Normal feedback" "table_row"
     When I follow "Normal feedback"
     And I should see "Not Completed" in the "User Seven" "table_row"
 
@@ -164,7 +164,7 @@ Feature: Normal feedback
     Then I should see "Are you sure you want to cancel this feedback request?"
     When I press "Continue"
     Then I should see "Request successfully cancelled"
-    And I should see "2 Responses (out of 2)" in the "Normal feedback" "table_row"
+    And I should see "2 out of 2" in the "Normal feedback" "table_row"
 
   Scenario: Remind feedback360 responders
     Given I log in as "user1"

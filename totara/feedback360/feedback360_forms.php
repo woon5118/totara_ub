@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author Simon Player <simon.player@totaralearning.com>
  * @package totara
  * @subpackage totara_feedback360
  */
@@ -50,6 +51,9 @@ class feedback360_edit_form extends moodleform {
 
             $mform->addElement('static', 'anonymous_ro', get_string('anonymousfeedback', 'totara_feedback360'),
                 $feedback360->anonymous ? get_string('yes') : get_string('no'));
+
+            $mform->addElement('static', 'selfevaluation_ro', get_string('selfevaluation', 'totara_feedback360'),
+                feedback360::get_selfevaluation_status($feedback360->selfevaluation));
         } else {
             $mform->addElement('text', 'name', get_string('name', 'totara_feedback360'), 'maxlength="255" size="50"');
             $mform->addRule('name', null, 'required');
@@ -61,6 +65,18 @@ class feedback360_edit_form extends moodleform {
 
             $mform->addElement('advcheckbox', 'anonymous', get_string('anonymousfeedback', 'totara_feedback360'));
             $mform->addHelpButton('anonymous', 'anonymousfeedback', 'totara_feedback360');
+
+            $selfevaluation = array();
+            $selfevaluation[] = $mform->createElement('radio', 'selfevaluation', null,
+                feedback360::get_selfevaluation_status(feedback360::SELF_EVALUATION_OPTIONAL), feedback360::SELF_EVALUATION_OPTIONAL);
+            $selfevaluation[] = $mform->createElement('radio', 'selfevaluation', null,
+                feedback360::get_selfevaluation_status(feedback360::SELF_EVALUATION_REQUIRED), feedback360::SELF_EVALUATION_REQUIRED);
+            $selfevaluation[] = $mform->createElement('radio', 'selfevaluation', null,
+                feedback360::get_selfevaluation_status(feedback360::SELF_EVALUATION_DISABLED), feedback360::SELF_EVALUATION_DISABLED);
+
+            $mform->addGroup($selfevaluation, 'selfevaluation', get_string('selfevaluation', 'totara_feedback360'), array('<br/>'), false);
+            $mform->setDefault('selfevaluation', feedback360::SELF_EVALUATION_OPTIONAL);
+            $mform->addHelpButton('selfevaluation', 'selfevaluation', 'totara_feedback360');
 
             $submittitle = get_string('createfeedback360', 'totara_feedback360');
             if ($feedback360->id > 0) {
@@ -298,7 +314,11 @@ class feedback360_quest_edit_form extends question_base_form {
 
 }
 
-// The form used to select which premade form to use for a feedback request.
+/**
+ * The form used to select which premade form to use for a feedback request.
+ *
+ * @deprecated since 10
+ */
 class request_select_form extends moodleform {
 
     public function definition() {
@@ -339,7 +359,7 @@ class request_select_form extends moodleform {
         foreach ($available_forms as $form) {
             // If it has existing requests it should be edited from the myfeedback page instead.
             $existingrequests = $DB->count_records('feedback360_resp_assignment',
-                    array('feedback360userassignmentid' => $form->assigid));
+                array('feedback360userassignmentid' => $form->assigid));
             if ($existingrequests > 0) {
                 continue;
             }
@@ -347,7 +367,7 @@ class request_select_form extends moodleform {
             $preview_params = array('userid' => $USER->id, 'feedback360id' => $form->id, 'preview' => true);
             $preview_url = new moodle_url('/totara/feedback360/feedback.php', $preview_params);
             $preview_link = html_writer::link($preview_url, get_string('previewencased', 'totara_feedback360'),
-                    array('class' => 'previewlink', 'id' => $form->id));
+                array('class' => 'previewlink', 'id' => $form->id));
 
             $radiostr = format_string($form->name) . ' ' . $preview_link;
             $requestforms[] =& $mform->createElement('radio', 'formid', '', $radiostr, $form->assigid);
@@ -361,7 +381,7 @@ class request_select_form extends moodleform {
 
         if (!empty($requestforms)) {
             $mform->addGroup($requestforms, 'formselector',
-                    get_string('feedback360selectform', 'totara_feedback360'), array(' '), false);
+                get_string('feedback360selectform', 'totara_feedback360'), array(' '), false);
             $mform->addHelpButton('formselector', 'feedback360selectform', 'totara_feedback360');
 
             $this->add_action_buttons(true, get_string('next', 'totara_feedback360'));
@@ -388,7 +408,7 @@ class request_select_users extends moodleform {
     private $emailsexisting = null;
 
     public function definition() {
-        global $CFG, $USER, $OUTPUT;
+        global $CFG, $USER;
 
         $mform =& $this->_form;
 
@@ -421,6 +441,11 @@ class request_select_users extends moodleform {
         // A hidden datefield to complare the new vs old dates when editing.
         $mform->addElement('hidden', 'oldduedate', 0);
         $mform->setType('oldduedate', PARAM_INT);
+
+        // A hidden selfevaluation field to compare the new vs old self evaluation when editing.
+        $mform->addElement('hidden', 'oldselfevaluation', 0);
+        $mform->setType('oldselfevaluation', PARAM_INT);
+
         // A hidden field used by js to popup a preview window.
         $popupurl = $CFG->wwwroot . "/totara/feedback360/feedback.php?userid={$USER->id}&preview=1&feedback360id=";
         $mform->addElement('hidden', 'popupurl', $popupurl);
@@ -436,6 +461,19 @@ class request_select_users extends moodleform {
 
         // Create a place to show existing system requests.
         $mform->addElement('static', 'system_assignments', get_string('requestuserssystem', 'totara_feedback360'), '');
+
+        // Self evaluation.
+        if ($this->_customdata['selfeval'] != feedback360::SELF_EVALUATION_DISABLED) {
+            $mform->addElement('checkbox', 'selfevaluation', get_string('selfevaluationlearner', 'totara_feedback360'), '');
+            $mform->addHelpButton('selfevaluation', 'selfevaluationlearner', 'totara_feedback360');
+
+            // Freeze if required or completed.
+            if ($this->_customdata['selfeval'] == feedback360::SELF_EVALUATION_REQUIRED ||
+                $this->_customdata['selfeval_complete']) {
+
+                $mform->hardFreeze('selfevaluation');
+            }
+        }
 
         // Text area to add new emails.
         $mform->addElement('textarea', 'emailnew', get_string('emailrequestsnew', 'totara_feedback360'));
@@ -495,7 +533,6 @@ class request_select_users extends moodleform {
             foreach ($this->systemexisting as $user) {
                 $resp_params = array('userid' => $user->id, 'feedback360userassignmentid' => $userform);
                 $resp = $DB->get_record('feedback360_resp_assignment', $resp_params);
-
                 $existing[] = $renderer->system_user_record($user, $userform, $resp, $data['anonymous']);
                 $existingids[] = $user->id;
             }
@@ -553,6 +590,11 @@ class request_select_users extends moodleform {
         if (!empty($data['duedate'])) {
             $mform->getElement('oldduedate')->setValue($data['duedate']);
             $mform->getElement('duedate')->setValue($data['duedate']);
+        }
+
+        if (!empty($data['selfevaluation'])) {
+            $mform->getElement('oldselfevaluation')->setValue($data['selfevaluation']);
+            $mform->getElement('selfevaluation')->setValue($data['selfevaluation']);
         }
 
         if (!empty($data['update'])) {
@@ -664,22 +706,21 @@ class request_confirmation extends moodleform {
         $mform->addElement('hidden', 'emailcancel', null);
         $mform->setType('emailcancel', PARAM_TEXT);
 
+        // The self evaluation setting.
+        $mform->addElement('hidden', 'selfevaluation', 1);
+        $mform->setType('selfevaluation', PARAM_INT);
+        $mform->addElement('hidden', 'oldselfevaluation', 1);
+        $mform->setType('oldselfevaluation', PARAM_INT);
+
         // Set up the header of the form.
         $mform->addElement('header', 'requestfeedback360', get_string('requestfeedback360', 'totara_feedback360'));
 
         // Set up the confirmation string.
         $strconfirm = get_string('requestfeedback360confirm', 'totara_feedback360');
-
         $mform->addElement('static', 'confirmation', '', $strconfirm);
 
-        // Create a place to show new feedback requests.
-        $mform->addElement('static', 'show_new_requests', '', '');
-
-        // Create a place to show cancelled requests.
-        $mform->addElement('static', 'show_cancelled_requests', '', '');
-
-        // Create a place to due date notifications.
-        $mform->addElement('static', 'show_date_notifications', '', '');
+        // Create a place to show request changes for confirmation.
+        $mform->addElement('static', 'show_changes', '', '');
 
         // And the confirm/cancel buttons.
         $this->add_action_buttons(true, get_string('confirm'));
@@ -759,6 +800,18 @@ class request_confirmation extends moodleform {
         }
 
         // Display all this on the screen.
+        $changesstr = '';
+
+        // Self evaluation change.
+        if ($data['selfevaluation'] != $data['oldselfevaluation']) {
+            if ($data['selfevaluation'] == 1) {
+                $changesstr .= html_writer::tag('p', get_string('requestfeedbackincludeselfevaluation', 'totara_feedback360'));
+            } else {
+                $changesstr .= html_writer::tag('p', get_string('requestfeedbackoptoutselfevaluation', 'totara_feedback360'));
+            }
+        }
+
+        // New requests.
         if (!empty($newsystem) || !empty($newexternal)) {
             $newsystemname = array();
             foreach ($newsystem as $userid) {
@@ -771,9 +824,10 @@ class request_confirmation extends moodleform {
             $newrequests .= implode(html_writer::empty_tag('li'), array_merge($newsystemname, $newexternal));
             $newrequests .= html_writer::end_tag('ul');
             $newrequests .= html_writer::end_tag('div');
-            $mform->getElement('show_new_requests')->setValue($newrequests);
+            $changesstr .= $newrequests;
         }
 
+        // Cancel requests.
         if (!empty($cancelsystem) || !empty($cancelexternal)) {
             $cancelsystemname = array();
             foreach ($cancelsystem as $userid) {
@@ -786,9 +840,10 @@ class request_confirmation extends moodleform {
             $cancelledrequests .= implode(html_writer::empty_tag('li'), array_merge($cancelsystemname, $cancelexternal));
             $cancelledrequests .= html_writer::end_tag('ul');
             $cancelledrequests .= html_writer::end_tag('div');
-            $mform->getElement('show_cancelled_requests')->setValue($cancelledrequests);
+            $changesstr .= $cancelledrequests;
         }
 
+        // Due notifications.
         if ($duenotifications) {
             if (!empty($keepsystem) || !empty($keepexternal)) {
                 $keepsystemname = array();
@@ -802,9 +857,11 @@ class request_confirmation extends moodleform {
                 $keeprequests .= implode(html_writer::empty_tag('li'), array_merge($keepsystemname, $keepexternal));
                 $keeprequests .= html_writer::end_tag('ul');
                 $keeprequests .= html_writer::end_tag('div');
-                $mform->getElement('show_date_notifications')->setValue($keeprequests);
+                $changesstr .= $keeprequests;
             }
         }
+
+        $mform->getElement('show_changes')->setValue($changesstr);
 
         parent::set_data($data);
     }

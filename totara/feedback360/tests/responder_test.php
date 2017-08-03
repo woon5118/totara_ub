@@ -486,13 +486,13 @@ class feedback360_responder_test extends feedback360_testcase {
         $user1 = $this->data_generator->create_user();
 
         /** @var feedback360 $feedback1*/
-        list($feedback1) = $this->prepare_feedback_with_users(array($user1));
+        list($feedback1) = $this->prepare_feedback_with_users(array($user1), 1, false, feedback360::SELF_EVALUATION_DISABLED);
         $feedback1->activate();
 
         $user1feedback1 = $DB->get_field('feedback360_user_assignment', 'id',
             array('feedback360id' => $feedback1->id, 'userid' => $user1->id));
 
-        // Assignees can not request feedback from themselves.
+        // Self evaluation is disabled, assignees can not request feedback for themselves.
         $invalidids = array($user1->id);
 
         $deleteduser = $this->data_generator->create_user();
@@ -516,6 +516,85 @@ class feedback360_responder_test extends feedback360_testcase {
     /**
      * Tests feedback360_responder::sort_system_userids().
      *
+     * In this case, the array of users we are adding are all invalid and the assignee
+     * has made no previous requests.
+     */
+    public function test_sort_system_userids_self_evaluation() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        $user1 = $this->data_generator->create_user();
+
+        /** @var feedback360 $feedback1_optional*/
+        list($feedback1_optional) = $this->prepare_feedback_with_users(array($user1), 1, false, feedback360::SELF_EVALUATION_OPTIONAL);
+        $feedback1_optional->activate();
+
+        /** @var feedback360 $feedback1_required*/
+        list($feedback1_required) = $this->prepare_feedback_with_users(array($user1), 1, false, feedback360::SELF_EVALUATION_REQUIRED);
+        $feedback1_required->activate();
+
+        $user1feedback1_optional = $DB->get_field('feedback360_user_assignment', 'id',
+            array('feedback360id' => $feedback1_optional->id, 'userid' => $user1->id));
+
+        $user1feedback2_required = $DB->get_field('feedback360_user_assignment', 'id',
+            array('feedback360id' => $feedback1_required->id, 'userid' => $user1->id));
+
+
+        $newuser1 = $this->data_generator->create_user();
+        $newuser2 = $this->data_generator->create_user();
+
+        $invalidids = array();
+
+        $deleteduser = $this->data_generator->create_user();
+        $DB->set_field('user', 'deleted', 1, array('id' => $deleteduser->id));
+        $invalidids[] = $deleteduser->id;
+
+        $suspendeduser = $this->data_generator->create_user();
+        $DB->set_field('user', 'suspended', 1, array('id' => $suspendeduser->id));
+        $invalidids[] = $suspendeduser->id;
+
+        $guestuser = guest_user();
+        $invalidids[] = $guestuser->id;
+
+        // Create the array of users that we want assigned as responders (which includes user1 for self evaluation).
+        $userids_to_sort = $invalidids;
+
+        $userids_to_sort[] = $user1->id;
+        $userids_to_sort[] = $newuser1->id;
+        $userids_to_sort[] = $newuser2->id;
+
+        list($new, $keep, $cancel) = feedback360_responder::sort_system_userids($userids_to_sort, $user1feedback1_optional);
+
+        $this->assertNotContains($deleteduser->id, $new);
+        $this->assertNotContains($suspendeduser->id, $new);
+        $this->assertNotContains($guestuser->id, $new);
+
+        $this->assertContains($user1->id, $new);
+        $this->assertContains($newuser1->id, $new);
+        $this->assertContains($newuser2->id, $new);
+        $this->assertEquals(3, count($new));
+
+        $this->assertEquals(array(), $keep);
+        $this->assertEquals(array(), $cancel);
+
+        list($new, $keep, $cancel) = feedback360_responder::sort_system_userids($userids_to_sort, $user1feedback2_required);
+
+        $this->assertNotContains($deleteduser->id, $new);
+        $this->assertNotContains($suspendeduser->id, $new);
+        $this->assertNotContains($guestuser->id, $new);
+
+        $this->assertContains($user1->id, $new);
+        $this->assertContains($newuser1->id, $new);
+        $this->assertContains($newuser2->id, $new);
+        $this->assertEquals(3, count($new));
+
+        $this->assertEquals(array(), $keep);
+        $this->assertEquals(array(), $cancel);
+    }
+
+    /**
+     * Tests feedback360_responder::sort_system_userids().
+     *
      * In this case, the assignee has several existing response requests already.
      *
      * An array of user ids is supplied and should see:
@@ -531,11 +610,11 @@ class feedback360_responder_test extends feedback360_testcase {
         $assignee = $this->data_generator->create_user();
 
         /** @var feedback360 $feedback1*/
-        list($feedback1) = $this->prepare_feedback_with_users(array($assignee));
+        list($feedback1) = $this->prepare_feedback_with_users(array($assignee), 1, false, feedback360::SELF_EVALUATION_DISABLED);
         $feedback1->activate();
 
         /** @var feedback360 $feedback2*/
-        list($feedback2) = $this->prepare_feedback_with_users(array($assignee));
+        list($feedback2) = $this->prepare_feedback_with_users(array($assignee), 1, false, feedback360::SELF_EVALUATION_DISABLED);
         $feedback2->activate();
 
         // Below we get the user assignment id for feedback1.
@@ -575,7 +654,7 @@ class feedback360_responder_test extends feedback360_testcase {
         $newuser2 = $this->data_generator->create_user();
         $newuser3 = $this->data_generator->create_user();
 
-        // Assignees can not request feedback from themselves.
+        // Self evaluation is disabled, assignees can not request feedback for themselves.
         $invalidids = array($assignee->id);
 
         $deleteduser = $this->data_generator->create_user();

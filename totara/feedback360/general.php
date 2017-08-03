@@ -58,6 +58,7 @@ if ($fromform = $mform->get_data()) {
     $todb = new stdClass();
     $todb->name = $fromform->name;
     $todb->anonymous = $fromform->anonymous;
+    $todb->selfevaluation = $fromform->selfevaluation;
     $feedback360->set($todb);
 
     if ($feedback360->id < 1) {

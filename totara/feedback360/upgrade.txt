@@ -14,3 +14,10 @@ submitting feedback.
 * Renamed CSS class "previewer" to "feedback360-previewer" so that it did not clash with the same CSS class in appraisals
 * Altered the renderer display_feedback_header()
 * Altered the renderer display_preview_feedback_header()
+* New database field selfevaluation added to the feedback360 table.
+  This will be used for self evaluation to specify if it is disabled, optional or required for each feedback template.
+  This will be used for self evaluation to record if the user has declined the feedback.
+* The feedback360::get_available_forms() has been deprecated and will be removed
+  in a future version.
+* The request_select_form class has been deprecated and will be removed
+  in a future version.

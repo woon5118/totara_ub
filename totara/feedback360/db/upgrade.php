@@ -82,5 +82,22 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2017042800, 'totara_feedback360');
     }
 
+    if ($oldversion < 2017081000) {
+        // Define field selfevaluation to be added to feedback360.
+        $table = new xmldb_table('feedback360');
+        $field = new xmldb_field('selfevaluation', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+
+        // Conditionally launch add field selfevaluation.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // We now need to set selfevaluation to 0 (SELF_EVALUATION_DISABLED) to maintain existing behaviour.
+            $DB->execute("UPDATE {feedback360} SET selfevaluation = 0");
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2017081000, 'totara', 'feedback360');
+    }
+
     return true;
 }

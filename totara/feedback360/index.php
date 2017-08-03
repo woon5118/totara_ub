@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralms.com>
+ * @author Simon Player <simon.player@totaralearning.com>
  * @package totara
  * @subpackage totara_feedback360
  */
@@ -84,15 +85,6 @@ if ($USER->id == $userid) {
 }
 
 $renderer = $PAGE->get_renderer('totara_feedback360');
-$available_forms = feedback360::get_available_forms($userid);
-$num_avail_forms = count($available_forms);
-
-// Title.
-$header = html_writer::start_tag('div', array('class' => 'myfeedback_header'));
-if ($canmanage && $num_avail_forms > 0) {
-    $header .= $renderer->request_feedback360_button($userid);
-}
-$header .= html_writer::end_tag('div');
 
 if ($viewrequestee) {
     // Feedback about user and request feedback button.
@@ -123,12 +115,13 @@ if ($viewrequested) {
     // Join to user so we have all their user name fields for later.
     $usernamefields = get_all_user_name_fields(true, 'u');
     $sql = "SELECT re.*, ua.feedback360id, ua.timedue, ua.userid as assignedby, {$usernamefields}
-            FROM {feedback360_resp_assignment} re
-            JOIN {feedback360_user_assignment} ua
-            ON re.feedback360userassignmentid = ua.id
-            JOIN {user} u
-            ON ua.userid = u.id
-            WHERE re.userid = :uid";
+              FROM {feedback360_resp_assignment} re
+              JOIN {feedback360_user_assignment} ua
+                  ON re.feedback360userassignmentid = ua.id
+              JOIN {user} u
+                  ON ua.userid = u.id
+             WHERE re.userid = :uid
+               AND re.userid != ua.userid";
 
     $resp_assignments = $DB->get_records_sql($sql, array('uid' => $userid));
 
@@ -150,11 +143,8 @@ echo $renderer->header();
 
 echo $renderer->display_userview_header($user);
 
-echo $header;
-
 // Display feedback created by/for the user.
 if ($viewrequestee) {
-    echo html_writer::empty_tag('br');
     echo $user_feedback;
 }
 
