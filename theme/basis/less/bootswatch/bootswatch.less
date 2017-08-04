@@ -153,7 +153,83 @@
 //
 .alert {
     border-radius: @alert-border-radius 0 @alert-border-radius 0;
+    border-width: 2px 2px 2px 20px;
+}
+
+// Extends the Bootstrap 3 alert component.
+.alert-with-icon {
+    padding: 0;
     border-width: 2px;
+}
+
+.alert-icon,
+.alert-message {
+    display: table-cell;
+    padding: @alert-padding;
+}
+
+.alert-icon {
+    vertical-align: middle;
+    padding: @alert-padding (@alert-padding * 0.6);
+    color: #fff;
+    .alert-info & {
+        background: @brand-info;
+    }
+    .alert-success & {
+        background: @brand-success;
+    }
+    .alert-warning & {
+        background: @brand-warning;
+    }
+    .alert-danger & {
+        background: @brand-danger;
+    }
+}
+
+.alert-close {
+    border-radius: 0 0 0 @alert-border-radius;
+    & .flex-icon {
+        display: table-cell;
+        // Unfortunately there is no variable for the fixed
+        // width size of font totara fixed width icons. It
+        // is 1.3em and this needs to be square.
+        padding: @padding-small-vertical @padding-small-vertical floor((@padding-small-vertical * 1.5)) ceil((@padding-small-vertical * 1.5));
+        height: 1.3em;
+        color: #fff;
+    }
+
+    .alert-info & {
+        background: @brand-info;
+        &:active:focus,
+        &:active:hover {
+            // Same as .btn active state.
+            background-color: darken(@btn-info-bg, 10%);
+        }
+    }
+    .alert-success & {
+        background: @brand-success;
+        &:active:focus,
+        &:active:hover {
+            // Same as .btn active state.
+            background-color: darken(@btn-success-bg, 10%);
+        }
+    }
+    .alert-warning & {
+        background: @brand-warning;
+        &:active:focus,
+        &:active:hover {
+            // Same as .btn active state.
+            background-color: darken(@btn-warning-bg, 10%);
+        }
+    }
+    .alert-danger & {
+        background: @brand-danger;
+        &:active:focus,
+        &:active:hover {
+            // Same as .btn active state.
+            background-color: darken(@btn-danger-bg, 10%);
+        }
+    }
 }
 
 //
