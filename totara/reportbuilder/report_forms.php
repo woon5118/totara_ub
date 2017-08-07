@@ -136,7 +136,6 @@ class report_builder_edit_filters_form extends moodleform {
         $unusedsidebarfilters = $this->_customdata['unusedsidebarfilters'];
         $allsearchcolumns = $this->_customdata['allsearchcolumns'];
         $unusedsearchcolumns = $this->_customdata['unusedsearchcolumns'];
-        $filters = array();
 
         $strmovedown = get_string('movedown', 'totara_reportbuilder');
         $strmoveup = get_string('moveup', 'totara_reportbuilder');
@@ -154,6 +153,7 @@ class report_builder_edit_filters_form extends moodleform {
         $mform->addHelpButton('standardfilter', 'standardfilter', 'totara_reportbuilder');
         $mform->setExpanded('standardfilter');
 
+        $filters = array();
         if (isset($report->filteroptions) && is_array($report->filteroptions) && count($report->filteroptions) > 0) {
             $filters = $report->filters;
 
@@ -1067,14 +1067,21 @@ class report_builder_edit_performance_form extends moodleform {
 
         $mform->addElement('header', 'filterperformance', get_string('initialdisplay_heading', 'totara_reportbuilder'));
         $mform->setExpanded('filterperformance');
-        $initial_display_attributes = sizeof($report->filters) < 1 ? array('disabled' => 'disabled', 'group' => null) : null;
-        $initial_display_sidenote = is_null($initial_display_attributes) ? '' : get_string('initialdisplay_disabled', 'totara_reportbuilder');
+
+        if (get_config('totara_reportbuilder', 'globalinitialdisplay') && !$report->embedded) {
+            $initial_display_attributes = array('disabled' => 'disabled', 'group' => null);
+            $initial_display_sidenote = get_string('globalinitialdisplay_enabled', 'totara_reportbuilder');
+            $report->initialdisplay = RB_INITIAL_DISPLAY_HIDE;
+        } else {
+            $sizeoffilters = sizeof($report->filters) + sizeof($report->searchcolumns);
+            $initial_display_attributes = $sizeoffilters < 1 ? array('disabled' => 'disabled', 'group' => null) : null;
+            $initial_display_sidenote = is_null($initial_display_attributes) ? '' : get_string('initialdisplay_disabled', 'totara_reportbuilder');
+        }
         $mform->addElement('advcheckbox', 'initialdisplay', get_string('initialdisplay', 'totara_reportbuilder'),
             $initial_display_sidenote, $initial_display_attributes, array(RB_INITIAL_DISPLAY_SHOW, RB_INITIAL_DISPLAY_HIDE));
         $mform->setType('initialdisplay', PARAM_INT);
         $mform->setDefault('initialdisplay', RB_INITIAL_DISPLAY_SHOW);
         $mform->addHelpButton('initialdisplay', 'initialdisplay', 'totara_reportbuilder');
-
         $mform->addElement('header', 'cachingperformance', get_string('reportbuildercache_heading', 'totara_reportbuilder'));
         $mform->setExpanded('cachingperformance');
         $problems = $report->get_caching_problems();

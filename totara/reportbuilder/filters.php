@@ -100,12 +100,14 @@ foreach ($report->columnoptions as $option) {
     }
 }
 
+$globalinitialdisplay = get_config('totara_reportbuilder', 'globalinitialdisplay');
+$initialdisplay = $report->initialdisplay == RB_INITIAL_DISPLAY_HIDE || ($globalinitialdisplay && !$report->embedded);
+$sizeoffilters  = sizeof($report->filters) + sizeof($report->searchcolumns);
 $PAGE->requires->strings_for_js(array('saving', 'confirmfilterdelete', 'confirmsearchcolumndelete', 'delete', 'moveup',
-    'movedown', 'add', 'initialdisplay_error'), 'totara_reportbuilder');
+    'movedown', 'add', 'initialdisplay_error', 'confirmfilterdelete_rid_enabled', 'confirmfilterdelete_grid_enabled'), 'totara_reportbuilder');
 $args = array('args' => '{"user_sesskey":"'.$USER->sesskey.'", "rb_reportid":'.$id.',
-    "rb_filters":'.count($report->filters).', "rb_search_columns":'.count($report->searchcolumns).',
-    "rb_initial_display":'.$report->initialdisplay.', "rb_filter_headings":'.json_encode($filterheadings).',
-    "rb_search_column_headings":'.json_encode($searchcolumnheadings).'}');
+    "rb_filters":'.$sizeoffilters.', "rb_initial_display":'.$initialdisplay.', "rb_global_initial_display":'.$globalinitialdisplay.',
+    "rb_filter_headings":'.json_encode($filterheadings).', "rb_search_column_headings":'.json_encode($searchcolumnheadings).'}');
 $jsmodule = array(
     'name' => 'totara_reportbuilderfilters',
     'fullpath' => '/totara/reportbuilder/filters.js',
@@ -119,28 +121,20 @@ if ($d and $confirm) {
         totara_set_notification(get_string('error:bad_sesskey', 'totara_reportbuilder'), $returnurl);
     }
     if (isset($fid)) {
-        if ($report->initialdisplay && count($report->filters) <= 1) {
-                totara_set_notification(get_string('initialdisplay_error', 'totara_reportbuilder'), $returnurl);
+        if ($report->delete_filter($fid)) {
+            \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
+            totara_set_notification(get_string('filterdeleted', 'totara_reportbuilder'), $returnurl,
+                array('class' => 'notifysuccess'));
         } else {
-            if ($report->delete_filter($fid)) {
-                \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
-                totara_set_notification(get_string('filterdeleted', 'totara_reportbuilder'), $returnurl,
-                    array('class' => 'notifysuccess'));
-            } else {
-                totara_set_notification(get_string('error:filter_not_deleted', 'totara_reportbuilder'), $returnurl);
-            }
+            totara_set_notification(get_string('error:filter_not_deleted', 'totara_reportbuilder'), $returnurl);
         }
     } else if (isset($searchcolumnid)) {
-        if ($report->initialdisplay && count($report->filters) <= 1) {
-                totara_set_notification(get_string('initialdisplay_error', 'totara_reportbuilder'), $returnurl);
+        if ($report->delete_search_column($searchcolumnid)) {
+            \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
+            totara_set_notification(get_string('searchcolumndeleted', 'totara_reportbuilder'), $returnurl,
+                array('class' => 'notifysuccess'));
         } else {
-            if ($report->delete_search_column($searchcolumnid)) {
-                \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
-                totara_set_notification(get_string('searchcolumndeleted', 'totara_reportbuilder'), $returnurl,
-                    array('class' => 'notifysuccess'));
-            } else {
-                totara_set_notification(get_string('error:search_column_not_deleted', 'totara_reportbuilder'), $returnurl);
-            }
+            totara_set_notification(get_string('error:search_column_not_deleted', 'totara_reportbuilder'), $returnurl);
         }
     }
 }
@@ -152,11 +146,27 @@ if ($d) {
     if (isset($fid)) {
         $confirmurl = new moodle_url('/totara/reportbuilder/filters.php',
             array('d' => '1', 'id' => $id, 'fid' => $fid, 'confirm' => '1', 'sesskey' => $USER->sesskey));
-        echo $output->confirm(get_string('confirmfilterdelete', 'totara_reportbuilder'), $confirmurl, $returnurl);
+        $confirmstr = get_string('confirmfilterdelete', 'totara_reportbuilder');
+        if ($initialdisplay && $sizeoffilters == 1) {
+            $a = '';
+            if ($globalinitialdisplay) {
+                $a = get_string('confirmfilterdelete_grid_enabled', 'totara_reportbuilder');
+            }
+            $confirmstr = get_string('confirmfilterdelete_rid_enabled', 'totara_reportbuilder', $a);
+        }
+        echo $output->confirm($confirmstr, $confirmurl, $returnurl);
     } else if (isset($searchcolumnid)) {
         $confirmurl = new moodle_url('/totara/reportbuilder/filters.php',
             array('d' => '1', 'id' => $id, 'searchcolumnid' => $searchcolumnid, 'confirm' => '1', 'sesskey' => $USER->sesskey));
-        echo $output->confirm(get_string('confirmsearchcolumndelete', 'totara_reportbuilder'), $confirmurl, $returnurl);
+        $confirmstr = get_string('confirmsearchcolumndelete', 'totara_reportbuilder');
+        if ($initialdisplay && $sizeoffilters == 1) {
+            $a = '';
+            if ($globalinitialdisplay) {
+                $a = get_string('confirmfilterdelete_grid_enabled', 'totara_reportbuilder');
+            }
+            $confirmstr = get_string('confirmfilterdelete_rid_enabled', 'totara_reportbuilder', $a);
+        }
+        echo $output->confirm($confirmstr, $confirmurl, $returnurl);
     }
 
     echo $output->footer();

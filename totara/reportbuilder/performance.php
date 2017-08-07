@@ -69,7 +69,6 @@ if ($fromform = $mform->get_data()) {
 
     $todb = new stdClass();
     $todb->id = $id;
-    $todb->initialdisplay = isset($fromform->initialdisplay) ? $fromform->initialdisplay : 0;
     $todb->cache = isset($fromform->cache) ? $fromform->cache : 0;
     // Only update this setting if we expect to be able to see it. Otherwise we could loose the setting.
     if (get_config('totara_reportbuilder', 'allowtotalcount')) {
@@ -77,6 +76,11 @@ if ($fromform = $mform->get_data()) {
     }
     if (totara_is_clone_db_configured()) {
         $todb->useclonedb = empty($fromform->useclonedb) ? 0 : 1;
+    }
+    if (get_config('totara_reportbuilder', 'globalinitialdisplay') && !$report->embedded) {
+        // Do nothing, don't overwrite initial value.
+    } else {
+        $todb->initialdisplay = isset($fromform->initialdisplay) ? $fromform->initialdisplay : 0;
     }
     $todb->timemodified = time();
     $DB->update_record('report_builder', $todb);

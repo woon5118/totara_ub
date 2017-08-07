@@ -75,6 +75,14 @@ if ($ADMIN->fulltree) {
             PARAM_INT
         )
     );
+    $rb->add(
+        new admin_setting_configcheckbox(
+            'totara_reportbuilder/globalinitialdisplay',
+            new lang_string('globalinitialdisplay', 'totara_reportbuilder'),
+            new lang_string('globalinitialdisplay_desc', 'totara_reportbuilder'),
+            0
+        )
+    );
 }
 
 // Add all above settings to the report builder settings node.

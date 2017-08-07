@@ -3975,7 +3975,7 @@ class reportbuilder {
      * @return string|void No return value but prints the current data table
      */
     public function display_table($return = false) {
-        global $SESSION, $DB, $OUTPUT, $PAGE, $CFG;
+        global $SESSION, $DB, $OUTPUT, $PAGE;
 
         $initiallyhidden = $this->is_initially_hidden();
 
@@ -4337,9 +4337,10 @@ class reportbuilder {
         $overrideinitial = isset($searchedstandard['addfilter']) || isset($searchedsidebar['addfilter']) ||
             $toolbarsearch || $ssort || $spage;
 
-        $this->_isinitiallyhidden = ($this->initialdisplay == RB_INITIAL_DISPLAY_HIDE &&
-                !$overrideinitial &&
-                !$this->is_report_filtered());
+        $globalinitialdisplay = get_config('totara_reportbuilder', 'globalinitialdisplay');
+        $initialdisplay = $this->initialdisplay == RB_INITIAL_DISPLAY_HIDE || ($globalinitialdisplay && !$this->embedded);
+        $sizeoffilters = sizeof($this->filters) + sizeof($this->searchcolumns);
+        $this->_isinitiallyhidden = ($initialdisplay && !$overrideinitial && !$this->is_report_filtered() && $sizeoffilters > 0);
 
         return $this->_isinitiallyhidden;
     }
