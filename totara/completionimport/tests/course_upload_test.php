@@ -32,7 +32,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 
-class coursecompletionimport_testcase extends advanced_testcase {
+class totara_completionimport_course_upload_testcase extends advanced_testcase {
 
     protected $user1, $user2, $course1, $course2, $course3;
 
@@ -73,8 +73,11 @@ class coursecompletionimport_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('course_completion_history'));
 
         $handle = fopen($filename, 'r');
+        $this->assertNotSame(false, $handle);
         $size = filesize($filename);
+        $this->assertGreaterThan(0, $size);
         $content = fread($handle, $size);
+        $this->assertNotSame(false, $content);
         \totara_completionimport\csv_import::import($content, $importname, $importtime);
 
         $this->assertEquals(1, $DB->count_records('course_completions'));
@@ -116,8 +119,11 @@ class coursecompletionimport_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('course_completion_history'));
 
         $handle = fopen($filename, 'r');
+        $this->assertNotSame(false, $handle);
         $size = filesize($filename);
+        $this->assertGreaterThan(0, $size);
         $content = fread($handle, $size);
+        $this->assertNotSame(false, $content);
         \totara_completionimport\csv_import::import($content, $importname, $importtime);
 
         $this->assertEquals(1, $DB->count_records('course_completions'));
