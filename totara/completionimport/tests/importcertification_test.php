@@ -110,7 +110,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         // Create some programs.
         $this->assertEquals(0, $DB->count_records('prog'), "Programs table isn't empty");
         for ($i = 1; $i <= self::COUNT_CERTIFICATIONS; $i++) {
-            $certifications[$i] = $this->getDataGenerator()->create_certification(array('prog_idnumber' => 'ID' . $i));
+            $this->getDataGenerator()->create_certification(['prog_idnumber' => 'ID' . $i, 'prog_shortname' => 'shortname' . $i]);
         }
         $this->assertEquals(self::COUNT_CERTIFICATIONS, $DB->count_records('prog'),
             'Record count mismatch in program table');

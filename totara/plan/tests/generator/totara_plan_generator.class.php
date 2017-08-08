@@ -136,6 +136,32 @@ class totara_plan_generator extends component_generator_base {
         return $DB->get_record('dp_plan', array('id' => $id));
     }
 
+    public function legacy_create_plan($userid, array $record) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/totara/plan/lib.php');
+
+        $default = array(
+            'templateid' => 0,
+            'userid' => $userid,
+            'name' => 'Learning plan',
+            'description' => '',
+            'startdate' => null,
+            'enddate' => time() + 23328000,
+            'timecompleted' => null,
+            'status' => DP_PLAN_STATUS_COMPLETE
+        );
+        $properties = array_merge($default, $record);
+
+        $todb = (object)$properties;
+        $newid = $DB->insert_record('dp_plan', $todb);
+
+        $plan = new development_plan($newid);
+        $plan->set_status(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_REASON_CREATE);
+        $plan->set_status(DP_PLAN_STATUS_APPROVED);
+
+        return $plan;
+    }
+
     /**
      * Add a competency to a learning plan.
      *

@@ -107,7 +107,9 @@ abstract class reportcache_advanced_testcase extends advanced_testcase {
      */
     public static function getDataGenerator() {
         if (is_null(static::$generator)) {
+            $generator = parent::getDataGenerator();
             static::$generator = new totara_reportbuilder_cache_generator();
+            static::$generator->set_actual_generator($generator);
         }
         return static::$generator;
     }

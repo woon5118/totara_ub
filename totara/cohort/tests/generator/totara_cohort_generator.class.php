@@ -214,6 +214,33 @@ class totara_cohort_generator extends component_generator_base {
     }
 
     /**
+     * Adds one or more parameters to an already created cohort rule.
+     *
+     * @param int $ruleid
+     * @param array $params
+     * @param array $listofvalues
+     */
+    public function add_param_to_cohort_rule($ruleid, $params, array $listofvalues) {
+        global $DB;
+        $data = array($params);
+        foreach ($listofvalues as $l) {
+            $data[] = array('listofvalues' => $l);
+        }
+        foreach ($data as $d) {
+            foreach ($d as $name => $value) {
+                $todb = new stdClass();
+                $todb->ruleid = $ruleid;
+                $todb->name = $name;
+                $todb->value = $value;
+                $todb->timecreated = time();
+                $todb->timemodified = time();
+                $todb->modifierid = 2;
+                $DB->insert_record('cohort_rule_params', $todb);
+            }
+        }
+    }
+
+    /**
      * Remove all current rules and params for a particular cohort ruleset.
      *
      * @param int $rulesetid   The id of the cohort to remove the rules from.

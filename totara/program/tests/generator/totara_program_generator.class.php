@@ -175,6 +175,59 @@ class totara_program_generator extends component_generator_base {
     }
 
     /**
+     * Create program certification for testing.
+     *
+     * @param array $data Override default properties - use 'cert_' or 'prog_' prefix for each parameter name
+     * @param array $coursesetdata Course set data which gets given to create_coursesets_in_program. Check that function for details.
+     * @return program Program object
+     */
+    public function legacy_create_certification(array $data = array()) {
+        global $DB;
+
+        // Separate the program and certification parameters from the given data.
+        $programdata = array();
+        $certificationdata = array();
+        foreach ($data as $key => $value) {
+            if (substr($key, 0, 5) === 'prog_') {
+                $programdata[substr($key, 5)] = $value;
+            } else if (substr($key, 0, 5) === 'cert_') {
+                $certificationdata[substr($key, 5)] = $value;
+            } else {
+                throw new \coding_exception("create_certification \$data keys must be prefixed with 'prog_' or 'cert_'");
+            }
+        }
+
+        // Set up defaults and merge them with the given data.
+        $programdefaults = array(
+            'fullname' => 'Certification fullname',
+            'usermodified' => 2,
+        );
+        $programmerged = array_merge($programdefaults, $programdata);
+
+        // Set up defaults and merge them with the given data.
+        $certifdefaults = array(
+            'learningcomptype' => CERTIFTYPE_PROGRAM,
+            'activeperiod' => '1 year',
+            'windowperiod' => '1 month',
+            'minimumactiveperiod' => '3 month',
+            'recertifydatetype' => CERTIFRECERT_COMPLETION,
+            'timemodified' => time(),
+        );
+        $certificationmerged = array_merge($certifdefaults, $certificationdata);
+
+        // Create the certification first (the program will point to it).
+        $certificationid = $DB->insert_record('certif', (object)$certificationmerged);
+
+        // Set the certificationid in the program.
+        $programmerged['certifid'] = $certificationid;
+
+        // Create and return the program.
+        $certifprogram = $this->create_program($programmerged);
+
+        return $certifprogram;
+    }
+
+    /**
      * Create test program
      *
      * @param array $data Override default properties
@@ -225,6 +278,27 @@ class totara_program_generator extends component_generator_base {
         );
         $event->trigger();
 
+        return $program;
+    }
+
+    /**
+     * Creates a program using the legacy method originating in the report builder generator.
+     *
+     * @param array $data Override default properties
+     * @return program Program object
+     */
+    public function legacy_create_program(array $data = array()) {
+        // Set up defaults and merge them with the given data.
+        $defaults = array(
+            'fullname' => 'Program fullname',
+            'usermodified' => 2,
+            'timestarted' => 0,
+            'category' => 1,
+        );
+        $properties = array_merge($defaults, $data);
+
+        // Create and return the program.
+        $program = program::create($properties);
         return $program;
     }
 
@@ -362,6 +436,98 @@ class totara_program_generator extends component_generator_base {
         $programcontent->save_content();
 
         totara_program\progress\program_progress_cache::mark_program_cache_stale($programid);
+    }
+
+    /**
+     * Creates course sets and adds content given on the data passed through details.
+     *
+     * Details should be an array of course set data, each item can have the following keys:
+     *
+     *   - type int The type, one of CONTENTTYPE_MULTICOURSE, CONTENTTYPE_COMPETENCY, CONTENTTYPE_RECURRING
+     *   - nextsetoperator int The next set operator, one of NEXTSETOPERATOR_THEN, NEXTSETOPERATOR_AND, NEXTSETOPERATOR_OR
+     *   - completiontype The type, one of COMPLETIONTYPE_ALL, COMPLETIONTYPE_SOME, COMPLETIONTYPE_OPTIONAL
+     *   - certifpath The certification path for this set, one of CERTIFPATH_STD, CERTIFPATH_RECERT
+     *   - mincourses int The minimum number of courses the user is required to complete (only relevant with COMPLETIONTYPE_SOME)
+     *   - timeallowed int The minimum time, in seconds, which users are expected to be able to finish in.
+     *   - courses array An array of courses created by create_course.
+     *
+     * @param program $program
+     * @param array $details
+     * @throws coding_exception
+     */
+    public function legacy_add_coursesets_to_program(program $program, array $details) {
+        $expected_coursesets = count($details);
+
+        $certifcontent = $program->get_content();
+
+        foreach ($details as $detail) {
+            /** @var course_set $courseset */
+            $type = (isset($detail['type'])) ? $detail['type'] : CONTENTTYPE_MULTICOURSE;
+            if (!$certifcontent->add_set($type)) {
+                // We really need to know about this when it happens, and as its testing coding exception is going to be best.
+                throw new coding_exception('Error adding set to course.');
+            }
+        }
+        $certifcontent->fix_set_sortorder();
+
+        if ($expected_coursesets !== count($certifcontent->get_course_sets())) {
+            // We really need to know about this when it happens, and as its testing coding exception is going to be best.
+            throw new coding_exception('Mis-match in the number of course sets created.');
+        }
+
+        foreach ($certifcontent->get_course_sets() as $courseset) {
+            $detail = array_shift($details);
+
+            $nextsetoperator = (isset($detail['nextsetoperator'])) ? $detail['nextsetoperator'] : NEXTSETOPERATOR_THEN;
+            $completiontype = (isset($detail['completiontype'])) ? $detail['completiontype'] : COMPLETIONTYPE_ALL;
+            $certifpath = (isset($detail['certifpath'])) ? $detail['certifpath'] : CERTIFPATH_STD;
+            $mincourses = (isset($detail['mincourses'])) ? (int)$detail['mincourses'] : 0;
+            $coursesumfield = (isset($detail['coursesumfield'])) ? (int)$detail['coursesumfield'] : 0;
+            $coursesumfieldtotal = (isset($detail['coursesumfieldtotal'])) ? (int)$detail['coursesumfieldtotal'] : 0;
+            $timeallowed = (isset($detail['timeallowed'])) ? (int)$detail['timeallowed'] : 0;
+
+            switch ($courseset->contenttype) {
+                case CONTENTTYPE_MULTICOURSE:
+                    $courses = (isset($detail['courses']) && is_array($detail['courses'])) ? $detail['courses'] : false;
+
+                    if ($courses) {
+                        /** @var multi_course_set $courseset */
+                        foreach ($courses as $course) {
+                            $key = $courseset->get_set_prefix() . 'courseid';
+                            $coursedata = new stdClass();
+                            $coursedata->{$key} = $course->id;
+                            if (!$courseset->add_course($coursedata)) {
+                                // We really need to know about this when it happens, and as its testing coding exception is going to be best.
+                                throw new coding_exception('Mis-match in the number of course sets created.');
+                            }
+                        }
+                    }
+                    break;
+
+                case CONTENTTYPE_COMPETENCY:
+                    $competency = (isset($detail['competency'])) ? $detail['competency'] : false;
+                    if ($competency) {
+                        // Add a competency to the competency courseset.
+                        $compdata = new stdClass();
+                        $compdata->{$courseset->get_set_prefix() . 'competencyid'} = $competency->id;
+                        $courseset->add_competency($compdata);
+                    }
+                    break;
+
+                default:
+                    throw new coding_exception('Courses can only be added to multi course sets and comptencies.');
+            }
+
+            $courseset->nextsetoperator = $nextsetoperator;
+            $courseset->completiontype = $completiontype;
+            $courseset->certifpath = $certifpath;
+            $courseset->mincourses = $mincourses;
+            $courseset->coursesumfield = $coursesumfield;
+            $courseset->coursesumfieldtotal = $coursesumfieldtotal;
+            $courseset->timeallowed = $timeallowed;
+        }
+
+        $certifcontent->save_content();
     }
 
     /**
