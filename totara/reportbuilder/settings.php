@@ -75,12 +75,28 @@ if ($ADMIN->fulltree) {
             PARAM_INT
         )
     );
+
     $rb->add(
         new admin_setting_configcheckbox(
             'totara_reportbuilder/globalinitialdisplay',
             new lang_string('globalinitialdisplay', 'totara_reportbuilder'),
             new lang_string('globalinitialdisplay_desc', 'totara_reportbuilder'),
             0
+        )
+    );
+
+    // Schedule type options.
+    $options = array();
+    foreach (scheduler::get_options() as $option => $code) {
+        $options[$code] = get_string('schedule' . $option, 'totara_core');
+    }
+    $rb->add(
+        new admin_setting_configselect(
+            'totara_reportbuilder/schedulerfrequency',
+            new lang_string('scheduledreportfrequency', 'totara_reportbuilder'),
+            new lang_string('scheduledreportfrequency_desc', 'totara_reportbuilder'),
+            scheduler::MINUTELY,
+            $options
         )
     );
 }

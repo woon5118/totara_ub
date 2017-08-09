@@ -102,8 +102,38 @@ class scheduled_reports_new_form extends moodleform {
             }
         }
 
-        $mform->addElement('scheduler', 'schedulegroup', $schedulestr,
-                           array('frequency' => $frequency, 'schedule' => $schedule));
+        // Schedule options.
+        $options = ['frequency' => $frequency, 'schedule' => $schedule];
+        if (!has_capability('totara/reportbuilder:overridescheduledfrequency', $context)) {
+            $currentoption  = [];
+            $defaultoptions = scheduler::get_options();
+            if (!is_null($frequency)) {
+                $currentoption = [array_flip($defaultoptions)[$frequency] => (int)$frequency];
+            }
+            $schedulerfrequency = get_config('totara_reportbuilder', 'schedulerfrequency');
+            switch ($schedulerfrequency) {
+                case scheduler::DAILY:
+                    unset($defaultoptions['hourly'], $defaultoptions['minutely']);
+                    break;
+                case scheduler::WEEKLY:
+                    unset($defaultoptions['daily'], $defaultoptions['hourly'], $defaultoptions['minutely']);
+                    break;
+                case scheduler::MONTHLY:
+                    unset($defaultoptions['weekly'], $defaultoptions['daily'], $defaultoptions['hourly'], $defaultoptions['minutely']);
+                    break;
+                case scheduler::HOURLY:
+                    unset($defaultoptions['minutely']);
+                    break;
+                case scheduler::MINUTELY:
+                    // Nothing to remove, keep all options.
+                    break;
+                default:
+                    // Default, keep all options.
+                    break;
+            }
+            $options['scheduleroptions'] = array_merge($defaultoptions, $currentoption);
+        }
+        $mform->addElement('scheduler', 'schedulegroup', $schedulestr, $options);
 
         // Email to, setting for the schedule reports.
         $mform->addElement('header', 'emailto', get_string('scheduledemailtosettings', 'totara_reportbuilder'));

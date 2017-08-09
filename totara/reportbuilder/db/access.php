@@ -24,9 +24,9 @@
 
 $capabilities = array(
 
-// Ability to create, edit and delete report builder reports view
-// the report builder administrative pages
-'totara/reportbuilder:managereports' => array(
+    // Ability to create, edit and delete report builder reports view
+    // the report builder administrative pages
+    'totara/reportbuilder:managereports' => array(
         'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS | RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -34,9 +34,8 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
         )
     ),
-
-// Ability to edit, reset and manage embedded report builder reports
-'totara/reportbuilder:manageembeddedreports' => array(
+    // Ability to edit, reset and manage embedded report builder reports
+    'totara/reportbuilder:manageembeddedreports' => array(
         'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS | RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -45,5 +44,14 @@ $capabilities = array(
         ),
         'clonepermissionsfrom' => 'totara/reportbuilder:managereports',
     ),
-
+    // Ability to override minimum scheduled report frequency
+    // the report builder administrative pages
+    'totara/reportbuilder:overridescheduledfrequency' => array(
+        'riskbitmask'   => RISK_CONFIG | RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    )
 );

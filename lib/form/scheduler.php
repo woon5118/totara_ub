@@ -36,6 +36,7 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
     /** @var array These complement separators, they are appended to the resultant HTML */
     public $_wrap = array('', '');
 
+    private $scheduleroptions = [];
     /**
      * constructor
      *
@@ -62,6 +63,9 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
                 }
             }
         }
+        if (isset($options['scheduleroptions'])) {
+            $this->scheduleroptions = $options['scheduleroptions'];
+        }
     }
 
     /**
@@ -82,9 +86,12 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
 
         $CALENDARDAYS = calendar_get_days();
 
+        if (empty($this->scheduleroptions)) {
+            $this->scheduleroptions = scheduler::get_options();
+        }
         // Schedule type options.
         $frequencyselect = array();
-        foreach (scheduler::get_options() as $option => $code) {
+        foreach ($this->scheduleroptions as $option => $code) {
             $frequencyselect[$code] = get_string('schedule' . $option, 'totara_core');
         }
 
@@ -131,9 +138,15 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
         $this->_elements['hourly'] = $this->createFormElement('select', 'hourly', get_string('hourlyon', 'totara_core'), $hourlyselect);
         $this->_elements['minutely'] = $this->createFormElement('select', 'minutely', get_string('minutelyon', 'totara_core'), $minutelyselect);
 
-        foreach ($this->_elements as $element){
-            if (method_exists($element, 'setHiddenLabel')){
-                $element->setHiddenLabel(true);
+        foreach ($this->_elements as $option => $element) {
+            if (array_key_exists($option, $this->scheduleroptions)) {
+                if (method_exists($element, 'setHiddenLabel')) {
+                    $element->setHiddenLabel(true);
+                }
+            } else {
+                if ($option != 'frequency') {
+                    unset($this->_elements[$option]);
+                }
             }
         }
     }

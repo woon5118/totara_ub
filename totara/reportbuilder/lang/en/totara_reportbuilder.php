@@ -632,6 +632,8 @@ $string['reportactions'] = 'Actions';
 $string['reportbuilder'] = 'Report builder';
 $string['reportbuilder:managereports'] = 'Create, edit and delete report builder user reports and manage report builder global settings';
 $string['reportbuilder:manageembeddedreports'] = 'Create, edit and reset report builder embedded reports';
+$string['reportbuilder:managereports'] = 'Create, edit and delete report builder reports';
+$string['reportbuilder:overridescheduledfrequency'] = 'Override minimum scheduled report frequency';
 $string['reportbuilderaccessmode'] = 'Access Mode';
 $string['reportbuilderaccessmode_help'] = '
 Access controls are used to restrict which users can view the report.
@@ -919,6 +921,8 @@ $string['saving'] = 'Saving...';
 $string['schedule'] = 'Schedule';
 $string['scheduledaily'] = 'Daily';
 $string['scheduledemailtosettings'] = 'Email Settings';
+$string['scheduledreportfrequency'] = 'Minimum scheduled report frequency';
+$string['scheduledreportfrequency_desc'] = 'This setting allows to set Schedule setting which is used in the scheduled reports to control how often scheduled report cron runs.';
 $string['scheduledreportmessage'] = 'Attached is a copy of the \'{$a->reportname}\' report in {$a->exporttype}. {$a->savedtext}
 
 You have been sent this report by {$a->sender}.
