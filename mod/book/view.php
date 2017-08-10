@@ -149,7 +149,6 @@ foreach ($chapters as $ch) {
     $last = $ch->id;
 }
 
-$islastchapter = false;
 if ($book->navstyle) {
     $chnavigation = '';
     if ($previd) {
@@ -192,9 +191,13 @@ if ($book->navstyle) {
             $chnavigation .= ' <a title="' . $navexit . '" class="bookexit"  href="'.$returnurl.'">' .
                 '<span class="chaptername">' . $navexit . '&nbsp;' . $OUTPUT->uarrow() . '</span></a>';
         }
-
-        $islastchapter = true;
     }
+}
+
+// We need to discover if this is the last chapter to mark activity as completed.
+$islastchapter = false;
+if (!$nextid) {
+    $islastchapter = true;
 }
 
 book_view($book, $chapter, $islastchapter, $course, $cm, $context);
