@@ -17,13 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Russell England <russell.england@catalyst-eu.net>
- * @package totara
- * @subpackage completionimport
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @package totara_completionimport
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017081100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120502;       // Requires this Moodle version.
-$plugin->component = 'totara_completionimport';   // To check on upgrade, that module sits in correct place.
+/* List of handlers */
+
+$tasks = array(
+    array(
+        'classname' => 'totara_completionimport\task\clean_course_completion_upload_logs_task',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '0',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+    array(
+        'classname' => 'totara_completionimport\task\clean_certification_completion_upload_logs_task',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '0',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);
