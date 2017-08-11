@@ -338,6 +338,48 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertEquals(5, $DB->count_records('user', array()));
     }
 
+    public function test_sync_user() {
+        global $DB, $USER;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        /** @var auth_connect_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('auth_connect');
+        $server = $generator->create_server();
+
+        $serveruser1 = $generator->get_fake_server_user(array('email' => 'xxx@example.com'));
+        $serveruser2 = $generator->get_fake_server_user(array('email' => 'yyy@example.com'));
+
+        jsend::set_phpunit_testdata(array(array('status' => 'success', 'data' => array('users' => array($serveruser1, $serveruser2)))));
+        $result = util::sync_users($server);
+        $this->assertTrue($result);
+
+        $user1 = $DB->get_record('user', array('email' => $serveruser1['email']), '*', MUST_EXIST);
+        $user2 = $DB->get_record('user', array('email' => $serveruser2['email']), '*', MUST_EXIST);
+
+        $serveruser1['firstname'] = 'Somethingunique';
+        jsend::set_phpunit_testdata(array(array('status' => 'success', 'data' => array('user' => $serveruser1))));
+        $result = util::sync_user($user1->id);
+        $this->assertFalse($result);
+
+        $this->set_auth_enabled(true);
+        jsend::set_phpunit_testdata(array(array('status' => 'success', 'data' => array('user' => $serveruser1))));
+        $result = util::sync_user($user1->id);
+        $this->assertTrue($result);
+        $updateduser = $DB->get_record('user', array('id' => $user1->id), '*', MUST_EXIST);
+        $this->assertSame($serveruser1['firstname'], $updateduser->firstname);
+        $this->assertNotSame($USER->firstname, $updateduser->firstname);
+
+        $this->setUser($user2);
+        $serveruser2['firstname'] = 'XXXXXXX';
+        jsend::set_phpunit_testdata(array(array('status' => 'success', 'data' => array('user' => $serveruser2))));
+        $result = util::sync_user($user2->id);
+        $this->assertTrue($result);
+        $updateduser = $DB->get_record('user', array('id' => $user2->id), '*', MUST_EXIST);
+        $this->assertSame($serveruser2['firstname'], $updateduser->firstname);
+        $this->assertSame($USER->firstname, $updateduser->firstname);
+    }
+
     public function test_update_local_users_basic() {
         global $DB;
         $this->resetAfterTest();

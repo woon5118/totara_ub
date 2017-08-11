@@ -204,7 +204,7 @@ class auth_plugin_manual extends auth_plugin_base {
      * Processes and stores configuration data for this authentication plugin.
      *
      * @param stdClass $config
-     * @return void
+     * @return bool success
      */
     function process_config($config) {
         // Set to defaults if undefined.
@@ -232,6 +232,7 @@ class auth_plugin_manual extends auth_plugin_base {
     *
     * @param string $username
     * @param string $confirmsecret
+    * @return int AUTH_CONFIRM_ constant
     */
     function user_confirm($username, $confirmsecret = null) {
         global $DB;

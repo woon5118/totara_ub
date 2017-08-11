@@ -157,6 +157,53 @@ class sep_services {
     }
 
     /**
+     * Get one client user with all data including profile fields, jobs and avatars.
+     * Deleted users may have deleted flag set or null is returned instead if user is missing.
+     *
+     * @param \stdClass $client
+     * @param array $parameters with 'userid' parameter
+     * @return array JSend compatible result
+     */
+    public static function get_user($client, array $parameters) {
+        global $DB;
+
+        if (empty($parameters['userid']) or !is_number($parameters['userid'])) {
+            return array(
+                'status' => 'fail',
+                'data' => array(
+                    'if' => 'missing server user id number',
+                ),
+            );
+        }
+
+        $guest = guest_user();
+        $cohortjoin = "";
+        $params = array('guestid' => $guest->id, 'userid' => $parameters['userid']);
+
+        if ($client->cohortid) {
+            $cohortjoin = "JOIN {cohort_members} xcm ON xcm.userid = u.id
+                           JOIN {totara_connect_clients} xcl ON (xcl.cohortid = xcm.cohortid AND xcl.id = :clientid)";
+            $params['clientid'] = $client->id;
+        }
+
+        $sql = "SELECT u.*
+                  FROM {user} u
+           $cohortjoin
+                 WHERE u.id <> :guestid AND u.id = :userid";
+
+        if ($user = $DB->get_record_sql($sql, $params)) {
+            util::prepare_user_for_client($client, $user, true);
+        } else {
+            $user = null;
+        }
+
+        return array(
+            'status' => 'success',
+            'data' => array('user' => $user),
+        );
+    }
+
+    /**
      * Get all client cohorts/courses and member users.
      *
      * @param \stdClass $client

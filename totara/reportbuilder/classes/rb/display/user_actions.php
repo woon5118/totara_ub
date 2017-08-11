@@ -32,77 +32,78 @@ namespace totara_reportbuilder\rb\display;
 class user_actions extends base {
 
     public static function display($userid, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG, $OUTPUT, $PAGE, $USER;
+        global $CFG, $OUTPUT, $USER;
 
         if ($format !== 'html') {
             // Only applicable to the HTML format.
             return '';
         }
 
-        $extrafields = self::get_extrafields_row($row, $column);
+        // Note: performance here is not an issue because this column is not exported.
+        require_once("$CFG->dirroot/lib/authlib.php");
 
         if (isguestuser($userid)) {
             // No actions for the guest user.
             return '';
         }
 
-        $buttons = array();
-        // We don't want to support Mnet in this report, bu we're going to check
-        // if the user is one so we don't display any actions that might cause problems.
-        $mnetuser = is_mnet_remote_user((object) array('id' => $userid, 'mnethostid' => $extrafields->mnethostid));
+        $user = self::get_extrafields_row($row, $column);
+        $user->id = $userid;
 
-        // Define the text used for alt and title parameters on the icons.
-        $text = array (
-            'edit' => get_string('editrecord', 'totara_reportbuilder', $extrafields->fullname),
-            'confirm' => get_string('confirmrecord', 'totara_reportbuilder', $extrafields->fullname),
-            'delete' => get_string('deleterecord', 'totara_reportbuilder', $extrafields->fullname),
-            'suspend' => get_string('suspendrecord', 'totara_reportbuilder', $extrafields->fullname),
-            'undelete' => get_string('undeleterecord', 'totara_reportbuilder', $extrafields->fullname),
-            'unsuspend' => get_string('unsuspendrecord', 'totara_reportbuilder', $extrafields->fullname),
-            'unlock' => get_string('unlockrecord', 'totara_reportbuilder', $extrafields->fullname),
-        );
-
-        // Define a URL that can be used to return the user to the page they started from.
-        $page = optional_param('spage', '0', PARAM_INT);
-        $reportparams = array(
-            'spage'=> $page
-        );
-        $returnurl = (string) new \moodle_url($PAGE->url, $reportparams);
-
-        // If we're on the admin/user.php page we don't need to add a return url (to return
-        // the user to the report) as the actions will be completed on the report page.
-        if ($PAGE->url->get_path() == '/admin/user.php') {
-            $actionurl = (string) new \moodle_url('/admin/user.php', $reportparams + ['sesskey' => sesskey()]);
-        } else {
-            $actionurl = (string) new \moodle_url('/admin/user.php', array('returnurl' => $returnurl, 'sesskey' => sesskey()));
-        }
-
-        // If it's an Mnet user no actions are supported.
-        if ($mnetuser) {
-
-            $buttons[] = \html_writer::span(
+        if ($user->mnethostid != $CFG->mnet_localhost_id) {
+            // We will not support Mnet in this report!
+            return \html_writer::span(
                 get_string('mnetuser', 'totara_reportbuilder'),
                 'label label-info',
                 array('title' => get_string('mnetnotsupported', 'totara_reportbuilder'))
             );
+        }
 
-        } else if ($extrafields->deleted && $extrafields->can_delete) {
+        $returnurl = new \moodle_url($report->get_current_url());
+        $spage = optional_param('spage', '', PARAM_INT);
+        if ($spage) {
+            $returnurl->param('spage', $spage);
+        }
+        $perpage = optional_param('perpage', '', PARAM_INT);
+        if ($perpage) {
+            $returnurl->param('perpage', $perpage);
+        }
+        $returnurl = $returnurl->out_as_local_url(false);
+        $actionurl = new \moodle_url('/user/action.php', array('id' => $user->id, 'returnurl' => $returnurl));
 
-            // If the record has been marked as deleted, don't show any edit, suspend etc icons
-            $preg_emailhash = '/^[0-9a-f]{32}$/i';
+        $sitecontext = \context_system::instance();
+        if ($user->deleted) {
+            $usercontext = $sitecontext;
+        } else {
+            $usercontext = \context_user::instance($user->id, IGNORE_MISSING);
+            if (!$usercontext) {
+                // This should never happen.
+                return '';
+            }
+        }
 
-            $buttons[] = \html_writer::link(
-                new \moodle_url($actionurl, array('undelete' => $userid, 'returnurl' => $returnurl)),
-                $OUTPUT->flex_icon('recycle', array('alt' => $text['undelete'])),
-                array('title' => $text['undelete'])
-            );
+        $buttons = array();
 
-            if ($CFG->authdeleteusers !== 'partial' && !preg_match($preg_emailhash, $extrafields->email)) {
+        if ($user->deleted) {
+            if (has_capability('totara/core:undeleteuser', $sitecontext)) {
+                // If the record has been marked as deleted, don't show any edit, suspend etc icons
+                $preg_emailhash = '/^[0-9a-f]{32}$/i';
+
+                $title = get_string('undeleterecord', 'totara_reportbuilder', $user->fullname);
                 $buttons[] = \html_writer::link(
-                    new \moodle_url($actionurl, array('delete' => $userid, 'returnurl' => $returnurl)),
-                    $OUTPUT->flex_icon('delete', array('alt' => $text['delete'])),
-                    array('title' => $text['delete'])
+                    new \moodle_url($actionurl, array('action' => 'undelete')),
+                    $OUTPUT->flex_icon('recycle', array('alt' => $title)),
+                    array('title' => $title)
                 );
+
+                if ($CFG->authdeleteusers !== 'partial' && !preg_match($preg_emailhash, $user->email)) {
+                    $title = get_string('deleterecord', 'totara_reportbuilder', $user->fullname);
+                    $buttons[] = \html_writer::link(
+                        new \moodle_url($actionurl, array('action' => 'delete')),
+                        $OUTPUT->flex_icon('delete', array('alt' => $title)),
+                        array('title' => $title)
+                    );
+                }
             }
 
         } else {
@@ -112,58 +113,75 @@ class user_actions extends base {
             // action icons, followed by: unlock and confirm.
 
             $issiteadmin = is_siteadmin($userid);
-            $iscurrentuser = ($userid != $USER->id);
+            $iscurrentuser = ($userid == $USER->id);
+            $canupdate = has_capability('moodle/user:update', $sitecontext);
+            $candelete = has_capability('moodle/user:delete', $sitecontext);
 
             // Add edit action icon but prevent editing of admins by non-admin users.
-            if ($extrafields->can_update && (is_siteadmin($USER) || !$issiteadmin)) {
-                $buttons[] = \html_writer::link(
-                    new \moodle_url('/user/editadvanced.php', array('id'=>$userid, 'course'=>SITEID, 'returnurl' => $returnurl)),
-                    $OUTPUT->flex_icon('settings', array('alt' => $text['edit'])),
-                    array('title' => $text['edit'])
-                );
+            if ((is_siteadmin($USER) || !$issiteadmin)) {
+                if ($canupdate) {
+                    $title = get_string('editrecord', 'totara_reportbuilder', $user->fullname);
+                    $buttons[] = \html_writer::link(
+                        new \moodle_url('/user/editadvanced.php', array('id'=>$userid, 'course'=>SITEID, 'returnurl' => $returnurl)),
+                        $OUTPUT->flex_icon('settings', array('alt' => $title)),
+                        array('title' => $title)
+                    );
+                } else if (has_capability('moodle/user:editprofile', $usercontext)) {
+                    $title = get_string('editrecord', 'totara_reportbuilder', $user->fullname);
+                    $buttons[] = \html_writer::link(
+                        new \moodle_url('/user/edit.php', array('id'=>$userid, 'course'=>SITEID, 'returnurl' => $returnurl)),
+                        $OUTPUT->flex_icon('settings', array('alt' => $title)),
+                        array('title' => $title)
+                    );
+                }
             }
 
             // Add suspend and unsuspend icons.
-            if ($extrafields->can_update && $iscurrentuser && !$issiteadmin) {
-                if ($extrafields->suspended) {
+            if ($canupdate && !$iscurrentuser && !$issiteadmin) {
+                if ($user->suspended) {
+                    $title = get_string('unsuspendrecord', 'totara_reportbuilder', $user->fullname);
                     $buttons[] = \html_writer::link(
-                        new \moodle_url($actionurl, array('unsuspend' => $userid, 'returnurl' => $returnurl)),
-                        $OUTPUT->flex_icon('show', array('alt' => $text['unsuspend'])),
-                        array('title' => $text['unsuspend'])
+                        new \moodle_url($actionurl, array('action' => 'unsuspend', 'sesskey' => sesskey())),
+                        $OUTPUT->flex_icon('show', array('alt' => $title)),
+                        array('title' => $title)
                     );
                 } else {
+                    $title = get_string('suspendrecord', 'totara_reportbuilder', $user->fullname);
                     $buttons[] = \html_writer::link(
-                        new \moodle_url($actionurl, array('suspend' => $userid, 'returnurl' => $returnurl)),
-                        $OUTPUT->flex_icon('hide', array('alt' => $text['suspend'])),
-                        array('title' => $text['suspend'])
+                        new \moodle_url($actionurl, array('action' => 'suspend', 'sesskey' => sesskey())),
+                        $OUTPUT->flex_icon('hide', array('alt' => $title)),
+                        array('title' => $title)
                     );
                 }
             }
 
             // Add delete action icon.
-            if ($extrafields->can_delete && $iscurrentuser && !$issiteadmin) {
+            if ($candelete && !$iscurrentuser && !$issiteadmin) {
+                $title = get_string('deleterecord', 'totara_reportbuilder', $user->fullname);
                 $buttons[] = \html_writer::link(
-                    new \moodle_url($actionurl, array('delete'=> $userid, 'returnurl' => $returnurl)),
-                    $OUTPUT->flex_icon('delete', array('alt' => $text['delete'])),
-                    array('title' => $text['delete'])
+                    new \moodle_url($actionurl, array('action' => 'delete')),
+                    $OUTPUT->flex_icon('delete', array('alt' => $title)),
+                    array('title' => $title)
                 );
             }
 
             // Add an unlock icon for when the user has locked their account.
-            if ($extrafields->can_update && login_is_lockedout((object)array('id' => $userid, 'mnethostid' => $extrafields->mnethostid))) {
+            if ($canupdate && login_is_lockedout($user)) {
+                $title = get_string('unlockrecord', 'totara_reportbuilder', $user->fullname);
                 $buttons[] = \html_writer::link(
-                    new \moodle_url($actionurl, array('unlock' => $userid)),
-                    $OUTPUT->flex_icon('unlock', array('alt' => $text['unlock'])),
-                    array('title' => $text['unlock'])
+                    new \moodle_url($actionurl, array('action' => 'unlock', 'sesskey' => sesskey())),
+                    $OUTPUT->flex_icon('unlock', array('alt' => $title)),
+                    array('title' => $title)
                 );
             }
 
             // If a user is self-registered allow the user to confirm the user.
-            if ($extrafields->can_update && empty($extrafields->confirmed)) {
+            if ($canupdate && empty($user->confirmed)) {
+                $title = get_string('confirmrecord', 'totara_reportbuilder', $user->fullname);
                 $buttons[] = \html_writer::link(
-                    new \moodle_url($actionurl, array('confirmuser' => $userid)),
-                    $OUTPUT->flex_icon('check', array('alt' => $text['confirm'])),
-                    array('title' => $text['confirm'])
+                    new \moodle_url($actionurl, array('action' => 'confirm', 'sesskey' => sesskey())),
+                    $OUTPUT->flex_icon('check', array('alt' => $title)),
+                    array('title' => $title)
                 );
             }
         }

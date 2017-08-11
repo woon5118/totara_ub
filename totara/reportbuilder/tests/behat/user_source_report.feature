@@ -1,4 +1,4 @@
-@core @core_admin @javascript
+@totara @totara_reportbuilder @javascript
 Feature: Verify functionality of user source report.
 
   # See admin/tests/behat/user_report.feature for more tests that are relevant
@@ -70,7 +70,7 @@ Feature: Verify functionality of user source report.
     When I follow "Delete Bob1 Learner1"
     Then I should see "Delete user"
 
-    When I press "Continue"
+    When I press "Delete"
     Then I should see "User Report: 6 records shown"
     And the following should exist in the "reportbuilder-table" table:
       | User's Fullname | Username | User's Email              | User Status  |
@@ -79,7 +79,7 @@ Feature: Verify functionality of user source report.
     When I follow "Undelete Bob1 Learner1"
     Then I should see "Undelete User"
 
-    When I press "Continue"
+    When I press "Undelete"
     Then I should see "User Report: 6 records shown"
     And the following should exist in the "reportbuilder-table" table:
       | User's Fullname | Username | User's Email              | User Status |
@@ -92,7 +92,7 @@ Feature: Verify functionality of user source report.
     When I follow "Delete Bob1 Learner1"
     Then I should see "Delete user"
 
-    When I press "Continue"
+    When I press "Delete"
     # A fully deleted user is not shown in the report.
     Then I should see "User Report: 5 records shown"
     And I should not see "Bob1 Learner1"
@@ -118,7 +118,7 @@ Feature: Verify functionality of user source report.
     When I follow "Delete Bob1 Learner1"
     Then I should see "Delete user"
 
-    When I press "Continue"
+    When I press "Delete"
     Then I should see "User Report: 7 records shown"
     And the following should exist in the "reportbuilder-table" table:
       | User's Fullname | Username | User's Email              | User Status  |

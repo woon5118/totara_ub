@@ -68,7 +68,7 @@ Feature: An admin can import users through HR import
     And I should see "Import User003"
     And I follow "Delete"
     And I should see "Are you absolutely sure you want to completely delete 'Import User003'"
-    And I press "Continue"
+    And I press "Delete"
     And I press "Clear"
     And I follow "Show more..."
     And I set the following fields to these values:
@@ -103,7 +103,7 @@ Feature: An admin can import users through HR import
     And I should see "Import User003"
     And I follow "Delete"
     And I should see "Are you absolutely sure you want to completely delete 'Import User003'"
-    And I press "Continue"
+    And I press "Delete"
     And I press "Clear"
     And I follow "Show more..."
     And I set the following fields to these values:
@@ -144,7 +144,7 @@ Feature: An admin can import users through HR import
     And I should see "Import User003"
     And I follow "Delete"
     And I should see "Are you absolutely sure you want to completely delete 'Import User003'"
-    And I press "Continue"
+    And I press "Delete"
     And I press "Clear"
     And I follow "Show more..."
     And I set the following fields to these values:
@@ -190,7 +190,7 @@ Feature: An admin can import users through HR import
     And I should see "Import User003"
     And I follow "Delete"
     And I should see "Are you absolutely sure you want to completely delete 'Import User003'"
-    And I press "Continue"
+    And I press "Delete"
     And I press "Clear"
     And I should see "Import User001"
     And I should see "Import User002"

@@ -18,29 +18,30 @@ Feature: Create users with custom profile fields
       | Should the data be unique       | Yes               |
       | Who is this field visible to    | Not visible       |
     And I press "Save changes"
-    When I navigate to "Add a new user" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I press "Add a new user"
     And I set the following fields to these values:
-      | Username                        | user1            |
+      | Username                        | user1             |
       | New password                    | A.New.Pw.123      |
       | First name                      | User              |
       | Surname                         | One               |
-      | Email address                   | a1@b.com          |
+      | Email address                   | a1@example.com    |
     And I press "Create user"
-    Then the following should exist in the "users" table:
-    | First name / Surname | Email address |
-    | User One  | a1@b.com |
-    When I navigate to "Add a new user" node in "Site administration > Users > Accounts"
+    Then the following should exist in the "system_browse_users" table:
+      | Username | User's Email   |
+      | user1    | a1@example.com |
+    When I press "Add a new user"
     And I set the following fields to these values:
-      | Username                        | user2            |
+      | Username                        | user2             |
       | New password                    | A.New.Pw.123      |
       | First name                      | User              |
       | Surname                         | Two               |
-      | Email address                   | a2@b.com          |
+      | Email address                   | a2@example.com   |
     And I press "Create user"
-    Then the following should exist in the "users" table:
-    | First name / Surname | Email address |
-    | User One  | a1@b.com |
-    | User Two  | a2@b.com |
+    Then the following should exist in the "system_browse_users" table:
+      | Username | User's Email   |
+      | user1    | a1@example.com |
+      | user2    | a2@example.com |
 
   Scenario: Can create users with custom fields
     Given I log in as "admin"
@@ -66,35 +67,36 @@ BBB
 CCC
 """
     And I press "Save changes"
-    When I navigate to "Add a new user" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I press "Add a new user"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Username                        | user1             |
       | New password                    | A.New.Pw.123      |
       | First name                      | User              |
       | Surname                         | One               |
-      | Email address                   | a1@b.com          |
+      | Email address                   | a1@example.com    |
       | Text Field                      | testing123        |
       | Menu Field                      | CCC               |
     And I press "Create user"
-    Then the following should exist in the "users" table:
-    | First name / Surname | Email address |
-    | User One             | a1@b.com      |
-    When I navigate to "Add a new user" node in "Site administration > Users > Accounts"
+    Then the following should exist in the "system_browse_users" table:
+      | Username | User's Email   |
+      | user1    | a1@example.com |
+    When I press "Add a new user"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Username                        | user2             |
       | New password                    | A.New.Pw.123      |
       | First name                      | User              |
       | Surname                         | Two               |
-      | Email address                   | a2@b.com          |
+      | Email address                   | a2@example.com    |
       | Text Field                      | testing456        |
       | Menu Field                      | AAA               |
     And I press "Create user"
-    Then the following should exist in the "users" table:
-    | First name / Surname | Email address |
-    | User One  | a1@b.com |
-    | User Two  | a2@b.com |
+    Then the following should exist in the "system_browse_users" table:
+      | Username | User's Email   |
+      | user1    | a1@example.com |
+      | user2    | a2@example.com |
     And I follow "User One"
     And I should see "testing123"
     And I should see "CCC"

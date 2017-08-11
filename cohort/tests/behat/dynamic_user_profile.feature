@@ -26,12 +26,10 @@ Feature: Limit an audience based on user profile fields
     And I expand all fieldsets
     And I set the field "test" to "1"
     And I press "Update profile"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "Edit" "link" in the "User Two" "table_row"
     And I expand all fieldsets
     And I set the field "test" to "2"
     And I press "Update profile"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "Edit" "link" in the "User Three" "table_row"
     And I expand all fieldsets
     And I set the field "test" to "3"

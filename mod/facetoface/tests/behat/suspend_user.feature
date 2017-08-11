@@ -143,7 +143,7 @@ Feature: Suspend user in different session times
 
     # Suspend Sam1 Student1 user
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I click on "Suspend user account" "link" in the "Sam1 Student1" "table_row"
+    And I click on "Suspend Sam1 Student1" "link" in the "Sam1 Student1" "table_row"
     And I wait until the page is ready
 
     And I click on "Find Learning" in the totara menu

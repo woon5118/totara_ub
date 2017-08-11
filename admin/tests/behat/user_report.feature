@@ -111,7 +111,7 @@ Feature: Verify functionality of user report.
     When I follow "Delete Bob1 Learner1"
     Then I should see "Delete user"
 
-    When I press "Continue"
+    When I press "Delete"
     Then I should see "Browse list of users: 3 records shown"
     Then the following should exist in the "reportbuilder-table" table:
       | User's Fullname | Username | User's Email              | User Status  |
@@ -120,7 +120,7 @@ Feature: Verify functionality of user report.
     When I follow "Undelete Bob1 Learner1"
     Then I should see "Undelete User"
 
-    When I press "Continue"
+    When I press "Undelete"
     Then I should see "Browse list of users: 3 records shown"
     And the following should exist in the "reportbuilder-table" table:
       | User's Fullname | Username | User's Email              | User Status |
@@ -133,7 +133,7 @@ Feature: Verify functionality of user report.
     When I follow "Delete Bob1 Learner1"
     Then I should see "Delete user"
 
-    When I press "Continue"
+    When I press "Delete"
     # A fully deleted user is not shown in the report.
     Then I should see "Browse list of users: 2 records shown"
     And I should not see "Bob1 Learner1"
@@ -158,7 +158,7 @@ Feature: Verify functionality of user report.
     When I follow "Delete Bob1 Learner1"
     Then I should see "Delete user"
 
-    When I press "Continue"
+    When I press "Delete"
     Then I should see "Browse list of users: 4 records shown"
     And the following should exist in the "reportbuilder-table" table:
       | User's Fullname | Username | User's Email              | User Status  |

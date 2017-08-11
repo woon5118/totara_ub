@@ -585,6 +585,7 @@ class auth_plugin_ldap extends auth_plugin_base {
      *
      * @param string $username
      * @param string $confirmsecret
+     * @return int AUTH_CONFIRM_ constant
      */
     function user_confirm($username, $confirmsecret) {
         global $DB;

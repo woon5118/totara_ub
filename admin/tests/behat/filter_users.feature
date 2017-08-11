@@ -23,6 +23,8 @@ Feature: An administrator can filter user accounts by role, cohort and other pro
       | user2 | C1 | student |
       | user3 | C1 | student |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | uselegacybrowselistofusersreport | 1 |
     And I add "User Two (two@example.com)" user to "CH1" cohort members
     And I add "User Three (three@example.com)" user to "CH1" cohort members
     And I navigate to "Users > Accounts > Browse list of users" in site administration

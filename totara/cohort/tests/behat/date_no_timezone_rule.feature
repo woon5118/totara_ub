@@ -21,18 +21,14 @@ Feature: Apply audience membership rules using custom date field
       | Name      | Join Date |
     And I press "Save changes"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I follow "user1"
-    And I follow "Edit profile"
-    And I expand all fieldsets
+    And I click on "Edit" "link" in the "user1" "table_row"
     And I set the following fields to these values:
       | profile_field_joindate[enabled] | 1    |
       | profile_field_joindate[day]     | 21   |
       | profile_field_joindate[month]   | July |
       | profile_field_joindate[year]    | 2015 |
     And I press "Update profile"
-    And I follow "user2"
-    And I follow "Edit profile"
-    And I expand all fieldsets
+    And I click on "Edit" "link" in the "user2" "table_row"
     And I set the following fields to these values:
       | profile_field_joindate[enabled] | 1    |
       | profile_field_joindate[day]     | 22   |

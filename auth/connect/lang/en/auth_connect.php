@@ -29,6 +29,7 @@ $string['comment'] = 'Comment';
 $string['confirmdelete'] = 'Type server ID number to confirm';
 $string['deletingserver'] = 'Delete in progress';
 $string['errorhttp'] = 'For security reasons all Totara Connect clients should be hosted via a secure protocol (https).';
+$string['errorprofiledit'] = 'Error updating local user information';
 $string['migratebyuniqueid'] = 'Totara Connect unique ID';
 $string['migratemap'] = 'Account mapping';
 $string['migratemap_desc'] = 'Map user accounts during migration using the selected field. Make sure the selected user field is locked and cannot be modified by ordinary users or customised during user self registration both on the server and clients.';

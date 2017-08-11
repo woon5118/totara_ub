@@ -803,7 +803,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      *
      * @param string $description
      * @param integer $reportid ID of the report the description belongs to
-     * @return HTML
+     * @return string HTML
      */
     public function print_description($description, $reportid) {
         $sitecontext = context_system::instance();

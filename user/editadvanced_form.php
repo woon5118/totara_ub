@@ -159,7 +159,7 @@ class user_editadvanced_form extends moodleform {
             $btnstring = get_string('updatemyprofile');
         }
 
-        $this->add_action_buttons(false, $btnstring);
+        $this->add_action_buttons(empty($USER->newadminuser), $btnstring); // Totara: do not allow cancelling in the install process.
 
         // Called at the end of the definition, prior to data being set.
         $hook = new core_user\hook\editadvanced_form_definition_complete($this, $this->_customdata);

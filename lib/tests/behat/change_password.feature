@@ -17,8 +17,7 @@ Feature: User can change their password
     And I set the following fields to these values:
       | New password | Pass-w0rd1 |
     And I press "Update profile"
-    Then I should see "Browse list of users"
-    And I should see "Add a new user"
+    Then I should see "User details"
 
     When I log out
     Then I should see "Log in"
@@ -74,8 +73,7 @@ Feature: User can change their password
     And I set the following fields to these values:
      | Force password change | 1 |
     And I press "Update profile"
-    Then I should see "Browse list of users"
-    And I should see "Add a new user"
+    Then I should see "User details"
 
     When I log out
     Then I should see "Log in"

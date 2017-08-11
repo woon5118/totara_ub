@@ -152,8 +152,7 @@ Feature: Learning plans can be created for members of an audience
     # Update another user so they are added to the audience
     When I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I follow "learner2 learner2"
-    And I follow "Edit profile"
+    And I click on "Edit" "link" in the "learner2 learner2" "table_row"
     And I set the field "City/town" to "Brighton"
     And I press "Update profile"
 

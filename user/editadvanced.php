@@ -36,8 +36,8 @@ $PAGE->https_required();
 
 $id     = optional_param('id', $USER->id, PARAM_INT);    // User id; -1 if creating new user.
 $course = optional_param('course', SITEID, PARAM_INT);   // Course id (defaults to Site).
-$returnto = optional_param('returnto', null, PARAM_ALPHA);  // Code determining where to return to after save.
-$returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
+$returnto = optional_param('returnto', null, PARAM_ALPHANUMEXT);  // Code determining where to return to after save.
+$customreturn = optional_param('returnurl', '', PARAM_LOCALURL);
 
 $PAGE->set_url('/user/editadvanced.php', array('course' => $course, 'id' => $id));
 
@@ -92,6 +92,16 @@ if ($id == -1) {
             $node->force_open();
         }
     }
+}
+
+// Totara: Use standard external edit profile url if not admin.
+$externalediturl = null;
+if (exists_auth_plugin($user->auth)) {
+    $userauth = get_auth_plugin($user->auth);
+    $externalediturl = $userauth->edit_profile_url($user->id);
+}
+if ($externalediturl and !is_siteadmin()) {
+    redirect($externalediturl);
 }
 
 // Remote users cannot be edited.
@@ -156,10 +166,18 @@ $filemanageroptions = array('maxbytes'       => $CFG->maxbytes,
 file_prepare_draft_area($draftitemid, $filemanagercontext->id, 'user', 'newicon', 0, $filemanageroptions);
 $user->imagefile = $draftitemid;
 // Create form.
-$userform = new user_editadvanced_form(new moodle_url($PAGE->url, array('returnto' => $returnto, 'returnurl' => $returnurl)), array(
+$formurl = new moodle_url($PAGE->url, array('returnto' => $returnto));
+if ($customreturn) {
+    $formurl->param('returnurl', $customreturn);
+}
+$userform = new user_editadvanced_form($formurl, array(
     'editoroptions' => $editoroptions,
     'filemanageroptions' => $filemanageroptions,
     'user' => $user));
+
+if ($userform->is_cancelled()) {
+    redirect(useredit_get_return_url($user, $returnto, $course, $customreturn));
+}
 
 if ($usernew = $userform->get_data()) {
     $usercreated = false;
@@ -310,23 +328,11 @@ if ($usernew = $userform->get_data()) {
             // Somebody double clicked when editing admin user during install.
             redirect("$CFG->wwwroot/$CFG->admin/");
         } else {
-            if ($returnto === 'profile') {
-                if ($course->id != SITEID) {
-                    $returnurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
-                } else {
-                    $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
-                }
-            } else {
-                $returnurl = new moodle_url('/user/preferences.php', array('userid' => $user->id));
-            }
-            redirect($returnurl);
+            redirect(useredit_get_return_url($usernew, $returnto, $course, $customreturn));
         }
     } else {
         \core\session\manager::gc(); // Remove stale sessions.
-        if (!$returnurl) {
-            $returnurl = "$CFG->wwwroot/$CFG->admin/user.php";
-        }
-        redirect($returnurl);
+        redirect(useredit_get_return_url($usernew, $returnto, $course, $customreturn));
     }
     // Never reached..
 }
@@ -371,6 +377,12 @@ if ($user->id == -1 or ($user->id != $USER->id)) {
 
     echo $OUTPUT->header();
     echo $OUTPUT->heading($streditmyprofile);
+}
+
+if ($externalediturl) {
+    // Totara: Tell admin that they should not edit the local profile when plugin has its own profile edit page.
+    echo $OUTPUT->notification(get_string('profileeditexternal', 'core_auth'), 'notifyproblem');
+    echo $OUTPUT->single_button(new moodle_url($externalediturl), get_string('editmyprofile'), 'get');
 }
 
 // Finally display THE form.

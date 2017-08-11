@@ -34,7 +34,8 @@ $PAGE->https_required();
 
 $userid = optional_param('id', $USER->id, PARAM_INT);    // User id.
 $course = optional_param('course', SITEID, PARAM_INT);   // Course id (defaults to Site).
-$returnto = optional_param('returnto', null, PARAM_ALPHA);  // Code determining where to return to after save.
+$returnto = optional_param('returnto', null, PARAM_ALPHANUMEXT);  // Code determining where to return to after save.
+$customreturn = optional_param('returnurl', '', PARAM_LOCALURL);
 $cancelemailchange = optional_param('cancelemailchange', 0, PARAM_INT);   // Course id (defaults to Site).
 
 $PAGE->set_url('/user/edit.php', array('course' => $course, 'id' => $userid));
@@ -90,7 +91,7 @@ if (!$userauth->can_edit_profile()) {
     print_error('noprofileedit', 'auth');
 }
 
-if ($editurl = $userauth->edit_profile_url()) {
+if ($editurl = $userauth->edit_profile_url($user->id)) {
     // This internal script not used.
     redirect($editurl);
 }
@@ -115,7 +116,7 @@ $personalcontext = context_user::instance($user->id);
 if ($user->id == $USER->id) {
     // Editing own profile - require_login() MUST NOT be used here, it would result in infinite loop!
     if (!has_capability('moodle/user:editownprofile', $systemcontext)) {
-        print_error('cannotedityourprofile');
+        print_error('cannotedityourprofile', 'error', useredit_get_return_url($user, $returnto, $course, $customreturn));
     }
 
 } else {
@@ -123,11 +124,11 @@ if ($user->id == $USER->id) {
     require_capability('moodle/user:editprofile', $personalcontext);
     // No editing of guest user account.
     if (isguestuser($user->id)) {
-        print_error('guestnoeditprofileother');
+        print_error('guestnoeditprofileother', 'error', useredit_get_return_url($user, $returnto, $course, $customreturn));
     }
     // No editing of primary admin!
     if (is_siteadmin($user) and !is_siteadmin($USER)) {  // Only admins may edit other admins.
-        print_error('useradmineditadmin');
+        print_error('useradmineditadmin', 'error', useredit_get_return_url($user, $returnto, $course, $customreturn));
     }
 }
 
@@ -180,25 +181,22 @@ $filemanageroptions = array('maxbytes'       => $CFG->maxbytes,
 file_prepare_draft_area($draftitemid, $filemanagercontext->id, 'user', 'newicon', 0, $filemanageroptions);
 $user->imagefile = $draftitemid;
 // Create form.
-$userform = new user_edit_form(new moodle_url($PAGE->url, array('returnto' => $returnto)), array(
+$formurl = new moodle_url($PAGE->url, array('returnto' => $returnto));
+if ($customreturn) {
+    $formurl->param('returnto', $customreturn);
+}
+$userform = new user_edit_form($formurl, array(
     'editoroptions' => $editoroptions,
     'filemanageroptions' => $filemanageroptions,
     'user' => $user));
 
 $emailchanged = false;
 
-if ($usernew = $userform->get_data()) {
+if ($userform->is_cancelled()) {
+    redirect(useredit_get_return_url($user, $returnto, $course, $customreturn));
+}
 
-    // Deciding where to send the user back in most cases.
-    if ($returnto === 'profile') {
-        if ($course->id != SITEID) {
-            $returnurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
-        } else {
-            $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
-        }
-    } else {
-        $returnurl = new moodle_url('/user/preferences.php', array('userid' => $user->id));
-    }
+if ($usernew = $userform->get_data()) {
 
     $emailchangedhtml = '';
 
@@ -309,7 +307,7 @@ if ($usernew = $userform->get_data()) {
     }
 
     if (!$emailchanged || !$CFG->emailchangeconfirmation) {
-        redirect($returnurl);
+        redirect(useredit_get_return_url($user, $returnto, $course, $customreturn));
     }
 }
 

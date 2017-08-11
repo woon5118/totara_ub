@@ -11,6 +11,8 @@ Feature: Tables can be sorted by additional names
     | student2 | George | Bradley | David | Gman | student2@example.com | s2 |
     | student3 | Travis | Sutcliff | Peter | Mr T | student3@example.com | s3 |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | uselegacybrowselistofusersreport | 1 |
     And I navigate to "User policies" node in "Site administration > Users > Permissions"
     And the following config values are set as admin:
     | fullnamedisplay | firstname middlename lastname |

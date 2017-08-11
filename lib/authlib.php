@@ -193,9 +193,10 @@ class auth_plugin_base {
      * This method is used if can_edit_profile() returns true.
      * This method is called only when user is logged in, it may use global $USER.
      *
-     * @return moodle_url url of the profile page or null if standard used
+     * @param int $userid local user id, null means current user
+     * @return moodle_url url of the profile editing page or null if standard used
      */
-    function edit_profile_url() {
+    function edit_profile_url($userid = null) {
         //override if needed
         return null;
     }
@@ -348,6 +349,7 @@ class auth_plugin_base {
      *
      * @param string $username
      * @param string $confirmsecret
+     * @return int AUTH_CONFIRM_ constant
      */
     function user_confirm($username, $confirmsecret) {
         //override when can confirm

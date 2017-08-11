@@ -58,11 +58,11 @@ class rb_source_user extends rb_base_source {
     private $staff_f2f;
 
     /*
-     * Indicate if the actions column is permitted on the source. It should ONLY
-     * be available to the user source and not any class that extends from it.
+     * Indicate if the actions column is permitted on the source.
+     * NOTE: you need to extend this source and override this if you want to enable user actions to your reports.
      * @var boolean.
      */
-    protected $allow_actions_column = false;
+    protected $allow_actions_column = null;
 
     /**
      * Constructor
@@ -79,8 +79,10 @@ class rb_source_user extends rb_base_source {
         // Remember the active global restriction set.
         $this->globalrestrictionset = $globalrestrictionset;
 
-        // Allow the actions column to be used in the user source.
-        $this->allow_actions_column = (get_class($this) === 'rb_source_user');
+        // Allow the actions column to be used in the user source, bul allow
+        if (!isset($this->allow_actions_column)) {
+            $this->allow_actions_column = (get_class($this) === 'rb_source_user');
+        }
 
         $this->base = "{user}";
         list($this->sourcewhere, $this->sourceparams) = $this->define_sourcewhere();
@@ -356,11 +358,8 @@ class rb_source_user extends rb_base_source {
         );
 
         $usednamefields = totara_get_all_user_name_fields_join('base', null, true);
-        $systemcontext = context_system::instance();
-        $can_update = has_capability('moodle/user:update', $systemcontext);
-        $can_delete = has_capability('moodle/user:delete', $systemcontext);
 
-        if (($can_delete || $can_update) && $this->allow_actions_column) {
+        if ($this->allow_actions_column) {
             $columnoptions[] = new rb_column_option(
                 'user',
                 'actions',
@@ -372,8 +371,6 @@ class rb_source_user extends rb_base_source {
                     'nosort' => true,
                     'graphable' => false,
                     'extrafields' => array(
-                        'can_update' => $can_update ? 1 : 0,
-                        'can_delete' => $can_delete ? 1 : 0,
                         'fullname' => $DB->sql_concat_join("' '", $usednamefields),
                         'username' => 'base.username',
                         'email' => 'base.email',

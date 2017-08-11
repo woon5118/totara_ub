@@ -134,6 +134,7 @@ $string['plaintext'] = 'Plain text';
 $string['pluginnotenabled'] = 'Authentication plugin \'{$a}\' is not enabled.';
 $string['pluginnotinstalled'] = 'Authentication plugin \'{$a}\' is not installed.';
 $string['potentialidps'] = 'Log in using your account on:';
+$string['profileeditexternal'] = 'This user account is not expected to be modified through this form, authentication plugin uses custom page.';
 $string['recaptcha'] = 'reCAPTCHA';
 $string['recaptcha_help'] = 'The CAPTCHA is for preventing abuse from automated programs. Simply enter the words in the box, in order and separated by a space.
 

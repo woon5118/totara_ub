@@ -4696,7 +4696,7 @@ class settings_navigation extends navigation_node {
             } else if ((has_capability('moodle/user:editprofile', $usercontext) && !is_siteadmin($user)) ||
                     ($currentuser && has_capability('moodle/user:editownprofile', $systemcontext))) {
                 if ($userauthplugin && $userauthplugin->can_edit_profile()) {
-                    $url = $userauthplugin->edit_profile_url();
+                    $url = $userauthplugin->edit_profile_url($user->id);
                     if (empty($url)) {
                         $url = new moodle_url('/user/edit.php', array('id'=>$user->id, 'course'=>$course->id));
                     }

@@ -500,3 +500,47 @@ function useredit_get_disabled_name_fields($enabledadditionalusernames = null) {
             array_merge(array('firstname', 'lastname'), $enabledadditionalusernames));
     return $nonusednamefields;
 }
+
+/**
+ * Find out what is the return URL for user/edit.php and user/editadvanced.php
+ *
+ * @since Totara 10.0
+ *
+ * @param stdClass $user
+ * @param string $returnto
+ * @param stdClass|null $course
+ * @param string $customreturn
+ * @return moodle_url
+ */
+function useredit_get_return_url(\stdClass $user, $returnto, \stdClass $course = null, $customreturn = null) {
+    if ($customreturn) {
+        $returnurl = new moodle_url($customreturn);
+
+    } else if (empty($user->id) or $user->id < 1 or $user->deleted) {
+        // Admin adding new user most likely.
+        if (has_capability('moodle/user:update', context_system::instance())) {
+            $returnurl = new moodle_url('/admin/user.php');
+        } else {
+            $returnurl = new moodle_url('/');
+        }
+
+    } else if ($returnto === 'profile') {
+        if ($course and $course->id != SITEID) {
+            $returnurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
+        } else {
+            $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
+        }
+
+    } else if ($returnto === 'allusers') {
+        $returnurl = new moodle_url('/admin/user.php');
+
+    } else {
+        $returnurl = new moodle_url('/user/preferences.php', array('userid' => $user->id));
+    }
+
+    // Allow plugins to use custom values for 'returnto' parameter or override defaults.
+    $hook = new \core_user\hook\profile_edit_returnto($user, $returnto, $returnurl);
+    $hook->execute();
+
+    return $hook->returnurl;
+}

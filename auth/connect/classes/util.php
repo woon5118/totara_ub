@@ -352,6 +352,83 @@ class util {
     }
 
     /**
+     * Sync local user data with with connect server.
+     *
+     * NOTE: session data is updated for current $USER if necessary.
+     *
+     * @param int $userid
+     * @return bool success
+     */
+    public static function sync_user($userid) {
+        global $DB, $USER;
+
+        if (!is_enabled_auth('connect')) {
+            return false;
+        }
+
+        $user = $DB->get_record('user', array('id' => $userid, 'deleted' => 0, 'auth' => 'connect'));
+        if (!$user) {
+            return false;
+        }
+        $connectuser = $DB->get_record('auth_connect_users', array('userid' => $user->id));
+        if (!$connectuser) {
+            return false;
+        }
+        $server = $DB->get_record('auth_connect_servers', array('id' => $connectuser->serverid));
+        if (!$server) {
+            return false;
+        }
+        if ($server->status != self::SERVER_STATUS_OK) {
+            return false;
+        }
+
+        $data = array(
+            'serveridnumber' => $server->serveridnumber,
+            'serversecret' => $server->serversecret,
+            'service' => 'get_user',
+            'userid' => $connectuser->serveruserid,
+        );
+        $result = jsend::request(self::get_sep_url($server), $data);
+
+        if ($result['status'] !== 'success' or !isset($result['data']['user'])) {
+            return false;
+        }
+
+        $localuser = self::update_local_user($server, $result['data']['user'], true);
+
+        if (!$localuser or $localuser->id != $user->id) {
+            return false;
+        }
+
+        if ($user->id != $USER->id) {
+            return true;
+        }
+
+        $newuser = $DB->get_record('user', array('id' => $user->id));
+
+        if ($newuser->deleted or $newuser->suspended) {
+            // This should not happen, user should have been already logged out.
+            return false;
+        }
+
+        // Override old $USER session variable if needed.
+        foreach ((array)$newuser as $variable => $value) {
+            if ($variable === 'description' or $variable === 'password') {
+                // These are not set for security and performance reasons.
+                continue;
+            }
+            $USER->$variable = $value;
+        }
+        // Preload custom fields.
+        profile_load_custom_fields($USER);
+
+        // Make sure the all preferences are preloaded too.
+        check_user_preferences_loaded($USER, 0);
+
+        return true;
+    }
+
+    /**
      * Update local users to match the list of server users.
      *
      * Note: Users fully deleted on Connect server are unconditionally
@@ -466,6 +543,7 @@ class util {
     public static function update_local_user(\stdClass $server, array $serveruser, $sso = false) {
         global $DB, $CFG;
         require_once("$CFG->dirroot/user/lib.php");
+        require_once("$CFG->dirroot/user/profile/lib.php");
 
         if ($serveruser['deleted'] != 0) {
             // Cannot sync deleted users, sorry.

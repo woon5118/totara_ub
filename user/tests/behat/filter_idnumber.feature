@@ -12,6 +12,8 @@ Feature: Filter users by idnumber
       | student2 | Student2 | 1 | student2@example.com | 2000000 |
       | student3 | Student3 | 1 | student3@example.com | 3000000 |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | uselegacybrowselistofusersreport | 1 |
     And I navigate to "Users > Accounts > Browse list of users" in site administration
 
   @javascript

@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2015 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @author Petr Skoda <petr.skoda@totaralearning.com>
  * @package totara_connect
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2017080200;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120502;       // Requires this Moodle version.
-$plugin->component = 'totara_connect';  // To check on upgrade, that module sits in correct place
+$watchers = [
+    [
+        // Alter return url in user/edit.php and user/editadvanced.php,
+        // client id is passed around in 'returnto' page parameter.
+        'hookname' => '\core_user\hook\profile_edit_returnto',
+        'callback' => 'totara_connect\watcher::profile_edit_returnto',
+        'priority' => 100,
+    ],
+];

@@ -226,10 +226,17 @@ class auth_plugin_connect extends auth_plugin_base {
 
     /**
      * Returns the edit profile link.
-     * @return moodle_url
+     *
+     * @param int $userid local user id, null means current user
+     * @return moodle_url url of the profile editing page or null if standard used
      */
-    public function edit_profile_url() {
-        return new \moodle_url('/auth/connect/user_edit.php');
+    public function edit_profile_url($userid = null) {
+        global $USER;
+        if (!$userid) {
+            $userid = $USER->id;
+        }
+        // No need to check validity here, the target page does it.
+        return new \moodle_url('/auth/connect/user_edit.php', array('userid' => $userid));
     }
 
     /**

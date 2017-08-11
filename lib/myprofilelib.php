@@ -88,7 +88,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
                 $userauthplugin = get_auth_plugin($user->auth);
             }
             if ($userauthplugin && $userauthplugin->can_edit_profile()) {
-                $url = $userauthplugin->edit_profile_url();
+                $url = $userauthplugin->edit_profile_url($user->id);
                 if (empty($url)) {
                     // Totara: 'id' is the name of parameter, Moodle messed it up during rewrite.
                     if (empty($course)) {

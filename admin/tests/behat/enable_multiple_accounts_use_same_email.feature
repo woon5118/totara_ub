@@ -20,7 +20,7 @@ Feature: Enable multiple accounts to have the same email address
       | Email address                   | testmultiemailuser@example.com  |
     And I press "Create user"
     And I should see "Test Multi1"
-    And I press "Add a new user"
+    And I navigate to "Add a new user" node in "Site administration>Users>Accounts"
     And I set the following fields to these values:
       | Username                        | testmultiemailuser2             |
       | Choose an authentication method | Manual accounts                 |
@@ -45,7 +45,7 @@ Feature: Enable multiple accounts to have the same email address
       | Email address                   | testmultiemailuser@example.com  |
     And I press "Create user"
     And I should see "Test Multi1"
-    And I press "Add a new user"
+    And I navigate to "Add a new user" node in "Site administration>Users>Accounts"
     And I set the following fields to these values:
       | Username                        | testmultiemailuser2             |
       | Choose an authentication method | Manual accounts                 |

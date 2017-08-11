@@ -21,14 +21,9 @@ if ($hassiteconfig
         $securewwwroot = str_replace('http:','https:',$CFG->wwwroot);
     }
     // stuff under the "accounts" subcategory
-    if (!empty($CFG->uselegacybrowselistofusersreport)) {
-        $browseusersurl = "$CFG->wwwroot/$CFG->admin/user_legacy.php";
-    } else {
-        $browseusersurl = "$CFG->wwwroot/$CFG->admin/user.php";
-    }
-    $ADMIN->add('accounts', new admin_externalpage('editusers', new lang_string('userlist','admin'), $browseusersurl, array('moodle/user:update', 'moodle/user:delete')));
+    $ADMIN->add('accounts', new admin_externalpage('editusers', new lang_string('userlist','admin'), "$CFG->wwwroot/$CFG->admin/user.php", array('moodle/user:update', 'moodle/user:delete')));
     $ADMIN->add('accounts', new admin_externalpage('userbulk', new lang_string('userbulk','admin'), "$CFG->wwwroot/$CFG->admin/user/user_bulk.php", array('moodle/user:update', 'moodle/user:delete')));
-    $ADMIN->add('accounts', new admin_externalpage('addnewuser', new lang_string('addnewuser'), "$securewwwroot/user/editadvanced.php?id=-1", 'moodle/user:create'));
+    $ADMIN->add('accounts', new admin_externalpage('addnewuser', new lang_string('addnewuser'), "$securewwwroot/user/editadvanced.php?id=-1&amp;returnto=profile", 'moodle/user:create'));
 
     // "User default preferences" settingpage.
     $temp = new admin_settingpage('userdefaultpreferences', new lang_string('userdefaultpreferences', 'admin'));
