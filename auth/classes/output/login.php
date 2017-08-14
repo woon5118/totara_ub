@@ -162,8 +162,10 @@ class login implements renderable, templatable {
         $data->hasidentityproviders = !empty($this->identityproviders);
         $data->hasinstructions = !empty($this->instructions);
         $data->identityproviders = $identityproviders;
-        list($data->instructions, $data->instructionsformat) = external_format_text($this->instructions, FORMAT_MOODLE,
-            context_system::instance()->id);
+        $context = context_system::instance();
+        $options = array('noclean' => true, 'filter' => true, 'context' => $context);
+        list($data->instructions, $data->instructionsformat) = external_format_text($this->instructions, FORMAT_HTML,
+            $context->id, null, null, null, $options);
         $data->loginurl = $this->loginurl->out(false);
         $data->rememberusername = $this->rememberusername;
         $data->rememberusernamechecked = $this->rememberusernamechecked;
