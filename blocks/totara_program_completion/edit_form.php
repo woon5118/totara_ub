@@ -38,8 +38,7 @@ class block_totara_program_completion_edit_form extends block_edit_form {
         require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
         local_js(array(
             TOTARA_JS_DIALOG,
-            TOTARA_JS_TREEVIEW,
-            TOTARA_JS_PLACEHOLDER
+            TOTARA_JS_TREEVIEW
         ));
 
         $programids = isset($this->block->config->programids) ? $this->block->config->programids : '';

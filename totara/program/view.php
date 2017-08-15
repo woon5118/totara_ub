@@ -63,10 +63,7 @@ $data = array('id' => $program->id, 'other' => array('section' => 'general'));
 $event = \totara_program\event\program_viewed::create_from_data($data)->trigger();
 
 //Javascript include
-local_js(array(
-    TOTARA_JS_DIALOG,
-    TOTARA_JS_PLACEHOLDER
-));
+local_js(array(TOTARA_JS_DIALOG));
 
 // Get extension dialog content
 $PAGE->requires->strings_for_js(array('pleaseentervaliddate', 'pleaseentervalidreason', 'extensionrequest', 'cancel', 'ok'), 'totara_program');

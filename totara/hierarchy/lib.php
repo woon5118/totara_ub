@@ -1932,11 +1932,6 @@ class hierarchy {
     /**
      * Return the HTML to display a framework search form
      *
-     * To get placeholder text to appear include the following in the source page:
-     *
-     * require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
-     * local_js(array(TOTARA_JS_PLACEHOLDER));
-     *
      * @param string $query An existing query to populate the search box with
      * @param string $placeholdertext Placeholder text to appear when the box is empty (optional)
      *

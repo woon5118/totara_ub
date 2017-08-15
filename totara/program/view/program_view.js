@@ -77,11 +77,6 @@ M.totara_programview = M.totara_programview || {
             $('#ui-datepicker-div').css('z-index',1600);
         }
 
-        totaraDialog_extension_handler.prototype.every_load = function() {
-            // rebind placeholder for date picker
-            $('input[placeholder], textarea[placeholder]').placeholder();
-        }
-
         // Adapt the handler's save function
         totaraDialog_extension_handler.prototype._save = function() {
 

@@ -94,8 +94,7 @@ local_js(array(
             TOTARA_JS_ICON_PREVIEW,
             TOTARA_JS_DIALOG,
             TOTARA_JS_TREEVIEW,
-            TOTARA_JS_DATEPICKER,
-            TOTARA_JS_PLACEHOLDER
+            TOTARA_JS_DATEPICKER
         ));
 
 // Enrolled audiences for personal goals only.

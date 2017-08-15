@@ -176,8 +176,6 @@ M.totara_programassignment = M.totara_programassignment || {
                 $('#instance').val(completioninstance);
                 $('#instancetitle').text(this._dialog.item.completioneventname);
             }
-            // rebind placeholder for date picker
-            $('input[placeholder], textarea[placeholder]').placeholder();
         };
 
         // The completion dialog

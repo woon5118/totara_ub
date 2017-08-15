@@ -158,7 +158,6 @@ if (isset($program) && $program->user_is_assigned($userid)) {
         local_js(array(
             TOTARA_JS_DIALOG,
             TOTARA_JS_TREEVIEW,
-            TOTARA_JS_PLACEHOLDER,
             TOTARA_JS_DATEPICKER
         ));
 

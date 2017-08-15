@@ -104,8 +104,7 @@ $PAGE->verify_https_required();
 local_js(array(
     TOTARA_JS_DIALOG,
     TOTARA_JS_TREEVIEW,
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER
+    TOTARA_JS_DATEPICKER
 ));
 $PAGE->requires->strings_for_js(array('chooseposition', 'choosemanager', 'chooseorganisation'), 'totara_job');
 $PAGE->requires->strings_for_js(array('error:positionnotselected', 'error:organisationnotselected', 'error:managernotselected'), 'totara_job');

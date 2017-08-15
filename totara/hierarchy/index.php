@@ -28,9 +28,6 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
 require_once($CFG->dirroot.'/totara/core/searchlib.php');
-require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
-
-local_js(array(TOTARA_JS_PLACEHOLDER));
 
 define('DEFAULT_PAGE_SIZE', 50);
 define('SHOW_ALL_PAGE_SIZE', 5000);

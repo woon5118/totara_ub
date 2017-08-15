@@ -37,4 +37,4 @@ and create {modulename_hook} as sample
 * The following functions has been deprecated and can not be used any more:
     - sql_cast2char()
     - sql_cast2float()
-
+* Deprecated TOTARA_JS_PLACEHOLDER as all supported browsers support the HTML placeholder attribute
