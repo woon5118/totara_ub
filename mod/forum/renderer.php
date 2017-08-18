@@ -210,7 +210,9 @@ class mod_forum_renderer extends plugin_renderer_base {
             $forum->id,
             true,
             $options[$value],
-            $value
+            $value,
+            null,
+            get_string('digestmailpostlink', 'mod_forum', $forum->name)
         );
 
         $editable->set_type_select($options);
