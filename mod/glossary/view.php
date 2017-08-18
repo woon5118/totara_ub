@@ -381,11 +381,11 @@ if ($glossary->intro && $showcommonelements) {
 if ($showcommonelements ) {
     echo '<form method="post" class="form form-inline m-b-1" action="view.php">';
 
-
+    echo html_writer::label(get_string('searchglossaryfor', 'mod_glossary'), 'mod_glossary_search', false, array('class' => 'sr-only'));
     if ($mode == 'search') {
-        echo '<input type="text" name="hook" size="20" value="'.s($hook).'" alt="'.$strsearch.'" class="form-control"/> ';
+        echo '<input id="mod_glossary_search" type="text" name="hook" size="20" value="'.s($hook).'" alt="'.$strsearch.'" class="form-control"/> ';
     } else {
-        echo '<input type="text" name="hook" size="20" value="" alt="'.$strsearch.'" class="form-control"/> ';
+        echo '<input id="mod_glossary_search" type="text" name="hook" size="20" value="" alt="'.$strsearch.'" class="form-control"/> ';
     }
     echo '<input type="submit" value="'.$strsearch.'" name="searchbutton" class="btn btn-secondary m-r-1"/> ';
     if ($fullsearch || $mode != 'search') {
