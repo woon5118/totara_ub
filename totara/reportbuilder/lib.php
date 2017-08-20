@@ -2082,7 +2082,7 @@ class reportbuilder {
 
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $mformsidebar = new report_builder_sidebar_search_form($this->get_current_url(),
-                array('report' => $this, 'fields' => $sidebarfilters), 'post', '', array('class' => 'rb-sidebar col-md-3 col-sm-4 col-xs-12'));
+                array('report' => $this, 'fields' => $sidebarfilters), 'post', '', array('class' => 'rb-sidebar'));
         $mformsidebar->display();
 
         // If is_capable is not implemented on an embedded report then don't activate instant filters.
@@ -4025,7 +4025,7 @@ class reportbuilder {
 
         // If we're displaying the sidebar filters we need the content to be responsive.
         if ($this->get_sidebar_filters()) {
-            $classes = ' col-md-9 col-sm-8 col-xs-12';
+            $classes = ' rb-has-sidebar';
         }
 
         // If it's an embedded report, put the shortname in the class. Can be used in css/js to select the specific report.

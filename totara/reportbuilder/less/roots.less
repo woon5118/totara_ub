@@ -52,6 +52,8 @@
     margin: 0;
     vertical-align: top;
     padding-right: @padding-small-horizontal;
+    width: 25%;
+    float: left;
 
     .fcontainer .fitem .fitemtitle,
     .fcontainer .fitem .fgroup legend {
@@ -71,6 +73,35 @@
 
     input[type='text'] {
         margin-right: @padding-small-horizontal;
+    }
+}
+
+@media (max-width: @screen-md) {
+    .rb-sidebar {
+        width: 33.33333333%;
+    }
+}
+
+@media (max-width: @screen-sm) {
+    .rb-sidebar {
+        width: 100%;
+    }
+}
+
+.rb-has-sidebar {
+    float: left;
+    width: 75%;
+}
+
+@media (max-width: @screen-md) {
+    .rb-has-sidebar {
+        width: 66.66666667%;
+    }
+}
+
+@media (max-width: @screen-sm) {
+    .rb-has-sidebar {
+        width: 100%;
     }
 }
 

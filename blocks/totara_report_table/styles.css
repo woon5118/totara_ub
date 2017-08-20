@@ -12,3 +12,7 @@
     right: 0;
     bottom: 0;
 }
+
+.block_totara_report_table .rb-display-table-container {
+    width: 100%;
+}
