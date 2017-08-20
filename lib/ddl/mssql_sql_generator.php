@@ -961,7 +961,11 @@ class mssql_sql_generator extends sql_generator {
             }
             $sqls[] = "DROP TRIGGER IF EXISTS ss_trigger_{$prefix}{$tablename}";
             $sqls[] = "CREATE TRIGGER ss_trigger_{$prefix}{$tablename} ON {$prefix}{$tablename} AFTER INSERT, UPDATE, DELETE AS
-                       UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
+                       BEGIN
+                       SET NOCOUNT ON;
+                       UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0;
+                       SET NOCOUNT OFF;
+                       END;";
         }
         if ($sqls) {
             $this->mdb->change_database_structure($sqls, null);
