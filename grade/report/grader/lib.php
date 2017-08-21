@@ -1656,8 +1656,7 @@ class grade_report_grader extends grade_report {
         $name = $element['object']->get_name();
         $courseheaderid = 'courseheader_' . clean_param($name, PARAM_ALPHANUMEXT);
         $courseheader = html_writer::tag('span', $name, array('id' => $courseheaderid,
-                'title' => $name, 'class' => 'gradeitemheader'));
-        $courseheader .= html_writer::label($showing, $courseheaderid, false, array('class' => 'accesshide'));
+                'title' => $name, 'class' => 'gradeitemheader', 'aria-label' => $showing));
         $courseheader .= $icon;
 
         return $courseheader;

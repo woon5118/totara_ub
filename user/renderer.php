@@ -121,38 +121,38 @@ class core_user_renderer extends plugin_renderer_base {
 
         // Bar of first initials.
         $content .= html_writer::start_tag('div', array('class' => 'initialbar firstinitial'));
-        $content .= html_writer::label(get_string('firstname').' : ', null);
+        $content .= html_writer::tag('span', get_string('firstname').' : ', array('id' => 'grader-report--firstname-label'));
 
         if (!empty($firstinitial)) {
-            $content .= html_writer::link($url.'&sifirst=', $strall);
+            $content .= html_writer::link($url.'&sifirst=', $strall, array('aria-labelledby' => 'grader-report--firstname-label'));
         } else {
-            $content .= html_writer::tag('strong', $strall);
+            $content .= html_writer::tag('strong', $strall, array('aria-labelledby' => 'grader-report--firstname-label'));
         }
 
         foreach ($alpha as $letter) {
             if ($letter == $firstinitial) {
-                $content .= html_writer::tag('strong', $letter);
+                $content .= html_writer::tag('strong', $letter, array('aria-labelledby' => 'grader-report--firstname-label'));
             } else {
-                $content .= html_writer::link($url.'&sifirst='.$letter, $letter);
+                $content .= html_writer::link($url.'&sifirst='.$letter, $letter, array('aria-labelledby' => 'grader-report--firstname-label'));
             }
         }
         $content .= html_writer::end_tag('div');
 
          // Bar of last initials.
         $content .= html_writer::start_tag('div', array('class' => 'initialbar lastinitial'));
-        $content .= html_writer::label(get_string('lastname').' : ', null);
+        $content .= html_writer::tag('span', get_string('lastname').' : ', array('id' => 'grader-report--surname-label'));
 
         if (!empty($lastinitial)) {
-            $content .= html_writer::link($url.'&silast=', $strall);
+            $content .= html_writer::link($url.'&silast=', $strall, array('aria-labelledby' => 'grader-report--surname-label'));
         } else {
-            $content .= html_writer::tag('strong', $strall);
+            $content .= html_writer::tag('strong', $strall, array('aria-labelledby' => 'grader-report--surname-label'));
         }
 
         foreach ($alpha as $letter) {
             if ($letter == $lastinitial) {
-                $content .= html_writer::tag('strong', $letter);
+                $content .= html_writer::tag('strong', $letter, array('aria-labelledby' => 'grader-report--surname-label'));
             } else {
-                $content .= html_writer::link($url.'&silast='.$letter, $letter);
+                $content .= html_writer::link($url.'&silast='.$letter, $letter, array('aria-labelledby' => 'grader-report--surname-label'));
             }
         }
         $content .= html_writer::end_tag('div');
