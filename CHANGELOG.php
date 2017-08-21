@@ -3,6 +3,293 @@
 
 Totara LMS Changelog
 
+Release Evergreen (23rd August 2017):
+=====================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-7753        The gauth authentication plugin has been removed from all versions of Totara
+
+                   The gauth plugin has now been removed from Totara 10, 9.10, 2.9.22, 2.7.30,
+                   and 2.6.47.
+                   It was removed because the Google OpenID 2.0 API used by this plugin has
+                   been shut down.
+                   The plugin itself has not worked since April 2015 for this reason.
+                   No alternative is available as a brand new plugin would need to be written
+                   to use the API's currently provided by Google.
+
+Security issues:
+
+    TL-10753       Prevented viewing of hidden program names in Program completions block ajax
+
+                   Previously, a user visiting an AJAX script for the program completions
+                   block could see names of hidden programs if certain values were used in the
+                   URL. Names of programs can now only be seen if the user has permission to
+                   view them.
+
+    TL-14213       Converted sesskey checks to use timing attack safe function hash_equals()
+
+Improvements:
+
+    TL-7668    +   Improved HR Import External Database source sanity checks and error messages
+    TL-9073    +   Minor text improvements in the Seminar activity
+    TL-12375   +   Changed colour of state-info-* and brand-info theme variables to allow more easily recognisable information UI elements
+    TL-12380   +   Added classes to abstract the execution of external applications
+
+                   A library has been created to abstract the execution of shell commands.
+                   This hardens security by only allowing applications to be run that are on a
+                   whitelist.
+                   On Unix systems, applications can also now be run via the PCNTL module. To
+                   enable this, add and enable the PCNTL module to the PHP installation that
+                   gets run via the CLI, then add the full path to the php binary to
+                   $CFG->pcntl_phpclipath in config.php.
+                   Information on using this library in custom plugins can be found at
+                   [https://help.totaralearning.com/display/DEV/Command+execution+API]
+
+    TL-12741   +   Course activities and types are now in alphabetical order when using the enhanced catalog
+
+                   This also makes the sort order locale aware (so users using Spanish
+                   language will have a different order to those using English)
+
+    TL-12886       Improved formatting when viewing user details within a course
+    TL-14096   +   Restricted Basis logo file upload to web images
+    TL-14122   +   Only users who can manage company goal assignments will be shown current assignments when viewing a goal
+    TL-14216   +   Converted loading icons when editing a course to font icons
+    TL-14312   +   Standardised notification colours in Badges
+    TL-14368       Added an autosubmit handler to Totara forms
+    TL-14405   +   Fixed known compatibility problems with PHP 7.2 in PHPUnit
+    TL-14420   +   Allow Reminders to be accessed with the "moodle/course:managereminders" capability only
+    TL-14726       Stopped duplicate calls to the core_output_load_template webservice
+
+                   When requesting the same template numerous times in quick succession via
+                   JavaScript, the template library was firing duplicate requests to the
+                   server. This improvement stops duplicate requests from happening.
+
+    TL-14781       Improved efficiency of job assignment filter joins
+
+                   Previously, job assignment filters were joining to the user table. Now,
+                   they can join to the user id in another table, such as the report's base
+                   table. If data from the user table is not needed then that join will no
+                   longer be needed in order to use the job assignment filters. These changes
+                   potentially result in a small performance improvement.
+
+    TL-14790   +   Ensured block action icons conform to WCAG AA for text contrast
+    TL-14812   +   Standardised order of Name and Short Name fields in User Profile Fields form
+    TL-14971   +   Removed deprecated create_function() calls
+    TL-14973   +   Removed the $tryloadifpossible parameter from cache::has()
+    TL-14986       Added proficiency achieved date to competencies
+
+                   Added new column called "timeproficient" to both the comp_record and
+                   comp_record_history tables, this field defaults to the first time when a
+                   user is marked proficient in a competency. There are also new "Date
+                   proficiency achieved" columns/filters for the competency report sources,
+                   and a date selector on the set competency status form allowing you to edit
+                   the field. Please note that this field only works for future proficiencies,
+                   but existing ones can be edited via the competency status form.
+                   This change has also added a default value when the default competency
+                   scale is created, so new installs will include a default value of 'Not
+                   competent'.
+
+    TL-14988       Ensured that a competency status is displayed on the Record of Learning even if a learning plan has been deleted
+    TL-14991   +   Fixed compatibility issues with MySQL 8.0 alpha
+    TL-14992   +   Enhanced the progress_bar output component to allow it to be used as a static progress bar also
+    TL-15002       Added navigation links on the Approval plugin edit signup page
+    TL-15006       Cleaned up and improved dataroot reset in behat and phpunit tests
+    TL-15009       Added new faster static MUC cache for phpunit tests
+    TL-15016       Improved the summary of the mod/facetoface:signupwaitlist capability to avoid confusion
+    TL-15049   +   Database reset code for phpunit and behat was reimplemented
+    TL-15087   +   Improved access control ordering in a couple of embedded reports
+    TL-15099   +   Added additional validation checking to update_hierarchy_item function
+
+                   In certain edge cases this function was not updating the hierarchy item and
+                   silently failing.
+
+    TL-15755       Unnecessary confirmation related emails are not sent when request is approved automatically in Self-registration with approval
+    TL-15757   +   Improved the user experience when editing profile information through connected Totara sites
+    TL-15760       Updated hardcoded URLs to point to new community site location
+
+                   Links to the community in code were updated from community.totaralms.com to
+                   the new url of totara.community.
+
+    TL-15767   +   Audience enrolment synchronisation is now performed by a dedicated scheduled task
+
+                   Course enrolments for audience members when memberships change in an
+                   audience are now synchronised by a dedicated scheduled task.
+                   The timing of this task can be configured in the Scheduled tasks
+                   interface.
+                   The task itself can be manually executed by running the following as the
+                   web server user on the command line:
+
+                   php admin/tool/task/cli/schedule_task.php --execute="\\enrol_cohort\\task\\sync_members"
+
+    TL-15803       Added 'Target date' and 'Status' columns to Goal Custom Fields report source
+
+                   This also allows adding these columns to exports of a user's goal
+                   information. This can be done by adding these columns to the Goal Custom
+                   Fields embedded report.
+
+Bug fixes:
+
+    TL-12459       Prevented the leave page confirmation when approving changes after adding an Audience rule
+    TL-12859   +   Fixed HTML in Assignments to use standard CSS classes when viewing buttons
+    TL-14148       Fixed static server version caching in database drivers
+    TL-14170       Fixed LDAP/user profile custom field sync bug
+    TL-14239       The required fields note now appears correctly when a Totara form is loaded via JavaScript
+    TL-14316       Fixed the loading of YUI dialogs within Totara dialogs
+    TL-14729   +   Prevented a directory check error when configuring HR Import to use a database instead of a CSV file
+    TL-14805       Ensured appraisal question field labels display consistently
+    TL-14813       Pix to Flex icon conversion now honours custom pix title attributes
+    TL-14828       Forum posts only marked as read when full post is displayed
+    TL-14935       Ensured that programs and their courses appear within the Current Learning Block when they are within an approved Learning Plan
+    TL-14953       Fixed missing JavaScript dependencies in the report table block
+
+                   While the Report Table Block allows the use of embedded report sources, it
+                   does not add embedded restrictions (which are only added on pages where the
+                   embedded report is displayed already).
+                   This means specific embedded restrictions will not be applied in the table
+                   and content displayed in block might be different from content displayed on
+                   page.
+                   For example, Alerts embedded report page will display only user's messages,
+                   while the same report in the Report Builder block will display messages for
+                   all users. It is better to use non-embedded report sources and saved
+                   searches to restrict information displayed.
+
+    TL-14954       Fixed the display of translated month names in date pickers
+    TL-14984       Fixed the display of grades in the Record of Learning grades column
+    TL-14994       Added missing parameter to job assignments url on the user profile page
+    TL-15000       Removed duplicate error messages when approving signups
+    TL-15011       Added check for valid hierarchy ids when accessing auth approved signup page with external defaults
+    TL-15024       Fixed an error that occurred when exporting assignees and their job assignments for Seminar events
+    TL-15025   +   Corrected a spelling mistake in the Reportbuilder date filter help text
+    TL-15039       Fixed an SQL error that occurred when searching in filters using just a space
+    TL-15040       Fixed the information sent in the attached ical when notifying users that a Seminar's date and details have been changed
+    TL-15054       Fixed inconsistent behaviour when changing number of course sections
+    TL-15057       ORACLE SQL keywords are now ignored when validating install.xml files
+    TL-15080       Fixed context of dynamic audiences rules permission check
+
+                   totara/cohort:managerules permissions were incorrectly checked in System
+                   context in some cases instead of in the Category context.
+
+    TL-15083       Updated the capability check in totara_gap_can_edit_aspirational_position to ensure new users can be created without error
+
+                   When a new user is added, their id is -1 until their record has been
+                   created. The totara_gap_can_edit_aspirational_position function has been
+                   updated to recognise this and to allow for new users to be added.
+
+    TL-15086       Fixed SCORM view page to display content depending on permissions
+
+                   If the user has the mod/scorm:savetrack capability, they can see the info
+                   page and enter the SCORM lesson.
+                   If the user has the mod/scorm:viewreport capability, they can see the SCORM
+                   reports.
+
+    TL-15095       Fixed known compatibility problems with MariaDB 10.2.7
+    TL-15097       Added a missing language string used within course reset
+    TL-15103       Fixed handling of HTML markup in multilingual authentication instructions
+    TL-15303       Fixed element heights set by JavaScript in grader report
+    TL-15731       Fixed the display of personal goal text area custom fields in Appraisal snapshots
+    TL-15738       Fixed program progress bar in Program Overview report source
+    TL-15754   +   Updated totara_plan/view_plan_component template to ensure single buttons are displayed correctly
+    TL-15775       Fixed incorrect encoding of language strings in Appraisal dialogs
+    TL-15811       Fixed admin tree rendering to handle empty sub items
+    TL-15838       Fixed Seminar Message Users to send a message to CC user manager
+
+API changes:
+
+    TL-13990   +   Activity completion caching now uses MUC and not the session
+    TL-15812   +   Deprecated TOTARA_JS_PLACEHOLDER usage
+
+                   As all supported browsers support the placeholder HTML attribute, the
+                   placeholder JavaScript is no longer required.
+
+Miscellaneous Moodle fixes:
+
+    TL-14833   +   MDL-58780: Removed AS table alias in assignment grading table query
+    TL-14838   +   MDL-58920: Fixed multilang support for Calculated questions' name
+    TL-14840   +   MDL-58852: Apply multilang filters in choice activity charts
+    TL-14842   +   MDL-58916: Fixed context filters when viewing user custom field data
+    TL-14845   +   MDL-58756: Made role names in Statistics reports compatible with the Multi-Language filter
+    TL-14846   +   MDL-58723: Improved testing of recurring events on the calendar
+    TL-14847   +   MDL-58811: Fixed quiz duplication with files in their links
+
+                   Fixed an issue with legacy file.php URLs from moodle 1.9
+
+    TL-14848   +   MDL-57558: auth LDAP now recognizes lowercase attribute names
+    TL-14849   +   MDL-58776: Added bootstrap classes to buttons on manage tags page
+    TL-14850   +   MDL-58795: Ensure duplicates are not returned when sorting the grader report table
+    TL-14851   +   MDL-58947: Fixed label link URLs that are displayed in global search results
+    TL-14852   +   MDL-57957: Show feedback file in absence of grade item
+    TL-14853   +   MDL-58986: Added bootstrap classes to buttons on quiz comment page
+    TL-14854   +   MDL-56617: Disabled grade to pass check if CBM is used in the quiz activity.
+    TL-14855   +   MDL-56973: Fixed title being locked when creating a new wiki page if language is forced for a course
+    TL-14856   +   MDL-58922: Fixed multilang support for calculatedmulti question name
+    TL-14858   +   MDL-58921: Fixed multilang support for Calculated question name
+    TL-14860   +   MDL-58577: Fixed multilang support for role names in head of the statistics report
+    TL-14862   +   MDL-49040: Fixed incorrect truncation of feedback comment in grader report
+
+                   When quick grading and AJAX were enabled for the grader report if a
+                   feedback comment contained a '&' then it would be truncated and only the
+                   text before the '&' character would be saved.
+
+    TL-14863   +   MDL-58997: Fixed the mutlilang on group names in the calendar
+    TL-14864   +   MDL-49988: Fixed wiki page layout if html contains line breaks
+    TL-14865   +   MDL-54887: Improved the formatting of exported multi-lang calendar events
+    TL-14870   +   MDL-58900: Fixed incorrect overrides ordering within the assignment module
+    TL-14871   +   MDL-58646: Updated PHP CSS parser library to newer version
+    TL-14872   +   MDL-59086: Added bootstrap classes to buttons in grader report
+    TL-14873   +   MDL-58658: Fixed cache static acceleration when setting empty but not false data
+    TL-14875   +   MDL-59154: Lock for all caching builds
+    TL-14877   +   MDL-46322: Only list enrolled graders as potential markers
+    TL-14880   +   MDL-40015: Fixed 'Duplicate course' web service description
+    TL-14882   +   MDL-51691: Feedback comments can now be deleted with save quick grading
+    TL-14883   +   MDL-58136: Added a course completion cache
+    TL-14885   +   MDL-58991: Ensured statistics report uses same date handling on chart rendering
+    TL-14886   +   MDL-58523: Deleting responses can now cause feedback activities to be marked incomplete
+    TL-14887   +   MDL-59140: Added "More..." link into "My Courses" navigation block, when not all courses are listed
+    TL-14889   +   MDL-59142: Added caching for post-processed CSS in MUC
+    TL-14891   +   MDL-44961: Fixed log dates being rolled forward when restoring course backups
+    TL-14893   +   MDL-51917: Activities returned by get_criteria are now ordered the same as in the course
+    TL-14894   +   MDL-59173: Changed the default of 'params' from null to array in the set_sql function of the table_sql class
+    TL-14896   +   MDL-58729: Improved performance of mysql_collation admin script
+    TL-14898   +   MDL-58472: Ensured videojs media player is initialised  on first page rendering to avoid failure on slower networks
+    TL-14899   +   MDL-59005: Fixed extraction of zip files with Cyrillic file names
+    TL-14900   +   MDL-58952: Fixed registration form language default
+    TL-14901   +   MDL-59269: Fixed problem uninstalling language packs with numbers in their names
+    TL-14903   +   MDL-49484: Fixed header wording for forms when adding/editing pages in a Lesson activity
+
+                   Header text now show the type of page or question you are creating/editing
+                   instead of the name of the activity.
+
+    TL-14904   +   MDL-58813: Ensured the web service core_course_create_courses initialises all section records
+    TL-14906   +   MDL-40818: Change login requirements on calendar pages to stop automatic guest  logins
+    TL-14907   +   MDL-56046: Fixed export to Excel of Quiz reports
+    TL-14909   +   MDL-59296: Searches on LatLong fields in Data module can only be for filled values
+    TL-14913   +   MDL-59073: Workshop: Prevent submission creation without file/content
+    TL-14915   +   MDL-32151: Fixed invalid references to 'nocourseid' language string throughout codebase
+    TL-14917   +   MDL-57809: Added NO_OUTPUT_BUFFERING to progress bar output
+    TL-14918   +   MDL-59308: Module completion now passes the module context to events when deleted
+    TL-14922   +   MDL-58651: logstore_database: Add ability to not send database options
+    TL-14923   +   MDL-58286: Fixed check for pagination in ldap enrollment
+    TL-14924   +   MDL-59294: Improved markup of login page
+    TL-14926   +   MDL-57021: Using password instead of password unmask fields where appropriate
+
+                   The following fields now use 'password' instead of 'password unmask'
+                   field:
+                    * Entering passwords during self-registration
+                    * Entering enrolment keys via the self enrolment and guest enrolment
+                   plugins (this applies when end users supply the keys, not course
+                   administrators creating them).
+
+
+Contributions:
+
+    * Barry Oosthuizen at Learning Pool - TL-14122
+    * Richard Eastbury at Think Associates - TL-15775
+    * Russell England at Kineo USA - TL-15083
+
+
 Release Evergreen (19th July 2017):
 ===================================
 
