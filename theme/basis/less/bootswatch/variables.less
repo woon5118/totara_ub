@@ -44,14 +44,26 @@
 @gray-light: #6e6e6e;
 @gray-lighter: #dde1e5;
 
+//
+// Colors.
+//
 @brand-primary: #36a5a6;
-@brand-success: #8ca83d;
-@brand-info: #88b8d5;
-@brand-warning: #eaa917;
-@brand-danger: #bb4247;
+@brand-info: #337ab7;
+@brand-success: #677b2d;
+@brand-warning: #8e660d;
+@brand-danger: #953539;
+
+// Basis-specific darker variant for WCAG AA min text contrast.
+/**
+ * @deprecated since 10.0
+ */
+@brand-primary-dark: #008287;
 
 // Reset to Bootstrap 3 default.
 @text-color: @gray-dark;
+
+// Ensure WCAG AA minimum text contrast against #fff and #f5f5f5.
+@link-color: darken(@brand-primary, 11%);
 
 @state-success-text: #6a7e26;
 @state-success-bg: #f7faee;
@@ -122,9 +134,16 @@
 @btn-warning-border: transparent;
 @btn-danger-border: transparent;
 
+@btn-primary-bg: darken(@brand-primary, 10%);
+
 @btn-border-radius-base: 3px;
 @btn-border-radius-small: @btn-border-radius-base;
 @btn-border-radius-large: @btn-border-radius-base;
+
+//
+// Labels.
+//
+@label-primary-bg: darken(@brand-primary, 10%);
 
 //
 // Type.
