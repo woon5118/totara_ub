@@ -73,7 +73,9 @@ DECLARE
   tablecount INTEGER;
 BEGIN
 
-  SET session_replication_role = replica;
+  -- No need to disable triggers and foreign keys because LMS does not use them yet,
+  -- note that changing session_replication_role requires superuser privileges.
+  --SET session_replication_role = replica;
 
   tablecount = 0;
 
@@ -115,7 +117,7 @@ BEGIN
 
   END LOOP;
 
-  SET session_replication_role = origin;
+  --SET session_replication_role = origin;
 
   RETURN tablecount;
 
