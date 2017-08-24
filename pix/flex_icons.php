@@ -437,6 +437,13 @@ $icons = array(
                         ),
                 ),
         ),
+    'close' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-times'
+                ),
+        ),
     'code' =>
         array(
             'data' =>
