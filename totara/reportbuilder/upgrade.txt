@@ -1,6 +1,11 @@
 This file describes API changes in reportbuilder,
 information provided here is intended especially for developers.
 
+=== 11.0 ===
+
+* get_source_object() added fifth argument $embeddata which passes the embedded report data to the report source.
+  This will affect how all report sources are called.
+
 === 10.0 ===
 
 * Added add_cohort_user_* calls to the add_user_* functions in the base source.

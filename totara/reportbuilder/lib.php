@@ -325,7 +325,7 @@ class reportbuilder {
 
         $this->_id = $report->id;
         $this->source = $report->source;
-        $this->src = self::get_source_object($this->source, $usesourcecache, true, $this->globalrestrictionset);
+        $this->src = self::get_source_object($this->source, $usesourcecache, true, $this->globalrestrictionset, $embeddata);
         $this->shortname = $report->shortname;
         $this->fullname = $report->fullname;
         $this->hidden = $report->hidden;
@@ -711,16 +711,15 @@ class reportbuilder {
     /**
      * Searches for and returns an instance of the specified source class
      *
-     * @param string  $source       The name of the source class to return
-     *                                 (excluding the rb_source prefix)
-     * @param boolean $usecache     Whether to use the source cache or load from scratch
-     * @param boolean $exception    Whether bad sources should throw exceptions or be ignored
+     * @param string $source The name of the source class to return (excluding the rb_source prefix)
+     * @param boolean $usecache Whether to use the source cache or load from scratch
+     * @param boolean $exception Whether bad sources should throw exceptions or be ignored
      * @param rb_global_restriction_set $globalrestrictionset optional global restriction set to restrict the report,
      *                              not compatible with $usecache
-     * @return rb_base_source An instance of the source. Returns false if
-     *                the source can't be found
+     * @param array $embeddata Extra data passed into the embedded report to be made available to the source.
+     * @return rb_base_source An instance of the source. Returns false if the source can't be found
      */
-    public static function get_source_object($source, $usecache = false, $exception = true, rb_global_restriction_set $globalrestrictionset = null) {
+    public static function get_source_object($source, $usecache = false, $exception = true, rb_global_restriction_set $globalrestrictionset = null, $embeddata = null) {
         global $USER;
         if ($globalrestrictionset and $usecache) {
             debugging('parameter $globalrestrictionset is not compatible with $usecache parameter, ignoring caches in get_source_object()', DEBUG_DEVELOPER);
@@ -739,7 +738,7 @@ class reportbuilder {
                 include_once($classfile);
                 $classname = 'rb_source_' . $source;
                 if (class_exists($classname)) {
-                    $instance = new $classname(null, $globalrestrictionset);
+                    $instance = new $classname(null, $globalrestrictionset, $embeddata);
                     if (!$globalrestrictionset) {
                         self::$sourceobjects[$USER->id][$source] = $instance;
                     }
@@ -760,7 +759,7 @@ class reportbuilder {
                     include_once($classfile);
                     $classname = 'rb_source_' . $basesource;
                     if (class_exists($classname)) {
-                        $instance = new $classname($groupid, $globalrestrictionset);
+                        $instance = new $classname($groupid, $globalrestrictionset, $embeddata);
                         if (!$globalrestrictionset) {
                             self::$sourceobjects[$USER->id][$source] = $instance;
                         }
@@ -781,7 +780,7 @@ class reportbuilder {
                     include_once($classfile);
                     $classname = 'rb_source_' . $basesource;
                     if (class_exists($classname)) {
-                        $instance = new $classname(0, $globalrestrictionset);
+                        $instance = new $classname(0, $globalrestrictionset, $embeddata);
                         if (!$globalrestrictionset) {
                             self::$sourceobjects[$USER->id][$source] = $instance;
                         }
