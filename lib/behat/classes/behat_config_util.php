@@ -470,6 +470,9 @@ class behat_config_util {
     protected function build_config($parallelruns = 0, $currentrun = 0) {
         global $CFG;
 
+        // Get the defaults first.
+        $config = Symfony\Component\Yaml\Yaml::parse(file_get_contents(__DIR__ . '/../../../behat.yml.dist'));
+
         if (!empty($parallelruns) && !empty($currentrun)) {
             $this->set_parallel_run($parallelruns, $currentrun);
         } else {
@@ -477,21 +480,21 @@ class behat_config_util {
             $parallelruns = $this->get_number_of_parallel_run();
         }
 
-        $selenium2wdhost = array('wd_host' => 'http://localhost:4444/wd/hub');
         // If parallel run, then set wd_host if specified.
         if (!empty($currentrun) && !empty($parallelruns)) {
             // Set proper selenium2 wd_host if defined.
             if (!empty($CFG->behat_parallel_run[$currentrun - 1]['wd_host'])) {
-                $selenium2wdhost = array('wd_host' => $CFG->behat_parallel_run[$currentrun - 1]['wd_host']);
+                $config['default']['extensions']['Behat\MinkExtension']['selenium2']['wd_host'] = $CFG->behat_parallel_run[$currentrun - 1]['wd_host'];
             }
         }
 
         // It is possible that it has no value as we don't require a full behat setup to list the step definitions.
-        if (empty($CFG->behat_wwwroot)) {
-            $CFG->behat_wwwroot = 'http://itwillnotbeused.com';
+        if (!empty($CFG->behat_wwwroot)) {
+            $config['default']['extensions']['Behat\MinkExtension']['base_url'] = $CFG->behat_wwwroot;
         }
+        $config['default']['extensions']['Moodle\BehatExtension']['moodledirroot'] = $CFG->dirroot;
 
-        $suites = $this->get_behat_suites($parallelruns, $currentrun);
+        $config['default']['suites'] = $this->get_behat_suites($parallelruns, $currentrun);
 
         $overriddenthemescontexts = $this->get_overridden_theme_contexts();
         if (!empty($overriddenthemescontexts)) {
@@ -513,30 +516,7 @@ class behat_config_util {
             }
         }
 
-        // Comments use black color, so failure path is not visible. Using color other then black/white is safer.
-        // https://github.com/Behat/Behat/pull/628.
-        $config = array(
-            'default' => array(
-                'formatters' => array(
-                    'moodle_progress' => array(
-                        'output_styles' => array(
-                            'comment' => array('magenta'))
-                    )
-                ),
-                'suites' => $suites,
-                'extensions' => array(
-                    'Behat\MinkExtension' => array(
-                        'base_url' => $CFG->behat_wwwroot,
-                        'goutte' => null,
-                        'selenium2' => $selenium2wdhost
-                    ),
-                    'Moodle\BehatExtension' => array(
-                        'moodledirroot' => $CFG->dirroot,
-                        'steps_definitions' => $allcontexts,
-                    )
-                )
-            )
-        );
+        $config['default']['extensions']['Moodle\BehatExtension']['steps_definitions'] = $allcontexts;
 
         return $config;
     }

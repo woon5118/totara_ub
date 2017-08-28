@@ -1,13 +1,31 @@
 default:
-  suites:
-    default:
-      paths: {  }
-      contexts: {  }
+  formatters:
+    moodle_progress:
+      output_styles:
+        comment:
+          - magenta
+  suites: { }
   extensions:
     Behat\MinkExtension:
-      base_url: 'http://localhost:8000'
+      base_url: 'http://127.0.0.1:8080/Totara/wwwroot'
       goutte: null
-      selenium2: null
+      selenium2:
+        wd_host: 'http://127.0.0.1:4444/wd/hub'
+        browser: chrome
+        capabilities:
+          extra_capabilities:
+            chromeOptions:
+              args:
+                - '--disable-infobars'
+                - '--disable-background-throttling'
+              prefs:
+                credentials_enable_service: false
     Moodle\BehatExtension:
-      moodledirroot: /Should/Change/To/Moodle/www/dir
+      moodledirroot: /Should/Change/To/Totara/dirroot
       steps_definitions: {  }
+firefox:
+  extensions:
+    Behat\MinkExtension:
+      selenium2:
+        browser: firefox
+
