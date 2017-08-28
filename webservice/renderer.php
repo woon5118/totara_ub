@@ -813,4 +813,22 @@ EOF;
         return $documentationhtml;
     }
 
+    /**
+     * Generates output for showing a newly created token.
+     *
+     * The token should never be retrieved from the database if it's not being shown to its owner. It should
+     * only be shown once newly created.
+     *
+     * @param string $token
+     * @return string containing html that suggests copying the token now plus the token itself.
+     */
+    public function token_details($token) {
+        $output = html_writer::div(get_string('copynowshowtoken', 'webservice'));
+        $output .= html_writer::empty_tag('br');
+        $output .= html_writer::div(
+            html_writer::nonempty_tag('strong', $token)
+        );
+        return $output;
+    }
+
 }

@@ -9348,7 +9348,8 @@ class admin_setting_managewebservicetokens extends admin_setting {
         $return = $OUTPUT->box_start('generalbox webservicestokenui');
 
         $table = new html_table();
-        $table->head  = array($strtoken, $struser, $strservice, $striprestriction, $strvaliduntil, $stroperation);
+        // TOTARA: We don't print the tokens due to flow on effect if the one page was compromised.
+        $table->head  = array($struser, $strservice, $striprestriction, $strvaliduntil, $stroperation);
         $table->colclasses = array('leftalign', 'leftalign', 'leftalign', 'centeralign', 'centeralign', 'centeralign');
         $table->id = 'webservicetokens';
         $table->attributes['class'] = 'admintable generaltable';
@@ -9404,7 +9405,8 @@ class admin_setting_managewebservicetokens extends admin_setting {
                     }
                 }
 
-                $table->data[] = array($token->token, $useratag, $token->name, $iprestriction, $validuntil, $delete);
+                // TOTARA: We don't print the tokens due to flow on effect if the one page was compromised.
+                $table->data[] = array($useratag, $token->name, $iprestriction, $validuntil, $delete);
             }
 
             $return .= html_writer::table($table);

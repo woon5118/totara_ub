@@ -223,3 +223,8 @@ $string['wsdocumentationintro'] = 'To create a client we advise you to read the 
 $string['wsdocumentationlogin'] = 'or enter your web service username and password:';
 $string['wspassword'] = 'Web service password';
 $string['wsusername'] = 'Web service username';
+
+// Totara strings
+
+$string['copynowshowtoken'] = 'The new token is shown below. Please copy this now as it will not be shown again.';
+$string['tokengeneratedsuccess'] = 'Token successfully generated';
