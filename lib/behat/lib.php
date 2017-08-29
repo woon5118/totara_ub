@@ -115,59 +115,6 @@ function behat_get_error_string($errtype) {
 }
 
 /**
- * PHP errors handler to use when running behat tests.
- *
- * Adds specific CSS classes to identify
- * the messages.
- *
- * @param int $errno
- * @param string $errstr
- * @param string $errfile
- * @param int $errline
- * @param array $errcontext
- * @return bool
- */
-function behat_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
-
-    // If is preceded by an @ we don't show it.
-    if (!error_reporting()) {
-        return true;
-    }
-
-    // This error handler receives E_ALL | E_STRICT, running the behat test site the debug level is
-    // set to DEVELOPER and will always include E_NOTICE,E_USER_NOTICE... as part of E_ALL, if the current
-    // error_reporting() value does not include one of those levels is because it has been forced through
-    // the moodle code (see fix_utf8() for example) in that cases we respect the forced error level value.
-    $respect = array(E_NOTICE, E_USER_NOTICE, E_STRICT, E_WARNING, E_USER_WARNING);
-    foreach ($respect as $respectable) {
-
-        // If the current value does not include this kind of errors and the reported error is
-        // at that level don't print anything.
-        if ($errno == $respectable && !(error_reporting() & $respectable)) {
-            return true;
-        }
-    }
-
-    // Using the default one in case there is a fatal catchable error.
-    default_error_handler($errno, $errstr, $errfile, $errline, $errcontext);
-
-    $errnostr = behat_get_error_string($errno);
-
-    // If ajax script then throw exception, so the calling api catch it and show it on web page.
-    if (defined('AJAX_SCRIPT')) {
-        throw new Exception("$errnostr: $errstr in $errfile on line $errline");
-    } else {
-        // Wrapping the output.
-        echo '<div class="phpdebugmessage" data-rel="phpdebugmessage">' . PHP_EOL;
-        echo "$errnostr: $errstr in $errfile on line $errline" . PHP_EOL;
-        echo '</div>';
-    }
-
-    // Also use the internal error handler so we keep the usual behaviour.
-    return false;
-}
-
-/**
  * Before shutdown save last error entries, so we can fail the test.
  */
 function behat_shutdown_function() {

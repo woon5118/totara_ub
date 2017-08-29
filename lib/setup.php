@@ -575,12 +575,7 @@ if (!PHPUNIT_TEST or PHPUNIT_UTIL) {
     set_error_handler('default_error_handler', E_ALL | E_STRICT);
 }
 
-// Acceptance tests needs special output to capture the errors,
-// but not necessary for behat CLI command and init script.
-if (defined('BEHAT_SITE_RUNNING') && !defined('BEHAT_TEST') && !defined('BEHAT_UTIL')) {
-    require_once(__DIR__ . '/behat/lib.php');
-    set_error_handler('behat_error_handler', E_ALL | E_STRICT);
-}
+// Totara: there is no need to creates behat hacks to deal with errors, we use normal error logs.
 
 // If there are any errors in the standard libraries we want to know!
 error_reporting(E_ALL | E_STRICT);

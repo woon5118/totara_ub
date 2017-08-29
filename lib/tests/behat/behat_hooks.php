@@ -62,6 +62,9 @@ use Behat\Testwork\Hook\Scope\BeforeSuiteScope,
  */
 class behat_hooks extends behat_base {
 
+    /** @var int the last error log position that was processed */
+    public static $errorlogposition = 0;
+
     /** @var bool Totara: Force restart before the next scenario */
     public static $forcerestart = false;
 
@@ -757,4 +760,15 @@ class behat_hooks extends behat_base {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_stop_exception extends \Exception {
+}
+
+/**
+ * Behat log exception
+ *
+ * This exception is thrown if there is a problem detected in logs after step.
+ *
+ * @package    core_test
+ * @copyright  2017 Petr Skoda <petr.skoda@totaralearning.com>
+ */
+class behat_log_exception extends \Exception {
 }
