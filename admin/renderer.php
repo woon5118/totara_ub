@@ -253,13 +253,15 @@ class core_admin_renderer extends plugin_renderer_base {
      * @param int|null $availableupdatesfetch timestamp of the most recent updates fetch or null (unknown)
      * @param string[] $cachewarnings An array containing warnings from the Cache API.
      * @param array $eventshandlers Events 1 API handlers.
+     * @param bool $themedesignermode Warn about the theme designer mode.
+     * @param bool $devlibdir Warn about development libs directory presence.
      *
      * @return string HTML to output.
      */
     public function admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed,
             $cronoverdue, $dbproblems, $maintenancemode, $availableupdates, $availableupdatesfetch,
             $buggyiconvnomb, $registered, array $cachewarnings = array(), $eventshandlers = 0,
-            $themedesignermode = false, $latesterror, $activeusers, $totara_release) {
+            $themedesignermode = false, $devlibdir = false, $latesterror, $activeusers, $totara_release) {
         global $CFG, $PAGE;
         $output = '';
         /** @var totara_core_renderer $totara_renderer */
@@ -269,6 +271,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->maturity_info($maturity);
         $output .= $this->legacy_log_store_writing_error();
         $output .= $this->insecure_dataroot_warning($insecuredataroot);
+        $output .= $this->development_libs_directories_warning($devlibdir);
         $output .= $this->themedesignermode_warning($themedesignermode);
         $output .= $this->display_errors_warning($errorsdisplayed);
         $output .= $this->buggy_iconv_warning($buggyiconvnomb);
@@ -496,6 +499,24 @@ class core_admin_renderer extends plugin_renderer_base {
 
         } else if ($insecuredataroot == INSECURE_DATAROOT_ERROR) {
             return $this->warning(get_string('datarootsecurityerror', 'admin', $CFG->dataroot), 'error');
+
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Render a warning that a directory with development libs is present.
+     *
+     * @param bool $devlibdir True if the warning should be displayed.
+     * @return string
+     */
+    protected function development_libs_directories_warning($devlibdir) {
+
+        if ($devlibdir) {
+            $moreinfo = new moodle_url('/report/security/index.php');
+            $warning = get_string('devlibdirpresent', 'core_admin', ['moreinfourl' => $moreinfo->out()]);
+            return $this->warning($warning, 'error');
 
         } else {
             return '';
