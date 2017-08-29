@@ -1141,6 +1141,7 @@ class core_plugin_manager {
         $plugins = array(
             // Totara 13 removals.
             'block_community',
+            'block_messages',
             'gradeexport_fusion',
             'repository_picasa',
             'portfolio_picasa',
@@ -1243,7 +1244,7 @@ class core_plugin_manager {
                 'calendar_upcoming', 'comments', 'community',
                 'completionstatus', 'course_list', 'course_overview',
                 'course_summary', 'feedback', 'globalsearch', 'glossary_random', 'html',
-                'login', 'mentees', 'messages', 'mnet_hosts', 'myprofile',
+                'login', 'mentees', 'mnet_hosts', 'myprofile',
                 'navigation', 'news_items', 'online_users', 'participants',
                 'private_files', 'quiz_results', 'recent_activity',
                 'rss_client', 'search_forums', 'section_links',
