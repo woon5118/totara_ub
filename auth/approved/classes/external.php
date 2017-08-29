@@ -41,7 +41,7 @@ class auth_approved_external extends external_api {
      * @return array of (job assignment id, user fullname + job title) tuples.
      */
     public static function job_assignment_by_user_names($searchquery, $page = 0, $perpage = 0, $termaggregation = 'OR') {
-        global $CFG, $DB;
+        global $CFG, $DB, $PAGE;
 
         $params = self::validate_parameters(
             self::job_assignment_by_user_names_parameters(), [
@@ -57,6 +57,8 @@ class auth_approved_external extends external_api {
         $termaggregation = ($params['termaggregation'] === 'AND') ? ' AND ' : ' OR ';
         unset($params);
         // DO NOT validate_context. That requires login :(
+        $PAGE->reset_theme_and_output();
+        $PAGE->set_context(\context_system::instance());
 
         $terms = preg_split('#\s+#', trim($searchquery));
         if (empty($terms)) {
