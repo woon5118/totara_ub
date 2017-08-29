@@ -23,6 +23,8 @@
  * @subpackage totara_appraisal
  */
 
+require_once($CFG->dirroot.'/totara/appraisal/db/upgradelib.php');
+
 /**
  * Local database upgrade script
  *
@@ -55,6 +57,15 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
 
         // Appraisal savepoint reached.
         upgrade_plugin_savepoint(true, 2017042800, 'totara', 'appraisal');
+    }
+
+    // TL-15900 Update team leaders in dynamic appraisals.
+    if ($oldversion < 2017083000) {
+
+        totara_appraisal_upgrade_update_team_leaders();
+
+        // Appraisal savepoint reached.
+        upgrade_plugin_savepoint(true, 2017083000, 'totara', 'appraisal');
     }
 
     return true;
