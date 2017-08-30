@@ -492,7 +492,7 @@ $capabilities = array(
 
     'moodle/user:delete' => array(
 
-        'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
+        'riskbitmask' => RISK_PERSONAL | RISK_DATALOSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
