@@ -929,7 +929,7 @@ class mssql_sql_generator extends sql_generator {
         }
 
         $sqls = array();
-        $sqls[] = "DROP TABLE IF EXISTS ss_tables_{$prefix}";
+        $sqls[] = "IF OBJECT_ID ('ss_tables_{$prefix}', 'U') IS NOT NULL DROP TABLE ss_tables_{$prefix}";
         $sqls[] = "CREATE TABLE ss_tables_{$prefix} (
                       tablename VARCHAR(64) NOT NULL,
                       nextid INTEGER NOT NULL,
@@ -955,11 +955,11 @@ class mssql_sql_generator extends sql_generator {
             $sql = "INSERT INTO ss_tables_{$prefix} (tablename, nextid, records, modifications,columnlist) VALUES (?, ?, ?, 0, ?)";
             $this->mdb->execute($sql, array($prefix.$tablename, $nextid, $records, $columnlist));
 
-            $sqls[] = "DROP TABLE IF EXISTS ss_t_{$prefix}{$tablename}";
+            $sqls[] = "IF OBJECT_ID ('ss_t_{$prefix}{$tablename}', 'U') IS NOT NULL DROP TABLE ss_t_{$prefix}{$tablename}";
             if ($records > 0) {
                 $sqls[] = "SELECT * INTO ss_t_{$prefix}{$tablename} FROM {$prefix}{$tablename}";
             }
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_trigger_{$prefix}{$tablename}";
+            $sqls[] = "IF OBJECT_ID ('ss_trigger_{$prefix}{$tablename}', 'TR') IS NOT NULL DROP TRIGGER ss_trigger_{$prefix}{$tablename}";
             $sqls[] = "CREATE TRIGGER ss_trigger_{$prefix}{$tablename} ON {$prefix}{$tablename} AFTER INSERT, UPDATE, DELETE AS
                        BEGIN
                        SET NOCOUNT ON;
@@ -985,7 +985,7 @@ class mssql_sql_generator extends sql_generator {
         $temptables = $this->temptables->get_temptables();
         foreach ($temptables as $temptable => $rubbish) {
             $this->temptables->delete_temptable($temptable);
-            $sqls[] = "DROP TABLE IF EXISTS #{$prefix}{$temptable}";
+            $sqls[] = "IF OBJECT_ID ('tempdb..#{$prefix}{$temptable}', 'U') IS NOT NULL DROP TABLE #{$prefix}{$temptable}";
         }
 
         // Reset modified tables.
@@ -1051,11 +1051,11 @@ class mssql_sql_generator extends sql_generator {
         $sqls = array();
         $rs = $this->mdb->get_recordset_sql("SELECT * FROM ss_tables_{$prefix}");
         foreach ($rs as $info) {
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_trigger_{$info->tablename}";
-            $sqls[] = "DROP TABLE IF EXISTS ss_t_{$info->tablename}";
+            $sqls[] = "IF OBJECT_ID ('ss_trigger_{$info->tablename}', 'TR') IS NOT NULL DROP TRIGGER ss_trigger_{$info->tablename}";
+            $sqls[] = "IF OBJECT_ID ('ss_t_{$info->tablename}', 'U') IS NOT NULL DROP TABLE ss_t_{$info->tablename}";
         }
         $rs->close();
-        $sqls[] = "DROP TABLE IF EXISTS {$tablestable}";
+        $sqls[] = "IF OBJECT_ID ('{$tablestable}', 'U') IS NOT NULL DROP TABLE {$tablestable}";
 
         $this->mdb->change_database_structure($sqls);
     }
