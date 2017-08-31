@@ -539,27 +539,6 @@ class behat_hooks extends behat_base {
             return;
         }
 
-        // Save the page content if the step failed.
-        if (!empty($CFG->behat_faildump_path) &&
-            $scope->getTestResult()->getResultCode() === Behat\Testwork\Tester\Result\TestResult::FAILED) {
-            $this->take_contentdump($scope);
-        }
-
-        // Abort any open transactions to prevent subsequent tests hanging.
-        // This does the same as abort_all_db_transactions(), but doesn't call error_log() as we don't
-        // want to see a message in the behat output.
-        if (($scope->getTestResult() instanceof \Behat\Behat\Tester\Result\ExecutedStepResult) &&
-            $scope->getTestResult()->hasException()) {
-            if ($DB && $DB->is_transaction_started()) {
-                $DB->force_transaction_rollback();
-            }
-        }
-
-        // Only run if JS.
-        if (!$this->running_javascript()) {
-            return;
-        }
-
         // Save a screenshot if the step failed.
         if (!empty($CFG->behat_faildump_path) &&
             $scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::FAILED) {
