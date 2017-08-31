@@ -146,6 +146,8 @@ Feature: SCORM navigation
     And I click on "//button[@id='nav_prev']" "xpath_element"
     And I switch to "scorm_object" iframe
     Then I should see "This is at @Level 1"
+    # Go away from the scorm to stop background requests
+    And I am on homepage
 
 
   Scenario: SCORM fast forward and backward navigation buttons
@@ -192,6 +194,8 @@ Feature: SCORM navigation
     And I press "<<"
     And I switch to "scorm_object" iframe
     Then I should see "This is at @Level 1"
+    # Go away from the scorm to stop background requests
+    And I am on homepage
 
 
   Scenario: SCORM up navigation button
@@ -222,4 +226,6 @@ Feature: SCORM navigation
     And I press "<<"
     And I switch to "scorm_object" iframe
     Then I should see "This is at @Level 1"
+    # Go away from the scorm to stop background requests
+    And I am on homepage
 

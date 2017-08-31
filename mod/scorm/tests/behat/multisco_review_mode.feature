@@ -51,6 +51,8 @@ Feature: Scorm multi-sco review mode.
     And I should see "Normal"
     And I press "Enter"
     Then I should not see "Review mode"
+    # Go away from the scorm to stop background requests
+    And I am on homepage
 
   @javascript
   Scenario: Test review mode with all scos completed.
@@ -174,3 +176,5 @@ Feature: Scorm multi-sco review mode.
     And I should see "Normal"
     And I press "Enter"
     Then I should see "Review mode"
+    # Go away from the scorm to stop background requests
+    And I am on homepage
