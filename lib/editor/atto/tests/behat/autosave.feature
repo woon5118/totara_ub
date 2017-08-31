@@ -43,6 +43,7 @@ Feature: Atto Autosave
     Then I should see "Draft content has been automatically restored on this page."
     And I click on ".atto_undo_button_undo" "css_element"
     Then I should not see "This is my draft"
+    And I press "Cancel"
 
   @javascript
   Scenario: Restore a draft
@@ -59,6 +60,7 @@ Feature: Atto Autosave
     # Wait for the autorestore
     And I wait "2" seconds
     Then I should see "This is my draft"
+    And I press "Cancel"
 
   @javascript
   Scenario: Do not restore a draft if files have been modified
@@ -94,6 +96,7 @@ Feature: Atto Autosave
     And I follow "Course 1"
     And I navigate to "Edit settings" node in "Course administration"
     Then I should not see "This is my draft"
+    And I press "Cancel"
 
   @javascript
   Scenario: Do not restore a draft if text has been modified
@@ -115,3 +118,4 @@ Feature: Atto Autosave
     And I navigate to "Edit settings" node in "Course administration"
     Then I should not see "This is my draft"
     And I should see "Modified text"
+    And I press "Cancel"
