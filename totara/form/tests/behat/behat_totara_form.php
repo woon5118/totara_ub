@@ -47,6 +47,7 @@ class behat_totara_form extends behat_base {
      * @Given /^I navigate to the Totara test form$/
      */
     public function i_navigate_to_the_totara_test_form() {
+        \behat_hooks::set_step_readonly(false);
         $url = new moodle_url('/totara/form/tests/fixtures/test_acceptance.php');
         $this->getSession()->visit($url->out(false));
     }
@@ -60,6 +61,7 @@ class behat_totara_form extends behat_base {
      * @param TableNode $data
      */
     public function i_set_the_following_totara_form_fields_to_these_values(TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         if ($this->running_javascript()) {
             // If there are multiple sections we need to click the expand all link.
@@ -90,6 +92,7 @@ class behat_totara_form extends behat_base {
      * @Given /^I set the "(?P<locator>(?:[^"]|\\")*)" Totara form field to "(?P<value>(?:[^"]|\\")*)"$/
      */
     public function i_set_totara_form_field_value($locator, $value) {
+        \behat_hooks::set_step_readonly(false);
         $field = $this->get_field_element_given_locator($locator);
         $field->assert_not_frozen();
         $field->set_value((string)$value);
@@ -104,6 +107,7 @@ class behat_totara_form extends behat_base {
      * @param TableNode $data
      */
     public function i_should_see_the_following_totara_form_fields_having_these_values(TableNode $data) {
+        \behat_hooks::set_step_readonly(true);
 
         if ($this->running_javascript()) {
             // If there are multiple sections we need to click the expand all link.
@@ -134,6 +138,7 @@ class behat_totara_form extends behat_base {
      * @Given /^I should see the "(?P<locator>(?:[^"]|\\")*)" Totara form field has value "(?P<value>(?:[^"]|\\")*)"$/
      */
     public function i_should_see_totara_form_field_value($locator, $value) {
+        \behat_hooks::set_step_readonly(true);
         $field = $this->get_field_element_given_locator($locator);
         $field->assert_value((string)$value);
     }
@@ -147,6 +152,7 @@ class behat_totara_form extends behat_base {
      * @param TableNode $data
      */
     public function i_should_see_the_following_totara_form_fields_frozen(TableNode $data) {
+        \behat_hooks::set_step_readonly(true);
 
         if ($this->running_javascript()) {
             // If there are multiple sections we need to click the expand all link.
@@ -177,6 +183,7 @@ class behat_totara_form extends behat_base {
      * @Given /^I should see the "(?P<locator>(?:[^"]|\\")*)" Totara form field is frozen$/
      */
     public function i_should_see_frozen_totara_form_field($locator) {
+        \behat_hooks::set_step_readonly(true);
         $field = $this->get_field_element_given_locator($locator);
         $field->assert_frozen();
     }

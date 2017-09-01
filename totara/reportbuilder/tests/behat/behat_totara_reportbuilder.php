@@ -36,7 +36,7 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I add the "([^"]*)" column to the report$/
      */
     public function i_add_the_column_to_the_report($columnname) {
-
+        \behat_hooks::set_step_readonly(false);
         $this->execute("behat_forms::i_set_the_field_to", array("newcolumns", $this->escape($columnname)));
         $this->execute("behat_forms::press_button", "Save changes");
         $this->execute("behat_general::assert_page_contains_text", "Columns updated");
@@ -52,6 +52,7 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I delete the "([^"]*)" column from the report$/
      */
     public function i_delete_the_column_from_the_report($columnname) {
+        \behat_hooks::set_step_readonly(false);
         $columnname_xpath = behat_context_helper::escape($columnname);
         $delstring = behat_context_helper::escape(get_string('delete'));
         $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//a[@title='.$delstring.']';
@@ -71,6 +72,7 @@ class behat_totara_reportbuilder extends behat_base {
      * @When /^I change the "([^"]*)" column to "([^"]*)" in the report$/
      */
     public function i_change_the_column_to_in_the_report($original_column, $new_column) {
+        \behat_hooks::set_step_readonly(false);
         $column_xpath = behat_context_helper::escape($original_column);
         $xpath = '//select[@class="column_selector"]//option[contains(.,' . $column_xpath . ') and @selected]/ancestor::select';
         $node = $this->find(
@@ -90,6 +92,7 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I set aggregation for the "([^"]*)" column to "([^"]*)" in the report$/
      */
     public function i_set_aggregation_for_the_column_to_in_the_report($columnname, $aggregation) {
+        \behat_hooks::set_step_readonly(false);
         $columnname_xpath = behat_context_helper::escape($columnname);
         $aggregation_xpath = behat_context_helper::escape($aggregation);
         $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//select//option[contains(., '.$aggregation_xpath.')]//ancestor::select';
@@ -107,7 +110,7 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I navigate to my "([^"]*)" report$/
      */
     public function i_navigate_to_my_report($reportname) {
-
+        \behat_hooks::set_step_readonly(false);
         $this->execute('behat_totara_core::i_click_on_in_the_totara_menu', 'Reports');
         $this->execute("behat_general::i_click_on_in_the", array($this->escape($reportname), 'link', ".reportmanager", "css_element"));
         $this->execute("behat_general::assert_element_contains_text", array($this->escape($reportname), "#region-main h2", "css_element"));
@@ -120,6 +123,7 @@ class behat_totara_reportbuilder extends behat_base {
      * @Then /^I should see "([^"]*)" in the "([^"]*)" report column for "([^"]*)"$/
      */
     public function i_should_see_in_the_report_column_for($value, $column, $rowcontent) {
+        \behat_hooks::set_step_readonly(true);
         $rowsearch = behat_context_helper::escape($rowcontent);
         $valuesearch = behat_context_helper::escape($value);
         // Find the table.
@@ -145,6 +149,7 @@ class behat_totara_reportbuilder extends behat_base {
      * @Then /^I should not see "([^"]*)" in the "([^"]*)" report column for "([^"]*)"$/
      */
     public function i_should_not_see_in_the_report_column_for($value, $column, $rowcontent) {
+        \behat_hooks::set_step_readonly(true);
         try {
             $this->i_should_see_in_the_report_column_for($value, $column, $rowcontent);
         } catch (ExpectationException $ex) {

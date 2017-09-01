@@ -45,6 +45,7 @@ class behat_cohort extends behat_base {
      * @param string $cohortidnumber
      */
     public function i_add_user_to_cohort_members($user, $cohortidnumber) {
+        \behat_hooks::set_step_readonly(false);
 
         // If we are not in the cohorts management we should move there before anything else.
         if (!$this->getSession()->getPage()->find('css', 'input#cohort_search_q')) {

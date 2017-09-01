@@ -48,6 +48,7 @@ class behat_mod_data extends behat_base {
      * @param TableNode $fielddata
      */
     public function i_add_a_field_to_database_and_i_fill_the_form_with($fieldtype, $activityname, TableNode $fielddata) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute("behat_general::click_link", $this->escape($activityname));
 
@@ -80,6 +81,7 @@ class behat_mod_data extends behat_base {
      * @param TableNode $entrydata
      */
     public function i_add_an_entry_to_database_with($activityname, TableNode $entrydata) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute("behat_general::click_link", $this->escape($activityname));
         $this->execute("behat_navigation::i_navigate_to_node_in", array(get_string('add', 'mod_data'),

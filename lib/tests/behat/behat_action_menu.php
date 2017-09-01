@@ -49,6 +49,7 @@ class behat_action_menu extends behat_base {
      * @return void
      */
     public function i_open_the_action_menu_in($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             // Action menus automatically expand in a visible list of actions when Javascript is disabled.
             return;
@@ -67,6 +68,7 @@ class behat_action_menu extends behat_base {
      * @return void
      */
     public function i_choose_in_the_open_action_menu($linkstring) {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new DriverException('Action menu steps are not available with Javascript disabled');
         }

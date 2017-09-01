@@ -259,6 +259,7 @@ class behat_totara_data_generators extends behat_base {
      * @param TableNode $data
      */
     public function the_following_exist_in_plugin($elementname, $component, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         // Now that we need them require the data generators.
         require_once(__DIR__ . '/../../../../lib/testing/generator/lib.php');

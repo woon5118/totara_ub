@@ -45,6 +45,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I should see the "([^"]*)" tab is disabled$/
      */
     public function i_should_see_the_tab_is_disabled($text) {
+        \behat_hooks::set_step_readonly(true);
         $text = behat_context_helper::escape($text);
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' tabtree ')]//a[contains(concat(' ', normalize-space(@class), ' '), ' nolink ') and not(@href)]/*[contains(text(), {$text})]";
         // Bootstrap 3 has different markup.
@@ -62,6 +63,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I am on a totara site$/
      */
     public function i_am_on_a_totara_site() {
+        \behat_hooks::set_step_readonly(false);
         global $DB;
         // Set Totara defaults. This is to undo the work done in /lib/behat/classes/util.php around line 90
         set_config('enablecompletion', 1);
@@ -105,6 +107,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I should see "([^"]*)" in the totara menu$/
      */
     public function i_should_see_in_the_totara_menu($text) {
+        \behat_hooks::set_step_readonly(true);
         $this->find_totara_menu_item($text);
     }
 
@@ -114,6 +117,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I should not see "([^"]*)" in the totara menu$/
      */
     public function i_should_not_see_in_the_totara_menu($text) {
+        \behat_hooks::set_step_readonly(true);
         try {
             $this->find_totara_menu_item($text);
         } catch (\Behat\Mink\Exception\ExpectationException $ex) {
@@ -129,6 +133,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I click on "([^"]*)" in the totara menu$/
      */
     public function i_click_on_in_the_totara_menu($text) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->find_totara_menu_item($text);
         $this->getSession()->visit($this->locate_path($node->getAttribute('href')));
     }
@@ -139,6 +144,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I create the following totara menu items:$/
      */
     public function i_create_the_following_totara_menu_items(TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
         $possiblemenufields = array('Parent item', 'Menu title', 'Visibility', 'Menu default url address', 'Open link in new window');
         $first = false;
 
@@ -197,6 +203,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I edit "([^"]*)" totara menu item$/
      */
     public function i_edit_totara_menu_item($text) {
+        \behat_hooks::set_step_readonly(false);
         $text = behat_context_helper::escape($text);
         $xpath = "//table[@id='totaramenutable']//td[contains(concat(' ', normalize-space(@class), ' '), ' name ')]/*[contains(text(),{$text})]//ancestor::tr//a[@title='Edit']";
         $node = $this->find(
@@ -215,7 +222,7 @@ class behat_totara_core extends behat_base {
      * @param string $category The fullname of the category containing the course
      */
     public function i_set_self_completion_for($course, $category) {
-
+        \behat_hooks::set_step_readonly(false);
         $this->execute("behat_navigation::i_navigate_to_node_in", array("Manage courses and categories", "Site administration > Courses"));
         $this->execute("behat_general::i_click_on_in_the", array($this->escape($category), 'link', ".category-listing", "css_element"));
         $this->execute("behat_general::i_click_on_in_the", array($this->escape($course), 'link', ".course-listing", "css_element"));
@@ -236,6 +243,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I should see "([^"]*)" program progress$/
      */
     public function i_should_see_program_progress($text) {
+        \behat_hooks::set_step_readonly(true);
 
         $text = behat_context_helper::escape($text);
         $xpath = "//div[@id = 'progressbar']//img[contains(@alt,{$text})]";
@@ -257,6 +265,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I set "([^"]*)" for courseset "([^"]*)" to "([^"]*)"$/
      */
     public function i_set_courseset_variable($varname, $courseset, $value) {
+        \behat_hooks::set_step_readonly(false);
 
         $xpath = "";
         $xpath .= "//div[@id = 'course_sets_ce' or @id = 'course_sets_rc']";
@@ -284,6 +293,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I wind back certification dates by (\d+) months$/
      */
     public function i_wind_back_certification_dates_by_months($windback) {
+        \behat_hooks::set_step_readonly(true); // No browser action.
         global $DB;
 
         $windback = (int)$windback * (4 * WEEKSECS); // Assuming 4 weeks per month (close enough).
@@ -317,6 +327,7 @@ class behat_totara_core extends behat_base {
      * @param int $seconds
      */
     public function i_force_sleep($seconds) {
+        \behat_hooks::set_step_readonly(true);
         if ($this->running_javascript()) {
             throw new \Behat\Mink\Exception\DriverException('Use \'I wait "X" seconds\' with Javascript support');
         }
@@ -331,6 +342,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I wait for the next second$/
      */
     public function i_wait_for_next_second() {
+        \behat_hooks::set_step_readonly(true);
         $now = microtime(true);
         $sleep = ceil($now) - $now;
         if ($sleep > 0) {
@@ -346,6 +358,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I should see the "([^"]*)" image in the "([^"]*)" "([^"]*)"$/
      */
     public function i_should_see_the_x_image_in_the_y_element($titleoralt, $containerelement, $containerselectortype) {
+        \behat_hooks::set_step_readonly(true);
         // Get the container node; here we throw an exception
         // if the container node does not exist.
         $containernode = $this->get_selected_node($containerselectortype, $containerelement);
@@ -373,6 +386,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I should not see the "([^"]*)" image in the "([^"]*)" "([^"]*)"$/
      */
     public function i_should_not_see_the_x_image_in_the_y_element($titleoralt, $containerelement, $containerselectortype) {
+        \behat_hooks::set_step_readonly(true);
         // Get the container node; here we throw an exception
         // if the container node does not exist.
         $containernode = $this->get_selected_node($containerselectortype, $containerelement);
@@ -430,6 +444,7 @@ class behat_totara_core extends behat_base {
      * @Then /^I should see "([^"]*)" in the page title$/
      */
     public function i_should_see_in_the_page_title($text) {
+        \behat_hooks::set_step_readonly(true);
         $text = behat_context_helper::escape($text);
         $xpath = "//title[contains(text(), {$text})]";
         $this->find(
@@ -447,6 +462,7 @@ class behat_totara_core extends behat_base {
      * @throws ExpectationException
      */
     public function i_search_for_in_the_totara_dialogue($term, $dialog) {
+        \behat_hooks::set_step_readonly(true);
         $dialog = $this->get_selected_node('totaradialogue', $dialog);
         if (!$dialog) {
             throw new ExpectationException('Unable to find the "'.$dialog.'" Totara dialog', $this->getSession());
@@ -475,6 +491,7 @@ class behat_totara_core extends behat_base {
      * @throws ExpectationException
      */
     public function i_click_on_from_the_search_results_in_the_totara_dialogue($term, $dialog) {
+        \behat_hooks::set_step_readonly(false);
         $dialog = $this->get_selected_node('totaradialogue', $dialog);
         if (!$dialog) {
             throw new ExpectationException('Unable to find the "'.$dialog.'" Totara dialog', $this->getSession());

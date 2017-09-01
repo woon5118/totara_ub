@@ -37,6 +37,7 @@ class behat_completion_report extends behat_base {
      * @param string $rpltext
      */
     public function i_complete_course_via_rpl($users_name, $rpltext) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Complete course via RPL step is not available with Javascript disabled');
@@ -64,6 +65,7 @@ class behat_completion_report extends behat_base {
      * @param string $users_name
      */
     public function i_delete_course_rpl($users_name) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Delete course RPL step is not available with Javascript disabled');

@@ -48,6 +48,8 @@ class behat_message extends behat_base {
      * @param string $userfullname
      */
     public function i_view_contact_in_messages($userfullname) {
+        \behat_hooks::set_step_readonly(false);
+
         // Visit home page and follow messages.
         $this->i_select_user_in_messaging($userfullname);
 
@@ -71,6 +73,7 @@ class behat_message extends behat_base {
      * @param string $userfullname
      */
     public function i_select_user_in_messaging($userfullname) {
+        \behat_hooks::set_step_readonly(false);
 
         // Visit home page and follow messages.
         $this->execute("behat_general::i_am_on_homepage");
@@ -111,6 +114,8 @@ class behat_message extends behat_base {
      * @param string $userfullname
      */
     public function i_send_message_to_user($messagecontent, $userfullname) {
+        \behat_hooks::set_step_readonly(false);
+
         $this->i_select_user_in_messaging($userfullname);
 
         $this->execute('behat_forms::i_set_the_field_with_xpath_to',
@@ -127,6 +132,8 @@ class behat_message extends behat_base {
      * @param string $messagecontent
      */
     public function i_send_message_in_the_message_area($messagecontent) {
+        \behat_hooks::set_step_readonly(false);
+
         $this->execute('behat_forms::i_set_the_field_with_xpath_to',
             array("//textarea[@data-region='send-message-txt']", $this->escape($messagecontent))
         );
@@ -142,6 +149,7 @@ class behat_message extends behat_base {
      * @param string $username
      */
     public function the_message_exists_for_user($messagesubject, $username) {
+        \behat_hooks::set_step_readonly(true);
         global $DB;
 
         $sql = "SELECT m.id
@@ -169,6 +177,7 @@ class behat_message extends behat_base {
      * @param string $username
      */
     public function the_message_does_not_contain_for_user($messagesubject, $messagecontains, $username) {
+        \behat_hooks::set_step_readonly(true);
         global $DB;
 
         $sql = "SELECT m.id
@@ -198,6 +207,7 @@ class behat_message extends behat_base {
      * @param string $username
      */
     public function the_message_contains_for_user($messagesubject, $messagecontains, $username) {
+        \behat_hooks::set_step_readonly(true);
         global $DB;
 
         $sql = "SELECT m.id
@@ -227,6 +237,7 @@ class behat_message extends behat_base {
      * @param string $username
      */
     public function the_message_contains_multiline_for_user($messagesubject, $username, PyStringNode $messagecontains) {
+        \behat_hooks::set_step_readonly(true);
         global $DB;
 
         $sql = "SELECT m.id

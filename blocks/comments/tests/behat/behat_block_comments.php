@@ -54,6 +54,7 @@ class behat_block_comments extends behat_base {
      * @param string $comment
      */
     public function i_add_comment_to_comments_block($comment) {
+        \behat_hooks::set_step_readonly(false);
 
         // Getting the textarea and setting the provided value.
         $exception = new ElementNotFoundException($this->getSession(), 'Comments block ');
@@ -66,7 +67,7 @@ class behat_block_comments extends behat_base {
             $this->find_link(get_string('savecomment'))->click();
             // Delay after clicking so that additional comments will have unique time stamps.
             // We delay 1 second which is all we need.
-            $this->getSession()->wait(1000, false);
+            $this->execute('behat_totara_core::i_wait_for_next_second');
 
         } else {
 
@@ -88,6 +89,7 @@ class behat_block_comments extends behat_base {
      * @param string $comment
      */
     public function i_delete_comment_from_comments_block($comment) {
+        \behat_hooks::set_step_readonly(false);
 
         $exception = new ElementNotFoundException($this->getSession(), '"' . $comment . '" comment ');
 

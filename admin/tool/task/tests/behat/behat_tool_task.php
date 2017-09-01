@@ -49,6 +49,7 @@ class behat_tool_task extends behat_base {
      * @param string $taskname Name of task e.g. 'mod_whatever\task\do_something'
      */
     public function i_run_the_scheduled_task($taskname) {
+        \behat_hooks::set_step_readonly(false);
         global $CFG;
 
         $task = \core\task\manager::get_scheduled_task($taskname);
@@ -96,6 +97,7 @@ class behat_tool_task extends behat_base {
      * @param string $taskname Name of task e.g. 'mod_whatever\task\do_something'
      */
     public function i_run_adhoc_scheduled_tasks($taskname) {
+        \behat_hooks::set_step_readonly(false);
         global $CFG;
 
         $previousurl = $this->getSession()->getCurrentUrl();

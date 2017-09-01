@@ -45,6 +45,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $itemname
      */
     public function i_click_on_student_and_grade_item($student, $itemname) {
+        \behat_hooks::set_step_readonly(false);
+
         $xpath = $this->get_student_and_grade_cell_selector($student, $itemname);
 
         $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
@@ -58,6 +60,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $itemname
      */
     public function i_click_away_from_student_and_grade_value($student, $itemname) {
+        \behat_hooks::set_step_readonly(false);
+
         $xpath = $this->get_student_and_grade_value_selector($student, $itemname);
 
         $this->execute('behat_general::i_take_focus_off_field', array($this->escape($xpath), 'xpath_element'));
@@ -71,6 +75,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $itemname
      */
     public function i_click_away_from_student_and_grade_feedback($student, $itemname) {
+        \behat_hooks::set_step_readonly(false);
+
         $xpath = $this->get_student_and_grade_feedback_selector($student, $itemname);
 
         $this->execute('behat_general::i_take_focus_off_field', array($this->escape($xpath), 'xpath_element'));
@@ -87,6 +93,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $value
      */
     public function the_grade_should_match($student, $itemname, $value) {
+        \behat_hooks::set_step_readonly(true);
+
         $xpath = $this->get_student_and_grade_value_selector($student, $itemname);
 
         $gradefield = $this->getSession()->getPage()->find('xpath', $xpath);
@@ -127,6 +135,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $itemname
      */
     public function i_should_see_grade_field($student, $itemname) {
+        \behat_hooks::set_step_readonly(true);
+
         $xpath = $this->get_student_and_grade_value_selector($student, $itemname);
 
         $this->execute('behat_general::should_be_visible', array($this->escape($xpath), 'xpath_element'));
@@ -140,6 +150,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $itemname
      */
     public function i_should_see_feedback_field($student, $itemname) {
+        \behat_hooks::set_step_readonly(true);
+
         $xpath = $this->get_student_and_grade_feedback_selector($student, $itemname);
 
         $this->execute('behat_general::should_be_visible', array($this->escape($xpath), 'xpath_element'));
@@ -153,6 +165,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $itemname
      */
     public function i_should_not_see_grade_field($student, $itemname) {
+        \behat_hooks::set_step_readonly(true);
+
         $xpath = $this->get_student_and_grade_value_selector($student, $itemname);
 
         $this->execute('behat_general::should_not_exist', array($this->escape($xpath), 'xpath_element'));
@@ -166,6 +180,8 @@ class behat_gradereport_grader extends behat_base {
      * @param string $itemname
      */
     public function i_should_not_see_feedback_field($student, $itemname) {
+        \behat_hooks::set_step_readonly(true);
+
         $xpath = $this->get_student_and_grade_feedback_selector($student, $itemname);
 
         $this->execute('behat_general::should_not_exist', array($this->escape($xpath), 'xpath_element'));

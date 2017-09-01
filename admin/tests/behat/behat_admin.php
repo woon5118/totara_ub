@@ -48,6 +48,7 @@ class behat_admin extends behat_base {
      * @param TableNode $table
      */
     public function i_set_the_following_administration_settings_values(TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$data = $table->getRowsHash()) {
             return;
@@ -58,7 +59,7 @@ class behat_admin extends behat_base {
             // We expect admin block to be visible, otherwise go to homepage.
             if (!$this->getSession()->getPage()->find('css', '.block_settings')) {
                 $this->getSession()->visit($this->locate_path('/index.php?redirect=0'));
-                $this->wait(self::TIMEOUT * 1000, self::PAGE_READY_JS);
+                $this->wait_for_pending_js();
             }
 
             // Search by label.
@@ -68,8 +69,7 @@ class behat_admin extends behat_base {
             $fieldxpath = "//form[@class='adminsearchform']//input[@type='submit'] | //form[@class='adminsearchform']//button[@type='submit']";
             $submitsearch = $this->find('xpath', $fieldxpath);
             $submitsearch->click();
-
-            $this->wait(self::TIMEOUT * 1000, self::PAGE_READY_JS);
+            $this->wait_for_pending_js();
 
             // Admin settings does not use the same DOM structure than other moodle forms
             // but we also need to use lib/behat/form_field/* to deal with the different moodle form elements.
@@ -114,6 +114,7 @@ class behat_admin extends behat_base {
             $field->set_value($value);
 
             $this->find_button(get_string('savechanges'))->press();
+            $this->wait_for_pending_js();
         }
     }
 
@@ -124,6 +125,7 @@ class behat_admin extends behat_base {
      * @param TableNode $table
      */
     public function the_following_config_values_are_set_as_admin(TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$data = $table->getRowsHash()) {
             return;
@@ -138,19 +140,6 @@ class behat_admin extends behat_base {
                 $value = $value[0];
             }
             set_config($config, $value, $plugin);
-        }
-    }
-
-    /**
-     * Waits with the provided params if we are running a JS session.
-     *
-     * @param int $timeout
-     * @param string $javascript
-     * @return void
-     */
-    protected function wait($timeout, $javascript = false) {
-        if ($this->running_javascript()) {
-            $this->getSession()->wait($timeout, $javascript);
         }
     }
 }

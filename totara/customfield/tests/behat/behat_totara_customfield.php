@@ -42,6 +42,8 @@ class behat_totara_customfield extends behat_base {
      * @param string $direction
      */
     public function i_should_not_be_able_to_move_the_totara_custom_field($fullname, $direction) {
+        \behat_hooks::set_step_readonly(true);
+
         $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
         $move_literal = behat_context_helper::escape(get_string($string));
@@ -69,6 +71,8 @@ class behat_totara_customfield extends behat_base {
      * @param string $direction
      */
     public function i_should_be_able_to_move_the_totara_custom_field($fullname, $direction) {
+        \behat_hooks::set_step_readonly(true);
+
         $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
         $move_literal = behat_context_helper::escape(get_string($string));
@@ -86,6 +90,8 @@ class behat_totara_customfield extends behat_base {
      * @param string $direction
      */
     public function i_click_to_move_the_totoara_custom_field($fullname, $direction) {
+        \behat_hooks::set_step_readonly(false);
+
         $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
         $move_literal = behat_context_helper::escape(get_string($string));
@@ -103,6 +109,7 @@ class behat_totara_customfield extends behat_base {
      * @param string $fieldshortname
      */
     public function i_should_see_the_form_validation_error_for_the_custom_field($errormsg, $fieldshortname) {
+        \behat_hooks::set_step_readonly(true);
 
         $fieldshortname_literal = behat_context_helper::escape('customfield_' . $fieldshortname);
 

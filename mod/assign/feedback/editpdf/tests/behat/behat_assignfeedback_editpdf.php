@@ -43,6 +43,7 @@ class behat_assignfeedback_editpdf extends behat_base {
      * @Given /^ghostscript is installed$/
      */
     public function ghostscript_is_installed() {
+        \behat_hooks::set_step_readonly(true);
         $testpath = assignfeedback_editpdf\pdf::test_gs_path();
         if (!extension_loaded('zlib') or
             $testpath->status !== assignfeedback_editpdf\pdf::GSPATH_OK) {
@@ -56,6 +57,7 @@ class behat_assignfeedback_editpdf extends behat_base {
      * @When /^I draw on the pdf$/
      */
     public function i_draw_on_the_pdf() {
+        \behat_hooks::set_step_readonly(false);
         $js = ' (function() {
     var instance = M.assignfeedback_editpdf.instance;
     var event = { clientX: 100, clientY: 250, preventDefault: function() {} };

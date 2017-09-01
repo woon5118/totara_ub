@@ -38,6 +38,7 @@ class behat_tool_totara_sync extends behat_base {
      * @Given /^I "(Enable|Disable)" the "([^"]*)" HR Import element$/
      */
     public function i_the_hr_import_element($state, $element) {
+        \behat_hooks::set_step_readonly(false);
         $xpath = "//table[@id='elements']//descendant::text()[contains(.,'{$element}')]//ancestor::tr//a[@title='{$state}']";
         $exception = new ElementNotFoundException($this->getSession(), 'Could not find state switch for the given HR Import element');
         $node = $this->find('xpath', $xpath, $exception);
@@ -53,6 +54,7 @@ class behat_tool_totara_sync extends behat_base {
      * @Given /^the following "([^"]*)" HR Import database source exists:$/
      */
     public function theFollowingHRImportDatabaseSourceExists($element, TableNode $datatable) {
+        \behat_hooks::set_step_readonly(false);
         global $CFG;
 
         require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');

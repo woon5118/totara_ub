@@ -47,6 +47,7 @@ class behat_enrol extends behat_base {
      * @param TableNode $table
      */
     public function i_add_enrolment_method_with($enrolmethod, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
         // Navigate to enrolment method page.
         $parentnodes = get_string('courseadministration') . ' > ' . get_string('users', 'admin');
         $this->execute("behat_navigation::i_navigate_to_node_in",
@@ -85,6 +86,7 @@ class behat_enrol extends behat_base {
      * @param string $rolename
      */
     public function i_enrol_user_as($userfullname, $rolename) {
+        \behat_hooks::set_step_readonly(false);
 
         // Navigate to enrolment page.
         $parentnodes = get_string('courseadministration') . ' > ' . get_string('users', 'admin');

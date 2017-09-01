@@ -48,6 +48,7 @@ class behat_groups extends behat_base {
      * @param string $groupname
      */
     public function i_add_user_to_group_members($userfullname, $groupname) {
+        \behat_hooks::set_step_readonly(false);
 
         $userfullname = behat_context_helper::escape($userfullname);
 
@@ -97,6 +98,7 @@ class behat_groups extends behat_base {
      * @param string $grouping grouping in which all group should be present.
      */
     public function the_groups_overview_should_include_groups_in_grouping($groups, $grouping) {
+        \behat_hooks::set_step_readonly(true);
 
         $groups = array_map('trim', explode(',', $groups));
 

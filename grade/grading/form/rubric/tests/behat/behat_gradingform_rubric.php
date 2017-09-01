@@ -66,6 +66,7 @@ class behat_gradingform_rubric extends behat_base {
      * @param TableNode $rubric
      */
     public function i_define_the_following_rubric(TableNode $rubric) {
+        \behat_hooks::set_step_readonly(false);
 
         // Being a smart method is nothing good when we talk about step definitions, in
         // this case we didn't have any other options as there are no labels no elements
@@ -226,6 +227,7 @@ class behat_gradingform_rubric extends behat_base {
      * @param string $criterionname
      */
     public function i_replace_rubric_level_with($currentvalue, $value, $criterionname) {
+        \behat_hooks::set_step_readonly(false);
 
         $currentvalueliteral = behat_context_helper::escape($currentvalue);
         $criterionliteral = behat_context_helper::escape($criterionname);
@@ -275,6 +277,7 @@ class behat_gradingform_rubric extends behat_base {
      * @param TableNode $rubric
      */
     public function i_grade_by_filling_the_rubric_with(TableNode $rubric) {
+        \behat_hooks::set_step_readonly(false);
 
         $criteria = $rubric->getRowsHash();
 
@@ -349,6 +352,7 @@ class behat_gradingform_rubric extends behat_base {
      * @return void
      */
     public function the_level_with_points_was_previously_selected_for_the_rubric_criterion($points, $criterionname) {
+        \behat_hooks::set_step_readonly(true);
 
         $levelxpath = $this->get_criterion_xpath($criterionname) .
             $this->get_level_xpath($points) .
@@ -378,6 +382,7 @@ class behat_gradingform_rubric extends behat_base {
      * @return void
      */
     public function the_level_with_points_is_selected_for_the_rubric_criterion($points, $criterionname) {
+        \behat_hooks::set_step_readonly(true);
 
         $levelxpath = $this->get_criterion_xpath($criterionname) .
             $this->get_level_xpath($points);
@@ -409,6 +414,7 @@ class behat_gradingform_rubric extends behat_base {
      * @return void
      */
     public function the_level_with_points_is_not_selected_for_the_rubric_criterion($points, $criterionname) {
+        \behat_hooks::set_step_readonly(true);
 
         $levelxpath = $this->get_criterion_xpath($criterionname) .
             $this->get_level_xpath($points);
@@ -437,6 +443,7 @@ class behat_gradingform_rubric extends behat_base {
      * @return void
      */
     protected function set_rubric_field_value($name, $value, $visible = false) {
+        \behat_hooks::set_step_readonly(false);
 
         // Fields are hidden by default.
         if ($this->running_javascript() == true && $visible === false) {

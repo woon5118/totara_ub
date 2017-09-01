@@ -47,6 +47,7 @@ class behat_completion extends behat_base {
      * @param string $activityname
      */
     public function user_has_completed_activity($userfullname, $activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         // Will throw an exception if the element can not be hovered.
         $titleliteral = behat_context_helper::escape($userfullname . ", " . $activityname . ": Completed");
@@ -54,6 +55,7 @@ class behat_completion extends behat_base {
             "/descendant::span[contains(@class, 'sr-only') and contains(., $titleliteral)]";
 
         $this->execute("behat_completion::go_to_the_current_course_activity_completion_report");
+        $this->wait_for_pending_js();
         $this->execute("behat_general::should_exist",
             array($this->escape($xpath), "xpath_element")
         );
@@ -67,6 +69,7 @@ class behat_completion extends behat_base {
      * @param string $activityname
      */
     public function user_has_not_completed_activity($userfullname, $activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         // Will throw an exception if the element can not be hovered.
         $titleliteral = behat_context_helper::escape($userfullname . ", " . $activityname . ": Not completed");
@@ -74,6 +77,7 @@ class behat_completion extends behat_base {
             "/descendant::span[contains(@class, 'sr-only') and contains(., $titleliteral)]";
 
         $this->execute("behat_completion::go_to_the_current_course_activity_completion_report");
+        $this->wait_for_pending_js();
         $this->execute("behat_general::should_exist", array($this->escape($xpath), "xpath_element"));
     }
 

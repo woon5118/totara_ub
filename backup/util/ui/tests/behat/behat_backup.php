@@ -52,6 +52,7 @@ class behat_backup extends behat_base {
      * @param TableNode $options Backup options or false if no options provided
      */
     public function i_backup_course_using_this_options($backupcourse, $options = false) {
+        \behat_hooks::set_step_readonly(false);
         // We can not use other steps here as we don't know where the provided data
         // table elements are used, and we need to catch exceptions contantly.
 
@@ -94,6 +95,7 @@ class behat_backup extends behat_base {
      * @param string $backupcourse
      */
     public function i_perform_a_quick_backup_of_course($backupcourse) {
+        \behat_hooks::set_step_readonly(false);
         // We can not use other steps here as we don't know where the provided data
         // table elements are used, and we need to catch exceptions contantly.
 
@@ -129,6 +131,7 @@ class behat_backup extends behat_base {
      * @param TableNode $options
      */
     public function i_import_course_into_course($fromcourse, $tocourse, $options = false) {
+        \behat_hooks::set_step_readonly(false);
 
         // We can not use other steps here as we don't know where the provided data
         // table elements are used, and we need to catch exceptions contantly.
@@ -187,6 +190,7 @@ class behat_backup extends behat_base {
      * @param TableNode $options Restore forms options or false if no options provided
      */
     public function i_restore_backup_into_course_using_this_options($backupfilename, $existingcourse, $options = false) {
+        \behat_hooks::set_step_readonly(false);
 
         // Confirm restore.
         $this->select_backup($backupfilename);
@@ -220,6 +224,7 @@ class behat_backup extends behat_base {
      * @param TableNode $options Restore forms options or false if no options provided
      */
     public function i_restore_backup_into_a_new_course_using_this_options($backupfilename, $options = false) {
+        \behat_hooks::set_step_readonly(false);
 
         // Confirm restore.
         $this->select_backup($backupfilename);
@@ -249,6 +254,7 @@ class behat_backup extends behat_base {
      * @param TableNode $options Restore forms options or false if no options provided
      */
     public function i_merge_backup_into_the_current_course($backupfilename, $options = false) {
+        \behat_hooks::set_step_readonly(false);
 
         // Confirm restore.
         $this->select_backup($backupfilename);
@@ -277,6 +283,7 @@ class behat_backup extends behat_base {
      * @param TableNode $options Restore forms options or false if no options provided
      */
     public function i_merge_backup_into_current_course_deleting_its_contents($backupfilename, $options = false) {
+        \behat_hooks::set_step_readonly(false);
 
         // Confirm restore.
         $this->select_backup($backupfilename);

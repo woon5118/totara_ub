@@ -40,6 +40,8 @@ class behat_grade extends behat_base {
      * @param string $itemname
      */
     public function i_give_the_grade($grade, $userfullname, $itemname) {
+        \behat_hooks::set_step_readonly(false);
+
         $gradelabel = $userfullname . ' ' . $itemname;
         $fieldstr = get_string('useractivitygrade', 'gradereport_grader', $gradelabel);
 
@@ -56,6 +58,8 @@ class behat_grade extends behat_base {
      * @param string $itemname
      */
     public function i_give_the_feedback($feedback, $userfullname, $itemname) {
+        \behat_hooks::set_step_readonly(false);
+
         $gradelabel = $userfullname . ' ' . $itemname;
         $fieldstr = get_string('useractivityfeedback', 'gradereport_grader', $gradelabel);
 
@@ -72,6 +76,7 @@ class behat_grade extends behat_base {
      * @param TableNode $data
      */
     public function i_set_the_following_settings_for_grade_item($gradeitem, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         $gradeitem = behat_context_helper::escape($gradeitem);
 
@@ -100,6 +105,7 @@ class behat_grade extends behat_base {
      * @param string $gradeitem
      */
     public function i_hide_the_grade_item($gradeitem) {
+        \behat_hooks::set_step_readonly(false);
 
         $gradeitem = behat_context_helper::escape($gradeitem);
 
@@ -126,6 +132,7 @@ class behat_grade extends behat_base {
      * @param TableNode $TableNode The grade item name - idnumbers relation.
      */
     public function i_set_calculation_for_grade_item_with_idnumbers($calculation, $gradeitem, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         $gradeitem = behat_context_helper::escape($gradeitem);
 
@@ -171,6 +178,7 @@ class behat_grade extends behat_base {
      * @param TableNode $data The grade item name - idnumbers relation.
      */
     public function i_set_calculation_for_grade_category_with_idnumbers($calculation, $gradeitem, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         $gradecategorytotal = behat_context_helper::escape($gradeitem . ' total');
         $gradeitem = behat_context_helper::escape($gradeitem);
@@ -218,6 +226,7 @@ class behat_grade extends behat_base {
      * @param $gradeitem
      */
     public function i_reset_weights_for_grade_category($gradeitem) {
+        \behat_hooks::set_step_readonly(false);
 
         $steps = array();
 
@@ -241,6 +250,8 @@ class behat_grade extends behat_base {
      * @param string $version
      */
     public function gradebook_calculations_for_the_course_are_frozen_at_version($coursename, $version) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
         global $DB;
         $courseid = $DB->get_field('course', 'id', array('shortname' => $coursename), MUST_EXIST);
         set_config('gradebook_calculations_freeze_' . $courseid, $version);
@@ -292,6 +303,8 @@ class behat_grade extends behat_base {
      * @param string $gradepath
      */
     public function i_navigate_to_in_the_course_gradebook($gradepath) {
+        \behat_hooks::set_step_readonly(false);
+
         // If we are not on one of the gradebook pages already, follow "Grades" link in the navigation block.
         $xpath = '//div[contains(@class,\'grade-navigation\')]';
         if (!$this->getSession()->getPage()->findAll('xpath', $xpath)) {
@@ -311,6 +324,8 @@ class behat_grade extends behat_base {
      * @param string $gradepath
      */
     public function i_go_to_in_the_course_gradebook($gradepath) {
+        \behat_hooks::set_step_readonly(false);
+
         $this->execute('behat_grade::i_navigate_to_in_the_course_gradebook', $gradepath);
     }
 }

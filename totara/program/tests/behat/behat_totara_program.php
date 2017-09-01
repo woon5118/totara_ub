@@ -39,6 +39,8 @@ class behat_totara_program extends behat_base {
      * @param TableNode $data
      */
     public function i_add_a_courseset_with_the_following_courses_to_program($courses, $programname, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
+
         global $CFG, $DB;
 
         // Now that we need them require the data generators.
@@ -118,6 +120,8 @@ class behat_totara_program extends behat_base {
      * @param string $field
      */
     public function i_should_see_for_in_the_program_overview($value, $field) {
+        \behat_hooks::set_step_readonly(true);
+
         $value_literal = behat_context_helper::escape($value);
         $field_literal = behat_context_helper::escape($field);
         $xpath =  "//div[contains(concat(' ', @class, ' '), ' fstatic ') + contains(text(),{$field_literal})]";

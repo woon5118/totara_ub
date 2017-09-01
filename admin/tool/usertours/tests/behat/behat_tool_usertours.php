@@ -43,6 +43,7 @@ class behat_tool_usertours extends behat_base {
      * @param TableNode $table
      */
     public function i_add_a_new_user_tour_with(TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
         $this->execute('behat_tool_usertours::i_open_the_user_tour_settings_page');
         $this->execute('behat_general::click_link', get_string('newtour', 'tool_usertours'));
 
@@ -60,6 +61,7 @@ class behat_tool_usertours extends behat_base {
      * @param   TableNode   $table
      */
     public function i_add_steps_to_the_named_tour($tourname, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
         $this->execute('behat_tool_usertours::i_open_the_user_tour_settings_page');
         $this->execute('behat_general::click_link', $this->escape($tourname));
 
@@ -81,6 +83,7 @@ class behat_tool_usertours extends behat_base {
      * @Given /^I open the User tour settings page$/
      */
     public function i_open_the_user_tour_settings_page() {
+        \behat_hooks::set_step_readonly(false);
         $this->execute('behat_navigation::i_navigate_to_node_in', [
                 get_string('usertours', 'tool_usertours'),
                 implode(' > ', [

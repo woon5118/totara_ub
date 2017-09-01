@@ -48,6 +48,7 @@ class behat_mod_feedback extends behat_base {
      * @param TableNode $questiondata with data for filling the add question form
      */
     public function i_add_question_to_the_feedback_with($questiontype, TableNode $questiondata) {
+        \behat_hooks::set_step_readonly(false);
 
         $questiontype = $this->escape($questiontype);
         $additem = $this->escape(get_string('add_item', 'feedback'));
@@ -81,6 +82,7 @@ class behat_mod_feedback extends behat_base {
      * @When /^I add a page break to the feedback$/
      */
     public function i_add_a_page_break_to_the_feedback() {
+        \behat_hooks::set_step_readonly(false);
 
         $questiontype = $this->escape(get_string('add_pagebreak', 'feedback'));
         $additem = $this->escape(get_string('add_item', 'feedback'));
@@ -99,6 +101,8 @@ class behat_mod_feedback extends behat_base {
      * @param TableNode $questiondata with data for filling the add question form
      */
     public function i_log_in_as_and_complete_feedback_in_course($username, $feedbackname, $coursename, TableNode $answers) {
+        \behat_hooks::set_step_readonly(false);
+
         $username = $this->escape($username);
         $coursename = $this->escape($coursename);
         $feedbackname = $this->escape($feedbackname);
@@ -128,6 +132,8 @@ class behat_mod_feedback extends behat_base {
      * @param string $filename
      */
     public function following_should_export_feedback_identical_to($link, $filename) {
+        \behat_hooks::set_step_readonly(false);
+
         global $CFG;
         $exception = new ExpectationException('Error while downloading data from ' . $link, $this->getSession());
 
@@ -153,6 +159,7 @@ class behat_mod_feedback extends behat_base {
      * @param string $feedbackname name of the feedback for which chart data needs to be shown.
      */
     public function i_show_chart_data_for_the_feedback($feedbackname) {
+        \behat_hooks::set_step_readonly(false);
 
         $feedbackxpath = "//th[contains(normalize-space(string(.)), \"" . $feedbackname . "\")]/ancestor::table/" .
             "following-sibling::div[contains(concat(' ', normalize-space(@class), ' '), ' chart-area ')][1]" .

@@ -184,17 +184,25 @@ class behat_files extends behat_base {
 
         $exception = new ExpectationException('No files can be added to the specified filemanager', $this->getSession());
 
+        $this->wait_for_pending_js();
+
         // We should deal with single-file and multiple-file filemanagers,
         // catching the exception thrown by behat_base::find() in case is not multiple
         try {
             // Looking for the add button inside the specified filemanager.
-            $add = $this->find('css', 'div.fp-btn-add a', $exception, $filemanagernode);
+            $add = $this->find('css', 'div.fp-btn-add a', $exception, $filemanagernode, 0.1);
         } catch (Exception $e) {
             // Otherwise should be a single-file filepicker form element.
-            $add = $this->find('css', 'input.fp-btn-choose', $exception, $filemanagernode);
+            try {
+                $add = $this->find('css', 'input.fp-btn-choose', $exception, $filemanagernode);
+            } catch (Exception $e) {
+                $add = $this->find('css', 'div.fp-btn-add a', $exception, $filemanagernode);
+            }
         }
         $this->ensure_node_is_visible($add);
         $add->click();
+
+        $this->wait_for_pending_js();
 
         // Wait for the default repository (if any) to load. This checks that
         // the relevant div exists and that it does not include the loading image.
@@ -226,6 +234,8 @@ class behat_files extends behat_base {
             // Clicking it while it's active causes issues, so only click it when it isn't (see MDL-51014).
             $repositorylink->click();
         }
+
+        $this->wait_for_pending_js();
     }
 
     /**

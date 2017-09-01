@@ -53,7 +53,7 @@ class behat_general extends behat_base {
      * @var string used by {@link switch_to_window()} and
      * {@link switch_to_the_main_window()} to work-around a Chrome browser issue.
      */
-    const MAIN_WINDOW_NAME = '__moodle_behat_main_window_name';
+    const MAIN_WINDOW_NAME = '__totara_behat_main_window_name';
 
     /**
      * @var string when we want to check whether or not a new page has loaded,
@@ -74,6 +74,7 @@ class behat_general extends behat_base {
      * @Given /^I am on homepage$/
      */
     public function i_am_on_homepage() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/'));
     }
 
@@ -83,6 +84,7 @@ class behat_general extends behat_base {
      * @Given /^I am on site homepage$/
      */
     public function i_am_on_site_homepage() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/?redirect=0'));
     }
 
@@ -92,6 +94,7 @@ class behat_general extends behat_base {
      * @Given /^I am on course index$/
      */
     public function i_am_on_course_index() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/course/index.php'));
     }
 
@@ -101,6 +104,7 @@ class behat_general extends behat_base {
      * @Given /^I reload the page$/
      */
     public function reload() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->reload();
     }
 
@@ -110,6 +114,7 @@ class behat_general extends behat_base {
      * @Given /^I wait to be redirected$/
      */
     public function i_wait_to_be_redirected() {
+        \behat_hooks::set_step_readonly(false);
 
         // Xpath and processes based on core_renderer::redirect_message(), core_renderer::$metarefreshtag and
         // moodle_page::$periodicrefreshdelay possible values.
@@ -162,6 +167,9 @@ class behat_general extends behat_base {
      * @param string $iframename
      */
     public function switch_to_iframe($iframename) {
+        \behat_hooks::set_step_readonly(false);
+
+        $this->wait_for_pending_js();
 
         // We spin to give time to the iframe to be loaded.
         // Using extended timeout as we don't know about which
@@ -184,6 +192,7 @@ class behat_general extends behat_base {
      * @Given /^I switch to the main frame$/
      */
     public function switch_to_the_main_frame() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->switchToIFrame();
     }
 
@@ -194,17 +203,12 @@ class behat_general extends behat_base {
      * @param string $windowname
      */
     public function switch_to_window($windowname) {
-        // In Behat, some browsers (e.g. Chrome) are unable to switch to a
-        // window without a name, and by default the main browser window does
-        // not have a name. To work-around this, when we switch away from an
-        // unnamed window (presumably the main window) to some other named
-        // window, then we first set the main window name to a conventional
-        // value that we can later use this name to switch back.
-        $this->getSession()->executeScript(
-                'if (window.name == "") window.name = "' . self::MAIN_WINDOW_NAME . '"');
+        \behat_hooks::set_step_readonly(false);
 
         // Totara: do not rely on tags, force browser restart here!
         behat_hooks::$forcerestart = true;
+
+        $this->wait_for_pending_js();
 
         // Totara: this sleep is mega super important, if we do not do it Chrome may get stuck randomly!
         sleep(1);
@@ -218,6 +222,9 @@ class behat_general extends behat_base {
      * @Given /^I switch to the main window$/
      */
     public function switch_to_the_main_window() {
+        \behat_hooks::set_step_readonly(false);
+
+        $this->wait_for_pending_js();
         $this->getSession()->switchToWindow(self::MAIN_WINDOW_NAME);
     }
 
@@ -226,6 +233,7 @@ class behat_general extends behat_base {
      * @Given /^I accept the currently displayed dialog$/
      */
     public function accept_currently_displayed_alert_dialog() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
     }
 
@@ -234,6 +242,7 @@ class behat_general extends behat_base {
      * @Given /^I dismiss the currently displayed dialog$/
      */
     public function dismiss_currently_displayed_alert_dialog() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->getDriver()->getWebDriverSession()->dismiss_alert();
     }
 
@@ -245,6 +254,7 @@ class behat_general extends behat_base {
      * @param string $link
      */
     public function click_link($link) {
+        \behat_hooks::set_step_readonly(false);
 
         $linknode = $this->find_link($link);
         $this->ensure_node_is_visible($linknode);
@@ -258,6 +268,8 @@ class behat_general extends behat_base {
      * @param int $seconds
      */
     public function i_wait_seconds($seconds) {
+        \behat_hooks::set_step_readonly(true);
+
         if ($this->running_javascript()) {
             $this->getSession()->wait($seconds * 1000, false);
         } else {
@@ -307,6 +319,7 @@ class behat_general extends behat_base {
      * @return void
      */
     public function wait_until_exists($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
         $this->ensure_element_exists($element, $selectortype);
     }
 
@@ -324,6 +337,7 @@ class behat_general extends behat_base {
      * @return void
      */
     public function wait_until_does_not_exists($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
         $this->ensure_element_does_not_exist($element, $selectortype);
     }
 
@@ -335,6 +349,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of what we look for
      */
     public function i_hover($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
 
         // Gets the node based on the requested selector type and locator.
         $node = $this->get_selected_node($selectortype, $element);
@@ -349,6 +364,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of what we look for
      */
     public function i_click_on($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
 
         // Gets the node based on the requested selector type and locator.
         $node = $this->get_selected_node($selectortype, $element);
@@ -364,6 +380,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of what we look for
      */
     public function i_take_focus_off_field($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new ExpectationException('Can\'t take focus off from "' . $element . '" in non-js mode', $this->getSession());
         }
@@ -415,6 +432,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of what we look for
      */
     public function i_click_on_confirming_the_dialogue($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
         $workaroundactive = $this->apply_confirm_workaround(true);
         $this->i_click_on($element, $selectortype);
         if ($workaroundactive) {
@@ -432,6 +450,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of what we look for
      */
     public function i_click_on_dismissing_the_dialogue($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
         $workaroundactive = $this->apply_confirm_workaround(false);
         $this->i_click_on($element, $selectortype);
         if ($workaroundactive) {
@@ -450,7 +469,7 @@ class behat_general extends behat_base {
      * @param string $nodeselectortype The type of selector where we look in
      */
     public function i_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype) {
-
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_node_in_container($selectortype, $element, $nodeselectortype, $nodeelement);
         $this->ensure_node_is_visible($node);
         $node->click();
@@ -468,6 +487,7 @@ class behat_general extends behat_base {
      * @param string $nodeselectortype The type of selector where we look in
      */
     public function i_click_on_in_the_confirming_the_dialogue($element, $selectortype, $nodeelement, $nodeselectortype) {
+        \behat_hooks::set_step_readonly(false);
         $workaroundactive = $this->apply_confirm_workaround(true);
         $node = $this->i_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype);
         if ($workaroundactive) {
@@ -488,6 +508,7 @@ class behat_general extends behat_base {
      * @param string $nodeselectortype The type of selector where we look in
      */
     public function i_click_on_in_the_dismissing_the_dialogue($element, $selectortype, $nodeelement, $nodeselectortype) {
+        \behat_hooks::set_step_readonly(false);
         $workaroundactive = $this->apply_confirm_workaround(false);
         $node = $this->i_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype);
         if ($workaroundactive) {
@@ -510,6 +531,7 @@ class behat_general extends behat_base {
      * @param string $containerselectortype
      */
     public function i_drag_and_i_drop_it_in($element, $selectortype, $containerelement, $containerselectortype) {
+        \behat_hooks::set_step_readonly(false);
 
         list($sourceselector, $sourcelocator) = $this->transform_selector($selectortype, $element);
         $sourcexpath = $this->getSession()->getSelectorsHandler()->selectorToXpath($sourceselector, $sourcelocator);
@@ -541,6 +563,7 @@ class behat_general extends behat_base {
      * @return void
      */
     public function should_be_visible($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Visible checks are disabled in scenarios without Javascript support');
@@ -568,6 +591,7 @@ class behat_general extends behat_base {
      * @return void
      */
     public function should_not_be_visible($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         try {
             $this->should_be_visible($element, $selectortype);
@@ -591,6 +615,7 @@ class behat_general extends behat_base {
      * @param string $nodeselectortype The type of selector where we look in
      */
     public function in_the_should_be_visible($element, $selectortype, $nodeelement, $nodeselectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Visible checks are disabled in scenarios without Javascript support');
@@ -622,6 +647,7 @@ class behat_general extends behat_base {
      * @param string $nodeselectortype The type of selector where we look in
      */
     public function in_the_should_not_be_visible($element, $selectortype, $nodeelement, $nodeselectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         try {
             $this->in_the_should_be_visible($element, $selectortype, $nodeelement, $nodeselectortype);
@@ -644,6 +670,7 @@ class behat_general extends behat_base {
      * @param string $formatstring
      */
     public function i_should_see_date_formatted($datestring, $formatstring) {
+        \behat_hooks::set_step_readonly(true);
 
         // NOTE: forget strtotime(), it seems very buggy when used with time zones.
 
@@ -680,6 +707,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of element where we are looking in.
      */
     public function i_should_see_date_formatted_in_the($datestring, $formatstring, $element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // NOTE: forget strtotime(), it seems very buggy when used with time zones.
 
@@ -713,6 +741,7 @@ class behat_general extends behat_base {
      * @param string $text
      */
     public function assert_page_contains_text($text) {
+        \behat_hooks::set_step_readonly(true);
 
         // Looking for all the matching nodes without any other descendant matching the
         // same xpath (we are using contains(., ....).
@@ -765,6 +794,7 @@ class behat_general extends behat_base {
      * @param string $text
      */
     public function assert_page_not_contains_text($text) {
+        \behat_hooks::set_step_readonly(true);
 
         // Looking for all the matching nodes without any other descendant matching the
         // same xpath (we are using contains(., ....).
@@ -827,6 +857,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of element where we are looking in.
      */
     public function assert_element_contains_text($text, $element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // Getting the container where the text should be found.
         $container = $this->get_selected_node($selectortype, $element);
@@ -881,6 +912,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of element where we are looking in.
      */
     public function assert_element_not_contains_text($text, $element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // Getting the container where the text should be found.
         $container = $this->get_selected_node($selectortype, $element);
@@ -937,6 +969,7 @@ class behat_general extends behat_base {
      * @param string $postselectortype The selector type of the latest element
      */
     public function should_appear_before($preelement, $preselectortype, $postelement, $postselectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // We allow postselectortype as a non-text based selector.
         list($preselector, $prelocator) = $this->transform_selector($preselectortype, $preelement);
@@ -964,6 +997,7 @@ class behat_general extends behat_base {
      * @param string $preselectortype The locator of the preceding element
      */
     public function should_appear_after($postelement, $postselectortype, $preelement, $preselectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // We allow postselectortype as a non-text based selector.
         list($postselector, $postlocator) = $this->transform_selector($postselectortype, $postelement);
@@ -989,6 +1023,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of element where we are looking in.
      */
     public function the_element_should_be_disabled($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // Transforming from steps definitions selector/locator format to Mink format and getting the NodeElement.
         $node = $this->get_selected_node($selectortype, $element);
@@ -1007,6 +1042,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of where we look
      */
     public function the_element_should_be_enabled($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // Transforming from steps definitions selector/locator format to mink format and getting the NodeElement.
         $node = $this->get_selected_node($selectortype, $element);
@@ -1025,6 +1061,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of element where we are looking in.
      */
     public function the_element_should_be_readonly($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
         // Transforming from steps definitions selector/locator format to Mink format and getting the NodeElement.
         $node = $this->get_selected_node($selectortype, $element);
 
@@ -1042,6 +1079,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of element where we are looking in.
      */
     public function the_element_should_not_be_readonly($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
         // Transforming from steps definitions selector/locator format to Mink format and getting the NodeElement.
         $node = $this->get_selected_node($selectortype, $element);
 
@@ -1061,6 +1099,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The selector type
      */
     public function should_exist($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // Getting Mink selector and locator.
         list($selector, $locator) = $this->transform_selector($selectortype, $element);
@@ -1080,6 +1119,7 @@ class behat_general extends behat_base {
      * @param string $selectortype The selector type
      */
     public function should_not_exist($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // Getting Mink selector and locator.
         list($selector, $locator) = $this->transform_selector($selectortype, $element);
@@ -1117,6 +1157,7 @@ class behat_general extends behat_base {
      * @Given /^I trigger cron$/
      */
     public function i_trigger_cron() {
+        \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/admin/cron.php'));
     }
 
@@ -1134,6 +1175,8 @@ class behat_general extends behat_base {
      * @throws DriverException
      */
     public function i_run_all_adhoc_tasks() {
+        \behat_hooks::set_step_readonly(false);
+
         // Do setup for cron task.
         cron_setup_user();
 
@@ -1170,6 +1213,7 @@ class behat_general extends behat_base {
      * @param string $containerselectortype The container locator
      */
     public function should_exist_in_the($element, $selectortype, $containerelement, $containerselectortype) {
+        \behat_hooks::set_step_readonly(true);
         // Get the container node.
         $containernode = $this->get_selected_node($containerselectortype, $containerelement);
 
@@ -1196,6 +1240,7 @@ class behat_general extends behat_base {
      * @param string $containerselectortype The container locator
      */
     public function should_not_exist_in_the($element, $selectortype, $containerelement, $containerselectortype) {
+        \behat_hooks::set_step_readonly(true);
 
         // Get the container node; here we throw an exception
         // if the container node does not exist.
@@ -1230,6 +1275,7 @@ class behat_general extends behat_base {
      * @param string $windowsize size of the window (small|medium|large|wxh).
      */
     public function i_change_window_size_to($windowviewport, $windowsize) {
+        \behat_hooks::set_step_readonly(false);
         $this->resize_window($windowsize, $windowviewport === 'viewport');
     }
 
@@ -1244,6 +1290,7 @@ class behat_general extends behat_base {
      * @param string $text Expected substring
      */
     public function the_attribute_of_should_contain($attribute, $element, $selectortype, $text) {
+        \behat_hooks::set_step_readonly(true);
         // Get the container node (exception if it doesn't exist).
         $containernode = $this->get_selected_node($selectortype, $element);
         $value = $containernode->getAttribute($attribute);
@@ -1268,6 +1315,7 @@ class behat_general extends behat_base {
      * @param string $text Expected substring
      */
     public function the_attribute_of_should_not_contain($attribute, $element, $selectortype, $text) {
+        \behat_hooks::set_step_readonly(true);
         // Get the container node (exception if it doesn't exist).
         $containernode = $this->get_selected_node($selectortype, $element);
         $value = $containernode->getAttribute($attribute);
@@ -1292,6 +1340,7 @@ class behat_general extends behat_base {
      * @param string $value text to check.
      */
     public function row_column_of_table_should_contain($row, $column, $table, $value) {
+        \behat_hooks::set_step_readonly(true);
         $tablenode = $this->get_selected_node('table', $table);
         $tablexpath = $tablenode->getXpath();
 
@@ -1350,6 +1399,7 @@ class behat_general extends behat_base {
      * @param string $value text to check.
      */
     public function row_column_of_table_should_not_contain($row, $column, $table, $value) {
+        \behat_hooks::set_step_readonly(true);
         try {
             $this->row_column_of_table_should_contain($row, $column, $table, $value);
         } catch (ElementNotFoundException $e) {
@@ -1379,6 +1429,7 @@ class behat_general extends behat_base {
      *        | Value 1 | Value 2 | Value 3|
      */
     public function following_should_exist_in_the_table($table, TableNode $data) {
+        \behat_hooks::set_step_readonly(true);
         $datahash = $data->getHash();
 
         foreach ($datahash as $row) {
@@ -1405,6 +1456,7 @@ class behat_general extends behat_base {
      *        | Value 1 | Value 2 | Value 3|
      */
     public function following_should_not_exist_in_the_table($table, TableNode $data) {
+        \behat_hooks::set_step_readonly(true);
         $datahash = $data->getHash();
 
         foreach ($datahash as $value) {
@@ -1434,6 +1486,7 @@ class behat_general extends behat_base {
      * @return string the content of the downloaded file.
      */
     public function download_file_from_link($link) {
+        \behat_hooks::set_step_readonly(false);
         // Find the link.
         $linknode = $this->find_link($link);
         $this->ensure_node_is_visible($linknode);
@@ -1466,6 +1519,7 @@ class behat_general extends behat_base {
      * @param number $expectedsize the expected file size in bytes.
      */
     public function following_should_download_bytes($link, $expectedsize) {
+        \behat_hooks::set_step_readonly(false);
         $exception = new ExpectationException('Error while downloading data from ' . $link, $this->getSession());
 
         // It will stop spinning once file is downloaded or time out.
@@ -1503,6 +1557,7 @@ class behat_general extends behat_base {
      * @param number $maxexpectedsize the maximum expected file size in bytes.
      */
     public function following_should_download_between_and_bytes($link, $minexpectedsize, $maxexpectedsize) {
+        \behat_hooks::set_step_readonly(false);
         // If the minimum is greater than the maximum then swap the values.
         if ((int)$minexpectedsize > (int)$maxexpectedsize) {
             list($minexpectedsize, $maxexpectedsize) = array($maxexpectedsize, $minexpectedsize);
@@ -1537,6 +1592,7 @@ class behat_general extends behat_base {
      * @Given /^I start watching to see if a new page loads$/
      */
     public function i_start_watching_to_see_if_a_new_page_loads() {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new DriverException('Page load detection requires JavaScript.');
         }
@@ -1566,6 +1622,7 @@ class behat_general extends behat_base {
      * @Given /^a new page should have loaded since I started watching$/
      */
     public function a_new_page_should_have_loaded_since_i_started_watching() {
+        \behat_hooks::set_step_readonly(false);
         $session = $this->getSession();
 
         // Make sure page load tracking was started.
@@ -1593,6 +1650,7 @@ class behat_general extends behat_base {
      * @Given /^a new page should not have loaded since I started watching$/
      */
     public function a_new_page_should_not_have_loaded_since_i_started_watching() {
+        \behat_hooks::set_step_readonly(false);
         $session = $this->getSession();
 
         // Make sure page load tracking was started.
@@ -1628,6 +1686,7 @@ class behat_general extends behat_base {
      */
     public function i_pause_scenario_executon() {
         global $CFG;
+        \behat_hooks::set_step_readonly(true);
 
         $posixexists = function_exists('posix_isatty');
 
@@ -1658,6 +1717,7 @@ class behat_general extends behat_base {
      * @throws ExpectationException
      */
     public function i_press_in_the_browser($button) {
+        \behat_hooks::set_step_readonly(false);
         $session = $this->getSession();
 
         if ($button == 'back') {
@@ -1683,6 +1743,7 @@ class behat_general extends behat_base {
      * @throws ExpectationException
      */
     public function i_press_key_in_element($key, $element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new DriverException('Key down step is not available with Javascript disabled');
         }
@@ -1717,6 +1778,7 @@ class behat_general extends behat_base {
      * @throws ExpectationException
      */
     public function i_post_tab_key_in_element($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new DriverException('Tab press step is not available with Javascript disabled');
         }

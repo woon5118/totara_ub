@@ -52,6 +52,7 @@ class behat_forms extends behat_base {
      * @returns array
      */
     public function press_button($button) {
+        \behat_hooks::set_step_readonly(false);
         // Totara: use alias to "I click on" because we need to wait for page to load.
         $this->execute('behat_general::i_click_on', array($button, 'button'));
     }
@@ -64,6 +65,7 @@ class behat_forms extends behat_base {
      * @param string $button
      */
     public function press_button_and_switch_to_main_window($button) {
+        \behat_hooks::set_step_readonly(false);
         // Ensures the button is present, before pressing.
         $buttonnode = $this->find_button($button);
         // Focus on button to ensure it is in viewport, before pressing it.
@@ -85,6 +87,7 @@ class behat_forms extends behat_base {
      * @param TableNode $data
      */
     public function i_set_the_following_fields_to_these_values(TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         // Expand all fields in case we have.
         $this->expand_all_fields();
@@ -102,6 +105,7 @@ class behat_forms extends behat_base {
      * @Given /^I expand all fieldsets$/
      */
     public function i_expand_all_fieldsets() {
+        \behat_hooks::set_step_readonly(false);
         $this->expand_all_fields();
     }
 
@@ -130,6 +134,7 @@ class behat_forms extends behat_base {
                 "[not(contains(concat(' ', @class, ' '), ' collapse-all '))]";
             $collapseexpandlink = $this->find('xpath', $xpath, false, false, self::REDUCED_TIMEOUT);
             $collapseexpandlink->click();
+            \behat_hooks::set_step_readonly(false);
 
         } catch (ElementNotFoundException $e) {
             // The behat_base::find() method throws an exception if there are no elements,
@@ -155,6 +160,7 @@ class behat_forms extends behat_base {
             $iterations = count($showmores);
             for ($i = 0; $i < $iterations; $i++) {
                 $showmores[0]->click();
+                \behat_hooks::set_step_readonly(false);
             }
 
         } catch (ElementNotFoundException $e) {
@@ -173,6 +179,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function i_set_the_field_to_local_url($field, $path) {
+        \behat_hooks::set_step_readonly(false);
         global $CFG;
         $this->set_field_value($field, $CFG->wwwroot . $path);
     }
@@ -189,6 +196,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function i_set_the_field_to($field, $value) {
+        \behat_hooks::set_step_readonly(false);
         $this->set_field_value($field, $value);
     }
 
@@ -205,6 +213,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function i_press_key_in_the_field($key, $field) {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new DriverException('Key press step is not available with Javascript disabled');
         }
@@ -230,6 +239,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function i_set_the_field_to_multiline($field, PyStringNode $value) {
+        \behat_hooks::set_step_readonly(false);
         $this->set_field_value($field, (string)$value);
     }
 
@@ -243,6 +253,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function i_set_the_field_with_xpath_to($fieldxpath, $value) {
+        \behat_hooks::set_step_readonly(false);
         $fieldnode = $this->find('xpath', $fieldxpath);
         $this->ensure_node_is_visible($fieldnode);
         $field = behat_field_manager::get_form_field($fieldnode, $this->getSession());
@@ -259,6 +270,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function the_field_matches_value($field, $value) {
+        \behat_hooks::set_step_readonly(true);
 
         // Get the field.
         $formfield = behat_field_manager::get_form_field_from_label($field, $this);
@@ -284,6 +296,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function the_field_does_not_match_value($field, $value) {
+        \behat_hooks::set_step_readonly(true);
 
         // Get the field.
         $formfield = behat_field_manager::get_form_field_from_label($field, $this);
@@ -308,6 +321,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function the_field_with_xpath_matches_value($fieldxpath, $value) {
+        \behat_hooks::set_step_readonly(true);
 
         // Get the field.
         $fieldnode = $this->find('xpath', $fieldxpath);
@@ -334,6 +348,7 @@ class behat_forms extends behat_base {
      * @return void
      */
     public function the_field_with_xpath_does_not_match_value($fieldxpath, $value) {
+        \behat_hooks::set_step_readonly(true);
 
         // Get the field.
         $fieldnode = $this->find('xpath', $fieldxpath);
@@ -356,6 +371,7 @@ class behat_forms extends behat_base {
      * @param TableNode $data Pairs of | field | value |
      */
     public function the_following_fields_match_these_values(TableNode $data) {
+        \behat_hooks::set_step_readonly(true);
 
         // Expand all fields in case we have.
         $this->expand_all_fields();
@@ -376,6 +392,7 @@ class behat_forms extends behat_base {
      * @param TableNode $data Pairs of | field | value |
      */
     public function the_following_fields_do_not_match_these_values(TableNode $data) {
+        \behat_hooks::set_step_readonly(true);
 
         // Expand all fields in case we have.
         $this->expand_all_fields();
@@ -399,6 +416,7 @@ class behat_forms extends behat_base {
      *                       values if multiple. Commas in multiple values escaped with backslash.
      */
     public function the_select_box_should_contain($select, $option) {
+        \behat_hooks::set_step_readonly(true);
 
         $selectnode = $this->find_field($select);
         $multiple = $selectnode->hasAttribute('multiple');
@@ -443,6 +461,7 @@ class behat_forms extends behat_base {
      *                       values if multiple. Commas in multiple values escaped with backslash.
      */
     public function the_select_box_should_not_contain($select, $option) {
+        \behat_hooks::set_step_readonly(true);
 
         $selectnode = $this->find_field($select);
         $multiple = $selectnode->hasAttribute('multiple');
@@ -500,6 +519,7 @@ class behat_forms extends behat_base {
      * @When I search for :arg1 in the :arg2 autocomplete
      */
     public function i_search_for_in_the_autocomplete($text, $inputlabel) {
+        \behat_hooks::set_step_readonly(false);
         /** @var behat_form_autocomplete $field */
         $field = behat_field_manager::get_form_field_from_label($inputlabel, $this);
         $field->search_value($text);
@@ -511,6 +531,7 @@ class behat_forms extends behat_base {
      * @Given /^I select "(?P<singleselect_option_string>(?:[^"]|\\")*)" from the "(?P<singleselect_name_string>(?:[^"]|\\")*)" singleselect$/
      */
     public function i_select_from_the_singleselect($option, $singleselect) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute('behat_forms::i_set_the_field_to', array($this->escape($singleselect), $this->escape($option)));
 

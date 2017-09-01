@@ -181,6 +181,7 @@ class behat_facetoface extends behat_base {
      * @Given /^I click on the link "([^"]*)" in row (\d+)$/
      */
     public function i_click_on_the_link_in_row($text, $row) {
+        \behat_hooks::set_step_readonly(false);
         $xpath = "//table//tbody//tr[{$row}]//a[text()='{$text}']";
         $node = $this->find(
             'xpath',
@@ -196,6 +197,7 @@ class behat_facetoface extends behat_base {
      * @Given /^I use magic to set Seminar "([^"]*)" to send capacity notification two days ahead$/
      */
     public function i_use_magic_to_set_seminar_cutoff_one_day_back($facetofacename) {
+        \behat_hooks::set_step_readonly(false);
         global $DB;
 
         $facetoface = $DB->get_record('facetoface', array('name' => $facetofacename), '*', MUST_EXIST);
@@ -211,6 +213,7 @@ class behat_facetoface extends behat_base {
      * @Given /^I make duplicates of seminar notification "([^"]*)"$/
      */
     public function i_make_duplicates_of_seminar_notification($title) {
+        \behat_hooks::set_step_readonly(false);
         global $DB;
         $notifications = $DB->get_records('facetoface_notification', array('title' => $title));
         foreach ($notifications as $note) {
@@ -229,6 +232,7 @@ class behat_facetoface extends behat_base {
      * @param string $should
      */
     public function a_seminar_custom_room_called_should_exist($roomname, $should) {
+        \behat_hooks::set_step_readonly(true);
         global $DB;
 
         $params = array(
@@ -257,6 +261,7 @@ class behat_facetoface extends behat_base {
      * @param string $should
      */
     public function a_seminar_custom_asset_called_should_exist($assetname, $should) {
+        \behat_hooks::set_step_readonly(true);
         global $DB;
 
         $params = array(
@@ -283,6 +288,7 @@ class behat_facetoface extends behat_base {
      * @param int $row
      */
     public function i_click_to_edit_the_facetoface_session_in_row($term, $row) {
+        \behat_hooks::set_step_readonly(false);
         $summaryliteral = behat_context_helper::escape(get_string('previoussessionslist', 'facetoface'));
         $titleliteral = behat_context_helper::escape(get_string('editsession', 'facetoface'));
         $xpath = "//table[@summary={$summaryliteral}]/tbody/tr[{$row}]//a/span[@title={$titleliteral}]/parent::a";
@@ -303,6 +309,7 @@ class behat_facetoface extends behat_base {
      * @param int $position
      */
     public function i_click_to_edit_the_seminar_event_date_at_position($position) {
+        \behat_hooks::set_step_readonly(false);
         $titleliteral = behat_context_helper::escape(get_string('editdate', 'facetoface'));
         $xpath = "//table[contains(@class, 'f2fmanagedates')]/tbody/tr[{$position}]//a/span[@title={$titleliteral}]/parent::a";
         /** @var \Behat\Mink\Element\NodeElement[] $nodes */

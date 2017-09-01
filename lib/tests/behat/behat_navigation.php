@@ -102,6 +102,7 @@ class behat_navigation extends behat_base {
      * @return bool
      */
     public function navigation_node_should_be_expandable($nodetext) {
+        \behat_hooks::set_step_readonly(true);
         if (!$this->running_javascript()) {
             // Nodes are only expandable when JavaScript is enabled.
             return false;
@@ -126,6 +127,7 @@ class behat_navigation extends behat_base {
      * @return bool
      */
     public function navigation_node_should_not_be_expandable($nodetext) {
+        \behat_hooks::set_step_readonly(true);
         if (!$this->running_javascript()) {
             // Nodes are only expandable when JavaScript is enabled.
             return false;
@@ -147,6 +149,7 @@ class behat_navigation extends behat_base {
      * @param string $nodetext
      */
     public function i_follow_in_the_user_menu($nodetext) {
+        \behat_hooks::set_step_readonly(false);
 
         if ($this->running_javascript()) {
             // The user menu must be expanded when JS is enabled.
@@ -172,6 +175,7 @@ class behat_navigation extends behat_base {
      * @return bool|void
      */
     public function i_expand_node($nodetext) {
+        \behat_hooks::set_step_readonly(false);
 
         // This step is useless with Javascript disabled as Moodle auto expands
         // all of tree's nodes; adding this because of scenarios that shares the
@@ -205,6 +209,7 @@ class behat_navigation extends behat_base {
      * @return bool|void
      */
     public function i_collapse_node($nodetext) {
+        \behat_hooks::set_step_readonly(false);
 
         // No collapsible nodes with non-JS browsers.
         if (!$this->running_javascript()) {
@@ -233,6 +238,8 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function i_navigate_to_node_in($nodetext, $parentnodes) {
+        \behat_hooks::set_step_readonly(false);
+
         // This step needs to be deprecated and replaced with one of:
         // - I navigate to "PATH" in current page administration
         // - I navigate to "PATH" in site administration
@@ -335,6 +342,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function i_switch_to_tab($nodetext) {
+        \behat_hooks::set_step_readonly(false);
         $xpath = "//*[contains(concat(' ', normalize-space(@class), ' '), ' tabtree ') or contains(concat(' ', normalize-space(@class), ' '), ' nav-tabs ')]" .
                 "//a[normalize-space(.)='" . $nodetext . "']";
         $nodetoclick = $this->find('xpath', $xpath);
@@ -431,6 +439,7 @@ class behat_navigation extends behat_base {
      * @Given /^I expand navigation bar$/
      */
     public function get_expand_navbar_step() {
+        \behat_hooks::set_step_readonly(false);
 
         // Checking if we need to click the navbar button to show the navigation menu, it
         // is hidden by default when using clean theme and a medium or small screen size.
@@ -464,6 +473,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function i_navigate_to_in_current_page_administration($nodetext) {
+        \behat_hooks::set_step_readonly(false);
         $parentnodes = array_map('trim', explode('>', $nodetext));
         // Find the name of the first category of the administration block tree.
         $xpath = '//div[contains(@class,\'block_settings\')]//div[@id=\'settingsnav\']/ul/li[1]/p[1]/span[2]'; // Totara: we have extra span from flex icons
@@ -485,6 +495,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function should_exist_in_current_page_administration($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
         $parentnodes = array_map('trim', explode('>', $element));
         // Find the name of the first category of the administration block tree.
         $xpath = '//div[contains(@class,\'block_settings\')]//div[@id=\'settingsnav\']/ul/li[1]/p[1]/span[2]'; // Totara: we have extra span from flex icons
@@ -510,6 +521,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function should_not_exist_in_current_page_administration($element, $selectortype) {
+        \behat_hooks::set_step_readonly(true);
         $parentnodes = array_map('trim', explode('>', $element));
         // Find the name of the first category of the administration block tree.
         $xpath = '//div[contains(@class,\'block_settings\')]//div[@id=\'settingsnav\']/ul/li[1]/p[1]/span[2]'; // Totara: we have extra span from flex icons
@@ -533,6 +545,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function i_navigate_to_in_site_administration($nodetext) {
+        \behat_hooks::set_step_readonly(false);
         $parentnodes = array_map('trim', explode('>', $nodetext));
         array_unshift($parentnodes, get_string('administrationsite'));
         $lastnode = array_pop($parentnodes);
@@ -547,6 +560,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function i_open_my_profile_in_edit_mode() {
+        \behat_hooks::set_step_readonly(false);
         // Skodak: Moodle developers are crazy, there is no way you could use $USER or has_capability() here!
 
         $this->execute('behat_navigation::i_follow_in_the_user_menu', array('Profile'));
@@ -562,6 +576,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function i_am_on_course_homepage($coursefullname) {
+        \behat_hooks::set_step_readonly(false);
         global $DB;
         $course = $DB->get_record("course", array("fullname" => $coursefullname), 'id', MUST_EXIST);
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);
@@ -577,6 +592,7 @@ class behat_navigation extends behat_base {
      * @return void
      */
     public function i_am_on_course_homepage_with_editing_mode_on($coursefullname) {
+        \behat_hooks::set_step_readonly(false);
         global $DB;
         $course = $DB->get_record("course", array("fullname" => $coursefullname), 'id', MUST_EXIST);
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);

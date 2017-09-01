@@ -38,6 +38,7 @@ class behat_totara_appraisal extends behat_base {
      * @param string    $page page number
      */
     public function create_appraisal_questions_on_page($numberofquestions, $page) {
+        \behat_hooks::set_step_readonly(false);
         global $DB;
 
         /** @var totara_appraisal_generator $datagenerator */
@@ -60,6 +61,8 @@ class behat_totara_appraisal extends behat_base {
      * @param string    $fieldname the field name
      */
     public function i_add_all_appraisal_message_placeholders_to_fieldname($fieldname) {
+        \behat_hooks::set_step_readonly(false);
+
         $placholdertext = '';
         foreach (appraisal_message::$placeholders as $placeholder) {
             $placholdertext .=  $placeholder . ': ['. $placeholder . ']' . PHP_EOL;

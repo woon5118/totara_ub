@@ -47,6 +47,7 @@ class behat_permissions extends behat_base {
      * @param TableNode $table
      */
     public function i_set_the_following_system_permissions_of_role($rolename, $table) {
+        \behat_hooks::set_step_readonly(false);
 
         $parentnodes = get_string('administrationsite') . ' > ' .
             get_string('users', 'admin') . ' > ' .
@@ -73,6 +74,7 @@ class behat_permissions extends behat_base {
      * @param TableNode $table
      */
     public function i_override_the_system_permissions_of_role_with($rolename, $table) {
+        \behat_hooks::set_step_readonly(false);
 
         // We don't know the number of overrides so we have to get it to match the option contents.
         $roleoption = $this->find('xpath', '//select[@name="roleid"]/option[contains(.,"' . $this->escape($rolename) . '")]');
@@ -97,6 +99,7 @@ class behat_permissions extends behat_base {
      * @return void
      */
     public function i_fill_the_capabilities_form_with_the_following_permissions($table) {
+        \behat_hooks::set_step_readonly(false);
 
         // Ensure we are using the advanced view.
         // Wrapped in a try/catch to capture the exception and continue execution, we don't know if advanced mode was already enabled.
@@ -155,6 +158,7 @@ class behat_permissions extends behat_base {
      * @return void
      */
     public function capability_has_permission($capabilityname, $permission) {
+        \behat_hooks::set_step_readonly(false);
 
         // We already know the name, so we just need the value.
         $radioxpath = "//table[contains(@class,'rolecap')]/descendant::input[@type='radio']" .
@@ -194,6 +198,7 @@ class behat_permissions extends behat_base {
      * @return void Executes other steps
      */
     public function i_define_the_allowed_role_assignments_for_a_role_as($rolename, $table) {
+        \behat_hooks::set_step_readonly(false);
         $parentnodes = get_string('administrationsite') . ' > ' .
             get_string('users', 'admin') . ' > ' .
             get_string('permissions', 'role');
@@ -226,6 +231,7 @@ class behat_permissions extends behat_base {
      * @return void
      */
     public function i_fill_in_the_allowed_role_assignments_form_for_a_role_with($sourcerole, $table) {
+        \behat_hooks::set_step_readonly(false);
         foreach ($table->getRows() as $key => $row) {
             list($targetrole, $allowed) = $row;
 

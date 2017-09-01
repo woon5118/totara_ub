@@ -187,6 +187,7 @@ class behat_data_generators extends behat_base {
      * @param TableNode $data
      */
     public function the_following_exist($elementname, TableNode $data) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
 
         // Now that we need them require the data generators.
         require_once(__DIR__ . '/../../testing/generator/lib.php');

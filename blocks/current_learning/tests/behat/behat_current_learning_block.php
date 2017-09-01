@@ -32,6 +32,7 @@ class behat_current_learning_block extends behat_base {
      * @Given /^I toggle "([^"]*)" in the current learning block$/
      */
     public function i_toggle_item_in_current_learning_block($program) {
+        \behat_hooks::set_step_readonly(false);
         $program_xpath = behat_context_helper::escape($program);
         $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
         $row = $this->find(

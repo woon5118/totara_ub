@@ -49,6 +49,7 @@ class behat_question_base extends behat_base {
      * @param TableNode $questiondata The data to fill the question type form
      */
     protected function finish_adding_question($questiontypename, TableNode $questiondata) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute('behat_forms::i_set_the_field_to', array($this->escape($questiontypename), 1));
         $this->execute("behat_general::i_click_on", array('.submitbutton', "css_element"));

@@ -44,6 +44,7 @@ class behat_auth extends behat_base {
      * @Given /^I log in as "(?P<username_string>(?:[^"]|\\")*)"$/
      */
     public function i_log_in_as($username) {
+        \behat_hooks::set_step_readonly(false);
         // Visit login page.
         $this->getSession()->visit($this->locate_path('login/index.php'));
 
@@ -61,6 +62,7 @@ class behat_auth extends behat_base {
      * @Given /^I log out$/
      */
     public function i_log_out() {
+        \behat_hooks::set_step_readonly(false);
 
         // Wait for page to be loaded.
         $this->wait_for_pending_js();

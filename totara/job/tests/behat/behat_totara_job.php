@@ -47,6 +47,7 @@ class behat_totara_job extends behat_base {
      * @param int $count
      */
     public function there_should_be_x_totara_job_assignments($count) {
+        \behat_hooks::set_step_readonly(true);
 
         // Note we don't use $this->find here - we should never ever need spin here.
         // If content becomes dynamic THEN we may need to convert this to spin, but lets try avoid it first.
@@ -68,6 +69,8 @@ class behat_totara_job extends behat_base {
      * @param string $fullname
      */
     public function job_assignment_at_position_X_should_be($position, $fullname) {
+        \behat_hooks::set_step_readonly(true);
+
         // Note we don't use $this->find here - we should never ever need spin here.
         // If content becomes dynamic THEN we may need to convert this to spin, but lets try avoid it first.
         $elementxpath = '(//*[contains(@class, \'totara-job-management-listing\')]/*/li)['.(string)(int)$position.']';
@@ -95,6 +98,7 @@ class behat_totara_job extends behat_base {
      * @param string $direction Either 'up' or 'down'
      */
     public function i_move_job_assignment($fullname, $direction) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Moving job assignments requires JavaScript');
@@ -138,6 +142,7 @@ class behat_totara_job extends behat_base {
      * @param string $fullname
      */
     public function i_click_the_delete_icon_for_the_job_assignment($fullname) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$this->running_javascript()) {
             throw new \Behat\Mink\Exception\DriverException('Deleting job assignments requires JavaScript');
@@ -176,6 +181,7 @@ class behat_totara_job extends behat_base {
      * @param string $not
      */
     public function i_should_be_able_to_delete_the_totara_job_assignment($not, $fullname) {
+        \behat_hooks::set_step_readonly(true);
 
         $not = ($not === 'should not');
 
@@ -207,6 +213,7 @@ class behat_totara_job extends behat_base {
      * @param string $not
      */
     public function i_should_be_able_to_sort_the_totara_job_assignment($not, $fullname) {
+        \behat_hooks::set_step_readonly(true);
 
         $not = ($not === 'should not');
 

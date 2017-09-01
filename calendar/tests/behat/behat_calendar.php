@@ -45,6 +45,7 @@ class behat_calendar extends behat_base {
      * @param TableNode $data
      */
     public function i_create_a_calendar_event_with_form_data($data) {
+        \behat_hooks::set_step_readonly(false);
         // Go to current month page.
         //$this->execute("behat_totara_core::i_click_on_in_the_totara_menu", get_string('dashboard', 'totara_dashboard'));
         $this->execute("behat_general::click_link", get_string('monththis', 'calendar'));
@@ -60,6 +61,7 @@ class behat_calendar extends behat_base {
      * @param TableNode $data
      */
     public function i_create_a_calendar_event($data) {
+        \behat_hooks::set_step_readonly(false);
         // Get the event name.
         $eventname = $data->getRow(1);
         $eventname = $eventname[1];
@@ -86,6 +88,7 @@ class behat_calendar extends behat_base {
      * @param int $day The day of the current month
      */
     public function i_hover_over_day_of_this_month_in_calendar($day) {
+        \behat_hooks::set_step_readonly(false);
         $summarytitle = get_string('calendarheading', 'calendar', userdate(time(), get_string('strftimemonthyear')));
         // The current month table.
         $currentmonth = "table[contains(concat(' ', normalize-space(@summary), ' '), ' {$summarytitle} ')]";
@@ -107,6 +110,7 @@ class behat_calendar extends behat_base {
      * @Given /^I hover over today in the calendar$/
      */
     public function i_hover_over_today_in_the_calendar() {
+        \behat_hooks::set_step_readonly(false);
         // For window's compatibility, using %d and not %e.
         $todaysday = trim(strftime('%d'));
         $todaysday = ltrim($todaysday, '0');

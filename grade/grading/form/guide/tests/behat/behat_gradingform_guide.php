@@ -57,6 +57,7 @@ class behat_gradingform_guide extends behat_base {
      * @param TableNode $guide
      */
     public function i_define_the_following_marking_guide(TableNode $guide) {
+        \behat_hooks::set_step_readonly(false);
         $steptableinfo = '| Criterion name | Description for students | Description for markers | Maximum score |';
 
         if ($criteria = $guide->getHash()) {
@@ -112,6 +113,7 @@ class behat_gradingform_guide extends behat_base {
      * @param TableNode $commentstable
      */
     public function i_define_the_following_frequently_used_comments(TableNode $commentstable) {
+        \behat_hooks::set_step_readonly(false);
         $steptableinfo = '| Comment |';
 
         if ($comments = $commentstable->getRows()) {
@@ -153,6 +155,7 @@ class behat_gradingform_guide extends behat_base {
      * @return void
      */
     public function i_grade_by_filling_the_marking_guide_with(TableNode $guide) {
+        \behat_hooks::set_step_readonly(false);
 
         $criteria = $guide->getRowsHash();
 
@@ -202,6 +205,7 @@ class behat_gradingform_guide extends behat_base {
      * @return void
      */
     protected function set_guide_field_value($name, $value, $visible = false) {
+        \behat_hooks::set_step_readonly(false);
         // Fields are hidden by default.
         if ($this->running_javascript() && $visible === false) {
             $xpath = "//*[@name='$name']/following-sibling::*[contains(concat(' ', normalize-space(@class), ' '), ' plainvalue ')]";

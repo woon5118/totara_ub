@@ -47,6 +47,7 @@ class behat_course extends behat_base {
      * @Given /^I turn editing mode on$/
      */
     public function i_turn_editing_mode_on() {
+        \behat_hooks::set_step_readonly(false);
 
         try {
             $this->execute("behat_forms::press_button", get_string('turneditingon'));
@@ -60,6 +61,7 @@ class behat_course extends behat_base {
      * @Given /^I turn editing mode off$/
      */
     public function i_turn_editing_mode_off() {
+        \behat_hooks::set_step_readonly(false);
 
         try {
             $this->execute("behat_forms::press_button", get_string('turneditingoff'));
@@ -75,6 +77,7 @@ class behat_course extends behat_base {
      * @param TableNode $table The course data
      */
     public function i_create_a_course_with(TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
 
         // Go to course management page.
         $this->i_go_to_the_courses_management_page();
@@ -134,6 +137,7 @@ class behat_course extends behat_base {
      * @Given /^I go to the courses management page$/
      */
     public function i_go_to_the_courses_management_page() {
+        \behat_hooks::set_step_readonly(false);
 
         $parentnodes = get_string('administrationsite') . ' > ' . get_string('courses', 'admin');
 
@@ -156,6 +160,7 @@ class behat_course extends behat_base {
      * @param TableNode $data The activity field/value data
      */
     public function i_add_to_section_and_i_fill_the_form_with($activity, $section, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         // Add activity to section.
         $this->execute("behat_course::i_add_to_section",
@@ -181,6 +186,7 @@ class behat_course extends behat_base {
      * @param int $section
      */
     public function i_add_to_section($activity, $section) {
+        \behat_hooks::set_step_readonly(false);
 
         if ($this->getSession()->getPage()->find('css', 'body#page-site-index') && (int)$section <= 1) {
             // We are on the frontpage.
@@ -239,6 +245,7 @@ class behat_course extends behat_base {
      * @param string $sectionnumber
      */
     public function i_open_section_edit_menu($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new DriverException('Section edit menu not available when Javascript is disabled');
         }
@@ -263,6 +270,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber The section number
      */
     public function i_delete_section($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
         // Ensures the section exists.
         $xpath = $this->section_exists($sectionnumber);
 
@@ -293,6 +301,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber The section number
      */
     public function i_turn_section_highlighting_on($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
 
         // Ensures the section exists.
         $xpath = $this->section_exists($sectionnumber);
@@ -315,6 +324,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber The section number
      */
     public function i_turn_section_highlighting_off($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
 
         // Ensures the section exists.
         $xpath = $this->section_exists($sectionnumber);
@@ -337,6 +347,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function i_show_section($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
         $showlink = $this->show_section_icon_exists($sectionnumber);
 
         // Ensure section edit menu is open before interacting with it.
@@ -358,6 +369,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function i_hide_section($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
         $hidelink = $this->hide_section_icon_exists($sectionnumber);
 
         // Ensure section edit menu is open before interacting with it.
@@ -379,6 +391,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function i_edit_the_section($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
         // If javascript is on, link is inside a menu.
         if ($this->running_javascript()) {
             $this->i_open_section_edit_menu($sectionnumber);
@@ -407,6 +420,7 @@ class behat_course extends behat_base {
      * @param TableNode $data The activity field/value data
      */
     public function i_edit_the_section_and_i_fill_the_form_with($sectionnumber, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         // Edit given section.
         $this->execute("behat_course::i_edit_the_section", $sectionnumber);
@@ -426,6 +440,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber The section number
      */
     public function section_should_be_highlighted($sectionnumber) {
+        \behat_hooks::set_step_readonly(true);
         // Totara: is the section marked as current, make it work even when edit mode off!
         $xpath = "//li[@id='section-" . $sectionnumber . "' and contains(concat(' ', normalize-space(@class), ' '), ' current ')]";
         $exception = new ExpectationException('The "' . $sectionnumber . '" section is not highlighted', $this->getSession());
@@ -440,6 +455,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber The section number
      */
     public function section_should_not_be_highlighted($sectionnumber) {
+        \behat_hooks::set_step_readonly(true);
 
         // We only catch ExpectationException, ElementNotFoundException should be thrown if the specified section does not exist.
         try {
@@ -461,6 +477,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function section_should_be_hidden($sectionnumber) {
+        \behat_hooks::set_step_readonly(true);
 
         $sectionxpath = $this->section_exists($sectionnumber);
 
@@ -483,6 +500,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function section_activities_should_be_hidden($sectionnumber) {
+        \behat_hooks::set_step_readonly(true);
         $sectionxpath = $this->section_exists($sectionnumber);
 
         // Preventive in case there is any action in progress.
@@ -523,6 +541,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function section_should_be_visible($sectionnumber) {
+        \behat_hooks::set_step_readonly(true);
 
         $sectionxpath = $this->section_exists($sectionnumber);
 
@@ -551,6 +570,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function i_move_up_section($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
 
         if ($this->running_javascript()) {
             throw new DriverException('Move a section up step is not available with Javascript enabled');
@@ -577,6 +597,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber
      */
     public function i_move_down_section($sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
 
         if ($this->running_javascript()) {
             throw new DriverException('Move a section down step is not available with Javascript enabled');
@@ -603,6 +624,7 @@ class behat_course extends behat_base {
      * @throws ExpectationException
      */
     public function activity_should_be_visible($activityname) {
+        \behat_hooks::set_step_readonly(true);
 
         // The activity must exists and be visible.
         $activitynode = $this->get_activity_node($activityname);
@@ -633,6 +655,7 @@ class behat_course extends behat_base {
      * @throws ExpectationException
      */
     public function activity_should_be_hidden($activityname) {
+        \behat_hooks::set_step_readonly(true);
 
         if ($this->is_course_editor()) {
 
@@ -670,6 +693,7 @@ class behat_course extends behat_base {
      * @param int $sectionnumber The number of section
      */
     public function i_move_activity_to_section($activityname, $sectionnumber) {
+        \behat_hooks::set_step_readonly(false);
 
         // Ensure the destination is valid.
         $sectionxpath = $this->section_exists($sectionnumber);
@@ -709,6 +733,7 @@ class behat_course extends behat_base {
      * @param string $newactivityname
      */
     public function i_change_activity_name_to($activityname, $newactivityname) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Change activity name step is not available with Javascript disabled');
@@ -735,6 +760,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function i_open_actions_menu($activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Activities actions menu not available when Javascript is disabled');
@@ -761,6 +787,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function i_close_actions_menu($activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Activities actions menu not available when Javascript is disabled');
@@ -786,6 +813,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function actions_menu_should_be_open($activityname) {
+        \behat_hooks::set_step_readonly(true);
 
         if (!$this->running_javascript()) {
             throw new DriverException('Activities actions menu not available when Javascript is disabled');
@@ -806,6 +834,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function i_indent_right_activity($activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         $activity = $this->escape($activityname);
         if ($this->running_javascript()) {
@@ -825,6 +854,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function i_indent_left_activity($activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         $activity = $this->escape($activityname);
         if ($this->running_javascript()) {
@@ -844,6 +874,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function i_delete_activity($activityname) {
+        \behat_hooks::set_step_readonly(false);
         $steps = array();
         $activity = $this->escape($activityname);
         if ($this->running_javascript()) {
@@ -875,6 +906,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function i_duplicate_activity($activityname) {
+        \behat_hooks::set_step_readonly(false);
         $steps = array();
         $activity = $this->escape($activityname);
         if ($this->running_javascript()) {
@@ -894,6 +926,7 @@ class behat_course extends behat_base {
      * @param TableNode $data
      */
     public function i_duplicate_activity_editing_the_new_copy_with($activityname, TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
 
         $activity = $this->escape($activityname);
         $activityliteral = behat_context_helper::escape($activityname);
@@ -952,6 +985,7 @@ class behat_course extends behat_base {
      * @return void
      */
     public function i_wait_until_section_is_available($sectionnumber) {
+        \behat_hooks::set_step_readonly(true);
 
         // Looks for a hidden lightbox or a non-existent lightbox in that section.
         $sectionxpath = $this->section_exists($sectionnumber);
@@ -971,6 +1005,7 @@ class behat_course extends behat_base {
      * @param string $activityname
      */
     public function i_click_on_in_the_activity($element, $selectortype, $activityname) {
+        \behat_hooks::set_step_readonly(false);
         $element = $this->get_activity_element($element, $selectortype, $activityname);
         $element->click();
     }
@@ -1252,6 +1287,7 @@ class behat_course extends behat_base {
      * @param string $name
      */
     public function i_click_on_category_in_the_management_interface($name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_category_listing_node_by_name($name, true);
         $node->click();
     }
@@ -1263,6 +1299,7 @@ class behat_course extends behat_base {
      * @param string $name
      */
     public function i_click_on_course_in_the_management_interface($name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_course_listing_node_by_name($name, true);
         $node->click();
     }
@@ -1274,6 +1311,7 @@ class behat_course extends behat_base {
      * @param string $name
      */
     public function i_select_category_in_the_management_interface($name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_category_listing_node_by_name($name);
         $node = $node->findField('bcat[]');
         if (!$node->isChecked()) {
@@ -1288,6 +1326,7 @@ class behat_course extends behat_base {
      * @param string $name
      */
     public function i_unselect_category_in_the_management_interface($name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_category_listing_node_by_name($name);
         $node = $node->findField('bcat[]');
         if ($node->isChecked()) {
@@ -1302,6 +1341,7 @@ class behat_course extends behat_base {
      * @param string $name
      */
     public function i_select_course_in_the_management_interface($name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_course_listing_node_by_name($name);
         $node = $node->findField('bc[]');
         if (!$node->isChecked()) {
@@ -1316,6 +1356,7 @@ class behat_course extends behat_base {
      * @param string $name
      */
     public function i_unselect_course_in_the_management_interface($name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_course_listing_node_by_name($name);
         $node = $node->findField('bc[]');
         if ($node->isChecked()) {
@@ -1330,6 +1371,7 @@ class behat_course extends behat_base {
      * @param string $name
      */
     public function i_move_category_to_top_level_in_the_management_interface($name) {
+        \behat_hooks::set_step_readonly(false);
         $this->i_select_category_in_the_management_interface($name);
 
         $this->execute('behat_forms::i_set_the_field_to',
@@ -1349,6 +1391,7 @@ class behat_course extends behat_base {
      * @param string $catidnumber
      */
     public function i_should_see_category_as_subcategory_of_in_the_management_interface($subcatidnumber, $catidnumber) {
+        \behat_hooks::set_step_readonly(false);
         $categorynodeid = $this->get_category_id($catidnumber);
         $subcategoryid = $this->get_category_id($subcatidnumber);
         $exception = new ExpectationException('The category '.$subcatidnumber.' is not a subcategory of '.$catidnumber, $this->getSession());
@@ -1365,6 +1408,7 @@ class behat_course extends behat_base {
      * @param string $catidnumber
      */
     public function i_should_not_see_category_as_subcategory_of_in_the_management_interface($subcatidnumber, $catidnumber) {
+        \behat_hooks::set_step_readonly(false);
         try {
             $this->i_should_see_category_as_subcategory_of_in_the_management_interface($subcatidnumber, $catidnumber);
         } catch (ExpectationException $e) {
@@ -1381,6 +1425,7 @@ class behat_course extends behat_base {
      * @param string $idnumber
      */
     public function i_click_to_expand_category_in_the_management_interface($idnumber) {
+        \behat_hooks::set_step_readonly(false);
         $categorynode = $this->get_management_category_listing_node_by_idnumber($idnumber);
         $exception = new ExpectationException('Category "' . $idnumber . '" does not contain an expand or collapse toggle.', $this->getSession());
         $togglenode = $this->find('css', 'a[data-action=collapse],a[data-action=expand]', $exception, $categorynode);
@@ -1394,6 +1439,7 @@ class behat_course extends behat_base {
      * @param string $idnumber
      */
     public function category_in_management_listing_should_be_visible($idnumber) {
+        \behat_hooks::set_step_readonly(true);
         $id = $this->get_category_id($idnumber);
         $exception = new ExpectationException('The category '.$idnumber.' is not visible.', $this->getSession());
         $selector = sprintf('#category-listing .listitem-category[data-id="%d"][data-visible="1"]', $id);
@@ -1407,6 +1453,7 @@ class behat_course extends behat_base {
      * @param string $idnumber
      */
     public function category_in_management_listing_should_be_dimmed($idnumber) {
+        \behat_hooks::set_step_readonly(true);
         $id = $this->get_category_id($idnumber);
         $selector = sprintf('#category-listing .listitem-category[data-id="%d"][data-visible="0"]', $id);
         $exception = new ExpectationException('The category '.$idnumber.' is visible.', $this->getSession());
@@ -1420,6 +1467,7 @@ class behat_course extends behat_base {
      * @param string $idnumber
      */
     public function course_in_management_listing_should_be_visible($idnumber) {
+        \behat_hooks::set_step_readonly(true);
         $id = $this->get_course_id($idnumber);
         $exception = new ExpectationException('The course '.$idnumber.' is not visible.', $this->getSession());
         $selector = sprintf('#course-listing .listitem-course[data-id="%d"][data-visible="1"]', $id);
@@ -1433,6 +1481,7 @@ class behat_course extends behat_base {
      * @param string $idnumber
      */
     public function course_in_management_listing_should_be_dimmed($idnumber) {
+        \behat_hooks::set_step_readonly(true);
         $id = $this->get_course_id($idnumber);
         $exception = new ExpectationException('The course '.$idnumber.' is visible.', $this->getSession());
         $selector = sprintf('#course-listing .listitem-course[data-id="%d"][data-visible="0"]', $id);
@@ -1448,6 +1497,7 @@ class behat_course extends behat_base {
      * @param string $idnumber
      */
     public function i_toggle_visibility_of_course_in_management_listing($idnumber) {
+        \behat_hooks::set_step_readonly(false);
         $id = $this->get_course_id($idnumber);
         $selector = sprintf('#course-listing .listitem-course[data-id="%d"][data-visible]', $id);
         $node = $this->find('css', $selector);
@@ -1468,6 +1518,7 @@ class behat_course extends behat_base {
      * @Given /^I toggle visibility of category "(?P<idnumber_string>(?:[^"]|\\")*)" in management listing$/
      */
     public function i_toggle_visibility_of_category_in_management_listing($idnumber) {
+        \behat_hooks::set_step_readonly(false);
         $id = $this->get_category_id($idnumber);
         $selector = sprintf('#category-listing .listitem-category[data-id="%d"][data-visible]', $id);
         $node = $this->find('css', $selector);
@@ -1489,6 +1540,7 @@ class behat_course extends behat_base {
      * @param string $direction The direction to move in, either up or down
      */
     public function i_click_to_move_category_by_one($idnumber, $direction) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_category_listing_node_by_idnumber($idnumber);
         $this->user_moves_listing_by_one('category', $node, $direction);
     }
@@ -1502,6 +1554,7 @@ class behat_course extends behat_base {
      * @param string $direction The direction to move in, either up or down
      */
     public function i_click_to_move_course_by_one($idnumber, $direction) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_course_listing_node_by_idnumber($idnumber);
         $this->user_moves_listing_by_one('course', $node, $direction);
     }
@@ -1515,6 +1568,7 @@ class behat_course extends behat_base {
      * @param bool $highlight If set to false we don't check the node has been highlighted.
      */
     protected function user_moves_listing_by_one($listingtype, $listingnode, $direction, $highlight = true) {
+        \behat_hooks::set_step_readonly(false);
         $up = (strtolower($direction) === 'up');
         if ($up) {
             $exception = new ExpectationException($listingtype.' listing does not contain a moveup button.', $this->getSession());
@@ -1543,6 +1597,7 @@ class behat_course extends behat_base {
      * @throws ExpectationException When unable to find the more information node.
      */
     public function i_follow_the_more_information_icon_for_the_course($coursename) {
+        \behat_hooks::set_step_readonly(false);
         $nameliteral = behat_context_helper::escape($coursename);
         $xpath = "//div[contains(@class, 'coursebox')]//a[text()={$nameliteral}]/ancestor::div[contains(@class, 'info')]//a[@title='Summary']";
         $nodes = $this->getSession()->getDriver()->find($xpath);
@@ -1585,6 +1640,7 @@ class behat_course extends behat_base {
      * @throws ExpectationException
      */
     public function i_should_see_course_listing_before($preceedingcourse, $followingcourse) {
+        \behat_hooks::set_step_readonly(true);
         $xpath = "//div[@id='course-listing']//li[contains(concat(' ', @class, ' '), ' listitem-course ')]//a[text()='{$preceedingcourse}']/ancestor::li[@data-id]//following::a[text()='{$followingcourse}']";
         $msg = "{$preceedingcourse} course does not appear before {$followingcourse} course";
         if (!$this->getSession()->getDriver()->find($xpath)) {
@@ -1602,6 +1658,7 @@ class behat_course extends behat_base {
      * @throws ExpectationException
      */
     public function i_should_see_category_listing_before($preceedingcategory, $followingcategory) {
+        \behat_hooks::set_step_readonly(true);
         $xpath = "//div[@id='category-listing']//li[contains(concat(' ', @class, ' '), ' listitem-category ')]//a[text()='{$preceedingcategory}']/ancestor::li[@data-id]//following::a[text()='{$followingcategory}']";
         $msg = "{$preceedingcategory} category does not appear before {$followingcategory} category";
         if (!$this->getSession()->getDriver()->find($xpath)) {
@@ -1616,6 +1673,7 @@ class behat_course extends behat_base {
      * @param string $mode The mode to expected. One of 'Courses', 'Course categories' or 'Course categories and courses'
      */
     public function i_should_see_the_courses_management_page($mode) {
+        \behat_hooks::set_step_readonly(true);
         $this->execute("behat_general::assert_element_contains_text",
             array("Course and category management", "#region-main h2", "css_element")
         );
@@ -1648,6 +1706,7 @@ class behat_course extends behat_base {
      * @param string $mode The mode to expected. One of 'Courses', 'Course categories' or 'Course categories and courses'
      */
     public function i_should_see_the_courses_management_page_with_a_course_selected($mode) {
+        \behat_hooks::set_step_readonly(true);
         $this->execute("behat_general::assert_element_contains_text",
             array("Course and category management", "#region-main h2", "css_element"));
 
@@ -1681,6 +1740,7 @@ class behat_course extends behat_base {
      * @param string $name The name of the course as it is displayed in the management interface.
      */
     public function i_click_on_action_for_item_in_management_course_listing($action, $name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_course_listing_node_by_name($name);
         $this->user_clicks_on_management_listing_action('course', $node, $action);
     }
@@ -1694,6 +1754,7 @@ class behat_course extends behat_base {
      * @param string $name The name of the category as it is displayed in the management interface.
      */
     public function i_click_on_action_for_item_in_management_category_listing($action, $name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_category_listing_node_by_name($name);
         $this->user_clicks_on_management_listing_action('category', $node, $action);
     }
@@ -1706,6 +1767,7 @@ class behat_course extends behat_base {
      * @param string $categoryname
      */
     public function i_toggle_category_children_visibility_in_frontpage($categoryname) {
+        \behat_hooks::set_step_readonly(false);
 
         $headingtags = array();
         for ($i = 1; $i <= 6; $i++) {
@@ -1731,6 +1793,7 @@ class behat_course extends behat_base {
      * @throws Behat\Mink\Exception\ExpectationException
      */
     protected function user_clicks_on_management_listing_action($listingtype, $listingnode, $action) {
+        \behat_hooks::set_step_readonly(false);
         $actionsnode = $listingnode->find('xpath', "//*[contains(concat(' ', normalize-space(@class), ' '), '{$listingtype}-item-actions')]");
         if (!$actionsnode) {
             throw new ExpectationException("Could not find the actions for $listingtype", $this->getSession());
@@ -1753,6 +1816,7 @@ class behat_course extends behat_base {
      * @param string $name The name of the category to click.
      */
     public function i_click_on_category_in_the_management_category_listing($name) {
+        \behat_hooks::set_step_readonly(false);
         $node = $this->get_management_category_listing_node_by_name($name);
         $node->find('css', 'a.categoryname')->click();
     }
@@ -1763,6 +1827,7 @@ class behat_course extends behat_base {
      * @Given /^I navigate to course participants$/
      */
     public function i_navigate_to_course_participants() {
+        \behat_hooks::set_step_readonly(false);
         $coursestr = behat_context_helper::escape(get_string('courses'));
         $mycoursestr = behat_context_helper::escape(get_string('mycourses'));
         $xpath = "//div[contains(@class,'block')]//li[p/*[string(.)=$coursestr or string(.)=$mycoursestr]]";

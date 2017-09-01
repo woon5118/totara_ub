@@ -46,6 +46,7 @@ class behat_mod_choice extends behat_base {
      * @return array
      */
     public function I_choose_option_from_activity($option, $choiceactivity) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute("behat_general::click_link", $this->escape($choiceactivity));
 
@@ -64,6 +65,8 @@ class behat_mod_choice extends behat_base {
      * @return array
      */
     public function I_choose_options_from_activity($option, $choiceactivity) {
+        \behat_hooks::set_step_readonly(false);
+
         // Get Behat general and forms contexts.
         $behatgeneral = behat_context_helper::get('behat_general');
         $behatforms = behat_context_helper::get('behat_forms');

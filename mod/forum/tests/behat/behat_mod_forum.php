@@ -46,6 +46,7 @@ class behat_mod_forum extends behat_base {
      * @param TableNode $table
      */
     public function i_add_a_new_topic_to_forum_with($forumname, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
         $this->add_new_discussion($forumname, $table, get_string('addanewtopic', 'forum'));
     }
 
@@ -57,6 +58,7 @@ class behat_mod_forum extends behat_base {
      * @param TableNode $table
      */
     public function i_add_a_forum_discussion_to_forum_with($forumname, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
         $this->add_new_discussion($forumname, $table, get_string('addanewdiscussion', 'forum'));
     }
 
@@ -69,6 +71,7 @@ class behat_mod_forum extends behat_base {
      * @param TableNode $table
      */
     public function i_reply_post_from_forum_with($postsubject, $forumname, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
 
         // Navigate to forum.
         $this->execute('behat_general::click_link', $this->escape($forumname));
@@ -93,6 +96,7 @@ class behat_mod_forum extends behat_base {
      * @param string $buttonstr
      */
     protected function add_new_discussion($forumname, TableNode $table, $buttonstr) {
+        \behat_hooks::set_step_readonly(false);
 
         // Navigate to forum.
         $this->execute('behat_general::click_link', $this->escape($forumname));

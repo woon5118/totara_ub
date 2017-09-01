@@ -68,20 +68,26 @@ class behat_hooks extends behat_base {
     /** @var bool Totara: Force restart before the next scenario */
     public static $forcerestart = false;
 
+    /** @var bool is the current step read only? */
+    protected static $stepreadonly;
+
+    /** @var float timestemp of last step that was nor read only readonly */
+    protected static $laststepaction;
+
     /**
-     * @var Last browser session start time.
+     * @var int Last browser session start time.
      */
     protected static $lastbrowsersessionstart = 0;
 
     /**
-     * @var For actions that should only run once.
+     * @var bool For actions that should only run once.
      */
     protected static $initprocessesfinished = false;
 
     /**
      * If we are saving any kind of dump on failure we should use the same parent dir during a run.
      *
-     * @var The parent dir name
+     * @var string|bool The parent dir name
      */
     protected static $faildumpdirname = false;
 
@@ -248,6 +254,8 @@ class behat_hooks extends behat_base {
         global $CFG;
         self::error_log('Feature start: ' . $scope->getFeature()->getTitle() . ' # ' . $scope->getFeature()->getFile());
 
+        self::$laststepaction = microtime(true);
+
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -262,6 +270,12 @@ class behat_hooks extends behat_base {
      * @AfterFeature
      */
     public static function after_feature(AfterFeatureScope $scope) {
+        global $DB;
+        if ($DB->is_transaction_started()) {
+            // This should not happen, but if it does we must abort transaction to allow reset.
+            $DB->force_transaction_rollback();
+        }
+
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -480,37 +494,71 @@ class behat_hooks extends behat_base {
                 sleep(2);
                 $this->wait_for_pending_js();
             } catch (Exception $e) {
-                throw new Exception('Main JS page not initialied properly', 0, $e);
+                throw new Exception('Main JS page not initialised properly', 0, $e);
             }
+        }
+
+        try {
+            // In Behat, some browsers (e.g. Chrome) are unable to switch to a
+            // window without a name, and by default the main browser window does
+            // not have a name. To work-around this, when we switch away from an
+            // unnamed window (presumably the main window) to some other named
+            // window, then we first set the main window name to a conventional
+            // value that we can later use this name to switch back.
+            if ($this->running_javascript()) {
+                $session->executeScript('window.name = "' . behat_general::MAIN_WINDOW_NAME . '";');
+            }
+        } catch (Exception $e) {
+            throw new Exception('Cannot set main window name', 0, $e);
         }
     }
 
     /**
-     * Totara: nothing to do
+     * Executed before each step.
      *
      * @BeforeStep
      */
-    public function before_step_javascript(Behat\Behat\Hook\Scope\BeforeStepScope $scope) {
+    public function before_step(Behat\Behat\Hook\Scope\BeforeStepScope $scope) {
         // Totara: we do not know if the previous step failed or not,
-        //         doing JS stuff makes no sense, do it after the step when we know the result!
+        //         doing JS stuff here makes no sense, do it after the step when we know the result!
+
+        self::$stepreadonly = null;
     }
 
     /**
-     * Wait for JS to complete after finishing the step.
+     * To be called from step definition to indicate the type of step.
      *
-     * With this we ensure that there are not AJAX calls
-     * still in progress.
+     * This is used to eliminate unnecessary spinning and waiting.
      *
-     * Executed only when running against a real browser. We wrap it
-     * all in a try & catch to forward the exception to i_look_for_exceptions
-     * so the exception will be at scenario level, which causes a failure, by
-     * default would be at framework level, which will stop the execution of
-     * the run.
+     * @param bool $readonly
+     */
+    public static function set_step_readonly($readonly) {
+        if (self::$stepreadonly === false) {
+            // If called repeatedly the first false always wins.
+            return;
+        }
+        self::$stepreadonly = (bool)$readonly;
+    }
+
+    /**
+     * IS the current step marked as read-only?
+     *
+     * @return bool|null null means we do not know
+     */
+    public static function is_step_readonly() {
+        return self::$stepreadonly;
+    }
+
+    /**
+     * Executed after each step.
+     *
+     * When using real browser it waits for JS to complete after finishing the step.
+     * With this we ensure that there are not AJAX calls still in progress.
      *
      * @param AfterStepScope $scope scope passed by event fired after step..
      * @AfterStep
      */
-    public function after_step_javascript(AfterStepScope $scope) {
+    public function after_step(AfterStepScope $scope) {
         global $CFG, $DB;
 
         // If step is undefined then throw exception, to get failed exit code.
@@ -518,56 +566,6 @@ class behat_hooks extends behat_base {
             throw new coding_exception("Step '" . $scope->getStep()->getText() . "'' is undefined.");
         }
 
-        // Save the page content if the step failed.
-        if (!empty($CFG->behat_faildump_path) &&
-            $scope->getTestResult()->getResultCode() === Behat\Testwork\Tester\Result\TestResult::FAILED) {
-            $this->take_contentdump($scope);
-        }
-
-        // Abort any open transactions to prevent subsequent tests hanging.
-        // This does the same as abort_all_db_transactions(), but doesn't call error_log() as we don't
-        // want to see a message in the behat output.
-        if (($scope->getTestResult() instanceof \Behat\Behat\Tester\Result\ExecutedStepResult) &&
-            $scope->getTestResult()->hasException()) {
-            if ($DB && $DB->is_transaction_started()) {
-                $DB->force_transaction_rollback();
-            }
-        }
-
-        // Only run if JS.
-        if (!$this->running_javascript()) {
-            return;
-        }
-
-        // Save a screenshot if the step failed.
-        if (!empty($CFG->behat_faildump_path) &&
-            $scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::FAILED) {
-            $this->take_screenshot($scope);
-        }
-
-        // Totara: do not try to wait for anything here if not success, we are going to
-        //         restart the browser anyway to make sure there are no leftovers.
-        if ($scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::PASSED) {
-            try {
-                $this->wait_for_pending_js();
-            } catch (Exception $e) {
-                // If there is any problem the next step will fail
-                // and we will restart the browser afterwards.
-                // Do NOT close any alerts here, we want to know when stuff goes wrong!
-                behat_hooks::$forcerestart = true;
-            }
-        }
-    }
-
-    /**
-     * Executed after scenario having switch window to restart session.
-     * This is needed to close all extra browser windows and starting
-     * one browser window.
-     *
-     * @param AfterStepScope $scope Scope fired after step.
-     * @AfterStep
-     */
-    public function after_step(AfterStepScope $scope) {
         // Totara: better restart browser after any failure to prevent cascading problems.
         if ($scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::FAILED) {
             self::$forcerestart = true;
@@ -580,20 +578,60 @@ class behat_hooks extends behat_base {
                     self::error_log('Exception: ' . $ex->getMessage() . ' (' . get_class($ex) . ')');
                 }
             }
+
+            if (!empty($CFG->behat_faildump_path)) {
+                // Save the page content if the step failed.
+                $this->take_contentdump($scope);
+                if ($this->running_javascript()) {
+                    // Save a screenshot if the step failed.
+                    $this->take_screenshot($scope);
+                }
+            }
         }
+
+        // Totara: no transactions spanning steps!
+        // Abort any open transactions to prevent subsequent tests hanging.
+        // This does the same as abort_all_db_transactions(), but doesn't call error_log() as we don't
+        // want to see a message in the behat output.
+        if ($DB->is_transaction_started()) {
+            if ($scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::PASSED) {
+                self::error_log('Error invalid open transaction detected: ' . $scope->getStep()->getText() . ' # ' . $scope->getFeature()->getFile() . ':' .$scope->getStep()->getLine());
+            } else {
+                $DB->force_transaction_rollback();
+            }
+        }
+
+        // If this step is read-only we do not need to wait for JavaScript here.
+        if (self::is_step_readonly()) {
+            return;
+        }
+
+        // Totara: do not try to wait for anything here if not success, we are going to
+        //         restart the browser anyway to make sure there are no leftovers.
+        if ($this->running_javascript()
+            and $scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::PASSED) {
+
+            try {
+                $this->wait_for_pending_js();
+            } catch (Exception $e) {
+                // If there is any problem the next step will fail
+                // and we will restart the browser afterwards.
+                // Do NOT close any alerts here, we want to know when stuff goes wrong!
+                behat_hooks::$forcerestart = true;
+            }
+        }
+
+        // Restart the timer for tracking of last browser change.
+        self::$laststepaction = microtime(true);
     }
 
     /**
-     * Totara: nothing to do
-     * Executed after scenario having switch window to restart session.
-     * This is needed to close all extra browser windows and starting
-     * one browser window.
+     * How long from the last action that modified browser data?
      *
-     * @param AfterScenarioScope $scope scope passed by event fired after scenario.
-     * @AfterScenario @_switch_window
+     * @return float seconds
      */
-    public function after_scenario_switchwindow(AfterScenarioScope $scope) {
-        // Totara: let's use our own session restart tricks in the switch_to_window() step itself.
+    public static function get_time_since_action() {
+        return (microtime(true) - self::$laststepaction);
     }
 
     /**
@@ -614,7 +652,7 @@ class behat_hooks extends behat_base {
     protected function take_screenshot(AfterStepScope $scope) {
         // Goutte can't save screenshots.
         if (!$this->running_javascript()) {
-            return false;
+            return;
         }
 
         list ($dir, $filename) = $this->get_faildump_filename($scope, 'png');
@@ -662,6 +700,7 @@ class behat_hooks extends behat_base {
      *
      * @param AfterStepScope $scope scope passed by event after step.
      * @param String $filetype The file suffix to use. Limited to 4 chars.
+     * @return array directory and file name
      */
     protected function get_faildump_filename(AfterStepScope $scope, $filetype) {
         global $CFG;

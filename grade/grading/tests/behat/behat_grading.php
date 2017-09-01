@@ -46,6 +46,7 @@ class behat_grading extends behat_base {
      * @param string $activityname
      */
     public function i_go_to_advanced_grading_page($activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute('behat_general::click_link', $this->escape($activityname));
 
@@ -60,6 +61,7 @@ class behat_grading extends behat_base {
      * @param string $activityname
      */
     public function i_go_to_advanced_grading_definition_page($activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         // Transforming to literals, probably not necessary, just in case.
         $newactionliteral = behat_context_helper::escape(get_string("manageactionnew", "grading"));
@@ -81,6 +83,7 @@ class behat_grading extends behat_base {
      * @param string $activityname The activity name
      */
     public function i_go_to_activity_advanced_grading_page($userfullname, $activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         // Step to access the user grade page from the grading page.
         $gradetext = get_string('grade');
@@ -106,6 +109,7 @@ class behat_grading extends behat_base {
      * @param string $activityname
      */
     public function i_publish_grading_form_definition_as_a_public_template($activityname) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute('behat_grading::i_go_to_advanced_grading_page', $this->escape($activityname));
 
@@ -122,6 +126,7 @@ class behat_grading extends behat_base {
      * @param string $templatename
      */
     public function i_set_activity_to_use_grading_form($activityname, $templatename) {
+        \behat_hooks::set_step_readonly(false);
 
         $templateliteral = behat_context_helper::escape($templatename);
 
@@ -154,6 +159,7 @@ class behat_grading extends behat_base {
      * @When /^I save the advanced grading form$/
      */
     public function i_save_the_advanced_grading_form() {
+        \behat_hooks::set_step_readonly(false);
 
         $this->execute('behat_forms::press_button', get_string('savechanges'));
         $this->execute('behat_forms::press_button', 'Ok');
@@ -170,6 +176,8 @@ class behat_grading extends behat_base {
      * @param TableNode $data
      */
     public function i_complete_the_advanced_grading_form_with_these_values(TableNode $data) {
+        \behat_hooks::set_step_readonly(false);
+
         $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
         $this->execute('behat_grading::i_save_the_advanced_grading_form');
     }

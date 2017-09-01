@@ -46,6 +46,8 @@ class behat_mod_workshop extends behat_base {
      * @param string $workshopname
      */
     public function i_change_phase_in_workshop_to($workshopname, $phase) {
+        \behat_hooks::set_step_readonly(false);
+
         $workshopname = $this->escape($workshopname);
         $phaseliteral = behat_context_helper::escape($phase);
         $switchphase = behat_context_helper::escape(get_string('switchphase', 'workshop'));
@@ -69,6 +71,8 @@ class behat_mod_workshop extends behat_base {
      * @param TableNode $table data to fill the submission form with, must contain 'Title'
      */
     public function i_add_a_submission_in_workshop_as($workshopname, $table) {
+        \behat_hooks::set_step_readonly(false);
+
         $workshopname = $this->escape($workshopname);
         $savechanges = $this->escape(get_string('savechanges'));
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' ownsubmission ')]/descendant::*[@type='submit']";
@@ -90,6 +94,8 @@ class behat_mod_workshop extends behat_base {
      * @param TableNode $table data to fill the submission form with, must contain 'Title'
      */
     public function i_edit_assessment_form_in_workshop_as($workshopname, $table) {
+        \behat_hooks::set_step_readonly(false);
+
         $this->execute('behat_general::click_link', $workshopname);
 
         $this->execute('behat_navigation::i_navigate_to_in_current_page_administration',
@@ -109,6 +115,8 @@ class behat_mod_workshop extends behat_base {
      * @param TableNode $table
      */
     public function i_assess_submission_in_workshop_as($submission, $workshopname, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
+
         $workshopname = $this->escape($workshopname);
         $submissionliteral = behat_context_helper::escape($submission);
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' assessment-summary ') ".
@@ -136,6 +144,8 @@ class behat_mod_workshop extends behat_base {
      * @param string $reviewer
      */
     public function i_should_see_grade_for_workshop_participant_set_by_peer($grade, $participant, $reviewer) {
+        \behat_hooks::set_step_readonly(true);
+
         $participantliteral = behat_context_helper::escape($participant);
         $reviewerliteral = behat_context_helper::escape($reviewer);
         $gradeliteral = behat_context_helper::escape($grade);
@@ -166,6 +176,7 @@ class behat_mod_workshop extends behat_base {
      * @param string $value
      */
     public function i_set_portfolio_instance_to($portfolioinstance, $value) {
+        \behat_hooks::set_step_readonly(false);
 
         $rowxpath = "//table[contains(@class, 'generaltable')]//tr//td[contains(text(), '"
             . $portfolioinstance . "')]/following-sibling::td";

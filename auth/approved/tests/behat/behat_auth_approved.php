@@ -29,6 +29,7 @@ class behat_auth_approved extends behat_base {
      * @When /^I confirm self-registration request from email "([^"]*)"$/
      */
     public function confirm_request($email) {
+        \behat_hooks::set_step_readonly(false);
         global $DB;
         $request = $DB->get_record('auth_approved_request', array('email' => $email));
         $this->getSession()->visit($this->locate_path('auth/approved/confirm.php?token=' . $request->confirmtoken));

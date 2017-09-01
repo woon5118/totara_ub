@@ -308,6 +308,8 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         if (!$timeout) {
             $timeout = self::TIMEOUT;
         }
+        // Totara: No need to wait after the read actions where we know nothing changed.
+        $timeout = $timeout - \behat_hooks::get_time_since_action();
         if ($microsleep) {
             // Will sleep 1/10th of a second by default for self::TIMEOUT seconds.
             $loops = $timeout * 10;
@@ -325,16 +327,14 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         if (!$jsrunning) {
             $loops = 1;
         }
+        // No timeout means one loop only.
+        if ($timeout < 0) {
+            $loops = 1;
+        }
 
         for ($i = 0; $i < $loops; $i++) {
 
-            if ($jsrunning) {
-                // Spin will first check if there are any pending JS operations, if there are then wait for pending JS will sleep until
-                // operations are done before returning us to the spin operation.
-                // This should help performance in many situations as rather than execute costly find operations it will execute some
-                // cheap JS until we expect things to be ready.
-                $this->wait_for_pending_js();
-            }
+            // Totara: do not call wait_for_pending_js() here, we wait after each step that is not read only!
 
             // We catch the exception thrown by the step definition to execute it again.
             try {
@@ -351,6 +351,9 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 }
             }
             // Totara: run at least once, but then use the total time spent here for timeout calculation.
+            if ($loops == 1) {
+                break;
+            }
             if ($start + $timeout < time()) {
                 break;
             }
@@ -738,9 +741,6 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     /**
      * Waits for all the JS to be loaded.
      *
-     * @throws \Exception
-     * @throws NoSuchWindow
-     * @throws UnknownError
      * @return bool True or false depending whether all the JS is loaded or not.
      */
     public function wait_for_pending_js() {
@@ -851,19 +851,6 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     }
 
     /**
-     * Converts HTML tags to line breaks to display the info in CLI
-     *
-     * @param string $html
-     * @return string
-     */
-    protected function get_debug_text($html) {
-
-        // Replacing HTML tags for new lines and keeping only the text.
-        $notags = preg_replace('/<+\s*\/*\s*([A-Z][A-Z0-9]*)\b[^>]*\/*\s*>*/i', "\n", $html);
-        return preg_replace("/(\n)+/s", "\n", $notags);
-    }
-
-    /**
      * Helper function to execute api in a given context.
      *
      * @param string $contextapi context in which api is defined.
@@ -880,13 +867,12 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         $context = behat_context_helper::get($contextapi[0]);
         call_user_func_array(array($context, $contextapi[1]), $params);
 
-        // NOTE: Wait for pending js and look for exception are not optional, as this might lead to unexpected results.
-        // Don't make them optional for performance reasons.
+        // Wait for pending JS only if the current step is not read only.
+        if (!\behat_hooks::is_step_readonly()) {
+            $this->wait_for_pending_js();
+        }
 
-        // Wait for pending js.
-        $this->wait_for_pending_js();
-
-        // Look for exceptions.
+        // Look for exceptions, we do it here to stop execution if we find problems, this is a cheap operation.
         $this->look_for_exceptions();
     }
 

@@ -50,6 +50,8 @@ class behat_workshopallocation_manual extends behat_base {
      * @param string $participantname
      */
     public function i_add_a_reviewer_for_workshop_participant($reviewername, $participantname) {
+        \behat_hooks::set_step_readonly(false);
+
         $participantnameliteral = behat_context_helper::escape($participantname);
         $xpathtd = "//table[contains(concat(' ', normalize-space(@class), ' '), ' allocations ')]/".
                 "tbody/tr[./td[contains(concat(' ', normalize-space(@class), ' '), ' peer ')]".
@@ -88,6 +90,7 @@ class behat_workshopallocation_manual extends behat_base {
      * @param TableNode $table should have one column with title 'Reviewer' and another with title 'Participant' (or 'Reviewee')
      */
     public function i_allocate_submissions_in_workshop_as($workshopname, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
 
         $this->find_link($workshopname)->click();
         $this->execute('behat_navigation::i_navigate_to_in_current_page_administration', get_string('allocate', 'workshop'));

@@ -57,6 +57,8 @@ class behat_totara_hierarchy extends behat_base {
      * @throws Exception
      */
     public function the_following_frameworks_exist($prefix, TableNode $table) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
         $required = array(
             'idnumber'
         );
@@ -102,6 +104,8 @@ class behat_totara_hierarchy extends behat_base {
      * @throws Exception
      */
     public function the_following_hierarchy_exists($prefix, TableNode $table) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
         global $DB;
 
         $required = array(
@@ -177,6 +181,7 @@ class behat_totara_hierarchy extends behat_base {
      * @throws Exception
      */
     public function goal_scale_called_exists($scalename, TableNode $table) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
         global $USER, $DB;
 
         $required = array(
@@ -236,6 +241,7 @@ class behat_totara_hierarchy extends behat_base {
      * @throws coding_exception
      */
     public function the_following_job_assignments_exist(TableNode $table) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
         global $DB, $CFG;
 
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
@@ -388,6 +394,7 @@ class behat_totara_hierarchy extends behat_base {
      * @Then /^I should see these hierarchy items at the following depths:$/
      */
     public function iShouldSeeTheseHierarchyItemsAtTheFollowingDepths(TableNode $table) {
+        \behat_hooks::set_step_readonly(true);
         $data = $table->getRows();
 
         foreach ($data as $row => $columns) {
