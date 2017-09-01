@@ -89,12 +89,12 @@ class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
             }
         }
 
-        if (empty($totara_renderer)) {
-            $totara_renderer = $PAGE->get_renderer('totara_core');
+        if (empty(self::$totara_renderer)) {
+            self::$totara_renderer = $PAGE->get_renderer('totara_core');
         }
 
         // Get relevant progress bar and return for display.
-        return $totara_renderer->progressbar($percentage, 'medium', $isexport, $percentage . '%');
+        return self::$totara_renderer->progressbar($percentage, 'medium', $isexport, $percentage . '%');
     }
 
     /**

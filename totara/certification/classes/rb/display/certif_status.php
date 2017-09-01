@@ -48,25 +48,25 @@ class certif_status extends \totara_reportbuilder\rb\display\base {
             return get_string('na', 'totara_certification');
         }
 
-        $strstatus = '';
-        if (isset($CERTIFSTATUS[$value])) {
-            $unassigned = '';
-            if (!empty($extrafields->unassigned)) {
-                $unassigned = get_string('unassigned', 'rb_source_dp_certification');
-            }
+        $unassigned = '';
+        if (!empty($extrafields->unassigned)) {
+            $unassigned = get_string('unassigned', 'rb_source_dp_certification');
+        }
+
+        if (isset($value) && isset($CERTIFSTATUS[$value])) {
             switch ($value) {
                 case CERTIFSTATUS_ASSIGNED:
-                    $strstatus = get_string('notcertified', 'totara_certification') . ' ' . $unassigned;
-                    break;
+                    return get_string('notcertified', 'totara_certification') . ' ' . $unassigned;
                 case CERTIFSTATUS_COMPLETED:
-                    $strstatus = get_string('certified', 'totara_certification') . ' ' . $unassigned;
-                    break;
+                    return get_string('certified', 'totara_certification') . ' ' . $unassigned;
                 default:
-                    $strstatus = get_string($CERTIFSTATUS[$value], 'totara_certification') . ' ' . $unassigned;
-                    break;
+                    return get_string($CERTIFSTATUS[$value], 'totara_certification') . ' ' . $unassigned;
             }
+        } else if (isset($value)) {
+            return get_string('error:invalidstatus', 'totara_program'). ' ' . $unassigned;
+        } else {
+            return get_string('notassigned', 'totara_certification'). ' ' . $unassigned;
         }
-        return $strstatus;
     }
 
     /**
