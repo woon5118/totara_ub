@@ -412,7 +412,7 @@ function lti_get_resource_link_id(int $instanceid): string {
  * @return array                    Request details
  */
 function lti_build_request($instance, $typeconfig, $course, $typeid = null, $islti2 = false) {
-    global $USER, $COURSE, $CFG;
+    global $USER, $CFG;
 
     if (empty($instance->cmid)) {
         $instance->cmid = 0;
@@ -424,7 +424,6 @@ function lti_build_request($instance, $typeconfig, $course, $typeid = null, $isl
         'user_id' => $USER->id,
         'lis_person_sourcedid' => $USER->idnumber,
         'roles' => $role,
-        'groups' => implode(",", groups_get_user_groups($COURSE->id, $USER->id)[0]),
         'context_id' => $course->id,
         'context_label' => trim(html_to_text($course->shortname, 0)),
         'context_title' => trim(html_to_text($course->fullname, 0)),
@@ -1323,6 +1322,8 @@ function lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $islti2)
                             $value = str_replace('<br>' , ' ', $value);
                             $value = format_string($value);
                         }
+                    } else {
+                        $value = lti_calculate_custom_parameter($value1);
                     }
                 } else if ($islti2) {
                     $val = $value;
@@ -1339,6 +1340,23 @@ function lti_parse_custom_parameter($toolproxy, $tool, $params, $value, $islti2)
         }
     }
     return $value;
+}
+
+/**
+ * Calculates the value of a custom parameter that has not been specified earlier
+ *
+ * @param string    $value          Custom parameter value
+ *
+ * @return string Calculated value of custom parameter
+ */
+function lti_calculate_custom_parameter($value) {
+    global $USER, $COURSE;
+
+    switch ($value) {
+        case 'Moodle.Person.userGroupIds':
+            return implode(",", groups_get_user_groups($COURSE->id, $USER->id)[0]);
+    }
+    return null;
 }
 
 /**
@@ -2671,7 +2689,7 @@ function lti_get_capabilities() {
        'Membership.role' => 'roles',
        'Result.sourcedId' => 'lis_result_sourcedid',
        'Result.autocreate' => 'lis_outcome_service_url',
-       'Group.sourceId' => 'groups');
+       'Moodle.Person.userGroupIds' => null);
 
     return $capabilities;
 
