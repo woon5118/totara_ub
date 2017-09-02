@@ -41,14 +41,11 @@ Feature: Take attendance for a seminar with multiple sessions
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I fill seminar session with relative date in form data:
-      | sessiontimezone      | Europe/London |
-      | timestart[timezone]  | Europe/London |
       | timestart[day]       | -10           |
       | timestart[month]     | 0             |
       | timestart[year]      | 0             |
       | timestart[hour]      | 0             |
       | timestart[minute]    | -25           |
-      | timefinish[timezone] | Europe/London |
       | timefinish[day]      | -10           |
       | timefinish[month]    | 0             |
       | timefinish[year]     | 0             |
@@ -76,14 +73,11 @@ Feature: Take attendance for a seminar with multiple sessions
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I fill seminar session with relative date in form data:
-      | sessiontimezone      | Europe/London |
-      | timestart[timezone]  | Europe/London |
       | timestart[day]       | -40           |
       | timestart[month]     | 0             |
       | timestart[year]      | 0             |
       | timestart[hour]      | 0             |
       | timestart[minute]    | -30           |
-      | timefinish[timezone] | Europe/London |
       | timefinish[day]      | -40           |
       | timefinish[month]    | 0             |
       | timefinish[year]     | 0             |
@@ -173,7 +167,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Record of Learning" in the totara menu
     And I switch to "Certifications" tab
     # Due date (when it expired, -40 + 15).
-    And I should see date "-25 day Europe/London" formatted "%d %B %Y"
+    And I should see date "-25 day" formatted "%d %B %Y"
     And I should see "Overdue!" in the "Certification program fullname 101" "table_row"
     And I should see "Expired" in the "Certification program fullname 101" "table_row"
 
@@ -204,9 +198,9 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Record of Learning" in the totara menu
     And I switch to "Certifications" tab
     # Completion, window open and expiry.
-    And I should see date "-10 day Europe/London" formatted "%d %b %Y"
-    And I should see date "-5 day Europe/London" formatted "%d %b %Y"
-    And I should see date "5 day Europe/London" formatted "%d %b %Y"
+    And I should see date "-10 day" formatted "%d %b %Y"
+    And I should see date "-5 day" formatted "%d %b %Y"
+    And I should see date "5 day" formatted "%d %b %Y"
     And I should see "Certified" in the "Certification program fullname 101" "table_row"
     And I should see "Due for renewal" in the "Certification program fullname 101" "table_row"
     And I should see "Open" in the "Certification program fullname 101" "table_row"
@@ -237,9 +231,9 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Record of Learning" in the totara menu
     And I switch to "Certifications" tab
     # Completion, window open and expiry.
-    And I should see date "-10 day Europe/London" formatted "%d %b %Y"
-    And I should see date "-5 day Europe/London" formatted "%d %b %Y"
-    And I should see date "5 day Europe/London" formatted "%d %b %Y"
+    And I should see date "-10 day" formatted "%d %b %Y"
+    And I should see date "-5 day" formatted "%d %b %Y"
+    And I should see date "5 day" formatted "%d %b %Y"
     And I should see "Certified" in the "Certification program fullname 101" "table_row"
     And I should see "Due for renewal" in the "Certification program fullname 101" "table_row"
     And I should see "Open" in the "Certification program fullname 101" "table_row"
@@ -271,9 +265,9 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Record of Learning" in the totara menu
     And I switch to "Certifications" tab
     # Completion, window open and expiry.
-    And I should see date "-10 day Europe/London" formatted "%d %b %Y"
-    And I should see date "-5 day Europe/London" formatted "%d %b %Y"
-    And I should see date "5 day Europe/London" formatted "%d %b %Y"
+    And I should see date "-10 day" formatted "%d %b %Y"
+    And I should see date "-5 day" formatted "%d %b %Y"
+    And I should see date "5 day" formatted "%d %b %Y"
     And I should see "Due for renewal" in the "Certification program fullname 101" "table_row"
     And I should see "Open" in the "Certification program fullname 101" "table_row"
 
@@ -299,7 +293,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "user1"
     And I follow "course1"
     And I click on "More details" "link"
-    And I should see date "-10 day Europe/London" formatted "%d %B %Y"
+    And I should see date "-10 day" formatted "%d %B %Y"
 
     # Complete older session.
     And I log out
@@ -324,7 +318,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "user1"
     And I follow "course1"
     And I click on "More details" "link"
-    And I should see date "-10 day Europe/London" formatted "%d %B %Y"
+    And I should see date "-10 day" formatted "%d %B %Y"
 
     # Reset activity completion.
     And I log out
@@ -347,7 +341,7 @@ Feature: Take attendance for a seminar with multiple sessions
     When I run the "\core\task\completion_regular_task" task
     And I follow "course1"
     And I click on "More details" "link"
-    And I should see date "-10 day Europe/London" formatted "%d %B %Y"
+    And I should see date "-10 day" formatted "%d %B %Y"
 
   Scenario: Complete older, complete newer, see older completion date, reset activity completion, see newer completion date
     # Complete older session.
@@ -371,7 +365,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "user1"
     And I follow "course1"
     And I click on "More details" "link"
-    And I should see date "-40 day Europe/London" formatted "%d %B %Y"
+    And I should see date "-40 day" formatted "%d %B %Y"
 
     # Complete newer session.
     And I log out
@@ -396,7 +390,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "user1"
     And I follow "course1"
     And I click on "More details" "link"
-    And I should see date "-40 day Europe/London" formatted "%d %B %Y"
+    And I should see date "-40 day" formatted "%d %B %Y"
 
     # Reset activity completion.
     And I log out
@@ -419,7 +413,7 @@ Feature: Take attendance for a seminar with multiple sessions
     When I run the "\core\task\completion_regular_task" task
     And I follow "course1"
     And I click on "More details" "link"
-    And I should see date "-10 day Europe/London" formatted "%d %B %Y"
+    And I should see date "-10 day" formatted "%d %B %Y"
 
   Scenario: Take attendance with minimum permissions
     Given the following "users" exist:

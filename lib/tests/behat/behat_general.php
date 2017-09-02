@@ -644,8 +644,28 @@ class behat_general extends behat_base {
      * @param string $formatstring
      */
     public function i_should_see_date_formatted($datestring, $formatstring) {
-        $date = strtotime($datestring);
-        $text = userdate($date, $formatstring);
+
+        // NOTE: forget strtotime(), it seems very buggy when used with time zones.
+
+        $timezone = 'Australia/Perth';
+        foreach (\core_date::get_list_of_timezones() as $tz => $ignored) {
+            if (is_numeric($tz)) {
+                continue;
+            }
+            if (strpos($datestring, $tz) !== false) {
+                $timezone = $tz;
+                $datestring = str_replace($tz, '', $datestring);
+            }
+        }
+        $datestring = trim($datestring);
+
+        $date = new DateTime('now', new DateTimeZone($timezone));
+
+        if ($datestring !== 'today') {
+            $date->modify($datestring);
+        }
+
+        $text = userdate($date->getTimestamp(), $formatstring, $timezone);
         $this->assert_page_contains_text($text);
     }
 
@@ -660,8 +680,28 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of element where we are looking in.
      */
     public function i_should_see_date_formatted_in_the($datestring, $formatstring, $element, $selectortype) {
-        $date = strtotime($datestring);
-        $text = userdate($date, $formatstring);
+
+        // NOTE: forget strtotime(), it seems very buggy when used with time zones.
+
+        $timezone = 'Australia/Perth';
+        foreach (\core_date::get_list_of_timezones() as $tz => $ignored) {
+            if (is_numeric($tz)) {
+                continue;
+            }
+            if (strpos($datestring, $tz) !== false) {
+                $timezone = $tz;
+                $datestring = str_replace($tz, '', $datestring);
+            }
+        }
+        $datestring = trim($datestring);
+
+        $date = new DateTime('now', new DateTimeZone($timezone));
+
+        if ($datestring !== 'today' and $datestring !== '0 day') {
+            $date->modify($datestring);
+        }
+
+        $text = userdate($date->getTimestamp(), $formatstring, $timezone);
         $this->assert_element_contains_text($text, $element, $selectortype);
     }
 

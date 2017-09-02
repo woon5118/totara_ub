@@ -41,65 +41,86 @@ class behat_facetoface extends behat_base {
      * @param TableNode $data
      */
     public function i_fill_seminar_session_with_relative_date_in_form_data(TableNode $data) {
-
-        $behatformcontext = behat_context_helper::get('behat_forms');
-        $rowday = array();
-        $rows = array();
-        foreach ($data->getRows() as $row) {
-            $rows[] = $row;
-        }
-        $timestartday = '';
-        $timestartmonth = '';
-        $timestartyear = '';
-        $timestarthour = '';
-        $timestartmin = '';
         $timestartzone = '';
-        $timefinishday = '';
-        $timefinishmonth = '';
-        $timefinishyear = '';
-        $timefinishhour = '';
-        $timefinishmin = '';
         $timefinishzone = '';
 
+        $startmodify = array();
+        $finishmodify = array();
+
+        $rows = array();
         foreach ($data->getRows() as $row) {
             switch ($row[0]) {
                 case 'timestart[day]':
-                    $timestartday = (!empty($row[1]) ? $row[1] . ' days': '');
+                    if (!empty($row[1])) {
+                        $startmodify[] = $row[1] . ' days';
+                    }
                     break;
                 case 'timestart[month]':
-                    $timestartmonth = (!empty($row[1]) ? $row[1] . ' months': '');
+                    if (!empty($row[1])) {
+                        $startmodify[] = $row[1] . ' months';
+                    }
                     break;
                 case 'timestart[year]':
-                    $timestartyear = (!empty($row[1]) ? $row[1] . ' years' : '');
+                    if (!empty($row[1])) {
+                        $startmodify[] = $row[1] . ' years';
+                    }
                     break;
                 case 'timestart[hour]':
-                    $timestarthour = (!empty($row[1]) ? $row[1] . ' hours': '');
+                    if (!empty($row[1])) {
+                        $startmodify[] = $row[1] . ' hours';
+                    }
                     break;
                 case 'timestart[minute]':
-                    $timestartmin = (!empty($row[1]) ? $row[1] . ' minutes': '');
+                    if (!empty($row[1])) {
+                        $startmodify[] = $row[1] . ' minutes';
+                    }
                     break;
                 case 'timestart[timezone]':
-                    $timestartzone = (!empty($row[1]) ? $row[1] : '');
-                    $rows[] = $row;
+                    if (!empty($row[1])) {
+                        $timestartzone = $row[1];
+                    }
                     break;
                 case 'timefinish[day]':
-                    $timefinishday = (!empty($row[1]) ? $row[1]  . ' days': '');
+                    if (!empty($row[1])) {
+                        $finishmodify[] = $row[1] . ' days';
+                    }
                     break;
                 case 'timefinish[month]':
-                    $timefinishmonth = (!empty($row[1]) ? $row[1]  . ' months': '');
+                    if (!empty($row[1])) {
+                        $finishmodify[] = $row[1] . ' months';
+                    }
                     break;
                 case 'timefinish[year]':
-                    $timefinishyear = (!empty($row[1]) ? $row[1]  . ' years' : '');
+                    if (!empty($row[1])) {
+                        $finishmodify[] = $row[1] . ' years';
+                    }
                     break;
                 case 'timefinish[hour]':
-                    $timefinishhour = (!empty($row[1]) ? $row[1] . ' hours': '');
+                    if (!empty($row[1])) {
+                        $finishmodify[] = $row[1] . ' hours';
+                    }
                     break;
                 case 'timefinish[minute]':
-                    $timefinishmin = (!empty($row[1]) ? $row[1] . ' minutes': '');
+                    if (!empty($row[1])) {
+                        $finishmodify[] = $row[1] . ' minutes';
+                    }
                     break;
                 case 'timefinish[timezone]':
-                    $timefinishzone = (!empty($row[1]) ? $row[1] : '');
-                    $rows[] = $row;
+                    if (!empty($row[1])) {
+                        $timefinishzone = $row[1];
+                    }
+                    break;
+                case 'sessiontimezone':
+                    // Developers often forget to fill all timezones, so do it for them to get expected results.
+                    if (!empty($row[1])) {
+                        if (empty($timefinishzone)) {
+                            $timefinishzone = $row[1];
+                        }
+                        if (empty($timestartzone)) {
+                            $timestartzone = $row[1];
+                        }
+                        $rows[] = $row;
+                    }
                     break;
                 default:
                     $rows[] = $row;
@@ -107,60 +128,51 @@ class behat_facetoface extends behat_base {
             }
         }
 
-        $now = time();
-        $newdate = strtotime("{$timestartmonth} {$timestartday} {$timestartyear} {$timestarthour} {$timestartmin}" , $now) ;
-        $startdate = new DateTime(date('Y-m-d H:i' , $newdate));
-        if ($timestartzone !== '') {
-            new DateTime(date('Y-m-d H:i' , $newdate), new DateTimeZone($timestartzone));
+        // Timezones first!
+        if (!$timestartzone) {
+            $timestartzone = 'Australia/Perth'; // Behat default.
+        }
+        $rows[] = array('timestart[timezone]', $timestartzone);
+        if (!$timefinishzone) {
+            $timefinishzone = 'Australia/Perth'; // Behat default.
+        }
+        $rows[] = array('timefinish[timezone]', $timefinishzone);
+
+        $startdate = new DateTime('now', new DateTimeZone($timestartzone));
+        foreach ($startmodify as $modify) {
+            $startdate->modify($modify);
+        }
+        $mindiff = $startdate->format("i") % 5;
+        if ($mindiff != 0) {
+            $startdate->modify('+ ' . (5 - $mindiff) . ' minutes');
         }
 
-        // Values for the minutes field should be multiple of 5 (from 00 to 55). So we need to fix these values.
-        $startmin = $startdate->format("i");
-        $minutes = (($startmin % 5 ) !== 0) ? floor($startmin / 5) * 5 + 5 : ($startmin / 5) * 5;
-
-        if ($minutes > 55) {
-            $minutes = 0;
-            $startdate->add(new DateInterval('PT1H'));
+        $finishdate = new DateTime('now', new DateTimeZone($timefinishzone));
+        foreach ($finishmodify as $modify) {
+            $finishdate->modify($modify);
         }
-
-        $startdate->setTime($startdate->format('H'), $minutes);
-
-        $newdate = strtotime("{$timefinishmonth} {$timefinishday} {$timefinishyear} {$timefinishhour} {$timefinishmin}" , $now);
-        $finishdate = new DateTime(date('Y-m-d H:i' , $newdate));
-        if ($timefinishzone !== '') {
-            $finishdate = new DateTime(date('Y-m-d H:i' , $newdate), new DateTimeZone($timefinishzone));
+        $mindiff = $finishdate->format('i') % 5;
+        if ($mindiff != 0) {
+            $finishdate->modify('+ ' . (5 - $mindiff) . ' minutes');
         }
-
-        $finishmin = $finishdate->format('i');
-        $minutes = (($finishmin % 5 ) !== 0) ? floor($finishmin / 5) * 5 + 5 : ($finishmin / 5) * 5;
-        if ($minutes > 55) {
-            $minutes = 0;
-            $finishdate->add(new DateInterval('PT1H'));
-        }
-        $finishdate->setTime($finishdate->format('H'), $minutes);
 
         // Replace values for timestart.
-        $rowday[] = array('timestart[day]', (int) $startdate->format('d'));
-        $rows[] = array('timestart[month]', (int) $startdate->format('m'));
         $rows[] = array('timestart[day]', (int) $startdate->format('d'));
+        $rows[] = array('timestart[month]', (int) $startdate->format('m'));
         $rows[] = array('timestart[year]', (int) $startdate->format('Y'));
         $rows[] = array('timestart[hour]', (int) $startdate->format('H'));
         $rows[] = array('timestart[minute]', (int) $startdate->format('i'));
 
         // Replace values for timefinish.
-        $rowday[] = array('timefinish[day]', (int) $finishdate->format('d'));
-        $rows[] = array('timefinish[month]', (int) $finishdate->format('m'));
         $rows[] = array('timefinish[day]', (int) $finishdate->format('d'));
+        $rows[] = array('timefinish[month]', (int) $finishdate->format('m'));
         $rows[] = array('timefinish[year]', (int) $finishdate->format('Y'));
         $rows[] = array('timefinish[hour]', (int) $finishdate->format('H'));
         $rows[] = array('timefinish[minute]', (int) $finishdate->format('i'));
 
-        // Set the the rows back to data.
-        $dataclone = new TableNode($rows);
-        $dataday = new TableNode($rowday);
-
-        $behatformcontext->i_set_the_following_fields_to_these_values($dataday);
-        $behatformcontext->i_set_the_following_fields_to_these_values($dataclone);
+        /** @var behat_forms $behatformcontext */
+        $behatformcontext = behat_context_helper::get('behat_forms');
+        $behatformcontext->i_set_the_following_fields_to_these_values(new TableNode($rows));
     }
 
     /**
