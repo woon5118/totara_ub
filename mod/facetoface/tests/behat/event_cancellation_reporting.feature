@@ -97,6 +97,8 @@ Feature: Seminar event cancellation reporting
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_700: viewing “seminars: event attendees report”
     When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I set the field "report-name" to "Seminars: Event attendees"
+    And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: Event attendees"
     And I follow "View This Report"
     And I follow "To view the report, first select an event from the Number of Attendees column in the next report."

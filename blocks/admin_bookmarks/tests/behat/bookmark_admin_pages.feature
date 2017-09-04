@@ -41,6 +41,8 @@ Feature: Add a bookmarks to an admin pages
 
     # Sessions report
     And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I set the field "report-name" to "Seminars:"
+    And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: View and manage sessions"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
@@ -48,6 +50,8 @@ Feature: Add a bookmarks to an admin pages
 
     # Events report
     And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I set the field "report-name" to "Seminars:"
+    And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: View and manage events"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
@@ -55,6 +59,8 @@ Feature: Add a bookmarks to an admin pages
 
     # Rooms report
     And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I set the field "report-name" to "Seminars:"
+    And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: Manage rooms"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
@@ -62,6 +68,8 @@ Feature: Add a bookmarks to an admin pages
 
     # Assets report
     And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I set the field "report-name" to "Seminars:"
+    And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: Manage assets"
     And I follow "View This Report"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"

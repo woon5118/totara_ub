@@ -96,7 +96,7 @@ Scenario: Status and target date fields are shown in the Goal Custom Fields repo
 
   And I log out
   And I log in as "admin"
-  And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+  And I navigate to "Create report" node in "Site administration > Reports > Report builder"
   And I set the following fields to these values:
     | Report Name | Goal Custom Fields report |
     | Source      | Goal Custom Fields        |
