@@ -63,5 +63,50 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017081600, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2017090500) {
+        // Unset all Job Assignment settings from the user sources.
+        unset_config('fieldmapping_jobassignmentenddate', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_jobassignmentfullname', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_jobassignmentidnumber', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_jobassignmentstartdate', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_manageridnumber', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_managerjobassignmentidnumber', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_orgidnumber', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_posidnumber', 'totara_sync_source_user_csv');
+        unset_config('fieldmapping_appraiseridnumber', 'totara_sync_source_user_csv');
+
+        unset_config('import_jobassignmentenddate', 'totara_sync_source_user_csv');
+        unset_config('import_jobassignmentfullname', 'totara_sync_source_user_csv');
+        unset_config('import_jobassignmentidnumber', 'totara_sync_source_user_csv');
+        unset_config('import_jobassignmentstartdate', 'totara_sync_source_user_csv');
+        unset_config('import_manageridnumber', 'totara_sync_source_user_csv');
+        unset_config('import_managerjobassignmentidnumber', 'totara_sync_source_user_csv');
+        unset_config('import_orgidnumber', 'totara_sync_source_user_csv');
+        unset_config('import_posidnumber', 'totara_sync_source_user_csv');
+        unset_config('import_appraiseridnumber', 'totara_sync_source_user_csv');
+
+        unset_config('fieldmapping_jobassignmentenddate', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_jobassignmentfullname', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_jobassignmentidnumber', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_jobassignmentstartdate', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_manageridnumber', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_managerjobassignmentidnumber', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_orgidnumber', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_posidnumber', 'totara_sync_source_user_database');
+        unset_config('fieldmapping_appraiseridnumber', 'totara_sync_source_user_database');
+
+        unset_config('import_jobassignmentenddate', 'totara_sync_source_user_database');
+        unset_config('import_jobassignmentfullname', 'totara_sync_source_user_database');
+        unset_config('import_jobassignmentidnumber', 'totara_sync_source_user_database');
+        unset_config('import_jobassignmentstartdate', 'totara_sync_source_user_database');
+        unset_config('import_manageridnumber', 'totara_sync_source_user_database');
+        unset_config('import_managerjobassignmentidnumber', 'totara_sync_source_user_database');
+        unset_config('import_orgidnumber', 'totara_sync_source_user_database');
+        unset_config('import_posidnumber', 'totara_sync_source_user_database');
+        unset_config('import_appraiseridnumber', 'totara_sync_source_user_database');
+
+        upgrade_plugin_savepoint(true, 2017090500, 'tool', 'totara_sync');
+    }
+
     return true;
 }
