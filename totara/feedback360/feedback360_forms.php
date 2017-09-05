@@ -239,7 +239,7 @@ class feedback360_answer_form extends moodleform {
  * Formslib template for the edit feedback360 choose element
  */
 class feedback360_add_quest_form extends question_choose_element_form {
-    public function definition() {
+    public function definition($excludegroups = array(), $excludetypes = array()) {
         $this->prefix = 'feedback360';
         $feedback360id = $this->_customdata['feedback360id'];
 
@@ -621,7 +621,7 @@ class request_select_users extends moodleform {
         $data['emailnew'] = trim($data['emailnew']);
         $data['systemnew'] = trim(trim($data['systemnew']), ',');
 
-        $emails = !empty($data['emailnew']) ? explode("\r\n", $data['emailnew']) : null;
+        $emails = !empty($data['emailnew']) ? explode("\r\n", $data['emailnew']) : array();
         $system = explode(',', $data['systemnew']);
 
         // Check atleast one email/system.

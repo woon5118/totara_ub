@@ -389,7 +389,7 @@ class appraisal_stage_page_edit_form extends moodleform {
  */
 class appraisal_add_quest_form extends question_choose_element_form {
 
-    public function definition() {
+    public function definition($excludegroups = array(), $excludetypes = array()) {
         $this->prefix = 'appraisal';
         $mform = & $this->_form;
         $mform->disable_form_change_checker();
