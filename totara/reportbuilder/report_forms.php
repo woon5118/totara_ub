@@ -1369,7 +1369,7 @@ class report_builder_course_expand_form extends moodleform {
         $action = isset($this->_customdata['action']) ? $this->_customdata['action'] : '';
         $url = isset($this->_customdata['url']) ? $this->_customdata['url'] : '';
 
-        if (count($inlineenrolmentelements) > 0) {
+        if (!empty($inlineenrolmentelements)) {
             $notices = totara_get_notifications();
             $noticeshtml = '';
             foreach ($notices as $notice) {
