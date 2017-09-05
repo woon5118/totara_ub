@@ -240,7 +240,7 @@ foreach ($overrides as $override) {
 
 // Output the table and button.
 echo html_writer::start_tag('div', array('id' => 'quizoverrides'));
-if (count($table->data)) {
+if (!empty($table->data)) {
     echo html_writer::table($table);
 }
 if ($hasinactive) {
