@@ -481,6 +481,17 @@ M.course_dndupload = {
             progress: document.createElement('span')
         };
 
+        require(['jquery', 'core/templates'], function($, templatelib) {
+            templatelib.renderIcon('loading').done(function(html) {
+                resel.icon = $(html)[0];
+                resel.a.appendChild(resel.icon);
+
+                resel.namespan.className = 'instancename';
+                resel.namespan.innerHTML = name;
+                resel.a.appendChild(resel.namespan);
+            });
+        });
+
         resel.li.className = 'activity ' + module + ' modtype_' + module;
 
         resel.indentdiv.className = 'mod-indent';
@@ -491,14 +502,6 @@ M.course_dndupload = {
 
         resel.a.href = '#';
         resel.div.appendChild(resel.a);
-
-        resel.icon.src = M.util.image_url('i/ajaxloader');
-        resel.icon.className = 'activityicon iconlarge';
-        resel.a.appendChild(resel.icon);
-
-        resel.namespan.className = 'instancename';
-        resel.namespan.innerHTML = name;
-        resel.a.appendChild(resel.namespan);
 
         resel.groupingspan.className = 'groupinglabel';
         resel.div.appendChild(resel.groupingspan);
