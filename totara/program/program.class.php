@@ -1100,8 +1100,9 @@ class program {
         if (count($coursesets) == 1) {
             $courseset = reset($coursesets);
 
-            if (count($courseset->courses) == 1) {
-                return reset($courseset->courses);
+            $courses = $courseset->get_courses();
+            if (count($courses) == 1) {
+                return reset($courses);
             }
         }
 

@@ -59,9 +59,9 @@ Feature: The Certification Completion report displays correctly for a learner.
     Given I log in as "user001"
     When I click on "Dashboard" in the totara menu
     Then I should see "Test Certification" in the "Current Learning" "block"
-    When I toggle "Test Certification" in the current learning block
-    Then I should see "Certify Course" in "Test Certification" within the current learning block
-    And I should not see "Recertify Course" in "Test Certification" within the current learning block
+    When I follow "Test Certification"
+    Then I should see "Certify Course"
+    And I should not see "Recertify Course"
 
     #
     # Status: Assigned without due date.
@@ -113,9 +113,9 @@ Feature: The Certification Completion report displays correctly for a learner.
     And I run the "\totara_certification\task\update_certification_task" task
     And I click on "Dashboard" in the totara menu
     Then I should see "Test Certification" in the "Current Learning" "block"
-    When I toggle "Test Certification" in the current learning block
-    Then I should not see "Certify Course" in "Test Certification" within the current learning block
-    And I should see "Recertify Course" in "Test Certification" within the current learning block
+    And I follow "Test Certification"
+    Then I should not see "Certify Course"
+    And I should see "Recertify Course"
     When I click on "Reports" in the totara menu
     And I follow "Certification Completion Report"
     Then I should see "Test Certification" in the "fn_001 ln_001" "table_row"

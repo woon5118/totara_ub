@@ -78,8 +78,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -97,8 +95,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -133,8 +129,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     And I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -158,8 +152,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -196,8 +188,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner2"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -222,8 +212,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     And I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -247,8 +235,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -266,8 +252,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -302,8 +286,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     And I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -327,8 +309,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -365,8 +345,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "manager1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -391,8 +369,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     And I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -416,8 +392,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -435,8 +409,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -472,8 +444,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     And I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -497,8 +467,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -534,8 +502,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "manager1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -560,8 +526,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     And I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -587,8 +551,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -621,8 +583,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner2"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -647,8 +607,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     And I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -674,8 +632,6 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
 
@@ -729,7 +685,5 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I log in as "learner1"
     Then I should see "Test Program 1"
     When I follow "Test Program 1"
-    Then I should see "Course 1"
-    When I click on "Launch course" "button" in the "Course 1" "table_row"
     Then I should see "Topic 1"
     And I log out
