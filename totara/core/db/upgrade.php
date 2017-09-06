@@ -158,5 +158,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017082302, 'totara', 'core');
     }
 
+    if ($oldversion < 2017090600) {
+
+        // Define field synctimemodified to be added to job_assignment.
+        $table = new xmldb_table('job_assignment');
+        $field = new xmldb_field('synctimemodified', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0', 'totarasync');
+
+        // Conditionally launch add field synctimemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2017090600, 'totara', 'core');
+    }
+
     return true;
 }

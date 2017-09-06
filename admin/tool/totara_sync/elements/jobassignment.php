@@ -496,7 +496,8 @@ class totara_sync_element_jobassignment extends totara_sync_element {
                     ON s.idnumber=j.idnumber
                  WHERE s.idnumber IS NOT NULL
                    AND s.idnumber != ''
-                   AND s.timemodified = j.timemodified";
+                   AND s.timemodified != 0
+                   AND s.timemodified = j.synctimemodified";
         $latertimemodified = $DB->get_fieldset_sql($sql);
 
         // No need for logging here. At present, this is simply expected behaviour for
@@ -714,7 +715,7 @@ class totara_sync_element_jobassignment extends totara_sync_element {
      * @return string SQL for retrieving records that will be created/updated
      */
     private function build_syncdata_select_query($table) {
-        $select = array("SELECT s.id, s.idnumber, u.id AS userid, s.useridnumber");
+        $select = array("SELECT s.id, s.idnumber, u.id AS userid, s.useridnumber, s.timemodified AS synctimemodified");
         $from = array("FROM {" . $table . "} s
                  JOIN {user} u
                    ON s.useridnumber=u.idnumber

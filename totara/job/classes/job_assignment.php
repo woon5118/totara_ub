@@ -57,6 +57,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read int appraiserid             optional
  * @property-read int sortorder               automatic (set when job assignment is created, modified by functions)
  * @property-read int totarasync              optional (defaults to zero, should be set to 1 if updates via HR Import are desired)
+ * @property-read int synctimemodified        optional (defaults to zero, represents the last time this record was updated in the external source)
  *
  * @package totara_job
  */
@@ -210,6 +211,15 @@ class job_assignment {
     private $totarasync = 0;
 
     /**
+     * The last time this record was updated in the external source. This value should either come
+     * directly from the HR Import data, representing how old that data was,
+     * or else specify the time of import if no external value was provided.
+     *
+     * @var int
+     */
+    private $synctimemodified = 0;
+
+    /**
      * Create instance of a job_assignment.
      *
      * @param \stdClass $record as returned by get_record('job_assignment', ...)
@@ -297,6 +307,9 @@ class job_assignment {
         if (!empty($record->totarasync)) {
             $this->totarasync = $record->totarasync;
         }
+        if (!empty($record->synctimemodified)) {
+            $this->synctimemodified = $record->synctimemodified;
+        }
     }
 
     /**
@@ -324,7 +337,7 @@ class job_assignment {
         foreach ($data as $key => $value) {
             if (!in_array($key, array('userid', 'fullname', 'shortname', 'idnumber', 'description', 'description_editor',
                                       'positionid', 'organisationid', 'startdate', 'enddate', 'managerjaid',
-                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync'))) {
+                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync', 'synctimemodified'))) {
                 throw new exception('Invalid field specified when creating new job assignment');
             }
         }
@@ -548,7 +561,7 @@ class job_assignment {
         } else if (in_array($name, array('id', 'userid', 'shortname', 'idnumber', 'timecreated', 'timemodified', 'usermodified',
                                          'positionid', 'positionassignmentdate', 'organisationid', 'startdate', 'enddate',
                                          'managerjaid', 'managerjapath', 'tempmanagerjaid', 'tempmanagerexpirydate',
-                                         'appraiserid', 'sortorder', 'totarasync'))) {
+                                         'appraiserid', 'sortorder', 'totarasync', 'synctimemodified'))) {
             return $this->$name;
 
         } else {
@@ -567,7 +580,7 @@ class job_assignment {
         $getproperties = array('id', 'userid', 'shortname', 'idnumber', 'timecreated', 'timemodified', 'usermodified',
             'positionid', 'positionassignmentdate', 'organisationid', 'startdate', 'enddate',
             'managerjaid', 'managerjapath', 'tempmanagerjaid', 'tempmanagerexpirydate',
-            'appraiserid', 'sortorder', 'totarasync');
+            'appraiserid', 'sortorder', 'totarasync', 'synctimemodified');
         $getproperties[] = 'description';
         $getproperties[] = 'description_editor';
         $getproperties[] = 'managerid';
@@ -612,6 +625,7 @@ class job_assignment {
         $data->appraiserid            = $this->appraiserid;
         $data->sortorder              = $this->sortorder;
         $data->totarasync             = $this->totarasync;
+        $data->synctimemodified       = $this->synctimemodified;
 
         return $data;
     }
@@ -635,7 +649,7 @@ class job_assignment {
         foreach ($data as $key => $value) {
             if (!in_array($key, array('fullname', 'shortname', 'idnumber', 'description', 'description_editor', 'positionid',
                                       'organisationid', 'startdate', 'enddate', 'managerjaid',
-                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync'))) {
+                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync', 'synctimemodified'))) {
                 throw new exception("Invalid field specified when updating job_assignment (not allowed or doesn't exist).");
             }
         }

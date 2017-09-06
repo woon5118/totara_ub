@@ -866,14 +866,14 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $DB->insert_record($source->temptablename, $past);
 
         $jobassignment4 = \totara_job\job_assignment::create(
-            ['userid' => $users['user1']->id, 'idnumber' => 'dev4', 'fullname' => 'Programmer', 'totarasync' => 1]);
+            ['userid' => $users['user1']->id, 'idnumber' => 'dev4', 'fullname' => 'Programmer', 'totarasync' => 1, 'synctimemodified' => 100]);
         // This shouldn't be updated so we'll save for later.
         $jobassign4timemodified = $jobassignment4->timemodified;
         $same = new stdClass();
         $same->idnumber = 'dev4';
         $same->useridnumber = 'user1';
         $same->fullname = 'Developer';
-        $same->timemodified = $jobassign4timemodified;
+        $same->timemodified = 100;
         $DB->insert_record($source->temptablename, $same);
 
         $source->set_config('import_fullname', '1');
@@ -882,7 +882,8 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $element->set_config('allow_update', '1');
 
         // If you start to get intermittent failures, don't move this back. Timemodified should
-        // be updated here for all except $jobassignment4 (idnumber = dev4).
+        // be updated here to the current time for all except $jobassignment4 (idnumber = dev4).
+        $this->waitForSecond();
         $this->setCurrentTimeStart();
         $element->sync();
 
@@ -900,6 +901,50 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $this->assertEquals('dev4', $jobassignments[4]->idnumber);
         $this->assertEquals('Programmer', $jobassignments[4]->fullname);
         $this->assertEquals($jobassign4timemodified, $jobassignments[4]->timemodified);
+
+        // Now just check that only the timemodified = 0 source record gets updated.
+        $source = $this->prepare_source_table();
+
+        $zero = new stdClass();
+        $zero->idnumber = 'dev1';
+        $zero->useridnumber = 'user1';
+        $zero->fullname = 'Updated';
+        $zero->timemodified = 0;
+        $DB->insert_record($source->temptablename, $zero);
+
+        $future = new stdClass();
+        $future->idnumber = 'dev2';
+        $future->useridnumber = 'user1';
+        $future->fullname = 'Updated';
+        $future->timemodified = 1900000000; // March 2030.
+        $DB->insert_record($source->temptablename, $future);
+
+        $past = new stdClass();
+        $past->idnumber = 'dev3';
+        $past->useridnumber = 'user1';
+        $past->fullname = 'Updated';
+        $past->timemodified = 100;
+        $DB->insert_record($source->temptablename, $past);
+
+        $same = new stdClass();
+        $same->idnumber = 'dev4';
+        $same->useridnumber = 'user1';
+        $same->fullname = 'Updated';
+        $same->timemodified = 100;
+        $DB->insert_record($source->temptablename, $same);
+
+        $element->sync();
+
+        $jobassignments = \totara_job\job_assignment::get_all($users['user1']->id);
+        $this->assertCount(4, $jobassignments);
+        $this->assertEquals('dev1', $jobassignments[1]->idnumber);
+        $this->assertEquals('Updated', $jobassignments[1]->fullname);
+        $this->assertEquals('dev2', $jobassignments[2]->idnumber);
+        $this->assertEquals('Developer', $jobassignments[2]->fullname);
+        $this->assertEquals('dev3', $jobassignments[3]->idnumber);
+        $this->assertEquals('Developer', $jobassignments[3]->fullname);
+        $this->assertEquals('dev4', $jobassignments[4]->idnumber);
+        $this->assertEquals('Programmer', $jobassignments[4]->fullname);
     }
 
     public function test_manager_valid() {
