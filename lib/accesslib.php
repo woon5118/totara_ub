@@ -324,8 +324,7 @@ function get_role_definitions_uncached(array $roleids) {
               FROM {role_capabilities} rc
               JOIN {context} ctx ON rc.contextid = ctx.id
               JOIN {capabilities} cap ON rc.capability = cap.name
-             WHERE rc.roleid $sql
-          ORDER BY ctx.path, rc.roleid, rc.capability";
+             WHERE rc.roleid $sql";
     $rs = $DB->get_recordset_sql($sql, $params);
 
     foreach ($rs as $rd) {
@@ -339,6 +338,15 @@ function get_role_definitions_uncached(array $roleids) {
     }
 
     $rs->close();
+
+    // Sometimes (e.g. get_user_capability_course_helper::get_capability_info_at_each_context)
+    // we process role definitinons in a way that requires we see parent contexts
+    // before child contexts. This sort ensures that works (and is faster than
+    // sorting in the SQL query).
+    foreach ($rdefs as $roleid => $rdef) {
+        ksort($rdefs[$roleid]);
+    }
+
     return $rdefs;
 }
 
