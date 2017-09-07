@@ -1,4 +1,4 @@
-@totara @tool @tool_totara_sync @_file_upload @javascript @robtest
+@totara @tool @tool_totara_sync @_file_upload @javascript @profile_fields
 Feature: User profile fields can be used via HR Import.
 
   Background:

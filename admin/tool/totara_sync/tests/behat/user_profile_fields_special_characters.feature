@@ -1,5 +1,5 @@
-@totara @tool @tool_totara_sync @_file_upload @javascript
-Feature: User menu profile field handles special characters via HR Import.
+@totara @tool @tool_totara_sync @_file_upload @javascript @profile_fields
+Feature: User menu profile fields handle special characters via HR Import.
 
   Background:
     Given I am on a totara site

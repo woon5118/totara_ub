@@ -1,4 +1,4 @@
-@totara @tool @_file_upload @javascript
+@totara @tool @_file_upload @javascript @profile_fields
 Feature: User profile fields handle the unique values correctly.
 
   Background:
@@ -170,12 +170,13 @@ Feature: User profile fields handle the unique values correctly.
     When I set the following fields to these values:
       | Text 1                           | Text Content 2       |
     And I press "Create user"
-    Then I should see "3 Users"
+    Then I should see "Browse list of users: 4 records shown"
     And the following should exist in the "users" table:
-      | First name / Surname | Email address        |
-      | Admin User           | moodle@example.com   |
-      | Bob1 Learner1        | learner1@example.com |
-      | Bob2 Learner2        | learner2@example.com |
+      | username |
+      | guest    |
+      | admin    |
+      | learner1 |
+      | learner2 |
 
   Scenario: Verify unique user profile fields when updating a user with non-unique values fail uniqueness check in manual user creation.
 
@@ -201,8 +202,10 @@ Feature: User profile fields handle the unique values correctly.
       | Textarea 1                       | Textarea Content 2   |
       | Text 1                           | Text Content 2       |
     And I press "Create user"
-    Then I should see "3 Users"
-    And I should see "Bob2 Learner2"
+    Then I should see "Browse list of users: 4 records shown"
+    And the following should exist in the "users" table:
+      | username |
+      | learner2 |
 
     When I click on "Edit" "link" in the "Bob2 Learner2" "table_row"
     And I expand all fieldsets
@@ -261,9 +264,10 @@ Feature: User profile fields handle the unique values correctly.
     When I set the following fields to these values:
       | Text 1                           | Text Content 3       |
     And I press "Update profile"
-    Then I should see "3 Users"
+    Then I should see "Browse list of users: 4 records shown"
     And the following should exist in the "users" table:
-      | First name / Surname | Email address        |
-      | Admin User           | moodle@example.com   |
-      | Bob1 Learner1        | learner1@example.com |
-      | Bob2 Learner2        | learner2@example.com |
+      | username |
+      | guest	 |
+      | admin    |
+      | learner1 |
+      | learner2 |

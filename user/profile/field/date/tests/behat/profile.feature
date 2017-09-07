@@ -1,4 +1,4 @@
-@profilefield_date @totara
+@profile_fields @totara
 Feature: Test date user profile field
   In order to use date field
   As a user
