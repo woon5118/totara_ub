@@ -384,7 +384,7 @@ class rb_global_restriction_set implements Iterator {
      * Iterator interface implementation
      */
     public function next () {
-        each($this->restrictions);
+        next($this->restrictions);
     }
 
     /**

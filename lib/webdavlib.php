@@ -955,7 +955,7 @@ EOD;
 
         $result = true;
 
-        while (list($localpath, $destpath) = each($filelist)) {
+        foreach ($filelist as $localpath => $destpath) {
 
             $localpath = rtrim($localpath, "/");
             $destpath  = rtrim($destpath, "/");
@@ -1012,7 +1012,7 @@ EOD;
 
         $result = true;
 
-        while (list($remotepath, $localpath) = each($filelist)) {
+        foreach ($filelist as $remotepath => $localpath) {
 
             $localpath   = rtrim($localpath, "/");
             $remotepath  = rtrim($remotepath, "/");

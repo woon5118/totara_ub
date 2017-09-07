@@ -2483,8 +2483,11 @@ function get_user_timezone($tz = 99) {
     $tz = 99;
 
     // Loop while $tz is, empty but not zero, or 99, and there is another timezone is the array.
-    while (((empty($tz) && !is_numeric($tz)) || $tz == 99) && $next = each($timezones)) {
-        $tz = $next['value'];
+    while (((empty($tz) && !is_numeric($tz)) || $tz == 99) && $next = current($timezones)) {
+        $tz = $next;
+        // Also need to advance array cursor - can't use only call to next as it advances
+        // the array cursor before the value is returned
+        next($timezones);
     }
     return is_numeric($tz) ? (float) $tz : $tz;
 }

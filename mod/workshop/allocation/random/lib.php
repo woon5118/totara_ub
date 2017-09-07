@@ -126,7 +126,10 @@ class workshop_random_allocator implements workshop_allocator {
             $allreviewers = $reviewers[0];
             $allreviewersreloaded = false;
             foreach ($newallocations as $newallocation) {
-                list($reviewerid, $authorid) = each($newallocation);
+                $reviewerid = key($newallocation);
+                $authorid = current($newallocation);
+                // No need to advance array_cursor - new array used in next iteration
+
                 $a = new stdClass();
                 if (isset($allreviewers[$reviewerid])) {
                     $a->reviewername = fullname($allreviewers[$reviewerid]);
@@ -324,7 +327,9 @@ class workshop_random_allocator implements workshop_allocator {
         $submissions    = $this->workshop->get_submissions($authorids);
         $submissions    = $this->index_submissions_by_authors($submissions);
         foreach ($newallocations as $newallocation) {
-            list($reviewerid, $authorid) = each($newallocation);
+            $reviewerid = key($newallocation);
+            $authorid = current($newallocation);
+            // No need to advance array_cursor
             if (!isset($submissions[$authorid])) {
                 throw new moodle_exception('unabletoallocateauthorwithoutsubmission', 'workshop');
             }
@@ -408,7 +413,8 @@ class workshop_random_allocator implements workshop_allocator {
                 continue;
             }
             foreach ($newallocations as $newallocation) {
-                list($nrid, $naid) = each($newallocation);
+                $nrid = key($newallocation);
+                $naid = current($newallocation);
                 if (array($arid, $aaid) == array($nrid, $naid)) {
                     // re-allocation found - let us continue with the next assessment
                     $keepids[$assessmentid] = null;
