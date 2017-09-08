@@ -1043,6 +1043,19 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'fullname'));
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => 'user', 'value' => 'email'));
             }
+            if ($sourcename === 'job_assignments') {
+                // Like the above this report has way too many columns and needs to be reduced in order for this test to pass.
+                // This one includes a ton of user fields, we will remove the user fields for each of four types.
+
+                foreach (['user', 'manager', 'appraiser', 'tempmanager'] as $type) {
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'fullname'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelink'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelinkicon'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'email'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'emailunobscured'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'auth'));
+                }
+            }
         }
 
         // Remove all filters that are not compatible with caching.
