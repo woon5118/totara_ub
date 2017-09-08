@@ -67,7 +67,7 @@ Feature: Preview a drag-drop onto image question
     And I wait "2" seconds
     # Odd, but the <br>s go to nothing, not a space.
     And I drag "OU" to "295,197" in the drag and drop markers question
-    And I drag "Railway station" to "226,174" in the drag and drop markers question
+    And I drag "Railway station" to "226,170" in the drag and drop markers question
     And I drag "Railway station,1" to "284,274" in the drag and drop markers question
     And I drag "Railway station,2" to "181,89" in the drag and drop markers question
     And I press "Submit and finish"
