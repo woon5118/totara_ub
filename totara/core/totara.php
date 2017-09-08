@@ -1797,6 +1797,20 @@ function assign_user_position($assignment, $unittest=false) {
 }
 
 /**
+ * Purge the MUC of ignored embedded reports and sources.
+ *
+ * @return void
+ */
+function totara_rb_purge_ignored_reports() {
+    // Embedded reports.
+    $cache = cache::make('totara_reportbuilder', 'rb_ignored_embedded');
+    $cache->purge();
+    // Report sources.
+    $cache = cache::make('totara_reportbuilder', 'rb_ignored_sources');
+    $cache->purge();
+}
+
+/**
 * Loops through the navigation options and returns an array of classes
 *
 * The array contains the navigation option name as a key, and a string

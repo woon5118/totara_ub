@@ -1024,6 +1024,80 @@ class reportbuilder {
     }
 
     /**
+     * Return an array of sources which should be ignored.
+     *
+     * @return array List of sources to ignore.
+     */
+    public static function get_ignored_sources() {
+        static $ignored = null;
+        if (is_null($ignored)) {
+            $cache = cache::make('totara_reportbuilder', 'rb_ignored_sources');
+            $ignored = $cache->get('all');
+
+            if (!is_array($ignored)) {
+                $ignored = [];
+                foreach (self::find_source_dirs() as $dir) {
+                    if (is_dir($dir) && $dh = opendir($dir)) {
+                        while(($file = readdir($dh)) !== false) {
+                            if (is_dir($file) ||
+                                !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
+                                continue;
+                            }
+                            $source = $matches[1];
+                            $src = reportbuilder::get_source_object($source);
+                            if ($src->is_ignored()) {
+                                $ignored[] = $source;
+                            }
+                        }
+                    }
+                }
+                $cache->set('all', $ignored);
+            }
+        }
+        return $ignored;
+    }
+
+    /**
+     * Return an array of embedded reports which should be ignored.
+     *
+     * @return array List of embedded files which should be ignored.
+     */
+    public static function get_ignored_embedded() {
+        global $CFG;
+        static $ignored = null;
+
+        if (is_null($ignored)) {
+            $cache = cache::make('totara_reportbuilder', 'rb_ignored_embedded');
+            $ignored = $cache->get('all');
+
+            if (!is_array($ignored)) {
+                $ignored = [];
+                $source_dirs = self::find_source_dirs();
+                $source_dirs[] = $CFG->dirroot . '/totara/reportbuilder/embedded/';
+
+                foreach ($source_dirs as $dir) {
+                    if (is_dir($dir) && $dh = opendir($dir)) {
+                        while(($file = readdir($dh)) !== false) {
+                            if (is_dir($file) || !preg_match('|^rb_(.*)\_embedded.php$|', $file, $matches)) {
+                                continue;
+                            }
+                            $embedded = $matches[1];
+
+                            $emb = reportbuilder_get_embedded_report_object($embedded);
+
+                            if ($emb->is_ignored()) {
+                                $ignored[] = $embedded;
+                            }
+                        }
+                    }
+                }
+                $cache->set('all', $ignored);
+            }
+        }
+        return $ignored;
+    }
+
+    /**
      * Gets list of source directories to look in for source files
      *
      * @param bool $resetstatic If set to true the static variable is ignored and reset.

@@ -126,6 +126,9 @@ class core_plugin_manager {
         }
         $cache = cache::make('core', 'plugin_manager');
         $cache->purge();
+
+        // Totara report builder.
+        totara_rb_purge_ignored_reports();
     }
 
     /**

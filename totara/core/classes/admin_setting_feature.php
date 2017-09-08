@@ -58,8 +58,8 @@ class totara_core_admin_setting_feature extends admin_setting_configselect {
     public function __construct($name, $visiblename, $description, $defaultsetting, array $updatecallbacks = null) {
         parent::__construct($name, $visiblename, $description, $defaultsetting, null);
         if ($updatecallbacks === null) {
-            // In majority of cases the Totara menu needs to be reset.
-            $updatecallbacks = array('totara_menu_reset_cache');
+            // In majority of cases the Totara menu  and Reportbuilder ignored sources needs to be reset.
+            $updatecallbacks = array('totara_menu_reset_cache', 'totara_rb_purge_ignored_reports');
         }
         $this->updatecallbacks = $updatecallbacks;
 

@@ -92,12 +92,21 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new admin_setting_configcheckbox('enableglobalrestrictions', new lang_string('enableglobalrestrictions', 'totara_reportbuilder'), new lang_string('enableglobalrestrictions_desc', 'totara_reportbuilder'), 0));
 
     // Audience visibility.
-    $optionalsubsystems->add(new admin_setting_configcheckbox('audiencevisibility', new lang_string('enableaudiencevisibility', 'totara_cohort'), new lang_string('configenableaudiencevisibility', 'totara_cohort'), 0));
+    $defaultenhanced = 0;
+    $setting = new admin_setting_configcheckbox('audiencevisibility',
+        new lang_string('enableaudiencevisibility', 'totara_cohort'),
+        new lang_string('configenableaudiencevisibility', 'totara_cohort'),
+        $defaultenhanced);
+    $setting->set_updatedcallback('totara_rb_purge_ignored_reports');
+    $optionalsubsystems->add($setting);
 
-    $optionalsubsystems->add(new admin_setting_configcheckbox('enableconnectserver',
+    $defaultenhanced = 0;
+    $setting = new admin_setting_configcheckbox('enableconnectserver',
         new lang_string('enableconnectserver', 'totara_connect'),
         new lang_string('enableconnectserver_desc', 'totara_connect'),
-        0));
+        $defaultenhanced);
+    $setting->set_updatedcallback('totara_rb_purge_ignored_reports');
+    $optionalsubsystems->add($setting);
 
     // Enchanced catalog.
     // Was upgrade - old catalog by default, otherwise - new catalog.
@@ -150,13 +159,15 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enablelearningplans', 'totara_plan'),
         new lang_string('configenablelearningplans', 'totara_plan'),
         TOTARA_SHOWFEATURE,
-        array('totara_menu_reset_cache', array('enrol_totara_learningplan_util', 'feature_setting_updated_callback'))));
+        array('totara_menu_reset_cache', 'totara_rb_purge_ignored_reports',
+            array('enrol_totara_learningplan_util', 'feature_setting_updated_callback'))));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableprograms',
         new lang_string('enableprograms', 'totara_program'),
         new lang_string('configenableprograms', 'totara_program'),
         TOTARA_SHOWFEATURE,
-        array('totara_menu_reset_cache', array('enrol_totara_program_util', 'feature_setting_updated_callback'))));
+        array('totara_menu_reset_cache', 'totara_rb_purge_ignored_reports',
+            array('enrol_totara_program_util', 'feature_setting_updated_callback'))));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecertifications',
         new lang_string('enablecertifications', 'totara_program'),
@@ -188,10 +199,13 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enableteam_desc', 'totara_core'),
         TOTARA_SHOWFEATURE));
 
-    $optionalsubsystems->add(new admin_setting_configcheckbox('enableprogramcompletioneditor',
+    $defaultenhanced = 0;
+    $setting = new admin_setting_configcheckbox('enableprogramcompletioneditor',
         new lang_string('enableprogramcompletioneditor', 'totara_program'),
         new lang_string('enableprogramcompletioneditor_desc', 'totara_program'),
-        0));
+        $defaultenhanced);
+    $setting->set_updatedcallback('totara_rb_purge_ignored_reports');
+    $optionalsubsystems->add($setting);
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('totara_job_allowmultiplejobs',
         new lang_string('setting:allowmultiplejobs', 'totara_job'),

@@ -4,7 +4,7 @@ Feature: Check Record of Learning feature visibility
   As an admin
   I need to be able to enable and disable it
 
-  Scenario: Verify Record of Learning appears in the Totara menu and reportbuilder if enabled
+  Scenario: Verify Record of Learning appears in the Totara menu if enabled
     Given I am on a totara site
     And I log in as "admin"
 
@@ -12,35 +12,7 @@ Feature: Check Record of Learning feature visibility
     Then I should see "Record of Learning" in the "#totaramenutable" "css_element"
     And I should see "Record of Learning" in the totara menu
 
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
-    And I set the field "report-name" to "Record of Learning"
-    And I press "id_submitgroupstandard_addfilter"
-    Then I should see "Record of Learning: Certifications" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Competencies" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Courses" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Evidence" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Objectives" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Previous Certifications" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Previous Course Completions" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Programs" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Recurring Programs" in the "#manage_embedded_reports" "css_element"
-    And I should see "Record of Learning: Programs Completion History " in the "#manage_embedded_reports" "css_element"
-    And I set the field "report-name" to "My Current Courses"
-    And I press "id_submitgroupstandard_addfilter"
-    And I should see "My Current Courses" in the "#manage_embedded_reports" "css_element"
-
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
-    Then the "Source" select box should contain "Record of Learning: Certifications"
-    And the "Source" select box should contain "Record of Learning: Competencies"
-    And the "Source" select box should contain "Record of Learning: Courses"
-    And the "Source" select box should contain "Record of Learning: Evidence"
-    And the "Source" select box should contain "Record of Learning: Objectives"
-    And the "Source" select box should contain "Record of Learning: Previous Certifications"
-    And the "Source" select box should contain "Record of Learning: Previous Course Completions"
-    And the "Source" select box should contain "Record of Learning: Programs"
-    And the "Source" select box should contain "Record of Learning: Recurring Programs"
-
-  Scenario: Verify Record of Learning does not appear in the Totara menu and reportbuilder if disabled
+  Scenario: Verify Record of Learning does not appear in the Totara menu if disabled
     Given I am on a totara site
     And I log in as "admin"
     And I navigate to "Advanced features" node in "Site administration"
@@ -50,32 +22,3 @@ Feature: Check Record of Learning feature visibility
     When I navigate to "Main menu" node in "Site administration > Appearance"
     Then I should not see "Record of Learning" in the "#totaramenutable" "css_element"
     And I should not see "Record of Learning" in the totara menu
-
-# TODO: TL-15962 embedded reports are now always visible
-#    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
-#    And I set the field "report-name" to "Record of Learning"
-#    And I press "id_submitgroupstandard_addfilter"
-#    Then I should not see "Record of Learning: Certifications" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Competencies" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Courses" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Evidence" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Objectives" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Previous Certifications" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Previous Course Completions" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Programs" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Recurring Programs" in the "#manage_embedded_reports" "css_element"
-#    And I should not see "Record of Learning: Programs Completion History " in the "#manage_embedded_reports" "css_element"
-#    And I set the field "report-name" to "My Current Courses"
-#    And I press "id_submitgroupstandard_addfilter"
-#    And I should not see "My Current Courses" in the "#manage_embedded_reports" "css_element"
-
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
-    Then the "Source" select box should not contain "Record of Learning: Certifications"
-    And the "Source" select box should not contain "Record of Learning: Competencies"
-    And the "Source" select box should not contain "Record of Learning: Courses"
-    And the "Source" select box should not contain "Record of Learning: Evidence"
-    And the "Source" select box should not contain "Record of Learning: Objectives"
-    And the "Source" select box should not contain "Record of Learning: Previous Certifications"
-    And the "Source" select box should not contain "Record of Learning: Previous Course Completions"
-    And the "Source" select box should not contain "Record of Learning: Programs"
-    And the "Source" select box should not contain "Record of Learning: Recurring Programs"

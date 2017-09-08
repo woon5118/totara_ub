@@ -53,6 +53,7 @@ class rb_source_reports extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = [];
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_reports');
+        list($this->sourcewhere, $this->sourceparams) = $this->define_sourcewhere();
 
         // Pull in all report related info via a trait so we
         // can reuse it in other report sources.
@@ -178,6 +179,38 @@ class rb_source_reports extends rb_base_source {
         ];
 
         return $paramoptions;
+    }
+
+    /**
+     * Exclude embedded reports based on enabled features.
+     *
+     * Remove reports from the embedded report page when those features
+     * are not enabled across the site.
+     */
+    protected function define_sourcewhere() {
+        global $DB;
+        $unwantedsources = reportbuilder::get_ignored_sources();
+        $unwantedembedded = reportbuilder::get_ignored_embedded();
+
+        $sql = '';
+        $params = [];
+
+        if (!empty($unwantedsources)) {
+            list($notinsql, $notinparams) = $DB->get_in_or_equal($unwantedsources, SQL_PARAMS_NAMED, 'sourcewhere', false);
+            // Exclude embedded reports from ignored sources.
+            $sql .= "base.source " . $notinsql;
+            $params = array_merge($params, $notinparams);
+        }
+
+        if (!empty($unwantedembedded)) {
+            list($notinsql, $notinparams) = $DB->get_in_or_equal($unwantedembedded, SQL_PARAMS_NAMED, 'sourcewhere', false);
+            // Exclude embedded reports that are set as ignored.
+            $sql .= empty($sql) ? '' : " AND ";
+            $sql .= "base.shortname " . $notinsql;
+            $params = array_merge($params, $notinparams);
+        }
+
+        return array($sql, $params);
     }
 
     /**
