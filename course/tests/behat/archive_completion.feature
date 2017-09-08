@@ -135,7 +135,7 @@ Feature: Test we can manually archive course completion.
     And "//table[@id='completion-progress']//th/a[text()='Learner Three']/ancestor::tr//span[contains(@title, 'Completed')]" "xpath_element" should exist
     And "//table[@id='completion-progress']//th/a[text()='Learner Four']/ancestor::tr//span[contains(@title, 'Completed')]" "xpath_element" should exist
 
-    When I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | Test course completion report |
       | Source      | Course Completion             |
@@ -173,7 +173,7 @@ Feature: Test we can manually archive course completion.
     And "Learner Four" row "Required grade" column of "report_test_course_completion_report" table should contain "85.7% (42.9% to complete)"
 
     When I am on homepage
-    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | Test course completion including history report |
       | Source      | Course Completion Including History |
