@@ -277,8 +277,10 @@ function behat_is_test_site() {
         return false;
     }
     if (isset($_SERVER['REMOTE_ADDR']) and behat_is_requested_url($CFG->behat_wwwroot)) {
-        // Something is accessing the web server like a real browser.
-        return true;
+        if (!empty($_COOKIE['BEHAT'])) {
+            // Totara: Something is accessing the web server with BEHAT cookie like a real browser.
+            return true;
+        }
     }
 
     return false;

@@ -208,6 +208,7 @@ class behat_util extends testing_util {
         // Get web versions used by behat site.
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_COOKIE, 'BEHAT=1');
         $result = curl_exec($ch);
         $statuscode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);

@@ -409,6 +409,9 @@ class behat_hooks extends behat_base {
         // Reset mink session between the scenarios.
         try {
             $session->reset();
+            // Totara: go to neutral page to reset stuff and set cookie to identify behat browsers.
+            $session->visit($this->locate_path('/admin/tool/behat/start.php'));
+            $session->setCookie('BEHAT', 1);
         } catch (Exception $e) {
             // Totara: This point is reached when Chrome driver freezes, let's give it one more kick.
             try {
@@ -416,6 +419,9 @@ class behat_hooks extends behat_base {
                 $session->restart();
                 sleep(5);
                 $session->reset();
+                // Totara: go to neutral page to reset stuff and set cookie to identify behat browsers.
+                $session->visit($this->locate_path('/admin/tool/behat/start.php'));
+                $session->setCookie('BEHAT', 1);
             } catch (Exception $e) {
                 throw new Exception('Resetting of Mink session failed', 0, $e);
             }
@@ -510,6 +516,22 @@ class behat_hooks extends behat_base {
             }
         } catch (Exception $e) {
             throw new Exception('Cannot set main window name', 0, $e);
+        }
+    }
+
+    /**
+     * Executed after every scenario.
+     *
+     * @AfterScenario
+     *
+     * @param AfterScenarioScope $scope
+     */
+    public function after_scenario(AfterScenarioScope $scope) {
+        try {
+            $this->visitPath('/admin/tool/behat/finish.php');
+        }
+        catch (Exception $e) {
+            self::$forcerestart = true;
         }
     }
 
