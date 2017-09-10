@@ -9,5 +9,6 @@ Totara changes:
 Extra patches:
 
 * support for inline SVG images in TCPDF::openHTMLTagHandler()
+* TL-16004 - Suppressed php 7.2 deprecation message on all uses of each()
 
 Petr Skoda

@@ -9,6 +9,7 @@ Description of import of Horde libraries
   in your path to Horde (the directory you've cloned the repository):
     /tmp/copyhorde.sh ~/git/ext/horde/
 # MDL-52361 patched for PHP7 compatibility, after upgrade make sure it's updated upstream and remove this line
+# TL-16004 Suppressed php 7.2 deprecation message on all uses of each()
 
 ====
 #!/bin/sh

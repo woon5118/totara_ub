@@ -29,5 +29,6 @@ Our changes:
    Check if fixed upstream during the next upgrade and remove this note.
  * Replaced create_function() with normal functions
  * TL-14768 Added fix in ADODB_mssqlnative::_connect() to ensure that host and port are separated by ,
+ * TL-16004 Suppressed php 7.2 deprecation message on all uses of each()
 
-skodak, iarenaza, moodler, stronk7, abgreeve, lameze
+skodak, iarenaza, moodler, stronk7, abgreeve, lameze, rianar
