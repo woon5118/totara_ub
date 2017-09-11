@@ -321,6 +321,10 @@ class mysqli_native_moodle_database extends moodle_database {
             // Totara: MySQL 8 supports only new file formats.
             return 'Barracuda';
         }
+        if ($this->get_dbvendor() === 'mariadb' and version_compare($info['version'], '10.3', '>')) {
+            // Totara: MariaDB 10.3 supports only new file formats.
+            return 'Barracuda';
+        }
 
         $rowformat = null;
         if (isset($table)) {
@@ -363,6 +367,11 @@ class mysqli_native_moodle_database extends moodle_database {
         if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0', '>')) {
             // Totara: MySQL 8 supports only new file formats.
             $this->compressedrowformatsupported = ($engine === 'innodb' or $engine === 'xtradb');
+
+        } else if ($this->get_dbvendor() === 'mariadb' and version_compare($info['version'], '10.3', '>')) {
+            // Totara: MariaDB 10.3 supports only new file formats.
+            $this->compressedrowformatsupported = ($engine === 'innodb' or $engine === 'xtradb');
+
         } else if (version_compare($info['version'], '5.5.0') < 0) {
             // MySQL 5.1 is not supported here because we cannot read the file format.
             $this->compressedrowformatsupported = false;
@@ -397,6 +406,8 @@ class mysqli_native_moodle_database extends moodle_database {
             return true;
         }
 
+        // NOTE: MariaDB 10.3.1dev did not remove this setting yet, so keep checking it for now.
+
         if ($filepertable = $this->get_record_sql("SHOW VARIABLES LIKE 'innodb_file_per_table'")) {
             if ($filepertable->value == 'ON') {
                 return true;
@@ -414,6 +425,11 @@ class mysqli_native_moodle_database extends moodle_database {
         $info = $this->get_server_info();
         if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0', '>')) {
             // Totara: MySQL 8 supports only new file formats.
+            return true;
+        }
+
+        if ($this->get_dbvendor() === 'mariadb' and version_compare($info['version'], '10.3', '>')) {
+            // Totara: MariaDB 10.3 supports only new file formats.
             return true;
         }
 
