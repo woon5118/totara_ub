@@ -235,8 +235,7 @@ select {
 
 .fcheckbox > span > label,
 .form-checkbox + label,
-.form-multicheckbox label,
-.unmask label {
+.form-multicheckbox label {
     &:extend(.checkbox label);
     padding-left: 0.3em;
     padding-right: 0.3em;
@@ -545,11 +544,6 @@ input[type="checkbox"] {
     > input {
         display: inline-block;
     }
-
-    .unmask {
-        display: inline-block;
-        margin-left: @padding-small-horizontal;
-    }
 }
 
 //
@@ -726,4 +720,60 @@ textarea#id_approval_termsandconds {
 
 .dl-horizontal dt label {
     padding-top: 7px;
+}
+
+.totara_passwordunmask .unmask-password-option {
+    display: none;
+}
+
+.jsenabled .totara_passwordunmask {
+    .unmask-password-option {
+        display: inline-block;
+        vertical-align: text-top;
+    }
+    input {
+        font-family: "Courier New", Courier, monospace;
+    }
+    .wrap {
+        position: relative;
+        display: inline-block;
+    }
+    input.passwordinput[type="text"] {
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        background-color: transparent;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+    }
+    input.passwordinput[type="text"]::selection {
+        background-color: gray;
+        color: gray;
+    }
+    .inputmask {
+        overflow: hidden;
+        z-index: 0;
+    }
+    &.unmask-password {
+        input.passwordinput[type="text"] {
+            -webkit-text-fill-color: inherit;
+            color: inherit;
+            background-color: inherit;
+            position: inherit;
+
+            &[readonly] {
+                background-color: @totara_form-disabled-bg;
+                opacity: 1; // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655
+            }
+        }
+        .inputmask {
+            display: none;
+        }
+    }
+}
+
+// Safari input is broken with user-select: none
+.safari.jsenabled .totara_passwordunmask input.passwordinput[type="text"] {
+    -webkit-user-select: text;
+    user-select: text;
 }

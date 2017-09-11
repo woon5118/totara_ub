@@ -76,6 +76,8 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         };
     }
 
+    /* eslint-enable */
+
     /**
      * Password unmask element
      *
