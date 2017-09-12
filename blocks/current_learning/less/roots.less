@@ -166,11 +166,13 @@
         padding: 10px 40px;
     }
     .current_learning-set {
-        padding: @padding-small-vertical @padding-horizontal;
+        padding: @padding-large-vertical @padding-horizontal;
         background-color: @bg;
         border-radius: @border-radius-large;
         h4 {
-            padding-top: @padding-small-vertical;
+            &:not(:first-child) {
+                padding-top: @padding-small-vertical;
+            }
             span {
                 color: #888;
                 font-size: @font-size-small;
