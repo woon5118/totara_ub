@@ -41,7 +41,7 @@ trait database_trait {
      * @param  \MoodleQuickForm $mform
      */
     protected function config_form_add_database_details(&$mform) {
-        global $PAGE;
+        global $PAGE, $OUTPUT;
 
         // Display required db table columns
         $fieldmappings = array();
@@ -74,7 +74,7 @@ trait database_trait {
         // Empty or null field info.
         if ($db_table) {
             $info = get_string('databaseemptynullinfo', 'tool_totara_sync');
-            $mform->addElement('html', \html_writer::tag('div', \html_writer::tag('p', $info), array('class' => "alert alert-warning")));
+            $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
         }
 
         $db_options = get_installed_db_drivers();

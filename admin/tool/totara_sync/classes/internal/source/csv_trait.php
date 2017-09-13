@@ -41,7 +41,7 @@ trait csv_trait {
      * @param \MoodleQuickForm $mform
      */
     protected function config_form_add_csv_details($mform) {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         // Display file example
         $fieldmappings = array();
@@ -70,7 +70,7 @@ trait csv_trait {
 
         $delimiter = $this->config->delimiter;
         $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct));
-        $mform->addElement('html', \html_writer::tag('div', \html_writer::tag('p', $info, array('class' => "informationbox"))));
+        $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
 
         // Add some source file details
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));

@@ -30,7 +30,7 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
 class totara_sync_source_user_database extends totara_sync_source_user {
 
     function config_form(&$mform) {
-        global $PAGE;
+        global $PAGE, $OUTPUT;
 
         $this->config->import_idnumber = "1";
         $this->config->import_username = "1";
@@ -86,7 +86,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         // Empty or null field info.
         if ($db_table) {
             $info = get_string('databaseemptynullinfo', 'tool_totara_sync');
-            $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $info), array('class' => "alert alert-warning")));
+            $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
         }
 
         $db_options = get_installed_db_drivers();

@@ -34,7 +34,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
     }
 
     function config_form(&$mform) {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         $filepath = $this->get_filepath();
         $this->config->import_idnumber = "1";
@@ -100,7 +100,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         // Empty field info.
         $langstring = !empty($this->element->config->csvsaveemptyfields) ? 'csvemptysettingdeleteinfo' : 'csvemptysettingkeepinfo';
         $info = get_string($langstring, 'tool_totara_sync');
-        $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $info), array('class' => "alert alert-warning")));
+        $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
 
         // Add some source file details
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
