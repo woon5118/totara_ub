@@ -38,3 +38,11 @@ and create {modulename_hook} as sample
     - sql_cast2char()
     - sql_cast2float()
 * Deprecated TOTARA_JS_PLACEHOLDER as all supported browsers support the HTML placeholder attribute
+* Updated totara_core_renderer::active_users()
+* Updated totara_core_renderer::errorlog_link()
+* Updated totara_core_renderer::is_registered()
+* Deprecated totara_core/is_registered mustache template
+* Deprecated core/alert_danger mustache template
+* Deprecated core/alert_info mustache template
+* Deprecated core/alert_success mustache template
+* Deprecated core/alert_warning mustache template

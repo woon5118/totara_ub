@@ -51,9 +51,8 @@ class totara_core_renderer extends plugin_renderer_base {
     */
     public function active_users($activeusers) {
         $data = new stdClass();
-        $data->content = get_string('numberofactiveusers', 'totara_core', $activeusers);
 
-        return $this->output->render_from_template('core/alert_info', $data);
+        return $this->notification(get_string('numberofactiveusers', 'totara_core', $activeusers), \core\output\notification::NOTIFY_INFO);
     }
 
     /**
@@ -82,10 +81,7 @@ class totara_core_renderer extends plugin_renderer_base {
         $data->downloadbutton = $this->output->single_button(new moodle_url('/admin/index.php', array('geterrors' => 1)), get_string('downloaderrorlog', 'totara_core'), 'post');
         $output = $this->render_from_template('totara_core/errorlog_link', $data);
 
-        // Add admin warning box and return the output.
-        $data = new stdClass();
-        $data->content = $output;
-        return $this->render_from_template('core/alert_warning', $data);
+        return $this->notification($output, \core\output\notification::NOTIFY_WARNING);
     }
 
     /**
@@ -736,7 +732,7 @@ class totara_core_renderer extends plugin_renderer_base {
 
         $data = new stdClass();
         $data->content = $message;
-        return $this->render_from_template('totara_core/is_registered', $data);
+        return $this->notification($message, \core\output\notification::NOTIFY_WARNING);
     }
 
     /**

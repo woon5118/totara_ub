@@ -51,7 +51,7 @@ $icons = array(
     ),
     'notification-error' => array(
         'data' => array(
-            'classes' => 'fa-bolt ft-size-300 ft-flip-rtl',
+            'classes' => 'fa-bolt ft-size-200 ft-flip-rtl',
         ),
     ),
 );
