@@ -80,8 +80,9 @@ class rb_system_browse_users_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'user',
-                'value' => 'email',
+                'value' => 'emailunobscured',
                 'advanced' => 1,
+                'fieldname' => get_string('useremail', 'totara_reportbuilder'),
             ),
         );
 
