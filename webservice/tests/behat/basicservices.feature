@@ -57,21 +57,21 @@ Feature: Basic web service access
     Then I should see "student1@example.com"
     And I should see "Sam1"
 
-    # Perform SOAP test
-    When I navigate to "Web service test client" node in "Site administration > Development"
-    And I set the following fields to these values:
-      | Authentication method | simple                      |
-      | Protocol              | SOAP protocol               |
-      | Function              | core_user_get_users_by_field |
-    And I press "Select"
-    And I set the following fields to these values:
-      | wsusername | admin           |
-      | wspassword | admin           |
-      | field      | idnumber        |
-      | values[0]  | u4              |
-    And I press "Execute"
-    Then I should see "student1@example.com"
-    And I should see "Sam1"
+# We cannot perform SOAP test in behat because there is no way to add the BEHAT cookie to the initial wsdl request.
+#    When I navigate to "Web service test client" node in "Site administration > Development"
+#    And I set the following fields to these values:
+#      | Authentication method | simple                      |
+#      | Protocol              | SOAP protocol               |
+#      | Function              | core_user_get_users_by_field |
+#    And I press "Select"
+#    And I set the following fields to these values:
+#      | wsusername | admin           |
+#      | wspassword | admin           |
+#      | field      | idnumber        |
+#      | values[0]  | u4              |
+#    And I press "Execute"
+#    Then I should see "student1@example.com"
+#    And I should see "Sam1"
 
     # Perform XML-RPC test
     When I navigate to "Web service test client" node in "Site administration > Development"

@@ -91,6 +91,10 @@ class webservice_xmlrpc_client {
             'User-Agent' => 'Moodle XML-RPC Client/1.0',
         );
 
+        if (!empty($_COOKIE['BEHAT'])) {
+            $headers['Cookie'] = 'BEHAT=' . (int)$_COOKIE['BEHAT'];
+        }
+
         // Get the response.
         $response = download_file_content($this->serverurl->out(false), $headers, $request); // Totara: explicitly convert to string value to work around TL-12939
 
