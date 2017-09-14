@@ -158,6 +158,8 @@ class mod_data_userdata_entries_testcase extends advanced_testcase {
              * itemid first and then update it in generator/lib.php once the itemid is known
              */
 
+            $this->setUser($user_object->id);
+
             // Define the data required to create the file field type file.
             $draftfileitemid = file_get_unused_draft_itemid();
             $filename = "Database_{$i}_file.text";
@@ -218,8 +220,10 @@ class mod_data_userdata_entries_testcase extends advanced_testcase {
             }
 
             // Create the test data for the module.
-            $generator->get_plugin_generator('mod_data')->create_entry($data_object, $fieldcontents, 0, $user_object->id);
+            $generator->get_plugin_generator('mod_data')->create_entry($data_object, $fieldcontents, 0);
         }
+
+        $this->setAdminUser();
 
         return $data;
     }
