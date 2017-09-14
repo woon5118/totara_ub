@@ -736,61 +736,9 @@ $CFG->directorypermissions = 02777;
 // $CFG->behat_prefix = 'bht_';
 // $CFG->behat_dataroot = '/home/example/bht_sitedata';
 //
-// You can override default Totara configuration for Behat and add your own
-// params; here you can add more profiles, use different Mink drivers than Selenium...
-// These params would be merged with the default Totara behat.yml, giving priority
-// to the ones specified here. The array format is YAML, following the Behat
-// params hierarchy. More info: http://docs.behat.org/guides/7.config.html
-// Example:
-//   $CFG->behat_config = array(
-//       'Mac-Firefox' => array(
-//           'suites' => array (
-//               'default' => array(
-//                   'filters' => array(
-//                      'tags' => '~@_file_upload'
-//                   ),
-//               ),
-//           ),
-//           'extensions' => array(
-//               'Behat\MinkExtension' => array(
-//                   'selenium2' => array(
-//                       'browser' => 'firefox',
-//                       'capabilities' => array(
-//                           'platform' => 'OS X 10.6',
-//                           'version' => 20
-//                       )
-//                   )
-//               )
-//           )
-//       ),
-//       'Mac-Safari' => array(
-//           'extensions' => array(
-//               'Behat\MinkExtension' => array(
-//                   'selenium2' => array(
-//                       'browser' => 'safari',
-//                       'capabilities' => array(
-//                           'platform' => 'OS X 10.8',
-//                           'version' => 6
-//                       )
-//                   )
-//               )
-//           )
-//       )
-//   );
-// You can also use the following config to override default Totara configuration for Behat.
-// This config is limited to default suite and will be supported in later versions.
-// It will have precedence over $CFG->behat_config.
-// $CFG->behat_profiles = array(
-//     'phantomjs' => array(
-//         'browser' => 'phantomjs',
-//         'tags' => '~@_file_upload&&~@_alert&&~@_bug_phantomjs',
-//         'wd_host' => 'http://127.0.0.1:4443/wd/hub',
-//         'capabilities' => array(
-//             'platform' => 'Linux',
-//             'version' => 2.1
-//         )
-//     ),
-// );
+// NOTE: both $CFG->behat_config and $CFG->behat_profile are deprecated,
+//       create a new /behat_local.yml file instead and put your settings there,
+//       the structure is the same as /behat.dist.yml file.
 //
 // You can force the browser session (not user's sessions) to restart after N seconds. This could
 // be useful if you are using a cloud-based service with time restrictions in the browser side.

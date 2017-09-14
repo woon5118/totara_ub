@@ -378,10 +378,6 @@ class behat_config_util {
 
         $config = $this->build_config();
 
-        $config = $this->merge_behat_config($config);
-
-        $config = $this->merge_behat_profiles($config);
-
         // Return config array for phpunit, so it can be tested.
         if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
             return $config;
@@ -472,6 +468,17 @@ class behat_config_util {
 
         // Get the defaults first.
         $config = Symfony\Component\Yaml\Yaml::parse(file_get_contents(__DIR__ . '/../../../behat.yml.dist'));
+
+        // Add local Totara overrides.
+        if (file_exists(__DIR__ . '/../../../behat_local.yml')) {
+            $localconfig = Symfony\Component\Yaml\Yaml::parse(file_get_contents(__DIR__ . '/../../../behat_local.yml'));
+            if ($localconfig) {
+                $config = $this->merge_config($config, $localconfig);
+            }
+        } else {
+            $config = $this->merge_behat_config($config);
+            $config = $this->merge_behat_profiles($config);
+        }
 
         if (!empty($parallelruns) && !empty($currentrun)) {
             $this->set_parallel_run($parallelruns, $currentrun);
@@ -726,6 +733,10 @@ class behat_config_util {
      * @return mixed The merge result
      */
     public function merge_config($config, $localconfig) {
+        // Totara: allow removal of sections from behat.ymnl.dist via behat_local.yml, this is necessary for support of other browsers.
+        if ($localconfig === array()) {
+            return $localconfig;
+        }
 
         if (!is_array($config) && !is_array($localconfig)) {
             return $localconfig;
@@ -756,6 +767,8 @@ class behat_config_util {
 
     /**
      * Merges $CFG->behat_config with the one passed.
+     *
+     * @deprecated since Totara 10
      *
      * @param array $config existing config.
      * @return array merged config with $CFG->behat_config
@@ -818,6 +831,8 @@ class behat_config_util {
 
     /**
      * Merges $CFG->behat_profiles with the one passed.
+     *
+     * @deprecated since Totara 10
      *
      * @param array $config existing config.
      * @return array merged config with $CFG->behat_profiles
