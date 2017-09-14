@@ -357,7 +357,6 @@ class core_setuplib_testcase extends advanced_testcase {
     public function test_get_exception_info_link() {
         global $CFG, $SESSION;
 
-        $initialloginhttps = $CFG->loginhttps;
         $httpswwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
         $CFG->loginhttps = false;
 
@@ -373,14 +372,15 @@ class core_setuplib_testcase extends advanced_testcase {
         $infos = $this->get_exception_info($exception);
         $this->assertSame($CFG->wwwroot . '/', $infos->link);
 
-        // HTTPS URL when login HTTPS is not enabled.
+        // HTTPS URL when login HTTPS is not enabled (default) and site is HTTP.
+        $CFG->wwwroot = str_replace('https:', 'http:', $CFG->wwwroot);
         $url = $httpswwwroot . '/something/here?really=yes';
         $exception = new moodle_exception('none', 'error', $url);
         $infos = $this->get_exception_info($exception);
         $this->assertSame($CFG->wwwroot . '/', $infos->link);
 
-        // HTTPS URL with login HTTPS.
-        $CFG->loginhttps = true;
+        // HTTPS URL when login HTTPS is not enabled and site is HTTPS.
+        $CFG->wwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
         $url = $httpswwwroot . '/something/here?really=yes';
         $exception = new moodle_exception('none', 'error', $url);
         $infos = $this->get_exception_info($exception);
@@ -435,14 +435,6 @@ class core_setuplib_testcase extends advanced_testcase {
         $infos = $this->get_exception_info($exception);
         $this->assertSame($CFG->wwwroot . '/', $infos->link);
 
-        // External HTTPS link from fromurl with login HTTPS.
-        $CFG->loginhttps = true;
-        $SESSION->fromurl = 'https://moodle.org/something/here?really=yes';
-        $exception = new moodle_exception('none');
-        $infos = $this->get_exception_info($exception);
-        $this->assertSame($CFG->wwwroot . '/', $infos->link);
-
-        $CFG->loginhttps = $initialloginhttps;
         $SESSION->fromurl = '';
     }
 

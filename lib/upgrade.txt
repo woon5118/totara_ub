@@ -5,6 +5,9 @@ information provided here is intended especially for developers.
 
 * updated popover_region.mustache correcting role attribute
 * Upgraded jQuery to 3.3.1
+* $CFG->loginhttps is now deprecated, do not use it.
+* $PAGE->https_required and $PAGE->verify_https_required() are now deprecated. They are no longer used and will throw a coding_exception.
+* $CFG->httpswwwroot is now deprecated and will always result in the same value as wwwroot.
 
 === 11.0 ===
 

@@ -647,21 +647,23 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('/just/a/path', clean_param('/just/a/path', PARAM_LOCALURL));
         $this->assertSame('course/view.php?id=3', clean_param('course/view.php?id=3', PARAM_LOCALURL));
 
-        // Local absolute HTTPS.
+        // Local absolute HTTPS in a non HTTPS site.
+        $CFG->wwwroot = str_replace('https:', 'http:', $CFG->wwwroot); // Need to simulate non-https site.
         $httpsroot = str_replace('http:', 'https:', $CFG->wwwroot);
-        $CFG->loginhttps = false;
         $this->assertSame('', clean_param($httpsroot, PARAM_LOCALURL));
         $this->assertSame('', clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
-        $CFG->loginhttps = true;
+
+        // Local absolute HTTPS in a HTTPS site.
+        $CFG->wwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
+        $httpsroot = $CFG->wwwroot;
         $this->assertSame($httpsroot, clean_param($httpsroot, PARAM_LOCALURL));
         $this->assertSame($httpsroot . '/with/something?else=true',
             clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
 
         // Test open redirects are not possible.
-        $CFG->loginhttps = false;
         $CFG->wwwroot = 'http://www.example.com';
         $this->assertSame('', clean_param('http://www.example.com.evil.net/hack.php', PARAM_LOCALURL));
-        $CFG->loginhttps = true;
+        $CFG->wwwroot = 'https://www.example.com';
         $this->assertSame('', clean_param('https://www.example.com.evil.net/hack.php', PARAM_LOCALURL));
     }
 

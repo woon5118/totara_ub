@@ -43,9 +43,6 @@ if (!$authplugin->can_signup()) {
     print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
 
-//HTTPS is required in this page when $CFG->loginhttps enabled
-$PAGE->https_required();
-
 $PAGE->set_url('/login/signup.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('login');
@@ -65,7 +62,7 @@ if (isloggedin() and !isguestuser()) {
     // Prevent signing up when already logged in.
     echo $OUTPUT->header();
     echo $OUTPUT->box_start();
-    $logout = new single_button(new moodle_url($CFG->httpswwwroot . '/login/logout.php',
+    $logout = new single_button(new moodle_url('/login/logout.php',
         array('sesskey' => sesskey(), 'loginpage' => 1)), get_string('logout'), 'post');
     $continue = new single_button(new moodle_url('/'), get_string('cancel'), 'get');
     echo $OUTPUT->confirm(get_string('cannotsignup', 'error', fullname($USER)), $logout, $continue);
@@ -96,9 +93,6 @@ if ($mform_signup->is_cancelled()) {
     $authplugin->user_signup($user, true); // prints notice and link to login/index.php
     exit; //never reached
 }
-
-// make sure we really are on the https page when https login required
-$PAGE->verify_https_required();
 
 // Setup custom javascript
 local_js(array(
