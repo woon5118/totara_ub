@@ -46,6 +46,7 @@ class rb_filter_textarea extends rb_filter_type {
         global $SESSION;
         $label = format_string($this->label);
         $advanced = $this->advanced;
+        $defaultvalue = $this->defaultvalue;
 
         $objs = array();
         $objs['select'] = $mform->createElement('select', $this->name.'_op', null, $this->getOperators());
@@ -63,7 +64,10 @@ class rb_filter_textarea extends rb_filter_type {
         // set default values
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
             $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
+        } else {
+            $defaults = $defaultvalue;
         }
+
         if (isset($defaults['operator'])) {
             $mform->setDefault($this->name . '_op', $defaults['operator']);
         }

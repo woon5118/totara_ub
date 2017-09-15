@@ -40,11 +40,12 @@ class rb_filter_date extends rb_filter_type {
      *                          when advanced options are shown (1)
      * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
+     * @param array $defaultvalue Default value for the filter
      *
      * @return rb_filter_date object
      */
-    public function __construct($type, $value, $advanced, $region, $report) {
-        parent::__construct($type, $value, $advanced, $region, $report);
+    public function __construct($type, $value, $advanced, $region, $report, $defaultvalue) {
+        parent::__construct($type, $value, $advanced, $region, $report, $defaultvalue);
 
         if (!isset($this->options['includetime'])) {
             $this->options['includetime'] = false;
@@ -74,6 +75,7 @@ class rb_filter_date extends rb_filter_type {
         global $SESSION;
         $label = format_string($this->label);
         $advanced = $this->advanced;
+        $defaultvalue = $this->defaultvalue;
         $includetime = $this->options['includetime'];
         $includebetween = $this->options['includebetween'];
         $includenotset = $this->options['includenotset'];
@@ -178,10 +180,13 @@ class rb_filter_date extends rb_filter_type {
             $mform->disabledIf($this->name.'_edt[minute]', $this->name.'daysbeforechkbox', 'checked');
         }
 
-        // set default values
+        // Set default values.
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
             $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
+        } else {
+            $defaults = $defaultvalue;
         }
+
         if (isset($defaults['after']) && $defaults['after'] != 0) {
             $mform->setDefault($this->name.'_sck', 1);
             $mform->setDefault($this->name.'_sdt', $defaults['after']);

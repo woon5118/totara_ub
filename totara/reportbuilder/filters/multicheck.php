@@ -37,11 +37,12 @@ class rb_filter_multicheck extends rb_filter_type {
      *                          when advanced options are shown (1)
      * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
+     * @param array $defaultvalue Default value for the filter
      *
      * @return rb_filter_multicheck object
      */
-    public function __construct($type, $value, $advanced, $region, $report) {
-        parent::__construct($type, $value, $advanced, $region, $report);
+    public function __construct($type, $value, $advanced, $region, $report, $defaultvalue) {
+        parent::__construct($type, $value, $advanced, $region, $report, $defaultvalue);
 
         if (!isset($this->options['selectfunc'])) {
             if (!isset($this->options['selectchoices'])) {
@@ -86,6 +87,7 @@ class rb_filter_multicheck extends rb_filter_type {
         global $OUTPUT, $SESSION;
         $grplabel = $label = format_string($this->label);
         $advanced = $this->advanced;
+        $defaultvalue = $this->defaultvalue;
         $options = $this->options['selectchoices'];
         $attr = $this->options['attributes'];
         $simplemode = $this->options['simplemode'];
@@ -123,10 +125,13 @@ class rb_filter_multicheck extends rb_filter_type {
             $mform->setAdvanced($this->name . '_grp');
         }
 
-        // set default values
+        // Set default values.
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
             $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
+        } else {
+            $defaults = $defaultvalue;
         }
+
         if (isset($defaults['operator'])) {
             $mform->setDefault($this->name . '_op', $defaults['operator']);
         }

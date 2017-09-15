@@ -1226,6 +1226,7 @@ class reportbuilder {
             $type = $filter->type;
             $value = $filter->value;
             $advanced = $filter->advanced;
+            $defaultvalue = !empty($filter->defaultvalue) ? unserialize($filter->defaultvalue) : array();
             $region = $filter->region;
             $key = "{$filter->type}-{$filter->value}";
 
@@ -1235,7 +1236,7 @@ class reportbuilder {
             $option = $this->filteroptions[$key];
 
             // Only include filter if a valid object is returned.
-            if ($filterobj = rb_filter_type::get_filter($type, $value, $advanced, $region, $this)) {
+            if ($filterobj = rb_filter_type::get_filter($type, $value, $advanced, $region, $this, $defaultvalue)) {
                 $filterobj->filterid = $filter->id;
                 $filterobj->filtername = $filter->filtername;
                 $filterobj->customname = $filter->customname;
@@ -6334,6 +6335,7 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
             $todb->type = $filter['type'];
             $todb->value = $filter['value'];
             $todb->advanced = isset($filter['advanced']) ? $filter['advanced'] : 0;
+            $todb->defaultvalue = !empty($filter['defaultvalue']) ? serialize($filter['defaultvalue']) : null;
             if (isset($filter['fieldname'])) {
                 $todb->filtername = $filter['fieldname'];
                 $todb->customname =  1;

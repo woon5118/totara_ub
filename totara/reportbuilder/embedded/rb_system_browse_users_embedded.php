@@ -72,6 +72,7 @@ class rb_system_browse_users_embedded extends rb_base_embedded {
                 'type' => 'user',
                 'value' => 'deleted',
                 'advanced' => 0,
+                'defaultvalue' => ['operator'=> 1, 'value' => 0],
             ),
             array(
                 'type' => 'user',

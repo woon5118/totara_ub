@@ -42,6 +42,7 @@ class rb_filter_type {
     public $type;
     public $value;
     public $advanced;
+    public $defaultvalue;
     public $region;
     public $filtertype;
     public $label;
@@ -71,13 +72,15 @@ class rb_filter_type {
      *                          when advanced options are shown (1)
      * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
+     * @param array $defaultvalue The default filter value
      *
      * @return filter_* object
      */
-    public function __construct($type, $value, $advanced, $region, $report) {
+    public function __construct($type, $value, $advanced, $region, $report, $defaultvalue = array()) {
         $this->type = $type;
         $this->value = $value;
         $this->advanced = $advanced;
+        $this->defaultvalue = $defaultvalue;
         $this->region = $region;
         $this->report = $report;
         $this->name = "{$type}-{$value}";
@@ -324,10 +327,11 @@ class rb_filter_type {
      * @param integer $advanced If the filter should be shown by default (0) or only
      *                          when advanced options are shown (1)
      * @param reportbuilder object $report The report this filter is for
+     * @param array $defaultvalue The default value for the filter
      *
      * @return rb_filter_type|bool false on failure
      */
-    public static function get_filter($type, $value, $advanced, $region, $report) {
+    public static function get_filter($type, $value, $advanced, $region, $report, $defaultvalue = array()) {
         global $CFG;
 
         // figure out what sort of filter it is
@@ -348,7 +352,7 @@ class rb_filter_type {
             return false;
         }
 
-        return new $classname($type, $value, $advanced, $region, $report);
+        return new $classname($type, $value, $advanced, $region, $report, $defaultvalue);
     }
 
 

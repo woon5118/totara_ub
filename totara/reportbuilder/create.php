@@ -113,6 +113,7 @@ if ($fromform = $mform->get_data()) {
                 $todb->type = $option['type'];
                 $todb->value = $option['value'];
                 $todb->advanced = isset($option['advanced']) ? $option['advanced'] : 0;
+                $todb->defaultvalue = isset($option['defaultvalue']) ? serialize($option['defaultvalue']) : '';
                 $todb->sortorder = $so;
                 $todb->region = isset($option['region']) ? $option['region'] : rb_filter_type::RB_FILTER_REGION_STANDARD;
                 $DB->insert_record('report_builder_filters', $todb);

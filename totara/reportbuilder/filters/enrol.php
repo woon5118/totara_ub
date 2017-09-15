@@ -51,6 +51,7 @@ class rb_filter_enrol extends rb_filter_type {
         global $SESSION;
         $label = format_string($this->label);
         $advanced = $this->advanced;
+        $defaultvalue = $this->defaultvalue;
 
         $options = array(
             1 => get_string('yes'),
@@ -67,7 +68,10 @@ class rb_filter_enrol extends rb_filter_type {
         // set default values
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
             $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
+        } else {
+            $defaults = $defaultvalue;
         }
+
         if (isset($defaults['value'])) {
             $mform->setDefault($this->name, $defaults['value']);
         }

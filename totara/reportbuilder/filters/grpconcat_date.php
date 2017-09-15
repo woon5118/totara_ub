@@ -31,8 +31,8 @@ class rb_filter_grpconcat_date extends rb_filter_date {
 
     private $datefield, $datejoin;
 
-    public function __construct($type, $value, $advanced, $region, $report) {
-        parent::__construct($type, $value, $advanced, $region, $report);
+    public function __construct($type, $value, $advanced, $region, $report, $defaultvalue) {
+        parent::__construct($type, $value, $advanced, $region, $report, $defaultvalue);
 
         if (!isset($this->options['prefix']) || !isset($this->options['datefield'])) {
             throw new ReportBuilderException('concatenated date filters must have a \'datefield\' set that maps

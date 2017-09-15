@@ -40,9 +40,9 @@ class rb_filter_course_multi extends rb_filter_type {
                      self::COURSE_MULTI_NOTEQUALTO => get_string('isnotequalto', 'filters'));
     }
 
-    public function __construct($type, $value, $advanced, $region, $report) {
+    public function __construct($type, $value, $advanced, $region, $report, $defaultvalue) {
         global $SESSION;
-        parent::__construct($type, $value, $advanced, $region, $report);
+        parent::__construct($type, $value, $advanced, $region, $report, $defaultvalue);
 
         // We need to check the user has permission to view the courses in the saved
         // search as these may be a search created by someone else who can view

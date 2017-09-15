@@ -80,6 +80,7 @@
         <FIELD NAME="filtername" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false" COMMENT="Visible name describing the filter to report users"/>
         <FIELD NAME="customname" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates whether the user has customised a name or if they are still using the default filter name value"/>
         <FIELD NAME="region" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates whether filter appears at the top or in the sidebar"/>
+        <FIELD NAME="defaultvalue" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialized data containing the default value for the filter"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

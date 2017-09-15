@@ -46,12 +46,13 @@ class rb_filter_grpconcat_jobassignment extends rb_filter_hierarchy_multi {
      *                          when advanced options are shown (1)
      * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
+     * @param array $defaultvalue Default value for the filter
      *
      * @return rb_filter_jobassignment_multi object
      */
-    public function __construct($type, $value, $advanced, $region, $report) {
+    public function __construct($type, $value, $advanced, $region, $report, $defaultvalue) {
         // We don't want to call parent construct because of the extra checks, so directly call the base filter.
-        rb_filter_type::__construct($type, $value, $advanced, $region, $report);
+        rb_filter_type::__construct($type, $value, $advanced, $region, $report, $defaultvalue);
 
 
         // The field in the job_assignment table that this filter refers to.
