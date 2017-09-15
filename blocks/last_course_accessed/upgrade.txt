@@ -1,6 +1,10 @@
 This files describes API changes in /blocks/last_course_accessed,
 information provided here is intended especially for developers.
 
+=== 10.1 ===
+
+* updated block.mustache, deprecating 'last_accessed'
+
 === 10.0 ===
 
 classes/helper.php class has been deprecated as the single method it contained has been depreacted and moved to core.

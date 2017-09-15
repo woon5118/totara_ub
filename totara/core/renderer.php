@@ -189,8 +189,7 @@ class totara_core_renderer extends plugin_renderer_base {
         }
 
         $data->statustext = get_string($COMPLETION_STATUS[$status], 'completion');
-        // TODO: Need to get a better way to get the width right
-        $pbar = new \static_progress_bar('', '70');
+        $pbar = new \static_progress_bar('', '0');
         $pbar->set_progress((string)$percent);
         $data->pbar = $pbar->export_for_template($OUTPUT);
 
