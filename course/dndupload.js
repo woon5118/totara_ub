@@ -108,16 +108,11 @@ M.course_dndupload = {
             handlefile = (this.handlers.filehandlers.length > 0),
             handletext = false,
             handlelink = false,
-            i = 0,
-            styletop,
-            styletopunit;
+            i = 0;
 
         if (!coursecontents) {
             return;
         }
-
-        div = Y.Node.create('<div id="dndupload-status"></div>').setStyle('opacity', '0.0');
-        coursecontents.insert(div, 0);
 
         for (i = 0; i < this.handlers.types.length; i++) {
             switch (this.handlers.types[i].identifier) {
@@ -130,60 +125,37 @@ M.course_dndupload = {
                     break;
             }
         }
-        $msgident = 'dndworking';
-        if (handlefile) {
-            $msgident += 'file';
-        }
-        if (handletext) {
-            $msgident += 'text';
-        }
-        if (handlelink) {
-            $msgident += 'link';
-        }
-        div.setContent(M.util.get_string($msgident, 'moodle'));
 
-        styletop = div.getStyle('top') || '0px';
-        styletopunit = styletop.replace(/^\d+/, '');
-        styletop = parseInt(styletop.replace(/\D*$/, ''), 10);
+        require(['core/str', 'core/templates'], function(strLib, templateLib) {
+            var $msgident = 'dndworking';
+            if (handlefile) {
+                $msgident += 'file';
+            }
+            if (handletext) {
+                $msgident += 'text';
+            }
+            if (handlelink) {
+                $msgident += 'link';
+            }
+            strLib.get_string($msgident, 'moodle').then(function (string) {
+                var context = {message: string};
+                return templateLib.render('core/notification_info', context);
+            }).then(function (html) {
+                var div = Y.Node.create(html)
+                    .set('id', 'dndupload-status');
 
-        var fadein = new Y.Anim({
-            node: '#dndupload-status',
-            from: {
-                opacity: 0.0,
-                top: (styletop - 30).toString() + styletopunit
-            },
+                var styletop = div.getStyle('top') || '0px';
+                var styletopunit = styletop.replace(/^\d+/, '');
+                var styletop = parseInt(styletop.replace(/\D*$/, ''), 10);
+                coursecontents.insert(div, 0);
 
-            to: {
-                opacity: 1.0,
-                top: styletop.toString() + styletopunit
-            },
-            duration: 0.5
-        });
+                // Do this so that there is a nice fade in effect
+                div.removeClass('in');
+                setTimeout(function () {div.addClass('in');}, 1);
 
-        var fadeout = new Y.Anim({
-            node: '#dndupload-status',
-            from: {
-                opacity: 1.0,
-                top: styletop.toString() + styletopunit
-            },
-
-            to: {
-                opacity: 0.0,
-                top: (styletop - 30).toString() + styletopunit
-            },
-            duration: 0.5
-        });
-
-        fadein.run();
-        fadein.on('end', function(e) {
-            Y.later(3000, this, function() {
-                fadeout.run();
-            });
-        });
-
-        fadeout.on('end', function(e) {
-            Y.one('#dndupload-status').remove(true);
-        });
+                setTimeout(function () {div.removeClass('in');}, 3000);
+            })
+        })
     },
 
     /**
