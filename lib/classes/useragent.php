@@ -948,11 +948,29 @@ class core_useragent {
             if (preg_match('/rv\:([1-2])\.([0-9])/', self::get_user_agent_string(), $matches)) {
                 $classes[] = "gecko{$matches[1]}{$matches[2]}";
             }
+        } else if (self::is_edge()) {
+            // Totara: MS Edge pretends to be Safari.
+            $classes[] = 'msedge'; // Note that 'edge' class might collide with existing classes.
+            if (self::is_webkit_android()) {
+                // Windows mobile masquerade as Android.
+                $classes[] = 'msmobile';
+            }
+        } else if (self::is_chrome()) {
+            // Totara: Give chrome its own class.
+            $classes[] = 'chrome';
+            if (self::is_safari_ios()) {
+                // At the moment chrome identifies itself as 'CriOS',
+                // so for now it will be identified as .safari.ios class.
+                $classes[] = 'ios';
+            } else if (self::is_webkit_android()) {
+                $classes[] = 'android';
+            }
         } else if (self::is_webkit()) {
             $classes[] = 'safari';
             if (self::is_safari_ios()) {
                 $classes[] = 'ios';
             } else if (self::is_webkit_android()) {
+                // Totara: we should not get here.
                 $classes[] = 'android';
             }
         } else if (self::is_opera()) {
