@@ -449,6 +449,8 @@ function upgrade_stale_php_files_present() {
     global $CFG;
 
     $someexamplesofremovedfiles = array(
+        // Removed in Totara 13.0
+        '/auth/README.txt',
         // Removed in Totara 12.0
         '/admin/auth_config.php',
         '/totara/catalog/classes/totara/menu/catalog.php', // post RC removal
