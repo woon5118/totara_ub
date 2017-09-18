@@ -219,9 +219,11 @@ class totara_program_upgradelib_testcase extends reportcache_advanced_testcase {
         $progcomp1 = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0));
         $this->assertEquals(0, $progcomp1->timestarted);
 
+        $sql = 'SELECT MIN(timestarted) FROM {prog_completion} WHERE userid = :uid AND coursesetid > 0';
         $progcomp2 = $DB->get_record('prog_completion', array('userid' => $this->user2->id, 'coursesetid' => 0));
         $this->assertNotEquals($progcomp2->timestarted, $this->past); // Even though we set the course to earlier you cant start before assignment.
-        $this->assertGreaterThanOrEqual($progcomp2->timestarted, $progcomp2->timecreated);
+        $this->assertEquals($progcomp2->timestarted, $DB->get_field_sql($sql, array('uid' => $this->user2->id)));
+        $this->assertGreaterThanOrEqual($progcomp2->timecreated, $progcomp2->timestarted);
 
         $progcomp3 = $DB->get_record('prog_completion', array('userid' => $this->user3->id, 'coursesetid' => 0));
         $this->assertGreaterThanOrEqual($this->future, $progcomp3->timestarted);
