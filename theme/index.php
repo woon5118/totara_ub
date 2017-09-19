@@ -139,7 +139,7 @@ if (!empty($CFG->enabledevicedetection) && empty($device)) {
 
         $lockwarning = '';
         if ($themelocked) {
-            $lockwarning = html_writer::div(get_string('configoverride', 'admin'), 'alert alert-info');
+            $lockwarning = $OUTPUT->notification(get_string('configoverride', 'admin'), \core\output\notification::NOTIFY_INFO);
         }
 
         $table->data[] = array(
@@ -215,7 +215,7 @@ if (!empty($CFG->enabledevicedetection) && empty($device)) {
         $infocell = $OUTPUT->heading($strthemename, 3);
 
         if ($themelocked) {
-            $infocell .= html_writer::div(get_string('configoverride', 'admin'), 'alert alert-info');
+            $infocell .= $OUTPUT->notification(get_string('configoverride', 'admin'), \core\output\notification::NOTIFY_INFO);
         }
 
         // Button to choose this as the main theme or unset this theme for devices other then default.
