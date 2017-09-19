@@ -2536,7 +2536,7 @@ EOD;
             $message .= '<p class="errormessage">' . get_string('installproblem', 'error') . '</p>';
             //It is usually not possible to recover from errors triggered during installation, you may need to create a new database or use a different database prefix for new installation.
         }
-        $output .= $this->box($message, 'errorbox alert alert-danger', null, array('data-rel' => 'fatalerror'));
+        $output .= $this->notification($message, \core\output\notification::NOTIFY_ERROR);
 
         if ($CFG->debugdeveloper) {
             if (!empty($debuginfo)) {
