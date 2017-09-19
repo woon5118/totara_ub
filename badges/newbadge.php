@@ -113,7 +113,7 @@ if ($form->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->box('', 'alert alert-warning notifyproblem hide', 'check_connection');
+echo $OUTPUT->heading(get_string('newbadge', 'badges'));
 
 $form->display();
 

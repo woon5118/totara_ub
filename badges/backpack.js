@@ -22,21 +22,22 @@ function addtobackpack(event, args) {
  * Check if website is externally accessible from the backpack.
  */
 function check_site_access() {
-    var add = Y.one('#check_connection');
-
     var callback = {
-            method: "GET",
-            on: {
-                success: function(id, o, args) {
-                            var data = Y.JSON.parse(o.responseText);
-                            if (data.code == 'http-unreachable') {
-                                add.setHTML(data.response);
-                                add.removeClass('hide');
-                            }
-                        },
-                failure: function(o) { }
+        method: "GET",
+        on: {
+            success: function(id, o) {
+                var data = Y.JSON.parse(o.responseText);
+                if (data.code == 'http-unreachable') {
+                    require(['core/templates'], function(templateLib) {
+                        var context = {message: data.response};
+                        templateLib.render('core/notification_warning', context).done(function(html) {
+                            document.getElementById('maincontent').insertAdjacentHTML('afterend', html);
+                        });
+                    });
+                }
             }
-        };
+        }
+    };
 
     Y.use('io-base', function(Y) {
         Y.io('ajax.php', callback);
