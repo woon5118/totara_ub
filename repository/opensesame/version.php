@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017042600;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2016120502;        // Requires this Moodle version.
+$plugin->version   = 2017091900;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2016120504;        // Requires this Moodle version.
 $plugin->component = 'repository_opensesame'; // Full name of the plugin (used for diagnostics).
