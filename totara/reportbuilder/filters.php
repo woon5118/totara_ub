@@ -101,7 +101,7 @@ foreach ($report->columnoptions as $option) {
 }
 
 $globalinitialdisplay = get_config('totara_reportbuilder', 'globalinitialdisplay');
-$initialdisplay = $report->initialdisplay == RB_INITIAL_DISPLAY_HIDE || ($globalinitialdisplay && !$report->embedded);
+$initialdisplay = ($report->initialdisplay == RB_INITIAL_DISPLAY_HIDE || ($globalinitialdisplay && !$report->embedded)) ? 1 : 0;
 $sizeoffilters  = sizeof($report->filters) + sizeof($report->searchcolumns);
 $PAGE->requires->strings_for_js(array('saving', 'confirmfilterdelete', 'confirmsearchcolumndelete', 'delete', 'moveup',
     'movedown', 'add', 'initialdisplay_error', 'confirmfilterdelete_rid_enabled', 'confirmfilterdelete_grid_enabled'), 'totara_reportbuilder');
