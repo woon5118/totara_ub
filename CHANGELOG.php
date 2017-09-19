@@ -3,6 +3,285 @@
 
 Totara LMS Changelog
 
+Release 10.0 (22nd September 2017):
+===================================
+
+Key:           +   Evergreen only
+
+Important:
+
+    TL-12978   +   Include features, improvements and bug fixes from Moodle 3.2
+
+                   This release contains features, improvements and bug fixes from Moodle 3.2
+                   By reviewing the changelog you can find out which Moodle issues have been
+                   included.
+                   Please be aware that not all Moodle changes are included in Totara, we are
+                   now selective about what gets included from upstream.
+
+    TL-15905   +   Minimum required version of MS SQL Server is 2014
+
+Security issues:
+
+    TL-12944       Updated Web Service tokens to use cryptographically secure generators
+
+                   Previously, Web Service tokens were generated via a method which would
+                   generate a random and hard-to-guess token that was not considered
+                   cryptographically secure. New tokens will now be generated using
+                   cryptographically secure methods, providing they are available in the
+                   server's current version of PHP.
+
+    TL-16116       Added a check for group permissions when viewing course user reports
+    TL-16117       Events belonging to activity modules can no longer be manually deleted from the calendar
+    TL-16118       Fixed the logic in checking whether users can view course profiles
+    TL-16119       Fixed incomplete escaping on the Feedback activity contact form
+    TL-16120       Added warning to admins when a development libs directory exists.
+
+New features:
+
+    TL-4156        Added the course completion editor
+
+                   The course completion editor is accessible in Course administration >
+                   Course completion, to all users who have the
+                   'totara/completioneditor:editcoursecompletion' capability in the course
+                   context (default is administrators only). The editor allows you to edit
+                   course completion, criteria completion, activity completion and history
+                   data, allowing you to put this data into any valid state. It includes
+                   transaction logs, which record all changes that are made to these records
+                   (both from within the editor and in other areas of Totara, e.g. completion
+                   of an activity, or when cron reaggregates completion). It also includes a
+                   checker, which can be used to find records which have data in an invalid
+                   state.
+
+Improvements:
+
+    TL-853     +   Replaced existing Browse List of Users page with Report builder report
+
+                   This new version of the user report provides the functionality of the
+                   original plus all the benefits of a report generated within Report builder.
+
+                   Please note, Mnet is not supported in the new report. You can however,
+                   access Mnet functionality through a legacy version of the report.
+
+    TL-8468    +   Added support for activity completion to course completion progress bars
+
+                   Previously a user's progress towards completion of a course were indicated
+                   via one of 3 states - not yet started, in progress and completed. This is
+                   now replaced with a progressbar that indicates the actual progress towards
+                   completion as a percentage.
+                   If a user is unable to complete a course due to completion tracking not
+                   enabled for the course,  no completion criteria defined for the course, or
+                   the specific user's progress not being tracked, an indication of this is
+                   shown instead of a progress bar.
+
+                   In previous versions a user could obtain detail on actions required to
+                   complete a course by clicking on the course's status bar. This is currently
+                   not available but will be provided by the implementation of TL-15920
+
+    TL-8741    +   Corrected handling of unique values for date and menu user profile fields.
+    TL-9204    +   Updated 'Manage reports' page to use an embedded report
+
+                   The report builder 'Manage reports' page has been split into two pages, one
+                   for user reports and one for embedded reports. There is now a separate
+                   capability that can be assigned independently so you can control who can
+                   manage embedded reports.
+
+                   In addition there is a new 'Reports' report source and the 'Manage reports'
+                   page has been converted to an embedded report, which means it's possible to
+                   customise the columns that are shown, add filters and export the list of
+                   reports.
+
+    TL-9315    +   Added self evaluations to 360° Feedback
+    TL-10228   +   Add Job Assignment HR Import source
+
+                   Job assignments can no longer be imported using the User HR Import source.
+                   Data must now be imported using this source instead. Job assignment data
+                   should be removed from the User source.
+
+                   IMPORTANT: If users had their own 'HR Import' setting enabled for their
+                   user record, all of their job assignments records will have the new 'HR
+                   Import' setting enabled after upgrade.
+
+                   This only applies during the upgrade. Updating a user's 'HR Import' setting
+                   enabled after upgrade will not alter this field for their job assignments.
+
+                   Consistent with how this setting operates for users and hierarchies, this
+                   setting is off by default when adding a job assignment manually. It will be
+                   on by default for job assignments created by the new HR Import source. The
+                   setting is only visible in a job assignment record once the Job Assignment
+                   HR Import source has been enabled.
+
+    TL-10256   +   Removed incorrect HTML label tags (and replaced by aria attributes where appropriate) when viewing grader report
+    TL-10918   +   Added additional information about what will be deleted when deleting Job assignments
+    TL-11014   +   Improved the handling of single course certifications and programs within the Current Learning block
+
+                   If a Program or the current path of a Certification only contains a single
+                   course, then the item will be shown without the ability to expand and will
+                   link directly to the Course within it instead of the Program/Certification.
+
+    TL-12661   +   Added an accessible label when search glossary entries
+    TL-12666   +   Added accessible text when changing forum digest type
+    TL-12788   +   Add scheduled tasks to clean the course and certification completion upload logs
+
+                   # added scheduled tasks to clean the course and certification completion
+                   upload logs
+                   # added 'Settings' submenu for Upload Completion Records where user can
+                   specify the length of time a user want to keep the course/certification
+                   completion upload logs information.
+
+    TL-12949   +   Web service tokens no longer shown in Manage token interface
+
+                   Previously, any current web service tokens were shown in the Manage token
+                   admin interface. These are now only shown one time when they are created
+                   and can not be found again after navigating away from the page.
+
+                   The 'Security keys' page in the user preferences is unaffected by this, as
+                   that only shows a user's own tokens and only if they have the correct
+                   permission to view it.
+
+    TL-14244       Updated default branding to Totara Learn
+
+                   Changed language strings and logos to use the new product name "Totara
+                   Learn" instead of "Totara LMS".
+
+    TL-14275       Users can now cause self completion from within a course activity
+
+                   This ability has been added to all core modules excluding Lesson and Quiz
+                   (where a user should at least attempt the activity). Non-core modules will
+                   need to be modified to support this functionality
+
+    TL-14280   +   Improved pix mustache helper to support JSON objects
+    TL-14394   +   Add global restriction initial display setting for report bulder
+    TL-14789   +   Improved readability of label, button, badge and alert UI components.
+    TL-14815   +   New report source for individual job assignments
+    TL-14825   +   Job assignment filters are now using consistently correlated subqueries
+    TL-15012   +   Added a new capability to upload courses
+    TL-15056       Added warning notice to the top of delete category page
+    TL-15768   +   Seminar enrolment expiration is now processed by a dedicated scheduled task
+
+                   Course enrolments for audience members when memberships change in an
+                   audience are now synchronised by a dedicated scheduled task.
+                   The timing of this task can be configured in the Scheduled tasks
+                   interface.
+                   The task itself can be manually executed by running the following as the
+                   web server user on the command line:
+
+                       php admin/tool/task/cli/schedule_task.php
+                       --execute="\\enrol_cohort\\task\\sync_members"
+
+                   Expiration of Seminar direct enrolments is now processed by a dedicated
+                   scheduled task.
+                   The timing of this task can be configured in the Scheduled tasks
+                   interface.
+                   The task itself can be manually executed by running the following as the
+                   web server user on the command line:
+
+                       php admin/tool/task/cli/schedule_task.php
+                       --execute="\\enrol_totara_facetoface\\task\\process_expirations"
+
+    TL-15773   +   Ensured body and link text colour contrast ratio is at least 3:1 (WCAG 2.0 A compliant)
+    TL-15774   +   Improved readability of notifications in theme_basis
+    TL-15781   +   Role definition caching now makes use of an MUC application cache
+    TL-15834       Improved Datepicker in Totara forms
+    TL-15880   +   Removed rolechangedwarning css
+    TL-15888   +   Behat and PHPUnit testing does not require superuser privileges for testing with PostgreSQL
+    TL-15902   +   Behat configuration improvements
+
+                   Developers can now run vendor/bin/behat without specifying of the
+                   configuration file.
+
+                   Chrome is now the default browser and all recommended setting are included
+                   by default.
+
+    TL-15908   +   Improved behat error detection
+    TL-15935   +   Improved performance and reliability of behat testing
+    TL-15965   +   Use BEHAT cookie to limit access to test sites
+    TL-15972   +   Fixed brand notification warning in element library
+    TL-15974   +   Upload message when editing a course now uses standard bootstrap fade
+    TL-15983   +   Improved support for MariaDB 10.3
+    TL-15996       Improved test environment init when switching PHP versions
+    TL-16009   +   Form elements used for password entry are using standardised unmasking logic
+    TL-16146   +   Behat settings can be changed via behat_local.yml file instead of CFG settings
+    TL-16148       Improved performance of category management page
+
+Bug fixes:
+
+    TL-11012       Fixed formatting of grade percentage shown in quiz review
+
+                   The configured 'decimal places in grades' value of a quiz is now also used
+                   when formatting the grade percentage on the quiz review page. In earlier
+                   releases the percentage has always been formatted with 0 decimal points
+                   which resulted in confusing results.
+
+                   Administrators and trainers are still responsible for ensuring that the
+                   configured 'decimal places in grades' value will not result in confusion
+                   for students due to the rounding up of the displayed values.
+
+                   It is advised to use at least 2 decimal places if a student can score a
+                   fraction of a point in any question in the quiz.
+
+    TL-14002   +   Report table block reports take up the available width regardless of sidebar filters
+    TL-14674   +   Fixed certification membership report not showing "Not assigned" status
+    TL-14676       Fixed error when deleting a closed 360 Feedback
+    TL-14753       Fixed the display of grades within the course completion report sources
+    TL-14996       Disabled multiple selection during manager selection in signup form
+    TL-15038       Fixed error when trying to save a search with availability filter in Rooms and Assets reports
+    TL-15785       Fixed the display of manager and appraiser filters while creating a saved search
+    TL-15844   +   Added scroll bar when viewing mustache template list
+    TL-15879       Fixed missing icon from Progress column in Record of Learning in some cases
+    TL-15883   +   Ensured Flavours admin UI uses Bootstrap 3 variables
+    TL-15884       Fixed an Job assignment error when taking attendance for a Seminar activity
+    TL-15891       Added checks and fixes for orphaned program user assignment exceptions
+
+                   Under certain exceptional circumstances, it is possible for a user assigned
+                   to a program or certification to have an exception, but that exception does
+                   not show up in the 'Exception Report' tab. In this state, the user is
+                   unable to continue working on the program, and the exception cannot be
+                   resolved. With this patch, the completion checker has been extended to
+                   detect this problem, and two triggerable fixes have been provided.
+
+                   To resolve the problem, run the program and certification completion
+                   checkers to find all records affected, or edit a completion record, then
+                   choose to either assign the users or have the exceptions recalculated. If
+                   the 'recalculate exceptions' option is chosen and an exception still
+                   applies to a user, then after fixing the problem you can resolve the
+                   exceptions as normal in the 'Exception Report' tab.
+
+    TL-15892       Ensured course deletion does not effect awarded course badges
+    TL-15897       Fixed some typos in Certification language strings
+    TL-15899       Corrected inconsistent validation of Seminar sender address setting
+    TL-15900       Fixed manager's manager not updating in dynamic appraisals
+
+                   After upgrade, the next time the "Update learner assignments to appraisals"
+                   scheduled task is run, it will update any managers' managers that have
+                   changed, where the update is appropriate.
+
+    TL-15919       Fixed missing delete assignment button for active appraisals
+    TL-15921       Fixed multiple display of seminar attendees that have been approved more than once
+    TL-15936       Fixed detection of non-lowercase authentication plugin names in HR Sync on OSX and Windows
+    TL-15937       Added missing appraisal data generator reset
+    TL-15938   +   Fixed several date related issues in behat
+    TL-15941   +   Fixed a use of count() on an item that doesn't implement countable within assign, lesson and quiz modules
+    TL-15946   +   Fixed a use of count() on an item that doesn't implement countable within report builder.
+    TL-15966   +   Changed loading icon when uploading a file to a course to a font icon
+    TL-15969   +   Added icons to notifications when on the site notifications page
+    TL-15971   +   Fixed mform tags issue in element library
+    TL-15977       Fixed SCORM cmi.interaction bug
+    TL-15985   +   Corrected Behat test regressions introduced by TL-8741.
+    TL-16010       Added reset method to hierarchy generator
+    TL-16121       Fixed View Details link not working when user is viewing appraisal answers only
+    TL-16126       Fixed how choice activity data is reset by certification windows
+    TL-16159   +   Added 'msedge' and 'chrome' CSS classes to allow browser targeting
+
+Miscellaneous Moodle fixes:
+
+    TL-16033       MDL-57649: Fixed removing of attached files in question pages of lesson module
+
+                   Fixed bug in lesson activity which did not automatically remove files
+                   attached to question pages when those pages were deleted.
+
+    TL-16034   +   Reverted MDL-54849 to return behaviour of next question button in lessons
+
+
 Release Evergreen (23rd August 2017):
 =====================================
 
