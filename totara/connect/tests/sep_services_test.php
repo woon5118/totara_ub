@@ -517,13 +517,15 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
         $result = sep_services::get_positions($client2, array());
         $this->assertSame('success', $result['status']);
         $this->assertCount(2, $result['data']);
-        $this->assertCount(2, $result['data']['frameworks']);
-        $this->assertCount(2, $result['data']['positions']);
 
-        $this->assertEquals($pos_framework1, $result['data']['frameworks'][0]);
-        $this->assertEquals($pos_framework3, $result['data']['frameworks'][1]);
-        $this->assertEquals($pos1, $result['data']['positions'][0]);
-        $this->assertEquals($pos3, $result['data']['positions'][1]);
+        // Normalise the order of results first.
+        core_collator::asort_objects_by_property($result['data']['frameworks'], 'id', core_collator::SORT_NUMERIC);
+        $result['data']['frameworks'] = array_values($result['data']['frameworks']);
+        core_collator::asort_objects_by_property($result['data']['positions'], 'id', core_collator::SORT_NUMERIC);
+        $result['data']['positions'] = array_values($result['data']['positions']);
+
+        $this->assertEquals(array($pos_framework1, $pos_framework3), $result['data']['frameworks']);
+        $this->assertEquals(array($pos1, $pos3), $result['data']['positions']);
     }
 
     public function test_get_organisations() {
@@ -560,13 +562,15 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
         $result = sep_services::get_organisations($client2, array());
         $this->assertSame('success', $result['status']);
         $this->assertCount(2, $result['data']);
-        $this->assertCount(2, $result['data']['frameworks']);
-        $this->assertCount(2, $result['data']['organisations']);
 
-        $this->assertEquals($org_framework1, $result['data']['frameworks'][0]);
-        $this->assertEquals($org_framework3, $result['data']['frameworks'][1]);
-        $this->assertEquals($org1, $result['data']['organisations'][0]);
-        $this->assertEquals($org3, $result['data']['organisations'][1]);
+        // Normalise the order of results first.
+        core_collator::asort_objects_by_property($result['data']['frameworks'], 'id', core_collator::SORT_NUMERIC);
+        $result['data']['frameworks'] = array_values($result['data']['frameworks']);
+        core_collator::asort_objects_by_property($result['data']['organisations'], 'id', core_collator::SORT_NUMERIC);
+        $result['data']['organisations'] = array_values($result['data']['organisations']);
+
+        $this->assertEquals(array($org_framework1, $org_framework3), $result['data']['frameworks']);
+        $this->assertEquals(array($org1, $org3), $result['data']['organisations']);
     }
 
     public function test_get_sso_user() {
