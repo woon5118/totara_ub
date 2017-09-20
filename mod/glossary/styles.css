@@ -123,5 +123,13 @@
 
 .path-mod-glossary .printicon {
     background: url([[pix:t/print]]) no-repeat scroll 2px center transparent;
+}
+
+.dir-ltr.path-mod-glossary .printicon {
     padding-left: 20px;
+}
+
+.dir-rtl.path-mod-glossary .printicon {
+    padding-right: 20px;
+    background-position-x: right;
 }
