@@ -441,15 +441,6 @@ class behat_hooks extends behat_base {
         $user = $DB->get_record('user', array('username' => 'admin'));
         \core\session\manager::set_user($user);
 
-        // Reset the browser if specified in config.php.
-        if (!empty($CFG->behat_restart_browser_after) && $this->running_javascript()) {
-            $now = time();
-            if (self::$lastbrowsersessionstart + $CFG->behat_restart_browser_after < $now) {
-                $session->restart();
-                self::$lastbrowsersessionstart = $now;
-            }
-        }
-
         // Set the theme if not default.
         if ($suitename !== "default") {
             set_config('theme', $suitename);
@@ -460,15 +451,9 @@ class behat_hooks extends behat_base {
         try {
             // Let's be conservative as we never know when new upstream issues will affect us.
             $session->visit($this->locate_path('/'));
+            $this->wait_for_pending_js();
         } catch (Exception $e) {
-            // Totara: Something weird is going on, wait a bit and retry before stopping the whole run.
-            try {
-                $session->restart();
-                sleep(5);
-                $session->visit($this->locate_path('/'));
-            } catch (Exception $e) {
-                throw new Exception('Visiting of the main page failed', 0, $e);
-            }
+            throw new Exception('Visiting of the main page failed', 0, $e);
         }
 
         raise_memory_limit(MEMORY_EXTRA); // Totara includes very many files.
@@ -485,23 +470,9 @@ class behat_hooks extends behat_base {
         // Run all test with medium (1024x768) screen size, to avoid responsive problems.
         try {
             $this->resize_window('medium');
-        } catch (Exception $e) {
-            throw new Exception('Error resizing the main page', 0, $e);
-        }
-
-        try {
             $this->wait_for_pending_js();
         } catch (Exception $e) {
-            try {
-                // We get here when devs do not close changed form at end of test and unsaved form data alert pops up.
-                $session->restart();
-                sleep(5);
-                $session->visit($this->locate_path('/'));
-                sleep(2);
-                $this->wait_for_pending_js();
-            } catch (Exception $e) {
-                throw new Exception('Main JS page not initialised properly', 0, $e);
-            }
+            throw new Exception('Error resizing the main page', 0, $e);
         }
 
         try {

@@ -136,6 +136,7 @@ class behat_totara_core extends behat_base {
         \behat_hooks::set_step_readonly(false);
         $node = $this->find_totara_menu_item($text);
         $this->getSession()->visit($this->locate_path($node->getAttribute('href')));
+        $this->wait_for_pending_js();
     }
 
     /**

@@ -1611,6 +1611,7 @@ class behat_course extends behat_base {
                 // We want to redirect here.
                 $url = $node->getAttribute('href');
                 $this->getSession()->getDriver()->visit($url);
+                $this->wait_for_pending_js();
             }
         } else {
             $exception = new ExpectationException("Unable to find the more information icon for the course '{$coursename}'", $this->getSession());

@@ -76,6 +76,7 @@ class behat_general extends behat_base {
     public function i_am_on_homepage() {
         \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/'));
+        $this->wait_for_pending_js();
     }
 
     /**
@@ -86,6 +87,7 @@ class behat_general extends behat_base {
     public function i_am_on_site_homepage() {
         \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/?redirect=0'));
+        $this->wait_for_pending_js();
     }
 
     /**
@@ -96,6 +98,7 @@ class behat_general extends behat_base {
     public function i_am_on_course_index() {
         \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/course/index.php'));
+        $this->wait_for_pending_js();
     }
 
     /**
@@ -106,6 +109,7 @@ class behat_general extends behat_base {
     public function reload() {
         \behat_hooks::set_step_readonly(false);
         $this->getSession()->reload();
+        $this->wait_for_pending_js();
     }
 
     /**
@@ -158,6 +162,8 @@ class behat_general extends behat_base {
             // Reload the page if no URL was provided.
             $this->getSession()->getDriver()->reload();
         }
+
+        $this->wait_for_pending_js();
     }
 
     /**
@@ -1159,6 +1165,7 @@ class behat_general extends behat_base {
     public function i_trigger_cron() {
         \behat_hooks::set_step_readonly(false);
         $this->getSession()->visit($this->locate_path('/admin/cron.php'));
+        // No need to wait for JS, cron is a plain text page.
     }
 
     /**

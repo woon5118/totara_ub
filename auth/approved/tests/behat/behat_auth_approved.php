@@ -33,5 +33,6 @@ class behat_auth_approved extends behat_base {
         global $DB;
         $request = $DB->get_record('auth_approved_request', array('email' => $email));
         $this->getSession()->visit($this->locate_path('auth/approved/confirm.php?token=' . $request->confirmtoken));
+        $this->wait_for_pending_js();
     }
 }

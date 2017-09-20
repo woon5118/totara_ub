@@ -101,6 +101,7 @@ class behat_backup extends behat_base {
 
         // Go to homepage.
         $this->getSession()->visit($this->locate_path('/?redirect=0'));
+        $this->execute("behat_general::wait_until_the_page_is_ready");
 
         // Click the course link.
         $this->execute("behat_general::click_link", $backupcourse);

@@ -84,10 +84,7 @@ class behat_tool_task extends behat_base {
         }
 
         $this->getSession()->visit($previousurl);
-
-        if ($general->running_javascript()) {
-            $general->wait_until_the_page_is_ready();
-        }
+        $this->wait_for_pending_js();
     }
 
     /**
@@ -127,10 +124,7 @@ class behat_tool_task extends behat_base {
         }
 
         $this->getSession()->visit($previousurl);
-
-        if ($general->running_javascript()) {
-            $general->wait_until_the_page_is_ready();
-        }
+        $this->wait_for_pending_js();
     }
 
     /**

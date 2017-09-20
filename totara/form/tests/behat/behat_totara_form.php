@@ -50,6 +50,7 @@ class behat_totara_form extends behat_base {
         \behat_hooks::set_step_readonly(false);
         $url = new moodle_url('/totara/form/tests/fixtures/test_acceptance.php');
         $this->getSession()->visit($url->out(false));
+        $this->wait_for_pending_js();
     }
 
     /**

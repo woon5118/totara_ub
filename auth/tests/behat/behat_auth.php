@@ -47,6 +47,7 @@ class behat_auth extends behat_base {
         \behat_hooks::set_step_readonly(false);
         // Visit login page.
         $this->getSession()->visit($this->locate_path('login/index.php'));
+        $this->wait_for_pending_js();
 
         // Enter username and password.
         $this->execute('behat_forms::i_set_the_field_to', array('Username', $this->escape($username)));

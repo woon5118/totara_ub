@@ -272,6 +272,7 @@ class behat_navigation extends behat_base {
             if ($parentnodes[0] === $siteadminstr) {
                 // Totara: we need to go to admin page to see full admin tree.
                 $this->getSession()->visit($this->locate_path('admin/index.php?cache=1'));
+                $this->wait_for_pending_js();
             }
         }
 
@@ -581,6 +582,7 @@ class behat_navigation extends behat_base {
         $course = $DB->get_record("course", array("fullname" => $coursefullname), 'id', MUST_EXIST);
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);
         $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->wait_for_pending_js();
     }
 
     /**
@@ -597,6 +599,7 @@ class behat_navigation extends behat_base {
         $course = $DB->get_record("course", array("fullname" => $coursefullname), 'id', MUST_EXIST);
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);
         $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->wait_for_pending_js();
         try {
             $this->execute("behat_forms::press_button", get_string('turneditingon'));
         } catch (Exception $e) {
