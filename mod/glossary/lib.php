@@ -2647,6 +2647,9 @@ function glossary_reset_course_form_definition(&$mform) {
 
     $mform->addElement('checkbox', 'reset_glossary_comments', get_string('deleteallcomments'));
     $mform->disabledIf('reset_glossary_comments', 'reset_glossary_all', 'checked');
+
+    $mform->addElement('checkbox', 'reset_glossary_tags', get_string('removeallglossarytags', 'glossary'));
+    $mform->disabledIf('reset_glossary_tags', 'reset_glossary_all', 'checked');
 }
 
 /**
@@ -2736,6 +2739,8 @@ function glossary_reset_userdata($data) {
                 //delete ratings
                 $ratingdeloptions->contextid = $context->id;
                 $rm->delete_ratings($ratingdeloptions);
+
+                core_tag_tag::delete_instances('mod_glossary', null, $context->id);
             }
         }
 
@@ -2769,6 +2774,8 @@ function glossary_reset_userdata($data) {
                     //delete ratings
                     $ratingdeloptions->contextid = $context->id;
                     $rm->delete_ratings($ratingdeloptions);
+
+                    core_tag_tag::delete_instances('mod_glossary', null, $context->id);
                 }
             }
 
@@ -2799,6 +2806,8 @@ function glossary_reset_userdata($data) {
                     //delete ratings
                     $ratingdeloptions->contextid = $context->id;
                     $rm->delete_ratings($ratingdeloptions);
+
+                    core_tag_tag::delete_instances('mod_glossary', null, $context->id);
                 }
             }
 
@@ -2872,6 +2881,22 @@ function glossary_reset_userdata($data) {
         $params[] = 'glossary_entry';
         $DB->delete_records_select('comments', "itemid IN ($allentriessql) AND commentarea= ? ", $params);
         $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallcomments'), 'error'=>false);
+    }
+
+    // Remove all the tags.
+    if (!empty($data->reset_glossary_tags)) {
+        if ($glossaries = $DB->get_records_sql($allglossariessql, $params)) {
+            foreach ($glossaries as $glossaryid => $unused) {
+                if (!$cm = get_coursemodule_from_instance('glossary', $glossaryid)) {
+                    continue;
+                }
+
+                $context = context_module::instance($cm->id);
+                core_tag_tag::delete_instances('mod_glossary', null, $context->id);
+            }
+        }
+
+        $status[] = array('component' => $componentstr, 'item' => get_string('tagsdeleted', 'glossary'), 'error' => false);
     }
 
     /// updating dates - shift may be negative too
