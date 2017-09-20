@@ -498,11 +498,39 @@ class behat_hooks extends behat_base {
      * @param AfterScenarioScope $scope
      */
     public function after_scenario(AfterScenarioScope $scope) {
+        $content = '';
+        $ex = null;
         try {
             $this->visitPath('/admin/tool/behat/finish.php');
+            $content = $this->getSession()->getPage()->getContent();
         }
         catch (Exception $e) {
+            $ex = $e;
+        }
+
+        if ($scope->getTestResult()->getResultCode() == \Behat\Testwork\Tester\Result\TestResult::FAILED) {
             self::$forcerestart = true;
+            try {
+                // There is a standard after scenario handler that resets the browser session,
+                // the trouble is it may end up with fatal exception if it hits open alert for example,
+                // so better force restart.
+                $this->getMink()->stopSessions();
+            } catch (Exception $ex) {
+                behat_hooks::error_log('Browser could not be stopped after failed scenario: [' . get_class($ex) . '] - ' . $ex->getMessage());
+            }
+
+        } else if (strpos($content, 'Scenario is finishing...') === false) {
+            self::$forcerestart = true;
+            if ($ex) {
+                behat_hooks::error_log('Cannot navigate away after scenario passed, forcing browser restart: [' . get_class($ex) . '] - ' . $ex->getMessage());
+            } else {
+                behat_hooks::error_log('Cannot navigate away after scenario passed, forcing browser restart');
+            }
+            try {
+                $this->getMink()->stopSessions();
+            } catch (Exception $ex) {
+                behat_hooks::error_log('Browser could not be stopped after problematic scenario: [' . get_class($ex) . '] - ' . $ex->getMessage());
+            }
         }
     }
 
