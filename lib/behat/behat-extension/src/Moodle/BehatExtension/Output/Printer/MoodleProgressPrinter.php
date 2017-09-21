@@ -94,11 +94,23 @@ final class MoodleProgressPrinter implements SetupPrinter {
 
         // Calling all directly from here as we avoid more behat framework extensions.
         $runinfo = \behat_util::get_site_info();
-        $runinfo .= 'Server OS "' . PHP_OS . '"' . ', Browser: "' . $browser . '"' . PHP_EOL;
-        if (in_array(strtolower($browser), array('chrome', 'safari', 'iexplore'))) {
-            $runinfo .= 'Browser specific fixes have been applied. See http://docs.moodle.org/dev/Acceptance_testing#Browser_specific_fixes' .  PHP_EOL;
+        $runinfo .= 'Browser: ' . $browser . PHP_EOL;
+
+        // Totara: tell devs where to get execution details.
+        $errorlog = ini_get('error_log');
+        if (strpos($errorlog, 'behatrun_error.log') !== false) {
+            // Bad luck in parallel runs, this header gets printed only once, so skip it completely in parallel runs.
+            $runinfo .= 'error_log: ' . $errorlog . PHP_EOL;
         }
-        $runinfo .= 'Started at ' . date('d-m-Y, H:i', time());
+
+        // Totara: Use the default PHP timezone and ISO format, we do not want the forced Aussie timezone here!
+        $tz = ini_get('date.timezone');
+        if (!$tz) {
+            $tz = 'UTC';
+        }
+        $date = new \DateTime('@' . time());
+        $date->setTimezone(new \DateTimeZone($tz));
+        $runinfo .= 'Started: ' . $date->format('Y-m-d H:i:s e');
 
         $printer->writeln($runinfo);
     }

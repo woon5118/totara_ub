@@ -248,6 +248,16 @@ if (empty($parallelrun)) {
         // Command to execute behat run.
         $cmds[BEHAT_PARALLEL_SITE_NAME . $i] = $behatcommand . ' --config ' . $behatconfigpath . " " . $myopts;
         echo "[" . BEHAT_PARALLEL_SITE_NAME . $i . "] " . $cmds[BEHAT_PARALLEL_SITE_NAME . $i] . PHP_EOL;
+
+        // Totara: add error_log info
+        $separator = DIRECTORY_SEPARATOR;
+        if (testing_is_cygwin()) {
+            $separator = '/';
+        }
+        $search = $separator . 'behat' . $separator . 'behat.yml';
+        $replace = '_error.log';
+        echo 'error_log: ' . str_replace($search, $replace, $behatconfigpath) . PHP_EOL;
+        echo PHP_EOL;
     }
 
     if (empty($cmds)) {
