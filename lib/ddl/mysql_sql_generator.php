@@ -1153,6 +1153,7 @@ class mysql_sql_generator extends sql_generator {
         $sqls = array();
         $tables = $this->mdb->get_tables(false);
         foreach ($tables as $tablename => $unused) {
+            $this->mdb->execute("ANALYZE TABLE {$prefix}{$tablename}");
             $status = $this->mdb->get_record_sql("SHOW TABLE STATUS WHERE name = ?", array($prefix.$tablename));
             $records = $this->mdb->count_records($tablename);
             $sql = "INSERT INTO ss_tables_{$prefix} (tablename, nextid, records, modifications) VALUES (?, ?, ?, 0)";
@@ -1201,6 +1202,9 @@ class mysql_sql_generator extends sql_generator {
             if ($info->records > 0) {
                 $sqls[] = "INSERT INTO {$info->tablename} SELECT * FROM ss_t_{$info->tablename}";
             }
+            if ($info->nextid) {
+                $sqls[] = "ALTER TABLE {$info->tablename} AUTO_INCREMENT = {$info->nextid}";
+            }
         }
         $sqls[] = "UPDATE ss_tables_{$prefix} SET modifications = 0 WHERE modifications = 1";
 
@@ -1213,11 +1217,6 @@ class mysql_sql_generator extends sql_generator {
                 // Delete extra tables.
                 $sqls[] = "DROP TABLE {$info->name}";
                 continue;
-            }
-            $expected = $this->snapshottables[$info->name];
-            if ($info->auto_increment != $expected->nextid) {
-                // Reset auto_increment if changed.
-                $sqls[] = "ALTER TABLE {$info->name} AUTO_INCREMENT = {$expected->nextid}";
             }
         }
         $rs->close();
