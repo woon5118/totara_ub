@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017091900;       // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2017092500;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120504;       // Requires this Moodle version.
 $plugin->component = 'tabexport_pdflandscape';   // To check on upgrade, that module sits in correct place
 $plugin->dependencies = array('tabexport_pdfportrait' => 2016092000);
