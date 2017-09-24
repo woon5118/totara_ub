@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018022700;
+$plugin->version = 2018031500;
 $plugin->requires = 2016120505;
 $plugin->component = 'availability_audience';

@@ -85,6 +85,7 @@ list($moodleplugins, $totaraplugins) = dev_get_totara_and_moodle_plugins();
 
 cli_heading('List of ' . count($totaraplugins) . ' Totara plugins');
 $today = date('Ymd') . '00';
+$today = '2018031500';
 $requirement = dev_get_requires_version();
 $error = false;
 $todo = array();
