@@ -574,18 +574,16 @@ class mysqli_native_moodle_database extends moodle_database {
         $this->mysqli->set_charset($this->get_charset());
         $this->query_end(true);
 
-        // If available, enforce strict mode for the session. That guaranties
+        // Enforce strict mode for the session and column quoting. That guaranties
         // standard behaviour under some situations, avoiding some MySQL nasty
         // habits like truncating data or performing some transparent cast losses.
         // With strict mode enforced, Moodle DB layer will be consistently throwing
         // the corresponding exceptions as expected.
         $si = $this->get_server_info();
-        if (version_compare($si['version'], '5.0.2', '>=')) {
-            $sql = "SET SESSION sql_mode = 'STRICT_ALL_TABLES'";
-            $this->query_start($sql, null, SQL_QUERY_AUX);
-            $result = $this->mysqli->query($sql);
-            $this->query_end($result);
-        }
+        $sql = "SET SESSION sql_mode = 'STRICT_ALL_TABLES,ANSI_QUOTES'";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = $this->mysqli->query($sql);
+        $this->query_end($result);
 
         // Totara: make sure the group_concat can work with large strings.
         $sql = "SELECT @@group_concat_max_len";
@@ -1232,7 +1230,11 @@ class mysqli_native_moodle_database extends moodle_database {
             throw new coding_exception('moodle_database::insert_record_raw() no fields found.');
         }
 
-        $fields = implode(',', array_keys($params));
+        $fields = array();
+        foreach ($params as $field => $value) {
+            $fields[] = '"' . $field . '"'; // Totara: always quote column names to allow reserved words.
+        }
+        $fields = implode(',', $fields);
         $qms    = array_fill(0, count($params), '?');
         $qms    = implode(',', $qms);
 
@@ -1459,7 +1461,7 @@ class mysqli_native_moodle_database extends moodle_database {
 
         $sets = array();
         foreach ($params as $field=>$value) {
-            $sets[] = "$field = ?";
+            $sets[] = '"' . $field .'" = ?'; // Totara: always quote column names to allow reserved words.
         }
 
         $params[] = $id; // last ? in WHERE condition
@@ -1534,9 +1536,9 @@ class mysqli_native_moodle_database extends moodle_database {
         $normalised_value = $this->normalise_value($column, $newvalue);
 
         if (is_null($normalised_value)) {
-            $newfield = "$newfield = NULL";
+            $newfield = '"' . $newfield . '" = NULL';
         } else {
-            $newfield = "$newfield = ?";
+            $newfield = '"' . $newfield . '" = ?';
             array_unshift($params, $normalised_value);
         }
         $sql = "UPDATE {$this->prefix}$table SET $newfield $select";

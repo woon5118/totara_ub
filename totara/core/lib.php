@@ -191,7 +191,7 @@ function sql_drop_table_if_exists($table) {
             $sql = "IF OBJECT_ID('dbo.{$table}','U') IS NOT NULL DROP TABLE dbo.{$table}";
             break;
         case 'mysql':
-            $sql = "DROP TABLE IF EXISTS `{$table}`";
+            $sql = "DROP TABLE IF EXISTS \"{$table}\"";
             break;
         case 'postgres':
         default:

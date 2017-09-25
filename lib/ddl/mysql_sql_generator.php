@@ -42,7 +42,7 @@ class mysql_sql_generator extends sql_generator {
     // Only set values that are different from the defaults present in XMLDBgenerator
 
     /** @var string Used to quote names. */
-    public $quote_string = '`';
+    public $quote_string = '"'; // Totara: always use ANSI quotes!
 
     /** @var string To define the default to set for NOT NULLs CHARs without default (null=do nothing).*/
     public $default_for_char = '';
@@ -498,7 +498,7 @@ class mysql_sql_generator extends sql_generator {
         $fieldsql = $this->getFieldSQL($xmldb_table, $xmldb_field_clone);
 
         $sql = 'ALTER TABLE ' . $this->getTableName($xmldb_table) . ' CHANGE ' .
-               $xmldb_field->getName() . ' ' . $fieldsql;
+               $this->getEncQuoted($xmldb_field->getName()) . ' ' . $fieldsql;
 
         return array($sql);
     }
@@ -821,6 +821,7 @@ class mysql_sql_generator extends sql_generator {
             'STARTING',
             'STORED', // Added in 5.7.6
             'STRAIGHT_JOIN',
+            'SYSTEM', // Added in 8.0.3
             'TABLE',
             'TERMINATED',
             'THEN',

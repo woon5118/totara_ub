@@ -1443,14 +1443,7 @@ class core_ddl_testcase extends database_driver_testcase {
 
         // Test we are able to drop indexes having hyphens MDL-22804.
         // Create index with hyphens (by hand).
-        $indexname = 'test-index-with-hyphens';
-        switch ($DB->get_dbfamily()) {
-            case 'mysql':
-                $indexname = '`' . $indexname . '`';
-                break;
-            default:
-                $indexname = '"' . $indexname . '"';
-        }
+        $indexname = '"test-index-with-hyphens"';
         $stmt = "CREATE INDEX {$indexname} ON {$DB->get_prefix()}test_table1 (course, name)";
         $DB->change_database_structure($stmt);
         $this->assertNotEmpty($dbman->find_index_name($table, $index));
@@ -1877,6 +1870,13 @@ class core_ddl_testcase extends database_driver_testcase {
             $this->assertNotEmpty($fields);
             foreach ($fields as $field) {
                 $fieldname = $field->getName();
+                if ($tablename === 'chat_messages' and $fieldname === 'system') {
+                    // Totara: skip this reserved word for now (introduced by MySQL 8.0.3RC1).
+                    continue;
+                } else if ($tablename === 'chat_messages_current' and $fieldname === 'system') {
+                    // Totara: skip this reserved word for now (introduced by MySQL 8.0.3RC1).
+                    continue;
+                }
                 $this->assertSame($fieldname, strtolower($fieldname));
                 $this->assertNotContains($fieldname, $reserved_words, $fielderror->set($tablename, $fieldname));
             }

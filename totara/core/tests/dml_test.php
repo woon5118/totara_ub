@@ -652,6 +652,49 @@ ORDER BY tt1.groupid";
         $dbman->drop_table($table);
     }
 
+    public function test_reserved_columns() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $tablename = 'test_table';
+        $table = new xmldb_table('test_table');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('from', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('where', XMLDB_TYPE_TEXT, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $record = new stdClass();
+        $record->from = '77';
+        $record->where = 'home';
+
+        // Test normal inserts.
+        $record->id = $DB->insert_record($tablename, $record);
+        $result = $DB->get_record($tablename, array('id' => $record->id));
+        $this->assertEquals($record, $result);
+
+        // Test normal update.
+        $update = clone($record);
+        $update->from = '99';
+        $update->where = 'work';
+        $DB->update_record($tablename, $update);
+        $result = $DB->get_record($tablename, array('id' => $update->id));
+        $this->assertEquals($update, $result);
+
+        // Test setting of field.
+        $update->from = '11';
+        $DB->set_field($tablename, 'from', $update->from, array('id' => $update->id));
+        $result = $DB->get_record($tablename, array('id' => $update->id));
+        $this->assertEquals($update, $result);
+
+        // Test where conditions array supports quoted columns.
+        $result = $DB->get_record($tablename, array('"id"' => $update->id));
+        $this->assertEquals($update, $result);
+        $result = $DB->get_record($tablename, array('"from"' => $update->from));
+        $this->assertEquals($update, $result);
+    }
+
     /**
      * Data provider that just returns two values: true and false
      * Useful for running phpunit test in two modes

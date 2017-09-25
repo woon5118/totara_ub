@@ -1052,8 +1052,24 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                     $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelink'));
                     $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelinkicon'));
                     $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'email'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'emailunobscured'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'auth'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'institution'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'department'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'address'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'city'));
+                    $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'idnumber'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'fullname'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelink'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelinkicon'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'email'));
                     $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'emailunobscured'));
                     $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'auth'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'institution'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'department'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'address'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'city'));
+                    $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'idnumber'));
                 }
             }
         }

@@ -640,6 +640,7 @@ abstract class moodle_database {
                 throw new dml_exception('ddltablenotexist', $table);
             }
             foreach ($conditions as $key=>$value) {
+                $key = trim($key, '"'); // Totara: ignore quotes around reserved words.
                 if (!isset($columns[$key])) {
                     $a = new stdClass();
                     $a->fieldname = $key;
@@ -668,8 +669,8 @@ abstract class moodle_database {
                 if ($allowed_types & SQL_PARAMS_NAMED) {
                     // Need to verify key names because they can contain, originally,
                     // spaces and other forbidden chars when using sql_xxx() functions and friends.
-                    $normkey = trim(preg_replace('/[^a-zA-Z0-9_-]/', '_', $key), '-_');
-                    if ($normkey !== $key) {
+                    $normkey = trim(preg_replace('/[^a-zA-Z0-9_-]/', '_', trim($key, '"')), '-_'); // Totara: ignore quotes around reserved words.
+                    if ($normkey !== trim($key, '"')) {
                         debugging('Invalid key found in the conditions array.');
                     }
                     $where[] = "$key = :$normkey";

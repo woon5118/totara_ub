@@ -1018,7 +1018,11 @@ class sqlsrv_native_moodle_database extends moodle_database {
         if (empty($params)) {
             throw new coding_exception('moodle_database::insert_record_raw() no fields found.');
         }
-        $fields = implode(',', array_keys($params));
+        $fields = array();
+        foreach ($params as $field => $value) {
+            $fields[] = '"' . $field . '"'; // Totara: always quote column names to allow reserved words.
+        }
+        $fields = implode(',', $fields);
         $qms = array_fill(0, count($params), '?');
         $qms = implode(',', $qms);
         $sql = "INSERT INTO {" . $table . "} ($fields) VALUES($qms)";
@@ -1185,7 +1189,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         $sets = array ();
 
         foreach ($params as $field => $value) {
-            $sets[] = "$field = ?";
+            $sets[] = '"' . $field .'" = ?'; // Totara: always quote column names to allow reserved words.
         }
 
         $params[] = $id; // last ? in WHERE condition
@@ -1258,9 +1262,9 @@ class sqlsrv_native_moodle_database extends moodle_database {
         $newvalue = $this->normalise_value($column, $newvalue);
 
         if (is_null($newvalue)) {
-            $newfield = "$newfield = NULL";
+            $newfield = '"' . $newfield . '" = NULL';
         } else {
-            $newfield = "$newfield = ?";
+            $newfield = '"' . $newfield . '" = ?';
             array_unshift($params, $newvalue);
         }
         $sql = "UPDATE {".$table."} SET $newfield $select";

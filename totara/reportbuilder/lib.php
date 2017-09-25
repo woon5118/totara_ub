@@ -5369,7 +5369,7 @@ function sql_table_from_select($table, $select, array $params) {
     $hashtablename = substr(md5($table), 0, 15);
     switch ($DB->get_dbfamily()) {
         case 'mysql':
-            $columnssql = "SHOW COLUMNS FROM `{$table}`";
+            $columnssql = "SHOW COLUMNS FROM \"{$table}\"";
             $indexsql = "CREATE INDEX rb_cache_{$hashtablename}_%1\$s ON {$table} (%2\$s)";
             $indexlongsql = "CREATE INDEX rb_cache_{$hashtablename}_%1\$s ON {$table} (%2\$s(%3\$d))";
             $fieldname = 'field';
@@ -5383,7 +5383,7 @@ function sql_table_from_select($table, $select, array $params) {
             $collationsql = "DEFAULT CHARACTER SET {$charset} DEFAULT COLLATE = {$collation}";
             $rowformat = "ROW_FORMAT = Compressed";
 
-            $sql = "CREATE TABLE `{$table}` $enginesql $collationsql $rowformat $select";
+            $sql = "CREATE TABLE \"{$table}\" $enginesql $collationsql $rowformat $select";
             $result = $DB->execute($sql, $params);
             break;
         case 'mssql':

@@ -900,7 +900,11 @@ class pgsql_native_moodle_database extends moodle_database {
             throw new coding_exception('moodle_database::insert_record_raw() no fields found.');
         }
 
-        $fields = implode(',', array_keys($params));
+        $fields = array();
+        foreach ($params as $field => $value) {
+            $fields[] = '"' . $field . '"'; // Totara: always quote column names to allow reserved words.
+        }
+        $fields = implode(',', $fields);
         $values = array();
         $i = 1;
         foreach ($params as $value) {
@@ -1111,7 +1115,7 @@ class pgsql_native_moodle_database extends moodle_database {
         $sets = array();
         foreach ($params as $field=>$value) {
             $this->detect_objects($value);
-            $sets[] = "$field = \$".$i++;
+            $sets[] = '"' . $field .'" = $' . $i++; // Totara: always quote column names to allow reserved words.
         }
 
         $params[] = $id; // last ? in WHERE condition
@@ -1187,7 +1191,7 @@ class pgsql_native_moodle_database extends moodle_database {
 
         $normalisedvalue = $this->normalise_value($column, $newvalue);
 
-        $newfield = "$newfield = \$" . $i;
+        $newfield = '"' . $newfield . '" = $' . $i;
         $params[] = $normalisedvalue;
         $sql = "UPDATE {$this->prefix}$table SET $newfield $select";
 

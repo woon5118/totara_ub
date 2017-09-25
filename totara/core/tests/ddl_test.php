@@ -117,4 +117,35 @@ class totara_core_ddl_testcase extends database_driver_testcase {
 
         $dbman->drop_table($table);
     }
+
+    public function test_manage_table_with_reserved_columns() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('from', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+        $columns = $DB->get_columns($table->getName());
+        $this->assertArrayHasKey('from', $columns);
+
+        $table = new xmldb_table('test_table');
+        $field = new xmldb_field('from');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '20', null, null, null, 'general', 'id');
+        $dbman->rename_field($table, $field, 'where');
+        $columns = $DB->get_columns($table->getName());
+        $this->assertArrayNotHasKey('from', $columns);
+        $this->assertArrayHasKey('where', $columns);
+
+        $table = new xmldb_table('test_table');
+        $field = new xmldb_field('where');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '20', null, null, null, 'general', 'id');
+        $dbman->drop_field($table, $field);
+        $columns = $DB->get_columns($table->getName());
+        $this->assertArrayNotHasKey('from', $columns);
+        $this->assertArrayNotHasKey('where', $columns);
+
+        $dbman->drop_table($table);
+    }
 }

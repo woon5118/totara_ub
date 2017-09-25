@@ -306,6 +306,11 @@ class mssql_sql_generator extends sql_generator {
         // Call to standard (parent) getRenameFieldSQL() function
         $results = array_merge($results, parent::getRenameFieldSQL($xmldb_table, $xmldb_field, $newname));
 
+        // Totara: remove double quotes around reserved words, SQL Server is using single quotes already.
+        foreach ($results as $k => $v) {
+            $results[$k] = str_replace('"', '', $v);
+        }
+
         return $results;
     }
 
