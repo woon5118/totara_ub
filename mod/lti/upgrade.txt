@@ -8,6 +8,7 @@ information provided here is intended especially for developers.
 ** mod/lti/templates/tool_card.mustache
 ** mod/lti/templates/tool_configure.mustache
 ** mod/lti/templates/tool_proxy_card.mustache
+* "Embed, without blocks" now uses incourse page layout (with blocks disabled)
 
 === 10 ===
 
