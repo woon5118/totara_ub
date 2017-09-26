@@ -543,7 +543,7 @@ function facetoface_delete_instance($id) {
 /**
  * Prepare the user data to go into the database.
  */
-function cleanup_session_data($session) {
+function facetoface_cleanup_session_data($session) {
 
     // Only numbers allowed here
     $session->capacity = preg_replace('/[^\d]/', '', $session->capacity);
@@ -565,7 +565,7 @@ function facetoface_add_session($session, $sessiondates) {
     global $DB;
 
     $session->timemodified = $session->timecreated = time();
-    $session = cleanup_session_data($session);
+    $session = facetoface_cleanup_session_data($session);
 
     $session->id = $DB->insert_record('facetoface_sessions', $session);
 
@@ -581,7 +581,7 @@ function facetoface_update_session($session, $sessiondates) {
     global $DB;
 
     $session->timemodified = time();
-    $session = cleanup_session_data($session);
+    $session = facetoface_cleanup_session_data($session);
 
     $DB->update_record('facetoface_sessions', $session);
     facetoface_save_dates($session->id, $sessiondates);
@@ -3785,7 +3785,7 @@ function facetoface_print_session_list($courseid, $facetoface, $sessions) {
 
     if ($editevents) {
         $output .= html_writer::link(
-            new moodle_url('sessions.php', array('f' => $facetoface->id, 'backtoallsessions' => 1)), get_string('addsession', 'facetoface'),
+            new moodle_url('events/add.php', array('f' => $facetoface->id, 'backtoallsessions' => 1)), get_string('addsession', 'facetoface'),
             array('class' => 'btn btn-default')
         );
     }
@@ -5568,7 +5568,7 @@ function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) 
 /**
  * Get attendance status
  */
-function get_attendance_status() {
+function facetoface_get_attendance_status() {
     global $MDL_F2F_STATUS;
 
     // Look for status fully_attended, partially_attended and no_show.
@@ -5585,10 +5585,10 @@ function get_attendance_status() {
 /**
  * Displays a bulk actions selector
  */
-function display_bulk_actions_picker() {
+function facetoface_display_bulk_actions_picker() {
     global $OUTPUT;
 
-    $status_options = get_attendance_status();
+    $status_options = facetoface_get_attendance_status();
     unset($status_options[MDL_F2F_STATUS_NOT_SET]);
     $out = $OUTPUT->container_start('facetoface-bulk-actions-picker');
     $select = html_writer::select($status_options, 'bulkattendanceop', '',
@@ -6245,35 +6245,6 @@ function facetoface_get_other_reservations($facetoface, $session, $managerid) {
                     'cancelled' => MDL_F2F_STATUS_USER_CANCELLED);
 
     return $DB->get_records_sql($sql, $params);
-}
-
-/**
- * Format the dates for the given session, when listing the other bookings made by a given manager
- * in a particular face to face instance.
- *
- * @param $session
- * @return string
- */
-function facetoface_format_session_dates($session) {
-    if (!empty($session->sessiondates)) {
-        $formatteddates = array();
-        foreach ($session->sessiondates as $date) {
-            $formatteddate = '';
-            $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
-            if ($sessionobj->startdate == $sessionobj->enddate) {
-                $formatteddate .= $sessionobj->startdate . ', ';
-            } else {
-                $formatteddate .= $sessionobj->startdate . ' - ' . $sessionobj->enddate . ', ';
-            }
-            $formatteddate .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone;
-            $formatteddates[] = $formatteddate;
-        }
-        $formatteddates = '<li>'.implode('</li><li>', $formatteddates).'</li>';
-        $ret = html_writer::tag('ul', $formatteddates);
-    } else {
-        $ret = html_writer::tag('em', get_string('wait-listed', 'facetoface'));
-    }
-    return $ret;
 }
 
 /**

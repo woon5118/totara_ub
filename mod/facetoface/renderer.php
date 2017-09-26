@@ -419,13 +419,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         // Can edit sessions.
         if ($editevents) {
             if ($session->cancelledstatus == 0) {
-                $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
+                $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/edit.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
                 if (!facetoface_has_session_started($session, $timenow)) {
-                    $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/cancelsession.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/block', get_string('cancelsession', 'facetoface'))) . ' ';
+                    $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/cancel.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/block', get_string('cancelsession', 'facetoface'))) . ' ';
                 }
             }
-            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'c' => 1, 'backtoallsessions' => $bas)), new pix_icon('t/copy', get_string('copysession', 'facetoface'))) . ' ';
-            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'd' => 1, 'backtoallsessions' => $bas)), new pix_icon('t/delete', get_string('deletesession', 'facetoface'))) . ' ';
+            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/edit.php', array('s' => $session->id, 'c' => 1, 'backtoallsessions' => $bas)), new pix_icon('t/copy', get_string('copysession', 'facetoface'))) . ' ';
+            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/delete.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/delete', get_string('deletesession', 'facetoface'))) . ' ';
             $options .= html_writer::empty_tag('br');
         }
 
@@ -871,7 +871,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $sessions[$booking->sessionid] = (object)array(
                     'reservations' => 0,
                     'bookings' => array(),
-                    'dates' => facetoface_format_session_dates($session),
+                    'dates' => \mod_facetoface\event_dates::format_dates($session),
                 );
             }
             if ($booking->userid) {

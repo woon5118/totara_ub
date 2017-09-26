@@ -23,25 +23,47 @@
  * @package modules
  * @subpackage facetoface
  */
-defined('MOODLE_INTERNAL') || die();
 
+namespace mod_facetoface;
 
+global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
+class event_form extends \moodleform {
 
-class mod_facetoface_session_form extends moodleform {
+    /** @var context_module */
+    protected $session;
+
+    /** @var context_module */
+    protected $facetoface;
+
     /** @var context_module */
     protected $context;
+
+    /** @var context_module */
+    protected $editoroptions;
+
+    /** @var context_module */
+    protected $fromform;
+
+    /** @var context_module */
+    protected $returnurl;
 
     function definition() {
         global $CFG;
 
         $mform =& $this->_form;
-        $session = (isset($this->_customdata['session'])) ? $this->_customdata['session'] : false;
+        $this->session = (isset($this->_customdata['session'])) ? $this->_customdata['session'] : false;
+        $this->facetoface = $this->_customdata['facetoface'];
+        $this->editoroptions = $this->_customdata['editoroptions'];
         $sessiondata = $this->_customdata['sessiondata'];
-
-        $this->context = context_module::instance($this->_customdata['cm']->id);
+        $this->context = \context_module::instance($this->_customdata['cm']->id);
+        if ($this->_customdata['backtoallsessions']) {
+            $this->returnurl = new \moodle_url('/mod/facetoface/view.php', array('f' => $this->facetoface->id));
+        } else {
+            $this->returnurl = new \moodle_url('/course/view.php', array('id' => $this->_customdata['course']->id));
+        }
 
         $mform->addElement('hidden', 'id', $this->_customdata['id']);
         $mform->addElement('hidden', 'f', $this->_customdata['f']);
@@ -55,8 +77,6 @@ class mod_facetoface_session_form extends moodleform {
         $mform->setType('backtoallsessions', PARAM_BOOL);
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
-
-        $editoroptions = $this->_customdata['editoroptions'];
 
         self::add_date_render_fields($this, $this->_customdata['defaulttimezone'], $this->_customdata['s'], $sessiondata);
 
@@ -124,7 +144,7 @@ class mod_facetoface_session_form extends moodleform {
         if (!get_config(NULL, 'facetoface_hidecost')) {
             $formarray  = array();
             $formarray[] = $mform->createElement('text', 'normalcost', get_string('normalcost', 'facetoface'), 'size="5"');
-            $formarray[] = $mform->createElement('static', 'normalcosthint', '', html_writer::tag('span', get_string('normalcosthinttext','facetoface'), array('class' => 'hint-text')));
+            $formarray[] = $mform->createElement('static', 'normalcosthint', '', \html_writer::tag('span', get_string('normalcosthinttext','facetoface'), array('class' => 'hint-text')));
             $mform->addGroup($formarray,'normalcost_group', get_string('normalcost','facetoface'), array(' '),false);
             $mform->setType('normalcost', PARAM_TEXT);
             $mform->addHelpButton('normalcost_group', 'normalcost', 'facetoface');
@@ -132,14 +152,14 @@ class mod_facetoface_session_form extends moodleform {
             if (!get_config(NULL, 'facetoface_hidediscount')) {
                 $formarray  = array();
                 $formarray[] = $mform->createElement('text', 'discountcost', get_string('discountcost', 'facetoface'), 'size="5"');
-                $formarray[] = $mform->createElement('static', 'discountcosthint', '', html_writer::tag('span', get_string('discountcosthinttext','facetoface'), array('class' => 'hint-text')));
+                $formarray[] = $mform->createElement('static', 'discountcosthint', '', \html_writer::tag('span', get_string('discountcosthinttext','facetoface'), array('class' => 'hint-text')));
                 $mform->addGroup($formarray,'discountcost_group', get_string('discountcost','facetoface'), array(' '),false);
                 $mform->setType('discountcost', PARAM_TEXT);
                 $mform->addHelpButton('discountcost_group', 'discountcost', 'facetoface');
             }
         }
 
-        $mform->addElement('editor', 'details_editor', get_string('details', 'facetoface'), null, $editoroptions);
+        $mform->addElement('editor', 'details_editor', get_string('details', 'facetoface'), null, $this->editoroptions);
         $mform->setType('details_editor', PARAM_RAW);
         $mform->addHelpButton('details_editor', 'details', 'facetoface');
 
@@ -220,13 +240,13 @@ class mod_facetoface_session_form extends moodleform {
         }
 
         // Show all custom fields. Customfield support.
-        if (!$session) {
-            $session = new stdClass();
+        if (!$this->session) {
+            $this->session = new \stdClass();
         }
-        if (empty($session->id)) {
-            $session->id = 0;
+        if (empty($this->session->id)) {
+            $this->session->id = 0;
         }
-        customfield_definition($mform, $session, 'facetofacesession', 0, 'facetoface_session');
+        customfield_definition($mform, $this->session, 'facetofacesession', 0, 'facetoface_session');
 
         $this->add_action_buttons();
 
@@ -240,13 +260,13 @@ class mod_facetoface_session_form extends moodleform {
      * @param int $sessionid
      * @param stdClass $sessiondata
      */
-    public static function add_date_render_fields(moodleform $form, $defaulttimezone, $sessionid, $sessiondata) {
+    public static function add_date_render_fields($form, $defaulttimezone, $sessionid, $sessiondata) {
         $mform = $form->_form;
 
         $mform->addElement('hidden', "cntdates");
         $mform->setType("cntdates", PARAM_INT);
 
-        $table = new html_table();
+        $table = new \html_table();
         $table->attributes['class'] = 'generaltable fullwidth f2fmanagedates';
         $table->head = array(
             get_string('dateandtime', 'facetoface'),
@@ -262,10 +282,10 @@ class mod_facetoface_session_form extends moodleform {
             $row = self::date_render_mixin($mform, $i, $sessiondata, $defaulttimezone);
             $table->data[] = $row;
         }
-        $dateshtmlcontent = html_writer::table($table);
+        $dateshtmlcontent = \html_writer::table($table);
 
         // Render this content hidden. Then it will be displayed by js during init.
-        $html = html_writer::div($dateshtmlcontent, 'sessiondates hidden', array('id'=>'sessiondates_' . $sessionid));
+        $html = \html_writer::div($dateshtmlcontent, 'sessiondates hidden', array('id'=>'sessiondates_' . $sessionid));
         $mform->addElement('static', 'sessiondates', get_string('sessiondates', 'facetoface'), $html);
         $mform->addElement('submit','date_add_fields', get_string('dateadd', 'facetoface'));
         $mform->registerNoSubmitButton('date_add_fields');
@@ -280,11 +300,11 @@ class mod_facetoface_session_form extends moodleform {
      * @param string $defaulttimezone Default timezone if date not set
      * @return
      */
-    public static function date_render_mixin(MoodleQuickForm $mform, $offset, $sessiondata, $defaulttimezone) {
+    public static function date_render_mixin($mform, $offset, $sessiondata, $defaulttimezone) {
         global $OUTPUT;
 
-        $dateid = !empty($sessiondata->{"sessiondateid[$offset]"}) ? $sessiondata->{"sessiondateid[$offset]"} : 0;
-        $roomid = !empty($sessiondata->{"roomid[$offset]"}) ? $sessiondata->{"roomid[$offset]"} : '';
+        $dateid   = !empty($sessiondata->{"sessiondateid[$offset]"}) ? $sessiondata->{"sessiondateid[$offset]"} : 0;
+        $roomid   = !empty($sessiondata->{"roomid[$offset]"}) ? $sessiondata->{"roomid[$offset]"} : '';
         $assetids = !empty($sessiondata->{"assetids[$offset]"}) ? $sessiondata->{"assetids[$offset]"} : '';
 
         // Add per-date form elements.
@@ -311,9 +331,9 @@ class mod_facetoface_session_form extends moodleform {
 
         // Dates.
         if (empty($sessiondata->{"timestart[$offset]"})
-                || empty($sessiondata->{"timefinish[$offset]"})
-                || empty($sessiondata->{"sessiontimezone[$offset]"})) {
-            list($timestart, $timefinish) = session_date_form::get_default_dates();
+            || empty($sessiondata->{"timefinish[$offset]"})
+            || empty($sessiondata->{"sessiontimezone[$offset]"})) {
+            list($timestart, $timefinish) = \mod_facetoface\event_dates::get_default();
             $sessiontimezone = $defaulttimezone;
         } else {
             $timestart = $sessiondata->{"timestart[$offset]"};
@@ -325,7 +345,7 @@ class mod_facetoface_session_form extends moodleform {
         $mform->setDefault("timefinish[$offset]", $timefinish);
         $mform->setDefault("sessiontimezone[$offset]", $sessiontimezone);
 
-        $dateshtml = session_date_form::render_dates(
+        $dateshtml = \mod_facetoface\event_dates::render(
             $timestart,
             $timefinish,
             $sessiontimezone,
@@ -336,36 +356,35 @@ class mod_facetoface_session_form extends moodleform {
         $strdelete = get_string('delete');
         $streditdate = get_string('editdate', 'facetoface');
 
-        $editicon = $OUTPUT->action_icon('#', new pix_icon('t/edit', $streditdate), null,
-                array('id' => "show-selectdate{$offset}-dialog", 'class' => 'action-icon show-selectdate-dialog', 'data-offset' => $offset));
-        $row[] = $editicon . html_writer::span($dateshtml, 'timeframe-text', array('id' => 'timeframe-text' . $offset));
+        $editicon = $OUTPUT->action_icon('#', new \pix_icon('t/edit', $streditdate), null,
+            array('id' => "show-selectdate{$offset}-dialog", 'class' => 'action-icon show-selectdate-dialog', 'data-offset' => $offset));
+        $row[] = $editicon . \html_writer::span($dateshtml, 'timeframe-text', array('id' => 'timeframe-text' . $offset));
 
         // Room.
-        $selectroom = html_writer::link("#", get_string('selectroom', 'facetoface'),
-                array('id' => "show-selectroom{$offset}-dialog", 'class' => 'show-selectroom-dialog', 'data-offset' => $offset));
+        $selectroom = \html_writer::link("#", get_string('selectroom', 'facetoface'),
+            array('id' => "show-selectroom{$offset}-dialog", 'class' => 'show-selectroom-dialog', 'data-offset' => $offset));
 
         // Room name and capacity will be loaded by js.
-        $row[] = html_writer::div('', 'roomname', array('id' => 'roomname' . $offset))
-                . $selectroom;
+        $row[] = \html_writer::div('', 'roomname', array('id' => 'roomname' . $offset)) . $selectroom;
 
         // Assets.
-        $selectassets = html_writer::link("#", get_string('selectassets', 'facetoface'), array(
+        $selectassets = \html_writer::link("#", get_string('selectassets', 'facetoface'), array(
             'id' => "show-selectassets{$offset}-dialog",
             'class' => 'show-selectassets-dialog',
             'data-offset' => $offset
         ));
 
         // Assets items will be loaded by js.
-        $row[] =  html_writer::tag('ul', '', array(
-            'id' => 'assetlist' . $offset,
-            'class' => 'assetlist nonempty',
-            'data-offset' => $offset
-        )) . $selectassets;
+        $row[] =  \html_writer::tag('ul', '', array(
+                'id' => 'assetlist' . $offset,
+                'class' => 'assetlist nonempty',
+                'data-offset' => $offset
+            )) . $selectassets;
 
         // Options.
-        $cloneicon = $OUTPUT->action_icon('#', new pix_icon('t/copy', $strcopy), null,
+        $cloneicon = $OUTPUT->action_icon('#', new \pix_icon('t/copy', $strcopy), null,
             array('class' => 'action-icon dateclone', 'data-offset' => $offset));
-        $deleteicon = $OUTPUT->action_icon('#', new pix_icon('t/delete', $strdelete), null,
+        $deleteicon = $OUTPUT->action_icon('#', new \pix_icon('t/delete', $strdelete), null,
             array('class' => 'action-icon dateremove', 'data-offset' => $offset));
         $row[] = $cloneicon . $deleteicon;
 
@@ -399,7 +418,7 @@ class mod_facetoface_session_form extends moodleform {
             }
             // If event is a cloning then remove session id and behave as a new event to get rooms availability.
             $sessid = ($data['c'] ? 0 : $data['s']);
-            $errdate = session_date_form::dates_validate($starttime, $endtime, $roomid, $assetlist, $sessid, $facetofaceid);
+            $errdate = \mod_facetoface\event_dates::validate($starttime, $endtime, $roomid, $assetlist, $sessid, $facetofaceid);
 
             if (!empty($errdate['timestart'])) {
                 $errdates[] = $errdate['timestart'];
@@ -442,7 +461,7 @@ class mod_facetoface_session_form extends moodleform {
             }
 
             // If valid date, add to array.
-            $date = new stdClass();
+            $date = new \stdClass();
             $date->timestart = $starttime;
             $date->timefinish = $endtime;
             $date->roomid = $roomid;
@@ -525,7 +544,7 @@ class mod_facetoface_session_form extends moodleform {
                         if (isset($this->_form->_types["trainerrole[{$roleid}][{$trainer}]"])) {
                             $errors["trainerrole[{$roleid}][{$trainer}]"] = facetoface_get_session_involvement($trainerlist[$trainer], $availability);
                         } else if (isset($this->_form->_types["trainerrole[{$roleid}]"])) {
-                            $trainererrors .= html_writer::tag('div', facetoface_get_session_involvement($trainerlist[$trainer], $availability));
+                            $trainererrors .= \html_writer::tag('div', facetoface_get_session_involvement($trainerlist[$trainer], $availability));
                         }
                         ++$hasconflicts;
                     }
@@ -595,251 +614,246 @@ class mod_facetoface_session_form extends moodleform {
 
         // Consolidate date errors.
         if (!empty($errdates)) {
-            $errors['errors'] = implode(html_writer::empty_tag('br'), $errdates);
+            $errors['errors'] = implode(\html_writer::empty_tag('br'), $errdates);
         }
         return $errors;
     }
-}
 
-/**
- * Form for choosing dates and associated information: room, and assets
- */
-class session_date_form extends moodleform {
-    /**
-     * Get rendered start date, finish date and timestamp.
-     * @param int $timestart start timestamp
-     * @param int $timefinish finish timestamp
-     * @param string $sesiontimezone
-     * @param bool $displaytimezone should timezone be displayed
-     * @return string
-     */
-    public static function render_dates($timestart, $timefinish, $sesiontimezone, $displaytimezone = true) {
-        $sessionobj = facetoface_format_session_times(
-            $timestart,
-            $timefinish,
-            $sesiontimezone
+    public static function prepare_data($session, $facetoface, $course, $context, $cntdates) {
+        global $TEXTAREA_OPTIONS;
+
+        $defaulttimezone = '99';
+
+        $editoroptions   = array(
+            'noclean'  => false,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'maxbytes' => $course->maxbytes,
+            'context'  => $context,
         );
 
-        if (empty($displaytimezone)) {
-            $sessionobj->timezone = '';
-        }
-
-        return get_string('sessiondatecolumn_html', 'facetoface', $sessionobj);
-    }
-
-    /**
-     * Return default start and end date/time of session
-     * @return array($defaultstart, $defaultfinish)
-     */
-    public static function get_default_dates() {
-        $config = get_config('facetoface');
-        $now = time();
-        $defaultstart = $now;
-
-        if (!empty($config->defaultdaystosession)) {
-            if (!empty($config->defaultdaysskipweekends)) {
-                $defaultstart = strtotime("+{$config->defaultdaystosession} weekdays", $defaultstart);
-            } else {
-                $defaultstart = strtotime("+{$config->defaultdaystosession} days", $defaultstart);
-            }
-        }
-
-        $defaultfinish = $defaultstart;
-
-        if (!empty($config->defaultdaysbetweenstartfinish)) {
-            $days = (int)$config->defaultdaysbetweenstartfinish;
-            if (!empty($config->defaultdaysskipweekends)) {
-                $defaultfinish = strtotime("+{$days} weekdays", $defaultfinish);
-            } else {
-                $defaultfinish = strtotime("+{$days} days", $defaultfinish);
-            }
-        }
-
-        // Adjust for start time hours.
-        if (!empty($config->defaultstarttime_hours)) {
-            $defaultstart = strtotime(date('Y-m-d', $defaultstart).' 00:00:00');
-            $defaultstart += HOURSECS * (int)$config->defaultstarttime_hours;
-        }
-
-        // Adjust for finish time hours.
-        if (!empty($config->defaultfinishtime_hours)) {
-            $defaultfinish = strtotime(date('Y-m-d', $defaultfinish).' 00:00:00');
-            $defaultfinish += HOURSECS * (int)$config->defaultfinishtime_hours;
-        }
-
-        // Adjust for start time minutes.
-        if (!empty($config->defaultstarttime_minutes)) {
-            $defaultstart += MINSECS * (int)$config->defaultstarttime_minutes;
-        }
-
-        // Adjust for finish time minutes.
-        if (!empty($config->defaultfinishtime_minutes)) {
-            $defaultfinish += MINSECS * (int)$config->defaultfinishtime_minutes;
-        }
-        return array($defaultstart, $defaultfinish);
-    }
-
-    public function definition() {
-        global $PAGE;
-        $mform = $this->_form;
-
-        $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
-
-        $defaulttimezone = $this->_customdata['timezone'];
-        $defaultstart = $this->_customdata['start'];
-        $defaultfinish = $this->_customdata['finish'];
-
-        $mform->addElement('hidden', 'sessiondateid', $this->_customdata['sessiondateid']);
-        $mform->setType('sessiondateid', PARAM_INT);
-        $mform->addElement('hidden', 'sessionid', $this->_customdata['sessionid']);
-        $mform->setType('sessionid', PARAM_INT);
-        $mform->addElement('hidden', 'roomid', $this->_customdata['roomid']);
-        $mform->setType('roomid', PARAM_INT);
-        $mform->addElement('hidden', 'assetids', $this->_customdata['assetids']);
-        $mform->setType('assetids', PARAM_SEQUENCE);
-        $mform->addElement('static', 'dateunavailable', "");
-
-        if ($displaytimezones) {
-            $timezones = array('99' => get_string('timezoneuser', 'totara_core')) + core_date::get_list_of_timezones();
-            $mform->addElement('select', 'sessiontimezone', get_string('sessiontimezone', 'facetoface'), $timezones);
+        if (!isset($session)) {
+            $sessiondata = new \stdClass();
+            $sessiondata->id = 0;
+            $sessiondata->allowcancellations = $facetoface->allowcancellationsdefault;
+            $sessiondata->cancellationcutoff = $facetoface->cancellationscutoffdefault;
+            $sessiondata->cntdates = $cntdates;
+            $nbdays = 1;
         } else {
-            $mform->addElement('hidden', 'sessiontimezone', '99');
-        }
-        $mform->addHelpButton('sessiontimezone', 'sessiontimezone','facetoface');
-        $mform->setDefault('sessiontimezone', $defaulttimezone);
-        $mform->setType('sessiontimezone', PARAM_TIMEZONE);
-
-        if (empty($defaultstart)) {
-            list($defaultstart, $defaultfinish) = self::get_default_dates();
-        }
-        // NOTE: Do not set type for date elements because it borks timezones!
-        $mform->addElement('date_time_selector', 'timestart', get_string('timestart', 'facetoface'), array('defaulttime' => $defaultstart, 'showtimezone' => true));
-        $mform->addHelpButton('timestart', 'sessionstarttime', 'facetoface');
-        $mform->setDefault('timestart', $defaultstart);
-        $mform->addElement('date_time_selector', 'timefinish', get_string('timefinish', 'facetoface'), array('defaulttime' => $defaultfinish, 'showtimezone' => true));
-        $mform->addHelpButton('timefinish', 'sessionfinishtime', 'facetoface');
-        $mform->setDefault('timefinish', $defaultfinish);
-
-        if ($displaytimezones) {
-            $tz = $defaulttimezone;
-            // Really nasty default timezone hackery.
-            $el = $mform->getElement("timestart");
-            $el->set_option('timezone', $tz);
-            $el = $mform->getElement("timefinish");
-            $el->set_option('timezone', $tz);
-        }
-        // Date selector put calendar above fields. And in dialog box it effectively pushes it over top of edge of screen.
-        // It doesn't support position settings, so hack it's instance to put it in position below.
-        // Better way is to fix dateselector form element allowing to choose position, but it will require changes in upstream code.
-        $PAGE->requires->yui_module('moodle-form-dateselector', '
-            (function() {
-                M.form.dateselector.fix_position = function() {
-                    if (this.currentowner) {
-                        var alignpoints = [
-                            Y.WidgetPositionAlign.TL,
-                            Y.WidgetPositionAlign.BL
-                        ];
-
-                        // Change the alignment if this is an RTL language.
-                        if (window.right_to_left()) {
-                            alignpoints = [
-                                Y.WidgetPositionAlign.TR,
-                                Y.WidgetPositionAlign.BR
-                            ];
-                        }
-
-
-                        this.panel.set(\'align\', {
-                            node: this.currentowner.get(\'node\').one(\'select\'),
-                            points: alignpoints
-                        });
-                    };
-                };
-            })');
-    }
-
-    /**
-     * Validate dates and room availability
-     * @param int $timestart
-     * @param int $timefinish
-     * @param int $roomid
-     * @param array $assetids
-     * @param int $sessionid ignore room conflicts within current session (as it is covered by dates and some dates can be marked as deleted)
-     * @param int $facetofaceid
-     * @return array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomid' => string)
-     */
-    public static function dates_validate($timestart, $timefinish, $roomid, $assetids, $sessionid, $facetofaceid) {
-        $errors = array();
-        // Validate start time.
-        if ($timestart > $timefinish) {
-            $errstr = get_string('error:sessionstartafterend', 'facetoface');
-            $errors['timestart'] = $errstr;
-            $errors['timefinish'] = $errstr;
-        }
-
-        // Validate room.
-        if (!empty($roomid)) {
-            $roomproblemfound = false;
-            // Check if the room is available.
-            $room = facetoface_get_room($roomid);
-            if (!$room) {
-                $errors['roomid'] = get_string('roomdeleted', 'facetoface');
-            } else if (!facetoface_is_room_available($timestart, $timefinish, $room, $sessionid, $facetofaceid)) {
-                 $link = html_writer::link(new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)), $room->name,
-                        array('target' => '_blank'));
-                // We should not get here because users should be able to select only available slots.
-                $errors['roomid'] = get_string('error:isalreadybooked', 'facetoface', $link);
+            if (!empty($session->sessiondates[0]->sessiontimezone) and $session->sessiondates[0]->sessiontimezone != '99') {
+                $defaulttimezone = \core_date::normalise_timezone($session->sessiondates[0]->sessiontimezone);
             }
-        }
 
-        // Validate assets.
-        if (!empty($assetids)) {
-            foreach ($assetids as $assetid) {
-                $asset = facetoface_get_asset($assetid);
-                if (!$asset) {
-                    $errors['assetid'][] = get_string('assetdeleted', 'facetoface');
-                } else if (!facetoface_is_asset_available($timestart, $timefinish, $asset, $sessionid, $facetofaceid)) {
-                    $link = html_writer::link(new moodle_url('/mod/facetoface/asset.php', array('assetid' => $assetid)), $asset->name,
-                        array('target' => '_blank'));
-                    // We should not get here because users should be able to select only available slots.
-                    $errors['assetid'][] = get_string('error:isalreadybooked', 'facetoface', $link);
+            $editoroptions = $TEXTAREA_OPTIONS;
+            $editoroptions['context'] = $context;
+
+            // Load custom fields data for the session.
+            customfield_load_data($session, 'facetofacesession', 'facetoface_session');
+
+            // Set values for the form and unset some values that will be evaluated later.
+            $sessiondata = clone($session);
+            if (isset($sessiondata->sessiondates)) {
+                unset($sessiondata->sessiondates);
+            }
+            $sessiondata->detailsformat = FORMAT_HTML;
+            $sessiondata = file_prepare_standard_editor($sessiondata, 'details', $editoroptions, $editoroptions['context'],
+                'mod_facetoface', 'session', $session->id);
+            // Let form know how many dates to process.
+            if ($cntdates > $sessiondata->cntdates) {
+                $sessiondata->cntdates = $cntdates;
+            }
+
+            $nbdays = count($session->sessiondates);
+            if ($session->sessiondates) {
+                $i = 0;
+                foreach ($session->sessiondates as $date) {
+                    $idfield = "sessiondateid[$i]";
+                    $timestartfield = "timestart[$i]";
+                    $timefinishfield = "timefinish[$i]";
+                    $timezonefield = "sessiontimezone[$i]";
+                    $roomidfield = "roomid[$i]";
+                    $assetsfield = "assetids[$i]";
+
+                    if ($date->sessiontimezone === '') {
+                        $date->sessiontimezone = '99';
+                    } else if ($date->sessiontimezone != 99) {
+                        $date->sessiontimezone = \core_date::normalise_timezone($date->sessiontimezone);
+                    }
+
+                    $sessiondata->$idfield = $date->id;
+                    $sessiondata->$timestartfield = $date->timestart;
+                    $sessiondata->$timefinishfield = $date->timefinish;
+                    $sessiondata->$timezonefield = $date->sessiontimezone;
+                    $sessiondata->$roomidfield = $date->roomid;
+                    $sessiondata->$assetsfield = $date->assetids;
+
+                    // NOTE: There is no need to remove rooms and assets
+                    //       because form validation will not allow saving
+                    //       and likely they will just change the date.
+
+                    $i++;
                 }
             }
-            if (!empty($errors['assetid'])) {
-                $errors['assetids'] = implode(html_writer::empty_tag('br'), $errors['assetid']);
+        }
+        return array($sessiondata, $editoroptions, $defaulttimezone, $nbdays);
+    }
+
+    public function process_data() {
+        global $USER;
+
+        if (!($fromform = $this->get_data())) { // Form submitted
+            return null;
+        }
+
+        $session = $this->session;
+        $facetoface = $this->facetoface;
+
+        // Make sure user cannot cancel this page request. (Back luck IIS users!)
+        ignore_user_abort();
+
+        if (empty($fromform->submitbutton)) {
+            print_error('error:unknownbuttonclicked', 'facetoface', $this->returnurl);
+        }
+
+        // Pre-process fields
+        if (empty($fromform->allowoverbook)) {
+            $fromform->allowoverbook = 0;
+        }
+        if (empty($fromform->waitlisteveryone)) {
+            $fromform->waitlisteveryone = 0;
+        }
+        if (empty($fromform->normalcost)) {
+            $fromform->normalcost = 0;
+        }
+        if (empty($fromform->discountcost)) {
+            $fromform->discountcost = 0;
+        }
+        if (empty($fromform->selfapproval)) {
+            $fromform->selfapproval = 0;
+        }
+        if ($fromform->mincapacity < 0) {
+            $fromform->mincapacity = 0;
+        }
+        if (empty($fromform->sendcapacityemail)) {
+            $fromform->sendcapacityemail = 0;
+        }
+
+        $todb = new \stdClass();
+        $todb->cutoff     = $fromform->cutoff;
+        $todb->capacity   = $fromform->capacity;
+        $todb->normalcost = $fromform->normalcost;
+        $todb->facetoface = $facetoface->id;
+        $todb->mincapacity = $fromform->mincapacity;
+        $todb->discountcost  = $fromform->discountcost;
+        $todb->usermodified  = $USER->id;
+        $todb->allowoverbook = $fromform->allowoverbook;
+        $todb->waitlisteveryone  = $fromform->waitlisteveryone;
+        $todb->sendcapacityemail = $fromform->sendcapacityemail;
+        $todb->registrationtimestart  = $fromform->registrationtimestart;
+        $todb->registrationtimefinish = $fromform->registrationtimefinish;
+
+        // Do not change cancellation here!
+        unset($fromform->cancelledstatus);
+
+        $canconfigurecancellation = has_capability('mod/facetoface:configurecancellation', $this->context);
+        if ($canconfigurecancellation) {
+            $todb->allowcancellations = $fromform->allowcancellations;
+            $todb->cancellationcutoff = $fromform->cancellationcutoff;
+        } else {
+            if ($session) {
+                $todb->allowcancellations = $session->allowcancellations;
+                $todb->cancellationcutoff = $session->cancellationcutoff;
+            } else {
+                $todb->allowcancellations = $facetoface->allowcancellationsdefault;
+                $todb->cancellationcutoff = $facetoface->cancellationscutoffdefault;
             }
         }
 
-        // Consolidate error message.
-        if (!empty($errors['roomid']) || !empty($errors['assetid'])) {
-            $items = array();
-            if (!empty($errors['roomid'])) {
-                $items[] = html_writer::tag('li', $errors['roomid']);
-                // Don't show duplicate error.
-                unset($errors['roomid']);
+        $this->fromform = $fromform;
+        return $todb;
+    }
+
+    public function save($todb) {
+        global $DB;
+
+        $session = $this->session;
+        $facetoface = $this->facetoface;
+        $fromform =& $this->fromform;
+
+        //check dates and calculate total duration
+        $sessiondates = array();
+        for ($i = 0; $i < $fromform->cntdates; $i++) {
+            if (!empty($fromform->datedelete[$i])) {
+                continue; // skip this date
             }
-            if (!empty($errors['assetid'])) {
-                foreach ($errors['assetid'] as $asseterror) {
-                    $items[] = html_writer::tag('li', $asseterror);
+            if (!empty($fromform->timestart[$i]) && !empty($fromform->timefinish[$i])) {
+                $date = new \stdClass();
+                $date->sessiontimezone = $fromform->sessiontimezone[$i];
+                $date->timestart  = $fromform->timestart[$i];
+                $date->timefinish = $fromform->timefinish[$i];
+                $date->roomid   = $fromform->roomid[$i];
+                $date->assetids = !empty($fromform->assetids[$i]) ? explode(',', $fromform->assetids[$i]) : array();
+                $sessiondates[] = $date;
+            }
+        }
+
+        $transaction = $DB->start_delegated_transaction();
+
+        $update = false;
+        $c = optional_param('c', 0, PARAM_INT); // is copy session
+        if (!$c && (int)$session->id != 0) {
+            $update = true;
+            $todb->id  = $session->id;
+            $sessionid = $session->id;
+            $olddates  = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
+            if (!facetoface_update_session($todb, $sessiondates)) {
+                print_error('error:couldnotupdatesession', 'facetoface', $this->returnurl);
+            }
+        } else {
+            // Create or Duplicate the session.
+            if (!$sessionid = facetoface_add_session($todb, $sessiondates)) {
+                print_error('error:couldnotaddsession', 'facetoface', $this->returnurl);
+            }
+        }
+
+        $fromform->id = $sessionid;
+        customfield_save_data($fromform, 'facetofacesession', 'facetoface_session');
+
+        $transaction->allow_commit();
+
+        // Retrieve record that was just inserted/updated.
+        if (!$session = facetoface_get_session($sessionid)) {
+            print_error('error:couldnotfindsession', 'facetoface', $this->returnurl);
+        }
+
+        if ($update) {
+            // Now that we have updated the session record fetch the rest of the data we need.
+            facetoface_update_attendees($session);
+        }
+
+        // Save trainer roles.
+        if (isset($fromform->trainerrole)) {
+            facetoface_update_trainers($facetoface, $session, $fromform->trainerrole);
+        }
+
+        // Save any calendar entries.
+        $session->sessiondates = $sessiondates;
+        $data = file_postupdate_standard_editor($fromform, 'details', $this->editoroptions, $this->context, 'mod_facetoface', 'session', $session->id);
+        $session->details = $data->details;
+        $DB->set_field('facetoface_sessions', 'details', $data->details, array('id' => $session->id));
+
+        facetoface_update_calendar_entries($session, $facetoface);
+
+        if ($update) {
+            // Send any necessary datetime change notifications but only if date/time is known.
+            if (!empty($sessiondates) && facetoface_session_dates_check($olddates, $sessiondates)) {
+                $attendees = facetoface_get_attendees($session->id);
+                foreach ($attendees as $user) {
+                    facetoface_send_datetime_change_notice($facetoface, $session, $user->id, $olddates);
                 }
-                // Don't show duplicate error.
-                unset($errors['assetid']);
             }
-            $details = html_writer::tag('ul', implode('', $items));
-            $errors['timestart'] = get_string('error:datesunavailablestuff', 'facetoface', $details);
+            \mod_facetoface\event\session_updated::create_from_session($session, $this->context)->trigger();
+        } else {
+            \mod_facetoface\event\session_created::create_from_session($session, $this->context)->trigger();
         }
-        return $errors;
     }
-
-    function validation($data, $files) {
-        $assetids = array();
-        if (!empty($data['assetids'])) {
-            $assetids = explode(',', $data['assetids']);
-        }
-        $facetofaceid = $this->_customdata['facetofaceid'];
-        $errors = session_date_form::dates_validate($data['timestart'], $data['timefinish'], $data['roomid'], $assetids,
-                $data['sessionid'], $facetofaceid);
-        return $errors;
-    }
-
 }

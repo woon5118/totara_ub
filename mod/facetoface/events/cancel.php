@@ -21,9 +21,9 @@
  * @package mod_facetoface
  */
 
-require_once(__DIR__ . '/../../config.php');
-require_once(__DIR__ . '/lib.php');
-require_once(__DIR__ . '/cancelsession_form.php');
+require_once(__DIR__ . '/../../../config.php');
+require_once(__DIR__ . '/../lib.php');
+require_once(__DIR__ . '/cancel_form.php');
 
 $s = required_param('s', PARAM_INT); // facetoface session ID
 $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
@@ -46,7 +46,7 @@ $context = context_module::instance($cm->id);
 require_login($course, false, $cm);
 require_capability('mod/facetoface:editevents', $context);
 
-$PAGE->set_url('/mod/facetoface/cancelsession.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions));
+$PAGE->set_url('/mod/facetoface/events/cancel.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions));
 $PAGE->set_title($facetoface->name);
 $PAGE->set_heading($course->fullname);
 
@@ -67,7 +67,7 @@ if ($session->cancelledstatus != 0) {
 
 // NOTE: $session->allowcancellations has no relation to this script.
 
-$mform = new mod_facetoface_cancelsession_form(null, compact('backtoallsessions', 'session'));
+$mform = new mod_facetoface_cancel_form(null, compact('backtoallsessions', 'session'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }

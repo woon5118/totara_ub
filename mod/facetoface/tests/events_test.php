@@ -67,7 +67,7 @@ class facetoface_events_testcase extends advanced_testcase {
         $this->assertSame('c', $event->crud);
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array($this->course->id, 'facetoface', 'added session',
-            "sessions.php?s={$this->session->id}", $this->session->id, $this->facetoface->cmid), $event);
+            "events/add.php?s={$this->session->id}", $this->session->id, $this->facetoface->cmid), $event);
     }
 
     public function test_session_updated_event() {
@@ -84,7 +84,7 @@ class facetoface_events_testcase extends advanced_testcase {
         $this->assertSame('u', $event->crud);
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array($this->course->id, 'facetoface', 'updated session',
-            "sessions.php?s={$this->session->id}", $this->session->id, $this->facetoface->cmid), $event);
+            "events/edit.php?s={$this->session->id}", $this->session->id, $this->facetoface->cmid), $event);
     }
 
     public function test_session_deleted_event() {
@@ -101,7 +101,7 @@ class facetoface_events_testcase extends advanced_testcase {
         $this->assertSame('d', $event->crud);
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array($this->course->id, 'facetoface', 'delete session',
-            "sessions.php?s={$this->session->id}", $this->session->id, $this->facetoface->cmid), $event);
+            "events/delete.php?s={$this->session->id}", $this->session->id, $this->facetoface->cmid), $event);
     }
 
     public function test_booking_cancelled_event() {

@@ -823,7 +823,7 @@ if ($show_table) {
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 's', 'value' => $s));
 
             // Prepare status options array.
-            $statusoptions = get_attendance_status();
+            $statusoptions = facetoface_get_attendance_status();
         }
 
         if (!$download) {
@@ -922,7 +922,7 @@ if ($show_table) {
             $table->define_headers($headers);
             $table->setup();
             if ($action == 'takeattendance') {
-                $table->add_toolbar_content(display_bulk_actions_picker(), 'left' , 'top', 1);
+                $table->add_toolbar_content(facetoface_display_bulk_actions_picker(), 'left' , 'top', 1);
             }
         }
         $cancancelreservations = has_capability('mod/facetoface:reserveother', $context);

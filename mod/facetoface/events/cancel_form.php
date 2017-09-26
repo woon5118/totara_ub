@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/lib/formslib.php");
 require_once("$CFG->dirroot/totara/customfield/fieldlib.php");
 
-class mod_facetoface_cancelsession_form extends moodleform {
+class mod_facetoface_cancel_form extends moodleform {
 
     protected function definition() {
         $mform = $this->_form;

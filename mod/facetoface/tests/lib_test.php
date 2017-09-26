@@ -977,7 +977,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
     }
 
-    function test_cleanup_session_data() {
+    function test_facetoface_cleanup_session_data() {
         $this->init_sample_data();
 
         //define session object for test
@@ -994,10 +994,10 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $sessionInvalid->discountcost = 'b';
 
         // Test - for valid values.
-        $this->assertEquals(cleanup_session_data($sessionValid), $sessionValid);
+        $this->assertEquals(facetoface_cleanup_session_data($sessionValid), $sessionValid);
 
         // Test - for invalid values.
-        $this->assertEquals(cleanup_session_data($sessionInvalid), $sessionInvalid);
+        $this->assertEquals(facetoface_cleanup_session_data($sessionInvalid), $sessionInvalid);
     }
 
     function test_facetoface_add_session() {
