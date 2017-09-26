@@ -513,6 +513,7 @@ $string['newpage'] = 'New page';
 $string['newpage_help'] = 'For longer quizzes it makes sense to stretch the quiz over several pages by limiting the number of questions per page. When adding questions to the quiz, page breaks will automatically be inserted according to this setting. However page breaks may later be moved manually on the editing page.';
 $string['newpageevery'] = 'Automatically start a new page';
 $string['newresponse'] = 'New Quiz responses';
+$string['newsectionheading'] = 'New heading';
 $string['noanswers'] = 'No answers were selected!';
 $string['noattempts'] = 'No attempts have been made on this quiz';
 $string['noattemptsfound'] = 'No attempts found.';
