@@ -598,14 +598,14 @@ function dp_print_workflow_diff($diff_array) {
     $headers[] = get_string('before', 'totara_plan');
     $columns[] = 'after';
     $headers[] = get_string('after', 'totara_plan');
+    ob_start();
 
     $baseurl = new moodle_url( '/totara/plan/template/workflow.php');
     $table = new flexible_table('Templates');
     $table->define_columns($columns);
     $table->define_headers($headers);
     $table->define_baseurl($baseurl);
-    $return = html_writer::start_tag('p');
-    $return .= $OUTPUT->heading(get_string('changes', 'totara_plan'), 3);
+    $return = $OUTPUT->heading(get_string('changes', 'totara_plan'), 3);
 
     $table->setup();
 
@@ -696,9 +696,7 @@ function dp_print_workflow_diff($diff_array) {
         $table->add_data($tablerow);
     }
 
-    ob_start();
     $table->finish_html();
-    echo html_writer::empty_tag('br');
     $return = ob_get_contents();
     ob_end_clean();
 
