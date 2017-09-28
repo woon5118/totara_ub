@@ -2653,21 +2653,28 @@ class recurring_course_set extends course_set {
         // Display the course name
         if (is_object($this->course)) {
             if (isset($this->course->fullname)) {
+                $courseoptions = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
+                $hascourseoptions = count($courseoptions) > 0;
+
                 $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
                 $templatehtml .= html_writer::start_tag('div', array('class' => 'fitemtitle'));
-                $templatehtml .= html_writer::tag('label', get_string('coursename', 'totara_program'));
+                if ($hascourseoptions) {
+                    $labelcontent = get_string('coursename', 'totara_program');
+                    $labelcontent .= $OUTPUT->help_icon('recurringcourse', 'totara_program');
+                    $templatehtml .= html_writer::tag('label', $labelcontent);
+                } else {
+                    $templatehtml .= html_writer::tag('label', get_string('coursename', 'totara_program'));
+                }
                 $templatehtml .= html_writer::end_tag('div');
 
                 // Add the 'Select course' drop down list.
                 $templatehtml .= html_writer::start_tag('div', array('class' => 'courseselector felement'));
-                $courseoptions = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
-                if (count($courseoptions) > 0) {
+                if ($hascourseoptions) {
                     if ($updateform) {
                         $mform->addElement('select',  $prefix.'courseid', '', $courseoptions);
                         $template_values['%'.$prefix.'courseid%'] = array('name' => $prefix.'courseid', 'value' => null);
                     }
                     $templatehtml .= '%'.$prefix.'courseid%'."\n";
-                    $templatehtml .= $OUTPUT->help_icon('recurringcourse', 'totara_program');
                     $formdataobject->{$prefix.'courseid'} = $this->course->id;
                 } else {
                     $templatehtml .= html_writer::tag('p', get_string('nocoursestoselect', 'totara_program'));
