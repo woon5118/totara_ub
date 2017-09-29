@@ -115,6 +115,9 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $temp->add(new admin_setting_configselect('moodlecourse/coursedisplay', new lang_string('coursedisplay'),
         new lang_string('coursedisplay_help'), COURSE_DISPLAY_SINGLEPAGE, $choices));
 
+    $temp->add(new admin_setting_configcheckbox('moodlecourse/courseenddateenabled', get_string('courseenddateenabled'),
+        get_string('courseenddateenabled_desc'), 1));
+
     // Totara: Changes made to treat less than an hour as invalid duration.
     $duration = new admin_setting_configduration(
         'moodlecourse/courseduration', get_string('courseduration'),
