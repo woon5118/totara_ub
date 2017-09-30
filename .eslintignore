@@ -63,6 +63,8 @@ lib/javascript_polyfill/src/other_ie11.js
 media/player/videojs/amd/src/video-lazy.js
 media/player/videojs/amd/src/Youtube-lazy.js
 media/player/videojs/videojs/
+media/player/videojs/amd/src/videojs-flash-lazy.js
+media/player/videojs/videojs/video-js.swf
 mod/assign/feedback/editpdf/fpdi/
 repository/s3/S3.php
 theme/base/fonts/
