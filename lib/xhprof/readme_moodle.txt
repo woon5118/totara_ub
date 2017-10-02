@@ -20,6 +20,7 @@ Our changes:  Look for "moodle" in code (commit #3 - always mimic from current m
  * xhprof_html/css/xhprof.css: Minor tweaks to report styles
  * xhprof_lib/utils/callgraph_utils.php: Modified to use $CFG->pathtodot
  * xhprof_lib/utils/callgraph_utils.php: Modified xhprof_generate_image_by_dot to use the command library
+ * xhprof_lib/utils/xhprof_runs.php: applied patch from https://github.com/phacility/xhprof/pull/99
 
 TODO:
  * improvements to the listing mode: various commodity details like:
@@ -39,5 +40,4 @@ TODO:
 20130621 - MDL-39733 - Eloy Lafuente (stronk7): Export & import of profiling runs
 20160721 - MDL-55292 - Russell Smith (mr-russ): Add support for tideways profiler collection for PHP7
 20170731 - TL-12380 - Brendan Cox: Modified xhprof_generate_image_by_dot() to use the new command library.
-           TL-14971 - replaced deprecated create_function()
-20171002 - MDL-60313 - Marina Glancy (marinaglancy): Upgrade to 0.9.4 release
+20171002 - MDL-60313 - Marina Glancy (marinaglancy): Upgrade to 0.9.4 release; patched for PHP7.2
