@@ -110,12 +110,12 @@ define(['jquery','core/yui', 'core/str', 'totara_form/form'], function($, Y, cor
         var self = this;
         Y.use(yuimodule.modules, function () {
             // Note: Eval is not pretty here, but it seems to be the most robust way to replicate the PHP JS stuff.
-            /*eslint-disable no-eval*/
+            /* eslint-disable no-eval*/
             var result = eval(yuimodule.functionstr);
             if (result) {
                 self.setEditor(result);
             }
-            /*eslint no-eval: "error"*/
+            /* eslint-enable no-eval*/
         });
     };
 
