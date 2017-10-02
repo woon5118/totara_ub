@@ -118,7 +118,7 @@ function xhprof_generate_image_by_dot($dot_script, $type) {
   $dotcommand = new \core\command\executable($CFG->pathtodot);
   $dotcommand->add_argument('-T', $type, PARAM_ALPHA, '');
 
-  $process = $dotcommand->proc_open($descriptorspec, $pipes, "/tmp", array());
+  $process = $dotcommand->proc_open($descriptorspec, $pipes, sys_get_temp_dir(), array( 'PATH' => getenv( 'PATH' ) ) );
   if (is_resource($process)) {
     fwrite($pipes[0], $dot_script);
     fclose($pipes[0]);
@@ -387,7 +387,7 @@ function xhprof_generate_dot_script($raw_data, $threshold, $source, $page,
 
       $result .= "N" . $sym_table[$parent]["id"] . " -> N"
                  . $sym_table[$child]["id"];
-      $result .= "[arrowsize=$arrow_size, style=\"setlinewidth($linewidth)\","
+      $result .= "[arrowsize=$arrow_size, color=grey, style=\"setlinewidth($linewidth)\","
                  ." label=\""
                  .$label."\", headlabel=\"".$headlabel
                  ."\", taillabel=\"".$taillabel."\" ]";
