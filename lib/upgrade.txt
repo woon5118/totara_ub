@@ -291,6 +291,7 @@ information provided here is intended especially for developers.
 * Removed accesslib private functions: load_course_context(), load_role_access_by_context(), dedupe_user_access() (MDL-49398).
 * Internal "accessdata" structure format has changed to improve ability to perform role definition caching (MDL-49398).
 * user_can_view_profile() now also checks the moodle/user:viewalldetails capability.
+* The caching option 'immutable' has been added to send_stored_file() and send_file().
 
 === 9.2 ===
 
