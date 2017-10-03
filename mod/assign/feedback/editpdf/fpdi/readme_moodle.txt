@@ -25,6 +25,14 @@ Installation
 
 Updated by Sam Hemelryk (TL-19330)
 
+2017/10/03
+----------
+1/ Updated to 1.6.2
+2/ Cherry-picked changes in MDL-55848
+3/ Renamed 'TCPDF' to 'pdf' as stated above.
+
+Updated by Ankit Agarwal<ankit.agrr@gmail.com> (MDL-60301)
+
 2016/11/15
 ----------
 
