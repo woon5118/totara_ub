@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/core/db" VERSION="20150130" COMMENT="XMLDB file for Moodle totara/core"
+<XMLDB PATH="totara/core/db" VERSION="20171120" COMMENT="XMLDB file for Moodle totara/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -13,9 +13,11 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for course_info_data"/>
+        <KEY NAME="courinfodata_fie_ix" TYPE="foreign" FIELDS="fieldid" REFTABLE="course_info_field" REFFIELDS="id"/>
+        <KEY NAME="courinfodata_cou_ix" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="coursei_fie_ix" UNIQUE="false" FIELDS="fieldid"/>
+        <INDEX NAME="courinfodata_fiecou_uix" UNIQUE="true" FIELDS="fieldid, courseid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="course_info_data_param" COMMENT="Custom course fields data parameters">

@@ -168,6 +168,90 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017103100, 'facetoface');
     }
 
+    if ($oldversion < 2017112000) {
+        // Update the indexes on the facetoface_asset_info_data table.
+        $table = new xmldb_table('facetoface_asset_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('faceasseinfodata_fiefac_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'facetofaceassetid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112000, 'totara', 'facetoface');
+    }
+
+    if ($oldversion < 2017112001) {
+        // Update the indexes on the facetoface_cancellation_info_data table.
+        $table = new xmldb_table('facetoface_cancellation_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('faceasseinfodata_fiefac_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'facetofacecancellationid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112001, 'totara', 'facetoface');
+    }
+
+    if ($oldversion < 2017112002) {
+        // Update the indexes on the facetoface_room_info_data table.
+        $table = new xmldb_table('facetoface_room_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('faceroominfodata_fiefac_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'facetofaceroomid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112002, 'totara', 'facetoface');
+    }
+
+    if ($oldversion < 2017112003) {
+        // Update the indexes on the facetoface_session_info_data table.
+        $table = new xmldb_table('facetoface_session_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('facesessinfodata_fiefac_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'facetofacesessionid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112003, 'totara', 'facetoface');
+    }
+
+    if ($oldversion < 2017112004) {
+        // Update the indexes on the facetoface_sessioncancel_info_data table.
+        $table = new xmldb_table('facetoface_sessioncancel_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('facesecainfodata_fiefac_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'facetofacesessioncancelid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112004, 'totara', 'facetoface');
+    }
+
+    if ($oldversion < 2017112005) {
+        // Update the indexes on the facetoface_signup_info_data table.
+        $table = new xmldb_table('facetoface_signup_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('facesigninfodata_fiefac_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'facetofacesignupid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112005, 'totara', 'facetoface');
+    }
+
     return true;
 
 }

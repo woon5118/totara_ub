@@ -166,5 +166,19 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2017042800, 'totara_program');
     }
 
+    if ($oldversion < 2017112000) {
+        // Update the indexes on the prog_info_data table.
+        $table = new xmldb_table('prog_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('proginfodata_fiepro_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'programid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112000, 'totara', 'totara_program');
+    }
+
     return true;
 }

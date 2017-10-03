@@ -182,5 +182,61 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017112300, 'totara', 'core');
     }
 
+    if ($oldversion < 2017112700) {
+        // Update the indexes on the course_info_data table.
+        $table = new xmldb_table('course_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('courinfodata_cou_ix', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112700, 'totara', 'core');
+    }
+
+    if ($oldversion < 2017112701) {
+        // Update the indexes on the course_info_data table.
+        $table = new xmldb_table('course_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('courinfodata_fiecou_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'courseid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112701, 'totara', 'core');
+    }
+
+    if ($oldversion < 2017112702) {
+        // Update the indexes on the user_info_data table.
+        $table = new xmldb_table('user_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('userinfodata_fie_ix', XMLDB_INDEX_NOTUNIQUE, array('fieldid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112702, 'totara', 'core');
+    }
+
+    if ($oldversion < 2017112703) {
+        // Update the indexes on the user_info_data table.
+        $table = new xmldb_table('user_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('userinfodata_use_ix', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112703, 'totara', 'core');
+    }
+
     return true;
 }

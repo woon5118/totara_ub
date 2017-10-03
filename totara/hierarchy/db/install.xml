@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/hierarchy/db" VERSION="20150921" COMMENT="XMLDB file for Moodle totara/hierarchy"
+<XMLDB PATH="totara/hierarchy/db" VERSION="20171120" COMMENT="XMLDB file for Moodle totara/hierarchy"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -270,6 +270,9 @@
         <KEY NAME="comptypeinfodata_fie_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="comp_type_info_field" REFFIELDS="id"/>
         <KEY NAME="comptypeinfodata_com_fk" TYPE="foreign" FIELDS="competencyid" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="comptypeinfodata_fiecom_uix" UNIQUE="true" FIELDS="fieldid, competencyid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="comp_type_info_data_param" COMMENT="Custom competencies fields data parameters">
       <FIELDS>
@@ -419,6 +422,9 @@
         <KEY NAME="postypeinfodata_fie_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="pos_type_info_field" REFFIELDS="id"/>
         <KEY NAME="postypeinfodata_pos_fk" TYPE="foreign" FIELDS="positionid" REFTABLE="pos" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="postypeinfodata_fiepos_uix" UNIQUE="true" FIELDS="fieldid, positionid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="pos_type_info_data_param" COMMENT="Custom positions fields data parameters">
       <FIELDS>
@@ -569,7 +575,7 @@
         <KEY NAME="orgtypeinfodata_org_fk" TYPE="foreign" FIELDS="organisationid" REFTABLE="org" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="orgtype_fie_ix" UNIQUE="false" FIELDS="fieldid"/>
+        <INDEX NAME="orgtypeinfodata_fieorg_uix" UNIQUE="true" FIELDS="fieldid, organisationid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="org_type_info_data_param" COMMENT="Custom organisations fields data parameters">
@@ -753,6 +759,9 @@
         <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="goal_type_info_field" REFFIELDS="id"/>
         <KEY NAME="goaltypeinfodata_goa_fk" TYPE="foreign" FIELDS="goalid" REFTABLE="goal" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="goaltypeinfodata_fiegoa_uix" UNIQUE="true" FIELDS="fieldid, goalid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="goal_type_info_data_param" COMMENT="Custom organisations fields data parameters">
       <FIELDS>
@@ -909,6 +918,9 @@
         <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="goal_user_info_field" REFFIELDS="id"/>
         <KEY NAME="goaluserinfodata_goa_fk" TYPE="foreign" FIELDS="goal_userid" REFTABLE="goal_personal" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="goaluserinfodata_fiegoa_uix" UNIQUE="true" FIELDS="fieldid, goal_userid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="goal_user_info_data_param" COMMENT="Custom organisations fields data parameters">
       <FIELDS>

@@ -72,5 +72,97 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017072700, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2017112700) {
+        // Update the indexes on the comp_type_info_data table.
+        $table = new xmldb_table('comp_type_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('comptypeinfodata_fiecom_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'competencyid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112700, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2017112701) {
+        // Update the indexes on the goal_type_info_data table.
+        $table = new xmldb_table('goal_type_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('goaltypeinfodata_fiegoa_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'goalid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112701, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2017112702) {
+        // Update the indexes on the goal_user_info_data table.
+        $table = new xmldb_table('goal_user_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('goaluserinfodata_fiegoa_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'goal_userid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112702, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2017112703) {
+        // Update the indexes on the org_type_info_data table.
+        $table = new xmldb_table('org_type_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('orgtypeinfodata_fieorg_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'organisationid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112703, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2017112704) {
+        // Update the indexes on the org_type_info_data table.
+        $table = new xmldb_table('org_type_info_data');
+
+        // Define index for fieldid to be dropped. We are doing this because there two indexes have been incorrectly
+        // added to the field. We will replace it with a new index later.
+        $index = new xmldb_index('orgtypeinfodata_fie2_ix', XMLDB_INDEX_NOTUNIQUE, array('fieldid'));
+        // Conditionally launch to drop the index.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define new index to be added.
+        $index = new xmldb_index('orgtypeinfodata_fie_ix', XMLDB_INDEX_NOTUNIQUE, array('fieldid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112704, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2017112705) {
+        // Update the indexes on the pos_type_info_data table.
+        $table = new xmldb_table('pos_type_info_data');
+
+        // Define new index to be added.
+        $index = new xmldb_index('postypeinfodata_fiepos_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'positionid'));
+        // Conditionally launch to add index.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2017112705, 'totara', 'hierarchy');
+    }
+
     return true;
 }
