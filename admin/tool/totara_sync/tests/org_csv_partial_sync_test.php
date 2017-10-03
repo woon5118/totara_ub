@@ -243,5 +243,27 @@ class tool_totara_sync_org_partial_sync_testcase extends advanced_testcase {
         $this->assertSame('Organisation 4', $organisations['4']->fullname);
         $this->assertArrayNotHasKey('2', $organisations);
     }
+
+    public function test_full_sync_update_including_delete() {
+        global $DB;
+
+        // Set config
+        $config = array_merge($this->configcsv, $this->importfields());
+        $this->set_config($config, 'totara_sync_source_org_csv');
+        $config = array_merge($this->config, array('sourceallrecords' => 1));
+        $this->set_config($config, 'totara_sync_element_org');
+
+        // Import file that doesn't contain all records,
+        // the missing records should be removed.
+        $data = file_get_contents(__DIR__ . '/fixtures/org_partial_sync_3.csv');
+        $filepath = $this->filedir . '/csv/ready/org.csv';
+        file_put_contents($filepath, $data);
+
+        // Initially we should have 4 users.
+        $this->assertCount(4, $DB->get_records('org', array('frameworkid' => $this->org_framework_data1['id'])));
+        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+
+        $this->assertCount(3, $DB->get_records('org', array('frameworkid' => $this->org_framework_data1['id'])));
+    }
 }
 

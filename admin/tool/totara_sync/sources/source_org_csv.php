@@ -291,27 +291,37 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
 
-        while ($row = fgetcsv($file, 0, $this->config->delimiter)) {
+        while ($csvrow = fgetcsv($file, 0, $this->config->delimiter)) {
             $fieldcount->rownum++;
             // Skip empty rows
-            if (is_array($row) && current($row) === null) {
+            if (is_array($csvrow) && current($csvrow) === null) {
                 $fieldcount->fieldcount = 0;
                 $fieldcount->delimiter = $this->config->delimiter;
                 $this->addlog(get_string('fieldcountmismatch', 'tool_totara_sync', $fieldcount), 'error', 'populatesynctablecsv');
                 unset($fieldcount->delimiter);
                 continue;
             }
-            $fieldcount->fieldcount = count($row);
+            $fieldcount->fieldcount = count($csvrow);
             if ($fieldcount->fieldcount !== $fieldcount->headercount) {
                 $fieldcount->delimiter = $this->config->delimiter;
                 $this->addlog(get_string('fieldcountmismatch', 'tool_totara_sync', $fieldcount), 'error', 'populatesynctablecsv');
                 unset($fieldcount->delimiter);
                 continue;
             }
-            $row = array_combine($fields, $row);  // nice associative array
+            $csvrow = array_combine($fields, $csvrow);  // nice associative array
 
             // Encode and clean the data.
-            $row = totara_sync_clean_fields($row);
+            $csvrow = totara_sync_clean_fields($csvrow);
+
+            // Set up a db row
+            $row = array();
+
+            // General fields
+            foreach ($this->fields as $field) {
+                if (!empty($this->config->{'import_'.$field})) {
+                    $row[$field] = $csvrow[$field];
+                }
+            }
 
             // The condition must use a combination of isset and !== '' because it needs to process 0 as a valid parentidnumber.
             $row['parentidnumber'] = isset($row['parentidnumber']) && $row['parentidnumber'] !== '' ? $row['parentidnumber'] : '';
