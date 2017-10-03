@@ -9,3 +9,4 @@ modifications:
 6/ MDL-49032: fixed rfc2445_fold() to fix incorrect RFC2445_WSP definition (16 Sep 2015)
 7/ added timestamp_to_date function to support zero duration events (16 Sept 2015)
 8/ replaced deprecated create_function() that was abused to do eval
+9/ Updated \iCalendar_event::invariant_holds() to allow for same dtstart and dtend timestamps (13 July 2017)
