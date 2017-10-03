@@ -116,4 +116,32 @@ class behat_totara_customfield extends behat_base {
         $this->execute('behat_general::assert_element_contains_text', array($errormsg, '//div[contains(@id,' . $fieldshortname_literal . ')]', 'xpath_element'));
     }
 
+    /**
+     * Checks a locked custom field has the right content.
+     *
+     * @Given /^I should see the "([^"]*)" custom field is locked and contains "([^"]*)"$/
+     *
+     * @param string $fieldshortname
+     * @param string $content
+     */
+    public function i_should_see_the_custom_field_is_locked_and_contains($fieldshortname, $content) {
+        \behat_hooks::set_step_readonly(true);
+
+        $fieldshortname_literal = behat_context_helper::escape('customfield_' . $fieldshortname);
+
+        $this->execute('behat_general::assert_element_contains_text', array($content, '//div[contains(@id,' . $fieldshortname_literal . ')]', 'xpath_element'));
+    }
+
+    /**
+     * Checks a locked custom field is empty.
+     *
+     * @Given /^I should see the "([^"]*)" custom field is locked and empty$/
+     *
+     * @param string $fieldshortname
+     */
+    public function i_should_see_the_custom_field_is_locked_and_empty($fieldshortname) {
+        $content = get_string('readonlyemptyfield', 'totara_customfield');
+        $this->i_should_see_the_custom_field_is_locked_and_contains($fieldshortname, $content);
+    }
+
 }

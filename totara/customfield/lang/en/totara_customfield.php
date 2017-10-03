@@ -182,6 +182,7 @@ $string['nofileselected'] = 'No file selected';
 $string['optionxtext'] = 'Option {$a} text';
 $string['pluginname'] = 'Customfields';
 $string['programcertcustomfields'] = 'Program and Certification custom fields';
+$string['readonlyemptyfield'] = '-';
 $string['regexpattern'] = 'Regular expression validation';
 $string['regexpattern_help'] = 'A regular expression that will be used to ensure entered text is in the expected format. For example "/^[0-9]{3}$/" will ensure the text consists of exactly 3 numbers.
 

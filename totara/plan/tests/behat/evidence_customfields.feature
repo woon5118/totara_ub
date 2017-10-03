@@ -729,6 +729,26 @@ Feature: Evidence custom fields.
     Then I should see "Available Evidence Custom Fields"
     And I should see "Locked multi-select test"
 
+    # Create a textarea custom field.
+    When I set the field "Create a new custom field" to "Text area"
+    And I set the following fields to these values:
+      | Full name                   | Locked Textarea 1 |
+      | Short name (must be unique) | textarea1         |
+      | Is this field locked?       | Yes               |
+    And I press "Save changes"
+    Then I should see "Available Evidence Custom Fields"
+    And I should see "Locked Textarea 1"
+
+    # Create a textarea custom field.
+    When I set the field "Create a new custom field" to "Text area"
+    And I set the following fields to these values:
+      | Full name                   | Locked Textarea 2 |
+      | Short name (must be unique) | textarea2         |
+      | Is this field locked?       | Yes               |
+    And I press "Save changes"
+    Then I should see "Available Evidence Custom Fields"
+    And I should see "Locked Textarea 2"
+
     # Create a piece of evidence to check the fields are locked after first input.
     When I click on "Record of Learning" in the totara menu
     And I press "Add evidence"
@@ -742,10 +762,13 @@ Feature: Evidence custom fields.
       | customfield_datetimetest[year]    | 2027                |
       | Locked menu of choices test       | menuoptiontwo       |
       | customfield_multiselecttest[1]    | 1                   |
+      | Locked Textarea 1                 | Locked text area!   |
+      | Locked Textarea 2                 |                     |
     And I press "Add evidence"
     Then I should see "Locked input test 1"
     When I follow "Locked input test 1"
     And I click on "Edit details" "button"
+
     Then the "Locked input test" "field" should be readonly
     And the "Locked checkbox test" "checkbox" should be disabled
     And I should see "menuoptiontwo"
@@ -753,3 +776,5 @@ Feature: Evidence custom fields.
     And the "id_customfield_multiselecttest_0" "checkbox" should be disabled
     And the "id_customfield_multiselecttest_1" "checkbox" should be disabled
     And the "id_customfield_multiselecttest_2" "checkbox" should be disabled
+    And I should see the "textarea1" custom field is locked and contains "Locked text area!"
+    And I should see the "textarea2" custom field is locked and empty
