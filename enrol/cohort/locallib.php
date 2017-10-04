@@ -557,18 +557,19 @@ function enrol_cohort_sync(progress_trace $trace, $courseid = NULL, $cohortid = 
             'enrolid' => $instance->id,
         );
         $ras = $DB->get_records_sql($sql, $params); // There is no way around this, we need to fetch it all into memory.
-        // Delete the role assignments.
+        // Delete the role assignments for users that do not have active enrolment record.
         $sql = "DELETE FROM {role_assignments}
                  WHERE component = 'enrol_cohort' AND itemid = :enrolid1
                        AND userid NOT IN (
                            SELECT ue.userid
                              FROM {user_enrolments} ue
                              JOIN {enrol} e ON (e.id = ue.enrolid)
-                            WHERE e.id = :enrolid2 AND ue.status = :useractive
+                            WHERE e.id = :enrolid2 AND ue.status = :useractive AND e.status = :statusenabled
                        )";
         $params = array(
             'useractive' => ENROL_USER_ACTIVE,
             'enrolid1' => $instance->id, 'enrolid2' => $instance->id,
+            'statusenabled' => ENROL_INSTANCE_ENABLED,
         );
         $DB->execute($sql, $params);
         $context->mark_dirty();
