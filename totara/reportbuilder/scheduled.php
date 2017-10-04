@@ -60,12 +60,21 @@ if ($id == 0) {
     $schedule->format = null;
     $schedule->exporttofilesystem = null;
     $schedule->userid = $USER->id;
+    $schedule->sendtoself = 1; // New schedules are sent to the creating user by default.
+
+    // Does this schedule belong to the current user. For new schedules its always yes.
+    $myscheduledreport = true;
 } else {
     if (!$schedule = $DB->get_record('report_builder_schedule', array('id' => $id))) {
         print_error('error:invalidreportscheduleid', 'totara_reportbuilder');
     }
+    // This will be set accurately when processing the current system users later.
+    $schedule->sendtoself = 0;
 
     $report = new reportbuilder($schedule->reportid);
+
+    // Does this schedule belong to the current user.
+    $myscheduledreport = ($USER->id == $schedule->userid);
 }
 
 if (!reportbuilder::is_capable($schedule->reportid)) {
@@ -85,8 +94,16 @@ $schedule->audiences = email_setting_schedule::get_audiences_to_email($id);
 $schedule->systemusers = email_setting_schedule::get_system_users_to_email($id);
 $schedule->externalusers = email_setting_schedule::get_external_users_to_email($id);
 
+// An array of already selected system users.
 $existingusers = array();
-foreach ($schedule->systemusers as $user) {
+foreach ($schedule->systemusers as $key => $user) {
+    if ($myscheduledreport && $user->id == $USER->id) {
+        // The current user owns this schedule, and the the system user is the current user.
+        // As they own it we want to use the sendtoself checkbox and remove them from the external users.
+        $schedule->sendtoself = 1;
+        unset($schedule->systemusers[$key]);
+        continue;
+    }
     $existingusers[$user->id] = $user;
 }
 
@@ -108,7 +125,8 @@ local_js(array(
 $args = array('args'=>'{"reportid":' . $reportid . ','
     . '"id":' . $id . ','
     . '"existingsyusers":"' . $existingsyusers .'",'
-    . '"existingaud":"' . $existingaud .'"}'
+    . '"existingaud":"' . $existingaud .'",'
+    . '"excludeself":"'.(int)$myscheduledreport.'"}'
 );
 
 $jsmodule = array('name' => 'totara_email_scheduled_report',
@@ -142,6 +160,17 @@ if ($mform->is_cancelled()) {
     redirect($myreportsurl);
 }
 if ($fromform = $mform->get_data()) {
+
+    if ($myscheduledreport && !empty($fromform->sendtoself)) {
+        // If the schedule belongs to the current user and seld to self has been selected then
+        // we want to remove that and add the current user to the system users before we save.
+        // NOTE: send to self is only shown to the user who owns the schedule.
+        unset($fromform->sendtoself);
+        $submit_systemusers = explode(',', $fromform->systemusers);
+        array_push($submit_systemusers, $USER->id);
+        $fromform->systemusers = join(',', $submit_systemusers);
+    }
+
     if (empty($fromform->submitbutton)) {
         totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
     }
@@ -195,11 +224,14 @@ function add_scheduled_report($fromform) {
         $transaction = $DB->start_delegated_transaction();
         $todb = new stdClass();
         if ($id = $fromform->id) {
+            // It's an existing scheduled report, save the id and don't change the owner.
             $todb->id = $id;
+        } else {
+            // Its a new scheduled report, set the owner to the current user.
+            $todb->userid = $USER->id;
         }
         $todb->reportid = $fromform->reportid;
         $todb->savedsearchid = $fromform->savedsearchid;
-        $todb->userid = $USER->id;
         $todb->format = $fromform->format;
         $todb->exporttofilesystem = $fromform->emailsaveorboth;
         $todb->frequency = $fromform->frequency;

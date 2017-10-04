@@ -956,6 +956,7 @@ $string['selectmanagers'] = 'Select Managers';
 $string['selectorganisations'] = 'Select Organisations';
 $string['selectpositions'] = 'Select Positions';
 $string['selectsource'] = 'Select a source...';
+$string['sendtoself'] = 'Send to self';
 $string['sessionroles_txtrestr'] = '{$a->rolelocalnames} {$a->title} AND {$a->userfullname}';
 $string['settings'] = 'Settings';
 $string['shortnametaken'] = 'That shortname is already in use';

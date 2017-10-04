@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  */
 class scheduled_reports_new_form extends moodleform {
     function definition() {
-        global $DB;
+        global $DB, $USER;
 
         $mform =& $this->_form;
         $id = $this->_customdata['id'];
@@ -149,6 +149,12 @@ class scheduled_reports_new_form extends moodleform {
 
         $mform->addElement('hidden', 'externalemails');
         $mform->setType('externalemails', PARAM_TEXT);
+
+        if ($USER->id == $ownerid) {
+            $mform->addElement('checkbox', 'sendtoself', get_string('sendtoself', 'totara_reportbuilder'));
+            $mform->setDefault('sendtoself', 1);
+            $mform->setType('sendtoself', PARAM_BOOL);
+        }
 
         if (has_capability('moodle/cohort:view', $context)) {
             // Create a place to show existing audiences.

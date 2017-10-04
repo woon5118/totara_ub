@@ -119,3 +119,46 @@ Feature: Test that report builder reports can be scheduled to be emailed
     And I set the field "External email address to add" to "firstname@localhost"
     And I press "Add email"
     Then I should see "firstname@localhost"
+
+  Scenario: Add myself as a recipient of the scheduled report
+    And the following "users" exist:
+      | username | firstname | lastname | email             |
+      | user1    | User      | One      | user1@example.com |
+      | user2    | User      | Two      | user2@example.com |
+
+    When I press "Add system user(s)"
+    And I click on "user1@example.com" "link" in the "Add system user(s)" "totaradialogue"
+    And I should not see "Admin User" in the "Add system user(s)" "totaradialogue"
+    And I click on "Save" "button" in the "Add system user(s)" "totaradialogue"
+    And I wait "1" seconds
+    Then I should see "User One"
+    And I should not see "User Two"
+
+    When I press "Save changes"
+    And I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    Then I should see "User One"
+    And I should not see "User Two"
+
+    When I set the field "Send to self" to "1"
+    And I press "Save changes"
+    And I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    Then I should see "User One"
+    And I should not see "User Two"
+
+    When I press "Add system user(s)"
+    And I click on "user2@example.com" "link" in the "Add system user(s)" "totaradialogue"
+    And I should not see "Admin User" in the "Add system user(s)" "totaradialogue"
+    And I click on "Save" "button" in the "Add system user(s)" "totaradialogue"
+    And I wait "1" seconds
+    Then I should see "User One"
+    And I should see "User Two"
+
+    # This requires that the user id to be correct
+    When I click on "Delete" "link" in the "#systemusers_3" "css_element"
+    Then I should not see "User One"
+    And I should see "User Two"
+
+    When I press "Save changes"
+    And I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    Then I should not see "User One"
+    And I should see "User Two"
