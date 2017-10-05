@@ -568,9 +568,11 @@ class pix_icon implements renderable, templatable {
 
         $altattributes = json_decode($alt, true);
 
-        if (json_last_error() === JSON_ERROR_NONE && $altattributes !== NULL) {
+        if (json_last_error() === JSON_ERROR_NONE && is_array($altattributes)) {
             $this->attributes = array_merge($this->attributes, $altattributes);
-        } if (!empty($alt) && empty($this->attributes['alt'])) {
+        }
+
+        if (!empty($alt) && empty($this->attributes['alt'])) {
             // legacy mode
             $this->attributes['alt'] = format_string($alt);
 
