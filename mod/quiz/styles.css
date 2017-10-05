@@ -1012,12 +1012,6 @@ table.quizreviewsummary td.cell {
     background-color: #afa;
 }
 
-#categoryquestions .header {
-    text-align: center;
-    padding: 0 2px;
-    border: 0 none;
-}
-
 #categoryquestions th.modifiername .sorters,
 #categoryquestions th.creatorname .sorters {
     font-weight: normal;
