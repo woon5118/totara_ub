@@ -50,6 +50,12 @@ class scheduled_reports_new_form extends moodleform {
         $savedsearches = $this->_customdata['savedsearches'];
         $exporttofilesystem = $this->_customdata['exporttofilesystem'];
         $context = context_system::instance();
+        $otherrecipients = $this->_customdata['otherrecipients'];
+
+        $allow_audiences = !empty($this->_customdata['allow_audiences']);
+        $allow_systemusers = !empty($this->_customdata['allow_systemusers']);
+        $allow_emailexternalusers = !empty($this->_customdata['allow_emailexternalusers']);
+        $allow_sendtoself = !empty($this->_customdata['allow_sendtoself']);
 
         $mform->addElement('hidden', 'id', $id);
         $mform->setType('id', PARAM_INT);
@@ -140,23 +146,18 @@ class scheduled_reports_new_form extends moodleform {
         $mform->addElement('html', html_writer::tag('p', get_string('warngrrvisibility', 'totara_reportbuilder')));
         $mform->addElement('static', 'emailrequired', '', '');
 
-        // Input hidden fields for system_users and audiences.
-        $mform->addElement('hidden', 'systemusers');
-        $mform->setType('systemusers', PARAM_SEQUENCE);
-
-        $mform->addElement('hidden', 'audiences');
-        $mform->setType('audiences', PARAM_SEQUENCE);
-
-        $mform->addElement('hidden', 'externalemails');
-        $mform->setType('externalemails', PARAM_TEXT);
-
-        if ($USER->id == $ownerid) {
+        if ($allow_sendtoself) {
             $mform->addElement('checkbox', 'sendtoself', get_string('sendtoself', 'totara_reportbuilder'));
             $mform->setDefault('sendtoself', 1);
             $mform->setType('sendtoself', PARAM_BOOL);
         }
 
-        if (has_capability('moodle/cohort:view', $context)) {
+        if ($allow_audiences) {
+
+            // Input hidden fields for audiences.
+            $mform->addElement('hidden', 'audiences');
+            $mform->setType('audiences', PARAM_SEQUENCE);
+
             // Create a place to show existing audiences.
             $audiences = array();
             $audiences[] =& $mform->createElement('static', 'audiences_list', '', html_writer::div('', 'list-audiences'));
@@ -164,7 +165,12 @@ class scheduled_reports_new_form extends moodleform {
             $mform->addGroup($audiences, 'audiences_group', get_string('cohorts', 'totara_cohort'), '');
         }
 
-        if (has_capability('moodle/user:viewdetails', $context)) {
+        if ($allow_systemusers) {
+
+            // Input hidden fields for system_users.
+            $mform->addElement('hidden', 'systemusers');
+            $mform->setType('systemusers', PARAM_SEQUENCE);
+
             // Create a place to show existing system users.
             $sysusers = array();
             $sysusers[] =& $mform->createElement('static', 'systemusers_list', get_string('systemusers', 'totara_reportbuilder'), html_writer::div('', 'list-systemusers'));
@@ -172,19 +178,36 @@ class scheduled_reports_new_form extends moodleform {
             $mform->addGroup($sysusers, 'systemusers_list_group', get_string('systemusers', 'totara_reportbuilder'), '');
         }
 
-        // Text input to add new emails for external users.
-        $objs = array();
-        $objs[] =& $mform->createElement('static', 'externalemails_list', '', html_writer::div('', 'list-externalemails'));
-        $objs[] =& $mform->createElement('text', 'emailexternals', get_string('externalemail', 'totara_reportbuilder'), array('class' => 'reportbuilder_scheduled_addexternal', 'maxlength' => 150, 'size' => 30));
-        $objs[] =& $mform->createElement('button', 'addemail', get_string('addexternalemail', 'totara_reportbuilder'),
-            array('id' => 'addexternalemail'));
+        if ($allow_emailexternalusers) {
 
-        // Create a group for the elements.
-        $mform->addGroup($objs, 'externalemailsgrp', get_string('emailexternalusers', 'totara_reportbuilder'), '');
-        $mform->setType('externalemailsgrp[emailexternals]', PARAM_TEXT);
-        $mform->addHelpButton('externalemailsgrp', 'emailexternalusers', 'totara_reportbuilder');
+            // Hidden inputs for external emails
+            $mform->addElement('hidden', 'externalemails');
+            $mform->setType('externalemails', PARAM_TEXT);
 
-        $mform->setType('emailexternals', PARAM_EMAIL);
+            // Text input to add new emails for external users.
+            $objs = array();
+            $objs[] =& $mform->createElement('static', 'externalemails_list', '', html_writer::div('', 'list-externalemails'));
+            $objs[] =& $mform->createElement('text', 'emailexternals', get_string('externalemail', 'totara_reportbuilder'), array('class' => 'reportbuilder_scheduled_addexternal', 'maxlength' => 150, 'size' => 30));
+            $objs[] =& $mform->createElement('button', 'addemail', get_string('addexternalemail', 'totara_reportbuilder'),
+                array('id' => 'addexternalemail'));
+
+            // Create a group for the elements.
+            $mform->addGroup($objs, 'externalemailsgrp', get_string('emailexternalusers', 'totara_reportbuilder'), '');
+            $mform->setType('externalemailsgrp[emailexternals]', PARAM_TEXT);
+            $mform->addHelpButton('externalemailsgrp', 'emailexternalusers', 'totara_reportbuilder');
+
+            $mform->setType('emailexternals', PARAM_EMAIL);
+        }
+
+        if (!empty($otherrecipients)) {
+            $label = get_string('otherrecipients', 'totara_reportbuilder');
+            $elements = [];
+            foreach ($otherrecipients as $otherrecipient) {
+                $text = get_string('otherrecipient:'.$otherrecipient['type'], 'totara_reportbuilder', $otherrecipient['a']);
+                $elements[] = $mform->createElement('advcheckbox', $otherrecipient['key'], '', $text);
+            }
+            $mform->addGroup($elements, 'otherrecipients', $label, "<br />");
+        }
 
         if (!empty($savedsearches)) {
             $this->add_action_buttons();
@@ -205,9 +228,13 @@ class scheduled_reports_new_form extends moodleform {
         unset($data->systemusers);
         unset($data->externalusers);
 
+        $allow_audiences = !empty($this->_customdata['allow_audiences']);
+        $allow_systemusers = !empty($this->_customdata['allow_systemusers']);
+        $allow_emailexternalusers = !empty($this->_customdata['allow_emailexternalusers']);
+
         parent::set_data($data);
 
-        if (!empty($audiences)) {
+        if ($allow_audiences && !empty($audiences)) {
             // Render all audiences.
             $audiencesrecords = array();
             $audienceids = array();
@@ -220,7 +247,7 @@ class scheduled_reports_new_form extends moodleform {
             $mform->getElement('audiences')->setValue(implode(',', $audienceids));
         }
 
-        if (!empty($sysusers)) {
+        if ($allow_systemusers && !empty($sysusers)) {
             // Render system users.
             $systemusers = array();
             $userids = array();
@@ -234,7 +261,7 @@ class scheduled_reports_new_form extends moodleform {
             $mform->getElement('systemusers')->setValue(implode(',', $userids));
         }
 
-        if (!empty($extusers)) {
+        if ($allow_emailexternalusers && !empty($extusers)) {
             // Render external emails.
             $externalemails = array();
             foreach ($extusers as $extuser) {
@@ -253,12 +280,28 @@ class scheduled_reports_new_form extends moodleform {
 
         $errors = parent::validation($data, $files);
 
-        $audiences = $data['audiences'];
-        $sysusers  = $data['systemusers'];
-        $extusers  = $data['externalemails'];
+        $allow_audiences = !empty($this->_customdata['allow_audiences']);
+        $allow_systemusers = !empty($this->_customdata['allow_systemusers']);
+        $allow_emailexternalusers = !empty($this->_customdata['allow_emailexternalusers']);
+        $allow_sendtoself = !empty($this->_customdata['allow_sendtoself']);
+        $otherrecipients = $this->_customdata['otherrecipients'];
+
+        $sendtoself = ($allow_sendtoself && !empty($data['sendtoself']));
+        $audiences = ($allow_audiences) ? $data['audiences'] : [];
+        $sysusers = ($allow_systemusers) ? $data['systemusers'] : [];
+        $extusers = ($allow_emailexternalusers) ? $data['externalemails'] : [];
+        $hasotherrecipients = false;
+        if (!empty($otherrecipients) && !empty($data['otherrecipients'])) {
+            foreach ($otherrecipients as $otherrecipient) {
+                if (isset($data['otherrecipients'][$otherrecipient['key']]) && $data['otherrecipients'][$otherrecipient['key']] == '1') {
+                    $hasotherrecipients = true;
+                    break;
+                }
+            }
+        }
         $emailsaveorboth = $data['emailsaveorboth'];
 
-        if (empty($audiences) && empty($sysusers) && empty($extusers) && $emailsaveorboth != REPORT_BUILDER_EXPORT_SAVE) {
+        if (!$sendtoself && !$hasotherrecipients && empty($audiences) && empty($sysusers) && empty($extusers) && $emailsaveorboth != REPORT_BUILDER_EXPORT_SAVE) {
             $errors['emailrequired'] = get_string('error:emailrequired', 'totara_reportbuilder');
         }
 

@@ -41,15 +41,20 @@ $PAGE->set_totara_menu_selected('myreports');
 // Get the report id. This can be in one of two variables because the two forms are constructed differently.
 $reportid = optional_param('reportid', 0, PARAM_INT); //report that a schedule is being added for
 $formdata = optional_param_array('addanewscheduledreport', null, PARAM_INT);
-$reportid = $reportid ? $reportid : intval($formdata['reportid']);
 // Get the id of a scheduled report that's being edited.
 $id = optional_param('id', 0, PARAM_INT);
 
+if ($reportid === 0 && isset($formdata['reportid'])) {
+    $reportid = clean_param($formdata['reportid'], PARAM_INT);
+}
+
 $myreportsurl = $CFG->wwwroot . '/my/reports.php';
-$returnurl = $CFG->wwwroot . '/totara/reportbuilder/scheduled.php';
+$returnurl = new moodle_url('/totara/reportbuilder/scheduled.php', ['id' => $id]);
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
-if ($id == 0) {
+$newreport = empty($id);
+
+if ($newreport) {
     // Try to create report object to catch invalid data.
     $report = new reportbuilder($reportid);
     $schedule = new stdClass();
@@ -84,33 +89,92 @@ if ($schedule->userid != $USER->id) {
     require_capability('totara/reportbuilder:managereports', context_system::instance());
 }
 
+$allowedscheduledrecipients = get_config('totara_reportbuilder', 'allowedscheduledrecipients');
+$allowedscheduledrecipients = explode(',', $allowedscheduledrecipients);
+
+$context = context_system::instance();
+$allow_audiences = in_array('audiences', $allowedscheduledrecipients) && has_capability('moodle/cohort:view', $context);
+$allow_systemusers = in_array('systemusers', $allowedscheduledrecipients) && has_capability('moodle/user:viewdetails', $context);
+$allow_emailexternalusers = in_array('emailexternalusers', $allowedscheduledrecipients);
+$allow_sendtoself = in_array('sendtoself', $allowedscheduledrecipients) && $myscheduledreport;
+// Clean up.
+unset($allowedscheduledrecipients);
+
 $savedsearches = $report->get_saved_searches($schedule->reportid, $USER->id);
 if (!isset($report->src->redirecturl)) {
     $savedsearches[0] = get_string('alldata', 'totara_reportbuilder');
 }
 
 // Get list of emails settings for this schedule report.
-$schedule->audiences = email_setting_schedule::get_audiences_to_email($id);
-$schedule->systemusers = email_setting_schedule::get_system_users_to_email($id);
-$schedule->externalusers = email_setting_schedule::get_external_users_to_email($id);
+if ($newreport) {
+    $current_audiences = $schedule->audiences = array();
+    $current_systemusers = $schedule->systemusers = array();
+    $current_externalusers = $schedule->externalusers = array();
+} else {
+    $current_audiences = $schedule->audiences = email_setting_schedule::get_audiences_to_email($id);
+    $current_systemusers = $schedule->systemusers = email_setting_schedule::get_system_users_to_email($id);
+    $current_externalusers = $schedule->externalusers = email_setting_schedule::get_external_users_to_email($id);
+}
+$schedule->otherrecipients = [];
 
 // An array of already selected system users.
 $existingusers = array();
+$otherrecipients = [];
 foreach ($schedule->systemusers as $key => $user) {
-    if ($myscheduledreport && $user->id == $USER->id) {
+    if ($allow_sendtoself && $user->id == $USER->id) {
         // The current user owns this schedule, and the the system user is the current user.
         // As they own it we want to use the sendtoself checkbox and remove them from the external users.
         $schedule->sendtoself = 1;
         unset($schedule->systemusers[$key]);
         continue;
     }
-    $existingusers[$user->id] = $user;
+    if ($allow_systemusers) {
+        $existingusers[$user->id] = $user;
+    } else {
+        $key = 'otherrecipients_' . sha1('user:'.$user->id);
+        $schedule->otherrecipients[$key] = 1;
+        $otherrecipients[] = [
+            'key' => $key,
+            'type' => 'systemusers',
+            'a' => $user->fullname,
+            'value' => $user->id
+        ];
+    }
 }
 
 $existingaudiences = array();
 foreach ($schedule->audiences as $audience) {
-    $existingaudiences[$audience->id] = $audience;
+    if ($allow_audiences) {
+        $existingaudiences[$audience->id] = $audience;
+    } else {
+        $key = 'otherrecipients_' . sha1('audience:'.$audience->id);
+        $schedule->otherrecipients[$key] = 1;
+        $otherrecipients[] = [
+            'key' => $key,
+            'type' => 'audiences',
+            'a' => $audience->fullname,
+            'value' => $audience->id
+        ];
+    }
 }
+
+$existingexternal = array();
+foreach ($schedule->externalusers as $email) {
+    if ($allow_emailexternalusers) {
+        $existingexternal[] = $email;
+    } else {
+        $key = 'otherrecipients_' . sha1('email:'.$email);
+        $schedule->otherrecipients[$key] = 1;
+        $otherrecipients[] = [
+            'key' => $key,
+            'type' => 'emailexternalusers',
+            'a' => $email,
+            'value' => $email
+        ];
+    }
+}
+$schedule->externalusers = $existingexternal;
+
 
 // Get existing users and audiences IDs.
 $existingsyusers = !empty($existingusers) ? implode(',', array_keys($existingusers)) : '';
@@ -126,7 +190,7 @@ $args = array('args'=>'{"reportid":' . $reportid . ','
     . '"id":' . $id . ','
     . '"existingsyusers":"' . $existingsyusers .'",'
     . '"existingaud":"' . $existingaud .'",'
-    . '"excludeself":"'.(int)$myscheduledreport.'"}'
+    . '"excludeself":"'.(int)$allow_sendtoself.'"}'
 );
 
 $jsmodule = array('name' => 'totara_email_scheduled_report',
@@ -151,6 +215,11 @@ $mform = new scheduled_reports_new_form(
         'savedsearches' => $savedsearches,
         'exporttofilesystem' => $schedule->exporttofilesystem,
         'ownerid' => $schedule->userid,
+        'otherrecipients' => $otherrecipients,
+        'allow_audiences' => $allow_audiences,
+        'allow_emailexternalusers' => $allow_emailexternalusers,
+        'allow_systemusers' => $allow_systemusers,
+        'allow_sendtoself' => $allow_sendtoself,
     )
 );
 
@@ -161,46 +230,124 @@ if ($mform->is_cancelled()) {
 }
 if ($fromform = $mform->get_data()) {
 
-    if ($myscheduledreport && !empty($fromform->sendtoself)) {
-        // If the schedule belongs to the current user and seld to self has been selected then
-        // we want to remove that and add the current user to the system users before we save.
-        // NOTE: send to self is only shown to the user who owns the schedule.
-        unset($fromform->sendtoself);
-        $submit_systemusers = explode(',', $fromform->systemusers);
-        array_push($submit_systemusers, $USER->id);
-        $fromform->systemusers = join(',', $submit_systemusers);
-    }
-
     if (empty($fromform->submitbutton)) {
         totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
     }
 
-    if ($fromform->id) {
-        if ($newid = add_scheduled_report($fromform)) {
-            totara_set_notification(get_string('updatescheduledreport', 'totara_reportbuilder'), $myreportsurl, array('class' => 'notifysuccess'));
+    if (!isset($fromform->reportid) || !isset($fromform->format) || !isset($fromform->frequency)) {
+        $noticekey = ($newreport) ? 'error:addscheduledreport' : 'error:updatescheduledreport';
+        totara_set_notification(get_string($noticekey, 'totara_reportbuilder'), $returnurl);
+    }
+
+    $subject = new stdClass();
+    $subject->schedule = $fromform->schedule;
+    $subject->frequency = $fromform->frequency;
+    $scheduler = new scheduler($subject);
+    $nextevent = $scheduler->next(time(), false, core_date::get_user_timezone());
+
+    $transaction = $DB->start_delegated_transaction();
+    $todb = new stdClass();
+    if (!$newreport) {
+        // It's an existing scheduled report, save the id and don't change the owner.
+        $todb->id = $id;
+    } else {
+        // Its a new scheduled report, set the owner to the current user.
+        $todb->userid = $USER->id;
+    }
+    $todb->reportid = $fromform->reportid;
+    $todb->savedsearchid = $fromform->savedsearchid;
+    $todb->format = $fromform->format;
+    $todb->exporttofilesystem = $fromform->emailsaveorboth;
+    $todb->frequency = $fromform->frequency;
+    $todb->schedule = $fromform->schedule;
+    $todb->nextreport = $nextevent->get_scheduled_time();
+
+    if ($newreport) {
+        $newid = $DB->insert_record('report_builder_schedule', $todb);
+
+        // Get audiences, system users and external users and update email tables.
+        $audiences = ($allow_audiences && !empty($fromform->audiences)) ? explode(',', $fromform->audiences) : array();
+        $systemusers = ($allow_systemusers && !empty($fromform->systemusers)) ? explode(',', $fromform->systemusers) : array();
+        $externalusers = ($allow_emailexternalusers && !empty($fromform->externalemails)) ? explode(',', $fromform->externalemails) : array();
+
+    } else {
+        $DB->update_record('report_builder_schedule', $todb);
+        $newid = $todb->id;
+
+        if ($allow_audiences && !empty($fromform->audiences)) {
+            $audiences = explode(',', $fromform->audiences);
+        } else {
+            $audiences = array_keys($current_audiences);
         }
-        else {
-            totara_set_notification(get_string('error:updatescheduledreport', 'totara_reportbuilder'), $returnurl);
+        if ($allow_systemusers && !empty($fromform->systemusers)) {
+            $systemusers = explode(',', $fromform->systemusers);
+        } else {
+            $systemusers = array_keys($current_systemusers);
+        }
+        if ($allow_emailexternalusers && !empty($fromform->externalemails)) {
+            $externalusers = explode(',', $fromform->externalemails);
+        } else {
+            $externalusers = $current_externalusers;
         }
     }
-    else {
-        if ($newid = add_scheduled_report($fromform)) {
-            totara_set_notification(get_string('addedscheduledreport', 'totara_reportbuilder'), $myreportsurl, array('class' => 'notifysuccess'));
-        }
-        else {
-            totara_set_notification(get_string('error:addscheduledreport', 'totara_reportbuilder'), $returnurl);
+
+    if ($allow_sendtoself && !empty($fromform->sendtoself) && !in_array($USER->id, $systemusers)) {
+        // If the schedule belongs to the current user and seld to self has been selected then
+        // we want to remove that and add the current user to the system users before we save.
+        // NOTE: send to self is only shown to the user who owns the schedule.
+        unset($fromform->sendtoself);
+        array_push($systemusers, $USER->id);
+    }
+
+    if (!empty($fromform->otherrecipients)) {
+        // Advanced checkboxes are shown for other recipients.
+        // We iterate the known other users, and if the value for them is given, and is 0 then
+        // we will remove them as recipients.
+        foreach ($otherrecipients as $recipient) {
+            if (isset($fromform->otherrecipients[$recipient['key']]) && empty($fromform->otherrecipients[$recipient['key']])) {
+                switch ($recipient['type']) {
+                    case 'systemusers':
+                        $recipientkey = array_search($recipient['value'], $systemusers);
+                        if ($recipient !== false) {
+                            unset($systemusers[$recipientkey]);
+                        }
+                        break;
+                    case 'audiences':
+                        $recipientkey = array_search($recipient['value'], $audiences);
+                        if ($recipient !== false) {
+                            unset($audiences[$recipientkey]);
+                        }
+                        break;
+                    case 'emailexternalusers':
+                        $recipientkey = array_search($recipient['value'], $externalusers);
+                        if ($recipient !== false) {
+                            unset($externalusers[$recipientkey]);
+                        }
+                        break;
+                    default:
+                        throw new coding_exception('Unexpected recipient type', $recipient);
+                        break;
+                }
+            }
         }
     }
+
+    $scheduleemail = new email_setting_schedule($newid);
+    $scheduleemail->set_email_settings($audiences, $systemusers, $externalusers);
+
+    $transaction->allow_commit();
+
+    $noticekey = ($newreport) ? 'addedscheduledreport' : 'updatescheduledreport';
+    totara_set_notification(get_string($noticekey, 'totara_reportbuilder'), $myreportsurl, array('class' => 'notifysuccess'));
 }
 
-if ($id == 0) {
+if ($newreport) {
     $pagename = 'addscheduledreport';
 } else {
     $pagename = 'editscheduledreport';
 }
 
 $PAGE->set_title(get_string($pagename, 'totara_reportbuilder'));
-$PAGE->set_cacheable(true);
 $PAGE->navbar->add(get_string('reports', 'totara_core'), new moodle_url('/my/reports.php'));
 $PAGE->navbar->add(get_string($pagename, 'totara_reportbuilder'));
 echo $output->header();
@@ -210,51 +357,3 @@ echo $output->heading(get_string($pagename, 'totara_reportbuilder'));
 $mform->display();
 
 echo $output->footer();
-
-function add_scheduled_report($fromform) {
-    global $DB, $USER;
-
-    if (isset($fromform->reportid) && isset($fromform->format) && isset($fromform->frequency)) {
-        $report = new stdClass();
-        $report->schedule = $fromform->schedule;
-        $report->frequency = $fromform->frequency;
-        $scheduler = new scheduler($report);
-        $nextevent = $scheduler->next(time(), false, core_date::get_user_timezone());
-
-        $transaction = $DB->start_delegated_transaction();
-        $todb = new stdClass();
-        if ($id = $fromform->id) {
-            // It's an existing scheduled report, save the id and don't change the owner.
-            $todb->id = $id;
-        } else {
-            // Its a new scheduled report, set the owner to the current user.
-            $todb->userid = $USER->id;
-        }
-        $todb->reportid = $fromform->reportid;
-        $todb->savedsearchid = $fromform->savedsearchid;
-        $todb->format = $fromform->format;
-        $todb->exporttofilesystem = $fromform->emailsaveorboth;
-        $todb->frequency = $fromform->frequency;
-        $todb->schedule = $fromform->schedule;
-        $todb->nextreport = $nextevent->get_scheduled_time();
-        if (!$id) {
-            $newid = $DB->insert_record('report_builder_schedule', $todb);
-        } else {
-            $DB->update_record('report_builder_schedule', $todb);
-            $newid = $todb->id;
-        }
-
-        // Get audiences, system users and external users and update email tables.
-        $audiences = (!empty($fromform->audiences)) ? explode(',', $fromform->audiences) : array();
-        $systemusers = (!empty($fromform->systemusers)) ? explode(',', $fromform->systemusers) : array();
-        $externalusers = (!empty($fromform->externalemails)) ? explode(',', $fromform->externalemails) : array();
-
-        $scheduleemail = new email_setting_schedule($newid);
-        $scheduleemail->set_email_settings($audiences, $systemusers, $externalusers);
-
-        $transaction->allow_commit();
-
-        return $newid;
-    }
-    return false;
-}

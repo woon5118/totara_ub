@@ -99,6 +99,10 @@ if ($ADMIN->fulltree) {
             $options
         )
     );
+
+    // Scheduled reports recipients settings.
+    $rb->add(new totara_reportbuilder_admin_setting_configallowedscheduledrecipients());
+
 }
 
 // Add all above settings to the report builder settings node.
