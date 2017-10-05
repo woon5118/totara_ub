@@ -67,8 +67,24 @@ class customfield_menu extends customfield_base {
      * Overwrites the base class method
      * @param   object   moodleform instance
      */
-    function edit_field_add(&$mform) {
-        $mform->addElement('select', $this->inputname, format_string($this->field->fullname), $this->options);
+    public function edit_field_add(&$mform) {
+
+        if ($this->itemid != 0 && $this->is_locked()) {
+            // Display the field using a hyphen if there's no content.
+            $mform->addElement(
+                'static',
+                'freezedisplay',
+                format_string($this->field->fullname),
+                html_writer::div(
+                    !empty($this->data) ? format_text($this->data) : get_string('readonlyemptyfield', 'totara_customfield'),
+                    null,
+                    ['id' => 'id_customfield_' . $this->field->shortname]
+                )
+            );
+        } else {
+            $mform->addElement('select', $this->inputname, format_string($this->field->fullname), $this->options);
+        }
+
     }
 
     /**
@@ -178,4 +194,22 @@ class customfield_menu extends customfield_base {
 
         return $syncitem;
     }
+
+    /**
+     * Display the data for the menu custom field.
+     *
+     * @param $data mixed The data to display.
+     * @param $extradata array Data that identifies the source of the data.
+     * @return string The formatted text for display.
+     */
+    public static function display_item_data($data, $extradata=array()) {
+
+        if (empty($data)) {
+            return get_string('readonlyemptyfield', 'totara_customfield');
+        } else {
+            return format_text($data);
+        }
+
+    }
+
 }

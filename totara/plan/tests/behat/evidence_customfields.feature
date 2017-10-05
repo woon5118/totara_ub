@@ -703,18 +703,34 @@ Feature: Evidence custom fields.
     # Create a menu of choices custom field.
     When I set the field "Create a new custom field" to "Menu of choices"
     And I set the following fields to these values:
-      | Full name                   | Locked menu of choices test |
-      | Short name (must be unique) | menutest                    |
-      | Is this field locked?       | Yes                         |
+      | Full name                   | Locked menu 1 |
+      | Short name (must be unique) | menutest1     |
+      | Is this field locked?       | Yes           |
     And I set the field "Menu options (one per line)" to multiline:
       """
-      menuoptionone
-      menuoptiontwo
-      menuoptionthree
+      Option 1
+      Option 2
+      Option 3
       """
     And I press "Save changes"
     Then I should see "Available Evidence Custom Fields"
-    And I should see "Locked menu of choices test"
+    And I should see "Locked menu 1"
+
+    # Create a menu of choices custom field.
+    When I set the field "Create a new custom field" to "Menu of choices"
+    And I set the following fields to these values:
+      | Full name                   | Locked menu 2 |
+      | Short name (must be unique) | menutest2     |
+      | Is this field locked?       | Yes           |
+    And I set the field "Menu options (one per line)" to multiline:
+      """
+      Option 1
+      Option 2
+      Option 3
+      """
+    And I press "Save changes"
+    Then I should see "Available Evidence Custom Fields"
+    And I should see "Locked menu 2"
 
     # Create a multi-select custom field.
     When I set the field "Create a new custom field" to "Multi-select"
@@ -760,7 +776,8 @@ Feature: Evidence custom fields.
       | customfield_datetimetest[day]     | 19                  |
       | customfield_datetimetest[month]   | 7                   |
       | customfield_datetimetest[year]    | 2027                |
-      | Locked menu of choices test       | menuoptiontwo       |
+      | Locked menu 1                     | Option 2            |
+      | Locked menu 2                     |                     |
       | customfield_multiselecttest[1]    | 1                   |
       | Locked Textarea 1                 | Locked text area!   |
       | Locked Textarea 2                 |                     |
@@ -771,7 +788,8 @@ Feature: Evidence custom fields.
 
     Then the "Locked input test" "field" should be readonly
     And the "Locked checkbox test" "checkbox" should be disabled
-    And I should see "menuoptiontwo"
+    And I should see the "menutest1" custom field is locked and contains "Option 2"
+    And I should see the "menutest2" custom field is locked and empty
     And "customfield_datetimetest[day]" "select" should not exist
     And the "id_customfield_multiselecttest_0" "checkbox" should be disabled
     And the "id_customfield_multiselecttest_1" "checkbox" should be disabled
