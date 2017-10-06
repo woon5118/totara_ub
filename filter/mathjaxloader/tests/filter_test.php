@@ -84,4 +84,38 @@ class filter_mathjaxloader_filter_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test the functionality of {@link filter_mathjaxloader::map_language_code()}.
+     *
+     * @param string $moodlelangcode the user's current language
+     * @param string $mathjaxlangcode the mathjax language to be used for the moodle language
+     *
+     * @dataProvider test_map_language_code_expected_mappings
+     */
+    public function test_map_language_code($moodlelangcode, $mathjaxlangcode) {
+
+        $filter = new filter_mathjaxloader(context_system::instance(), []);
+        $this->assertEquals($mathjaxlangcode, $filter->map_language_code($moodlelangcode));
+    }
+
+    /**
+     * Data provider for {@link self::test_map_language_code}
+     *
+     * @return array of [moodlelangcode, mathjaxcode] tuples
+     */
+    public function test_map_language_code_expected_mappings() {
+
+        return [
+            ['cz', 'cs'], // Explicit mapping.
+            ['cs', 'cs'], // Implicit mapping (exact match).
+            ['ca_valencia', 'ca'], // Implicit mapping of a Moodle language variant.
+            ['pt_br', 'pt-br'], // Explicit mapping.
+            ['en_kids', 'en'], // Implicit mapping of English variant.
+            ['de_kids', 'de'], // Implicit mapping of non-English variant.
+            ['es_mx_kids', 'es'], // More than one underscore in the name.
+            ['zh_tw', 'zh-hant'], // Explicit mapping of the Taiwain Chinese in the traditional script.
+            ['zh_cn', 'zh-hans'], // Explicit mapping of the Simplified Chinese script.
+        ];
+    }
+
 }
