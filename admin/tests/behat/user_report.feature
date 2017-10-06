@@ -12,16 +12,9 @@ Feature: Verify functionality of user report.
     And I press "Edit this report"
     Then I should see "Edit Report 'Browse list of users'"
 
-    When I switch to "Columns" tab
-    # The table comparison definition will not work using the user profile with an image column.
-    # So, just for testing, swap it for a similar column without the profile image.
-    And I change the "User's Fullname (linked to profile with icon)" column to "User's Fullname" in the report
-    And I press "Save changes"
-    Then I should see "Columns updated"
-
     When I follow "View This Report"
     Then I should see "Browse list of users: 3 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status | Last Login                   |
       | Guest user      | guest    | root@localhost            | Active user |                              |
       | Admin User      | admin    | moodle@example.com        | Active user | Within the last five minutes |
@@ -38,21 +31,21 @@ Feature: Verify functionality of user report.
   Scenario: Verify column sorting in user report.
 
     When I follow "User's Fullname"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              |
       | Admin User      | admin	   | moodle@example.com        |
       | Bob1 Learner1	| learner1 | bob1.learner1@example.com |
       | Guest user      | guest    | root@localhost            |
 
     When I follow "User's Fullname"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              |
       | Guest user      | guest    | root@localhost            |
       | Bob1 Learner1	| learner1 | bob1.learner1@example.com |
       | Admin User      | admin	   | moodle@example.com        |
 
     When I follow "User's Email"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              |
       | Bob1 Learner1	| learner1 | bob1.learner1@example.com |
       | Admin User      | admin	   | moodle@example.com        |
@@ -60,7 +53,7 @@ Feature: Verify functionality of user report.
 
     When I follow "Last Login"
     And I follow "Last Login"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | Last Login                   |
       | Admin User      | admin	   | moodle@example.com        | Within the last five minutes |
       | Bob1 Learner1	| learner1 | bob1.learner1@example.com |                              |
@@ -79,7 +72,7 @@ Feature: Verify functionality of user report.
       | Email address | bob2.learner2@example.com |
     And I press "Create user"
     Then I should see "Browse list of users: 4 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              |
       | Bob2 Learner4   | learner2 | bob2.learner2@example.com |
 
@@ -88,19 +81,19 @@ Feature: Verify functionality of user report.
     Given I follow "Edit Bob1 Learner1"
     When I set the field "First name" to "Sir Bob1"
     And I press "Update profile"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname   | Username | User's Email              |
       | Sir Bob1 Learner1 | learner1 | bob1.learner1@example.com |
 
   Scenario: Verify suspend and unsuspend of user in user report.
 
     Given I follow "Suspend Bob1 Learner1"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status    |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Suspended user |
 
     When I follow "Unsuspend Bob1 Learner1"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
 
@@ -113,7 +106,7 @@ Feature: Verify functionality of user report.
 
     When I press "Delete"
     Then I should see "Browse list of users: 3 records shown"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
 
@@ -122,7 +115,7 @@ Feature: Verify functionality of user report.
 
     When I press "Undelete"
     Then I should see "Browse list of users: 3 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
 
@@ -160,14 +153,14 @@ Feature: Verify functionality of user report.
 
     When I press "Delete"
     Then I should see "Browse list of users: 4 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
 
     When I log out
     And I log in as "manager1"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
 
@@ -206,7 +199,7 @@ Feature: Verify functionality of user report.
 
     When I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
 
@@ -241,7 +234,7 @@ Feature: Verify functionality of user report.
 
     When I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
 
@@ -322,7 +315,7 @@ Feature: Verify functionality of user report.
     When I log in as "learner1"
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     Then I should see "Browse list of users: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
@@ -334,7 +327,7 @@ Feature: Verify functionality of user report.
     When I log in as "learner3"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     Then I should see "Browse list of users: 2 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |

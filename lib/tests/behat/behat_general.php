@@ -1345,8 +1345,10 @@ class behat_general extends behat_base {
      * @param string $column column text to search (or numeric value for the column position)
      * @param string $table table id/class/caption
      * @param string $value text to check.
+     * @param bool $mustequal If true, the table cell must be identical to the data to be matched.
+     *                        If false, the table cell needs to contain the data (other data can be present).
      */
-    public function row_column_of_table_should_contain($row, $column, $table, $value) {
+    public function row_column_of_table_should_contain($row, $column, $table, $value, $mustequal = true) {
         \behat_hooks::set_step_readonly(true);
         $tablenode = $this->get_selected_node('table', $table);
         $tablexpath = $tablenode->getXpath();
@@ -1382,8 +1384,13 @@ class behat_general extends behat_base {
         // Check if value exists in specific row/column.
         // Get row xpath.
         // GoutteDriver uses DomCrawler\Crawler and it is making XPath relative to the current context, so use descendant.
-        $rowxpath = $tablexpath."/tbody/tr[descendant::th[normalize-space(.)=" . $rowliteral .
-                    "] | descendant::td[normalize-space(.)=" . $rowliteral . "]]";
+        if ($mustequal) {
+            $rowxpath = $tablexpath . "/tbody/tr[descendant::th[normalize-space(.)=" . $rowliteral .
+                        "] | descendant::td[normalize-space(.)=" . $rowliteral . "]]";
+        } else {
+            $rowxpath = $tablexpath . "/tbody/tr[descendant::th[contains(.," . $rowliteral .
+                        ")] | descendant::td[contains(.," . $rowliteral . ")]]";
+        }
 
         $columnvaluexpath = $rowxpath . $columnpositionxpath . "[contains(normalize-space(.)," . $valueliteral . ")]";
 
@@ -1421,6 +1428,21 @@ class behat_general extends behat_base {
     }
 
     /**
+     * This function is very similar to "the following should exist in the <table> table"
+     * but does a 'contains' rather than an 'equals' match against the table data. This allows
+     * superfluous cell content such as images to be ignored but a match to be achieved.
+     *
+     * @Then /^the "(?P<table_string>[^"]*)" table should contain the following:$/
+     * @param string $table name of table
+     * @param TableNode $data table with first row as header and following values
+     *        | Header 1 | Header 2 | Header 3 |
+     *        | Value 1  | Value 2  | Value 3  |
+     */
+    public function the_table_should_contain_fhe_following($table, TableNode $data) {
+        $this->following_should_exist_in_the_table($table, $data, false);
+    }
+
+    /**
      * Checks that the provided value exist in table.
      * More info in http://docs.moodle.org/dev/Acceptance_testing#Providing_values_to_steps.
      *
@@ -1433,9 +1455,10 @@ class behat_general extends behat_base {
      * @param string $table name of table
      * @param TableNode $data table with first row as header and following values
      *        | Header 1 | Header 2 | Header 3 |
-     *        | Value 1 | Value 2 | Value 3|
+     *        | Value 1  | Value 2  | Value 3  |
+     * @param bool $mustequal Indicates of the match must equal or contain the data.
      */
-    public function following_should_exist_in_the_table($table, TableNode $data) {
+    public function following_should_exist_in_the_table($table, TableNode $data, $mustequal = true) {
         \behat_hooks::set_step_readonly(true);
         $datahash = $data->getHash();
 
@@ -1445,7 +1468,7 @@ class behat_general extends behat_base {
                 if ($firstcell === null) {
                     $firstcell = $value;
                 } else {
-                    $this->row_column_of_table_should_contain($firstcell, $column, $table, $value);
+                    $this->row_column_of_table_should_contain($firstcell, $column, $table, $value, $mustequal);
                 }
             }
         }

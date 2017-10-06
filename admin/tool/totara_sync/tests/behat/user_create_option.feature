@@ -1,5 +1,5 @@
 @totara @tool @tool_totara_sync @javascript
-Feature: Verify changing user element settings for csv import.
+Feature: Verify changing user element settings for CSV import.
 
   Background:
     Given I am on a totara site
@@ -98,16 +98,9 @@ Feature: Verify changing user element settings for csv import.
     And I press "Edit this report"
     Then I should see "Edit Report 'Browse list of users'"
 
-    When I switch to "Columns" tab
-    # The table comparison definition will not work using the user profile with an image column.
-    # So, just for testing, swap it for a similar column without the profile image.
-    And I change the "User's Fullname (linked to profile with icon)" column to "User's Fullname" in the report
-    And I press "Save changes"
-    Then I should see "Columns updated"
-
     # Check that the user have been created successfully.
     When I follow "View This Report"
     Then the following should exist in the "system_browse_users" table:
-      | User's Fullname | User's Email          |
-      | Import User001	| duplicate@example.com |
-      | Import User002	| duplicate@example.com |
+      | Username  | User's Email          |
+      | import001 | duplicate@example.com |
+      | import001 | duplicate@example.com |

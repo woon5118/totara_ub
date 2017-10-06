@@ -22,13 +22,13 @@ Feature: Verify functionality of user source report.
     Then I should see "Edit Report 'User Report'"
 
     When I switch to "Columns" tab
-    And I change the "User's Fullname (linked to profile with icon)" column to "User's Fullname" in the report
-    And I change the "User Last Login" column to "User's Email" in the report
-    And I press "Save changes"
+    And I set the field "newcolumns" to "User's Email"
+    And I press "Add"
     And I set the field "newcolumns" to "User Status"
     And I press "Add"
     And I set the field "newcolumns" to "Actions"
     And I press "Add"
+    And I press "Save changes"
     Then I should see "Columns updated"
 
     When I switch to "Access" tab
@@ -45,21 +45,21 @@ Feature: Verify functionality of user source report.
     When I set the field "First name" to "Sir Bob1"
     And I press "Update profile"
     Then I should see "User Report: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
-      | User's Fullname   | Username | User's Email              |
-      | Sir Bob1 Learner1 | learner1 | bob1.learner1@example.com |
+    And the "reportbuilder-table" table should contain the following:
+      | User's Fullname   | Username | User's Email              | User Status |
+      | Sir Bob1 Learner1 | learner1 | bob1.learner1@example.com | Active user |
 
   Scenario: Verify suspend and unsuspend of user in user source report.
 
     Given I follow "Suspend Bob1 Learner1"
     Then I should see "User Report: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status    |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Suspended user |
 
     When I follow "Unsuspend Bob1 Learner1"
     Then I should see "User Report: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
 
@@ -72,7 +72,7 @@ Feature: Verify functionality of user source report.
 
     When I press "Delete"
     Then I should see "User Report: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
 
@@ -81,7 +81,7 @@ Feature: Verify functionality of user source report.
 
     When I press "Undelete"
     Then I should see "User Report: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
 
@@ -120,7 +120,7 @@ Feature: Verify functionality of user source report.
 
     When I press "Delete"
     Then I should see "User Report: 7 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
 
@@ -130,7 +130,7 @@ Feature: Verify functionality of user source report.
     When I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
     And I click on "View" "link" in the "User Report" "table_row"
     Then I should see "User Report: 7 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
 
@@ -172,7 +172,7 @@ Feature: Verify functionality of user source report.
     When I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
     And I click on "View" "link" in the "User Report" "table_row"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email     | User Status |
       | Bob5 Learner5   | learner5 | Email is private | Active user |
 
@@ -208,7 +208,7 @@ Feature: Verify functionality of user source report.
     When I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
     And I click on "View" "link" in the "User Report" "table_row"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
 
@@ -232,7 +232,7 @@ Feature: Verify functionality of user source report.
       | learner4 | C1     | student |
     # As admin we can see all the learner's record.
     Then I should see "User Report: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
@@ -244,7 +244,7 @@ Feature: Verify functionality of user source report.
     And I click on "Reports" in the totara menu
     And I follow "User Report"
     # Email addresses is 'hidden from everyone' and only visible to course members.
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
       | Bob3 Learner3   | learner3 | Email is private          | Active user |
@@ -255,7 +255,7 @@ Feature: Verify functionality of user source report.
     And I click on "Reports" in the totara menu
     And I follow "User Report"
     # Email addresses is 'hidden from everyone' and only visible to course members.
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
       | Bob3 Learner3   | learner3 | Email is private          | Active user |
@@ -308,7 +308,7 @@ Feature: Verify functionality of user source report.
     And I click on "Reports" in the totara menu
     And I follow "User Report"
     Then I should see "User Report: 6 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
@@ -321,7 +321,7 @@ Feature: Verify functionality of user source report.
     And I click on "Reports" in the totara menu
     And I follow "User Report"
     Then I should see "User Report: 2 records shown"
-    And the following should exist in the "reportbuilder-table" table:
+    And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
