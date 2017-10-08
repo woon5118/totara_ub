@@ -38,7 +38,7 @@
 <div class="form-colourpicker defaultsnext">
     <div class="admin_colourpicker clearfix">
         {{#icon}}
-            {{>core/pix_icon}}
+            {{#pix}} {{key}}, {{component}}, {{{title}}} {{/pix}}
         {{/icon}}
     </div>
     <input type="text" name="{{name}}" id="{{id}}" value="{{value}}" size="12" class="text-ltr">

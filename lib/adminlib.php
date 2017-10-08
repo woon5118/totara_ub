@@ -4663,7 +4663,7 @@ class admin_setting_emoticons extends admin_setting {
                 }
                 $context->emoticons[] = [
                     'fields' => $fields,
-                    'icon' => $icon ? $icon->export_for_template($OUTPUT) : null
+                    'icon' => $icon ? $icon->export_for_pix($OUTPUT) : null
                 ];
                 $fields = [];
                 $i = 0;
@@ -9573,7 +9573,7 @@ class admin_setting_configcolourpicker extends admin_setting {
             'id' => $this->get_id(),
             'name' => $this->get_full_name(),
             'value' => $data,
-            'icon' => $icon->export_for_template($OUTPUT),
+            'icon' => $icon->export_for_pix($OUTPUT),
             'haspreviewconfig' => !empty($this->previewconfig),
             'forceltr' => $this->get_force_ltr()
         ];

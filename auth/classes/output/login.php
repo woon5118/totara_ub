@@ -144,10 +144,7 @@ class login implements renderable, templatable {
         global $CFG;
 
         $identityproviders = array_map(function($idp) use ($output) {
-            $idp['icon'] = $idp['icon']->export_for_template($output);
-            if ($idp['url'] instanceof moodle_url) {
-                $idp['url'] = $idp['url']->out(false);
-            }
+            $idp['icon'] = $idp['icon']->export_for_pix($output);
             return $idp;
         }, $this->identityproviders);
 

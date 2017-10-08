@@ -148,9 +148,9 @@
             <div class="potentialidplist">
                 {{#identityproviders}}
                     <div class="potentialidp">
-                        <a href="{{url}}" title={{#quote}}{{name}}{{/quote}} class="btn">
+                        <a href="{{url}}">
                             {{#icon}}
-                                {{>core/pix_icon}}
+                                {{#pix}} {{key}}, {{component}}{{/pix}}
                             {{/icon}}
                             {{name}}
                         </a>
