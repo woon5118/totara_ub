@@ -48,6 +48,7 @@ require(__DIR__ . '/lib/environmentmincheck.php');
 
 define('CLI_SCRIPT', false); // prevents some warnings later
 define('AJAX_SCRIPT', false); // prevents some warnings later
+define('NO_DEBUG_DISPLAY', false);
 define('CACHE_DISABLE_ALL', true); // Disables caching.. just in case.
 define('PHPUNIT_TEST', false);
 define('IGNORE_COMPONENT_CACHE', true);
