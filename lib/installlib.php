@@ -401,7 +401,11 @@ function install_print_footer($config, $reload=false) {
 
     echo '<div id="nav_buttons">'.$first.$next.'</div>';
 
-    $homelink  = '<small class="page-footer-poweredby">' . s(get_string('poweredby', 'totara_core')) . '</small>';
+    $a = new stdClass();
+    $a->totaralearn = get_string('totaralearn', 'totara_core');
+    $str = get_string('poweredbyx', 'totara_core', $a);
+
+    $homelink  = '<small class="page-footer-poweredby">' . s($str) . '</small>';
 
     echo '</form></div>';
     echo '<div id="page-footer">'.$homelink.'</div>';

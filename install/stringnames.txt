@@ -60,12 +60,13 @@ pathswrongadmindir,install
 phpextension,install
 phpversionhelp,install
 phpversion,install
-poweredby,totara_core
+poweredbyx,totara_core
 previous,moodle
 reload,moodle
 remotedownloaderror,error
 thisdirection,langconfig
 thislanguage,langconfig
+totaralearn,totara_core
 upgradekeyset,admin
 welcomep10,install
 welcomep20,install
