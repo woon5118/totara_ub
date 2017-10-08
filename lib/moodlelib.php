@@ -2803,7 +2803,9 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         } else if ($userauth->can_change_password()) {
             throw new moodle_exception('forcepasswordchangenotice');
         } else {
-            throw new moodle_exception('nopasswordchangeforced', 'auth');
+            // Totara: this may happen if change is forced before migration to different auth type, do not block access!
+            error_log("Warning: 'auth_forcepasswordchange' could not be enforced for user '{$USER->id}' because auth plugin '{$USER->auth}' does not support changing of passwords");
+            unset_user_preference('auth_forcepasswordchange');
         }
     }
 
@@ -4654,7 +4656,9 @@ function complete_user_login($user) {
                 redirect($CFG->httpswwwroot.'/login/change_password.php');
             }
         } else {
-            print_error('nopasswordchangeforced', 'auth');
+            // Totara: this may happen if change is forced before migration to different auth type, do not block access!
+            error_log("Warning: 'auth_forcepasswordchange' could not be enforced for user '{$USER->id}' because auth plugin '{$USER->auth}' does not support changing of passwords");
+            unset_user_preference('auth_forcepasswordchange');
         }
     }
     return $USER;

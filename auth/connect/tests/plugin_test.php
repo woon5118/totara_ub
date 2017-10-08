@@ -49,4 +49,41 @@ class auth_connect_plugin_testcase extends advanced_testcase {
         $expected = new moodle_url('/auth/connect/user_edit.php', array('userid' => $user1->id));
         $this->assertSame((string)$expected, (string)$connectauth->edit_profile_url($user1->id));
     }
+
+    public function test_auth_forcepasswordchange() {
+        $this->resetAfterTest();
+
+        $olderrorlog = ini_get('error_log');
+        $errorlog = make_request_directory() . '/log';
+        ini_set('error_log', $errorlog);
+
+        /** @var auth_connect_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('auth_connect');
+
+        // Delete everything, but suspend users only.
+        $server = $generator->create_server();
+        $user = $this->getDataGenerator()->create_user(array('auth' => 'connect'));
+        $generator->migrate_server_user($server, $user, 777);
+
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $connectauth = get_auth_plugin('connect');
+        $this->assertFalse($connectauth->can_change_password());
+
+        $this->setUser($user);
+        $this->assertFalse(get_user_preferences('auth_forcepasswordchange', false));
+        require_login($course);
+
+        set_user_preference('auth_forcepasswordchange', '1');
+        require_login($course);
+        $this->assertFalse(get_user_preferences('auth_forcepasswordchange', false));
+
+        $this->setUser(null);
+        set_user_preference('auth_forcepasswordchange', '1');
+        @complete_user_login($user); // Silence session warnings.
+        $this->assertFalse(get_user_preferences('auth_forcepasswordchange', false));
+
+        ini_set('error_log', $olderrorlog);
+    }
 }
