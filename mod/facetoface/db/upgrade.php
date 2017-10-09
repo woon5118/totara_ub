@@ -148,6 +148,19 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017062900, 'facetoface');
     }
 
+    if ($oldversion < 2017092501) {
+        // Define index mailed (not unique) to be dropped form assign_grades.
+        $table = new xmldb_table('facetoface_notification_tpl');
+        $index = new xmldb_index('title', XMLDB_INDEX_UNIQUE, array('title'));
+
+        // Conditionally launch drop unique index title.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2017092501, 'facetoface');
+    }
+
     return true;
 
 }
