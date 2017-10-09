@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 10.1 ===
+
+* updated progress_bar.mustache
+
 === 10.0 ===
 
 * Added classes for external command execution (e.g. shell commands or external applications)

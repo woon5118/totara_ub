@@ -64,21 +64,17 @@
     /**
      * Updates display of progress bar text based on the size of the text
      */
-    function checkInvert() {
+    function checkInvert(percent) {
         var progressBarText = progressBar.getElementsByClassName('progressbar__text')[0];
-        var margin = document.dir === "ltr" ? 'margin-left' : 'margin-right';
-        if (progressBar.clientWidth <= parseInt(getComputedStyle(progressBarText).width, 10) || progressBarText.textContent == '0%') {
+        if (percent < 50) {
             el.classList.add('progress-invert');
-            pb = progressBar;
-            progressBarText.style[margin] = progressBar.clientWidth + 'px'
         } else {
             el.classList.remove('progress-invert');
-            progressBarText.style[margin] = 0;
         }
     }
 
     checkText();
-    checkInvert();
+    checkInvert(parseInt(progressBar.attributes['aria-valuenow'].value, 10));
 
     el.addEventListener('update', function(e) {
         var msg = e.detail.message,
@@ -91,13 +87,13 @@
             require(['core/str'], function (strlib) {
                 strlib.get_string('xpercent', 'core', percent).done(function (str) {
                     progressBar.getElementsByClassName('progressbar__text')[0].textContent = str;
-                    checkInvert();
+                    checkInvert(percent);
                 })
             })
         } else {
             // requireJS is not available
             progressBar.getElementsByClassName('progressbar__text')[0].textContent = percent + '%';
-            checkInvert();
+            checkInvert(percent);
         }
 
         if (percent === 100) {
@@ -116,8 +112,5 @@
         progressBar.setAttribute('aria-valuenow', percent);
         progressBar.style.width = percent + '%';
     });
-
-    progressBar.addEventListener('transitionend', checkInvert);
-    progressBar.addEventListener('transitioncancel', checkInvert);
 })();
 </script>
