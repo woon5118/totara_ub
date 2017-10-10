@@ -201,6 +201,7 @@ $string['settings:totara_sync_source_jobassignment_csv'] = 'Job assignment - CSV
 $string['settings:totara_sync_source_jobassignment_database'] = 'Job assignment - external database source settings';
 $string['startdate'] = 'Start date';
 $string['startafterendjobassignment'] = 'Start date cannot be later than end date. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['unabletomatchuseridnumber'] = 'Unable to match useridnumber \'{$a->useridnumber}\' to a user ID number for job assignment \'{$a->idnumber}\'';
 $string['updatedjobassignmentx'] = 'Updated job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['willcreateduplicatejobidnumber'] = 'User \'{$a->useridnumber}\' has another job assignment with the same idnumber as what is being updated. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 

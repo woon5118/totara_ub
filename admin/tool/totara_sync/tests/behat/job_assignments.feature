@@ -1633,3 +1633,28 @@ Feature: Use user source to import job assignments data in HR sync
     # if we drop them there and source contains all records, you may lose their record.
     And I should see "Created job assignment 'newjaid' for user 'user3'."
     And I should see "Invalid date format for field 'startdate' for job assignment with id number 'newjaid' for user 'user3'. Values for this field will not be added/updated."
+
+  Scenario: Verify the uploaded useridnumber field is validated against the user idnumber data.
+
+    Given I set the following fields to these values:
+      | Full name                 | 0      |
+      | Start date                | 0      |
+      | End date                  | 0      |
+      | Organisation              | 0      |
+      | Position                  | 0      |
+      | Manager                   | 0      |
+      | Appraiser                 | 0      |
+    When I press "Save changes"
+    Then I should see "Settings saved"
+
+    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/jobassignment/idnumber_2.csv" file to "CSV" filemanager
+    And I press "Upload"
+    And I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    Then I should see "Running HR Import cron...Done! However, there have been some problems"
+
+    When I navigate to "HR Import Log" node in "Site administration > HR Import"
+    Then the following should exist in the "totarasynclog" table:
+      | Log type | Action      | Info                                                                                 |
+      | Error    | checksanity | Unable to match useridnumber 'userbob' to a user ID number for job assignment 'dev1' |

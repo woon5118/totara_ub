@@ -643,6 +643,20 @@ class totara_sync_element_jobassignment extends totara_sync_element {
         }
         $multiples->close();
 
+        // Check that the job assignment useridnumber corresponds to a valid user idnumber.
+        $sql = "SELECT s.id, s.idnumber, s.useridnumber
+                  FROM {" . $table . "} s
+             LEFT JOIN {user} u ON s.useridnumber = u.idnumber
+                 WHERE u.id IS NULL";
+        $nomatchingusers = $DB->get_recordset_sql($sql);
+
+        foreach($nomatchingusers as $nomatchinguser) {
+            $this->addlog(get_string('unabletomatchuseridnumber', 'tool_totara_sync', $nomatchinguser), 'error', 'checksanity');
+            $idstodelete[] = $nomatchinguser->id;
+        }
+
+        $nomatchingusers->close();
+
         return $idstodelete;
     }
 
