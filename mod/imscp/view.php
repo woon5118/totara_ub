@@ -71,7 +71,7 @@ if (!$imscp->structure) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($imscp->name));
 
-echo self_completion_form($cm);
+echo self_completion_form($cm, $course);
 
 imscp_print_content($imscp, $cm, $course);
 
