@@ -230,8 +230,7 @@ Feature: Cancellation for session
     And I click on "Home" in the totara menu
     And I navigate to "Custom fields" node in "Site administration > Seminars"
     And I click on "User cancellation" "link"
-    And I click on "Delete" "link" in the "Cancellation note" "table_row"
-    And I press "Yes"
+    And I click on "Hide" "link" in the "Cancellation note" "table_row"
     And I log out
 
     When I log in as "student1"

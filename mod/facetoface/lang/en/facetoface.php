@@ -608,6 +608,7 @@ $string['error:sessionstartafterend'] = 'Event start date/time is after end.';
 $string['error:sessiondatesconflict'] = 'This date conflicts with an earlier date in this event';
 $string['error:sessiondatesbookingconflict'] = 'Booking conflict: {$a->users} user(s) have another booking on the selected date and time. Change event time or exclude these users to continue. {$a->link}';
 $string['error:signedupinothersession'] = 'You are already signed up in another event for this activity. You can only sign up for one event per seminar activity.';
+$string['error:shortnamecustomfield'] = 'This shortname is reserved by Totara seminar custom field';
 $string['error:takeattendance'] = 'An error occurred while taking attendance';
 $string['error:therearexconflicts'] = 'There are ({$a}) conflicts with the proposed time period.';
 $string['error:thereisaconflict'] = 'There is a conflict with the proposed time period.';

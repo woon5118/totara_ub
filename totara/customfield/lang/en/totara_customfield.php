@@ -86,6 +86,14 @@ $string['customfieldshortname'] = 'Custom Field short name';
 $string['customfieldshortname_help'] = 'Custom field short name is the abbreviated name of the custom field and can be used for display purposes.
 
 Custom fields will appear as options on the edit item screen for items.';
+$string['customfieldshortnamereadonly'] = 'Reserved Custom Field short name';
+$string['customfieldshortnamereadonly_help'] = 'Custom field short name is the abbreviated name of the custom field and can be used for display purposes.
+
+Custom fields will appear as options on the edit item screen for items.
+
+A reserved custom field short name is already in use in the system. It cannot be deleted, but it can be hidden.';
+$string['customfieldshortnamereserved'] = 'Custom Field is reserved';
+$string['customfieldshortnamereserved_help'] = 'This custom field makes use of a reserved custom field. The type cannot be edited, and the field can\'t be deleted, but it can be hidden';
 $string['customfieldtextdateformat'] = 'd/m/Y';
 $string['customfieldtypecheckbox'] = 'Checkbox';
 $string['customfieldtypedatetime'] = 'Date/time';
@@ -198,6 +206,7 @@ $string['regexvalidationfailed'] = 'The value you have entered for {$a} does not
 $string['requiredandlockednotallowed'] = 'The combination of required and locked is not allowed. Please, change one of them';
 $string['returntoframework'] = 'Return to Framework';
 $string['shortname'] = 'Short name (must be unique)';
+$string['shortnamereserved'] = 'Short name (reserved)';
 $string['shortnamenotunique'] = 'This short name is already in use';
 $string['specificsettings'] = 'Specific settings';
 $string['startyear'] = 'Start year';

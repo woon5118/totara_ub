@@ -65,6 +65,12 @@ define('CUSTOMFIELD_TYPE_TEXT',        0);
 define('CUSTOMFIELD_TYPE_SELECT',      1);
 define('CUSTOMFIELD_TYPE_MULTISELECT', 2);
 
+// Custom field reserved shortnames.
+define('CUSTOMFIELD_BUILDING', 'building');
+define('CUSTOMFIELD_LOCATION', 'location');
+define('CUSTOMFIELD_CANCELNOTE', 'cancellationnote');
+define('CUSTOMFIELD_SIGNUPNOTE', 'signupnote');
+
 // Calendar-related constants
 if (!defined('CALENDAR_MAX_NAME_LENGTH')) {
     // Admins may override this in config.php if necessary.
@@ -107,7 +113,7 @@ define('APPROVAL_ADMIN', 8);
 
 // This array must match the status codes above, and the values
 // must equal the end of the constant name but in lower case
-global $MDL_F2F_STATUS, $F2F_SELECT_OPTIONS;
+global $MDL_F2F_STATUS, $F2F_SELECT_OPTIONS, $F2F_CUSTOMFIELD_RESERVED;
 $MDL_F2F_STATUS = array(
     MDL_F2F_STATUS_USER_CANCELLED       => 'user_cancelled',
     MDL_F2F_STATUS_SESSION_CANCELLED    => 'session_cancelled',
@@ -130,6 +136,12 @@ $F2F_SELECT_OPTIONS = array(
     MDL_F2F_SELECT_NOT_SET => get_string('selectnotsetop', 'facetoface')
 );
 
+// Define custom field array for reserved shortnames.
+$F2F_CUSTOMFIELD_RESERVED = [
+    'facetofaceroom' => ['text' => CUSTOMFIELD_BUILDING, 'location' => CUSTOMFIELD_LOCATION],
+    'facetofacesignup' => ['text' => CUSTOMFIELD_SIGNUPNOTE],
+    'facetofacecancellation' => ['text' => CUSTOMFIELD_CANCELNOTE]
+];
 
 /**
  * Returns the human readable code for a face-to-face status
