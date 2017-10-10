@@ -1153,7 +1153,10 @@ function is_enrolled(context $context, $user = null, $withcapability = '', $only
                 if ($until == 0) {
                     $until = ENROL_MAX_TIMESTAMP;
                 }
-                $USER->enrol['enrolled'][$coursecontext->instanceid] = $until;
+                // TOTARA: Only cache enrol if course is visible to the user.
+                if (totara_course_is_viewable($coursecontext->instanceid)) {
+                    $USER->enrol['enrolled'][$coursecontext->instanceid] = $until;
+                }
                 if (isset($USER->enrol['tempguest'][$coursecontext->instanceid])) {
                     unset($USER->enrol['tempguest'][$coursecontext->instanceid]);
                     remove_temp_course_roles($coursecontext);

@@ -2078,7 +2078,7 @@ function can_access_course(stdClass $course, $user = null, $withcapability = '',
         }
     }
 
-    if (!$course->visible and !has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid)) {
+    if (!totara_course_is_viewable($course)) {
         return false;
     }
 
