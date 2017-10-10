@@ -46,6 +46,9 @@ if ($forumform->is_cancelled()) {
     redirect($redirect);
 } else if ($data = $forumform->get_data()) {
 
+    // Updating preferences directly in the user table to avoid errors
+    // if username contains uppercase characters
+
     $user->maildigest = $data->maildigest;
     $user->autosubscribe = $data->autosubscribe;
     if (!empty($CFG->forum_trackreadposts)) {
@@ -53,11 +56,14 @@ if ($forumform->is_cancelled()) {
         if (property_exists($data, 'markasreadonnotification')) {
             $user->preference_forum_markasreadonnotification = $data->markasreadonnotification;
         }
+        $DB->set_field('user', 'trackforums', $user->trackforums, ['id' => $userid]);
     }
     unset($user->markasreadonnotification);
 
+    $DB->set_field('user', 'maildigest', $user->maildigest, ['id' => $userid]);
+    $DB->set_field('user', 'autosubscribe', $user->autosubscribe, ['id' => $userid]);
+
     useredit_update_user_preference($user);
-    user_update_user($user, false, false);
 
     // Trigger event.
     \core\event\user_updated::create_from_userid($user->id)->trigger();
