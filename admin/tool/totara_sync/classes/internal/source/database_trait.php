@@ -41,41 +41,9 @@ trait database_trait {
      * @param  \MoodleQuickForm $mform
      */
     protected function config_form_add_database_details(&$mform) {
-        global $PAGE, $OUTPUT;
+        global $PAGE;
 
-        // Display required db table columns
-        $fieldmappings = array();
-
-        foreach ($this->fields as $field) {
-            if (!empty($this->config->{'fieldmapping_'.$field})) {
-                $fieldmappings[$field] = $this->config->{'fieldmapping_'.$field};
-            }
-        }
-
-        $dbstruct = array();
-        foreach ($this->fields as $field) {
-            if (!empty($this->config->{'import_'.$field})) {
-                $dbstruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;
-            }
-        }
-
-        $db_table = isset($this->config->{'database_dbtable'}) ? $this->config->{'database_dbtable'} : false;
-
-        if (!$db_table) {
-            $mform->addElement('html', \html_writer::tag('p',get_string('dbconnectiondetails', 'tool_totara_sync')));
-        }
-
-        $dbstruct = implode(', ', $dbstruct);
-        $description = \html_writer::tag('p', get_string('tablemustincludexdb', 'tool_totara_sync'));
-        $description .= \html_writer::tag('p', $dbstruct);
-
-        $mform->addElement('html', $description);
-
-        // Empty or null field info.
-        if ($db_table) {
-            $info = get_string('databaseemptynullinfo', 'tool_totara_sync');
-            $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
-        }
+        $mform->addElement('html', \html_writer::tag('p', get_string('dbconnectiondetails', 'tool_totara_sync')));
 
         $db_options = get_installed_db_drivers();
 

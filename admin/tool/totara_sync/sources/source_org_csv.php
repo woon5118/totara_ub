@@ -46,45 +46,10 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
         $this->config->import_deleted = (isset($this->element->config->sourceallrecords) &&
             $this->element->config->sourceallrecords == 0) ? "1" : "0";
 
-
         if (empty($filepath) && get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY) {
             $mform->addElement('html', html_writer::tag('p', get_string('nofilesdir', 'tool_totara_sync')));
             return false;
         }
-
-        // Display file example
-        $fieldmappings = array();
-        foreach ($this->fields as $f) {
-            if (!empty($this->config->{'fieldmapping_'.$f})) {
-                $fieldmappings[$f] = $this->config->{'fieldmapping_'.$f};
-            }
-        }
-        foreach ($this->customfields as $key => $f) {
-            if (!empty($this->config->{'fieldmapping_'.$key})) {
-                $fieldmappings[$key] = $this->config->{'fieldmapping_'.$key};
-            }
-        }
-
-        $filestruct = array();
-        foreach ($this->fields as $f) {
-            if (!empty($this->config->{'import_'.$f})) {
-                $filestruct[] = !empty($fieldmappings[$f]) ? '"'.$fieldmappings[$f].'"' : '"'.$f.'"';
-            }
-        }
-        foreach (array_keys($this->customfields) as $f) {
-            if (!empty($this->config->{'import_'.$f})) {
-                $filestruct[] = !empty($fieldmappings[$f]) ? '"'.$fieldmappings[$f].'"' : '"'.$f.'"';
-            }
-        }
-
-        $delimiter = $this->config->delimiter;
-        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct));
-        $mform->addElement('html',  html_writer::tag('div', html_writer::tag('p', $info, array('class' => "informationbox"))));
-
-        // Empty field info.
-        $langstring = !empty($this->element->config->csvsaveemptyfields) ? 'csvemptysettingdeleteinfo' : 'csvemptysettingkeepinfo';
-        $info = get_string($langstring, 'tool_totara_sync');
-        $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
 
         // Add some source file details
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
@@ -409,4 +374,14 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
 
         return true;
     }
+
+    /**
+     * Get any notifications that should be displayed for the element source.
+     *
+     * @return string Notifications HTML.
+     */
+    public function get_notifications() {
+        return $this->get_common_csv_notifications();
+    }
+
 }

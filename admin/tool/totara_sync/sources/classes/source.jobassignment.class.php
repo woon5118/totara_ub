@@ -69,8 +69,8 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
             'timemodified'
         );
 
-        $element = new totara_sync_element_jobassignment();
-        if (empty($element->config->sourceallrecords)) {
+        $this->element = new totara_sync_element_jobassignment();
+        if (empty($this->element->config->sourceallrecords)) {
             $this->set_config('import_deleted', '1');
             $this->required_fields[] = 'deleted';
         } else {
@@ -78,7 +78,7 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
             $this->disabled_fields[] = 'deleted';
         }
 
-        if (empty($element->config->updateidnumbers)) {
+        if (empty($this->element->config->updateidnumbers)) {
             $this->fields[] = 'managerjobassignmentidnumber';
             $this->noform_fields[] = 'managerjobassignmentidnumber';
             if ($this->is_importing_field('manageridnumber')) {

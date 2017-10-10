@@ -43,35 +43,6 @@ trait csv_trait {
     protected function config_form_add_csv_details($mform) {
         global $CFG, $OUTPUT;
 
-        // Display file example
-        $fieldmappings = array();
-        foreach ($this->fields as $f) {
-            if (!empty($this->config->{'fieldmapping_'.$f})) {
-                $fieldmappings[$f] = $this->config->{'fieldmapping_'.$f};
-            }
-        }
-
-        $filestruct = array();
-        foreach ($this->fields as $f) {
-            if (!empty($this->config->{'import_'.$f})) {
-                $filestruct[] = !empty($fieldmappings[$f]) ? '"'.$fieldmappings[$f].'"' : '"'.$f.'"';
-            }
-        }
-
-        // Add stupid line breaks :(
-        $fcount = 0;
-        foreach ($filestruct as $i => $f) {
-            if (!empty($fcount) && !($fcount % 8)) {
-                $filestruct[$i] = \html_writer::empty_tag('br').$f;
-            }
-            $fcount++;
-        }
-        unset($fcount);
-
-        $delimiter = $this->config->delimiter;
-        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct));
-        $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
-
         // Add some source file details
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
         $mform->setExpanded('fileheader');

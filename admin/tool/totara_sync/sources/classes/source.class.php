@@ -252,4 +252,114 @@ abstract class totara_sync_source {
     public function is_importing_field($fieldname) {
         return !empty($this->config->{"import_" . $fieldname});
     }
+
+    /**
+     * Generate common CSV source information and notifications.
+     *
+     * @return string HTML output.
+     */
+    protected function get_common_csv_notifications() {
+        global $OUTPUT;
+
+        // Display file example
+        $fieldmappings = array();
+
+        foreach ($this->fields as $field) {
+            if (!empty($this->config->{'fieldmapping_' . $field})) {
+                $fieldmappings[$field] = $this->config->{'fieldmapping_' . $field};
+            }
+        }
+
+        // If we've got a set of customfields for this element, process these too
+        // - not all elements have them.
+        if (isset($this->customfields)) {
+            foreach ($this->customfields as $key => $field) {
+                if (!empty($this->config->{'fieldmapping_' . $key})) {
+                    $fieldmappings[$key] = $this->config->{'fieldmapping_' . $key};
+                }
+            }
+        }
+
+        $filestruct = array();
+
+        foreach ($this->fields as $field) {
+            if (!empty($this->config->{'import_' . $field})) {
+                $filestruct[] = !empty($fieldmappings[$field]) ? '"' . $fieldmappings[$field] . '"' : '"' . $field . '"';
+            }
+        }
+
+        if (isset($this->customfields)) {
+            foreach (array_keys($this->customfields) as $field) {
+                if (!empty($this->config->{'import_' . $field})) {
+                    $filestruct[] = !empty($fieldmappings[$field]) ? '"' . $fieldmappings[$field] . '"' : '"' . $field . '"';
+                }
+            }
+        }
+
+        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($this->config->delimiter, $filestruct));
+        $notifications = html_writer::tag('div', $info, ['class' => 'informationbox']);
+
+        // Empty field info.
+        $langstring = !empty($this->element->config->csvsaveemptyfields) ? 'csvemptysettingdeleteinfo' : 'csvemptysettingkeepinfo';
+        $notifications .= $OUTPUT->notification(get_string($langstring, 'tool_totara_sync'), \core\output\notification::NOTIFY_WARNING);
+
+        return $notifications;
+    }
+
+    /**
+     * Generate common database source information and notifications.
+     *
+     * @return string HTML output.
+     */
+    protected function get_common_db_notifications() {
+        global $OUTPUT;
+
+        $notifications = '';
+
+        // Display required db table columns
+        $fieldmappings = array();
+
+        foreach ($this->fields as $field) {
+            if (!empty($this->config->{'fieldmapping_' . $field})) {
+                $fieldmappings[$field] = $this->config->{'fieldmapping_' . $field};
+            }
+        }
+
+        // If we've got a set of customfields for this element, process these too
+        // - not all elements have them.
+        if (isset($this->customfields)) {
+            foreach ($this->customfields as $key => $field) {
+                if (!empty($this->config->{'fieldmapping_' . $key})) {
+                    $fieldmappings[$key] = $this->config->{'fieldmapping_'.$key};
+                }
+            }
+        }
+
+        $dbstruct = array();
+
+        foreach ($this->fields as $field) {
+            if (!empty($this->config->{'import_' . $field})) {
+                $dbstruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;
+            }
+        }
+
+        if (isset($this->customfields)) {
+            foreach (array_keys($this->customfields) as $field) {
+                if (!empty($this->config->{'import_' . $field})) {
+                    $dbstruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;;
+                }
+            }
+        }
+
+        $dbstruct = implode(', ', $dbstruct);
+        $description = get_string('tablemustincludexdb', 'tool_totara_sync') . \html_writer::empty_tag('br') . $dbstruct;
+        $notifications = html_writer::tag('div', $description, ['class' => 'informationbox']);
+
+        // Empty or null field info.
+        $info = get_string('databaseemptynullinfo', 'tool_totara_sync');
+        $notifications .= $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING);
+
+        return $notifications;
+    }
+
 }

@@ -235,4 +235,14 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
 
         return true;
     }
+
+    /**
+     * Get any notifications that should be displayed for the element source.
+     *
+     * @return string Notifications HTML.
+     */
+    public function get_notifications() {
+        return $this->get_common_csv_notifications();
+    }
+
 }

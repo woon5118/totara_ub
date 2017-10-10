@@ -51,40 +51,6 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
             return false;
         }
 
-        // Display file example
-        $fieldmappings = array();
-        foreach ($this->fields as $field) {
-            if (!empty($this->config->{'fieldmapping_'.$field})) {
-                $fieldmappings[$field] = $this->config->{'fieldmapping_'.$field};
-            }
-        }
-        foreach ($this->customfields as $key => $f) {
-            if (!empty($this->config->{'fieldmapping_'.$key})) {
-                $fieldmappings[$key] = $this->config->{'fieldmapping_'.$key};
-            }
-        }
-
-        $filestruct = array();
-        foreach ($this->fields as $field) {
-            if (!empty($this->config->{'import_'.$field})) {
-                $filestruct[] = !empty($fieldmappings[$field]) ? '"'.$fieldmappings[$field].'"' : '"'.$field.'"';
-            }
-        }
-        foreach (array_keys($this->customfields) as $f) {
-            if (!empty($this->config->{'import_'.$f})) {
-                $filestruct[] = !empty($fieldmappings[$f]) ? '"'.$fieldmappings[$f].'"' : '"'.$f.'"';
-            }
-        }
-
-        $delimiter = $this->config->delimiter;
-        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct));
-        $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $info, array('class' => "informationbox"))));
-
-        // Empty field info.
-        $langstring = !empty($this->element->config->csvsaveemptyfields) ? 'csvemptysettingdeleteinfo' : 'csvemptysettingkeepinfo';
-        $info = get_string($langstring, 'tool_totara_sync');
-        $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
-
         // Add some source file details
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
         $mform->setExpanded('fileheader');
@@ -406,4 +372,14 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
 
         return true;
     }
+
+    /**
+     * Get any notifications that should be displayed for the element source.
+     *
+     * @return string Notifications HTML.
+     */
+    public function get_notifications() {
+        return $this->get_common_csv_notifications();
+    }
+
 }

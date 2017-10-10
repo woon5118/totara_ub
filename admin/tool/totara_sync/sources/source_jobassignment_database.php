@@ -191,4 +191,14 @@ class totara_sync_source_jobassignment_database extends totara_sync_source_jobas
 
         return true;
     }
+
+    /**
+     * Get any notifications that should be displayed for the element source.
+     *
+     * @return string Notifications HTML.
+     */
+    public function get_notifications() {
+        return $this->get_common_db_notifications();
+    }
+
 }

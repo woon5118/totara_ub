@@ -40,48 +40,10 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         $this->config->import_deleted = (isset($this->element->config->sourceallrecords) &&
             $this->element->config->sourceallrecords == 0) ? "1" : "0";
 
-        // Display required db table columns
-        $fieldmappings = array();
-
-        foreach ($this->fields as $field) {
-            if (!empty($this->config->{'fieldmapping_'.$field})) {
-                $fieldmappings[$field] = $this->config->{'fieldmapping_'.$field};
-            }
-        }
-        foreach ($this->customfields as $key => $field) {
-            if (!empty($this->config->{'fieldmapping_'.$key})) {
-                $fieldmappings[$key] = $this->config->{'fieldmapping_'.$key};
-            }
-        }
-
-        $dbstruct = array();
-        foreach ($this->fields as $field) {
-            if (!empty($this->config->{'import_'.$field})) {
-                $dbstruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;
-            }
-        }
-        foreach (array_keys($this->customfields) as $field) {
-            if (!empty($this->config->{'import_'.$field})) {
-                $dbstruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;
-            }
-        }
-
         $db_table = isset($this->config->{'database_dbtable'}) ? $this->config->{'database_dbtable'} : false;
 
         if (!$db_table) {
             $mform->addElement('html', html_writer::tag('p',get_string('dbconnectiondetails', 'tool_totara_sync')));
-        }
-
-        $dbstruct = implode(', ', $dbstruct);
-        $description = html_writer::tag('p', get_string('tablemustincludexdb', 'tool_totara_sync'));
-        $description .= html_writer::tag('p', $dbstruct);
-
-        $mform->addElement('html', $description);
-
-        // Empty or null field info.
-        if ($db_table) {
-            $info = get_string('databaseemptynullinfo', 'tool_totara_sync');
-            $mform->addElement('html', $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING));
         }
 
         $db_options = get_installed_db_drivers();
@@ -335,4 +297,14 @@ class totara_sync_source_org_database extends totara_sync_source_org {
 
         return true;
     }
+
+    /**
+     * Get any notifications that should be displayed for the element source.
+     *
+     * @return string Notifications HTML.
+     */
+    public function get_notifications() {
+        return $this->get_common_db_notifications();
+    }
+
 }
