@@ -60,6 +60,8 @@ $courseids = optional_param('courseids', '', PARAM_RAW);
 if (!empty($courseids)) {
     $courseids = explode(',', $courseids);
     $courseids = clean_param_array($courseids, PARAM_INT);
+} else {
+    $courseids = [];
 }
 
 // We first get the submitted data as we want to set it all in the page URL.
