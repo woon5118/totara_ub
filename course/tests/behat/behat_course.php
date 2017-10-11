@@ -1578,11 +1578,6 @@ class behat_course extends behat_base {
             $button = $this->find('css', 'a.action-movedown', $exception, $listingnode);
         }
         $button->click();
-        if ($this->running_javascript() && $highlight) {
-            $listitem = $listingnode->getParent();
-            $exception = new ExpectationException('Nothing was highlighted, ajax didn\'t occur or didn\'t succeed.', $this->getSession());
-            $this->spin(array($this, 'listing_is_highlighted'), $listitem->getTagName().'#'.$listitem->getAttribute('id'), 2, $exception, true);
-        }
     }
 
     /**
