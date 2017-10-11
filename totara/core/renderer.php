@@ -155,10 +155,10 @@ class totara_core_renderer extends plugin_renderer_base {
     * Returns exported template data for displaying a progress bar of a user's course progress
     *
     * @access  public
-    * @param   $userid     int
-    * @param   $courseid   int
-    * @param   $status     int     COMPLETION_STATUS_ constant
-    * @return  string stdClass with exported template data
+    * @param   int $userid
+    * @param   int $courseid
+    * @param   int $status COMPLETION_STATUS_ constant
+    * @return  stdClass with exported template data
     */
     public function export_course_progress_for_template($userid, $courseid, $status) {
         global $COMPLETION_STATUS, $OUTPUT;
@@ -170,18 +170,28 @@ class totara_core_renderer extends plugin_renderer_base {
             return $data;
         }
 
-        // If there is no completion criteria and status != 'complete' and status != 'completeviarpl', show 'no criteria'
-        if (!completion_criteria::course_has_criteria($courseid) && $status != COMPLETION_STATUS_COMPLETE && $status != COMPLETION_STATUS_COMPLETEVIARPL) {
-            $data->statustext = get_string('statusnocriteria', 'completion');
-            return $data;
+        $completion = new completion_completion(['userid' => $userid, 'course' => $courseid]);
+        $progressinfo = $completion->get_progressinfo();
+        $percent = $progressinfo->get_percentagecomplete();
+        if ($percent === false) {
+            $customdata = $progressinfo->get_customdata();
+            // enabled is only set if completion tracking is NOT enabled
+            if (isset($customdata['enabled']) && $customdata['enabled'] === false) {
+                $data->statustext = get_string('statusnottracked', 'completion');
+                return $data;
+            }
+
+            // If there is no completion criteria and status != 'complete' and status != 'completeviarpl', show 'no criteria'
+            if (!completion_criteria::course_has_criteria($courseid) && $status != COMPLETION_STATUS_COMPLETE && $status != COMPLETION_STATUS_COMPLETEVIARPL) {
+                $data->statustext = get_string('statusnocriteria', 'completion');
+                return $data;
+            }
         }
 
-        $completion = new completion_completion(['userid' => $userid, 'course' => $courseid]);
         $data->statustext = get_string($COMPLETION_STATUS[$status], 'completion');
-
         // TODO: Need to get a better way to get the width right
         $pbar = new \static_progress_bar('', '70');
-        $pbar->set_progress((string)$completion->get_progressinfo()->get_percentagecomplete());
+        $pbar->set_progress((string)$percent);
         $data->pbar = $pbar->export_for_template($OUTPUT);
 
         // Get the popover detail on required completion criteria

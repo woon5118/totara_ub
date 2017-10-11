@@ -197,6 +197,10 @@ if ($editform->is_cancelled()) {
         update_course($data, $editoroptions);
         // Set the URL to take them too if they choose save and display.
         $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
+
+        // Invalidate the completion cache
+        $info = new completion_info($course);
+        $info->invalidatecache();
     }
 
     $hook = new core_course\hook\edit_form_save_changes($iscreating, $course->id, $data);

@@ -211,6 +211,29 @@ class core_completion_generator extends component_generator_base {
         $course->completionstartonenrol = 1;
         $course->completionprogressonview = 1;
         update_course($course);
+
+        // Invalidate the completion cache
+        $info = new completion_info($course);
+        $info->invalidatecache();
+    }
+
+    /**
+     * Disable completion tracking for this course.
+     *
+     * @param object $course
+     */
+    public function disable_completion_tracking($course) {
+        global $CFG;
+        require_once($CFG->dirroot . '/course/lib.php');
+
+        // Update course completion settings.
+        $course->enablecompletion = COMPLETION_DISABLED;
+        update_course($course);
+
+        // Invalidate the completion cache
+        $info = new completion_info($course);
+        $info->invalidatecache();
+
     }
 
     /**

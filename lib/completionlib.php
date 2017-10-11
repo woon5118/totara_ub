@@ -2000,6 +2000,7 @@ class completion_info {
         $progressinfo = \totara_core\progressinfo::from_data($agg_method);
 
         if (!$this->is_enabled()) {
+            $progressinfo->set_customdata(array('enabled' => false));
             return $progressinfo;
         }
 
