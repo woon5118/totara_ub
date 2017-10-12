@@ -55,8 +55,9 @@ Feature: Seminar session date with timezone management
     And I log out
 
   @javascript
-  Scenario: Create seminar session by teacher in one timezone, check that timezones stored correctly, and check be tecacher in another timezone
+  Scenario: Create seminar session by teacher in one timezone, check that timezones stored correctly, and check be teacher in another timezone
     Given I log in as "teacher1"
+    And I wait "1" seconds
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
@@ -113,7 +114,7 @@ Feature: Seminar session date with timezone management
 
     When I click on "Edit" "link" in the "Room 1" "table_row"
     And I click on "Edit date" "link"
-    Then the following fields match these values:
+    Then I set the following fields to these values:
       | sessiontimezone      | Pacific/Auckland |
       | timestart[day]       | 2                |
       | timestart[month]     | January          |
@@ -131,7 +132,7 @@ Feature: Seminar session date with timezone management
     And I press "Save changes"
     When I click on "Edit" "link" in the "Room 1" "table_row"
     And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
-    Then the following fields match these values:
+    Then I set the following fields to these values:
       | sessiontimezone      | User timezone    |
       | timestart[day]       | 3                |
       | timestart[month]     | February         |
@@ -148,7 +149,7 @@ Feature: Seminar session date with timezone management
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     When I press "Add a new date"
     And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
-    Then the following fields match these values:
+    Then I set the following fields to these values:
       | sessiontimezone      | Pacific/Auckland |
       | timestart[timezone]  | Pacific/Auckland |
       | timefinish[timezone] | Pacific/Auckland |

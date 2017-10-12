@@ -22,12 +22,11 @@
  * @subpackage facetoface
  */
 
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once "$CFG->dirroot/lib/formslib.php";
-require_once "$CFG->dirroot/mod/facetoface/lib.php";
-
-class mod_facetoface_signup_form extends moodleform {
+class signup extends \moodleform {
     function definition() {
         global $CFG;
 
@@ -45,7 +44,7 @@ class mod_facetoface_signup_form extends moodleform {
             $managers = array();
             $managerids = $session->managerids;
             foreach ($managerids as $managerid) {
-                $manager = core_user::get_user($managerid);
+                $manager = \core_user::get_user($managerid);
                 $managers[] = fullname($manager);
             }
             $manager_title = implode(', ', $managers);
@@ -54,7 +53,7 @@ class mod_facetoface_signup_form extends moodleform {
         $managerid = 0;
         if (!empty($this->_customdata['managerid'])) {
             $managerid = $this->_customdata['managerid'];
-            $manager = core_user::get_user($managerid);
+            $manager = \core_user::get_user($managerid);
             $manager_title = fullname($manager);
         }
 
@@ -68,8 +67,8 @@ class mod_facetoface_signup_form extends moodleform {
         if ($approvaltype == APPROVAL_SELF) {
             global $PAGE;
 
-            $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $session->id));
-            $tandcurl = html_writer::link($url, get_string('approvalterms', 'mod_facetoface'), array("class"=>"tsandcs ajax-action"));
+            $url = new \moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $session->id));
+            $tandcurl = \html_writer::link($url, get_string('approvalterms', 'mod_facetoface'), array("class"=>"tsandcs ajax-action"));
 
             $PAGE->requires->strings_for_js(array('approvalterms', 'close'), 'mod_facetoface');
             $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init');
@@ -95,8 +94,8 @@ class mod_facetoface_signup_form extends moodleform {
                     'static',
                     'managerselector',
                     get_string('manager', 'totara_job'),
-                    html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
-                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
+                    \html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
+                    . \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
                 );
                 $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
                 if (!empty($managerids)) {
@@ -124,8 +123,8 @@ class mod_facetoface_signup_form extends moodleform {
                     'static',
                     'managerselector',
                     get_string('manager', 'totara_job'),
-                    html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
-                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
+                    \html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
+                    . \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
                 );
 
                 $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
@@ -141,14 +140,13 @@ class mod_facetoface_signup_form extends moodleform {
             }
 
             // Display a list of approval administrators.
-            $approvallist = html_writer::start_tag('ul', array('class' => 'approvallist'));
+            $approvallist = \html_writer::start_tag('ul', array('class' => 'approvallist'));
 
             // System approvers.
             $sysapps = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
             foreach ($sysapps as $approver) {
                 if (!empty($approver)) {
-                    $approvallist .= html_writer::tag('li', fullname($approver));
-                    //$approvers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
+                    $approvallist .= \html_writer::tag('li', fullname($approver));
                 }
             }
 
@@ -156,11 +154,11 @@ class mod_facetoface_signup_form extends moodleform {
             $actapps = explode(',', $approvaladmins);
             foreach ($actapps as $approverid) {
                 if (!empty($approverid)) {
-                     $approver = core_user::get_user($approverid);
-                     $approvallist .= html_writer::tag('li', fullname($approver));
+                     $approver = \core_user::get_user($approverid);
+                     $approvallist .= \html_writer::tag('li', fullname($approver));
                 }
             }
-            $approvallist .= html_writer::end_tag('ul');
+            $approvallist .= \html_writer::end_tag('ul');
 
             $mform->addElement('static', 'approvalusers', get_string('approvalusers', 'mod_facetoface'), $approvallist);
             $mform->setType('approvalusers', PARAM_TEXT);
@@ -175,7 +173,7 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('discountcode', PARAM_TEXT);
 
-        $signup = new stdClass();
+        $signup = new \stdClass();
         $signup->id = 0;
         customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
         // To avoid crashing the form check if 'customfields' element exists, it may happened when all custom fields removed.
@@ -215,8 +213,6 @@ class mod_facetoface_signup_form extends moodleform {
         } else {
             $signupstr = 'signupandrequest';
         }
-
-        $strsignup = $this->_customdata['signupbywaitlist'] ? 'joinwaitlist' : 'signup';
         $this->add_action_buttons(true, get_string($signupstr, 'facetoface'));
     }
 
@@ -245,7 +241,7 @@ class mod_facetoface_signup_form extends moodleform {
             $mform->setType($controlname, PARAM_INT);
 
             foreach ($jobassignments as $jobassignment) {
-                $label = position::job_position_label($jobassignment);
+                $label = \position::job_position_label($jobassignment);
                 $posselectelement->addOption($label, $jobassignment->id);
             }
         }

@@ -24,13 +24,13 @@
  * @subpackage facetoface
  */
 
-namespace mod_facetoface;
+namespace mod_facetoface\form;
 
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
-class event_form extends \moodleform {
+class event extends \moodleform {
 
     /** @var context_module */
     protected $session;

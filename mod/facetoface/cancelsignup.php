@@ -23,28 +23,15 @@
 
 require_once '../../config.php';
 require_once 'lib.php';
-require_once 'cancelsignup_form.php';
 
 $s  = required_param('s', PARAM_INT); // facetoface session ID
 $confirm           = optional_param('confirm', false, PARAM_BOOL);
 $backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
 
-if (!$session = facetoface_get_session($s)) {
-    print_error('error:incorrectcoursemodulesession', 'facetoface');
-}
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 if (!$session->allowcancellations) {
     print_error('error:cancellationsnotallowed', 'facetoface');
 }
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
-    print_error('error:incorrectfacetofaceid', 'facetoface');
-}
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-if (!$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemoduleid', 'facetoface');
-}
-$context = context_module::instance($cm->id);
 
 require_login($course, false, $cm);
 require_capability('mod/facetoface:view', $context);
@@ -85,7 +72,7 @@ $cancellation_note = facetoface_get_attendee($s, $USER->id);
 $cancellation_note->id = $cancellation_note->submissionid;
 customfield_load_data($cancellation_note, 'facetofacecancellation', 'facetoface_cancellation');
 
-$mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions', 'cancellation_note', 'userisinwaitlist'));
+$mform = new \mod_facetoface\form\cancelsignup(null, compact('s', 'backtoallsessions', 'cancellation_note', 'userisinwaitlist'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }

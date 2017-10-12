@@ -21,14 +21,13 @@
  * @subpackage facetoface
  */
 
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once "$CFG->dirroot/lib/formslib.php";
+class cancelsignup extends \moodleform {
 
-class mod_facetoface_cancelsignup_form extends moodleform {
-
-    function definition()
-    {
+    function definition() {
         $mform =& $this->_form;
         $cancellationnote = $this->_customdata['cancellation_note'];
         $strheader = 'cancelbooking';
@@ -47,7 +46,7 @@ class mod_facetoface_cancelsignup_form extends moodleform {
 
         $mform->addElement('html', get_string($strcancellationconfirm, 'facetoface')); // Instructions.
 
-        $cancellation = new stdClass();
+        $cancellation = new \stdClass();
         $cancellation->id = $cancellationnote->id;
 
         $mform->addElement('hidden', 'id');

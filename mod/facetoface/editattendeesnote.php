@@ -24,7 +24,6 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/mod/facetoface/attendee_note_form.php');
 
 $userid    = required_param('userid', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
@@ -34,15 +33,7 @@ $returnurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessi
 
 require_sesskey();
 
-if (!$session = facetoface_get_session($sessionid)) {
-    print_error('error:incorrectcoursemodulesession', 'facetoface');
-}
-
-$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
-$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
-$context = context_module::instance($cm->id);
-
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
 // Check essential permissions.
 $PAGE->set_url($url);
 require_login($course, true, $cm);
@@ -54,7 +45,7 @@ $attendeenote->id = $attendeenote->submissionid;
 $attendeenote->sessionid = $sessionid;
 customfield_load_data($attendeenote, 'facetofacesignup', 'facetoface_signup');
 
-$mform = new attendee_note_form(null, array('s' => $sessionid, 'userid' => $userid, 'attendeenote' => $attendeenote));
+$mform = new \mod_facetoface\form\attendee_note(null, array('s' => $sessionid, 'userid' => $userid, 'attendeenote' => $attendeenote));
 $mform->set_data($attendeenote);
 
 if ($mform->is_cancelled()) {

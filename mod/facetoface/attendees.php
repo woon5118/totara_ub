@@ -26,7 +26,6 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
-require_once($CFG->dirroot.'/mod/facetoface/attendees_message_form.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
@@ -507,7 +506,7 @@ if ($form = data_submitted()) {
         $formurl = clone($baseurl);
         $formurl->param('action', 'messageusers');
 
-        $mform = new mod_facetoface_attendees_message_form($formurl, array('s' => $s));
+        $mform = new \mod_facetoface\form\attendees_message($formurl, array('s' => $s));
 
         // Check form validates
         if ($mform->is_cancelled()) {
@@ -630,7 +629,7 @@ if (!$onlycontent) {
 
     $jsmodule = array(
         'name' => 'totara_f2f_attendees',
-        'fullpath' => '/mod/facetoface/attendees.js',
+        'fullpath' => '/mod/facetoface/js/attendees.js',
         'requires' => array('json', 'totara_core'));
 
     if ($action == 'messageusers') {
@@ -639,14 +638,14 @@ if (!$onlycontent) {
 
         $jsmodule = array(
             'name' => 'totara_f2f_attendees_message',
-            'fullpath' => '/mod/facetoface/attendees_messaging.js',
+            'fullpath' => '/mod/facetoface/js/attendees_messaging.js',
             'requires' => array('json', 'totara_core'));
 
         $PAGE->requires->js_init_call('M.totara_f2f_attendees_messaging.init', $args, false, $jsmodule);
     } else {
         $jsmodule = array(
             'name' => 'totara_f2f_attendees',
-            'fullpath' => '/mod/facetoface/attendees.js',
+            'fullpath' => '/mod/facetoface/js/attendees.js',
             'requires' => array('json', 'totara_core'));
 
         $args = array('args' => '{"sessionid":'.$session->id.','.
@@ -1155,7 +1154,7 @@ if ($show_table) {
         if (!empty($downloadsheetattendees)) {
             // We need the dates, and we only want to show this option if there are one or more dates.
             $action = new moodle_url('/mod/facetoface/signinsheet.php');
-            $signinform = new mod_facetoface_signin_form($action, $session);
+            $signinform = new \mod_facetoface\form\signin($action, $session);
             echo html_writer::start_div('f2fdownloadsigninsheet');
             $signinform->display();
             echo html_writer::end_div();
@@ -1196,7 +1195,7 @@ if ($action == 'messageusers') {
     $formurl = clone($baseurl);
     $formurl->param('action', 'messageusers');
 
-    $mform = new mod_facetoface_attendees_message_form($formurl, array('s' => $s));
+    $mform = new \mod_facetoface\form\attendees_message($formurl, array('s' => $s));
     $mform->display();
 }
 

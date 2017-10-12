@@ -26,29 +26,17 @@ define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/mod/facetoface/attendee_note_form.php');
 
 $userid    = required_param('userid', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
 
 require_sesskey();
 
-if (!$session = facetoface_get_session($sessionid)) {
-    print_error('error:incorrectcoursemodulesession', 'facetoface');
-}
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
-    print_error('error:incorrectfacetofaceid', 'facetoface');
-}
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemodule', 'facetoface');
-}
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
 
 // Check essential permissions.
 require_login($course, true, $cm);
-$context = context_module::instance($cm->id);
+
 if (!has_capability('mod/facetoface:manageattendeesnote', $context)) {
     print_error('nopermissions', 'error', '', 'Update attendee note');
 }

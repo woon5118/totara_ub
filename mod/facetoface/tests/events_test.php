@@ -148,7 +148,6 @@ class facetoface_events_testcase extends advanced_testcase {
 
     public function test_attendee_note_updated_event() {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/facetoface/attendee_note_form.php');
 
         $this->resetAfterTest();
         $this->setAdminUser();

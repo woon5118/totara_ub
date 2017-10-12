@@ -34,12 +34,7 @@ $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 $backtosession = optional_param('backtosession', null, PARAM_ALPHA);
 $managerid = optional_param('managerid', null, PARAM_INT);
 
-if (!$session = facetoface_get_session($sid)) {
-    throw new moodle_exception('invalidsessionid', 'mod_facetoface');
-}
-$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
-$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sid);
 
 $url = new moodle_url('/mod/facetoface/reserve.php', array('s' => $session->id, 'action' => $action, 'backtoallsessions' => $backtoallsessions));
 if ($backtosession) {
@@ -51,7 +46,6 @@ if ($managerid) {
 $PAGE->set_url($url);
 
 require_login($course, false, $cm);
-$context = context_module::instance($cm->id);
 
 $validactions = array('reserve', 'allocate');
 if (!in_array($action, $validactions)) {

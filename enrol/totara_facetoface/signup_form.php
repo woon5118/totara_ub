@@ -23,7 +23,6 @@
  */
 
 require_once($CFG->dirroot . '/lib/formslib.php');
-require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
 
 class enrol_totara_facetoface_signup_form extends moodleform {
     protected $instance;
@@ -164,7 +163,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             $mform->addElement('hidden', 'eventhandlers', $url);
             $mform->setType('eventhandlers', PARAM_URL);
 
-            $url = $CFG->wwwroot . '/mod/facetoface/signup_tsandcs_ajax.js';
+            $url = $CFG->wwwroot . '/mod/facetoface/js/signup_tsandcs_ajax.js';
             $mform->addElement('html', '<script src=' . $url . '></script>');
         } else {
             global $PAGE;

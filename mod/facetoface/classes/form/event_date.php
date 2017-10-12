@@ -22,12 +22,12 @@
  */
 
 
-namespace mod_facetoface;
+namespace mod_facetoface\form;
 
 /**
  * Form for choosing dates and associated information: room, and assets
  */
-class event_date_form extends \moodleform {
+class event_date extends \moodleform {
 
     public function definition() {
         global $PAGE;

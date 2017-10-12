@@ -23,7 +23,6 @@
 
 require_once('../../config.php');
 require_once('lib.php');
-require_once('interestform.php');
 
 $f = required_param('f', PARAM_INT); // Facetoface ID.
 $confirm = optional_param('confirm', false, PARAM_BOOL);
@@ -58,7 +57,7 @@ $title = $course->shortname . ': ' . format_string($facetoface->name);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 
-$mform = new mod_facetoface_interest_form(null, array('f' => $f, 'declare' => $declare));
+$mform = new \mod_facetoface\form\interest(null, array('f' => $f, 'declare' => $declare));
 
 if ($mform->is_cancelled()) {
     redirect($redirecturl);

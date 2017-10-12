@@ -81,7 +81,7 @@ $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'm
 $PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
     'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
 
-$form = new \mod_facetoface\event_date_form($currenturl, $params, 'post', '', array('class' => 'dialog-nobind'), true, null, md5($start.$finish));
+$form = new \mod_facetoface\form\event_date($currenturl, $params, 'post', '', array('class' => 'dialog-nobind'), true, null, md5($start.$finish));
 if ($data = $form->get_data()) {
     // Provide timestamp, timezone values, and rendered dates text.
     $data->html = \mod_facetoface\event_dates::render(

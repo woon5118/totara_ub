@@ -21,12 +21,11 @@
  * @package mod_facetoface
  */
 
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/lib/formslib.php");
-require_once("$CFG->dirroot/totara/customfield/fieldlib.php");
-
-class mod_facetoface_cancel_form extends moodleform {
+class cancelsession extends \moodleform {
 
     protected function definition() {
         $mform = $this->_form;

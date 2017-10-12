@@ -26,19 +26,12 @@ $action = optional_param('action', '', PARAM_ALPHA);
 $managerid = optional_param('managerid', 0, PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
-if (!$session = facetoface_get_session($sid)) {
-    throw new moodle_exception('invalidsessionid', 'mod_facetoface');
-}
-
-$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
-$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sid);
 
 $url = new moodle_url('/mod/facetoface/managereservations.php', array('s' => $session->id));
 $PAGE->set_url($url);
 
 require_login($course, false, $cm);
-$context = context_module::instance($cm->id);
 require_capability('mod/facetoface:managereservations', $context);
 
 if ($action == 'delete') {

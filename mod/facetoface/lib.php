@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/user/selector/lib.php');
 require_once $CFG->dirroot.'/mod/facetoface/messaginglib.php';
 require_once $CFG->dirroot.'/mod/facetoface/notification/lib.php';
 require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
 require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/asset/lib.php');
 

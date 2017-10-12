@@ -23,16 +23,14 @@
  * @package modules
  * @subpackage facetoface
  */
+
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot.'/mod/facetoface/lib.php');
-
-class mod_facetoface_attendees_message_form extends moodleform {
+class attendees_message extends \moodleform {
 
     function definition() {
-        global $CFG;
 
         $mform =& $this->_form;
 

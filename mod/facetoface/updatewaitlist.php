@@ -34,21 +34,10 @@ $data = required_param('datasubmission', PARAM_SEQUENCE);
 
 $data = explode(',', $data);
 
-if (!$session = facetoface_get_session($sessionid)) {
-    print_error('error:incorrectcoursemodulesession', 'facetoface');
-}
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-if (!$cm = get_coursemodule_from_instance('facetoface', $session->facetoface, $course->id)) {
-    print_error('error:incorrectcoursemodule', 'facetoface');
-}
-
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
 // Check essential permissions.
 require_course_login($course, true, $cm);
-$context = context_module::instance($cm->id);
 require_capability('mod/facetoface:takeattendance', $context);
-
 require_sesskey();
 
 $result = array('result'=>'failure');

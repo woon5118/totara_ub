@@ -25,16 +25,10 @@ define('AJAX_SCRIPT', true);
 
 require_once('../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/mod/facetoface/signup_tsandcs_form.php');
 
 $s = required_param('s', PARAM_INT); // Facetoface session ID.
 
-if (!$session = facetoface_get_session($s)) {
-    print_error('error:incorrectcoursemodulesession', 'facetoface');
-}
-$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
-$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course->id);
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
 if ($facetoface->approvaltype != APPROVAL_SELF) {
     // This should not happen unless there is a concurrent change of settings.
@@ -48,7 +42,7 @@ if ($facetoface->approvaltype != APPROVAL_SELF) {
 if (can_access_course($course)) {
     // User is already enrolled, let them view the text again.
     require_login($course, true, $cm);
-    require_capability('mod/facetoface:view', context_module::instance($cm->id));
+    require_capability('mod/facetoface:view', $context);
 
 } else {
     // EVERYONE must login.
@@ -77,7 +71,7 @@ if (can_access_course($course)) {
     }
 }
 
-$mform = new signup_tsandcs_form(null, array('tsandcs' => $facetoface->approvalterms, 's' => $s));
+$mform = new \mod_facetoface\form\signup_tsandcs(null, array('tsandcs' => $facetoface->approvalterms, 's' => $s));
 
 // This should be json_encoded, but for now we need to use html content
 // type to not break $.get().

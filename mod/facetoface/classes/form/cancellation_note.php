@@ -21,11 +21,11 @@
  * @package mod_facetoface
  */
 
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once "$CFG->dirroot/lib/formslib.php";
-
-class cancellation_note_form extends moodleform {
+class cancellation_note extends \moodleform {
 
     public function definition() {
 
@@ -45,7 +45,7 @@ class cancellation_note_form extends moodleform {
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
 
-        $cancellation = new stdClass();
+        $cancellation = new \stdClass();
         $cancellation->id = $attendeenote->submissionid;
         customfield_definition($mform, $cancellation, 'facetofacecancellation', 0, 'facetoface_cancellation');
         $mform->removeElement('customfields');

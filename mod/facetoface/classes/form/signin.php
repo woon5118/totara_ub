@@ -20,14 +20,12 @@
  * @author Petr Skoda <petr.skoda@totaralms.com>
  * @package mod_facetoface
  */
+
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once("{$CFG->libdir}/formslib.php");
-require_once("{$CFG->dirroot}/totara/reportbuilder/lib.php");
-require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
-
-class mod_facetoface_signin_form extends moodleform {
+class signin extends \moodleform {
     public function definition() {
         $mform = $this->_form;
 

@@ -33,19 +33,7 @@ $add            = optional_param('add', 0, PARAM_BOOL);
 $remove         = optional_param('remove', 0, PARAM_BOOL);
 $recipients     = optional_param('recipients', '', PARAM_SEQUENCE);
 
-if (!$session = facetoface_get_session($s)) {
-    print_error('error:incorrectcoursemodulesession', 'facetoface');
-}
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
-    print_error('error:incorrectfacetofaceid', 'facetoface');
-}
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemodule', 'facetoface');
-}
-$context = context_module::instance($cm->id);
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
 // Check essential permissions
 require_login($course, false, $cm);

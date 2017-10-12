@@ -80,9 +80,9 @@ if ($backtoallsessions) {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
-list($sessiondata, $editoroptions, $defaulttimezone, $nbdays) = \mod_facetoface\event_form::prepare_data($session, $facetoface, $course, $context, $cntdates);
+list($sessiondata, $editoroptions, $defaulttimezone, $nbdays) = \mod_facetoface\form\event::prepare_data($session, $facetoface, $course, $context, $cntdates);
 
-$mform = new \mod_facetoface\event_form(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata', 'backtoallsessions'));
+$mform = new \mod_facetoface\form\event(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata', 'backtoallsessions'));
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);

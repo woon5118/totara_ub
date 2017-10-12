@@ -22,11 +22,11 @@
  * @subpackage facetoface
  */
 
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once "$CFG->dirroot/lib/formslib.php";
-
-class attendee_note_form extends moodleform {
+class attendee_note extends \moodleform {
 
     public function definition() {
 
@@ -46,7 +46,7 @@ class attendee_note_form extends moodleform {
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
 
-        $signup = new stdClass();
+        $signup = new \stdClass();
         $signup->id = $attendeenote->submissionid;
         customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
         $mform->removeElement('customfields');

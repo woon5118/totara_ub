@@ -20,13 +20,14 @@
  * @copyright 2014 Yair Spielmann, Synergy Learning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') or die();
 
-require_once($CFG->libdir.'/formslib.php');
+class interest extends \moodleform {
 
-class mod_facetoface_interest_form extends moodleform {
     public function definition() {
-        global $CFG;
 
         $mform =& $this->_form;
 

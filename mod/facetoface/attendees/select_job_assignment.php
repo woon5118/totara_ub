@@ -26,8 +26,6 @@ define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/mod/facetoface/attendee_job_assignment_form.php');
-require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
 
 $userid = required_param('id', PARAM_INT); // User ID.
 $listid = required_param('listid', PARAM_ALPHANUM); // Session key to list of users to add.
@@ -75,7 +73,7 @@ $formparams = array(
     'listid' => $listid
 );
 
-$mform = new attendee_job_assignment_form(null, $formparams);
+$mform = new \mod_facetoface\form\attendee_job_assignment(null, $formparams);
 
 if ($fromform = $mform->get_data()) {
 

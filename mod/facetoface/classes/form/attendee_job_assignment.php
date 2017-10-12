@@ -21,11 +21,13 @@
  * @package totara
  * @subpackage facetoface
  */
+
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/formslib.php');
+class attendee_job_assignment extends \moodleform {
 
-class attendee_job_assignment_form extends moodleform {
     public function definition() {
         $mform = & $this->_form;
         $jobassignments = $this->_customdata['jobassignments'];
@@ -52,12 +54,12 @@ class attendee_job_assignment_form extends moodleform {
                 $mform->setType('listid', PARAM_INT);
             }
 
-            $mform->addElement('html', html_writer::tag('p', '&nbsp;', array('id' => 'attendee_note_err', 'class' => 'error')));
+            $mform->addElement('html', \html_writer::tag('p', '&nbsp;', array('id' => 'attendee_note_err', 'class' => 'error')));
 
             $jobassignselectelement = $mform->addElement('select', 'selectjobassign', get_string('selectjobassignment', 'mod_facetoface'));
 
             foreach ($jobassignments as $jobassignment) {
-                $label = position::job_position_label($jobassignment);
+                $label = \position::job_position_label($jobassignment);
                 $jobassignselectelement->addOption($label, $jobassignment->id);
             }
             $jobassignselectelement->setSelected($selectedjaid);

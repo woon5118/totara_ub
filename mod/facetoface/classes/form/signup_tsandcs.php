@@ -22,11 +22,11 @@
  * @subpackage facetoface
  */
 
+namespace mod_facetoface\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/lib/formslib.php");
-
-class signup_tsandcs_form extends moodleform {
+class signup_tsandcs extends \moodleform {
 
     public function definition() {
         $mform = & $this->_form;
