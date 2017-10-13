@@ -349,7 +349,7 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
                 $customfields = array();
                 foreach ($customfieldkeys as $key) {
                     // Get shortname and check if we need to do field type processing
-                    $value = trim($row[$key]);
+                    $value = trim($csvrow[$key]);
                     if (!empty($value)) {
                         $shortname = str_replace('customfield_', '', $key);
                         $datatype = $DB->get_field('org_type_info_field', 'datatype', array('shortname' => $shortname));
@@ -366,7 +366,7 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
                         }
                     }
                     $customfields[$key] = $value;
-                    unset($row[$key]);
+                    unset($csvrow[$key]);
                 }
 
                 $row['customfields'] = json_encode($customfields);
