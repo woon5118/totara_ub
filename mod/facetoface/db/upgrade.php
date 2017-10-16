@@ -161,6 +161,13 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017092501, 'facetoface');
     }
 
+    if ($oldversion < 2017103100) {
+        facetoface_upgradelib_calendar_events_for_sessiondates();
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2017103100, 'facetoface');
+    }
+
     return true;
 
 }
