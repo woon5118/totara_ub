@@ -192,13 +192,19 @@ var createLoaderImg = function (elClass, parentId, wwwRoot) {
         // A loader image already exists.
         return false;
     }
-    var loadingImg = document.createElement("img");
+    var loading = document.createElement("span");
 
-    loadingImg.setAttribute("src", M.util.image_url('/i/ajaxloader', 'moodle'));
-    loadingImg.setAttribute("class", elClass);
-    loadingImg.setAttribute("alt", "Loading");
-    loadingImg.setAttribute("id", "loaderImg");
-    parentEl.appendChild(loadingImg);
+    require(['core/str', 'core/templates'], function(strlib, templatelib) {
+        strlib.get_string('loading').then(function(loading) {
+            return templatelib.renderIcon('loading', loading);
+        }).then(function(icon) {
+            loading.innerHTML = icon;
+        });
+    });
+
+    loading.setAttribute("class", elClass);
+    loading.setAttribute("id", "loaderImg");
+    parentEl.appendChild(loading);
 
     return true;
 };
