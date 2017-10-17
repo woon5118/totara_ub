@@ -171,15 +171,6 @@ $string['configcronremotepassword'] = 'This means that the cron.php script canno
     http://site.example.com/admin/cron.php?password=opensesame
 </pre>If this is left empty, no password is required.';
 $string['configcurlcache'] = 'Time-to-live for cURL cache, in seconds.';
-$string['configcustommenuitems'] = 'This is deprecated functionality and will not display in core themes (will be deleted in Totara 10.0). Please customise the main menu instead (Site adminsitration > Appearance > Main menu).<br/>
-You can configure a custom menu here to be shown by themes. Each line consists of some menu text, a link URL (optional), a tooltip title (optional) and a language code or comma-separated list of codes (optional, for displaying the line to users of the specified language only), separated by pipe characters. You can specify a structure using hyphens, and dividers can be used by adding a line of one or more # characters where desired. For example:
-<pre>
-Totara community|https://totara.community
-Totara development|https://help.totaralearning.com/display/DEV
--Totara help|https://help.totaralearning.com/
-Totara News|https://www.totaralms.com/about-us/news-events
-Totara Partners|https://www.totaralms.com/partners
-</pre>';
 $string['configcustomusermenuitems'] = 'You can configure the contents of the user menu (with the exception of the log out link, which is automatically added). Each line is separated by | characters and consists of 1) a string in "langstringname, componentname" form or as plain text, 2) a URL, and 3) an icon either as a pix icon or as a URL. Dividers can be used by adding a line of one or more # characters where desired.';
 $string['configdbsessions'] = 'If enabled, this setting will use the database to store information about current sessions. Note that changing this setting now will log out all current users (including you). If you are using MySQL please make sure that \'max_allowed_packet\' in my.cnf (or my.ini) is at least 4M. Other session drivers can be configured directly in config.php, see config-dist.php for more information. This option disappears if you specify session driver in config.php file.';
 $string['configdebug'] = 'If you turn this on, then PHP\'s error_reporting will be increased so that more warnings are printed.  This is only useful for developers.';
@@ -401,8 +392,6 @@ $string['curltimeoutkbitrate'] = 'Bitrate to use when calculating cURL timeouts 
 $string['curltimeoutkbitrate_help'] = 'This setting is used to calculate an appropriate timeout during large cURL requests. As part of this calculation an HTTP HEAD request is made to determine the size of the content. Setting this to 0 disables this request from being made.';
 $string['currenttheme'] = 'Current theme';
 $string['customcheck'] = 'Other checks';
-$string['custommenu'] = 'Custom menu';
-$string['custommenuitems'] = 'Custom menu items (Deprecated)';
 $string['customusermenuitems'] = 'User menu items';
 $string['datarootsecurityerror'] = '<p><strong>SECURITY WARNING!</strong></p><p>Your dataroot directory is in the wrong location and is exposed to the web. This means that all your private files are available to anyone in the world, and some of them could be used by a cracker to obtain unauthorised administrative access to your site!</p>
 <p>You <em>must</em> move dataroot directory ({$a}) to a new location that is not within your public web directory, and update the <code>$CFG->dataroot</code> setting in your config.php accordingly.</p>';
@@ -1321,3 +1310,18 @@ $string['uselegacybrowselistofusersreport_desc'] = 'In Totara 10 the original Br
 by a new report builder based version that included all the main functionality of the original, with exception of Mnet
 support. Mnet will be deprecated and removed in the next major release of Totara. By default the new Browse List of
 Users report will be used. However, you can override that by choosing this option.';
+
+/*
+ * @deprecated since Totara 11.0
+ */
+$string['configcustommenuitems'] = 'This is deprecated functionality and will not display in core themes (will be deleted in Totara 10.0). Please customise the main menu instead (Site adminsitration > Appearance > Main menu).<br/>
+You can configure a custom menu here to be shown by themes. Each line consists of some menu text, a link URL (optional), a tooltip title (optional) and a language code or comma-separated list of codes (optional, for displaying the line to users of the specified language only), separated by pipe characters. You can specify a structure using hyphens, and dividers can be used by adding a line of one or more # characters where desired. For example:
+<pre>
+Totara community|https://totara.community
+Totara development|https://help.totaralearning.com/display/DEV
+-Totara help|https://help.totaralearning.com/
+Totara News|https://www.totaralms.com/about-us/news-events
+Totara Partners|https://www.totaralms.com/partners
+</pre>';
+$string['custommenuitems'] = 'Custom menu items (Deprecated)';
+$string['custommenu'] = 'Custom menu';
