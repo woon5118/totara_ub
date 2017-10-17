@@ -4180,7 +4180,21 @@ function facetoface_get_customfielddata($sessionid) {
     $out = [];
     $item = (object)['id' => $sessionid];
     $out['sess'] = customfield_get_data($item, 'facetoface_session', 'facetofacesession', false);
-    $out['room'] = customfield_get_data($item, 'facetoface_room', 'facetofaceroom', false);
+
+    // A session can have more than one room if there are more than one date in the session and different
+    // rooms are used on different dates
+    $rooms = facetoface_get_session_rooms($sessionid);
+    $out['room'] = array();
+    foreach ($rooms as $room) {
+        $out['room'] = array_merge_recursive($out['room'], customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false));
+    }
+
+    // We want rooms values to be in 1 comma separated string
+    foreach ($out['room'] as $key => $vals) {
+        if (is_array($vals)) {
+            $out['room'][$key] = implode(', ', $vals);
+        }
+    }
     return $out;
 }
 
