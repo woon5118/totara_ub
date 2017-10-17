@@ -8,6 +8,8 @@ information provided here is intended especially for developers.
     - following_should_exist_in_the_table
     - row_column_of_table_should_contain
 * Removed deprecated custom menu functionality
+* Changed core_renderer::maintenance_warning()
+* Deprecated maintenancemodetimer YUI module.
 
 === 10.1 ===
 

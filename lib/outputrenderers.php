@@ -380,24 +380,26 @@ class core_renderer extends renderer_base {
         if (isset($CFG->maintenance_later) and $CFG->maintenance_later > time()) {
             $timeleft = $CFG->maintenance_later - time();
             // If timeleft less than 30 sec, set the class on block to error to highlight.
-            $errorclass = ($timeleft < 30) ? 'alert-error alert-danger' : 'alert-warning';
-            $output .= $this->box_start($errorclass . ' moodle-has-zindex maintenancewarning m-a-1 alert');
+            $notifytype = ($timeleft < 30) ? \core\output\notification::NOTIFY_ERROR : \core\output\notification::NOTIFY_WARNING;
             $a = new stdClass();
             $a->hour = (int)($timeleft / 3600);
             $a->min = (int)(($timeleft / 60) % 60);
             $a->sec = (int)($timeleft % 60);
             if ($a->hour > 0) {
-                $output .= get_string('maintenancemodeisscheduledlong', 'admin', $a);
+                $notification = new \core\output\notification(get_string('maintenancemodeisscheduledlong', 'admin', $a), $notifytype);
             } else {
-                $output .= get_string('maintenancemodeisscheduled', 'admin', $a);
+                $notification = new \core\output\notification(get_string('maintenancemodeisscheduled', 'admin', $a), $notifytype);
             }
 
-            $output .= $this->box_end();
-            $this->page->requires->yui_module('moodle-core-maintenancemodetimer', 'M.core.maintenancemodetimer',
-                    array(array('timeleftinsec' => $timeleft)));
+            $notification->set_extra_classes(array('maintenancewarning'));
+            $output = $this->render($notification);
+
+            $this->page->requires->js_call_amd('core/maintenance', 'init', array($timeleft));
+
+            // Precache strings
             $this->page->requires->strings_for_js(
-                    array('maintenancemodeisscheduled', 'maintenancemodeisscheduledlong', 'sitemaintenance'),
-                    'admin');
+                array('maintenancemodeisscheduled', 'maintenancemodeisscheduledlong', 'sitemaintenance'),
+                'admin');
         }
         return $output;
     }
