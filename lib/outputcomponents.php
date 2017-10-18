@@ -576,7 +576,7 @@ class pix_icon implements renderable, templatable {
             // legacy mode
             $this->attributes['alt'] = format_string($alt);
 
-            if (empty($this->attributes['title'])) {
+            if (!isset($this->attributes['title'])) {
                 $this->attributes['title'] = format_string($alt);
             }
         }
@@ -4194,12 +4194,11 @@ class action_menu implements renderable, templatable {
             $primary->menutrigger = $this->menutrigger;
         } else {
             $primary->title = get_string('actions');
-            $actionicon = new pix_icon('t/edit_menu', '', 'moodle', ['class' => 'iconsmall actionmenu', 'title' => '']);
+            $actionicon = new pix_icon('t/edit_menu', $primary->title, 'moodle', ['class' => 'iconsmall actionmenu', 'title' => '']);
         }
 
         if ($actionicon instanceof pix_icon) {
             $primary->icon = $actionicon->export_for_pix();
-            $primary->title = !empty($actionicon->attributes['alt']) ? $this->actionicon->attributes['alt'] : '';
         } else {
             $primary->iconraw = $actionicon ? $output->render($actionicon) : '';
         }
