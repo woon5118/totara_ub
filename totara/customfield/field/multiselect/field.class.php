@@ -325,11 +325,12 @@ class customfield_multiselect extends customfield_base {
      */
     public function edit_field_set_locked(&$mform) {
         $groupbasename = 'grp_' . $this->fieldid;
-        $group = $mform->getElement($groupbasename);
 
-        if (empty($group->_elements)) {
+        if (!$mform->elementExists($groupbasename)) {
             return;
         }
+
+        $group = $mform->getElement($groupbasename);
 
         // If the group is locked then lock all the
         // items in the group.

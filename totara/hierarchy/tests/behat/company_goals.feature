@@ -82,7 +82,7 @@ Scenario: Verify custom fields can be successfully added to a company goal type 
     | Full name                   | File 1 |
     | Short name (must be unique) | file1  |
   And I press "Save changes"
-  Then I should see "Datetime 1"
+  Then I should see "File 1"
 
   # Create a menu of choices.
   When I set the field "Create a new custom field" to "Menu of choices"
