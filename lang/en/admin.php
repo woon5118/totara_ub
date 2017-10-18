@@ -1156,7 +1156,7 @@ $string['unsupporteddbfileformat'] = 'Totara requires Barracuda file format in M
 $string['unsupporteddbfilepertable'] = 'Totara requires one file per table in MySQL and MariaDB, you need to change the database settings to: innodb_file_per_table=1';
 $string['unsupporteddblargeprefix'] = 'For full support of UTF-8 both MySQL and MariaDB require you to change the database settings to: innodb_large_prefix=1';
 $string['unsupporteddbstorageengine'] = 'The database storage engine being used is no longer supported.';
-$string['unsupporteddbtablerowformat'] = 'Your database has tables using Antelope as the file format. You are recommended to convert the tables to the Barracuda file format.';
+$string['unsupporteddbtablerowformat'] = 'Your database has tables using unsupported legacy row formats. It is strongly recommended to convert all tables to supported row formats using admin/cli/mysql_compressed_rows.php CLI script.';
 $string['unsupportedphpversion7'] = 'PHP version 7.0 and higher is not supported.';
 $string['unsupportedphpversion71'] = 'PHP version 7.1 and higher is not supported.';
 $string['unsuspenduser'] = 'Activate user account';

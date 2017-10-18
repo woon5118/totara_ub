@@ -2195,7 +2195,8 @@ function check_database_storage_engine(environment_results $result) {
 function check_database_tables_row_format(environment_results $result) {
     global $DB;
 
-    if ($DB->get_dbfamily() == 'mysql') {
+    if ($DB->get_dbfamily() === 'mysql') {
+        /** @var mysql_sql_generator $generator */
         $generator = $DB->get_manager()->generator;
 
         foreach ($DB->get_tables(false) as $table) {
@@ -2203,11 +2204,17 @@ function check_database_tables_row_format(environment_results $result) {
             $size = $generator->guess_antelope_row_size($columns);
             $format = $DB->get_row_format($table);
 
-            if ($size <= $generator::ANTELOPE_MAX_ROW_SIZE) {
+            if ($format === 'Compressed') {
                 continue;
-            }
 
-            if ($format === 'Compact' or $format === 'Redundant') {
+            } else if ($format === 'Dynamic') {
+                if ($size > $generator::ANTELOPE_MAX_ROW_SIZE) {
+                    $result->setInfo('unsupported_db_table_row_format');
+                    $result->setStatus(false);
+                    return $result;
+                }
+
+            } else {
                 $result->setInfo('unsupported_db_table_row_format');
                 $result->setStatus(false);
                 return $result;
@@ -2231,7 +2238,9 @@ function check_mysql_file_format(environment_results $result) {
         return null;
     }
 
-    if ($DB->get_row_format() !== "Barracuda") {
+    /** @var mysqli_native_moodle_database $DB */
+
+    if ($DB->get_file_format() !== "Barracuda") {
         $result->setStatus(false);
         return $result;
     }

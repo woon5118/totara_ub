@@ -88,7 +88,7 @@ class mysql_sql_generator extends sql_generator {
     /** @var string SQL sentence to rename one key 'TABLENAME', 'OLDKEYNAME' and 'NEWKEYNAME' are dynamically replaced.*/
     public $rename_key_sql = null;
 
-    /** Maximum size of InnoDB row in Antelope file format */
+    /** Maximum size of InnoDB row in Antelope file format, this is now abused to decide if we should use Compressed or Dynamic row format */
     const ANTELOPE_MAX_ROW_SIZE = 8126;
 
     /** @var array cache of snapshot table infos for PHPUnit */
@@ -130,6 +130,7 @@ class mysql_sql_generator extends sql_generator {
 
     /**
      * Calculate proximate row size when using InnoDB tables in Antelope row format.
+     * Totara: This is now abused to decide if we should use Compressed or Dynamic row format
      *
      * Note: the returned value is a bit higher to compensate for errors and changes of column data types.
      *
@@ -214,16 +215,11 @@ class mysql_sql_generator extends sql_generator {
         $collation = $this->mdb->get_dbcollation();
 
         // Do we need to use compressed format for rows?
-        $rowformat = "";
+        $rowformat = "\n ROW_FORMAT=Dynamic"; // Totara: we need at least dynamic, this is fine because Barracuda is required now.
         $size = $this->guess_antelope_row_size($xmldb_table->getFields());
         if ($size > self::ANTELOPE_MAX_ROW_SIZE) {
-            if ($this->mdb->is_compressed_row_format_supported()) {
-                $rowformat = "\n ROW_FORMAT=Compressed";
-            }
+            $rowformat = "\n ROW_FORMAT=Compressed";
         }
-
-        $utf8mb4rowformat = $this->mdb->get_row_format_sql($engine, $collation);
-        $rowformat = ($utf8mb4rowformat == '') ? $rowformat : $utf8mb4rowformat;
 
         $sqlarr = parent::getCreateTableSQL($xmldb_table);
 
@@ -312,12 +308,9 @@ class mysql_sql_generator extends sql_generator {
             $size += $this->guess_antelope_row_size(array($xmldb_field));
 
             if ($size > self::ANTELOPE_MAX_ROW_SIZE) {
-                if ($this->mdb->is_compressed_row_format_supported()) {
-                    $format = strtolower($this->mdb->get_row_format($tablename));
-                    if ($format === 'compact' or $format === 'redundant') {
-                        // Change the format before conversion so that we do not run out of space.
-                        array_unshift($sqls, "ALTER TABLE {$this->prefix}$tablename ROW_FORMAT=Compressed");
-                    }
+                if ($this->mdb->get_row_format($tablename) !== 'Compressed') {
+                    // Change the format before conversion so that we do not run out of space.
+                    array_unshift($sqls, "ALTER TABLE {$this->prefix}$tablename ROW_FORMAT=Compressed");
                 }
             }
         }

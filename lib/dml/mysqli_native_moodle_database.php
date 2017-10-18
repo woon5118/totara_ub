@@ -39,8 +39,6 @@ class mysqli_native_moodle_database extends moodle_database {
 
     /** @var mysqli $mysqli */
     protected $mysqli = null;
-    /** @var bool is compressed row format supported cache */
-    protected $compressedrowformatsupported = null;
 
     private $transactions_supported = null;
 
@@ -224,15 +222,16 @@ class mysqli_native_moodle_database extends moodle_database {
     }
 
     /**
-     * Get expected database charset.
+     * Get expected database charset for current db collation.
      *
-     * NOTE: utf8 is the default, in Totara admins must set a utf8mb4 collation in config.php
-     *       before installation if they want to use full unicode in MySQL database.
+     * NOTE: only utf8 and utf8mb4 charsets are supported,
+     *       so watch out if used for external database connections.
      *
      * @return string
      */
     public function get_charset() {
-        if (isset($this->dboptions['dbcollation']) and strpos($this->dboptions['dbcollation'], 'utf8mb4_') === 0) {
+        $dbcollation = $this->get_dbcollation();
+        if (strpos($dbcollation, 'utf8mb4_') === 0) {
             return 'utf8mb4';
         } else {
             return 'utf8';
@@ -242,20 +241,36 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Returns the current MySQL db collation.
      *
-     * This is an ugly workaround for MySQL default collation problems.
+     * The order of detection is:
+     *  1/ $CFG->dboptions['dbcollation'] value
+     *  2/ collation of the 'config' table
+     *  3/ default collation of current database
+     *  4/ default server collation
      *
-     * @return string or null MySQL collation name
+     * NOTE: the results are cached in $this->dboptions['dbcollation']
+     *
+     * @return string MySQL collation name
      */
     public function get_dbcollation() {
         if (isset($this->dboptions['dbcollation'])) {
             return $this->dboptions['dbcollation'];
         }
-        if ($this->external) {
-            return null;
-        }
 
         $collation = null;
-        $charset = $this->get_charset();
+
+        if ($this->external) {
+            // Totara: Get the default database collation,
+            // if it is not utf8 compatible things may fail pretty badly - bad luck.
+            $sql = "SELECT @@collation_database";
+            $this->query_start($sql, NULL, SQL_QUERY_AUX);
+            $result = $this->mysqli->query($sql);
+            $this->query_end($result);
+            if ($rec = $result->fetch_assoc()) {
+                $collation = $rec['@@collation_database'];
+            }
+            $result->close();
+            return $collation;
+        }
 
         // Look for current collation of our config table (the first table that gets created),
         // so that we create all tables with the same collation.
@@ -265,22 +280,22 @@ class mysqli_native_moodle_database extends moodle_database {
         $this->query_end($result);
         if ($rec = $result->fetch_assoc()) {
             $collation = $rec['Collation'];
-            if (strpos($collation, $charset . '_') !== 0) {
-                // We cannot continue, admin needs to fix config.php!
-                throw new moodle_exception("Unexpected collation '{$collation}' detected in the config table, admin needs to add it to config.php dbcollation setting and verify all existing database tables");
+            if (strpos($collation, 'utf8') !== 0) {
+                // We cannot continue, admin needs to fix the database!
+                throw new moodle_exception("Unsupported collation '{$collation}' detected in the config table!");
             }
         }
         $result->close();
 
 
         if (!$collation) {
-            // Get the default database collation, but only if using UTF-8.
+            // Get the default database collation, but only if using utf8 or utf8mb4 compatible collations.
             $sql = "SELECT @@collation_database";
             $this->query_start($sql, NULL, SQL_QUERY_AUX);
             $result = $this->mysqli->query($sql);
             $this->query_end($result);
             if ($rec = $result->fetch_assoc()) {
-                if (strpos($rec['@@collation_database'], $charset . '_') === 0) {
+                if (strpos($rec['@@collation_database'], 'utf8') === 0) {
                     $collation = $rec['@@collation_database'];
                 }
             }
@@ -288,9 +303,9 @@ class mysqli_native_moodle_database extends moodle_database {
         }
 
         if (!$collation) {
-            // We want only utf8 compatible collations.
+            // We want only utf8 or utf8mb4 compatible collations.
             $collation = null;
-            $sql = "SHOW COLLATION WHERE Collation LIKE '{$charset}\_%' AND Charset = '{$charset}'";
+            $sql = "SHOW COLLATION WHERE Collation LIKE 'utf8%'";
             $this->query_start($sql, NULL, SQL_QUERY_AUX);
             $result = $this->mysqli->query($sql);
             $this->query_end($result);
@@ -304,6 +319,11 @@ class mysqli_native_moodle_database extends moodle_database {
             $result->close();
         }
 
+        if (!$collation) {
+            // Totara: we need to always return something valid so that we can perform installation.
+            $collation = 'utf8_unicode_ci';
+        }
+
         // Cache the result to improve performance.
         $this->dboptions['dbcollation'] = $collation;
         return $collation;
@@ -315,7 +335,27 @@ class mysqli_native_moodle_database extends moodle_database {
      * @param string $table
      * @return string row_format name or null if not known or table does not exist.
      */
-    public function get_row_format($table = null) {
+    public function get_row_format($table) {
+        $rowformat = null;
+        $table = $this->mysqli->real_escape_string($table);
+        $sql = "SHOW TABLE STATUS WHERE Name = '{$this->prefix}$table'";
+        $this->query_start($sql, NULL, SQL_QUERY_AUX);
+        $result = $this->mysqli->query($sql);
+        $this->query_end($result);
+        if ($rec = $result->fetch_assoc()) {
+            $rowformat = $rec['Row_format'];
+        }
+        $result->close();
+
+        return $rowformat;
+    }
+
+    /**
+     * Get the InnoDB file format used in database.
+     *
+     * @return string returns innodb_file_format
+     */
+    public function get_file_format() {
         $info = $this->get_server_info();
         if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0', '>')) {
             // Totara: MySQL 8 supports only new file formats.
@@ -326,26 +366,17 @@ class mysqli_native_moodle_database extends moodle_database {
             return 'Barracuda';
         }
 
-        $rowformat = null;
-        if (isset($table)) {
-            $table = $this->mysqli->real_escape_string($table);
-            $sql = "SHOW TABLE STATUS WHERE Name = '{$this->prefix}$table'";
-        } else {
-            $sql = "SHOW VARIABLES LIKE 'innodb_file_format'";
-        }
+        $fileformat = null;
+        $sql = "SHOW VARIABLES LIKE 'innodb_file_format'";
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
         $this->query_end($result);
         if ($rec = $result->fetch_assoc()) {
-            if (isset($table)) {
-                $rowformat = $rec['Row_format'];
-            } else {
-                $rowformat = $rec['Value'];
-            }
+            $fileformat = $rec['Value'];
         }
         $result->close();
 
-        return $rowformat;
+        return $fileformat;
     }
 
     /**
@@ -353,45 +384,14 @@ class mysqli_native_moodle_database extends moodle_database {
      * This feature is necessary for support of large number of text
      * columns in InnoDB/XtraDB database.
      *
+     * @deprecated since Totara 10.2
+     *
      * @param bool $cached use cached result
      * @return bool true if table can be created or changed to compressed row format.
      */
     public function is_compressed_row_format_supported($cached = true) {
-        if ($cached and isset($this->compressedrowformatsupported)) {
-            return($this->compressedrowformatsupported);
-        }
-
-        $engine = strtolower($this->get_dbengine());
-        $info = $this->get_server_info();
-
-        if ($this->get_dbvendor() === 'mysql' and version_compare($info['version'], '8.0', '>')) {
-            // Totara: MySQL 8 supports only new file formats.
-            $this->compressedrowformatsupported = ($engine === 'innodb' or $engine === 'xtradb');
-
-        } else if ($this->get_dbvendor() === 'mariadb' and version_compare($info['version'], '10.3', '>')) {
-            // Totara: MariaDB 10.3 supports only new file formats.
-            $this->compressedrowformatsupported = ($engine === 'innodb' or $engine === 'xtradb');
-
-        } else if (version_compare($info['version'], '5.5.0') < 0) {
-            // MySQL 5.1 is not supported here because we cannot read the file format.
-            $this->compressedrowformatsupported = false;
-
-        } else if ($engine !== 'innodb' and $engine !== 'xtradb') {
-            // Other engines are not supported, most probably not compatible.
-            $this->compressedrowformatsupported = false;
-
-        } else if (!$this->is_file_per_table_enabled()) {
-            $this->compressedrowformatsupported = false;
-
-        } else if ($this->get_row_format() !== 'Barracuda') {
-            $this->compressedrowformatsupported = false;
-
-        } else {
-            // All the tests passed, we can safely use ROW_FORMAT=Compressed in sql statements.
-            $this->compressedrowformatsupported = true;
-        }
-
-        return $this->compressedrowformatsupported;
+        // Totara: we require database that supports Compressed and Dynamic row formats, this is tested in environment.
+        return true;
     }
 
     /**
@@ -448,30 +448,14 @@ class mysqli_native_moodle_database extends moodle_database {
      * be either dynamic or compressed (default is compact) in order to allow for bigger indexes (MySQL
      * errors #1709 and #1071).
      *
+     * @deprecated since Totara 10.2
+     *
      * @param  string $engine The database engine being used. Will be looked up if not supplied.
      * @param  string $collation The database collation to use. Will look up the current collation if not supplied.
      * @return string An sql fragment to add to sql statements.
      */
     public function get_row_format_sql($engine = null, $collation = null) {
-
-        if (!isset($engine)) {
-            $engine = $this->get_dbengine();
-        }
-        $engine = strtolower($engine);
-
-        if (!isset($collation)) {
-            $collation = $this->get_dbcollation();
-        }
-
-        $rowformat = '';
-        if (($engine === 'innodb' || $engine === 'xtradb') && strpos($collation, 'utf8mb4_') === 0) {
-            if ($this->is_compressed_row_format_supported()) {
-                $rowformat = "ROW_FORMAT=Compressed";
-            } else {
-                $rowformat = "ROW_FORMAT=Dynamic";
-            }
-        }
-        return $rowformat;
+        return "ROW_FORMAT=Compressed";
     }
 
     /**

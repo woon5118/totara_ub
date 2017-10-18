@@ -64,7 +64,9 @@ $CFG->dboptions = array(
                                 // If you set those in the database then
                                 // the advanced settings will not be sent.
 );
-// Uncomment the following option if you need to have full UTF-8 support on MySQL or MariaDB.
+// If you need to have full UTF-8 support on MySQL or MariaDB
+// make sure the database has appropriate utf8mb4 collation before
+// you start installation or uncomment the following option:
 //    $CFG->dboptions['dbcollation'] = 'utf8mb4_unicode_ci';
 
 

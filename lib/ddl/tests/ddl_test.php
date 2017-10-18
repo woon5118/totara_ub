@@ -555,23 +555,10 @@ class core_ddl_testcase extends database_driver_testcase {
         }
         $dbman->create_table($table);
 
-        try {
-            $id = $DB->insert_record('test_innodb', $data);
-            $expected = (array)$data;
-            $expected['id'] = (string)$id;
-            $this->assertEquals($expected, (array)$DB->get_record('test_innodb', array('id' => $id)), '', 0, 10, true);
-        } catch (dml_exception $e) {
-            // Give some nice error message when known problematic MySQL with InnoDB detected.
-            if ($DB->get_dbfamily() === 'mysql') {
-                $engine = strtolower($DB->get_dbengine());
-                if ($engine === 'innodb' or $engine === 'xtradb') {
-                    if (!$DB->is_compressed_row_format_supported()) {
-                        $this->fail("Row size limit reached in MySQL using InnoDB, configure server to use innodb_file_format=Barracuda and innodb_file_per_table=1");
-                    }
-                }
-            }
-            throw $e;
-        }
+        $id = $DB->insert_record('test_innodb', $data);
+        $expected = (array)$data;
+        $expected['id'] = (string)$id;
+        $this->assertEquals($expected, (array)$DB->get_record('test_innodb', array('id' => $id)), '', 0, 10, true);
 
         $dbman->drop_table($table);
 
