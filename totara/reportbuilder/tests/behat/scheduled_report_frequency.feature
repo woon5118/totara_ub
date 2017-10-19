@@ -55,7 +55,7 @@ Feature: Test scheduled reports with new frequency setting
     And I set the field "externalemailsgrp[emailexternals]" to "user1@example.com"
     And I click on "Add email" "button"
     When I press "Save changes"
-    Then I should see "Daily at 10:00 am"
+    Then I should see "Daily at 10:00 AM"
     And I log out
 
     # Change new capability to allow for the user
