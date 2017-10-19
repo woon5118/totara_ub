@@ -3368,7 +3368,7 @@ function update_user_login_times() {
  * @return bool
  */
 function user_not_fully_set_up($user) {
-    global $CFG;
+    global $CFG, $SESSION, $USER;
     require_once($CFG->dirroot.'/user/profile/lib.php');
 
     if (isguestuser($user)) {
@@ -3383,8 +3383,20 @@ function user_not_fully_set_up($user) {
         return false;
     }
 
+    $iscurrentuser = ($user->id == $USER->id);
+
+    if ($iscurrentuser && isset($SESSION->profile_custom_field_setup_passed)) {
+        // TOTARA: Its the current user and we've already completed the profile field setup test.
+        return false;
+    }
+
     if (!profile_has_required_custom_fields_set($user->id)) {
         return true;
+    }
+
+    if ($iscurrentuser) {
+        // TOTARA: If its the current user then record that we've passed the custom field setup test already.
+        $SESSION->profile_custom_field_setup_passed = true;
     }
 
     return false;
