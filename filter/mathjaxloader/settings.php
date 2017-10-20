@@ -46,7 +46,7 @@ if ($ADMIN->fulltree) {
     $default = '
 MathJax.Ajax.config.path["Contrib"] = "{wwwroot}/filter/mathjaxloader/contrib";
 MathJax.Hub.Config({
-    config: ["default.js", "MMLorHTML.js", "Safe.js"],
+    config: ["Accessible.js", "Safe.js"],
     errorSettings: { message: ["!"] },
     skipStartupTypeset: true,
     messageStyle: "none"
