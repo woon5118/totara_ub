@@ -294,4 +294,14 @@ class data_field_textarea extends data_field_base {
         return content_to_text($content->content, $content->content1);
     }
 
+    /**
+     * Custom export for text area that converts html to plain
+     * text
+     *
+     * @param object $record
+     * @return String formatted result
+     */
+    public function export_text_value($record) {
+        return html_to_text($record->content);
+    }
 }
