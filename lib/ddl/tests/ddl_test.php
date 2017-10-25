@@ -2233,8 +2233,6 @@ class core_ddl_testcase extends database_driver_testcase {
 
             switch ($dbfamily) {
                 case 'mysql':
-                    $this->assertSame("`$columnname`", $gen->getEncQuoted($columnname));
-                    break;
                 case 'mssql': // The Moodle connection runs under 'QUOTED_IDENTIFIER ON'.
                 case 'oracle':
                 case 'postgres':
