@@ -3,6 +3,223 @@
 
 Totara LMS Changelog
 
+Release Evergreen (27th October 2017):
+======================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-16017       Issues from Moodle 3.2.5 have been included
+    TL-16313       Release packages are now provided through https://subscriptions.totara.community/
+
+                   Release packages are no longer being provided through FetchApp, and can now
+                   be accessed through our new Subscription system at
+                   https://subscriptions.totara.community/.
+
+                   If you experience any problems accessing packages through this system
+                   please open a support request and let us know.
+
+                   Please note that SHA1 checksums for previous Evergreen releases will be
+                   different from those provided in the changelog notes at the time of
+                   release.
+                   The reason for this is that we changed the name of the root directory
+                   within the package archives to ensure it is consistent across all products.
+
+Security issues:
+
+    TL-12466       Corrected access restrictions on 360° Feedback files
+
+                   Previously, users may have been able to access 360° Feedback files when
+                   they did not have access to the corresponding 360° Feedback itself. This
+                   will have included users who were not logged in. To do this, the user would
+                   have needed to correctly guess the URL for the file. The access
+                   restrictions on these files have now been fixed.
+
+Performance improvement:
+
+    TL-16061       Fixed a problem where duplicating a module caused the course cache to be rebuilt twice
+    TL-16161       Reduced load times for the course and category management page when using audience visibility
+
+Improvements:
+
+    TL-8723    +   Updated text area custom field to display hyphen when the field is locked and empty
+    TL-11296       Added accessible text when creating/editing profile fields and categories
+    TL-12650       Removed HTML table when viewing the print book page
+    TL-14936       Added a report setting to control the minimum allowed time for scheduled reports
+    TL-15835       Made some minor improvements to program and certification completion editors
+
+                   Changes included:
+                    * Improved formatting of date strings in the transaction interface and
+                   logs.
+                    * Fixed some inaccurate error messages when faults might occur.
+                    * The program completion editor will now correctly default to the
+                   "invalid" state when there is a problem with the record.
+
+    TL-15871   +   Force users to complete required user profile fields upon login
+
+                   The users will be forced during the login to complete any user profile
+                   fields that have been set as required and have not yet been completed for
+                   that user.
+
+    TL-15913       Greatly improved the display of the progress bar component and improved the quality of the CSS
+    TL-16007   +   Converted warning messages in HR Import to use the notification API
+    TL-16069       Improved alignment of question bank table headings
+    TL-16170       Externally accessible badge check now uses the correct notify_warning template
+    TL-16198       Fixed known problems with MySQL 8.0.3RC
+    TL-16260       Invalid request to force password change is automatically deleted if auth plugin does not support changing of passwords
+
+Bug fixes:
+
+    TL-11085       Improved location of help icon when adding a recurring course to a program
+    TL-15846       Removed an incorrectly displayed sidebar report filters dropdown from the Basis theme
+    TL-15885       Fixed Navigation block problems with course visibility
+    TL-15923       Fixed duplicate calendar records for  wait-list user calendar
+    TL-15932       Fixed problem of SCORM window size cutting off content
+    TL-15997       Fixed saving of new/changed Seminar direct enrolment custom fields
+    TL-16124       Fixed Seminar booking confirmation sent to manager when no approval required
+    TL-16186       Improved display of icons within bootstrap labels
+    TL-16206       Added validation in HR Import to check job assignment useridnumber matches a user idnumber when importing data
+    TL-16212       Fixed issue where self completion from within a certificate activity may complete a different activity
+    TL-16215       Role assignments granted through the enrol_cohort plugin are now deleted if the plugin is disabled
+
+                   Previously when the cohort enrolment plugin instance was disabled, the
+                   roles for the affected users were not deleted from the {{role_assignments
+                   table}} even though the log messages seemed to indicate this was the case.
+                   This has been corrected with this patch.
+
+                   Note the deletion behavior has always been correct in the original code
+                   when the cohort enrolment plugin itself was disabled, However, it needs the
+                   cohort enrolment task to be run first (every hour by default) to physically
+                   delete the records from the table.
+
+    TL-16223       Fixed a typo in the "cancellationcutoff" session variable
+    TL-16224       Prevented orphaned program exceptions from occurring
+
+                   It was possible for program and certification exceptions to become orphaned
+                   - no exception showed in the "Exception report" tab, but users were
+                   treated as having an exception and were being prevented from progressing.
+                   The cause of this problem has now been fixed. After upgrade, use the
+                   program and certification completion checkers to identify any records in
+                   this state and fix them using one of the two available automated fixes
+                   (which were added in TL-15891, in the previous release of Totara).
+
+    TL-16238       Fixed warnings when running HR Import with Organisation and Position sources
+
+                   If "Source contains all records" was set to yes and the deleted columns was
+                   included in the uploaded CSV file then warnings would be shown if debugging
+                   was enabled. This did not effect the functionality and HR Import still
+                   finished successfully when this occurred.
+
+    TL-16242       Scorm loading placeholders are now displayed correctly in RTL languages
+    TL-16248       Added an is_array condition for json_decode alt string in the pix_icon class
+    TL-16250       Replaced an incorrect usage of the pix_icon template
+    TL-16254       Fixed automated course backup not taking audience-based visibility into account
+    TL-16258       Fixed uniqueness checks for certification completion history
+
+                   Certification completion history records should always be a unique
+                   combination of user, certification, expiry date and completion date.
+
+                   Completion import adhered to this rule, however the process of copying a
+                   certification completion to history when the certification window opened
+                   did not take the completion date into account. This led to overwriting of
+                   the completion date if a history record had a matching expiry date but
+                   different completion date. This could also lead to errors during the Update
+                   certifications scheduled task.
+
+                   The correct uniqueness rule has been applied consistently to prevent the
+                   above behaviour.
+
+    TL-16261       Added missing link to specialised customfield less within the Roots theme
+    TL-16267       Fixed permissions error when accessing SCORM activities as a guest
+    TL-16274       Fixed an issue when updating user Forum preferences when user's username contains uppercase characters
+    TL-16279       Added additional checks when displaying and validating self completion from within an activity
+    TL-16288       Checkbox and radio options lists no longer have bold input labels
+    TL-16289       Fixed course completion editor link requiring incorrect capability
+
+                   The link no longer requires the 'moodle/course:update' capability. It now
+                   only requires the 'totara/completioneditor:editcoursecompletion'
+                   capability.
+
+    TL-16291       Fixed course progress display for courses with disabled completion tracking
+    TL-16292       Fixed saving of seminar custom fields for all users
+    TL-16301       Fixed calendar filtering on seminar room fields
+    TL-16392       Fixed namespace of activity completion form
+
+Miscellaneous Moodle fixes:
+
+    TL-16019       MDL-58332: Fixed error when toggling the notification menu in MSSQL
+
+                   When toggling the notification menu in MSSQL an exception would sometimes
+                   be thrown.
+
+    TL-16020       MDL-59317: Improved the loading speed of the Messages page
+    TL-16021       MDL-52501: Fixed graded assignments with missing submission records on course restoration
+    TL-16025       MDL-59431: Added an error log message when an AMD module cannot be loaded.
+    TL-16026       MDL-59363: Fixed naming of learners when browsing submitted workshop files
+    TL-16027       MDL-54965: Fixed an SQL error when editing a database activity entry after having added a new picture/file field
+    TL-16029       MDL-59371: Fixed capabilities allowing default roles to access the Grades Overview report
+    TL-16030       MDL-55979: Fixed an error when moving the last quiz question from the last page
+    TL-16031       MDL-55912: Set grader details to the correct user
+    TL-16035       MDL-59377: Fixed embedded image display in activity descriptions on course page
+    TL-16036       MDL-58119: The send_stored_file() function now relies on the send_file() function
+    TL-16037       MDL-59527: Fixed race condition when using autocomplete forms
+    TL-16038       MDL-59411: When an activity is restricted and student follows a URL Totara should display why it is restricted
+    TL-16041       MDL-59109: Auto commit SCORM package setting now import properly from a backup
+    TL-16042       MDL-39471: Fixed comment visibility when blind marking
+    TL-16043       MDL-59255: Added support for rtmp URLs in core_media_manager
+    TL-16045       MDL-59490: Fixed LTI failures due to the resource title being wrapped during communication
+    TL-16047       MDL-38129: Fixed a case sensitive failure with user profile fields when using grade export
+    TL-16051       MDL-59485: Added missing LTI capabilities
+    TL-16055       MDL-58744: Ensured Sticky block region can be overridden
+    TL-16056       MDL-58196: Fixed activity restriction based on required passing grade
+    TL-16059       MDL-57546: Added YouTube mobile URL support to media filter
+    TL-16063       MDL-59473: Fixed Oauth2 Token response causing a redirection loop
+    TL-16064       MDL-58928: Added missing ALT attribute on Enrollment "edit" and "delete" icons
+    TL-16066       MDL-55364: Improved display of forum discussions table at low resolutions
+    TL-16067       MDL-57259: Fixed debug error created by missing set_url() within get_fragment() of the core_external class
+    TL-16071       MDL-59662: Fixed typo in mysql_collation CLI script
+    TL-16072       MDL-51745: Fixed lesson feedback not using format_text
+    TL-16073       MDL-59055: Fixed the incorrect display of manual grade
+    TL-16075       MDL-59172: Removed redundant permissions check to moodle/user:viewalldetails
+    TL-16077       MDL-59506: Fixed issue with unavailable DB lock factory during installation
+    TL-16078       MDL-59737: Changed domain for anonymised users from doesntexist.com to doesntexist.invalid
+    TL-16079       MDL-57188: Added missing call to $PAGE->set_url in the course management interface
+    TL-16081       MDL-59785: Fixed TOC style Book navigation not marking user complete
+    TL-16082       MDL-57611: Fixed capabilities for viewing logs on User's profiles
+
+                   The capabilities report/log:view and report/log:viewtoday now control
+                   access to the correct reports.
+
+    TL-16084       MDL-58435: Fixed behat edit section step to work with section 0
+    TL-16085       MDL-59836: Fixed autocomplete form element sometimes showing 'No suggestions' before showing correct results
+    TL-16087       MDL-55937: Fixed error message when viewing on group submissions by plugin
+    TL-16088       MDL-57246: Fixed redirection after attempting to view a forum without permissions
+    TL-16089       MDL-59893: Fixed file prefixes in assignment download submissions
+    TL-16090       MDL-57775: Fixed encoding errors in the XML-RPC client
+    TL-16092       MDL-59826: Added context information to the user profile page
+    TL-16093       MDL-59784: Refactored the addblock link to listen earlier
+    TL-16094       MDL-59663: Fixed the Expand all link in the front page combo list widget when all categories expanded
+    TL-16095       MDL-51827: When users confirm their own self-registration, they are now taken to a page that advises this was successful
+    TL-16096       MDL-57412: Fixed course section headers to respect the 'Always link course sections' site setting
+    TL-16097       MDL-59790: Fixed data label in chart tooltips
+    TL-16099       MDL-59708: Added hooks to file API
+    TL-16101       MDL-35290: Fixed bug preventing access to all private files if one file is missing
+    TL-16102       MDL-56646: Fixed assignment grade rescaling not working correctly with empty grades
+    TL-16103       MDL-59908: Course backups now parse both http and https links
+    TL-16104       MDL-59195: Fixed error after using 'Switch to rule' and viewing assignments
+    TL-16106       MDL-53936: Fixed URL when navigating within course completion report in course administration
+    TL-16107       MDL-59963: Report > Logs pages now correctly set the origin parameter upon pagination
+    TL-16109       MDL-59834: Fixed errors when global search tries to index message data for deleted users
+    TL-16110       MDL-59815: Fixed definition of risks for user:delete
+    TL-16111       MDL-59992: Fixed issue with invalid web service token causing errors in web server logs
+    TL-16113       MDL-59198: Fixed compatibility with LTI version 2
+
+Contributions:
+
+    * Nicholas Hoobin at Catalyst AU - TL-16212
+
+
 Release 10.0 (22nd September 2017):
 ===================================
 
