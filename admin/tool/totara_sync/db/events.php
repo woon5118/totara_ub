@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package totara
- * @subpackage customfield
+ * @author Alastair Munro <alastair.munro@totaralearning.com>
+ * @package tool_totara_sync
  */
 
-defined('MOODLE_INTERNAL') || die();
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');
+}
 
-$plugin->version  = 2017102701;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_customfield';   // To check on upgrade, that module sits in correct place
+$observers = array(
+    array(
+        'eventname' => '\totara_customfield\event\profilefield_updated',
+        'callback' => '\tool_totara_sync\observer::profilefield_updated',
+    ),
+);
