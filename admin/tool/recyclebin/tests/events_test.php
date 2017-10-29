@@ -121,10 +121,15 @@ class tool_recyclebin_events_testcase extends advanced_testcase {
         $sink = $this->redirectEvents();
         $rb->restore_item($item);
         $events = $sink->get_events();
-        $event = $events[6];
+        foreach($events as $event) {
+            if ($event instanceof \tool_recyclebin\event\category_bin_item_restored) {
+                // $event is now equal to the array element we are interested in.
+                break;
+            }
+        }
 
         // Check that the event contains the expected values.
-        $this->assertInstanceOf('\tooL_recyclebin\event\category_bin_item_restored', $event);
+        $this->assertInstanceOf('\tool_recyclebin\event\category_bin_item_restored', $event);
         $this->assertEquals(context_coursecat::instance($course->category), $event->get_context());
         $this->assertEquals($item->id, $event->objectid);
         $this->assertEventContextNotUsed($event);

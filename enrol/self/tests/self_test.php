@@ -723,4 +723,116 @@ class enrol_self_testcase extends advanced_testcase {
         $contact = $selfplugin->get_welcome_email_contact(ENROL_SEND_EMAIL_FROM_NOREPLY, $context);
         $this->assertEquals($noreplyuser, $contact);
     }
+
+    /**
+     * Restores a course that only has the default, disabled self-enrolment when you
+     * create a course.
+     */
+    public function test_restore_user_enrolment_default_instance() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        set_config('categorybinenable', 1, 'tool_recyclebin');
+        $course = $this->getDataGenerator()->create_course(array('fullname' => 'Test course'));
+
+        $instances = enrol_get_instances($course->id, false);
+
+        $countselfenrol = 0;
+        foreach($instances as $instance) {
+            if ($instance->enrol === 'self') {
+                $countselfenrol++;
+                $this->assertSame(ENROL_INSTANCE_DISABLED, (int)$instance->status);
+            }
+        }
+        $this->assertSame(1, $countselfenrol);
+
+        delete_course($course, false);
+
+        $this->assertFalse($DB->get_record('course', array('fullname' => 'Test course')));
+
+        $recyclebin = new \tool_recyclebin\category_bin($course->category);
+        foreach ($recyclebin->get_items() as $item) {
+            $recyclebin->restore_item($item);
+        }
+
+        $restoredcourse = $DB->get_record('course', array('fullname' => 'Test course'));
+
+        // This should happen anyway, but just confirms that we must not be finding left over enrol instances
+        // if the course id is different.
+        $this->assertNotEquals($course->id, $restoredcourse->id);
+
+        $instances = enrol_get_instances($restoredcourse->id, false);
+
+        $countselfenrol = 0;
+        foreach($instances as $instance) {
+            if ($instance->enrol === 'self') {
+                $countselfenrol++;
+                $this->assertSame(ENROL_INSTANCE_DISABLED, (int)$instance->status);
+            }
+        }
+        $this->assertSame(1, $countselfenrol);
+    }
+
+    /**
+     * Restores a course where the self-enrolment instance was enabled and a user was enrolled to the
+     * course via that method.
+     */
+    public function test_restore_user_enrolment_enrolled_users() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        set_config('categorybinenable', 1, 'tool_recyclebin');
+        $course = $this->getDataGenerator()->create_course(array('fullname' => 'Test course'));
+        $user = $this->getDataGenerator()->create_user();
+
+        $instances = enrol_get_instances($course->id, false);
+
+        foreach($instances as $instance) {
+            if ($instance->enrol === 'self') {
+                break;
+            }
+        }
+        $selfenrol = new enrol_self_plugin();
+
+        // Enable this enrolment type for this course and enrol our user.
+        $selfenrol->update_status($instance, ENROL_INSTANCE_ENABLED);
+        $selfenrol->enrol_user($instance, $user->id);
+
+        // Make sure the user is now enrolled and is using thay instance.
+        $enrolments = core_enrol_get_all_user_enrolments_in_course($user->id, $course->id);
+        $this->assertCount(1, $enrolments);
+        $this->assertSame('self', reset($enrolments)->enrol);
+
+        delete_course($course, false);
+
+        $this->assertFalse($DB->get_record('course', array('fullname' => 'Test course')));
+
+        $recyclebin = new \tool_recyclebin\category_bin($course->category);
+        foreach ($recyclebin->get_items() as $item) {
+            $recyclebin->restore_item($item);
+        }
+
+        $restoredcourse = $DB->get_record('course', array('fullname' => 'Test course'));
+
+        // This should happen anyway, but just confirms that we must not be finding left over enrol instances
+        // if the course id is different.
+        $this->assertNotEquals($course->id, $restoredcourse->id);
+
+        $instances = enrol_get_instances($restoredcourse->id, false);
+
+        $countselfenrol = 0;
+        foreach($instances as $instance) {
+            if ($instance->enrol === 'self') {
+                $countselfenrol++;
+                // This enrolment instance was enabled before the course was deleted.
+                $this->assertSame(ENROL_INSTANCE_ENABLED, (int)$instance->status);
+            }
+        }
+        $this->assertSame(1, $countselfenrol);
+
+        // A user was assigned via the self enrolment method before deletion. Check they've been returned to that state.
+        $enrolments = core_enrol_get_all_user_enrolments_in_course($user->id, $restoredcourse->id);
+        $this->assertCount(1, $enrolments);
+        $this->assertSame('self', reset($enrolments)->enrol);
+    }
 }

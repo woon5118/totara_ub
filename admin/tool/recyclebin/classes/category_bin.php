@@ -215,23 +215,16 @@ class category_bin extends base_bin {
         $fb = get_file_packer('application/vnd.moodle.backup');
         $fb->extract_to_pathname($file, $fulltempdir);
 
-        // Build a course.
-        $course = new \stdClass();
-        $course->category = $this->_categoryid;
-        $course->shortname = $item->shortname;
-        $course->fullname = $item->fullname;
-        $course->summary = '';
-
-        // Create a new course.
-        $course = create_course($course);
-        if (!$course) {
+        // Create a new skeleton course.
+        $courseid = \restore_dbops::create_new_course($item->fullname, $item->shortname, $this->_categoryid);
+        if (!$courseid) {
             throw new \moodle_exception("Could not create course to restore into.");
         }
 
         // Define the import.
         $controller = new \restore_controller(
             $tempdir,
-            $course->id,
+            $courseid,
             \backup::INTERACTIVE_NO,
             \backup::MODE_GENERAL,
             $user->id,
@@ -248,7 +241,7 @@ class category_bin extends base_bin {
                 fulldelete($fulltempdir);
 
                 // Delete the course we created.
-                delete_course($course, false);
+                delete_course($courseid, false);
 
                 echo $OUTPUT->header();
                 $backuprenderer = $PAGE->get_renderer('core', 'backup');
