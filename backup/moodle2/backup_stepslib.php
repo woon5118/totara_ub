@@ -2540,11 +2540,11 @@ class backup_course_completion_structure_step extends backup_structure_step {
         $criteriacompletions = new backup_nested_element('course_completion_crit_completions');
 
         $criteriacomplete = new backup_nested_element('course_completion_crit_compl', array('id'), array(
-            'criteriaid', 'userid', 'gradefinal', 'unenrolled', 'timecompleted'
+            'criteriaid', 'userid', 'gradefinal', 'unenrolled', 'timecompleted', 'rpl'
         ));
 
         $coursecompletions = new backup_nested_element('course_completions', array('id'), array(
-            'userid', 'course', 'timeenrolled', 'timestarted', 'timecompleted', 'reaggregate', 'status'
+            'userid', 'course', 'timeenrolled', 'timestarted', 'timecompleted', 'reaggregate', 'status', 'rpl', 'rplgrade'
         ));
 
         $coursecompletionhistory = new backup_nested_element('course_completion_history', array('id'), array(

@@ -322,6 +322,116 @@ class core_course_restore_testcase extends advanced_testcase {
         $this->assertEquals($c2->summaryformat, $restored->summaryformat);
     }
 
+    // TOTARA - Test rpl is correctly backed up and restored.
+    public function test_restore_course_completion_data() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator();
+        $completion_generator = $this->getDataGenerator()->get_plugin_generator('core_completion');
+
+        // Set up some courses.
+        $c1 = $generator->create_course(['shortname' => 'origin', 'fullname' => 'Original Course', 'summary' => 'DESC', 'summaryformat' => FORMAT_MOODLE]);
+        $completion_generator->enable_completion_tracking($c1);
+        $compinfo1 = new completion_info($c1);
+        $c2 = $generator->create_course(['shortname' => 'restore', 'fullname' => 'Restored Course', 'summary' => 'DESC', 'summaryformat' => FORMAT_MOODLE]);
+        $completion_generator->enable_completion_tracking($c2);
+        $compinfo2 = new completion_info($c2);
+        $this->assertEquals(COMPLETION_ENABLED, $compinfo1->is_enabled());
+        $this->assertEquals(COMPLETION_ENABLED, $compinfo2->is_enabled());
+
+        // Set up and enrol some users.
+        $u1 = $generator->create_user(); // Course Complete
+        $u2 = $generator->create_user(); // Course RPL
+        $u3 = $generator->create_user(); // Activity Complete
+        $u4 = $generator->create_user(); // Activity RPL
+        $u5 = $generator->create_user(); // Control
+        $generator->enrol_user($u1->id, $c1->id);
+        $generator->enrol_user($u2->id, $c1->id);
+        $generator->enrol_user($u3->id, $c1->id);
+        $generator->enrol_user($u4->id, $c1->id);
+        $generator->enrol_user($u5->id, $c1->id);
+
+        // Create an activity with completion and set it as a course criteria.
+        $completiondefaults = array(
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionview' => COMPLETION_VIEW_REQUIRED
+        );
+        $act1 = $generator->create_module('certificate', array('course' => $c1->id), $completiondefaults);
+        $cm1 = get_coursemodule_from_instance('certificate', $act1->id, $c1->id);
+        $this->assertEquals(COMPLETION_TRACKING_AUTOMATIC, $compinfo1->is_enabled($cm1));
+
+        $data = new stdClass();
+        $data->course = $c1->id;
+        $data->id = $c1->id;
+        $data->overall_aggregation = COMPLETION_AGGREGATION_ANY;
+        $data->criteria_activity_value = array($act1->id => 1);
+        $criterion = new completion_criteria_activity();
+        $criterion->update_config($data);
+        $criterion->id = $DB->get_field('course_completion_criteria', 'id', array('course' => $c1->id));
+
+        // Create some dummy completion and RPL data for the course.
+        $now = time();
+        $comp1 = $DB->get_record('course_completions', array('userid' => $u1->id, 'course' => $c1->id));
+        $comp1->status = COMPLETION_STATUS_COMPLETE; # completion/completion_completion.php
+        $comp1->timecompleted = $now;
+        $DB->update_record('course_completions', $comp1);
+        $comp2 = $DB->get_record('course_completions', array('userid' => $u2->id, 'course' => $c1->id));
+        $comp2->status = COMPLETION_STATUS_COMPLETEVIARPL;
+        $comp2->timecompleted = $now;
+        $comp2->rpl = 'RippleCrs';
+        $comp2->rplgrade = 7.5;
+        $DB->update_record('course_completions', $comp2);
+
+        // Create some dummy completion and RPL data for the activity.
+        $compinfo1->set_module_viewed($cm1, $u3->id);
+        $crit1 = new stdClass();
+        $crit1->userid = $u3->id;
+        $crit1->course = $c1->id;
+        $crit1->criteriaid = $criterion->id;
+        $crit1->timecompleted = $now;
+        $DB->insert_record('course_completion_crit_compl', $crit1);
+
+        $crit2 = new stdClass();
+        $crit2->userid = $u4->id;
+        $crit2->course = $c1->id;
+        $crit2->criteriaid = $criterion->id;
+        $crit2->timecompleted = $now;
+        $crit2->rpl = 'RippleAct';
+        $DB->insert_record('course_completion_crit_compl', $crit2);
+
+        // Backup and restore course 1 into course 2.
+        $backupid = $this->backup_course($c1->id);
+        $restored = $this->restore_to_existing_course($backupid, $c2->id);
+
+        // Test the data.
+        $compcrs1 = $DB->get_record('course_completions', array('userid' => $u1->id, 'course' => $c2->id));
+        $this->assertEquals(COMPLETION_STATUS_COMPLETE, $compcrs1->status);
+        $this->assertEquals($now, $compcrs1->timecompleted);
+        $this->assertEmpty($compcrs1->rpl);
+        $this->assertEmpty($compcrs1->rplgrade);
+
+        $compcrs2 = $DB->get_record('course_completions', array('userid' => $u2->id, 'course' => $c2->id));
+        $this->assertEquals(COMPLETION_STATUS_COMPLETEVIARPL, $compcrs2->status);
+        $this->assertEquals($now, $compcrs2->timecompleted);
+        $this->assertEquals('RippleCrs', $compcrs2->rpl);
+        $this->assertEquals(7.5, $compcrs2->rplgrade);
+
+        $compact3 = $DB->get_record('course_completion_crit_compl', array('userid' => $u3->id, 'course' => $c2->id));
+        $this->assertEquals($now, $compact3->timecompleted);
+        $this->assertEmpty($compact3->rpl);
+
+        $compact4 = $DB->get_record('course_completion_crit_compl', array('userid' => $u4->id, 'course' => $c2->id));
+        $this->assertEquals($now, $compact4->timecompleted);
+        $this->assertEquals('RippleAct', $compact4->rpl);
+
+        $compcrs5 = $DB->get_record('course_completions', array('userid' => $u5->id, 'course' => $c2->id));
+        $this->assertEmpty($compcrs5->timecompleted);
+        $this->assertEmpty($compcrs5->rpl);
+        $compact5 = $DB->get_record('course_completion_crit_compl', array('userid' => $u5->id, 'course' => $c2->id));
+        $this->assertFalse($compact5);
+    }
+
     public function test_restore_course_completion_history_data() {
         global $DB;
 
