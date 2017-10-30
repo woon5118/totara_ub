@@ -1775,6 +1775,7 @@ class restore_course_structure_step extends restore_structure_step {
         $tag = new restore_path_element('tag', '/course/tags/tag');
         $visibleaudience = new restore_path_element('visibleaudience', '/course/visibleaudiences/visibleaudience');
         $custom_field = new restore_path_element('custom_field', '/course/custom_fields/custom_field');
+        $customrolename = new restore_path_element('custom_role_name', '/course/custom_role_names/custom_role_name');
 
         // Apply for 'format' plugins optional paths at course level
         $this->add_plugin_structure('format', $course);
@@ -1797,7 +1798,7 @@ class restore_course_structure_step extends restore_structure_step {
         // Apply for admin tool plugins optional paths at course level.
         $this->add_plugin_structure('tool', $course);
 
-        return array($course, $category, $tag, $visibleaudience, $custom_field);
+        return array($course, $category, $tag, $visibleaudience, $custom_field, $customrolename);
     }
 
     /**
@@ -2022,6 +2023,40 @@ class restore_course_structure_step extends restore_structure_step {
                     }
                 }
             }
+        }
+    }
+
+    public function process_custom_role_name($data) {
+        global $DB;
+
+        $data = (object)$data;
+
+        if (empty($data->role_name) || empty($data->custom_name)) {
+            return;
+        }
+
+        // Only restore custom role names into new courses.
+        $target = $this->get_task()->get_target();
+        if ($target != backup::TARGET_NEW_COURSE) {
+            return;
+        }
+
+        if (!$role = $DB->get_record('role', array('shortname' => $data->role_name))) {
+            debugging("Custom role name [{$data->custom_name}] cannot be restored because it doesn't exist in the target database");
+        }
+
+        $context = context_course::instance($this->get_courseid());
+
+        $rolename = new stdClass();
+        $rolename->roleid = $role->id;
+        $rolename->contextid = $context->id;
+        $rolename->name = $data->custom_name;
+
+        if ($existingid = $DB->get_field('role_names', 'id', array('roleid' => $role->id, 'contextid' => $context->id), IGNORE_MISSING)) {
+            $rolename->id = $existingid;
+            $DB->update_record('role_names', $rolename);
+        } else {
+            $DB->insert_record('role_names', $rolename);
         }
     }
 

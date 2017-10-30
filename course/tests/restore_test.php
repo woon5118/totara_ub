@@ -529,4 +529,89 @@ class core_course_restore_testcase extends advanced_testcase {
         $u4hist = $DB->get_records('course_completion_history', array('courseid' => $c2->id, 'userid' => $u4->id));
         $this->assertCount(0, $u4hist);
     }
+
+    public function test_restore_custom_role_names() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator();
+
+        // Set up a course.
+        $course = $generator->create_course(array(
+            'shortname' => 'origin',
+            'fullname' => 'Original Course',
+            'summary' => 'DESC',
+            'summaryformat' => FORMAT_MOODLE,
+        ));
+        $coursecontext = context_course::instance($course->id);
+
+        // Customise the names.
+        $rolemanager = $DB->get_record('role', array('shortname' => 'manager'));
+        $roleteacher = $DB->get_record('role', array('shortname' => 'teacher'));
+        $rolestudent = $DB->get_record('role', array('shortname' => 'student'));
+        save_local_role_names($course->id, array(
+            'role_' . $rolemanager->id => 'custom manager name',
+            'role_' . $roleteacher->id => 'custom teacher name',
+            'role_' . $rolestudent->id => 'custom student name',
+        ));
+
+        $this->assertEquals(3, $DB->count_records('role_names'));
+
+        // Backup.
+        $backupid = $this->backup_course($course->id);
+
+        // Change the custom role names of the original course.
+        $rolemanager = $DB->get_record('role', array('shortname' => 'manager'));
+        $roleteacher = $DB->get_record('role', array('shortname' => 'teacher'));
+        $rolestudent = $DB->get_record('role', array('shortname' => 'student'));
+        save_local_role_names($course->id, array(
+            'role_' . $rolemanager->id => 'renamed manager name',
+            'role_' . $roleteacher->id => 'renamed teacher name',
+            'role_' . $rolestudent->id => 'renamed student name',
+        ));
+
+        // Restore into a new course.
+        $newcourse = $this->restore_to_new_course($backupid);
+        $newcoursecontext = context_course::instance($newcourse->id);
+
+        // Test the data.
+        $this->assertEquals(6, $DB->count_records('role_names'));
+
+        $this->assertEquals(3, $DB->count_records('role_names',
+            array('contextid' => $newcoursecontext->id)));
+
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $newcoursecontext->id, 'roleid' => $rolemanager->id, 'name' => 'custom manager name')));
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $newcoursecontext->id, 'roleid' => $roleteacher->id, 'name' => 'custom teacher name')));
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $newcoursecontext->id, 'roleid' => $rolestudent->id, 'name' => 'custom student name')));
+
+        $this->assertEquals(3, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id)));
+
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id, 'roleid' => $rolemanager->id, 'name' => 'renamed manager name')));
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id, 'roleid' => $roleteacher->id, 'name' => 'renamed teacher name')));
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id, 'roleid' => $rolestudent->id, 'name' => 'renamed student name')));
+
+        // Restore over the first course.
+        $backupid = $this->backup_course($newcourse->id);
+        $this->restore_to_existing_course($backupid, $course->id);
+
+        // Test the data - the 'renamed' have NOT been changed, because we are restoring into an existing course.
+        $this->assertEquals(6, $DB->count_records('role_names'));
+
+        $this->assertEquals(3, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id)));
+
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id, 'roleid' => $rolemanager->id, 'name' => 'renamed manager name')));
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id, 'roleid' => $roleteacher->id, 'name' => 'renamed teacher name')));
+        $this->assertEquals(1, $DB->count_records('role_names',
+            array('contextid' => $coursecontext->id, 'roleid' => $rolestudent->id, 'name' => 'renamed student name')));
+    }
 }

@@ -397,6 +397,10 @@ class backup_course_structure_step extends backup_structure_step {
         $customfield = new backup_nested_element('custom_field', array('id'), array(
             'field_name', 'field_type', 'field_data', 'paramdatavalue', 'field_data_id'));
 
+        $customrolenames = new backup_nested_element('custom_role_names');
+        $customrolename = new backup_nested_element('custom_role_name', array('role_name'),
+            array('custom_name'));
+
         $module = new backup_nested_element('module', array(), array('modulename'));
 
         $visibleaudiences = new backup_nested_element('visibleaudiences');
@@ -442,6 +446,9 @@ class backup_course_structure_step extends backup_structure_step {
         $course->add_child($customfields);
         $customfields->add_child($customfield);
 
+        $course->add_child($customrolenames);
+        $customrolenames->add_child($customrolename);
+
         // Set the sources
 
         $courserec = $DB->get_record('course', array('id' => $this->task->get_courseid()));
@@ -481,6 +488,12 @@ class backup_course_structure_step extends backup_structure_step {
                                         JOIN {course_info_data} d ON d.fieldid = f.id
                                    LEFT JOIN {course_info_data_param} dp ON dp.dataid = d.id
                                        WHERE d.courseid = ?', array(backup::VAR_PARENTID));
+
+        $customrolename->set_source_sql('SELECT r.shortname AS role_name, rn.name AS custom_name
+                                        FROM {role_names} rn
+                                        JOIN {role} r ON r.id = rn.roleid
+                                       WHERE rn.contextid = ?',
+            array(backup::VAR_CONTEXTID));
 
         $module->set_source_sql('SELECT m.name AS modulename
                                    FROM {modules} m
