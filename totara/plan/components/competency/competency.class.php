@@ -96,7 +96,7 @@ class dp_competency_component extends dp_base_component {
         global $DB;
 
         // Generate where clause
-        $where = "c.visible = 1 AND a.planid = :planid";
+        $where = "a.planid = :planid";
         $params = array('planid' => $this->plan->id);
         if ($approved !== null) {
             list($approvedsql, $approvedparams) = $DB->get_in_or_equal($approved, SQL_PARAMS_NAMED, 'approved');
@@ -180,7 +180,10 @@ class dp_competency_component extends dp_base_component {
                 {dp_plan_competency_assign} a
             INNER JOIN
                 {comp} c
-                ON c.id = a.competencyid
+                ON c.id = a.competencyid AND c.visible = 1
+            INNER JOIN
+                {comp_framework} cf
+                ON cf.id = c.frameworkid AND cf.visible = 1
             $countjoin
             $status
             WHERE
