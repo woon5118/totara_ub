@@ -1812,18 +1812,13 @@ function facetoface_get_userfields() {
  *
  * @param string $facetofacename Seminar name
  * @param integer $facetofaceid Seminar ID
- * @param string $location Location to filter by, @deprecated 9.0 No longer used by internal code.
+ * @param string $unused Previously it was $location but that was deprecated in 9 and removed in 11.
  * @param string $format Download format
  *
  * @return null
  */
-function facetoface_download_attendance($facetofacename, $facetofaceid, $location, $format) {
+function facetoface_download_attendance($facetofacename, $facetofaceid, $unused = null, $format) {
     global $CFG, $DB;
-
-    if (!empty($location)) {
-        debugging('The $location parameter in facetoface_download_attendance has been deprecated. Use Room location custom field.',
-            DEBUG_DEVELOPER);
-    }
 
     $timenow = time();
     $timeformat = str_replace(' ', '_', get_string('strftimedate', 'langconfig'));
@@ -1849,7 +1844,7 @@ function facetoface_download_attendance($facetofacename, $facetofaceid, $locatio
     $courseid = $DB->get_field('facetoface', 'course', array('id' => $facetofaceid));
     $coursecontext = context_course::instance($courseid);
     facetoface_write_worksheet_header($worksheet, $coursecontext);
-    facetoface_write_activity_attendance($worksheet, $coursecontext, 1, $facetofaceid, $location, '', '', $dateformat);
+    facetoface_write_activity_attendance($worksheet, $coursecontext, 1, $facetofaceid, null, '', '', $dateformat);
     $workbook->close();
     exit;
 }
@@ -1901,7 +1896,6 @@ function facetoface_write_worksheet_header(&$worksheet, $context) {
 
 /**
  * Write in the worksheet the given facetoface attendance information
- * filtered by location.
  *
  * This function includes lots of custom SQL because it's otherwise
  * way too slow.
@@ -1910,20 +1904,15 @@ function facetoface_write_worksheet_header(&$worksheet, $context) {
  * @param object  $coursecontext context of the course containing this f2f activity
  * @param integer $startingrow  Index of the starting row (usually 1)
  * @param integer $facetofaceid ID of the facetoface activity
- * @param string  $location     Location to filter by, @deprecated 9.0 No longer used by internal code.
+ * @param string  $unused       Previously $location it was deprecated in Totara 9 and removed in Totara 11.
  * @param string  $coursename   Name of the course (optional)
  * @param string  $activityname Name of the facetoface activity (optional)
  * @param object  $dateformat   Use to write out dates in the spreadsheet
  * @returns integer Index of the last row written
  */
-function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $startingrow, $facetofaceid, $location,
+function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $startingrow, $facetofaceid, $unused = null,
                                               $coursename, $activityname, $dateformat) {
     global $CFG, $DB;
-
-    if (!empty($location)) {
-        debugging('The $location parameter in facetoface_write_activity_attendance has been deprecated. Use Room location custom field.',
-            DEBUG_DEVELOPER);
-    }
 
     $trainerroles = facetoface_get_trainer_roles($coursecontext);
     $userfields = facetoface_get_userfields();
@@ -2030,35 +2019,14 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         }
     }
 
-    // Location filter.
-    // This is snippet reused in facetoface_get_sessions($facetofaceid, $location).
-    // I don't know why facetoface_get_sessions was not used here initially.
-    $locationjoin = '';
-    $locationwhere = '';
-    $locationparams = array();
-    if (!empty($location)) {
-        $locationsql = $DB->sql_like('rid.data', ':location', false);
-        $locationparams['location'] = $location;
-        $locationjoin = "
-            INNER JOIB {facetoface_room} r ON (r.id = d.roomid)
-            INNER JOIN {facetoface_room_info_data} rid ON (rid.facetofaceroomid = r.id)
-            INNER JOIN {facetoface_room_info_field} rif ON (rid.fieldid = rif.id AND rif.shortname = 'location')
-            ";
-        $locationwhere = "AND $locationsql";
-    }
-
     $sql = "SELECT d.id as dateid, s.id, s.capacity, d.timestart, d.timefinish, d.roomid,
                    d.sessiontimezone
               FROM {facetoface_sessions} s
-              JOIN {facetoface_sessions_dates} d
-              $locationjoin
-                ON s.id = d.sessionid
-             WHERE s.facetoface = :fid
-               AND d.sessionid = s.id
-               $locationwhere
+              JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
+             WHERE s.facetoface = :fid AND d.sessionid = s.id
           ORDER BY d.timestart";
 
-    $sessions = $DB->get_records_sql($sql, array_merge(array('fid' => $facetofaceid), $locationparams));
+    $sessions = $DB->get_records_sql($sql, array_merge(array('fid' => $facetofaceid)));
 
     $i = $i - 1; // will be incremented BEFORE each row is written
 
