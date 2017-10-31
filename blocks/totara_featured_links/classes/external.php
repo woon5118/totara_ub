@@ -47,6 +47,9 @@ namespace block_totara_featured_links;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->libdir . '/externallib.php');
+
 /**
  * Class block_totara_featured_links\external
  * This has the functions that will be called by AJAX
