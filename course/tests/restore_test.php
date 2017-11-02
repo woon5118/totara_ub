@@ -321,4 +321,102 @@ class core_course_restore_testcase extends advanced_testcase {
         $this->assertEquals($c2->summary, $restored->summary);
         $this->assertEquals($c2->summaryformat, $restored->summaryformat);
     }
+
+    public function test_restore_course_completion_history_data() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator();
+        $completion_generator = $this->getDataGenerator()->get_plugin_generator('core_completion');
+
+        // Set up some courses.
+        $c1 = $generator->create_course(['shortname' => 'origin', 'fullname' => 'Original Course', 'summary' => 'DESC', 'summaryformat' => FORMAT_MOODLE]);
+        $completion_generator->enable_completion_tracking($c1);
+        $compinfo1 = new completion_info($c1);
+        $c2 = $generator->create_course(['shortname' => 'restore', 'fullname' => 'Restored Course', 'summary' => 'DESC', 'summaryformat' => FORMAT_MOODLE]);
+        $completion_generator->enable_completion_tracking($c2);
+        $compinfo2 = new completion_info($c2);
+        $this->assertEquals(COMPLETION_ENABLED, $compinfo1->is_enabled());
+        $this->assertEquals(COMPLETION_ENABLED, $compinfo2->is_enabled());
+
+        // Set up and enrol some users.
+        $u1 = $generator->create_user(); // Course Complete
+        $u2 = $generator->create_user(); // Course Complete + History
+        $u3 = $generator->create_user(); // Course Complete + Multiple History
+        $u4 = $generator->create_user(); // Control
+        $generator->enrol_user($u1->id, $c1->id);
+        $generator->enrol_user($u2->id, $c1->id);
+        $generator->enrol_user($u3->id, $c1->id);
+        $generator->enrol_user($u4->id, $c1->id);
+
+        // Create some dummy completion and RPL data for the course.
+        $now = time();
+        $comp1 = $DB->get_record('course_completions', array('userid' => $u1->id, 'course' => $c1->id));
+        $comp1->status = COMPLETION_STATUS_COMPLETE; # completion/completion_completion.php
+        $comp1->timecompleted = $now;
+        $DB->update_record('course_completions', $comp1);
+        $comp2 = $DB->get_record('course_completions', array('userid' => $u2->id, 'course' => $c1->id));
+        $comp2->status = COMPLETION_STATUS_COMPLETE;
+        $comp2->timecompleted = $now;
+        $DB->update_record('course_completions', $comp2);
+        $hist1 = ['userid' => $u2->id, 'courseid' => $c1->id, 'timecompleted' => 1234567890, 'grade' => 6.4];
+        $DB->insert_record('course_completion_history', $hist1);
+        $comp3 = $DB->get_record('course_completions', array('userid' => $u3->id, 'course' => $c1->id));
+        $comp3->status = COMPLETION_STATUS_COMPLETE;
+        $comp3->timecompleted = $now;
+        $DB->update_record('course_completions', $comp3);
+        $hist2 = ['userid' => $u3->id, 'courseid' => $c1->id, 'timecompleted' => 1234567890, 'grade' => 5.4];
+        $DB->insert_record('course_completion_history', $hist2);
+        $hist3 = ['userid' => $u3->id, 'courseid' => $c1->id, 'timecompleted' => 1324567890, 'grade' => 7.4];
+        $DB->insert_record('course_completion_history', $hist3);
+
+        // Backup and restore course 1 into course 2.
+        $backupid = $this->backup_course($c1->id);
+        $restored = $this->restore_to_existing_course($backupid, $c2->id);
+
+        // Test the data.
+        $compcrs1 = $DB->get_record('course_completions', array('userid' => $u1->id, 'course' => $c2->id));
+        $this->assertEquals(COMPLETION_STATUS_COMPLETE, $compcrs1->status);
+        $this->assertEquals($now, $compcrs1->timecompleted);
+        $this->assertEmpty($compcrs1->rpl);
+        $this->assertEmpty($compcrs1->rplgrade);
+        $u1hist = $DB->get_records('course_completion_history', array('courseid' => $c2->id, 'userid' => $u1->id));
+        $this->assertCount(0, $u1hist);
+
+        $compcrs2 = $DB->get_record('course_completions', array('userid' => $u2->id, 'course' => $c2->id));
+        $this->assertEquals(COMPLETION_STATUS_COMPLETE, $compcrs2->status);
+        $this->assertEquals($now, $compcrs2->timecompleted);
+        $this->assertEmpty($compcrs2->rpl);
+        $this->assertEmpty($compcrs2->rplgrade);
+        $u2hist = $DB->get_records('course_completion_history', array('courseid' => $c2->id, 'userid' => $u2->id));
+        $this->assertCount(1, $u2hist);
+        $u2hist = array_pop($u2hist);
+        $this->assertEquals('1234567890', $u2hist->timecompleted);
+        $this->assertEquals(6.4, $u2hist->grade);
+
+        $compcrs3 = $DB->get_record('course_completions', array('userid' => $u3->id, 'course' => $c2->id));
+        $this->assertEquals(COMPLETION_STATUS_COMPLETE, $compcrs3->status);
+        $this->assertEquals($now, $compcrs3->timecompleted);
+        $this->assertEmpty($compcrs3->rpl);
+        $this->assertEmpty($compcrs3->rplgrade);
+        $u3hist = $DB->get_records('course_completion_history', array('courseid' => $c2->id, 'userid' => $u3->id));
+        $this->assertCount(2, $u3hist);
+        foreach ($u3hist as $histrec) {
+            if ($histrec->grade == 5.4) {
+                $this->assertEquals('1234567890', $histrec->timecompleted);
+            } else if ($histrec->grade == 7.4) {
+                $this->assertEquals('1324567890', $histrec->timecompleted);
+            } else {
+                $this->assertTrue(false, 'Unexpected history record for user3');
+            }
+        }
+
+        $compcrs4 = $DB->get_record('course_completions', array('userid' => $u4->id, 'course' => $c2->id));
+        $this->assertEquals(COMPLETION_STATUS_NOTYETSTARTED, $compcrs4->status);
+        $this->assertEmpty($compcrs4->timecompleted);
+        $this->assertEmpty($compcrs4->rpl);
+        $this->assertEmpty($compcrs4->rplgrade);
+        $u4hist = $DB->get_records('course_completion_history', array('courseid' => $c2->id, 'userid' => $u4->id));
+        $this->assertCount(0, $u4hist);
+    }
 }

@@ -2547,6 +2547,10 @@ class backup_course_completion_structure_step extends backup_structure_step {
             'userid', 'course', 'timeenrolled', 'timestarted', 'timecompleted', 'reaggregate', 'status'
         ));
 
+        $coursecompletionhistory = new backup_nested_element('course_completion_history', array('id'), array(
+            'courseid', 'userid', 'timecompleted', 'grade'
+        ));
+
         $aggregatemethod = new backup_nested_element('course_completion_aggr_methd', array('id'), array(
             'course','criteriatype','method','value'
         ));
@@ -2555,6 +2559,7 @@ class backup_course_completion_structure_step extends backup_structure_step {
             $criteria->add_child($criteriacompletions);
                 $criteriacompletions->add_child($criteriacomplete);
         $cc->add_child($coursecompletions);
+        $cc->add_child($coursecompletionhistory);
         $cc->add_child($aggregatemethod);
 
         // We need some extra data for the restore.
@@ -2572,11 +2577,13 @@ class backup_course_completion_structure_step extends backup_structure_step {
         if ($userinfo) {
             $criteriacomplete->set_source_table('course_completion_crit_compl', array('criteriaid' => backup::VAR_PARENTID));
             $coursecompletions->set_source_table('course_completions', array('course' => backup::VAR_COURSEID));
+            $coursecompletionhistory->set_source_table('course_completion_history', array('courseid' => backup::VAR_COURSEID));
         }
 
         $criteria->annotate_ids('role', 'role');
         $criteriacomplete->annotate_ids('user', 'userid');
         $coursecompletions->annotate_ids('user', 'userid');
+        $coursecompletionhistory->annotate_ids('user', 'userid');
 
         return $cc;
 

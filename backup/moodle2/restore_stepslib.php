@@ -2997,6 +2997,7 @@ class restore_course_completion_structure_step extends restore_structure_step {
         if ($userinfo) {
             $paths[] = new restore_path_element('course_completion_crit_compl', '/course_completion/course_completion_criteria/course_completion_crit_completions/course_completion_crit_compl');
             $paths[] = new restore_path_element('course_completions', '/course_completion/course_completions');
+            $paths[] = new restore_path_element('course_completion_history', '/course_completion/course_completion_history');
         }
 
         return $paths;
@@ -3183,6 +3184,35 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 \core_completion\helper::log_course_completion($data->course, $data->userid,
                     "Created completion in restore_course_completion_structure_step->process_course_completions");
             }
+            $transaction->allow_commit();
+        }
+    }
+
+    /**
+     * Process course completion history
+     *
+     * @global moodle_database $DB
+     * @param stdClass $data
+     */
+    public function process_course_completion_history($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $userid = $this->get_mappingid('user', $data->userid);
+        $courseid = $this->get_courseid();
+
+        if (!empty($userid)) {
+            $params = array(
+                'userid' => $userid,
+                'courseid' => $courseid,
+                'timecompleted' => $this->apply_date_offset($data->timecompleted),
+                'grade' => $data->grade
+            );
+
+            $transaction = $DB->start_delegated_transaction();
+            $DB->insert_record('course_completion_history', $params);
+            \core_completion\helper::log_course_completion($courseid, $userid,
+                "Created historical completion in restore_course_completion_structure_step->process_course_completion_history");
             $transaction->allow_commit();
         }
     }
