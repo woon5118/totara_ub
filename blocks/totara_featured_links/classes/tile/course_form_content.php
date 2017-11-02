@@ -45,7 +45,11 @@ class course_form_content extends base_form_content {
      */
     public function specific_definition(group $group) {
         if (empty($this->model->get_current_data('course_name')['course_name'])) {
-            $course_name = get_string('course_not_selected', 'block_totara_featured_links');
+            if (empty($this->model->get_current_data('course_name_id')['course_name_id'])) {
+                $course_name = get_string('course_not_selected', 'block_totara_featured_links');
+            } else {
+                $course_name = get_string('course_has_been_deleted', 'block_totara_featured_links');
+            }
         } else {
             $course_name = $this->model->get_current_data('course_name')['course_name'];
         }

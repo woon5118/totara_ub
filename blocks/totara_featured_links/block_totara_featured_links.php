@@ -75,7 +75,7 @@ class block_totara_featured_links extends block_base {
             'title' => $this->config->title,
             'manual_id' => $this->config->manual_id,
             'instanceid' => $this->instance->id,
-            'hidden_text' => get_string('hidden_text', 'block_totara_featured_links')];
+        ];
 
         $core_renderer = $this->page->get_renderer('core');
 

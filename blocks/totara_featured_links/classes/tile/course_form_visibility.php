@@ -70,16 +70,20 @@ class course_form_visibility extends base_form_visibility {
         /** @var course_tile $tile */
         $tile = $this->parameters['tile'];
 
-        if (empty($CFG->audiencevisibility)) {
-            // This check is moved from require_login().
-
-            if ($tile->get_course()->visible) {
-                $state = get_string('visible');
-            } else {
-                $state = get_string('course_hidden', 'block_totara_featured_links');
-            }
+        if (empty($tile->get_course())) {
+            $state = get_string('course_has_been_deleted', 'block_totara_featured_links');
         } else {
-            $state = $COHORT_VISIBILITY[$tile->get_course()->audiencevisible];
+            if (empty($CFG->audiencevisibility)) {
+                // This check is moved from require_login().
+
+                if ($tile->get_course()->visible) {
+                    $state = get_string('visible');
+                } else {
+                    $state = get_string('course_hidden', 'block_totara_featured_links');
+                }
+            } else {
+                $state = $COHORT_VISIBILITY[$tile->get_course()->audiencevisible];
+            }
         }
 
         $this->model->get_items()[0]->add(new static_html('coursevisibility', get_string('coursevisibility', 'block_totara_featured_links'), $state), 0);

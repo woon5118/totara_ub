@@ -37,20 +37,13 @@ class course_tile extends base{
 
     /** @var string This is the name of the class which defines the visibility form */
     protected $visibility_form = '\block_totara_featured_links\tile\course_form_visibility';
-    /** @var \stdClass $course the database row of the course  */
-    protected $course;
 
     /**
-     * course_tile constructor.
-     * @param \stdClass|null $tile
+     * @var \stdClass $course the database row of the course
+     *
+     * Call $this->get_course() to load this property.
      */
-    public function __construct($tile = null) {
-        parent::__construct($tile);
-        global $DB;
-        if (!empty($this->data->courseid)) {
-            $this->course = $DB->get_record('course', ['id' => $this->data->courseid]);
-        }
-    }
+    protected $course = null;
 
     /**
      * Does the custom adding of the tile
@@ -66,8 +59,8 @@ class course_tile extends base{
      */
     public function get_content_form_data() {
         $dataobj = parent::get_content_form_data();
-        if (isset($this->course->fullname)) {
-            $dataobj->course_name = $this->course->fullname;
+        if (!empty($this->get_course())) {
+            $dataobj->course_name = $this->get_course()->fullname;
         }
         if (isset($this->data_filtered->courseid)) {
             $dataobj->course_name_id = $this->data_filtered->courseid;
@@ -88,10 +81,11 @@ class course_tile extends base{
      * @return array
      */
     protected function get_content_template_data() {
-        if (empty($this->data->courseid) || empty($this->course)) {
+        if (empty($this->get_course())) {
             return null;
         }
-        return ['heading' => $this->course->fullname,
+        return [
+            'heading' => $this->get_course()->fullname,
             'textbody' => false,
             'content_class' => (empty($this->content_class) ? '' : $this->content_class),
             'heading_location' => (empty($this->data_filtered->heading_location) ? '' : $this->data_filtered->heading_location),
@@ -111,7 +105,7 @@ class course_tile extends base{
             $this->data_filtered->background_color :
             false);
         $data['alt_text'] = $this->get_accessibility_text();
-        $data['url'] = (!empty($this->course) ? $CFG->wwwroot.'/course/view.php?id='.$this->course->id : false);
+        $data['url'] = (!empty($this->get_course()) ? $CFG->wwwroot.'/course/view.php?id='.$this->get_course()->id : false);
         return $data;
     }
 
@@ -144,7 +138,13 @@ class course_tile extends base{
      * @return bool
      */
     protected function user_can_view_content() {
-        return totara_course_is_viewable($this->course);
+        if (empty($this->get_course())) {
+            // This function is used when viewing the content, not when modifying the tile.
+            // So return false as there is no content to view.
+            return false;
+        } else {
+            return totara_course_is_viewable($this->get_course());
+        }
     }
 
     /**
@@ -178,10 +178,32 @@ class course_tile extends base{
     /**
      * Returns the course this tile is associated with.
      *
-     * @return \stdClass
+     * @return \stdClass|bool The course record or false if there is no associated course.
      */
-    public function get_course() {
+    public function get_course($reload = false) {
+        global $DB;
+
+        if (!isset($this->course) or $reload) {
+            if (!empty($this->data->courseid)) {
+                $this->course = $DB->get_record('course', ['id' => $this->data->courseid]);
+            } else {
+                $this->course = false;
+            }
+        }
+
         return $this->course;
     }
 
+    /**
+     * We'll return that the course was deleted if that is the case.
+     *
+     * @return string of text shown if a tile is hidden but being viewed in edit mode.
+     */
+    protected function get_hidden_text() {
+        if (empty($this->get_course())) {
+            return get_string('course_has_been_deleted', 'block_totara_featured_links');
+        } else {
+            return parent::get_hidden_text();
+        }
+    }
 }

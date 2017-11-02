@@ -45,6 +45,7 @@ $string['content_form_title'] = 'Edit content of {$a} tile';
 $string['content_menu_title'] = 'Content';
 $string['content_menu_title_sr-only'] = 'Edit content for {$a} tile';
 $string['color_error'] = 'The value entered did not match a hexadecimal value ie \'#11FFaa\'';
+$string['course_has_been_deleted'] = 'Course has been deleted';
 $string['course_hidden'] = 'Hidden';
 $string['course_name'] = 'Course Tile';
 $string['course_name_label'] = 'Course name';

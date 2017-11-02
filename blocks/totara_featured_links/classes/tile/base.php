@@ -820,13 +820,15 @@ abstract class base {
             get_string('delete_menu_title', 'block_totara_featured_links').'<span class="sr-only">'.get_string('delete_menu_title_sr-only', 'block_totara_featured_links',
                 $this->get_accessibility_text()['sr-only']).'</span>',
             ['type' => 'remove', 'blockid' => $this->blockid, 'tileid' => $this->id]);
+
         return [
             'tile_id' => $this->id,
             'content' => $this->render_content($renderer),
             'disabled' => (!$this->is_visible()),
             'controls' => $renderer->render(
                 new \action_menu($action_menu_items)
-            )
+            ),
+            'hidden_text' => $this->get_hidden_text()
         ];
     }
 
@@ -868,5 +870,17 @@ abstract class base {
                 $this->data_filtered->$key = $value;
             }
         }
+    }
+
+    /**
+     * This text is shown in the top corner if viewing a tile that will not be visible.
+     *
+     * You may override this if there could be a special reason that the tile could be hidden, e.g. a deleted course
+     * for a course tile.
+     *
+     * @return string of text shown if a tile is hidden but being viewed in edit mode.
+     */
+    protected function get_hidden_text() {
+        return get_string('hidden_text', 'block_totara_featured_links');
     }
 }

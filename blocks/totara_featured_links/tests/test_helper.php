@@ -59,7 +59,7 @@ abstract class test_helper extends advanced_testcase {
      * @param object $object
      * @param string $method
      * @param array $args
-     * @return ReflectionClass
+     * @return mixed
      */
     protected static function call_protected_method($object, $method, array $args = []) {
         $class = new \ReflectionClass(get_class($object));

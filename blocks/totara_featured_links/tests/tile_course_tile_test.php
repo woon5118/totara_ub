@@ -30,49 +30,21 @@ defined('MOODLE_INTERNAL') || die();
  * Test the course_tile class
  */
 class block_totara_featured_links_tile_course_tile_testcase extends test_helper {
-    /**
-     * The block generator instance for the test.
-     * @var block_totara_featured_links_generator $generator
-     */
-    protected $blockgenerator;
-
-    /**
-     * Gets executed before every test case.
-     */
-    public function setUp() {
-        parent::setUp();
-        $this->blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
-    }
 
     /**
      * Makes sure that the course id is saved to the database.
      */
     public function test_save_content_tile() {
+        $this->resetAfterTest(false);
         global $DB;
-        $this->resetAfterTest();
-        $this->setAdminUser();
-        $instance = $this->blockgenerator->create_instance();
-        $tile1 = $this->blockgenerator->create_course_tile($instance->id);
-        $course = $this->getDataGenerator()->create_course();
-        $data = new \stdClass();
-        $data->type = 'block_totara_featured_links-default_tile';
-        $data->sortorder = 4;
-        $data->course_name = $course->fullname;
-        $data->course_name_id = $course->id;
-        $tile1->save_content($data);
-        $this->assertEquals($course->id, json_decode($DB->get_field('block_totara_featured_links_tiles', 'dataraw', ['id' => $tile1->id]))->courseid);
-    }
 
-    /**
-     * Checks that the course is rendered with the tile.
-     */
-    public function test_render_course() {
-        global $PAGE;
-        $PAGE->set_url('/');
-        $this->resetAfterTest();
         $this->setAdminUser();
-        $instance = $this->blockgenerator->create_instance();
-        $tile1 = $this->blockgenerator->create_course_tile($instance->id);
+        /* @var block_totara_featured_links_generator $blockgenerator */
+        $blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
+        $instance = $blockgenerator->create_instance();
+        $tile = $blockgenerator->create_course_tile($instance->id);
+        $tilenocourse = $blockgenerator->create_course_tile($instance->id);
+
         $course = $this->getDataGenerator()->create_course();
         $data = new \stdClass();
         $data->type = 'block_totara_featured_links-course_tile';
@@ -80,32 +52,110 @@ class block_totara_featured_links_tile_course_tile_testcase extends test_helper 
         $data->course_name = $course->fullname;
         $data->course_name_id = $course->id;
         $data->background_color = '#FFFFFF';
-        $tile1->save_content($data);
-        $tile_reload = \block_totara_featured_links\tile\base::get_tile_instance($tile1->id); // Load the course data.
+        $tile->save_content($data);
+        $this->assertEquals($course->id, json_decode($DB->get_field('block_totara_featured_links_tiles', 'dataraw', ['id' => $tile->id]))->courseid);
 
-        $content = $tile_reload->render_content_wrapper($PAGE->get_renderer('core'), []);
+        return ['course' => $course, 'tile' => $tile, 'tilenocourse' => $tilenocourse];
+    }
+
+    /**
+     * @param array $tiledata
+     * @depends test_save_content_tile
+     */
+    public function test_get_course_valid($tiledata) {
+        $this->resetAfterTest(false);
+
+        /* @var \block_totara_featured_links\tile\course_tile $tile */
+        $tile = $tiledata['tile'];
+        $course = $tiledata['course'];
+
+        $loadedcourse = $tile->get_course();
+        $this->assertEquals($course->id, $loadedcourse->id);
+    }
+
+    /**
+     * @param array $tiledata
+     * @depends test_save_content_tile
+     */
+    public function test_get_course_reload($tiledata) {
+        $this->resetAfterTest(false);
+        global $DB;
+
+        /* @var \block_totara_featured_links\tile\course_tile $tile */
+        $tile = $tiledata['tile'];
+        $course = $tiledata['course'];
+
+        $originalshortname = $course->shortname;
+        $course->shortname = 'newshortname';
+        $this->assertNotEquals($originalshortname, $course->shortname);
+
+        $DB->update_record('course', $course);
+
+        // Without setting the reload argument to true, it still loads the original shortname.
+        $loadedcourse = $tile->get_course();
+        $this->assertEquals($originalshortname, $loadedcourse->shortname);
+
+        $reloadedcourse = $tile->get_course(true);
+        $this->assertEquals($course->id, $reloadedcourse->id);
+        $this->assertEquals('newshortname', $reloadedcourse->shortname);
+
+        /* @var \block_totara_featured_links\tile\course_tile $tilenocourse */
+        $tilenocourse = $tiledata['tilenocourse'];
+        $this->assertFalse($tilenocourse->get_course());
+    }
+
+    /**
+     * @param array $tiledata
+     * @depends test_save_content_tile
+     */
+    public function test_get_course_no_course($tiledata) {
+        $this->resetAfterTest(false);
+
+        /* @var \block_totara_featured_links\tile\course_tile $tilenocourse */
+        $tilenocourse = $tiledata['tilenocourse'];
+        $this->assertFalse($tilenocourse->get_course());
+    }
+
+    /**
+     * Checks that the course is rendered with the tile.
+     *
+     * @param array $tiledata
+     * @depends test_save_content_tile
+     */
+    public function test_render_course($tiledata) {
+        $this->resetAfterTest(false);
+        global $PAGE;
+
+        $PAGE->set_url('/');
+
+        $content = $tiledata['tile']->render_content_wrapper($PAGE->get_renderer('core'), []);
         $this->assertStringStartsWith('<div', $content);
         $this->assertStringEndsWith('</div>', $content);
         $this->assertContains('Test course 1', $content);
     }
 
-    public function test_user_can_view_content() {
+    /**
+     * @param array $tile
+     * @depends test_save_content_tile
+     */
+    public function test_user_can_view_content($tiledata) {
         global $DB;
-        $this->resetAfterTest();
+        $this->resetAfterTest(true);
+
         $this->setUser();
-        $instance = $this->blockgenerator->create_instance();
-        $tile1 = $this->blockgenerator->create_course_tile($instance->id);
-        $course = $this->getDataGenerator()->create_course();
-        $data = new stdClass();
-        $data->course_name_id = $course->id;
-        $tile1->save_content($data);
-        $this->refresh_tiles($tile1);
-        $this->assertTrue($this->call_protected_method($tile1, 'user_can_view_content'));
+
+        /* @var \block_totara_featured_links\tile\course_tile $tile */
+        $tile = $tiledata['tile'];
+        $course = $tiledata['course'];
+
+        $this->assertTrue($this->call_protected_method($tile, 'user_can_view_content'));
+
         $course->visible = '0';
         $DB->update_record('course', $course);
-        $this->refresh_tiles($tile1);
-        $this->assertFalse($this->call_protected_method($tile1, 'user_can_view_content'));
+        $tile->get_course(true); // Reload the course data.
+
+        $this->assertFalse($this->call_protected_method($tile, 'user_can_view_content'));
         $this->setAdminUser();
-        $this->assertTrue($this->call_protected_method($tile1, 'user_can_view_content'));
+        $this->assertTrue($this->call_protected_method($tile, 'user_can_view_content'));
     }
 }
