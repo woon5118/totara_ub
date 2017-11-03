@@ -689,7 +689,7 @@ if (!$onlycontent && !$download) {
     echo $OUTPUT->heading(format_string($facetoface->name));
 
     if ($can_view_session) {
-        echo facetoface_print_session($session, true);
+        echo facetoface_print_session($session, true, false, true, true);
 
         // Print customfields.
         $customfields = customfield_get_data($session, 'facetoface_sessioncancel', 'facetofacesessioncancel');

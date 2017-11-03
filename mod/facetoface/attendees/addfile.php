@@ -244,7 +244,7 @@ $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('addattendeestep1', 'facetoface'));
-echo facetoface_print_session($session, false, true, true);
+echo facetoface_print_session($session, false, false, true, true);
 
 $mform->display();
 

@@ -172,7 +172,7 @@ $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('addattendeestep2', 'facetoface'));
-echo facetoface_print_session($session, false, true, true);
+echo facetoface_print_session($session, false, false, true, true);
 
 // Table.
 $f2frenderer = $PAGE->get_renderer('mod_facetoface');
