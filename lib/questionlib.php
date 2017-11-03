@@ -902,7 +902,9 @@ function flatten_category_tree(&$categories, $id, $depth = 0, $nochildrenof = -1
     // Indent the name of this category.
     $newcategories = array();
     $newcategories[$id] = $categories[$id];
-    $newcategories[$id]->indentedname = str_repeat('&nbsp;&nbsp;&nbsp;', $depth) .
+    // Added indentation to the structure so that it can be used for RTL languages
+    $newcategories[$id]->indentation = str_repeat('&nbsp;&nbsp;&nbsp;', $depth);
+    $newcategories[$id]->indentedname = $newcategories[$id]->indentation .
             $categories[$id]->name;
 
     // Recursively indent the children.
@@ -1112,12 +1114,13 @@ function question_category_options($contexts, $top = false, $currentcat = 0,
         foreach ($categories as $category) {
             if ($category->contextid == $contextid) {
                 $cid = $category->id;
+                // We have to cater for RLT languages
                 if ($currentcat != $cid || $currentcat == 0) {
-                    $countstring = !empty($category->questioncount) ?
-                            " ($category->questioncount)" : '';
-                    $categoriesarray[$contextstring][$cid] =
-                            format_string($category->indentedname, true,
-                                array('context' => $context)) . $countstring;
+                    $a = new stdClass();
+                    $a->name = format_string($category->name, true, array('context' => $context));
+                    $a->count = !empty($category->questioncount) ? "$category->questioncount" : '0';
+                    $categoriesarray[$contextstring][$cid] = '<pre>' . $category->indentation . '</pre>' .
+                        get_string('categorynameandcount', 'question', $a);
                 }
             }
         }
@@ -1191,6 +1194,31 @@ function question_categorylist($categoryid) {
 
     return $categorylist;
 }
+
+/**
+ * @return array of question category ids of all parents of this category
+ */
+function question_parent_categorylist($categoryid) {
+    global $DB;
+
+    // Final list of parent category IDs.
+    $parentlist = array();
+
+    // Next category to get parent of.
+    $checkid = $categoryid;
+    while ($checkid != 0) {
+        // We don't want parent == 0, so no need to test return type.
+        if ($parent = $DB->get_field('question_categories', 'parent', array('id' => $checkid))) {
+            $parentlist[] = $parent;
+            $checkid = $parent;
+        } else {
+            $checkid = 0;
+        }
+    }
+
+    return $parentlist;
+}
+
 
 //===========================
 // Import/Export Functions
@@ -1973,4 +2001,41 @@ function question_module_uses_questions($modname) {
     }
 
     return false;
+}
+
+/**
+ * Recursively add the questioncount to the specified category and all its parents
+ *
+ * @param $categories
+ * @param int $id Current category to add to
+ * @param int $questioncount Count to add
+ */
+function add_question_category_counts(&$data, $categories, $id, $questioncount) {
+    $category = $categories[$id];
+    $key = "$category->id,$category->contextid";
+    if (isset($data[$key]) && isset($data[$key]['includedcount'])) {
+        $data[$key]['includedcount'] += $questioncount;
+    } else {
+        $data[$key]['includedcount'] = $questioncount;
+    }
+
+    if ($category->parent > 0) {
+        add_question_category_counts($data, $categories, $category->parent, $questioncount);
+    }
+}
+
+/**
+ * Calculate the number of questions in each category including its sub-categories
+ * @since totara 10
+ */
+function question_categories_calculate_includedcount($categories) {
+    $data = array();
+    foreach ($categories as $id => $category) {
+        $key = "$category->id,$category->contextid";
+        $data[$key]['questioncount'] = (int) $category->questioncount;
+        $data[$key]['includedcount'] = 0;
+        add_question_category_counts($data, $categories, $id, $category->questioncount);
+    }
+
+    return $data;
 }

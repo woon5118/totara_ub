@@ -205,6 +205,8 @@ for ($pageiter = 1; $pageiter <= $numberoflisteners; $pageiter++) {
 $PAGE->requires->data_for_js('quiz_edit_config', $quizeditconfig);
 $PAGE->requires->js('/question/qengine.js');
 
+$PAGE->requires->js_call_amd('mod_quiz/warn_add_randomquestions', 'init', array());
+
 // Questions wrapper start.
 echo html_writer::start_tag('div', array('class' => 'mod-quiz-edit-content'));
 

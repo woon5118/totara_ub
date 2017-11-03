@@ -50,7 +50,19 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function edit_page(\quiz $quizobj, structure $structure,
             \question_edit_contexts $contexts, \moodle_url $pageurl, array $pagevars) {
+        global $OUTPUT, $PAGE;
+
         $output = '';
+
+        // Add a hidden notification for randomquestions without sufficient questions in the cateogory.
+        // Show/Hide of this this is handled in js
+        $output .= \html_writer::start_div('randomnotification', array('style' => "display: none;"));
+        $notification = new \core\output\notification(get_string('editingquizneedrandomquestions', 'quiz'),
+            \core\output\notification::NOTIFY_WARNING);
+        $notification->set_show_closebutton(true);
+        $output .= $OUTPUT->render($notification);
+
+        $output .= \html_writer::end_div();
 
         // Page title.
         $output .= $this->heading_with_help(get_string('editingquizx', 'quiz',
@@ -104,6 +116,11 @@ class edit_renderer extends \plugin_renderer_base {
             // Include the question chooser.
             $output .= $this->question_chooser();
         }
+
+        // Determine whether there are any random questions for which there are not enough questions in the databank.
+        $categories_used_data = $structure->get_random_categories_used($quizobj->get_quiz());
+        $PAGE->requires->js_call_amd('mod_quiz/warn_randomquestions', 'set_totara_random_category_selectors',
+            array($categories_used_data['categoryselectors']));
 
         return $output;
     }
@@ -899,8 +916,14 @@ class edit_renderer extends \plugin_renderer_base {
         $qbanklink = ' ' . \html_writer::link($qbankurl,
                 get_string('seequestions', 'quiz'), array('class' => 'mod_quiz_random_qbank_link'));
 
+        // Add a hidden warning icon next to the question name. It will be shown if the question's category
+        // question bank doesn't contain enough questions
+        $randomiconstr = get_string('randomquestioncategorynotenough', 'quiz');
+        $randomiconclass = 'randomwarning_' . $question->category . '_' . (empty($question->questiontext) ? '0' : '1');
+        $randomicon = $this->pix_icon('i/warning', $randomiconstr, '', array('title' => '', 'class' => $randomiconclass));
+
         return html_writer::link($editurl, $icon . $editicon, array('title' => $configuretitle)) .
-                ' ' . $instancename . ' ' . $qbanklink;
+                ' ' . $instancename . ' ' . $qbanklink . ' ' . $randomicon;
     }
 
     /**
@@ -978,6 +1001,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function random_question_form(\moodle_url $thispageurl, \question_edit_contexts $contexts, array $pagevars) {
+        global $PAGE;
 
         if (!$contexts->have_cap('moodle/question:useall')) {
             return '';
@@ -990,6 +1014,18 @@ class edit_renderer extends \plugin_renderer_base {
                 'randomnumber' => 1,
                 'cmid' => $thispageurl->param('cmid'),
         ));
+
+        $usablecontexts = $contexts->having_cap('moodle/question:useall');
+        $pcontexts = array();
+        foreach ($usablecontexts as $context) {
+            $pcontexts[] = $context->id;
+        }
+        $contextslist = join($pcontexts, ', ');
+
+        $categories = get_categories_for_contexts($contextslist);
+
+        $PAGE->requires->js_call_amd('mod_quiz/warn_add_randomquestions', 'set_totara_category_counts',
+            array('totara_category_counts' => question_categories_calculate_includedcount($categories)));
         return html_writer::div($randomform->render(), 'randomquestionformforpopup');
     }
 

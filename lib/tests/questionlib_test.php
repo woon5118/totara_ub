@@ -443,4 +443,45 @@ class core_questionlib_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists('question', ['id' => $q2c->id]));
         $this->assertTrue($DB->record_exists('question', ['id' => $q2d->id]));
     }
+
+    public function test_question_parent_categorylist() {
+        $qcat = array();
+
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        // Create a hierarchy of categories
+        // 0
+        //   -> 1
+        //       -> 2
+        //           -> 3
+        //           -> 4
+        //              -> 5
+        //   -> 6
+        //       -> 7
+
+        $qcat[0] = $generator->create_question_category(array('name' => 'category_0'));
+        $qcat[1] = $generator->create_question_category(array('name' => 'category_1', 'parent' => $qcat[0]->id));
+        $qcat[2] = $generator->create_question_category(array('name' => 'category_2', 'parent' => $qcat[1]->id));
+        $qcat[3] = $generator->create_question_category(array('name' => 'category_3', 'parent' => $qcat[2]->id));
+        $qcat[4] = $generator->create_question_category(array('name' => 'category_4', 'parent' => $qcat[2]->id));
+        $qcat[5] = $generator->create_question_category(array('name' => 'category_5', 'parent' => $qcat[4]->id));
+        $qcat[6] = $generator->create_question_category(array('name' => 'category_6', 'parent' => $qcat[0]->id));
+        $qcat[7] = $generator->create_question_category(array('name' => 'category_7', 'parent' => $qcat[6]->id));
+
+        // Test retrieval of parents
+        $parentlist = question_parent_categorylist($qcat[0]->id);
+        $this->assertEmpty($parentlist);
+
+        $parentlist = question_parent_categorylist($qcat[3]->id);
+        $this->assertEquals(3, count($parentlist));
+        $this->assertTrue(array_search($qcat[0]->id, $parentlist) !== false);
+        $this->assertTrue(array_search($qcat[1]->id, $parentlist) !== false);
+        $this->assertTrue(array_search($qcat[2]->id, $parentlist) !== false);
+
+        $parentlist = question_parent_categorylist($qcat[5]->id);
+        $this->assertEquals(4, count($parentlist));
+        $this->assertTrue(array_search($qcat[0]->id, $parentlist) !== false);
+        $this->assertTrue(array_search($qcat[1]->id, $parentlist) !== false);
+        $this->assertTrue(array_search($qcat[2]->id, $parentlist) !== false);
+        $this->assertTrue(array_search($qcat[4]->id, $parentlist) !== false);
+    }
 }

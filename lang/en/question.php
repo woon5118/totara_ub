@@ -70,6 +70,7 @@ $string['categoryinfo'] = 'Category info';
 $string['categorymove'] = 'The category \'{$a->name}\' contains {$a->count} questions (some of which may be hidden questions or random questions that are still in use in a quiz). Please choose another category to move them to.';
 $string['categorymoveto'] = 'Save in category';
 $string['categorynamecantbeblank'] = 'The category name cannot be blank.';
+$string['categorynameandcount'] = '{$a->name} ({$a->count})';
 $string['clickflag'] = 'Flag question';
 $string['clicktoflag'] = 'Flag this question for future reference';
 $string['clicktounflag'] = 'Remove flag';

@@ -3175,5 +3175,6 @@ MoodleQuickForm::registerElementType('textarea', "$CFG->libdir/form/textarea.php
 MoodleQuickForm::registerElementType('url', "$CFG->libdir/form/url.php", 'MoodleQuickForm_url');
 MoodleQuickForm::registerElementType('warning', "$CFG->libdir/form/warning.php", 'MoodleQuickForm_warning');
 MoodleQuickForm::registerElementType('scheduler', "$CFG->libdir/form/scheduler.php", 'MoodleQuickForm_scheduler');
+MoodleQuickForm::registerElementType('form-notification', "$CFG->libdir/form/form_notification.php", 'MoodleQuickForm_form_notification');
 
 MoodleQuickForm::registerRule('required', null, 'MoodleQuickForm_Rule_Required', "$CFG->libdir/formslib.php");

@@ -834,4 +834,297 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         $structure = \mod_quiz\structure::create_for_quiz($quizobj);
         $this->assertEquals(0, $structure->is_question_dependent_on_previous_slot(2));
     }
+
+    // Setup questionbank with the specified number of test categories
+    // Each category has $i - 1 questions
+    protected function setup_questionbank($numtestcat) {
+        $qcat = array();
+
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        // Create a hierarchy of categories with questions in some
+        for ($i = 0; $i < $numtestcat; $i++) {
+            $data = array('name' => "category_$i");
+            if ($i > 0) {
+                $data['parent'] = $qcat[$i - 1]->id;
+            }
+            $qcat[$i] = $questiongenerator->create_question_category($data);
+
+            for ($j = 0; $j < $i; $j++) {
+                $questiongenerator->create_question('truefalse', null,
+                    array('name' => 'TF_'.$i.'_'.$j, 'category' => $qcat[$i]->id));
+            }
+        }
+
+        return $qcat;
+    }
+
+    // One random question with enough questions in the questionbank
+    public function test_quiz_get_random_questions_used_one_enough() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $qcat = $this->setup_questionbank(3);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF1', 1, 'truefalse'),
+            ));
+
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[1]->id, 1, false);
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        $selector = '.randomwarning_' . $qcat[1]->id . '_0';
+        $this->assertEquals($selector, $categories_used['categoryselectors']['hasenough']);
+        $this->assertEmpty($categories_used['categoryselectors']['notenough']);
+    }
+
+    // One random question not enough questions in the questionbank
+    public function test_quiz_get_random_questions_used_one_notenough() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $qcat = $this->setup_questionbank(3);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF2', 1, 'truefalse'),
+            ));
+
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[0]->id, 1, false);
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        $selector = '.randomwarning_' . $qcat[0]->id . '_0';
+        $this->assertEmpty($categories_used['categoryselectors']['hasenough']);
+        $this->assertEquals($selector, $categories_used['categoryselectors']['notenough']);
+    }
+
+    // Multiple random questions enough questions in single category with sub categories
+    public function test_quiz_get_random_questions_used_many_enough_with_subs() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $qcat = $this->setup_questionbank(4);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF3', 1, 'truefalse'),
+            ));
+
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[0]->id, 5, true);
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        $selector = '.randomwarning_' . $qcat[0]->id . '_1';
+        $this->assertEquals($selector, $categories_used['categoryselectors']['hasenough']);
+        $this->assertEmpty($categories_used['categoryselectors']['notenough']);
+    }
+
+    // Multiple random questions in different categories. Some with enough questions, some not
+    public function test_quiz_get_random_questions_used_many_mixed() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $numtestcat = 4;
+        $qcat = $this->setup_questionbank($numtestcat);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF4', 1, 'truefalse'),
+            ));
+
+        for ($i = 0; $i < $numtestcat; $i++) {
+            quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[$i]->id, 2, false);
+        }
+
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        for ($i = 0; $i < 2; $i++) {
+            $selector = '.randomwarning_' . $qcat[$i]->id . '_0';
+            $this->assertFalse(strpos($categories_used['categoryselectors']['hasenough'], $selector));
+            $this->assertTrue(strpos($categories_used['categoryselectors']['notenough'], $selector) >= 0);
+        }
+
+        for ($i = 2; $i < $numtestcat; $i++) {
+            $selector = '.randomwarning_' . $qcat[$i]->id . '_0';
+            $this->assertTrue(strpos($categories_used['categoryselectors']['hasenough'], $selector) >= 0);
+            $this->assertFalse(strpos($categories_used['categoryselectors']['notenough'], $selector));
+        }
+    }
+
+    // Category used on its own as well as part of parent with subs
+    // Individual random question have enough questions in the questionbank,
+    // but having both results in insufficient number of questions.
+    public function test_quiz_get_random_questions_used_sub_and_singleparent() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $numtestcat = 4;
+        $qcat = $this->setup_questionbank($numtestcat);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF5', 1, 'truefalse'),
+            ));
+
+        // Top category with recurse
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[0]->id, 4, true);
+
+        // One question for each other category without recurse - results in overall
+        // requirement for 7 questions - only 6 in the bank
+        for ($i = 1; $i < $numtestcat; $i++) {
+            quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[$i]->id, 1, false);
+        }
+
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        // Top category doesn't have enough left
+        $selector = '.randomwarning_' . $qcat[0]->id . '_1';
+        $this->assertFalse(strpos($categories_used['categoryselectors']['hasenough'], $selector));
+        $this->assertTrue(strpos($categories_used['categoryselectors']['notenough'], $selector) >= 0);
+
+        for ($i = 1; $i < $numtestcat; $i++) {
+            $selector = '.randomwarning_' . $qcat[$i]->id . '_0';
+            $this->assertTrue(strpos($categories_used['categoryselectors']['hasenough'], $selector) >= 0);
+            $this->assertFalse(strpos($categories_used['categoryselectors']['notenough'], $selector));
+        }
+    }
+
+    // Category used on its own as well as part of parent both with subs
+    public function test_quiz_get_random_questions_used_sub_and_parent_all_recurse() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $numtestcat = 4;
+        $qcat = $this->setup_questionbank($numtestcat);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF5', 1, 'truefalse'),
+            ));
+
+        // Top category with recurse
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[0]->id, 4, true);
+
+        // One other category with recurse
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[2]->id, 4, true);
+
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        // Top category doesn't have enough left
+        $selector = '.randomwarning_' . $qcat[0]->id . '_1';
+        $this->assertFalse(strpos($categories_used['categoryselectors']['hasenough'], $selector));
+        $this->assertTrue(strpos($categories_used['categoryselectors']['notenough'], $selector) >= 0);
+
+        // Other category has enough on its own
+        $selector = '.randomwarning_' . $qcat[2]->id . '_1';
+        $this->assertTrue(strpos($categories_used['categoryselectors']['hasenough'], $selector) >= 0);
+        $this->assertFalse(strpos($categories_used['categoryselectors']['notenough'], $selector));
+    }
+
+    // Category used on its own as well as part of parent with subs
+    public function test_quiz_get_random_questions_used_sub_and_multi_parent() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $numtestcat = 4;
+        $qcat = $this->setup_questionbank($numtestcat);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF5', 1, 'truefalse'),
+            ));
+
+        // Top category with recurse
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[0]->id, 2, true);
+
+        // Antoher parent category with recurse
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[2]->id, 4, true);
+
+        // Sub of both that will result in both parents not having enough
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[3]->id, 2, true);
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        // Top and third categorie don't have enough left
+        $selector = '.randomwarning_' . $qcat[0]->id . '_1';
+        $this->assertFalse(strpos($categories_used['categoryselectors']['hasenough'], $selector));
+        $this->assertTrue(strpos($categories_used['categoryselectors']['notenough'], $selector) >= 0);
+        $selector = '.randomwarning_' . $qcat[2]->id . '_1';
+        $this->assertFalse(strpos($categories_used['categoryselectors']['hasenough'], $selector));
+        $this->assertTrue(strpos($categories_used['categoryselectors']['notenough'], $selector) >= 0);
+
+        // Other category has enough on its own
+        $selector = '.randomwarning_' . $qcat[3]->id . '_0';
+        $this->assertTrue(strpos($categories_used['categoryselectors']['hasenough'], $selector) >= 0);
+        $this->assertFalse(strpos($categories_used['categoryselectors']['notenough'], $selector));
+    }
+
+    // Same category used on its own as well as with subs
+    public function test_quiz_get_random_questions_with_and_without_subs() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $numtestcat = 4;
+        $qcat = $this->setup_questionbank($numtestcat);
+        $quizobj = $this->create_test_quiz(array(
+                array('TF6', 1, 'truefalse'),
+            ));
+
+        // A category with recurse - enough questions on its own
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[2]->id, 4, true);
+
+        // Same category without recurse - enough on its own but not in combination with recurse
+        quiz_add_random_questions($quizobj->get_quiz(), 1, $qcat[2]->id, 2, true);
+
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $categories_used = $structure->get_random_categories_used($quizobj->get_quiz());
+
+        $this->assertArrayHasKey('categoryselectors', $categories_used);
+        $this->assertArrayHasKey('hasenough', $categories_used['categoryselectors']);
+        $this->assertArrayHasKey('notenough', $categories_used['categoryselectors']);
+
+        // Category without recurse have enough
+        // Category with recurse doesn't have enough
+        $selector = '.randomwarning_' . $qcat[2]->id . '_0';
+        $this->assertTrue(strpos($categories_used['categoryselectors']['hasenough'], $selector) >= 0);
+        $this->assertFalse(strpos($categories_used['categoryselectors']['notenough'], $selector));
+        $selector = '.randomwarning_' . $qcat[2]->id . '_1';
+        $this->assertFalse(strpos($categories_used['categoryselectors']['hasenough'], $selector));
+        $this->assertTrue(strpos($categories_used['categoryselectors']['notenough'], $selector) >= 0);
+    }
 }

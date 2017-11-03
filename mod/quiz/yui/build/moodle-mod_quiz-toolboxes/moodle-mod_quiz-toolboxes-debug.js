@@ -402,6 +402,12 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                 if (response.deleted) {
                     // Actually remove the element.
                     Y.Moodle.mod_quiz.util.slot.remove(element);
+                    require(['mod_quiz/warn_randomquestions'], function(warn_randomquestions) {
+                        if (response.hasOwnProperty('random_category_selectors')) {
+                           warn_randomquestions.set_totara_random_category_selectors(response.random_category_selectors);
+                        }
+                    });
+
                     this.reorganise_edit_page();
                     if (M.core.actionmenu && M.core.actionmenu.instance) {
                         M.core.actionmenu.instance.hideMenu(ev);

@@ -172,8 +172,10 @@ switch($requestmethod) {
                 $structure->remove_slot($slot->slot);
                 quiz_delete_previews($quiz);
                 quiz_update_sumgrades($quiz);
+                $categories_used_data = $structure->get_random_categories_used($quizobj->get_quiz());
                 echo json_encode(array('newsummarks' => quiz_format_grade($quiz, $quiz->sumgrades),
-                            'deleted' => true, 'newnumquestions' => $structure->get_question_count()));
+                            'deleted' => true, 'newnumquestions' => $structure->get_question_count(),
+                            'random_category_selectors' => $categories_used_data['categoryselectors']));
                 break;
         }
         break;

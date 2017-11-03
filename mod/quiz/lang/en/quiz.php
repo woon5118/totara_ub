@@ -276,6 +276,7 @@ $string['editingquiz_help'] = 'When creating a quiz, the main concepts are:
 * Random questions -  A student gets different questions each time they attempt the quiz and different students can get different questions';
 $string['editingquiz_link'] = 'mod/quiz/edit';
 $string['editingquizx'] = 'Editing quiz: {$a}';
+$string['editingquizneedrandomquestions'] = 'This quiz contains one or more random questions drawn from question categories that contain an insufficient number of questions. Learners will not be able to attempt this quiz until this is resolved.';
 $string['editmaxmark'] = 'Edit maximum mark';
 $string['editoverride'] = 'Edit override';
 $string['editqcats'] = 'Edit questions categories';
@@ -700,6 +701,8 @@ $string['randomfromcategory'] = 'Random question from category:';
 $string['randomfromexistingcategory'] = 'Random question from an existing category';
 $string['randomnumber'] = 'Number of random questions';
 $string['randomnosubcat'] = 'Questions from this category only, not its subcategories.';
+$string['randomnotenough'] = 'The selected category does not contain enough questions. Either add questions to the selected category or reduce the number of random questions drawn from it.';
+$string['randomquestioncategorynotenough'] = 'Category doesn\'t contain enough questions';
 $string['randomquestionusinganewcategory'] = 'Random question using a new category';
 $string['randomwithsubcat'] = 'Questions from this category and its subcategories.';
 $string['readytosend'] = 'You are about to send your whole quiz to be graded.  Are you sure you want to continue?';

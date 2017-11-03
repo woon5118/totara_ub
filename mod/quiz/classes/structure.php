@@ -1042,4 +1042,85 @@ class structure {
         }
         $DB->delete_records('quiz_sections', array('id' => $sectionid));
     }
+
+    /**
+     * Retrieved all the random question categories that are used in this quiz and
+     * whether there are enough questions in the question bank
+     *
+     * @param \stdClass $quiz the quiz
+     * @return array with used random category selectors
+     */
+    public function get_random_categories_used($quiz) {
+        global $DB;
+
+        $sql = "SELECT q.category, q.questiontext as recurse, qc.parent, COUNT(1) as requiredcount
+                  FROM {quiz_slots} slot
+                  JOIN {question} q
+                    ON q.id = slot.questionid
+                  JOIN {question_categories} qc
+                    ON qc.id = q.category
+                 WHERE slot.quizid = :quizid
+                   AND q.qtype = :qtype
+              GROUP BY q.category, q.questiontext, qc.parent";
+        $params = array('quizid' => $quiz->id, 'qtype' => 'random');
+        $rows = $DB->get_recordset_sql($sql, $params);
+
+        $usedcategories = array();
+        // First get the number of available questions for each used category
+        foreach ($rows as $row) {
+            $key = $row->category . '_' . ($row->recurse ? '1' : '0');
+            $usedcategories[$key] = (object)array(
+                'category' => $row->category,
+                'recurse' => $row->recurse,
+                'parent' => $row->parent,
+                'requiredcount' => $row->requiredcount);
+            $questions = \question_bank::get_qtype('random')->get_available_questions_from_category($row->category, $row->recurse);
+            $usedcategories[$key]->availablecount = count($questions);
+        }
+
+        // Add used counts to parents who has recurse flag set
+        // Add non-recursed counts to same category with recurse
+        $withparents = array_filter($usedcategories, function ($category) {
+            return $category->parent != 0;
+        });
+        foreach ($usedcategories as $category) {
+            // Add count to any used parent with recurse
+            if ($category->parent != 0) {
+                // We've already retrieved the first parent, so only retrieving parents of row->parent
+                $parentlist = question_parent_categorylist($category->parent);
+                array_unshift($parentlist, $category->parent);
+
+                // Now add this category's requiredcount to all used parents with recurse flag set
+                foreach ($parentlist as $parentid) {
+                    $parentkey = $parentid . '_1';
+                    if (array_key_exists($parentkey, $usedcategories)) {
+                        $usedcategories[$parentkey]->requiredcount += $category->requiredcount;
+                    }
+                }
+            }
+
+            // Handle case where category is included with and without recurse
+            if (!$category->recurse) {
+                $key = $category->category . '_1';
+                if (array_key_exists($key, $usedcategories)) {
+                    $usedcategories[$key]->requiredcount += $category->requiredcount;
+                }
+            }
+        }
+
+        $hasenough = array();
+        $notenough = array();
+
+        // Group categores with and without enough questions into lists with the css selector for each category used
+        foreach ($usedcategories as $key => $category) {
+            $selector = '.randomwarning_' . $key;
+            if ($category->requiredcount <= $category->availablecount) {
+                $hasenough[] = $selector;
+            } else {
+                $notenough[] = $selector;
+            }
+        }
+
+        return array('categoryselectors' => array('hasenough' => implode(',', $hasenough), 'notenough' => implode(',', $notenough)));
+    }
 }
