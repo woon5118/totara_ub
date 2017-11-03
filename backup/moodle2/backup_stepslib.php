@@ -1104,6 +1104,11 @@ class backup_gradebook_structure_step extends backup_structure_step {
         $grade_item->annotate_ids('scalefinal', 'scaleid'); // Straight as scalefinal because it's > 0
         $grade_item->annotate_ids('outcomefinal', 'outcomeid');
 
+        $coursescales = $DB->get_records('scale', array('courseid' => $this->get_courseid()));
+        foreach ($coursescales as $coursescale) {
+            backup_structure_dbops::insert_backup_ids_record($this->get_backupid(), 'scalefinal', $coursescale->id);
+        }
+
         //just in case there are any users not already annotated by the activities
         $grade_grade->annotate_ids('userfinal', 'userid');
 
