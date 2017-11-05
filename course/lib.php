@@ -3168,6 +3168,9 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
             'totopofsection',
         ), 'moodle');
 
+    // TOTARA TL-16427.
+    $PAGE->requires->string_for_js('deletecheckrecyclebin', 'tool_recyclebin');
+
     // Include section-specific strings for formats which support sections.
     if (course_format_uses_sections($course->format)) {
         $PAGE->requires->strings_for_js(array(

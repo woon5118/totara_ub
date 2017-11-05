@@ -135,6 +135,9 @@ echo $OUTPUT->heading($heading);
 // Grab our items, check there is actually something to display.
 $items = $recyclebin->get_items();
 
+// TOTARA TL-16427.
+echo $OUTPUT->notification(get_string('crondelaymodule', 'tool_recyclebin'), 'notifymessage');
+
 // Nothing to show? Bail out early.
 if (empty($items)) {
     echo $OUTPUT->box(get_string('noitemsinbin', 'tool_recyclebin'));

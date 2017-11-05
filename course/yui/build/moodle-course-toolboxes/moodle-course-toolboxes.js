@@ -462,6 +462,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             confirmstring = M.util.get_string('deletechecktype', 'moodle', plugindata);
         }
 
+        // TOTARA TL-16427.
+        confirmstring += '<br/>' + M.util.get_string('deletecheckrecyclebin', 'tool_recyclebin');
+
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
             question: confirmstring,
