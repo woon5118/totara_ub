@@ -61,11 +61,11 @@ class behat_tool_totara_sync extends behat_base {
         require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/databaselib.php');
 
         // Validate the element type given.
-        if ($element != 'organisation' && $element != 'position' && $element != 'user') {
+        if ($element != 'organisation' && $element != 'position' && $element != 'user' && $element != 'jobassignment') {
             throw new PendingException("'{$element}' is not a valid HR Import element name.");
         }
 
-        $short_element = ($element != 'user' ? substr($element, 0, 3) : $element);
+        $short_element = ($element == 'organisation' || $element == 'position' ? substr($element, 0, 3) : $element);
         $dbconfig = array();
 
         // Determine the database connection settings we need to use.
@@ -168,6 +168,26 @@ class behat_tool_totara_sync extends behat_base {
                 $table->add_field('description', XMLDB_TYPE_TEXT);
                 $table->add_field('parentidnumber', XMLDB_TYPE_CHAR, '100');
                 $table->add_field('typeidnumber', XMLDB_TYPE_CHAR, '100');
+
+                break;
+
+            case 'jobassignment':
+                // Define a list of required fields so we can check the source data against them.
+                $required_fields = array ('idnumber', 'useridnumber', 'timemodified', 'deleted');
+
+                // Define the default columns.
+                $table->add_field('useridnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
+                $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+                $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+                // Define the optional additional columns.
+                $table->add_field('fullname', XMLDB_TYPE_CHAR, '100');
+                $table->add_field('startdate', XMLDB_TYPE_INTEGER, '10');
+                $table->add_field('enddate', XMLDB_TYPE_INTEGER, '10');
+                $table->add_field('orgidnumber', XMLDB_TYPE_CHAR, '100');
+                $table->add_field('posidnumber', XMLDB_TYPE_CHAR, '100');
+                $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '100');
+                $table->add_field('appraiseridnumber', XMLDB_TYPE_CHAR, '100');
 
                 break;
 

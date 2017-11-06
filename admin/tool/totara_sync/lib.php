@@ -132,7 +132,8 @@ function tool_totara_sync_run() {
             }
 
             // Finally, start element syncing
-            $status = $status && $element->sync();
+            $success = $element->sync();
+            $status = $status && $success;
         } catch (totara_sync_exception $e) {
             $msg = $e->getMessage();
             $msg .= !empty($e->debuginfo) ? " - {$e->debuginfo}" : '';
