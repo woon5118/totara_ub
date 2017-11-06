@@ -99,7 +99,7 @@ foreach ($notifications as $note) {
 }
 if (!empty($defaultnotifications)) {
     $message = get_string('missingdefaultnotifications', 'facetoface', count($defaultnotifications));
-    $addmissingdefaulturl = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id));
+    $addmissingdefaulturl = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id, 'sesskey' => sesskey()));
     $link = html_writer::link($addmissingdefaulturl, get_string('missingdefaultsfix', 'facetoface'));
     echo $OUTPUT->notification($message . ' ' . $link, 'notifymessage');
 }
