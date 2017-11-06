@@ -1025,13 +1025,13 @@ Improvements:
                    (,). Where the value contains a comma, use single quotes (') around the
                    value.
 
-    TL-9342        Time created and time modified are now recorded for Learning Plans
+    TL-9342        Time created and time modified are now recorded for Learning Plan Objectives
 
-                   We now record the time a Learning Plan was created, and when it was last
+                   We now record the time a Learning Plan Objective was created, and when it was last
                    modified.
                    Two new columns have been added to Report Builder reports to display this
                    information.
-                   Please be aware that this information is only available for Learning Plans
+                   Please be aware that this information is only available for Learning Plan Objectives
                    created or modified after upgrading to this version of Totara.
 
     TL-10216       Added Event start and finish time columns to Seminar Events report source
