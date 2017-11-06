@@ -6258,19 +6258,18 @@ abstract class rb_base_source {
     public function get_all_advanced_column_options() {
         $advoptions = array();
         $advoptions[get_string('none')][''] = '-';
-
-        foreach (array('transform', 'aggregate') as $type) {
-            $classes = $this->get_advanced_aggregation_classes($type);
-            foreach ($classes as $name => $classname) {
-                $advoptions[$classname::get_typename()][$type . '_' . $name] = get_string("{$type}type{$name}_name",
-                            'totara_reportbuilder');
+        foreach (\totara_reportbuilder\rb\transform\base::get_options() as $key => $options) {
+            $advoptions[$key] = array();
+            foreach ($options as $optionkey => $value) {
+                $advoptions[$key]['transform_' . $optionkey] = $value;
             }
         }
-
-        foreach ($advoptions as $k => $unused) {
-            \core_collator::asort($advoptions[$k]);
+        foreach (\totara_reportbuilder\rb\aggregate\base::get_options() as $key => $options) {
+            $advoptions[$key] = array();
+            foreach ($options as $optionkey => $value) {
+                $advoptions[$key]['aggregate_' . $optionkey] = $value;
+            }
         }
-
         return $advoptions;
     }
 
@@ -6341,6 +6340,8 @@ abstract class rb_base_source {
 
     /**
      * Inject column_test data into database.
+     *
+     * @codeCoverageIgnore
      * @param totara_reportbuilder_column_testcase $testcase
      */
     public function phpunit_column_test_add_data(totara_reportbuilder_column_testcase $testcase) {
@@ -6352,6 +6353,8 @@ abstract class rb_base_source {
 
     /**
      * Returns expected result for column_test.
+     *
+     * @codeCoverageIgnore
      * @param rb_column_option $columnoption
      * @return int
      */
