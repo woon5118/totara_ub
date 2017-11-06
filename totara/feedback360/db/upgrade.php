@@ -22,6 +22,8 @@
  * @subpackage feedback360
  */
 
+require_once($CFG->dirroot.'/totara/feedback360/db/upgradelib.php');
+
 /**
  * Local database upgrade script
  *
@@ -97,6 +99,15 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
 
         // Main savepoint reached.
         upgrade_plugin_savepoint(true, 2017081000, 'totara', 'feedback360');
+    }
+
+    // TL-16443 Make all multichoice questions use int for param1.
+    if ($oldversion < 2017110700) {
+
+        totara_feedback360_upgrade_fix_inconsistent_multichoice_param1();
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2017110700, 'totara', 'feedback360');
     }
 
     return true;
