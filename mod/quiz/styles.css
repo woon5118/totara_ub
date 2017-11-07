@@ -379,11 +379,13 @@ table.quizattemptsummary .noreviewmessage {
     font-size: 0.7em;
 }
 
-.quizstartbuttondiv.quizsecuremoderequired input {
+.quizstartbuttondiv.quizsecuremoderequired input,
+.quizstartbuttondiv.quizsecuremoderequired button {
     display: none;
 }
 
-.jsenabled .quizstartbuttondiv.quizsecuremoderequired input {
+.jsenabled .quizstartbuttondiv.quizsecuremoderequired input,
+.jsenabled .quizstartbuttondiv.quizsecuremoderequired button {
     display: inline;
 }
 .quizattempt #mod_quiz_preflight_form {
