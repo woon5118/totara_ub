@@ -1,4 +1,4 @@
-@mod @mod_scorm @_file_upload @_switch_iframe
+@mod @mod_scorm @_file_upload @_switch_iframe @javascript
 Feature: Scorm multi-sco completion
   In order to let students access a scorm package
   As a teacher
@@ -8,15 +8,17 @@ Feature: Scorm multi-sco completion
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
       | student1 | Student | 1 | student1@example.com |
+    And the following config values are set as admin:
+      | enablecompletion | 1 |
     And the following "courses" exist:
-      | fullname | shortname | category |
-      | Course 1 | C1 | 0 |
+      | fullname | shortname | category | enablecompletion |
+      | Course 1 | C1        | 0        | 1                |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
 
-  @javascript
+
   Scenario: Test completion with a single sco completion.
     When I log in as "teacher1"
     And I follow "Course 1"
@@ -27,12 +29,12 @@ Feature: Scorm multi-sco completion
     And I press "Save and display"
     And I add a "SCORM package" to section "1"
     And I set the following fields to these values:
-      | Name | Basic Multi-sco SCORM package |
-      | Description | Description |
-      | Completion tracking | Show activity as complete when conditions are met |
-      | Require all scos to return completion status | 0 |
+      | Name                                          | Basic Multi-sco SCORM package                     |
+      | Description                                   | Description                                       |
+      | Completion tracking                           | Show activity as complete when conditions are met |
+      | Require all scos to return "completed" status | 0                                                 |
     And I set the field "Completed" to "1"
-    And I upload "mod/scorm/tests/packages/RuntimeMinimumCalls_SCORM12.zip" file to "Package file" filemanager
+    And I upload "mod/scorm/tests/packages/multisco_w_status_no_raw_score.zip" file to "Package file" filemanager
     And I click on "Save and display" "button"
     Then I should see "Basic Multi-sco SCORM package"
     And I log out
@@ -53,7 +55,7 @@ Feature: Scorm multi-sco completion
     And I follow "Course 1"
     Then "Student 1" user has completed "Basic Multi-sco SCORM package" activity
 
-  @javascript
+
   Scenario: Test completion with all scos and correct sco load on re-entry.
     When I log in as "teacher1"
     And I follow "Course 1"
@@ -64,12 +66,12 @@ Feature: Scorm multi-sco completion
     And I press "Save and display"
     And I add a "SCORM package" to section "1"
     And I set the following fields to these values:
-      | Name | ADV Multi-sco SCORM package |
-      | Description | Description |
-      | Completion tracking | Show activity as complete when conditions are met |
-      | Require all scos to return completion status | 1 |
+      | Name                                          | ADV Multi-sco SCORM package                       |
+      | Description                                   | Description                                       |
+      | Completion tracking                           | Show activity as complete when conditions are met |
+      | Require all scos to return "completed" status | 1                                                 |
     And I set the field "Completed" to "1"
-    And I upload "mod/scorm/tests/packages/RuntimeMinimumCalls_SCORM12.zip" file to "Package file" filemanager
+    And I upload "mod/scorm/tests/packages/multisco_w_status_no_raw_score.zip" file to "Package file" filemanager
     And I click on "Save and display" "button"
     Then I should see "ADV Multi-sco SCORM package"
     And I log out

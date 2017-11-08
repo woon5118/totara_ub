@@ -1425,9 +1425,9 @@ function scorm_get_completion_state($course, $cm, $userid, $type) {
                     return completion_info::aggregate_completion_states($type, $result, false);
                 }
             }
-            return completion_info::aggregate_completion_states($type, $result, true);
+            $result &= completion_info::aggregate_completion_states($type, $result, true);
         } else if ($scorm->completionstatusrequired & $nstatus) {
-            return completion_info::aggregate_completion_states($type, $result, true);
+            $result &= completion_info::aggregate_completion_states($type, $result, true);
         } else {
             return completion_info::aggregate_completion_states($type, $result, false);
         }

@@ -18,3 +18,5 @@ Other test packages
 * validscorm.zip - non functional package with an imsmanifest.xml, used for validation check.
 * validaicc.zip - non functional package with AICC config files, used for validation check.
 * complexscorm.zip - copied from: https://github.com/jleyva/scorm-debugger
+* multisco_w_status_no_raw_score.zip - Multi-SCO packaging example. SCORM 1.2.
+* multisco_w_status_w_raw_score.zip - Multi-SCO packaging example. SCORM 1.2.
