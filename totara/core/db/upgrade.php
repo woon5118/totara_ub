@@ -173,5 +173,14 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017090600, 'totara', 'core');
     }
 
+    if ($oldversion < 2017112300) {
+        // Enable registration, only wa to disable it is via config.php,
+        // admins will be asked to select the site type during upgrade
+        // and they will be briefed about the data sending to Totara server.
+        set_config('registrationenabled', 1);
+
+        upgrade_plugin_savepoint(true, 2017112300, 'totara', 'core');
+    }
+
     return true;
 }
