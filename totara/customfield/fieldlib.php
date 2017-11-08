@@ -598,6 +598,8 @@ function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false, $
  * empty fields are not returned. Data has been passed through the appropriate
  * display_data() method.
  *
+ * @deprecated since Totara 11.0
+ *
  * @param integer $item The item the fields belong to
  * @param string $tableprefix Prefix to append '_info_field' to
  * @param string $prefix Custom field prefix (e.g. 'course' or 'position')
@@ -605,6 +607,8 @@ function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false, $
  * @return array Associate array of field names and data values
  */
 function customfield_get_fields($item, $tableprefix, $prefix) {
+
+    debugging('customfield_get_fields has been deprecated since 11.0. Please use customfield_get_data instead.', DEBUG_DEVELOPER);
 
     $out = array();
     $fields = customfield_get_fields_definition($tableprefix);
@@ -707,8 +711,7 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
                 break;
 
         }
-        $index = ($indexfullname) ? 'fullname' : 'shortname';
-        $out[s($field->{$index})] = $data;
+        $out[$indexfullname ? format_string($field->fullname) : $field->shortname] = $data;
     }
     return $out;
 }

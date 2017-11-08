@@ -240,15 +240,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      */
     private function session_customfield_table_cells($session, $customfields, $datescount = 0) {
 
-        $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+        $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession', false);
         $sessionrow = array();
 
         foreach ($customfields as $customfield) {
             if (empty($customfield->showinsummary)) {
                 continue;
             }
-            if (array_key_exists($customfield->fullname, $customfieldsdata)) {
-                $cell = new html_table_cell($customfieldsdata[$customfield->fullname]);
+            if (array_key_exists($customfield->shortname, $customfieldsdata)) {
+                $cell = new html_table_cell($customfieldsdata[$customfield->shortname]);
                 if ($datescount > 1) {
                     $cell->rowspan = $datescount;
                 }

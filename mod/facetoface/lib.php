@@ -2083,13 +2083,13 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             foreach ($sessionsignups[$session->id] as $attendee) {
                 $i++; $j=0;
                 // Custom fields.
-                $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+                $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession', false);
                 foreach ($customsessionfields as $customfield) {
                     if (empty($customfield->showinsummary)) {
                         continue; // Skip.
                     }
-                    if (array_key_exists($customfield->fullname, $customfieldsdata)) {
-                        $data = format_string($customfieldsdata[$customfield->fullname]);
+                    if (array_key_exists($customfield->shortname, $customfieldsdata)) {
+                        $data = format_string($customfieldsdata[$customfield->shortname]);
                     } else {
                         $data = '-';
                     }
@@ -2191,14 +2191,14 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             $i++; $j=0;
 
             // Custom fields.
-            $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+            $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession', false);
             foreach ($customsessionfields as $customfield) {
                 if (empty($customfield->showinsummary)) {
                     continue;
                 }
 
-                if (array_key_exists($customfield->fullname, $customfieldsdata)) {
-                    $data = format_string($customfieldsdata[$customfield->fullname]);
+                if (array_key_exists($customfield->shortname, $customfieldsdata)) {
+                    $data = format_string($customfieldsdata[$customfield->shortname]);
                 } else {
                     $data = '-';
                 }
@@ -3847,7 +3847,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     $customfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession', true, array('extended' => true));
     if (!empty($customfields)) {
         foreach ($customfields as $cftitle => $cfvalue) {
-            $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', format_string($cftitle)));
+            $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', $cftitle));
             $output .= html_writer::tag('dd', $cfvalue);
         }
     }

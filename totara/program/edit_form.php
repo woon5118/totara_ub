@@ -307,7 +307,7 @@ class program_edit_form extends moodleform {
         if (in_array($action, array('add', 'edit'))) {
             customfield_definition($mform, $program, 'program', 0, 'prog');
         } else {
-            $customfields = customfield_get_fields($program, 'prog', 'program');
+            $customfields = customfield_get_data($program, 'prog', 'program');
             if (!empty($customfields)) {
                 $mform->addElement('header', 'customfields', get_string('customfields', 'totara_customfield'));
                 foreach ($customfields as $cftitle => $cfvalue) {

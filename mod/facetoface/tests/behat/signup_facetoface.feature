@@ -50,6 +50,55 @@ Feature: Sign up to a seminar
     And I press "Save changes"
     And I log out
 
+  @totara_customfield
+  Scenario: Language filter should work on custom fields in seminar when an admin looks at the note in the seminar attendees list popup
+    Given I log in as "admin"
+
+    # Enabling multi-language filters for headings and content.
+    And I navigate to "Manage filters" node in "Site administration > Plugins > Filters"
+    And I set the field with xpath "//table[@id='filterssetting']//form[@id='activemultilang']//select[@name='newstate']" to "1"
+    And I set the field with xpath "//table[@id='filterssetting']//form[@id='applytomultilang']//select[@name='stringstoo']" to "1"
+
+    # Add sign-up custom fields.
+    And I navigate to "Custom fields" node in "Site administration > Seminars"
+    And I click on "Sign-up" "link"
+    When I set the field "datatype" to "Text input"
+    And I set the following fields to these values:
+      | fullname           | <span lang="de" class="multilang">German content</span><span lang="en" class="multilang">English content</span>  |
+      | shortname          | sampleinput                                                                                                      |
+    And I press "Save changes"
+    Then I should see "English content"
+    And I should not see "German"
+    Then I log out
+
+    # Signing up for an event as a student.
+    And I log in as "student1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    When I follow "Sign-up"
+    Then I should see "English content"
+    And I should not see "German"
+    And I set the following fields to these values:
+      | customfield_signupnote              | Note               |
+      | customfield_sampleinput             | Sample value       |
+    And I press "Sign-up"
+    And I log out
+
+    # As the trainer confirm I can see the details of the signup.
+    And I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    And I follow "Attendees"
+    And "Sam1 Student1" row "English content" column of "facetoface_sessions" table should contain "Sample value"
+    When I click on ".attendee-add-note" "css_element"
+    And I wait "1" seconds
+    Then I should not see "German"
+    And I should see "English content"
+    And I click on ".closebutton" "css_element"
+    And I log out
+
   Scenario: Sign up to a session and unable to sign up to a full session from the course page
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu

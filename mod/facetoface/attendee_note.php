@@ -58,7 +58,7 @@ $output = get_string('usernoteheading', 'facetoface', fullname($user));
 $output .= html_writer::empty_tag('hr');
 if (!empty($customfields)) {
     foreach ($customfields as $cftitle => $cfvalue) {
-        $output .= html_writer::tag('strong', str_replace(' ', '&nbsp;', format_string($cftitle)) . ': ')
+        $output .= html_writer::tag('strong', str_replace(' ', '&nbsp;', $cftitle) . ': ')
             . html_writer::span($cfvalue);
         $output .= html_writer::empty_tag('br');
     }

@@ -699,7 +699,7 @@ if (!$onlycontent && !$download) {
             $output = html_writer::start_tag('dl', array('class' => 'f2f'));
 
             foreach ($customfields as $cftitle => $cfvalue) {
-                $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', format_string($cftitle)));
+                $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', $cftitle));
                 $output .= html_writer::tag('dd', $cfvalue);
             }
 
