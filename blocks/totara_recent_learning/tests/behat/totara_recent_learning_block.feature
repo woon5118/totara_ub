@@ -103,15 +103,15 @@ Feature: Test Recent Learning block
     And I press "Customise this page"
     And I add the "Recent Learning" block
     Then I should see "Course 1" in the "Recent Learning" "block"
-    And I should see "0%" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 1')]]" "xpath_element"
+    And I should see "0%" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 1')]" "xpath_element"
     And I should see "Course 2" in the "Recent Learning" "block"
-    And I should see "0%" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 2')]]" "xpath_element"
+    And I should see "0%" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 2')]" "xpath_element"
     And I should see "Course 3" in the "Recent Learning" "block"
-    And I should see "No criteria" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 3')]]" "xpath_element"
+    And I should see "No criteria" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 3')]" "xpath_element"
     And I should see "Course 4" in the "Recent Learning" "block"
-    And I should see "0%" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 4')]]" "xpath_element"
+    And I should see "0%" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 4')]" "xpath_element"
     And I should see "Course 5" in the "Recent Learning" "block"
-    And I should see "Not tracked" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 5')]]" "xpath_element"
+    And I should see "Not tracked" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 5')]" "xpath_element"
 
     # Complete some activities
     And I click on "Find Learning" in the totara menu
@@ -134,14 +134,14 @@ Feature: Test Recent Learning block
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 1" in the "Recent Learning" "block"
-    And I should see "50%" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 1')]]" "xpath_element"
+    And I should see "50%" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 1')]" "xpath_element"
     And I should see "Course 2" in the "Recent Learning" "block"
-    And I should see "100%" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 2')]]" "xpath_element"
+    And I should see "100%" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 2')]" "xpath_element"
     And I should see "Course 3" in the "Recent Learning" "block"
-    And I should see "No criteria" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 3')]]" "xpath_element"
+    And I should see "No criteria" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 3')]" "xpath_element"
     And I should see "Course 4" in the "Recent Learning" "block"
-    And I should see "0%" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 4')]]" "xpath_element"
+    And I should see "0%" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 4')]" "xpath_element"
     And I should see "Course 5" in the "Recent Learning" "block"
-    And I should see "Not tracked" in the "//table[contains(@class, 'recent_learning')]//tr[td[contains (., 'Course 5')]]" "xpath_element"
+    And I should see "Not tracked" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 5')]" "xpath_element"
 
     And I log out
