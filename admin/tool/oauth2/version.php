@@ -28,3 +28,4 @@ $plugin->version   = 2018120300; // The current plugin version (Date: YYYYMMDDXX
 $plugin->requires  = 2017051500; // Requires this Moodle version.
 $plugin->component = 'tool_oauth2'; // Full name of the plugin (used for diagnostics).
 $plugin->backported = 'v3.6.4'; // Backported from this upstream tagged release.
+
