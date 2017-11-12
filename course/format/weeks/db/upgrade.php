@@ -36,6 +36,9 @@ function xmldb_format_weeks_upgrade($oldversion) {
     // Automatically generated Moodle v3.3.0 release upgrade line.
     // Put any upgrade step following this.
 
+    // Automatically generated Moodle v3.4.0 release upgrade line.
+    // Put any upgrade step following this.
+
     if ($oldversion < 2017051501) {
 
         // During upgrade to Moodle 3.3 it could happen that general section (section 0) became 'invisible'.

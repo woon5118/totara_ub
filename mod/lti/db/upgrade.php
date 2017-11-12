@@ -63,8 +63,6 @@ function xmldb_lti_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Totara 10 branching line.
-
     if ($oldversion < 2016041800) {
 
         // Define field description to be added to lti_types.
@@ -154,6 +152,8 @@ function xmldb_lti_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017051501, 'lti');
     }
 
-    return true;
+    // Automatically generated Moodle v3.4.0 release upgrade line.
+    // Put any upgrade step following this.
 
+    return true;
 }

@@ -189,7 +189,7 @@ function xmldb_auth_ldap_upgrade($oldversion) {
         }
     }
 
-    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

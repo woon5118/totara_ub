@@ -34,8 +34,6 @@ function xmldb_scorm_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Totara 10 branching line.
-
     // MDL-50620 Add mastery override option.
     if ($oldversion < 2016021000) {
         $table = new xmldb_table('scorm');

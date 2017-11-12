@@ -39,8 +39,6 @@ function xmldb_workshop_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Totara 10 branching line.
-
     if ($oldversion < 2016022200) {
         // Add field submissionfiletypes to the table workshop.
         $table = new xmldb_table('workshop');

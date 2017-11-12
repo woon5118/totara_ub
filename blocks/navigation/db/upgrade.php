@@ -84,5 +84,8 @@ function xmldb_block_navigation_upgrade($oldversion, $block) {
         upgrade_plugin_savepoint(true, 2017051500.01, 'block', 'navigation');
     }
 
+    // Automatically generated Moodle v3.4.0 release upgrade line.
+    // Put any upgrade step following this.
+
     return true;
 }
