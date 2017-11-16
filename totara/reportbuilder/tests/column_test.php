@@ -920,6 +920,15 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             // Remove the report again so reports report source gets expected count.
             $DB->delete_records('report_builder_columns', ['reportid' => $reportid]);
             $DB->delete_records('report_builder', ['id' => $reportid]);
+
+            // Make sure the type string exists.
+            $langstr = 'type_' . $column->type;
+            if (!get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)
+                and !get_string_manager()->string_exists($langstr, 'totara_reportbuilder')
+            ) {
+                // Display in missing string format to make it obvious.
+                $type = get_string($langstr, 'rb_source_' . $sourcename);
+            }
         }
 
         $sortorder = 1;
@@ -978,6 +987,15 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
             // Just try to get the count, we cannot guess the actual number here.
             $rb->get_filtered_count();
+
+            // Make sure the type string exists.
+            $langstr = 'type_' . $filter->type;
+            if (!get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)
+                and !get_string_manager()->string_exists($langstr, 'totara_reportbuilder')
+            ) {
+                // Display in missing string format to make it obvious.
+                $type = get_string($langstr, 'rb_source_' . $sourcename);
+            }
         }
 
         // Make sure that joins are not using reserved SQL keywords.
@@ -1093,5 +1111,36 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         }
 
         reportbuilder_purge_cache($bigreportid, false);
+    }
+
+    public function test_embedded_reports() {
+        $this->resetAfterTest();
+
+        $embeddedobjects = reportbuilder_get_all_embedded_reports();
+        foreach ($embeddedobjects as $embeddedobject) {
+            $source = reportbuilder::get_source_object($embeddedobject->source, false, true, null);
+
+            foreach ($embeddedobject->columns as $column) {
+                foreach ($source->columnoptions as $option) {
+                    /** @var rb_column_option $option */
+                    if ($column['type'] === $option->type and $column['value'] === $option->value) {
+                        continue 2;
+                    }
+                }
+                $columnname = $column['type'] . '-' . $column['value'];
+                $this->fail("Invalid column {$columnname} detected in embedded report {$embeddedobject->shortname}");
+            }
+
+            foreach ($embeddedobject->filters as $filter) {
+                foreach ($source->filteroptions as $option) {
+                    /** @var rb_filter_option $option */
+                    if ($filter['type'] === $option->type and $filter['value'] === $option->value) {
+                        continue 2;
+                    }
+                }
+                $filtername = $filter['type'] . '-' . $filter['value'];
+                $this->fail("Invalid filter {$filtername} detected in embedded report {$embeddedobject->shortname}");
+            }
+        }
     }
 }

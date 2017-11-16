@@ -98,7 +98,7 @@ final class rb_manage_scheduled_reports_embedded extends rb_base_embedded {
         return [
             [
                 'type' => 'report',
-                'value' => 'namelinkeditview',
+                'value' => 'name',
                 'advanced' => 0
             ],
             [
@@ -111,16 +111,6 @@ final class rb_manage_scheduled_reports_embedded extends rb_base_embedded {
                 'value' => 'format',
                 'advanced' => 0
             ],
-            [
-                'type' => 'schedule',
-                'value' => 'schedule',
-                'advanced' => 0
-            ],
-            [
-                'type' => 'schedule',
-                'value' => 'next',
-                'advanced' => 0
-            ]
         ];
     }
 

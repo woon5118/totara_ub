@@ -184,7 +184,7 @@ final class rb_source_scheduled_reports extends rb_base_source {
         $defaultfilters = [
             [
                 'type' => 'report',
-                'value' => 'namelinkview'
+                'value' => 'name'
             ],
             [
                 'type' => 'user',
@@ -194,14 +194,6 @@ final class rb_source_scheduled_reports extends rb_base_source {
                 'type' => 'schedule',
                 'value' => 'format'
             ],
-            [
-                'type' => 'schedule',
-                'value' => 'schedule'
-            ],
-            [
-                'type' => 'schedule',
-                'value' => 'next'
-            ]
         ];
 
         return $defaultfilters;
