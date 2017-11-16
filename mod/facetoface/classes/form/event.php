@@ -830,6 +830,9 @@ class event extends \moodleform {
             facetoface_update_attendees($session);
         }
 
+        // Set session dates.
+         $session->sessiondates = $sessiondates;
+
         // Get details.
         // This should be done before sending any notification as it could be a required field in their template.
         $data = file_postupdate_standard_editor($fromform, 'details', $this->editoroptions, $this->context, 'mod_facetoface', 'session', $session->id);
@@ -842,7 +845,6 @@ class event extends \moodleform {
         }
 
         // Save any calendar entries.
-        $session->sessiondates = $sessiondates;
         facetoface_update_calendar_entries($session, $facetoface);
 
         if ($update) {
@@ -851,6 +853,12 @@ class event extends \moodleform {
                 $attendees = facetoface_get_attendees($session->id);
                 foreach ($attendees as $user) {
                     facetoface_send_datetime_change_notice($facetoface, $session, $user->id, $olddates);
+                }
+                $sessiontrainers = facetoface_get_trainers($session->id);
+                foreach ($sessiontrainers as $roleid => $trainers) {
+                    foreach ($trainers as $trainer) {
+                        facetoface_send_datetime_change_notice($facetoface, $session, $trainer->id, $olddates);
+                    }
                 }
             }
             \mod_facetoface\event\session_updated::create_from_session($session, $this->context)->trigger();
