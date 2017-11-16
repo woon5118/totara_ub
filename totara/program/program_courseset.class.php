@@ -213,26 +213,15 @@ abstract class course_set {
     /**
      * Returns a html string with warnings or blank if none
      *
+     * @deprecated since Totara 10.0.
      * @global object $DB
      * @param object $course
      * @return string html content
      */
-   protected function get_course_warnings($course) {
-       global $DB, $OUTPUT;
-
-       $content = '';
-       $modinfo = get_fast_modinfo($course);
-       if (!empty($modinfo->instances['facetoface'])) {
-           // Is facetoface multiple session set to true?
-           $facetofaceids = array_keys($modinfo->get_instances_of('facetoface'));
-           list($sql, $params) = $DB->get_in_or_equal($facetofaceids);
-
-           if ($DB->record_exists_select('facetoface', 'multiplesessions = 0 AND id ' . $sql, $params)) {
-               $content .= $OUTPUT->notification(get_string('multiplefacetofacewarning', 'totara_program'), 'notifyproblem');
-           }
-       }
-       return $content;
-   }
+    protected function get_course_warnings($course) {
+        debugging('course_set::get_course_warnings is deprecated and no longer has any purpose', DEBUG_DEVELOPER);
+        return '';
+    }
 
     /**
      * Returns true or false depending on whether or not this course set
@@ -1269,7 +1258,6 @@ class multi_course_set extends course_set {
                 $content .= html_writer::end_tag('a');
                 $content .= format_string($course->fullname);
                 $content .= html_writer::end_tag('div');
-                $content .= $this->get_course_warnings($course);
                 $list .= html_writer::tag('li', $content);
             }
             $ulattrs = array('id' => $prefix.'courselist', 'class' => 'course_list');
@@ -1605,7 +1593,6 @@ class multi_course_set extends course_set {
                 $content .= html_writer::end_tag('a');
                 $content .= format_string($course->fullname);
                 $content .= html_writer::end_tag('div');
-                $content .= $this->get_course_warnings($course);
                 $list .= html_writer::tag('li', $content);
             }
             $ulattrs = array('id' => $prefix.'displaycourselist', 'class' => 'course_list');
@@ -2208,7 +2195,6 @@ class competency_course_set extends course_set {
                     $content .= html_writer::end_tag('a');
                     $content .= format_string($course->fullname);
                     $content .= html_writer::end_tag('div');
-                    $content .= $this->get_course_warnings($course);
                     $list .= html_writer::tag('li', $content);
                 }
                 $ulattrs = array('id' => $prefix.'courselist', 'class' => 'course_list');

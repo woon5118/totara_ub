@@ -3574,6 +3574,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      * Test facetoface_can_user_signup()
      */
     public function test_facetoface_can_user_signup() {
+        global $DB;
         $now = time();
         $course = $this->getDataGenerator()->create_course();
         $room = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 1));
@@ -3674,5 +3675,55 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         facetoface_user_signup($session7, $facetoface7, $course, '', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user71->id);
         $this->assertDebuggingCalled();
         $this->assertFalse(facetoface_can_user_signup($session7, $user72->id, $now));
+
+    }
+
+    /**
+     * facetoface_has_unarchived_signups:
+     *     returns true if there is another sign up
+     *     returns false if there is:
+     *         a sign up that was part of a certification that expired
+     *         no signups
+     */
+    public function test_facetoface_has_unarchived_signups_basecase() {
+        global $DB, $PAGE;
+        $now = time();
+        $course = $this->getDataGenerator()->create_course();
+        $room = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 1));
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+        $sessiondates = [$this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $room->id)];
+        $sessionid = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface->id,
+            'sessiondates' => $sessiondates,
+            'registrationtimestart' => $now - (DAYSECS * 1),
+            'registrationtimefinish' => $now + (DAYSECS * 1),
+        ));
+        $session2id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface->id,
+            'sessiondates' => $sessiondates,
+            'registrationtimestart' => $now - (DAYSECS * 1),
+            'registrationtimefinish' => $now + (DAYSECS * 1),
+        ));
+        $session = facetoface_get_session($sessionid);
+        $session2 = facetoface_get_session($session2id);
+
+        // There are no signups.
+        $this->assertFalse(facetoface_has_unarchived_signups($facetoface->id, $user->id));
+
+        facetoface_user_signup($session, $facetoface, $course, '', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user->id);
+        $this->assertDebuggingCalled(); // To catch to error thown from the page url not being set.
+
+        // There is one unarchived signup.
+        $this->assertTrue(facetoface_has_unarchived_signups($facetoface->id, $user->id));
+        $this->assertTrue(facetoface_has_unarchived_signups($facetoface->id, $user->id));
+
+        $dataobj = $DB->get_record('facetoface_signups', ['sessionid' => $session->id, 'userid' => $user->id], '*', MUST_EXIST);
+        $dataobj->archived = 1;
+        $DB->update_record('facetoface_signups', $dataobj);
+
+        // There is one archived signup.
+        $this->assertFalse(facetoface_has_unarchived_signups($facetoface->id, $user->id));
     }
 }

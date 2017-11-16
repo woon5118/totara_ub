@@ -2993,7 +2993,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $declareinterest_link = html_writer::link($declareinterest_url, $declareinterest_label, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $declareinterest_label));
 
     // User has signedup for the instance.
-    if ($submissions = facetoface_get_user_submissions($facetoface->id, $USER->id)) {
+    if (facetoface_has_unarchived_signups($facetoface->id, $USER->id)) {
+        $submissions = facetoface_get_user_submissions($facetoface->id, $USER->id);
         if (!$facetoface->multiplesessions) {
             // First submission only.
             $submissions = array(array_shift($submissions));
@@ -3812,9 +3813,13 @@ function facetoface_print_calendar_session($event) {
         $linkurl = $CFG->wwwroot . "/mod/facetoface/signup.php?s=$session->id";
         $output .= get_string("calendareventdescriptionbooking", 'facetoface', $linkurl);
     } else  if ($facetoface->showoncalendar == F2F_CAL_SITE || $facetoface->showoncalendar == F2F_CAL_COURSE) {
-        $linkurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
-        $linktext = get_string('signupforthissession', 'facetoface');
-        $output .= html_writer::link($linkurl, $linktext);
+        // If the user has not signed up before.
+        if (!facetoface_has_unarchived_signups($session->facetoface, $USER->id)
+            || $facetoface->multiplesessions == '1') {
+            $linkurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
+            $linktext = get_string('signupforthissession', 'facetoface');
+            $output .= html_writer::link($linkurl, $linktext);
+        }
     } else {
         $output = '';
     }
@@ -6341,8 +6346,42 @@ function facetoface_can_user_signup($session, $userid, $time = 0) {
     if (!empty($session->registrationtimefinish) && $session->registrationtimefinish < $time) {
         return false;
     }
-
     return true;
+}
+
+/**
+ * Check if the user has any signups that don't have any of the following
+ *     not being archived
+ *     cancelled by user
+ *     declined
+ *     session cancelled
+ *     status not set
+ * @param int $facetofaceid
+ * @param int $userid
+ * @return bool
+ */
+function facetoface_has_unarchived_signups($facetofaceid, $userid) {
+    global $DB;
+
+    $sql  = "SELECT 1 FROM {facetoface_signups} ftf_sign
+               JOIN {facetoface_sessions} sess
+                    ON sess.facetoface = :facetofaceid
+               JOIN {facetoface_signups_status} sign_stat
+                    ON sign_stat.signupid = ftf_sign.id
+                    AND sign_stat.superceded <> 1
+              WHERE ftf_sign.userid = :userid
+                AND ftf_sign.sessionid = sess.id
+                AND ftf_sign.archived <> 1
+                AND sign_stat.statuscode > :statusdeclined
+                AND sign_stat.statuscode <> :statusnotset";
+
+    $params = array('facetofaceid' => $facetofaceid,
+        'userid' => $userid,
+        'statusdeclined' => MDL_F2F_STATUS_DECLINED,
+        'statusnotset' => MDL_F2F_STATUS_NOT_SET);
+
+    // Check if user is already signed up to a session in the facetoface and it has not been archived.
+    return $DB->record_exists_sql($sql, $params);
 }
 
 /**
@@ -6616,7 +6655,8 @@ function facetoface_validate_user_import($user, $context, $facetoface, $session,
     // If multiple sessions are allowed then just check against this session
     // Otherwise check against all sessions
     $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
-    if (facetoface_get_user_submissions($facetoface->id, $user->id, $minimumstatus, MDL_F2F_STATUS_FULLY_ATTENDED, $multisessionid)) {
+    if (facetoface_get_user_submissions($facetoface->id, $user->id, $minimumstatus, MDL_F2F_STATUS_FULLY_ATTENDED, $multisessionid)
+        && empty($facetoface->multiplesessions) && facetoface_has_unarchived_signups($facetoface->id, $user->id)) {
         if ($user->id == $USER->id) {
             $result['result'] = get_string('error:addalreadysignedupattendeeaddself', 'facetoface');
         } else {

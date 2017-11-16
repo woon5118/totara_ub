@@ -39,7 +39,7 @@ class seminar_calendar_dynamic_content {
      * @param calendar_dynamic_content $hook
      */
     public static function signup(calendar_dynamic_content $hook) {
-        global $USER, $PAGE;
+        global $USER, $PAGE, $DB;
 
         if (!$session = facetoface_get_session($hook->event->uuid)) {
             return;
@@ -47,19 +47,25 @@ class seminar_calendar_dynamic_content {
 
         $content = '';
         $class = 'pull-right';
+
         if (facetoface_check_signup($session->facetoface, $session->id)) {
             $class .= ' text-uppercase label label-default';
             $content = get_string('booked', 'mod_facetoface');
         } else if (facetoface_can_user_signup($session, $USER->id)) {
-            $content = \html_writer::link(
-                new \moodle_url('/mod/facetoface/signup.php',
-                    array('s' => $hook->event->uuid,
-                        'returnurl' => $PAGE->url,
-                    )
-                ),
-                get_string('signup', 'mod_facetoface'),
-                array('class' => 'btn btn-default btn-sm')
-            );
+            $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), 'multiplesessions');
+            if (!facetoface_has_unarchived_signups($session->facetoface, $USER->id)
+                || $facetoface->multiplesessions) {
+
+                $content = \html_writer::link(
+                    new \moodle_url('/mod/facetoface/signup.php',
+                        array('s' => $hook->event->uuid,
+                            'returnurl' => $PAGE->url,
+                        )
+                    ),
+                    get_string('signup', 'mod_facetoface'),
+                    array('class' => 'btn btn-default btn-sm')
+                );
+            }
         }
         if (!empty($content)) {
             $hook->content .= \html_writer::div($content, $class);

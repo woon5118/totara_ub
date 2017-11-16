@@ -723,7 +723,6 @@ $string['multicourseset'] = 'Set of courses';
 $string['multicourseset_help'] = 'This is a set of courses chosen individually from the course catalogue.
 
 You can define the set name, whether the Learner must complete one or all courses and the general time allowance to complete the set.';
-$string['multiplefacetofacewarning'] = 'Warning : this course has seminar activity without multiple events set';
 $string['nocertificationlearning'] = 'No certifications';
 $string['nocontent'] = 'Does not contain any content';
 $string['nocoursecontent'] = 'No course content.';
@@ -1105,6 +1104,7 @@ $string['duplicatecourse'] = 'Already assigned to a different certification that
 $string['error:info_timedueunknown'] = 'This problem could cause program assignment exceptions, prevent the learner accessing the program or certification, or other problems related to the internal processing of this record. It should be fixed manually, by either disabling the \'Due date\' or setting a valid \'Due date\'.';
 $string['learnersassigned'] = '{$a->total} learner(s) assigned. {$a->assignments} learner(s) are active, {$a->exceptions} with exception(s)';
 $string['learnersassignedexceptions'] = '{$a->total} learner(s) assigned. {$a->assignments} learner(s) are active, <strong>{$a->exceptions} with exception(s)</strong>';
+$string['multiplefacetofacewarning'] = 'Warning : this course has seminar activity without multiple events set';
 $string['overrideandaddprogram'] = 'Override and add program';
 $string['setrealistictimeallowance'] = 'Set realistic time allowance';
 $string['total'] = 'Total';

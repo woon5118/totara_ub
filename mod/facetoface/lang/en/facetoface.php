@@ -491,6 +491,7 @@ $string['enablemincapacity'] = 'Enable minimum bookings';
 $string['enablemincapacitynotification'] = 'Notify about minimum bookings';
 $string['enablemincapacitynotification_help'] = 'If the minimum bookings have not been reached by the cut-off point, then the appropriate users will be notified. Users to be notified is determined by the role assignments and the configuration setting under Site administration > Seminars > General Settings > Notification';
 $string['enrolled'] = 'enrolled';
+$string['error:alreadysignedup'] = 'Already signed up';
 $string['error:addalreadysignedupattendee'] = 'This user is already signed-up for this seminar activity.';
 $string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this seminar activity.';
 $string['error:addattendee'] = 'Could not add {$a} to the event.';

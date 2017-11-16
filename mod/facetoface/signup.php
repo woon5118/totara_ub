@@ -131,7 +131,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
     if (!facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
         print_error('sessionisfull', 'facetoface', $returnurl);
-    } else if (facetoface_get_user_submissions($facetoface->id, $USER->id, MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_FULLY_ATTENDED, $multisessionid)) {
+    } else if (facetoface_has_unarchived_signups($facetoface->id, $USER->id) && empty($facetoface->multiplesessions)) {
         print_error('alreadysignedup', 'facetoface', $returnurl);
     } else if (!empty($session->registrationtimestart) && ($session->registrationtimestart > time())) {
         $refresh = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
@@ -244,7 +244,15 @@ $heading = get_string($strheading, 'facetoface', $facetoface->name);
 $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
 $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
 $signedup = facetoface_check_signup($facetoface->id, $multisessionid);
-if ($signedup and $signedup != $session->id) {
+$sessionssignedupto = array_column(
+    facetoface_get_user_submissions($facetoface->id,
+        $USER->id,
+        MDL_F2F_STATUS_REQUESTED,
+        MDL_F2F_STATUS_FULLY_ATTENDED),
+    'sessionid');
+
+if ($signedup and !in_array($signedup, $sessionssignedupto)
+    and facetoface_has_unarchived_signups($facetoface->id, $USER->id) and empty($facetoface->multiplesessions)) {
     print_error('error:signedupinothersession', 'facetoface', $returnurl);
 }
 
@@ -283,7 +291,7 @@ if (!facetoface_get_attendee($session->id, $USER->id)
 
 echo facetoface_print_session($session, $viewattendees, false, false, $signedup);
 
-if ($signedup) {
+if ($signedup && $signedup == $session->id) {
     if (facetoface_allow_user_cancellation($session)) {
         // Cancellation link.
         $canceltext = facetoface_is_user_on_waitlist($session) ? get_string('cancelwaitlist', 'facetoface') : get_string('cancelbooking', 'facetoface');

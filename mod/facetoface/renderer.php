@@ -574,7 +574,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @throws coding_exception
      */
     private function session_options_signup_link($session, $sessionstarted, $regdatestooltip = false, $returntoallsessions = true, $displaytimezones = true) {
-
+        global $USER, $DB;
         $signuplink = '';
 
         $timenow = time();
@@ -600,7 +600,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', $urlparams);
 
         $hasbookedsession = !empty($session->bookedsession);
-        $isbookedsession = ($hasbookedsession && ($session->id == $session->bookedsession->sessionid));
+        $isbookedsession = ($hasbookedsession
+            && in_array($session->id, array_column(facetoface_get_user_submissions($session->facetoface, $USER->id), 'sessionid')));
+
         // Check if the user is allowed to cancel his booking.
         $allowcancellation = facetoface_allow_user_cancellation($session);
         if ($isbookedsession) {
@@ -612,19 +614,26 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
                 $signuplink .= html_writer::link($cancelurl, get_string($canceltext, 'facetoface'), array('title' => get_string($canceltext, 'facetoface')));
             }
-        } else if (!$sessionstarted and !$hasbookedsession) {
+        } else if (!$sessionstarted) {
             if (!facetoface_session_has_capacity($session, $this->context, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
                 $signuplink .= get_string('none', 'facetoface');
             } else {
-                if (empty($session->cancelledstatus) && $registrationopen == true && $registrationclosed == false) {
-                    // Ok to register.
-                    if ($regdatestooltip) {
-                        $tooltip = $this->get_regdates_tooltip_info($session, $displaytimezones);
+                $facetoface = $DB->get_record('facetoface', ['id' => $session->facetoface], 'multiplesessions');
+                if (empty($session->cancelledstatus)) {
+                    if (!facetoface_has_unarchived_signups($session->facetoface, $USER->id)
+                        || $facetoface->multiplesessions == "1") {
+                        // Ok to register.
+                        if ($regdatestooltip) {
+                            $tooltip = $this->get_regdates_tooltip_info($session, $displaytimezones);
+                        } else {
+                            $tooltip = '';
+                        }
+                        $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
+                        $signuplink .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'), array('title' => $tooltip, 'aria-label' => $tooltip));
                     } else {
-                        $tooltip = '';
+                        $signuplink .= html_writer::span(get_string('error:alreadysignedup', 'facetoface'), '',
+                            array('aria-label' => get_string('error:alreadysignedup', 'facetoface')));
                     }
-                    $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
-                    $signuplink .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'), array('title' => $tooltip, 'aria-label' => $tooltip));
                 } else if ($registrationclosed == true) {
                     // Registration has closed for this session.
                     if ($regdatestooltip) {
