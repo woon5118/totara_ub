@@ -1803,7 +1803,11 @@ abstract class rb_base_source {
         }
     }
 
+    /**     *
+     * @deprecated Since 10.2; replaced by totara/reportbuilder/classes/rb/display/user_email class.
+     */
     function rb_display_user_email($email, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_user_email has been deprecated. Please use the totara/reportbuilder/classes/rb/display/user_email class instead', DEBUG_DEVELOPER);
         if (empty($email)) {
             return '';
         }
@@ -1824,7 +1828,11 @@ abstract class rb_base_source {
         }
     }
 
+    /**     *
+     * @deprecated Since 10.2; replaced by totara/reportbuilder/classes/rb/display/user_email_unobscured class.
+     */
     public function rb_display_user_email_unobscured($email, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_user_email_unobscured has been deprecated. Please use the totara/reportbuilder/classes/rb/display/user_email_unobscured class instead', DEBUG_DEVELOPER);
         if ($isexport) {
             return $email;
         } else {
