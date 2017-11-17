@@ -115,7 +115,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
-    And I click on "Edit date" "link"
+    And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
@@ -143,7 +143,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I follow "Go back"
 
     And I follow "Add a new event"
-    And I click on "Edit date" "link"
+    And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 2    |
@@ -230,7 +230,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
-    And I click on "Edit date" "link"
+    And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
@@ -258,7 +258,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I follow "Go back"
 
     And I follow "Add a new event"
-    And I click on "Edit date" "link"
+    And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 2    |
@@ -289,7 +289,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I follow "Course 2"
     And I follow "View all events"
     And I follow "Add a new event"
-    And I click on "Edit date" "link"
+    And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
       | timestart[month]   | 1    |
@@ -317,7 +317,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
 
     And I follow "Go back"
     And I follow "Add a new event"
-    And I click on "Edit date" "link"
+    And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
       | timestart[month]   | 2    |
