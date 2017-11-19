@@ -31,7 +31,6 @@ Feature: Verify the LCA block content displays the correct information.
     # Return to My Learning to check the content of the block.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 1" in the "Last Course Accessed" "block"
-    And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     # The admin should not see a progress bar as they're not enrolled on the course.
     And I should see "Not tracked" in the "Last Course Accessed" "block"
 
@@ -42,7 +41,6 @@ Feature: Verify the LCA block content displays the correct information.
     # Return to My Learning to check the content of the block.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
-    And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     # The admin should not see a progress bar as they're not enrolled on the course.
     And I should see "Not tracked" in the "Last Course Accessed" "block"
 
@@ -81,7 +79,6 @@ Feature: Verify the LCA block content displays the correct information.
     # Return to My Learning to check the content of the block.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 1" in the "Last Course Accessed" "block"
-    And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "No criteria" in the "Last Course Accessed" "block"
 
@@ -92,7 +89,6 @@ Feature: Verify the LCA block content displays the correct information.
     # Return to My Learning to check the content of the block.
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
-    And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "0%" in the "Last Course Accessed" "block"
 
@@ -102,7 +98,6 @@ Feature: Verify the LCA block content displays the correct information.
     And I follow "Test Page"
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
-    And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "100%" in the "Last Course Accessed" "block"
 
@@ -176,7 +171,6 @@ Feature: Verify the LCA block content displays the correct information.
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
-    And I should see "Within the last five minutes" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "33%" in the "Last Course Accessed" "block"
 
