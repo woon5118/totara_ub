@@ -95,7 +95,7 @@ class auth_plugin_email extends auth_plugin_base {
      * @param boolean $notify print notice with link and terminate
      */
     function user_signup($user, $notify=true) {
-        global $CFG, $DB;
+        global $CFG, $DB, $SESSION;
         require_once($CFG->dirroot.'/user/profile/lib.php');
         require_once($CFG->dirroot.'/user/lib.php');
 
@@ -114,6 +114,11 @@ class auth_plugin_email extends auth_plugin_base {
 
         // Totara: We need to update primary position fields here.
         position_save_data($user);
+
+        // Save wantsurl against user profile, so we can return them there later.
+        if (!empty($SESSION->wantsurl)) {
+            set_user_preference('auth_email_wantsurl', $SESSION->wantsurl, $user);
+        }
 
         // Trigger event.
         \core\event\user_created::create_from_userid($user->id)->trigger();
@@ -152,7 +157,7 @@ class auth_plugin_email extends auth_plugin_base {
      * @return int AUTH_CONFIRM_ constant
      */
     function user_confirm($username, $confirmsecret) {
-        global $DB;
+        global $DB, $SESSION;
         $user = get_complete_user_data('username', $username);
 
         if (!empty($user)) {
@@ -164,6 +169,12 @@ class auth_plugin_email extends auth_plugin_base {
 
             } else if ($user->secret == $confirmsecret) {   // They have provided the secret key to get in
                 $DB->set_field("user", "confirmed", 1, array("id"=>$user->id));
+
+                if ($wantsurl = get_user_preferences('auth_email_wantsurl', false, $user)) {
+                    // Ensure user gets returned to page they were trying to access before signing up.
+                    $SESSION->wantsurl = $wantsurl;
+                    unset_user_preference('auth_email_wantsurl', $user);
+                }
 
                 // TOTARA - throw an event for user confirmation.
                 \core\event\user_confirmed::create_from_userid($user->id)->trigger();

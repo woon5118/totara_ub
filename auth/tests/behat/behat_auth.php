@@ -71,4 +71,19 @@ class behat_auth extends behat_base {
         // Click on logout link in footer, as it's much faster.
         $this->execute('behat_general::i_click_on_in_the', array(get_string('logout'), 'link', '#page-footer', "css_element"));
     }
+
+    /**
+     * Confirms a user
+     *
+     * @Given /^confirm self-registered login as user "(?P<username_string>(?:[^"]|\\")*)"$/
+     */
+    public function confirm_selfregistered_login_as_user($username) {
+        global $CFG, $DB;
+
+        \behat_hooks::set_step_readonly(false);
+
+        $user = $DB->get_record('user', array('username' => $username));
+
+        $this->getSession()->visit($this->locate_path('/login/confirm.php?data=' . $user->secret . '/' . $user->username));
+    }
 }
