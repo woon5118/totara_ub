@@ -406,7 +406,7 @@ class totara_sync_element_user extends totara_sync_element {
                         if (!$updatepassword && !empty($this->config->undeletepwreset)) {
                             // If the password wasn't supplied in the sync and reset is enabled then tag the revived
                             // user for new password generation (if applicable).
-                            $userauth = get_auth_plugin(strtolower($user->auth));
+                            $userauth = get_auth_plugin($user->auth);
                             if ($userauth->can_change_password()) {
                                 set_user_preference('auth_forcepasswordchange', 1, $user->id);
                                 set_user_preference('create_password',          1, $user->id);
@@ -449,10 +449,10 @@ class totara_sync_element_user extends totara_sync_element {
 
                 // Update user password.
                 if ($updatepassword) {
-                    $userauth = get_auth_plugin(strtolower($user->auth));
+                    $userauth = get_auth_plugin($user->auth);
                     if ($userauth->can_change_password()) {
                         $passwordupdateproblem = false;
-                        if (strtolower($user->auth) === 'manual' && !empty($CFG->tool_totara_sync_enable_fasthash)) {
+                        if ($user->auth === 'manual' && !empty($CFG->tool_totara_sync_enable_fasthash)) {
                             if (!update_internal_user_password($user, $suser->password, true)) {
                                 $passwordupdateproblem = true;
                             }
@@ -476,7 +476,7 @@ class totara_sync_element_user extends totara_sync_element {
                 }
 
                 // Using auth plugin that does not allow password changes, lets clear auth_forcepasswordchange setting.
-                $userauth = get_auth_plugin(strtolower($user->auth));
+                $userauth = get_auth_plugin($user->auth);
                 if (!$userauth->can_change_password()) {
                     set_user_preference('auth_forcepasswordchange', 0, $user->id);
                     set_user_preference('create_password', 0, $user->id);
@@ -528,7 +528,7 @@ class totara_sync_element_user extends totara_sync_element {
             $user->mnethostid = $CFG->mnet_localhost_id;
             $user->lang = $CFG->lang;
             $user->timecreated = time();
-            $user->auth = isset($suser->auth) ? strtolower($suser->auth) : 'manual';
+            $user->auth = isset($suser->auth) ? $suser->auth : 'manual';
             $this->set_sync_user_fields($user, $suser, $saveemptyfields);
 
             try {
@@ -539,7 +539,7 @@ class totara_sync_element_user extends totara_sync_element {
             }
 
             try {
-                $userauth = get_auth_plugin(strtolower($user->auth));
+                $userauth = get_auth_plugin($user->auth);
             } catch (Exception $e) {
                 // Throws exception which will be captured by caller.
                 $transaction->rollback(new totara_sync_exception('user', 'createusers', 'invalidauthforuserx', $user->auth));
@@ -553,7 +553,7 @@ class totara_sync_element_user extends totara_sync_element {
                 } else {
                     // Set user password.
                     $passwordupdateproblem = false;
-                    if (strtolower($user->auth) === 'manual' && !empty($CFG->tool_totara_sync_enable_fasthash)) {
+                    if ($user->auth === 'manual' && !empty($CFG->tool_totara_sync_enable_fasthash)) {
                         if (!update_internal_user_password($user, $suser->password, true)) {
                             $passwordupdateproblem = true;
                         }
