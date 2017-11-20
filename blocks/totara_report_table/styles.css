@@ -1,18 +1,12 @@
 .block_totara_report_table .instantreportwait {
     display: block;
     position: absolute;
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.block_totara_report_table .instantreportwait span {
-    display: inline-block;
-    margin: auto;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
 }
 
 .block_totara_report_table .rb-display-table-container {
     width: 100%;
+}
+
+.block_totara_report_table .rb-loading .totara-table-container {
+    opacity: 0.5;
 }
