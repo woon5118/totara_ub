@@ -554,11 +554,16 @@ class completion_completion extends data_object {
         // Check if already complete.
         if ($this->timecompleted) {
             // Check if already complete.
-            // If we need to build progressinfo, follow the full path as if we didn't know that the activity is already completed.
-            // If completed via rpl, init the progressinfo to reflect this
+            // If completed add customdata with detail to be used when showing summary information
             $customdata = null;
+            $format = get_string('strfdateshortmonth', 'langconfig');
+            $a = array('timecompleted' => userdate($this->timecompleted, $format));
+
             if (!empty($this->rpl) && $this->status == COMPLETION_STATUS_COMPLETEVIARPL) {
-                $customdata = array('rpl' => $this->rpl);
+                $a['rpl'] = $this->rpl;
+                $customdata = array('completion' => get_string('completedviarpl-on', 'completion', $a));
+            } else {
+                $customdata = array('completion' => get_string('completed-on', 'completion', $a));
             }
             // Create a complete progressinfo, but don't worry about generating the full structure.
             // We don't need it at this point.
@@ -566,7 +571,6 @@ class completion_completion extends data_object {
                 \totara_core\progressinfo::AGGREGATE_ALL,
                 1,
                 1,
-                '',
                 $customdata
             );
             // Ensure percentagecomplete is 100 if marked as completed
@@ -808,14 +812,25 @@ class completion_completion extends data_object {
             'hascoursecriteria' => false
         );
 
-        if (empty($progressinfo) || empty($criteria)) {
+        if (empty($progressinfo)) {
+            return $data;
+        }
+
+        $percent = $progressinfo->get_percentagecomplete();
+        if (empty($criteria)) {
+            $customdata = $progressinfo->get_customdata();
+            if (!empty($customdata['completion'])) {
+                $data['summary'] = $customdata['completion'];
+            } else if ($percent == 100) {
+                $data['summary'] = get_string('completed', 'completion');
+            }
             return $data;
         }
 
         $data = array(
             'hascoursecriteria' => true,
             'criteria' => array(),
-            'progress' => $progressinfo->get_percentagecomplete()
+            'progress' => $percent
         );
 
         $aggregate = $progressinfo->get_agg_method();
@@ -864,9 +879,11 @@ class completion_completion extends data_object {
 
                 case COMPLETION_CRITERIA_TYPE_ROLE:
                     $nrole = $info->count_criteria();
+                    $customdata = $info->get_customdata();
+
                     if ($nrole == 1) {
                         $data['criteria'][] = get_string('tooltipcompletionroleone', 'completion',
-                            isset($customdata['role']) ? $customdata['role'] : '');
+                            isset($customdata['roles']) ? $customdata['roles'] : '');
                     } else {
                         $a = new \stdClass();
                         if ($info->get_agg_method() == COMPLETION_AGGREGATION_ALL) {
@@ -875,7 +892,6 @@ class completion_completion extends data_object {
                             $a->aggregation = get_string('aggregateany', 'completion');
                         }
 
-                        $customdata = $info->get_customdata();
                         $a->roles = isset($customdata['roles']) ? $customdata['roles'] : '';
                         $data['criteria'][] = get_string('tooltipcompletionroleany', 'completion', $a);
                     }

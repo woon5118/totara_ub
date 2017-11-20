@@ -2017,7 +2017,8 @@ class completion_info {
             switch ($criteria->criteriatype) {
 
                 case COMPLETION_CRITERIA_TYPE_DATE:
-                    $customdata = ['date' => userdate($criteria->timeend, '%d %m %y', null, false)];
+                    $format = get_string('strfdateshortmonth', 'langconfig');
+                    $customdata = ['date' => userdate($criteria->timeend, $format, null, false)];
                     break;
 
                 case COMPLETION_CRITERIA_TYPE_DURATION:

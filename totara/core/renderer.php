@@ -192,12 +192,12 @@ class totara_core_renderer extends plugin_renderer_base {
         $data->percent = $percent;
         $pbar = new \static_progress_bar('', '0');
         $pbar->set_progress((string)$percent);
-        $data->pbar = $pbar->export_for_template($OUTPUT);
-
-        // Get the popover detail on required completion criteria
-        if (completion_can_view_data($userid, $courseid)) {
-            $data->detail = $completion->export_completion_criteria_for_template();
+        $detaildata = $completion->export_completion_criteria_for_template();
+        if (!empty($detaildata)) {
+            $pbar->add_popover(\core\output\popover::create_from_template('totara_core/course_completion_criteria', $detaildata));
         }
+
+        $data->pbar = $pbar->export_for_template($OUTPUT);
 
         return $data;
     }

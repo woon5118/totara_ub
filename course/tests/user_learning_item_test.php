@@ -221,5 +221,503 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
         // Test type.
         $this->assertEquals('course', $learning_items->get_type());
     }
+
+    public function test_export_for_template_one_activity() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+        $data = $this->generator->create_module('data', array('course' => $course->id), array('completion' => 1));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $this->completion_generator->set_activity_completion($course->id, array($data));
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('One activity needs to be completed', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_multi_activities() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+        $data = $this->generator->create_module('data', array('course' => $course->id), array('completion' => 1));
+        $forum = $this->generator->create_module('forum',  array('course' => $course->id), array('completion' => 1));
+        $assign = $this->generator->create_module('assign',  array('course' => $course->id));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $this->completion_generator->set_aggregation_method($course->id, null, COMPLETION_AGGREGATION_ANY);
+        $this->completion_generator->set_activity_completion($course->id, array($data, $forum, $assign));
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>Any</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('3 activities need to be completed', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_one_other_course() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $this->completion_generator->set_course_criteria_course_completion($course, array($this->course2->id), COMPLETION_AGGREGATION_ALL);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('One other course needs to be completed', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_multi_other_courses() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $this->completion_generator->set_course_criteria_course_completion($course, array($this->course2->id, $this->course3->id), COMPLETION_AGGREGATION_ALL);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('2 other courses need to be completed', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_until_data() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $enddate = strtotime("+1 week");
+        $strdate = strftime('%d %b %Y', $enddate);
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_DATE] = $enddate;
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('You must remain enrolled until ' . $strdate, $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_days_left() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_DURATION] = 2 * 86400;
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('You must be enrolled for a total of 2 days', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_grade() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_GRADE] = 75.0;
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('You must achieve a grade of 75.00', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_manual_self_completion() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_SELF] = 1;
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('You must mark yourself as complete', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_one_role() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_ROLE] = array(
+            'elements' => array($teacherrole->id),
+            'aggregationmethod' => COMPLETION_AGGREGATION_ALL);
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('You must be marked as complete by a Trainer', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_multiple_roles_all() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+        $editteacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_ROLE] = array(
+            'elements' => array($teacherrole->id, $editteacherrole->id),
+            'aggregationmethod' => COMPLETION_AGGREGATION_ALL);
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('You must be marked as complete by <strong>All</strong> of the following roles: Editing Trainer, Trainer',
+            $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_multiple_roles_any() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+        $editteacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_ROLE] = array(
+            'elements' => array($teacherrole->id, $editteacherrole->id),
+            'aggregationmethod' => COMPLETION_AGGREGATION_ANY);
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(1, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('You must be marked as complete by <strong>Any</strong> of the following roles: Editing Trainer, Trainer',
+            $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+    }
+
+    public function test_export_for_template_combined_criteriatypes() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+        $data = $this->generator->create_module('data', array('course' => $course->id), array('completion' => 1));
+        $forum = $this->generator->create_module('forum',  array('course' => $course->id), array('completion' => 1));
+        $assign = $this->generator->create_module('assign',  array('course' => $course->id));
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+        $editteacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_ACTIVITY] = array(
+            'elements' => array($data, $forum, $assign),
+            'aggregationmethod' => COMPLETION_AGGREGATION_ANY);
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_COURSE] = array(
+            'elements' => array($this->course2->id, $this->course3->id),
+            'aggregationmethod' => COMPLETION_AGGREGATION_ALL);
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_ROLE] = array(
+            'elements' => array($teacherrole->id, $editteacherrole->id),
+            'aggregationmethod' => COMPLETION_AGGREGATION_ALL);
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $this->assertTrue($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('<strong>All</strong> of the following criteria need to be met to complete this course',
+                            $info->progress->pbar['popover']['contenttemplatecontext']['aggregation']);
+        $this->assertTrue(is_array($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals(3, count($info->progress->pbar['popover']['contenttemplatecontext']['criteria']));
+        $this->assertEquals('One activity needs to be completed', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][0]);
+        $this->assertEquals('You must be marked as complete by <strong>All</strong> of the following roles: Editing Trainer, Trainer',
+            $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][1]);
+        $this->assertEquals('2 other courses need to be completed', $info->progress->pbar['popover']['contenttemplatecontext']['criteria'][2]);
+    }
+
+    public function test_export_for_template_completed() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+        $data = $this->generator->create_module('data', array('course' => $course->id), array('completion' => 1));
+        $forum = $this->generator->create_module('forum',  array('course' => $course->id), array('completion' => 1));
+        $assign = $this->generator->create_module('assign',  array('course' => $course->id));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $completioncriteria = array();
+        $completioncriteria[COMPLETION_CRITERIA_TYPE_DATE] = strtotime("-1 week");
+        $this->completion_generator->set_completion_criteria($course, $completioncriteria);
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $strdate = strftime('%d %b %Y', time());
+        $this->assertFalse($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('Completed on ' . $strdate, $info->progress->pbar['popover']['contenttemplatecontext']['summary']);
+    }
+
+    public function test_export_for_template_completed_via_rpl() {
+        global $DB;
+
+        $course = $this->generator->create_course(array('shortname' => 'cc1','fullname' => 'Completion Course 1', 'enablecompletion' => 1));
+        $course = $DB->get_record('course', array('id' => $this->course6->id));
+        $data = $this->generator->create_module('data', array('course' => $course->id), array('completion' => 1));
+
+        $this->completion_generator->enable_completion_tracking($course);
+        $this->completion_generator->set_activity_completion($course->id, array($data));
+
+        $this->generator->enrol_user($this->user1->id, $course->id);
+
+        // Mark course completed via rpl
+        $completion = new completion_completion(['userid' => $this->user1->id, 'course' => $course->id]);
+        $completion->rpl = 'Course completed via rpl in user_learning_item_test';
+        $completion->status = COMPLETION_STATUS_COMPLETEVIARPL;
+        $completion->mark_complete();
+
+        // Now test the exported completion criteria
+        $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
+        $info = $learning_items->export_for_template();
+
+        $this->assertObjectHasAttribute('progress', $info);
+        $this->assertObjectHasAttribute('pbar', $info->progress);
+        $this->assertArrayHasKey('popover', $info->progress->pbar);
+        $this->assertArrayHasKey('contenttemplatecontext', $info->progress->pbar['popover']);
+        $this->assertArrayHasKey('hascoursecriteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('aggregation', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayNotHasKey('criteria', $info->progress->pbar['popover']['contenttemplatecontext']);
+        $this->assertArrayHasKey('summary', $info->progress->pbar['popover']['contenttemplatecontext']);
+
+        $strdate = strftime('%d %b %Y', time());
+        $this->assertFalse($info->progress->pbar['popover']['contenttemplatecontext']['hascoursecriteria']);
+        $this->assertEquals('Completed via rpl (Course completed via rpl in user_learning_item_test) on ' . $strdate,
+            $info->progress->pbar['popover']['contenttemplatecontext']['summary']);
+    }
 }
 

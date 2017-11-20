@@ -177,7 +177,7 @@ class core_completion_progressinfo_testcase extends externallib_advanced_testcas
 
         $verify_info->add_criteria(COMPLETION_CRITERIA_TYPE_SELF, \totara_core\progressinfo::AGGREGATE_ALL, 1, 0);
         $verify_info->add_criteria(COMPLETION_CRITERIA_TYPE_DATE, \totara_core\progressinfo::AGGREGATE_ALL, 1, 0,
-            array('date' => '02 05 17'));
+            array('date' => '02 May 2017'));
         $verify_info->add_criteria(COMPLETION_CRITERIA_TYPE_DURATION, \totara_core\progressinfo::AGGREGATE_ALL, 1, 0,
             array('duration' => '1 days'));
         $verify_info->add_criteria(COMPLETION_CRITERIA_TYPE_GRADE, \totara_core\progressinfo::AGGREGATE_ALL, 1, 0,

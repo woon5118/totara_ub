@@ -190,12 +190,9 @@ class item extends item_base implements item_has_progress {
                 return;
             }
 
-            if (!$info->is_tracked_user($this->user->id)) {
-                // The user is not being tracked for completion, thus cannot complete the course.
-                return;
-            }
+            // The user may be enrolled via the program only or was marked completed via rpl.
+            // In this case it may not be tracked for completion, but we still want to show progress
 
-            // The user can complete this course.
             $this->progress_canbecompleted = true;
             // But they may not already be complete.
             $this->progress_complete = false;
@@ -256,15 +253,12 @@ class item extends item_base implements item_has_progress {
             // TODO: Need to get a better way to get the width right
             $pbar = new \static_progress_bar('', '70');
             $pbar->set_progress((int)$this->progress_percentage);
-            $record->pbar = $pbar->export_for_template($OUTPUT);
-
             $completion = new \completion_completion(['userid' => $this->user->id, 'course' => $this->id]);
-            $progressdetail = $completion->export_completion_criteria_for_template();
-            if (!empty($progressdetail['hascoursecriteria'])) {
-                foreach($progressdetail as $key => $detail) {
-                    $record->{$key} = $detail;
-                }
+            $detaildata = $completion->export_completion_criteria_for_template();
+            if (!empty($detaildata)) {
+                $pbar->add_popover(\core\output\popover::create_from_template('totara_core/course_completion_criteria', $detaildata));
             }
+            $record->pbar = $pbar->export_for_template($OUTPUT);
         }
 
         return $record;
