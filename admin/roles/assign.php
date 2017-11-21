@@ -241,13 +241,13 @@ if ($roleid) {
     }
 
     // Print a form to swap roles, and a link back to the all roles list.
-    echo '<div class="backlink">';
+    echo html_writer::start_tag('div', array('class'=>'backlink'));
 
     $select = new single_select($PAGE->url, 'roleid', $nameswithcounts, $roleid, null);
     $select->label = get_string('assignanotherrole', 'core_role');
     echo $OUTPUT->render($select);
-    echo '<p><a href="' . $PAGE->url . '">' . get_string('backtoallroles', 'core_role') . '</a></p>';
-    echo '</div>';
+    echo html_writer::tag('p', html_writer::link($url, get_string('backtoallroles', 'core_role')));
+    echo html_writer::end_tag('div');
 
 } else if (empty($assignableroles)) {
     // Print a message that there are no roles that can me assigned here.
