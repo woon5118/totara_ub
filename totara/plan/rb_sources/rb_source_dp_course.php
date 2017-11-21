@@ -41,26 +41,16 @@ class rb_source_dp_course extends rb_base_source {
     public $defaultfilters, $requiredcolumns, $sourcetitle;
 
     /**
-     * Data that has been passed to the report source from the embedded report.
-     */
-    private $embeddeddata;
-
-    /**
      * Constructor
      */
-    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null, $embeddeddata = null) {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
-        }
-        if (isset($embeddeddata) && is_array($embeddeddata)) {
-            $this->embeddeddata = $embeddeddata;
         }
         // Remember the active global restriction set.
         $this->globalrestrictionset = $globalrestrictionset;
 
         $this->base = $this->get_dp_status_base_sql();
-        list($this->sourcewhere, $this->sourceparams) = $this->define_sourcewhere();
-        $this->sourcejoins = $this->define_sourcejoins();
 
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -69,6 +59,7 @@ class rb_source_dp_course extends rb_base_source {
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = array();
+        $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_course');
         parent::__construct();
     }
@@ -80,36 +71,6 @@ class rb_source_dp_course extends rb_base_source {
     public function global_restrictions_supported() {
         return true;
     }
-
-    /**
-     * Define some extra SQL for the base to limit the data set.
-     *
-     * @return array The SQL and parmeters that defines the WHERE for the source.
-     */
-    protected function define_sourcewhere() {
-
-        $sql = '';
-        $params = array ();
-
-        if (isset($this->embeddeddata['userid'])) {
-            list($visibilitysql, $params) = totara_visibility_where($this->embeddeddata['userid'], 'course.id', 'course.visible', 'course.audiencevisible', 'course', 'course', false, false);
-
-            $sql = "(({$visibilitysql}) OR course_completion.status > :dp_course_source_notyetstarted)";
-            $params['dp_course_source_notyetstarted'] = COMPLETION_STATUS_NOTYETSTARTED;
-        }
-
-        return array($sql, $params);
-    }
-
-    /**
-     * Defines a list of joins that are mandatory for the report.
-     *
-     * @return array A list of joins.
-     */
-    protected function define_sourcejoins() {
-        return array('course', 'course_completion', 'ctx');
-    }
-
 
     //
     //
@@ -668,27 +629,64 @@ class rb_source_dp_course extends rb_base_source {
         return $defaultcolumns;
     }
 
-    /**
-     * @deprecated Since Totara 11.0.
-     *
-     * Required columns can restrict aggregation functionality in report builder, so
-     * they have been removed and appropriate joins added instread, This also affects
-     * the post_config method which process the required columns.
-     */
     protected function define_requiredcolumns() {
-        debugging('define_requiredcolumns() has been deprecated to remove required columns from the record of learning report source', DEBUG_DEVELOPER);
-        return array();
+        $requiredcolumns = array();
+
+        $requiredcolumns[] = new rb_column(
+            'visibility',
+            'id',
+            '',
+            "course.id",
+            array('joins' => 'course')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'visibility',
+            'visible',
+            '',
+            "course.visible",
+            array('joins' => 'course')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'visibility',
+            'audiencevisible',
+            '',
+            "course.audiencevisible",
+            array('joins' => 'course')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'ctx',
+            'id',
+            '',
+            "ctx.id",
+            array('joins' => 'ctx')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'visibility',
+            'completionstatus',
+            '',
+            "course_completion.status",
+            array(
+                'joins' => array('course_completion'),
+            )
+        );
+
+        return $requiredcolumns;
     }
 
-    /**
-     * @deprecated Since Totara 11.0.
-     *
-     * This is no longer required as the define_requiredcolumns method has been deprecated.
-     */
     public function post_config(reportbuilder $report) {
-        // No debugging message here as it's a method that is always called and can't
-        // be disabled without negatively affecting other report source. It can, however,
-        // be removed and will be at a later date.
+        // Visibility checks are only applied if viewing a single user's records.
+        if ($report->get_param_value('userid')) {
+            list($visibilitysql, $whereparams) = $report->post_config_visibility_where('course', 'course',
+                $report->get_param_value('userid'), true);
+            $completionstatus = $report->get_field('visibility', 'completionstatus', 'course_completion.status');
+            $wheresql = "(({$visibilitysql}) OR ({$completionstatus} > :notyetstarted))";
+            $whereparams['notyetstarted'] = COMPLETION_STATUS_NOTYETSTARTED;
+            $report->set_post_config_restrictions(array($wheresql, $whereparams));
+        }
     }
 
     function rb_display_course_completion_progress($status, $row, $isexport) {
