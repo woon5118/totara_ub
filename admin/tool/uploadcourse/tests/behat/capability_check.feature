@@ -34,7 +34,8 @@ Feature: Check the course upload interface is shown to people with the right cap
 
     When I log in as "staffmanager"
     And I expand "Site administration" node
-    Then "Courses" "link" should not exist in current page administration
+    Then I should see "Users" in the "Administration" "block"
+    And I should not see "Courses" in the "Administration" "block"
     And I log out
 
     # Remove capability for the coursecreator role and try again.
@@ -47,7 +48,7 @@ Feature: Check the course upload interface is shown to people with the right cap
     And I log out
 
     When I log in as "coursecreator"
-    And I expand "Site administration" node
-    And I expand "Courses" node
-    Then "Courses" "link" should not exist in current page administration
+    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    Then I should see "Manage courses and categories" in the "Administration" "block"
+    And I should not see "Upload courses" in the "Administration" "block"
     And I log out
