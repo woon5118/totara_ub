@@ -1,7 +1,139 @@
 <?php
 /*
 
-Totara LMS Changelog
+Totara Learn Changelog
+
+Release Evergreen (22nd November 2017):
+=======================================
+
+Key:           + Evergreen only
+
+Security issues:
+
+    TL-16270       360° Feedback now correctly disposes of the user's access token when no longer needed
+
+                   Previously if a user accessed a 360° Feedback instance using a token, that
+                   token would be stored in the user's session and would allow them to access
+                   the 360° Feedback as a user (not with a token).
+                   The token used to access the first 360° Feedback instance is now disposed
+                   of correctly.
+
+Improvements:
+
+    TL-14937       Added popover UI component
+
+                   This UI component is based off the bootstrap 3 popover component. This can
+                   be viewed through the core/progress_bar template in the template library
+                   (Site administration > Development > Template library)
+
+    TL-15798   +   Added default values for filters
+    TL-15832   +   Updated xpath when matching against html tables using Behat to allow non-exact matches
+    TL-15895   +   Added the 'Send to self' option to Email settings for Scheduled reports
+    TL-15896   +   Added a report builder administration setting to control what scheduled report email options are available
+    TL-15907       Improved how evidence custom field data is saved when importing completion history
+    TL-16154       Improved CSS of the last course accessed block, increasing the width of the progress bar
+    TL-16176   +   Converted maintenance countdown timer to use the correct notification template and AMD module
+    TL-16217   +   Removed deprecated custom menu functionality
+
+                   Please use Site administration > Appearance > Main menu instead
+
+    TL-16432       Course completion history records are now included in course backups and can be restored
+
+Bug fixes:
+
+    TL-9360        Managers approving Seminar booking requests are now notified of the updates success
+
+                   Previously, when a manager approved staff requests for bookings into a
+                   Seminar event, they would then be redirected to a page saying 'You can not
+                   enrol yourself in this course' (assuming they were not enrolled or did not
+                   have other permissions to view the attendees page). Following any approvals
+                   (by a manager or any other user), the page will now refresh onto the
+                   approval required page, with a message confirming the update was
+                   successful.
+
+    TL-9462        Improved page layout when confirming a learning plan template workflow change
+    TL-13934       Fixed 'user' join not in join list for content in the message report
+    TL-14776       Fixed quickform error when using a multiselect custom field
+    TL-15029       Fixed brief positioning issue when scrolling a 360° Feedback page
+    TL-15956       Set the RPL fields on the course completion report to read only when appropriate
+
+                   Previously, the RPL fields were allowing data to be entered/edited when
+                   users were already complete. The form will now set them to read only in
+                   this situation. There is also now a column with a link to the course
+                   completion editor, which should be used if changes are required.
+
+    TL-16173       Program error messages are now rendered as standard notifications
+    TL-16253       HTML pasted into Atto is now sanitised to remove markup known to cause display issues
+
+                   When copying HTML into an Atto editor instance, script, iframe and head
+                   HTML tags are now removed. These tags can be added manually when editing
+                   the text in source mode.
+
+    TL-16287       Fixed renaming of user profile fields breaking HR Import user source settings
+
+                   If the HR Import user source (CSV or Database) was configured to import a
+                   custom profile field and the field short name was changed then HR Import
+                   would no longer import data to it. In some situations it would then be
+                   impossible to re-add the field. This has now been fixed.
+
+    TL-16296       Fixed a bug leading to schedule changes for reports being forgotten
+    TL-16312       Fixed formatting of text area fields in the Database course activity when exporting
+
+                   When exporting text area field data from the Database activity the field
+                   content included HTML tags. It now converts the HTML to standard text.
+
+    TL-16318       Fixed calendar events for single Seminar sessions with multiple dates
+    TL-16320       The standard loading icon is now used when managing course groups
+    TL-16376       Fixed LDAP sync for user profile custom menu field
+
+                   TL-14170 fixed a problem where custom user profile fields were not being
+                   synced with an LDAP backend. The fix worked for all user profile custom
+                   fields except for menu dropdowns which required an extra processing step
+                   during the LDAP syncing. This has now been fixed.
+
+    TL-16386       Fixed dashboard reset error with deleted users
+    TL-16396       Fixed an SQL error occurring due to a missing default
+
+                   This may have affected sites that have upgraded through Totara 2.5, and
+                   which were using Seminar room functionality.
+                   A missing upgrade step may have lead to an incorrect null default value
+                   existing in the facetoface_room table.
+                   The fix for this issue has added the missing upgrade step which correctly
+                   removes the null values and replaces them with the expected "0".
+
+    TL-16404       Prevented default content being duplicated when restoring a course from the recycle bin
+    TL-16405       Added RPL data to course backup and restore
+
+                   This in turn means that RPL data will be restored on courses retrieved from
+                   the recycle bin.
+
+    TL-16411       Fixed unused custom grade scales not included in course backups
+    TL-16417       Added missing include in the features link block external tests
+    TL-16420       Course tiles are hidden in Featured Links blocks when the referenced course is deleted
+    TL-16422       Fixed and removed forgotten deprecated location code in Seminar
+    TL-16428       Ensured all HR Import sources run regardless of any error detected in the previous source
+
+                   Previously, if an error occurred while importing an HR Import source, the
+                   following sources would not be processed. Now, the following sources will
+                   be processed, regardless of the result of earlier source imports.
+
+    TL-16429       Fixed session details missing from Trainer confirmation email
+    TL-16430       Fixed alphabetical order user list when selecting a manager
+    TL-16435       Fixed missing "Notification does not exist" string
+    TL-16436       Fixed missing sesskey in Seminar notifications
+    TL-16443       Fixed an SQL error in the Appraisal details report due to multi-select questions
+    TL-16515       Fixed upgrade problem in langimport due to moodle merge
+
+API changes:
+
+    TL-16383   +   Converted Dynamic audience CSS to LESS
+
+Contributions:
+
+    * Francis Devine at Catalyst NZ - TL-16417
+    * Grace Cooper at Kineo UK - TL-16396
+    * Richard Eastbury at Think Associates - TL-16376, TL-16436
+
 
 Release Evergreen (27th October 2017):
 ======================================
