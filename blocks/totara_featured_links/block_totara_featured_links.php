@@ -75,6 +75,7 @@ class block_totara_featured_links extends block_base {
             'title' => $this->config->title,
             'manual_id' => $this->config->manual_id,
             'instanceid' => $this->instance->id,
+            'shape' => isset($this->config->shape) ? $this->config->shape : 'square'
         ];
 
         $core_renderer = $this->page->get_renderer('core');
@@ -124,6 +125,7 @@ class block_totara_featured_links extends block_base {
     public function instance_create() {
         $this->config = new stdClass();
         $this->config->size = 'medium';
+        $this->config->shape = 'square';
         $this->config->title = get_string('pluginname', 'block_totara_featured_links');
         $this->config->manual_id = '';
 

@@ -78,7 +78,7 @@
     {{/editing}}
     <div id="block-totara-featured-links-gallery-tile-{{tile_id}}" class="block-totara-featured-links-gallery-images">
     {{#background_imgs}}
-        <img src="{{& .}}" style="{{#background_color}}background-color: {{background_color}};{{/background_color}}display: none;" alt="{{alt_text.tile_title}}">
+        <div style="{{#background_color}}background-color: {{background_color}};{{/background_color}}display: none;background-image: url('{{& .}}');" alt="{{alt_text.tile_title}}"></div>
     {{/background_imgs}}
     </div>
 </div>

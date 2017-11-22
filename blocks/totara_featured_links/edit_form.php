@@ -31,12 +31,13 @@ class block_totara_featured_links_edit_form extends \block_edit_form{
 
     /**
      * defines the form for the custom block options
-     * @param object $mform
+     * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
         $mform->addElement('header', 'config_header', get_string('blocksettings', 'block'));
 
         $mform->addElement('text', 'config_title', get_string('block_header', 'block_totara_featured_links'), []);
+
         $mform->addElement(
             'select',
             'config_size',
@@ -46,6 +47,31 @@ class block_totara_featured_links_edit_form extends \block_edit_form{
                 'small' => get_string('size_small', 'block_totara_featured_links')
             ]
         );
+
+        $shapeoptions = [];
+        $shapeoptions[] = $mform->createElement('radio',
+            'config_shape',
+            '',
+            get_string('shape_square', 'block_totara_featured_links'),
+            'square');
+        $shapeoptions[] = $mform->createElement('radio',
+            'config_shape',
+            '',
+            get_string('shape_portrait', 'block_totara_featured_links'),
+            'portrait');
+        $shapeoptions[] = $mform->createElement('radio',
+            'config_shape',
+            '',
+            get_string('shape_landscape', 'block_totara_featured_links'),
+            'landscape');
+        $shapeoptions[] = $mform->createElement('radio',
+            'config_shape',
+            '',
+            get_string('shape_fullwidth', 'block_totara_featured_links'),
+            'fullwidth');
+
+        $mform->addGroup($shapeoptions, 'config_shape', get_string('tile_shape', 'block_totara_featured_links'), ['<br>'], false);
+
         $mform->addElement('text', 'config_manual_id', get_string('manual_id', 'block_totara_featured_links'));
 
         $mform->setType('config_title', PARAM_TEXT);

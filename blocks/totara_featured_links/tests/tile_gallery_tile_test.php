@@ -129,7 +129,7 @@ class block_totara_featured_links_tile_gallery_tile_testcase extends test_helper
         $this->call_protected_method($tile1, 'decode_data');
 
         $content = $tile1->render_content_wrapper($PAGE->get_renderer('core'), []);
-        $this->assertContains('<img', $content);
+        $this->assertContains('background-image: url', $content);
         $this->assertContains($this->get_protected_property($tile1, 'data')->background_imgs[0], $content);
     }
 }

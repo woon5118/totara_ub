@@ -23,57 +23,31 @@
 /*
  * This switches the images on the tiles with multiple images.
  */
-define(['jquery'], function ($) {
+define(['jquery'], function($) {
     return {
-        init: function (interval, id) {
-            var current_img = 1;
-            var max_img = 0;
-            max_img = $('#' + id).children('img').length;
-            current_img = Math.floor(Math.random() * (max_img)) + 1;
-            $('#' + id + ' img:nth-of-type(' + current_img + ')').show();
-            if (max_img <= 1) {
+        init: function(interval, id) {
+            var currentImg = 1;
+            var maxImg = 0;
+            maxImg = $('#' + id).children('div').length;
+            currentImg = Math.floor(Math.random() * (maxImg)) + 1;
+            $('#' + id + ' div:nth-of-type(' + currentImg + ')').show();
+            if (maxImg <= 1) {
                 return;
             }
-            if (interval == 0) {
+            if (interval === 0) {
                 return;
             }
-            window.setInterval(function () {
-                $('#' + id + ' img:nth-of-type(' + current_img + ')').css({'z-index': '2'}).fadeOut('slow');
+            window.setInterval(function() {
+                $('#' + id + ' div:nth-of-type(' + currentImg + ')').css({'z-index': '2'}).fadeOut('slow');
 
-                var new_current_img = -1;
+                var newcurrentImg = -1;
                 do {
-                    new_current_img = Math.floor(Math.random() * (max_img)) + 1;
-                } while (current_img == new_current_img);
-                current_img = new_current_img;
+                    newcurrentImg = Math.floor(Math.random() * (maxImg)) + 1;
+                } while (currentImg === newcurrentImg);
+                currentImg = newcurrentImg;
 
-                $('#' + id + ' img:nth-of-type(' + current_img + ')').css({'z-index': '1'}).show();
+                $('#' + id + ' div:nth-of-type(' + currentImg + ')').css({'z-index': '1'}).show();
             }, interval);
-        },
-        resize_images: function () {
-            // This imitates the background-size: cover attribute in css.
-            $('.block-totara-featured-links-gallery-images').each(function () {
-                var th = $(this).height(),
-                    tw = $(this).width();
-                $(this).find('img').each(function () {
-                    var ih = $(this).height(),
-                        iw = $(this).width();
-                    if (ih > iw) {
-                        $(this).css('width', '100%');
-                    } else {
-                        $(this).css('height', '100%');
-                    }
-                    var nh = $(this).height(),
-                        nw = $(this).width(),
-                        hd = (nh - th) / 2,
-                        wd = (nw - tw) / 2;
-                    if (nh < nw) {
-                        $(this).css({marginLeft: '-' + wd + 'px', marginTop: 0});
-                    } else {
-                        $(this).css({marginTop: '-' + hd + 'px', marginLeft: 0});
-                    }
-                });
-
-            });
         }
     };
 });

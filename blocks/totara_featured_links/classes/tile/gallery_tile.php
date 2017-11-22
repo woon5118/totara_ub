@@ -244,7 +244,6 @@ class gallery_tile extends base {
      */
     protected function get_content_wrapper_template_data(\renderer_base $renderer) {
         global $PAGE;
-        $PAGE->requires->js_call_amd('block_totara_featured_links/switcher', 'resize_images', [$this->id]);
         $data = parent::get_content_wrapper_template_data($renderer);
 
         // Build background urls.
