@@ -118,6 +118,9 @@ class MoodleQuickForm_course extends MoodleQuickForm_autocomplete {
         // Set up all currently selected courses as options, so that they will definitely exist.
         if (isset($options['currentdata'])) {
             foreach ($options['currentdata'] as $courseid) {
+                if (empty($courseid)) {
+                    continue;
+                }
                 $course = $DB->get_record('course', array('id' => $courseid));
                 context_helper::preload_from_record($course);
                 $context = context_course::instance($course->id);
@@ -141,7 +144,8 @@ class MoodleQuickForm_course extends MoodleQuickForm_autocomplete {
 
         // We only need to validate submitted course ids if they are not already in the list of options.
         foreach ($courseids as $courseid) {
-            if ((!$this->optionExists($courseid)) &&
+            if (!empty($courseid) &&
+                (!$this->optionExists($courseid)) &&
                 ($courseid !== '_qf__force_multiselect_submission')) {
                 array_push($coursestoadd, $courseid);
             }
