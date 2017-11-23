@@ -242,5 +242,16 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017103000, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2017111400) {
+
+        // Increase max length of report fullname field to 1333 characters.
+        $table = new xmldb_table('report_builder');
+        $field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, 1333, null,XMLDB_NOTNULL, null);
+        $dbman->change_field_precision($table, $field);
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2017111400, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

@@ -1767,24 +1767,25 @@ class reportbuilder {
     public static function create_shortname($fullname) {
         global $DB;
 
-        // leaves only letters and numbers
-        // replaces spaces + dashes with underscores
-        $validchars = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $fullname));
-        $shortname = "report_{$validchars}";
-        $try = $shortname;
-        $i = 1;
-        while($i < 1000) {
-            if ($DB->get_field('report_builder', 'id', array('shortname' => $try))) {
-                // name exists, try adding a number to make unique
-                $try = $shortname . $i;
-                $i++;
-            } else {
-                // return the shortname
-                return $try;
-            }
+        // Transliterate all non-latin characters to latin.
+        if (function_exists('transliterator_transliterate')) {
+            $fullname = transliterator_transliterate('Any-Latin; Latin-ASCII', $fullname);
         }
-        // if all 1000 name tries fail, give up and use a timestamp
-        return "report_" . time();
+
+        // Leaves only letters and numbers replaces spaces + dashes with underscores.
+        $fullname = strtolower(preg_replace(['/[^a-zA-Z\d\s-_]/', '/[\s-]/'], ['', '_'], $fullname));
+        $shortname = "report_{$fullname}";
+
+        if (strlen($shortname) > 255) {
+            $shortname = substr($shortname, 0, 255);
+        }
+
+        while ($DB->get_field('report_builder', 'id', ['shortname' => $shortname])) {
+            $hash = substr(sha1($shortname . (time() + microtime(true))), 10, 10);
+            $shortname = substr($shortname, 0, 244) . "_{$hash}";
+        }
+
+        return $shortname;
     }
 
 

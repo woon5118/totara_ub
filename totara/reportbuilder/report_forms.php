@@ -46,9 +46,10 @@ class report_builder_new_form extends moodleform {
         $sources = reportbuilder::get_source_list();
         if (count($sources) > 0) {
 
-            $mform->addElement('text', 'fullname', get_string('reportname', 'totara_reportbuilder'), 'maxlength="255"');
+            $mform->addElement('text', 'fullname', get_string('reportname', 'totara_reportbuilder'), ['size' => 30]);
             $mform->setType('fullname', PARAM_TEXT);
             $mform->addRule('fullname', null, 'required');
+            $mform->addRule('fullname', get_string('maximumchars', '', 1333), 'maxlength', 1333);
             $mform->addHelpButton('fullname', 'reportbuilderfullname', 'totara_reportbuilder');
 
             $pick = array(0 => get_string('selectsource', 'totara_reportbuilder'));
@@ -82,10 +83,11 @@ class report_builder_edit_form extends moodleform {
         $record = $this->_customdata['record'];
 
         $mform->addElement('header', 'general', get_string('reportsettings', 'totara_reportbuilder'));
-
-        $mform->addElement('text', 'fullname', get_string('reporttitle', 'totara_reportbuilder'), array('size' => '30'));
+        $mform->addElement('text', 'fullname', get_string('reporttitle', 'totara_reportbuilder'), ['size' => 30]);
         $mform->setType('fullname', PARAM_TEXT);
+        $mform->addRule('fullname', get_string('maximumchars', '', 1333), 'maxlength', 1333);
         $mform->addRule('fullname', null, 'required');
+
         $mform->addHelpButton('fullname', 'reportbuilderfullname', 'totara_reportbuilder');
 
         $mform->addElement('editor', 'description_editor', get_string('description'), null, $TEXTAREA_OPTIONS);

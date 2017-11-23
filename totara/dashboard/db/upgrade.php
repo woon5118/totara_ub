@@ -70,5 +70,22 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017010400, 'totara', 'dashboard');
     }
 
+    if ($oldversion < 2017111400) {
+
+        // Increase max length of dashboard name field to 1333 characters.
+        $table = new xmldb_table('totara_dashboard');
+        $field = new xmldb_field('name', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null);
+        $index = new xmldb_index('name', XMLDB_INDEX_NOTUNIQUE, ['name']);
+
+        // Drop index if exists.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        // Adjust name field size.
+        $dbman->change_field_precision($table, $field);
+
+        upgrade_plugin_savepoint(true, 2017111400, 'totara', 'dashboard');
+    }
+
     return true;
 }

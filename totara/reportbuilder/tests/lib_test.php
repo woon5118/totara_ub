@@ -626,20 +626,34 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     function test_reportbuilder_create_shortname() {
+        $verylongstring = 'It is a long established fact that a reader will be distracted by the readable content of a page ' .
+            'when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution ' .
+            'of letters, as opposed to using \'Content here, content here\', making it look like readable English. ';
+
         $shortname1 = reportbuilder::create_shortname('name');
         $shortname2 = reportbuilder::create_shortname('My Report with special chars\'"%$*[]}~');
         $shortname3 = reportbuilder::create_shortname('Space here');
-        // should prepend 'report_' to name
+        $shortname4 = reportbuilder::create_shortname($verylongstring);
+
+        // Should prepend 'report_' to name.
         $this->assertEquals('report_name', $shortname1);
-        // special chars should be stripped
+
+        // Special chars should be stripped.
         $this->assertEquals('report_my_report_with_special_chars', $shortname2);
-        // spaces should be replaced with underscores and upper case moved to lower case
+
+        // Spaces should be replaced with underscores and upper case moved to lower case.
         $this->assertEquals('report_space_here', $shortname3);
+
+        // Confirm that the function trims the shortname to 255 symbols.
+        $this->assertLessThanOrEqual(255, strlen($shortname4));
+
         // Confirm existing report short name which we will collide with.
         $this->assertEquals('report_test', $this->rb->shortname);
+
         $existingname = reportbuilder::create_shortname('test');
-        // should append numbers to suggestion if shortname already exists
-        $this->assertEquals('report_test1', $existingname);
+
+        // Should append random hash at the end of the string, thus should be different from what we have in the db.
+        $this->assertNotEquals('report_test', $existingname);
 
         $this->resetAfterTest(true);
     }

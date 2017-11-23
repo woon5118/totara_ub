@@ -7,7 +7,7 @@
     <TABLE NAME="report_builder" COMMENT="Each report has an entry here">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="ID of the table"/>
-        <FIELD NAME="fullname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Title of report, displayed on page and used to refer to a report instance"/>
+        <FIELD NAME="fullname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Title of report, displayed on page and used to refer to a report instance"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique shortname used internally as a unique way of identifying a report"/>
         <FIELD NAME="source" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Data source on which the report is based"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If set to 1, report not shown on My Reports page but still accessible at URL"/>
