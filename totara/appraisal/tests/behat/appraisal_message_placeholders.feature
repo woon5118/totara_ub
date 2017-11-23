@@ -106,6 +106,7 @@ Feature: Test appraisal messages
     Then "Close" "link" should exist in the "Appraisal1" "table_row"
     And I log out
 
+    And I run the scheduled task "\totara_appraisal\task\scheduled_messages"
     # Test Message 1, appraisal activation for the learner.
     And the message "Message 1 - Appraisal Activation - Appraisal1" exists for "learner1" user
     And the message "Message 1 - Appraisal Activation - Appraisal1" does not contain "[" for "learner1" user
@@ -601,6 +602,7 @@ listofstagenames: * App1_Stage1
     Then "Close" "link" should exist in the "Appraisal1" "table_row"
     And I log out
 
+    And I run the scheduled task "\totara_appraisal\task\scheduled_messages"
     # Test Message 1, appraisal activation for default values.
     And the message "Message 1 - Appraisal Activation - Appraisal1" exists for "learner3" user
     And the message "Message 1 - Appraisal Activation - Appraisal1" does not contain "[" for "learner3" user

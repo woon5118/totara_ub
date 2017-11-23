@@ -17,27 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @author David Curry <david.curry@totaralms.com>
- * @package totara
- * @subpackage totara_appraisal
+ * @author David Curry <david.curry@totaralearning.com>
+ * @package totara_appraisal
  */
+namespace totara_appraisal\task;
 
 /**
- * This file should be used for all appraisal event definitions and handers.
+ * Update learner assignments for active appraisals.
  */
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
-}
+class scheduled_messages extends \core\task\scheduled_task {
 
-$observers = array(
-    array(
-        'eventname' => '\totara_appraisal\event\appraisal_stage_completion',
-        'callback' => 'totara_appraisal_observer::appraisal_stage_completion',
-    ),
-    array(
-        'eventname' => '\core\event\user_deleted',
-        'callback' => 'totara_appraisal_observer::user_deleted',
-    ),
-);
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('sendscheduledmessagestask', 'totara_appraisal');
+    }
+
+    /**
+     * Do the job.
+     * Throw exceptions on errors (the job will be retried).
+     */
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot.'/totara/appraisal/lib.php');
+
+        \appraisal::send_scheduled(); // Abstracted out for ease of testing.
+    }
+}
