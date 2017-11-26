@@ -325,7 +325,6 @@ $string['error:assignmentnotfound'] = 'Assignment record not found';
 $string['error:availibileuntilearlierthanfrom'] = 'Available until date cannot be earlier than from date';
 $string['error:badcheckvariable'] = 'The check variable was wrong - try again';
 $string['error:cannotloadcompletionrecord'] = 'Tried to load prog_completion record which doesn\'t exist for programid: {$a->programid}, userid: {$a->userid}';
-$string['error:cannotrequestextnotuser'] = 'You cannot request an extension for another user';
 $string['error:completioneditornotenabled'] = 'Completion editor is not enabled on this site';
 $string['error:couldnotloadextension'] = 'Error, could not load extension.';
 $string['error:coursecreationrepeat_nonzero'] = 'Course creation must be more than zero days before course repeats';
@@ -364,7 +363,6 @@ $string['error:nextcoursesetmissing'] = "Next course set operator OR or AND spec
 $string['error:nocompetency'] = 'A competency must be selected.';
 $string['error:nocompletionrecord'] = 'Error, could not find completion record for assignment';
 $string['error:nopermissions'] = 'You do not have the necessary permissions to perform this action';
-$string['error:noprogramcompletionfound'] = 'No program completion record was found';
 $string['error:noprogramid'] = 'Must specify program id or short name';
 $string['error:notaprogram'] = 'This is not a program, it is a certification';
 $string['error:notextensionallowed'] = 'Program extension request is not enable on this site.';
@@ -454,7 +452,6 @@ $string['extensionrejectbutton'] = 'Deny Extension';
 $string['extensionrejecttext'] = 'Extension Denied';
 $string['extensionrequest'] = 'Request for program extension by {$a}';
 $string['extensionrequestfailed'] = 'The extension request failed. Please try again.';
-$string['extensionrequestfailed:nomanager'] = 'Extension request was not sent. Manager could not be found';
 $string['extensionrequestmessage'] = '<p>A user has requested an extension for program <em>{$a->programfullname}</em>. The details of the request are:</p><ul><li>Date: {$a->extensiondatestr}</li><li>Reason: {$a->extensionreason}</li></ul><p><a href=\'{$a->manageurl}\'>Click here to manage extensions</a></p>';
 $string['extensionrequestmessage_help'] = 'This message will be sent to the student\'s manager whenever a program extension request is made.';
 $string['extensionrequestnotsent'] = 'The extension request could NOT be sent. Please try again.';
@@ -1112,3 +1109,9 @@ $string['totalassignments'] = 'Total potential assignments';
 $string['totalassignments_help'] = 'The total number of assignments that is displayed in the program assignments page and the overview page represents the total number of learners in all the assigned categories and not the number of learners currently assigned to the program.
 
 If a learner belongs to an organisation that is assigned to the program and also holds a position that is assigned to the program then the learner will be counted in each category (but will only be assigned to the program once).';
+
+// Deprecated since Totara 11
+
+$string['error:cannotrequestextnotuser'] = 'You cannot request an extension for another user';
+$string['extensionrequestfailed:nomanager'] = 'Extension request was not sent. Manager could not be found';
+$string['error:noprogramcompletionfound'] = 'No program completion record was found';
