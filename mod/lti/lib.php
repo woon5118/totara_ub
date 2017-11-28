@@ -346,10 +346,11 @@ function lti_user_complete($course, $user, $mod, $basiclti) {
  *
  * @uses $CFG
  * @return boolean
- * @TODO: implement this moodle function
+ *
+ * @deprecated since Totara 11.0
  **/
 function lti_print_recent_activity($course, $isteacher, $timestart) {
-    return false;  //  True if anything was printed, otherwise false.
+    return false;
 }
 
 /**

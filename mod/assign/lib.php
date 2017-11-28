@@ -800,6 +800,7 @@ function assign_get_grade_details_for_print_overview(&$unmarkedsubmissions, $sql
  * Print recent activity from all assignments in a given course
  *
  * This is used by the recent activity block
+ * @deprecated since Totara 11.0 - use {@link mod_assign_renderer::render_recent_activities()} instead
  * @param mixed $course the course to print activity for
  * @param bool $viewfullnames boolean to determine whether to show full names or not
  * @param int $timestart the time the rendering started
@@ -1045,17 +1046,11 @@ function assign_get_recent_mod_activity(&$activities,
     $aname = format_string($cm->name, true);
     foreach ($show as $submission) {
         $activity = new stdClass();
-
-        $activity->type         = 'assign';
-        $activity->cmid         = $cm->id;
-        $activity->name         = $aname;
-        $activity->sectionnum   = $cm->sectionnum;
+        // Fields required to display.
         $activity->timestamp    = $submission->timemodified;
+        $activity->text         = $cm->name;
+        $activity->link         = (new moodle_url('/mod/assign/view.php', ['id' => $cm->id]))->out();
         $activity->user         = new stdClass();
-        if ($grader) {
-            $activity->grade = $grades->items[0]->grades[$submission->userid]->str_long_grade;
-        }
-
         $userfields = explode(',', user_picture::fields());
         foreach ($userfields as $userfield) {
             if ($userfield == 'id') {
@@ -1066,6 +1061,14 @@ function assign_get_recent_mod_activity(&$activities,
             }
         }
         $activity->user->fullname = fullname($submission, $viewfullnames);
+        // Other fields.
+        $activity->type         = 'assign';
+        $activity->cmid         = $cm->id;
+        $activity->name         = $aname;
+        $activity->sectionnum   = $cm->sectionnum;
+        if ($grader) {
+            $activity->grade = $grades->items[0]->grades[$submission->userid]->str_long_grade;
+        }
 
         $activities[$index++] = $activity;
     }
@@ -1077,6 +1080,7 @@ function assign_get_recent_mod_activity(&$activities,
  * Print recent activity from all assignments in a given course
  *
  * This is used by course/recent.php
+ * @deprecated since Totara 11.0 - use {@link mod_assign_renderer::render_recent_activity()} instead
  * @param stdClass $activity
  * @param int $courseid
  * @param bool $detail

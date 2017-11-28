@@ -457,6 +457,7 @@ function workshop_user_complete($course, $user, $mod, $workshop) {
  * that has occurred in workshop activities and print it out.
  * Return true if there was output, or false is there was none.
  *
+ * @deprecated since Totara 11.0 - use {@link mod_workshop_renderer::render_recent_activities()} instead
  * @param stdClass $course
  * @param bool $viewfullnames
  * @param int $timestart
@@ -875,36 +876,45 @@ function workshop_get_recent_mod_activity(&$activities, &$index, $timestart, $co
 
     foreach ($submissions as $submission) {
         $tmpactivity                = new stdclass();
+        // Fields require for display.
+        $tmpactivity->timestamp     = $submission->timemodified;
+        $tmpactivity->text          = $submission->title;
+        $tmpactivity->link          = (new moodle_url('/mod/workshop/submission.php', ['id' => $submission->id, 'cmid' => $cm->id]))->out();
+        $tmpactivity->extratext     = '';
+        if ($submission->authornamevisible and !empty($users[$submission->authorid])) {
+            $tmpactivity->user      = $users[$submission->authorid];
+        }
+        // Other fields.
         $tmpactivity->type          = 'workshop';
         $tmpactivity->cmid          = $cm->id;
         $tmpactivity->name          = $workshopname;
         $tmpactivity->sectionnum    = $cm->sectionnum;
-        $tmpactivity->timestamp     = $submission->timemodified;
         $tmpactivity->subtype       = 'submission';
         $tmpactivity->content       = $submission;
         if ($grader) {
             $tmpactivity->grade     = $grades->items[0]->grades[$submission->authorid]->str_long_grade;
-        }
-        if ($submission->authornamevisible and !empty($users[$submission->authorid])) {
-            $tmpactivity->user      = $users[$submission->authorid];
         }
         $activities[$index++]       = $tmpactivity;
     }
 
     foreach ($assessments as $assessment) {
         $tmpactivity                = new stdclass();
+        // Fields require for display.
+        $tmpactivity->timestamp     = $assessment->timemodified;
+        $tmpactivity->text          = $assessment->submissiontitle;
+        $tmpactivity->link          = (new moodle_url('/mod/workshop/assessment.php', ['asid' => $assessment->id]))->out();
+        if ($assessment->reviewernamevisible and !empty($users[$assessment->reviewerid])) {
+            $tmpactivity->user      = $users[$assessment->reviewerid];
+        }
+        // Other fields.
         $tmpactivity->type          = 'workshop';
         $tmpactivity->cmid          = $cm->id;
         $tmpactivity->name          = $workshopname;
         $tmpactivity->sectionnum    = $cm->sectionnum;
-        $tmpactivity->timestamp     = $assessment->timemodified;
         $tmpactivity->subtype       = 'assessment';
         $tmpactivity->content       = $assessment;
         if ($grader) {
             $tmpactivity->grade     = $grades->items[1]->grades[$assessment->reviewerid]->str_long_grade;
-        }
-        if ($assessment->reviewernamevisible and !empty($users[$assessment->reviewerid])) {
-            $tmpactivity->user      = $users[$assessment->reviewerid];
         }
         $activities[$index++]       = $tmpactivity;
     }
@@ -912,6 +922,7 @@ function workshop_get_recent_mod_activity(&$activities, &$index, $timestart, $co
 
 /**
  * Print single activity item prepared by {@see workshop_get_recent_mod_activity()}
+ * @deprecated since Totara 11.0 - use {@link mod_workshop_renderer::render_recent_activity()} instead
  */
 function workshop_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
     global $CFG, $OUTPUT;

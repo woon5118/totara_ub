@@ -1,12 +1,10 @@
-.block_recent_activity .activitydate,
+.block_recent_activity .activitydate {
+    font-weight: bold;
+}
 .block_recent_activity .activityhead {
-    text-align: center;
+    margin-bottom: 20px;
 }
 
-.block_recent_activity .unlist li {
-    margin-bottom: 1em;
-}
-
-.block_recent_activity li .head .date {
-    float: right;
+.block_recent_activity.block .content h3.sectionname {
+    font-size: 24px;
 }

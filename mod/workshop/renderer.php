@@ -1101,6 +1101,59 @@ class mod_workshop_renderer extends plugin_renderer_base {
         return $text;
     }
 
+    /**
+     * Renders Recent activity to go in the recent activity block
+     * Basically a wrapper for {@link render_recent_activity_note()}
+     *
+     * @param array $activities array of stdClasses from {@link workshop_get_recent_mod_activity()}
+     * @param bool $viewfullnames
+     * @return string
+     */
+    public function render_recent_activities(array $activities, bool $viewfullnames=true) :string {
+        if (count($activities) == 0) {
+            return '';
+        }
+
+        $submissionfilter = function($activity) {
+            return isset($activity->subtype) && $activity->subtype == 'submission';
+        };
+        $submissions = array_filter($activities, $submissionfilter);
+        $assessmentfilter = function($activity) {
+            return isset($activity->subtype) && $activity->subtype == 'assessment';
+        };
+        $assessments = array_filter($activities, $assessmentfilter);
+
+        $output = '';
+        if (!empty($submissions)) {
+            $output .= html_writer::tag('h3', get_string('recentsubmissions', 'workshop'), ['class' => 'sectionname']);
+            foreach ($submissions as $activity) {
+                $output .= print_recent_activity_note($activity->timestamp,
+                    $activity->user,
+                    $activity->text,
+                    $activity->link,
+                    true,
+                    $viewfullnames,
+                    null,
+                    isset($activity->extratext) ? $activity->extratext : '');
+            }
+        }
+
+        if (!empty($assessments)) {
+            $output .= html_writer::tag('h3', get_string('recentassessments', 'workshop'), ['class' => 'sectionname']);
+            foreach ($assessments as $activity) {
+                $output .= print_recent_activity_note($activity->timestamp,
+                    $activity->user,
+                    $activity->text,
+                    $activity->link,
+                    true,
+                    $viewfullnames,
+                    null,
+                    isset($activity->extratext) ? $activity->extratext : '');
+            }
+        }
+        return $output;
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Static helpers
     ////////////////////////////////////////////////////////////////////////////

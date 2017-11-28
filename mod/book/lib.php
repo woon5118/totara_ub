@@ -142,9 +142,11 @@ function book_delete_instance($id) {
  * @param bool $viewfullnames
  * @param int $timestart
  * @return bool true if there was output, or false is there was none
+ *
+ * @deprecated since Totara 11
  */
 function book_print_recent_activity($course, $viewfullnames, $timestart) {
-    return false;  //  True if anything was printed, otherwise false
+    return false;
 }
 
 /**

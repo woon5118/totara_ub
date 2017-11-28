@@ -450,19 +450,23 @@ function feedback_get_recent_mod_activity(&$activities, &$index,
         }
 
         $tmpactivity = new stdClass();
-
+        // Fields required to display.
+        $tmpactivity->timestamp = $feedbackitem->timemodified;
+        $tmpactivity->text      = $aname;
+        $tmpactivity->link      = (new moodle_url('/mod/feedback/view.php', ['id' => $cm->id]))->out();
+        $tmpactivity->user = user_picture::unalias($feedbackitem, null, 'useridagain');
+        $tmpactivity->user->fullname = fullname($feedbackitem, $viewfullnames);
+        // Other fields.
         $tmpactivity->type      = 'feedback';
         $tmpactivity->cmid      = $cm->id;
         $tmpactivity->name      = $aname;
         $tmpactivity->sectionnum= $cm->sectionnum;
-        $tmpactivity->timestamp = $feedbackitem->timemodified;
+        $tmpactivity->courseid  = $courseid;
 
         $tmpactivity->content = new stdClass();
         $tmpactivity->content->feedbackid = $feedbackitem->id;
         $tmpactivity->content->feedbackuserid = $feedbackitem->userid;
 
-        $tmpactivity->user = user_picture::unalias($feedbackitem, null, 'useridagain');
-        $tmpactivity->user->fullname = fullname($feedbackitem, $viewfullnames);
 
         $activities[$index++] = $tmpactivity;
     }
@@ -474,6 +478,7 @@ function feedback_get_recent_mod_activity(&$activities, &$index,
  * Prints all users who has completed a specified feedback since a given time
  * many thanks to Manolescu Dorel, who contributed these two functions
  *
+ * @deprecated since Totara 11.0 - use {@link mod_feedback_renderer::render_recent_activity()} instead
  * @global object
  * @param object $activity
  * @param int $courseid

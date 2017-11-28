@@ -204,6 +204,7 @@ function survey_user_complete($course, $user, $mod, $survey) {
 }
 
 /**
+ * @deprecated as of totara 11 - use {@link mod_survey_renderer::render_recent_activities()} instead
  * @global stdClass
  * @global object
  * @param object $course
@@ -266,6 +267,84 @@ function survey_print_recent_activity($course, $viewfullnames, $timestart) {
     }
 
     return true;
+}
+
+/**
+ * Get the recent activty for the survey.
+ *
+ * @param $activities
+ * @param $index
+ * @param $timestart
+ * @param $courseid
+ * @param $cmid
+ * @param int $userid
+ * @param int $groupid
+ */
+function survey_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
+    global $COURSE, $DB;
+
+    if ($COURSE->id == $courseid) {
+        $course = $COURSE;
+    } else {
+        $course = $DB->get_record('course', array('id' => $courseid));
+    }
+
+    $modinfo = get_fast_modinfo($course);
+    $cm = $modinfo->cms[$cmid];
+
+    if (!$cm->uservisible) {
+        return;
+    }
+
+    $params =  ['timestart' => $timestart];
+    if ($userid) {
+        $userselect = "AND u.id = :userid";
+        $params['userid'] = $userid;
+    } else {
+        $userselect = "";
+    }
+
+    if ($groupid) {
+        return; // Cannot sort by group as the data it not saved in database.
+    }
+
+    $allusernames = user_picture::fields('u');
+    $rs = $DB->get_recordset_sql("SELECT sa.userid, s.name, MAX(sa.time) AS time,
+                                         $allusernames
+                                    FROM {survey_answers} sa
+                                    JOIN {user} u ON u.id = sa.userid
+                                    JOIN {survey} s ON s.id = sa.survey
+                                   WHERE sa.survey = {$cm->instance} AND sa.time > :timestart $userselect
+                                GROUP BY s.name, sa.userid, sa.survey, $allusernames
+                                ORDER BY time ASC", $params);
+    if (!$rs->valid()) {
+        $rs->close(); // Not going to iterate (but exit), close rs.
+        return;
+    }
+
+    foreach ($rs as $survey) {
+        $tmpactivity = new stdClass();
+        // Fields required for display.
+        $tmpactivity->timestamp = $survey->time;
+        $tmpactivity->text = $survey->name;
+        $tmpactivity->link = (new moodle_url('/mod/survey/view.php', ['id' => $cm->id]))->out();
+        $tmpactivity->user = new stdClass();
+        $tmpactivity->user = username_load_fields_from_object($tmpactivity->user,
+            $survey,
+            null,
+            explode(',', user_picture::fields()));
+        $tmpactivity->user->id = $survey->userid;
+        // Other fields.
+        $tmpactivity->type = 'survey';
+        $tmpactivity->cmid = $cm->id;
+        $tmpactivity->name = $survey->name;
+        $tmpactivity->sectionnum = $cm->sectionnum;
+        $tmpactivity->courseid = $courseid;
+
+        $activities[] = $tmpactivity;
+        $index = $index + 1;
+    }
+    $rs->close();
 }
 
 // SQL FUNCTIONS ////////////////////////////////////////////////////////

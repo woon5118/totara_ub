@@ -275,6 +275,7 @@ function wiki_supports($feature) {
  * that has occurred in wiki activities and print it out.
  * Return true if there was output, or false is there was none.
  *
+ * @deprecated as of totara 11 - use {@link mod_wiki_renderer::render_recent_activities()} instead
  * @global $CFG
  * @global $DB
  * @uses CONTEXT_MODULE
@@ -329,6 +330,115 @@ function wiki_print_recent_activity($course, $viewfullnames, $timestart) {
 
     return true; //  True if anything was printed, otherwise false
 }
+
+/**
+ * Gets recent activity for the wiki module.
+ *
+ * @param $activities
+ * @param $index
+ * @param $timestart
+ * @param $courseid
+ * @param $cmid
+ * @param int $userid
+ * @param int $groupid
+ */
+function wiki_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
+    global $DB, $CFG, $COURSE;
+
+    if ($COURSE->id == $courseid) {
+        $course = $COURSE;
+    } else {
+        $course = $DB->get_record('course', array('id' => $courseid));
+    }
+
+    $modinfo = get_fast_modinfo($course);
+    $cm = $modinfo->cms[$cmid];
+
+    $params = ['timestart' => $timestart, 'courseid' => $course->id];
+    if ($userid) {
+        $userselect = "AND u.id = :userid";
+        $params['userid'] = $userid;
+    } else {
+        $userselect = "";
+    }
+
+    if ($groupid) {
+        $groupselect = "AND sw.groupid = :groupid";
+        $params['groupid'] = $groupid;
+    } else {
+        $groupselect = "";
+    }
+
+    $userpicturefields = user_picture::fields('u', null, 'userid');
+
+    $sql = "SELECT p.id as id, p.timemodified, p.subwikiid, sw.wikiid, w.name, w.wikimode, sw.userid, sw.groupid, u.id as editorid, $userpicturefields
+            FROM {wiki_pages} p
+                JOIN {wiki_subwikis} sw ON sw.id = p.subwikiid
+                JOIN {wiki_pages} wp ON wp.subwikiid = sw.id
+                INNER JOIN (
+                      SELECT smpv.pageid, MAX(version) AS version
+                      FROM {wiki_versions} smpv
+                      GROUP BY smpv.pageid) AS versionmax ON versionmax.version > 0
+                JOIN {wiki_versions} swv ON swv.pageid = versionmax.pageid AND swv.version = versionmax.version AND swv.pageid = wp.id
+                JOIN {user} u ON u.id = swv.userid
+                JOIN {wiki} w ON w.id = sw.wikiid
+            WHERE p.timemodified > :timestart AND w.course = :courseid $groupselect $userselect
+            ORDER BY p.timemodified ASC";
+
+    $pages = $DB->get_records_sql($sql, $params);
+    if (!$pages) {
+        return;
+    }
+
+    require_once($CFG->dirroot . "/mod/wiki/locallib.php");
+    $wikis = [];
+
+    $subwikivisible = [];
+    foreach ($pages as $page) {
+        if (!isset($subwikivisible[$page->subwikiid])) {
+            $subwiki = new stdClass();
+            $subwiki->id = $page->subwikiid;
+            $subwiki->wikiid = $page->wikiid;
+            $subwiki->groupid = $page->groupid;
+            $subwiki->userid = $page->userid;
+
+            $wiki = new stdClass();
+            $wiki->id = $page->wikiid;
+            $wiki->course = $courseid;
+            $wiki->wikimode = $page->wikimode;
+
+            $subwikivisible[$page->subwikiid] = wiki_user_can_view($subwiki, $wiki);
+        }
+        if ($subwikivisible[$page->subwikiid]) {
+            $wikis[] = $page;
+        }
+    }
+
+    foreach ($wikis as $wiki) {
+        $tmpactivity = new stdClass();
+        // Fields required for display.
+        $tmpactivity->timestamp = $wiki->timemodified;
+        $tmpactivity->text = $wiki->name;
+        $tmpactivity->link = (new moodle_url('/mod/wiki/view.php', ['pageid' => $wiki->id]))->out();
+
+        $tmpactivity->user = new stdClass();
+        $additionalfields = array('id' => 'userid', 'picture', 'imagealt', 'email');
+        $additionalfields = explode(',', user_picture::fields());
+        $tmpactivity->user = username_load_fields_from_object($tmpactivity->user, $wiki, null, $additionalfields);
+        $tmpactivity->user->id = $wiki->editorid;
+        // Other fields.
+        $tmpactivity->type = 'wiki';
+        $tmpactivity->id = $wiki->id;
+        $tmpactivity->cmid = $cmid;
+        $tmpactivity->name = $wiki->name;
+        $tmpactivity->courseid = $courseid;
+        $tmpactivity->sectionnum = $cm->sectionnum;
+
+        $activities[] = $tmpactivity;
+        $index = $index + 1;
+    }
+}
+
 /**
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such

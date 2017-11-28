@@ -230,6 +230,7 @@ function chat_delete_instance($id) {
  * Given a course and a date, prints a summary of all chat rooms past and present
  * This function is called from block_recent_activity
  *
+ * @deprecated as of totara 11 - use {@link mod_chat_renderer::render_recent_activities()} instead
  * @global object
  * @global object
  * @global object
@@ -376,6 +377,112 @@ function chat_print_recent_activity($course, $viewfullnames, $timestart) {
     }
 
     return true;
+}
+
+/**
+ * Get recent activity from chat
+ *
+ * @param $activities
+ * @param $index
+ * @param $timestart
+ * @param $courseid
+ * @param $cmid
+ * @param int $userid
+ * @param int $groupid
+ * @return void
+ */
+function chat_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
+    global $DB, $COURSE, $CFG;
+
+    $timeout = $CFG->chat_old_ping * 10;
+
+    if ($COURSE->id == $courseid) {
+        $course = $COURSE;
+    } else {
+        $course = $DB->get_record('course', array('id' => $courseid));
+    }
+
+    $modinfo = get_fast_modinfo($course);
+    $cm = $modinfo->cms[$cmid];
+
+    $params = ['timestart' => $timestart, 'courseid' => $course->id, 'cmid' => $cmid];
+
+    if ($groupid) {
+        $groupselect = "AND chm.groupid = :groupid";
+        $params['groupid'] = $groupid;
+    } else {
+        $groupselect = "";
+    }
+
+    $sql = "SELECT lastmesg.timestamp as timestamp, ch.name as name, ch.id as id
+              FROM {course_modules} cm
+              JOIN {modules} md ON md.id = cm.module
+              JOIN {chat} ch ON ch.id = cm.instance
+              JOIN (SELECT mesg.chatid, MAX(mesg.timestamp) AS timestamp
+                  FROM {chat_messages} mesg
+                  GROUP BY mesg.chatid) AS lastmesg ON lastmesg.chatid = ch.id
+             WHERE lastmesg.timestamp > :timestart AND ch.course = :courseid AND md.name = 'chat' AND cm.id = :cmid
+                  $groupselect
+          ORDER BY lastmesg.timestamp ASC";
+
+    $chat = $DB->get_record_sql($sql, $params);
+
+    if (!$chat || empty($modinfo->cms[$cmid]) || !$cm->uservisible) {
+        return;
+    }
+
+    $timeold    = round(time() - $CFG->chat_old_ping, -1);
+    $timeoldext = round(time() - $CFG->chat_old_ping, -1) * 10;
+    $params = ['timeold' => $timeold, 'timeoldext' => $timeoldext, 'cmid' => $cm->id];
+    $timeout = "AND ((chu.version<>'basic' AND chu.lastping>:timeold) OR (chu.version='basic' AND chu.lastping>:timeoldext))";
+    $cmgroupids = $modinfo->groups[$cm->groupingid];
+    if (!empty($cmgroupids)) {
+        list($subquery, $subparams) = $DB->get_in_or_equal($cmgroupids, SQL_PARAMS_NAMED, 'gid');
+        $params += $subparams;
+        $groupselect = "AND (chu.groupid $subquery OR chu.groupid = 0)";
+    } else {
+        $groupselect = "";
+    }
+
+    if ($userid) {
+        $userselect = "AND u.id = :userid";
+        $params['userid'] = $userid;
+    } else {
+        $userselect = "";
+    }
+
+    $users = $DB->get_records_sql("SELECT *
+                                     FROM {course_modules} cm
+                                     JOIN {chat} ch        ON ch.id = cm.instance
+                                     JOIN {chat_users} chu ON chu.chatid = ch.id
+                                     JOIN {user} u         ON u.id = chu.userid
+                                    WHERE cm.id = :cmid $timeout $groupselect $userselect",
+                                    $params);
+
+    if (empty($users)) {
+        return;
+    }
+
+    foreach ($users as $user) {
+        $tmpactivity = new stdClass();
+        // Fields required for display.
+        $tmpactivity->timestamp = $chat->timestamp;
+        $tmpactivity->text = $chat->name;
+        $tmpactivity->link = (new moodle_url('/mod/chat/view.php', ['id' => $cm->id]))->out();
+        $tmpactivity->user = $user;
+        // Other fields.
+        $tmpactivity->type = 'chat';
+        $tmpactivity->cmid = $cmid;
+        $tmpactivity->id = $chat->id;
+        $tmpactivity->name = $chat->name;
+        $tmpactivity->courseid = $courseid;
+        $tmpactivity->sectionnum = $cm->sectionnum;
+        $tmpactivity->users = $users;
+
+        $activities[] = $tmpactivity;
+        $index = $index + 1;
+    }
+
 }
 
 /**

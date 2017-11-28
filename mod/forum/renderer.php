@@ -239,4 +239,21 @@ class mod_forum_renderer extends plugin_renderer_base {
     public function render_big_search_form(\mod_forum\output\big_search_form $form) {
         return $this->render_from_template('mod_forum/big_search_form', $form->export_for_template($this));
     }
+
+    /**
+     * Renders Recent activity to go in the recent activity block
+     * Basically a wrapper for {@link render_recent_activity_notes()}
+     *
+     * @param array $activities array of stdClasses from {@link forum_get_recent_mod_activity()}
+     * @param bool $viewfullnames
+     * @return string
+     */
+    public function render_recent_activities(array $activities, bool $viewfullnames=true) :string {
+        if (count($activities) == 0) {
+            return '';
+        }
+        $output = html_writer::tag('h3', get_string('newforumposts', 'forum') . ':', ['class' => 'sectionname']);
+        $output .= render_recent_activity_notes($activities, $viewfullnames);
+        return $output;
+    }
 }

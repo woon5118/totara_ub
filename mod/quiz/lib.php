@@ -951,12 +951,18 @@ function quiz_get_recent_mod_activity(&$activities, &$index, $timestart,
         $options = quiz_get_review_options($quiz, $attempt, $context);
 
         $tmpactivity = new stdClass();
-
+        // Fields required for display.
+        $tmpactivity->timestamp  = $attempt->timefinish;
+        $tmpactivity->text       = $aname;
+        $tmpactivity->link       = (new moodle_url('/mod/quiz/view.php', ['id' => $cm->id]))->out();
+        $tmpactivity->user = user_picture::unalias($attempt, null, 'useridagain');
+        $tmpactivity->user->fullname  = fullname($tmpactivity->user, $viewfullnames);
+        // Other fields.
         $tmpactivity->type       = 'quiz';
         $tmpactivity->cmid       = $cm->id;
         $tmpactivity->name       = $aname;
+        $tmpactivity->courseid   = $courseid;
         $tmpactivity->sectionnum = $cm->sectionnum;
-        $tmpactivity->timestamp  = $attempt->timefinish;
 
         $tmpactivity->content = new stdClass();
         $tmpactivity->content->attemptid = $attempt->id;
@@ -969,13 +975,18 @@ function quiz_get_recent_mod_activity(&$activities, &$index, $timestart,
             $tmpactivity->content->maxgrade  = null;
         }
 
-        $tmpactivity->user = user_picture::unalias($attempt, null, 'useridagain');
-        $tmpactivity->user->fullname  = fullname($tmpactivity->user, $viewfullnames);
 
         $activities[$index++] = $tmpactivity;
     }
 }
 
+/**
+ * @deprecated since Totara 11.0 - use {@link mod_quiz_renderer::render_recent_activity()} instead
+ * @param $activity
+ * @param $courseid
+ * @param $detail
+ * @param $modnames
+ */
 function quiz_print_recent_mod_activity($activity, $courseid, $detail, $modnames) {
     global $CFG, $OUTPUT;
 

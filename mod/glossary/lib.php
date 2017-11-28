@@ -428,14 +428,27 @@ function glossary_get_recent_mod_activity(&$activities, &$index, $timestart, $co
          */
 
         $tmpactivity                       = new stdClass();
+        // Field require for display.
+        $tmpactivity->timestamp            = $entry->timemodified;
+        $tmpactivity->text                 = format_string($entry->concept, true);
+        if ($entry->approved) {
+            $urlparams = ['g' => $entry->glossaryid,
+                'mode' => 'entry',
+                'hook' => $entry->entryid];
+        } else {
+            $urlparams = ['id' => $$cm->id,
+                'mode' => 'approval',
+                'hook' => format_text($entry->concept, true)];
+        }
+        $tmpactivity->link                 = (new moodle_url('/mod/glossary/view.php', $urlparams))->out();
         $tmpactivity->user                 = user_picture::unalias($entry, null, 'userid');
         $tmpactivity->user->fullname       = fullname($tmpactivity->user, $viewfullnames);
+        // Other fields.
         $tmpactivity->type                 = 'glossary';
         $tmpactivity->cmid                 = $cm->id;
         $tmpactivity->glossaryid           = $entry->glossaryid;
         $tmpactivity->name                 = format_string($cm->name, true);
         $tmpactivity->sectionnum           = $cm->sectionnum;
-        $tmpactivity->timestamp            = $entry->timemodified;
         $tmpactivity->content              = new stdClass();
         $tmpactivity->content->entryid     = $entry->entryid;
         $tmpactivity->content->concept     = $entry->concept;
@@ -451,6 +464,7 @@ function glossary_get_recent_mod_activity(&$activities, &$index, $timestart, $co
 /**
  * Outputs the glossary entry indicated by $activity
  *
+ * @deprecated since Totara 11.0 - use {@link mod_glossary_renderer::render_recent_activity()} instead
  * @param object $activity      the activity object the glossary resides in
  * @param int    $courseid      the id of the course the glossary resides in
  * @param bool   $detail        not used, but required for compatibilty with other modules
@@ -499,6 +513,7 @@ function glossary_print_recent_mod_activity($activity, $courseid, $detail, $modn
  * that has occurred in glossary activities and print it out.
  * Return true if there was output, or false is there was none.
  *
+ * @deprecated since Totara 11.0 - use {@link mod_assign_renderer::render_recent_activities()} instead
  * @global object
  * @global object
  * @global object

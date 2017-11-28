@@ -2465,7 +2465,6 @@ function print_group_picture($group, $courseid, $large=false, $return=false, $li
     }
 }
 
-
 /**
  * Display a recent activity note
  *
@@ -2475,33 +2474,83 @@ function print_group_picture($group, $courseid, $large=false, $return=false, $li
  * @param string $text Text for display for the note
  * @param string $link The link to wrap around the text
  * @param bool $return If set to true the HTML is returned rather than echo'd
- * @param string $viewfullnames
+ * @param bool|null $viewfullnames
+ * @param int|null $courseid id  of the course that the course module is in
+ * @param string $extratext extra text to add to the head row
  * @return string If $retrun was true returns HTML for a recent activity notice.
  */
-function print_recent_activity_note($time, $user, $text, $link, $return=false, $viewfullnames=null) {
+function print_recent_activity_note($time, $user, $text, $link, $return=false, $viewfullnames=null, $courseid=null, $extratext='') {
+    global $PAGE;
     static $strftimerecent = null;
-    $output = '';
 
-    if (is_null($viewfullnames)) {
-        $context = context_system::instance();
-        $viewfullnames = has_capability('moodle/site:viewfullnames', $context);
+    $data = [];
+    if (!empty($user)) {
+        if (is_null($viewfullnames)) {
+            $context = context_system::instance();
+            $viewfullnames = has_capability('moodle/site:viewfullnames', $context);
+        }
+
+        $data['user'] = [];
+        $data['user']['name'] = fullname($user, $viewfullnames);
+        if ($courseid != null) {
+            $data['user']['url'] = (new moodle_url('/user/view.php', ['id' => $user->id, 'course' => $courseid]))->out();
+        } else {
+            $data['user']['url'] = (new moodle_url('/user/view.php', ['id' => $user->id]))->out();
+        }
+    }
+    if (!empty($time)) {
+        if (is_null($strftimerecent)) {
+            $strftimerecent = get_string('strftimerecent');
+        }
+        $data['date'] = userdate($time, $strftimerecent);
+    }
+    if (!empty($extratext)) {
+        $data['extratext'] = $extratext;
+    }
+    if (!empty($text)) {
+        $data['link'] = [];
+        $data['link']['text'] = format_string($text, true);
+        if (!empty($link)) {
+            $data['link']['url'] = $link;
+        }
     }
 
-    if (is_null($strftimerecent)) {
-        $strftimerecent = get_string('strftimerecent');
-    }
-
-    $output .= '<div class="head">';
-    $output .= '<div class="date">'.userdate($time, $strftimerecent).'</div>';
-    $output .= '<div class="name">'.fullname($user, $viewfullnames).'</div>';
-    $output .= '</div>';
-    $output .= '<div class="info"><a href="'.$link.'">'.format_string($text, true).'</a></div>';
+    $renderer = $PAGE->get_renderer('core');
+    $output = $renderer->render_from_template('core/recent_activity_note', $data);
 
     if ($return) {
         return $output;
     } else {
         echo $output;
     }
+}
+
+/**
+ * Renders an array of recent activity objects.
+ *
+ * @param array $activities
+ * @param bool|null $viewfullnames
+ * @return string
+ */
+function render_recent_activity_notes(array $activities, bool $viewfullnames = null) {
+    $output = '';
+    foreach ($activities as $activity) {
+        assert(isset($activity->text), 'The text property on the activity is used to display nicely');
+        assert(isset($activity->link), 'Activities can have a link associated with them');
+        assert(isset($activity->user), 'Fillout the user property to show the username');
+        assert(isset($activity->timestamp), 'Set the timestamp property to show the time in the activity note');
+
+        $output .= print_recent_activity_note(
+            isset($activity->timestamp) ? $activity->timestamp : null,
+            isset($activity->user) ? $activity->user : null,
+            isset($activity->text) ? $activity->text : null,
+            isset($activity->link) ? $activity->link : null,
+            true,
+            $viewfullnames,
+            isset($activity->courseid) ? $activity->courseid : null,
+            isset($activity->extratext) ? $activity->extratext : '');
+    }
+    return $output;
 }
 
 /**

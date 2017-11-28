@@ -745,11 +745,18 @@ class behat_course extends behat_base {
             array(get_string('edittitle'), "link", $activity)
         );
 
-        // Adding chr(10) to save changes.
         $this->execute('behat_forms::i_set_the_field_to',
-            array('title', $this->escape($newactivityname) . chr(10))
+            array('New name for activity '.$activityname, $this->escape($newactivityname))
         );
 
+        // Press the enter key to hide the textbox and save the change.
+        $this->execute('behat_forms::i_press_key_in_the_field',
+            array(13, 'New name for activity '.$activityname)
+        );
+
+        $this->execute('behat_general::i_wait_seconds',
+            array(1)
+        );
     }
 
     /**

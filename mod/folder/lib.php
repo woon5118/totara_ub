@@ -589,12 +589,16 @@ function folder_get_recent_mod_activity(&$activities, &$index, $timestart, $cour
 
     foreach ($files as $file) {
         $tmpactivity = new stdClass();
-
+        // Fields requires to display.
+        $tmpactivity->timestamp  = $file->get_timemodified();
+        $tmpactivity->text       = $file->get_filename();
+        $tmpactivity->link       = (moodle_url::make_pluginfile_url($file->get_contextid(), 'mod_folder', 'content',
+            $file->get_itemid(), $file->get_filepath(), $file->get_filename()))->out();
+        $tmpactivity->user       = core_user::get_user($file->get_userid());
+        // Other fields.
         $tmpactivity->type       = 'folder';
         $tmpactivity->cmid       = $cm->id;
         $tmpactivity->sectionnum = $cm->sectionnum;
-        $tmpactivity->timestamp  = $file->get_timemodified();
-        $tmpactivity->user       = core_user::get_user($file->get_userid());
 
         $tmpactivity->content           = new stdClass();
         $tmpactivity->content->url      = moodle_url::make_pluginfile_url($file->get_contextid(), 'mod_folder', 'content',
@@ -608,6 +612,7 @@ function folder_get_recent_mod_activity(&$activities, &$index, $timestart, $cour
         }
 
         $tmpactivity->content->image    = $image;
+        $tmpactivity->content->author = $file->get_author();
         $tmpactivity->content->filename = $file->get_filename();
 
         $activities[$index++] = $tmpactivity;
@@ -618,6 +623,7 @@ function folder_get_recent_mod_activity(&$activities, &$index, $timestart, $cour
 /**
  * Outputs the folder uploads indicated by $activity.
  *
+ * @deprecated since Totara 11.0 - use {@link mod_folder_renderer::render_recent_activity()} instead
  * @param object $activity      the activity object the folder resides in
  * @param int    $courseid      the id of the course the folder resides in
  * @param bool   $detail        not used, but required for compatibilty with other modules
@@ -690,6 +696,7 @@ function folder_get_recent_activity($context, $timestart, $userid=0) {
  * Given a course and a date, prints a summary of all the new
  * files posted in folder resources since that date
  *
+ * @deprecated since Totara 11.0 - use {@link mod_folder_renderer::render_recent_activities()} instead
  * @uses CONTEXT_MODULE
  * @param object $course
  * @param bool $viewfullnames capability

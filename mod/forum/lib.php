@@ -1603,6 +1603,7 @@ function forum_print_overview($courses,&$htmlarray) {
  * Given a course and a date, prints a summary of all the new
  * messages posted in the course since that date
  *
+ * @deprecated since Totara 11.0 - use {@link mod_forum_renderer::render_recent_activities()} instead
  * @global object
  * @global object
  * @global object
@@ -6004,13 +6005,30 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
     $aname = format_string($cm->name,true);
 
     foreach ($printposts as $post) {
+        $authorhidden = forum_is_author_hidden((object)['parent' => $post->parent], (object)['type' => $post->forumtype]);
+
         $tmpactivity = new stdClass();
 
+        // Fields required for display.
+        $tmpactivity->timestamp    = $post->modified;
+        $tmpactivity->text         = format_string($post->subject);
+        $tmpactivity->link         = (new moodle_url('/mod/forum/discuss.php', ['d' => $post->discussion]))->out();
+
+        if (!$authorhidden) {
+            $additionalfields = array('id' => 'userid', 'picture', 'imagealt', 'email');
+            $additionalfields = explode(',', user_picture::fields());
+            $tmpactivity->user = new \stdClass();
+            $tmpactivity->user = username_load_fields_from_object($tmpactivity->user, $post, null, $additionalfields);
+            $tmpactivity->user->id = $post->userid;
+        } else {
+
+            $tmpactivity->user = null;
+        }
+        // Other fields.
         $tmpactivity->type         = 'forum';
         $tmpactivity->cmid         = $cm->id;
         $tmpactivity->name         = $aname;
         $tmpactivity->sectionnum   = $cm->sectionnum;
-        $tmpactivity->timestamp    = $post->modified;
 
         $tmpactivity->content = new stdClass();
         $tmpactivity->content->id         = $post->id;
@@ -6019,11 +6037,6 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
         $tmpactivity->content->parent     = $post->parent;
         $tmpactivity->content->forumtype  = $post->forumtype;
 
-        $tmpactivity->user = new stdClass();
-        $additionalfields = array('id' => 'userid', 'picture', 'imagealt', 'email');
-        $additionalfields = explode(',', user_picture::fields());
-        $tmpactivity->user = username_load_fields_from_object($tmpactivity->user, $post, null, $additionalfields);
-        $tmpactivity->user->id = $post->userid;
 
         $activities[$index++] = $tmpactivity;
     }
@@ -6034,6 +6047,7 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
 /**
  * Outputs the forum post indicated by $activity.
  *
+ * @deprecated since Totara 11.0 - use {@link mod_forum_renderer::render_recent_activity()} instead
  * @param object $activity      the activity object the forum resides in
  * @param int    $courseid      the id of the course the forum resides in
  * @param bool   $detail        not used, but required for compatibilty with other modules
