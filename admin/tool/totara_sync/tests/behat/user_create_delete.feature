@@ -72,7 +72,7 @@ Feature: An admin can import users through HR import
     And I press "Clear"
     And I follow "Show more..."
     And I set the following fields to these values:
-      | User Status | Active users only |
+      | User Status | Active |
     And I press "id_submitgroupstandard_addfilter"
     And I should see "Import User001"
     And I should see "Import User002"
@@ -87,7 +87,7 @@ Feature: An admin can import users through HR import
     Then I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Show more..."
     And I set the following fields to these values:
-      | User Status | Active users only |
+      | User Status | Active |
     And I press "id_submitgroupstandard_addfilter"
     And I should see "Import User001"
     And I should see "Import User002"
@@ -107,7 +107,7 @@ Feature: An admin can import users through HR import
     And I press "Clear"
     And I follow "Show more..."
     And I set the following fields to these values:
-      | User Status | Active users only |
+      | User Status | Active |
     And I press "id_submitgroupstandard_addfilter"
     And I should see "Import User001"
     And I should see "Import User002"
@@ -128,7 +128,7 @@ Feature: An admin can import users through HR import
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Show more..."
     And I set the following fields to these values:
-      | User Status | Active users only |
+      | User Status | Active |
     And I press "id_submitgroupstandard_addfilter"
     And I should see "Import User001"
     And I should see "Import User002"
@@ -148,7 +148,7 @@ Feature: An admin can import users through HR import
     And I press "Clear"
     And I follow "Show more..."
     And I set the following fields to these values:
-      | User Status | Active users only |
+      | User Status | Active |
     And I press "id_submitgroupstandard_addfilter"
     And I should see "Import User001"
     And I should see "Import User002"
@@ -170,7 +170,7 @@ Feature: An admin can import users through HR import
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Show more..."
     And I set the following fields to these values:
-      | User Status | Active users only |
+      | User Status | Active |
     And I press "id_submitgroupstandard_addfilter"
     And I should see "Import User001"
     And I should see "Import User002"

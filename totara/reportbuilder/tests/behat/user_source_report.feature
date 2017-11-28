@@ -47,21 +47,21 @@ Feature: Verify functionality of user source report.
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname   | Username | User's Email              | User Status |
-      | Sir Bob1 Learner1 | learner1 | bob1.learner1@example.com | Active user |
+      | Sir Bob1 Learner1 | learner1 | bob1.learner1@example.com | Active      |
 
   Scenario: Verify suspend and unsuspend of user in user source report.
 
     Given I follow "Suspend Bob1 Learner1"
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status    |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Suspended user |
+      | User's Fullname | Username | User's Email              | User Status |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Suspended   |
 
     When I follow "Unsuspend Bob1 Learner1"
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
 
   Scenario: Verify partial delete and undelete of user in user source report.
 
@@ -73,8 +73,8 @@ Feature: Verify functionality of user source report.
     When I press "Delete"
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status  |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
+      | User's Fullname | Username | User's Email              | User Status |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
 
     When I follow "Undelete Bob1 Learner1"
     Then I should see "Undelete User"
@@ -83,7 +83,7 @@ Feature: Verify functionality of user source report.
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
 
   Scenario: Verify full delete of user in user source report.
 
@@ -121,8 +121,8 @@ Feature: Verify functionality of user source report.
     When I press "Delete"
     Then I should see "User Report: 7 records shown"
     And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status  |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
+      | User's Fullname | Username | User's Email              | User Status |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
 
     When I log out
     And I log in as "manager1"
@@ -131,8 +131,8 @@ Feature: Verify functionality of user source report.
     And I click on "View" "link" in the "User Report" "table_row"
     Then I should see "User Report: 7 records shown"
     And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status  |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
+      | User's Fullname | Username | User's Email              | User Status |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
 
     When I set the following system permissions of "Site Manager" role:
       | capability                  | permission |
@@ -143,8 +143,8 @@ Feature: Verify functionality of user source report.
     And I click on "View" "link" in the "User Report" "table_row"
     Then I should see "User Report: 6 records shown"
     And the following should not exist in the "reportbuilder-table" table:
-      | User's Fullname | Username | User's Email              | User Status  |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
+      | User's Fullname | Username | User's Email              | User Status |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
 
   Scenario: Verify confirm new self-registration user in user source report.
 
@@ -174,10 +174,13 @@ Feature: Verify functionality of user source report.
     And I click on "View" "link" in the "User Report" "table_row"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email     | User Status |
-      | Bob5 Learner5   | learner5 | Email is private | Active user |
+      | Bob5 Learner5   | learner5 | Email is private | Unconfirmed |
 
     When I follow "Confirm Bob5 Learner5"
     Then I should not see "Confirm Bob5 Learner5"
+    And the "reportbuilder-table" table should contain the following:
+      | User's Fullname | Username | User's Email     | User Status |
+      | Bob5 Learner5   | learner5 | Email is private | Active      |
 
   Scenario: Verify unlock of user account in user source report.
 
@@ -210,7 +213,7 @@ Feature: Verify functionality of user source report.
     And I click on "View" "link" in the "User Report" "table_row"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
 
     When I follow "Unlock Bob1 Learner1"
     Then I should not see "Unlock Bob1 Learner1"
@@ -234,10 +237,10 @@ Feature: Verify functionality of user source report.
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
-      | Bob3 Learner3   | learner3 | Email is private          | Active user |
-      | Bob4 Learner4   | learner4 | Email is private          | Active user |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob3 Learner3   | learner3 | Email is private          | Active      |
+      | Bob4 Learner4   | learner4 | Email is private          | Active      |
     And I log out
 
     When I log in as "learner1"
@@ -246,9 +249,9 @@ Feature: Verify functionality of user source report.
     # Email addresses is 'hidden from everyone' and only visible to course members.
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
-      | Bob3 Learner3   | learner3 | Email is private          | Active user |
-      | Bob4 Learner4   | learner4 | Email is private          | Active user |
+      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob3 Learner3   | learner3 | Email is private          | Active      |
+      | Bob4 Learner4   | learner4 | Email is private          | Active      |
     And I log out
 
     When I log in as "learner2"
@@ -257,9 +260,9 @@ Feature: Verify functionality of user source report.
     # Email addresses is 'hidden from everyone' and only visible to course members.
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
-      | Bob3 Learner3   | learner3 | Email is private          | Active user |
-      | Bob4 Learner4   | learner4 | Email is private          | Active user |
+      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob3 Learner3   | learner3 | Email is private          | Active      |
+      | Bob4 Learner4   | learner4 | Email is private          | Active      |
 
   Scenario: Verify Global Report Restrictions works on the report in user source report.
 
@@ -310,10 +313,10 @@ Feature: Verify functionality of user source report.
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
-      | Bob3 Learner3   | learner3 | Email is private          | Active user |
-      | Bob4 Learner4   | learner4 | Email is private          | Active user |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob3 Learner3   | learner3 | Email is private          | Active      |
+      | Bob4 Learner4   | learner4 | Email is private          | Active      |
     And I log out
 
     # Learner3 should be restricted to a report containing only learner1 and 2.
@@ -323,8 +326,8 @@ Feature: Verify functionality of user source report.
     Then I should see "User Report: 2 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active user |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |
+      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
 
   Scenario: Verify reports extending from the user source class do not support the action column in user source report.
 

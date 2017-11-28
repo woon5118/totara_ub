@@ -37,10 +37,15 @@ information provided here is intended especially for developers.
 
 * view_all_reports_link() renderer method now requires argument $embedded
 
-* rb_base_source::rb_display_user_email() has been deprecated, use the totara/reportbuilder/classes/rb/display/user_email class instead.
+* rb_base_source::rb_display_user_email() has been deprecated, use the
+  totara/reportbuilder/classes/rb/display/user_email class instead.
 
-* rb_base_source::rb_display_user_email_unobscured() has been deprecated, use the totara/reportbuilder/classes/rb/display/user_email_unobscured class instead.
+* rb_base_source::rb_display_user_email_unobscured() has been deprecated, use the
+  totara/reportbuilder/classes/rb/display/user_email_unobscured class instead.
 
 === 11.0 ===
 
-* Triggering of "\totara_reportbuilder\event\report_updated" event for deletion of scheduled reports has been deprecated. Use "\totara_reportbuilder\event\scheduled_report_deleted" event instead.
+* Triggering of "\totara_reportbuilder\event\report_updated" event for deletion of scheduled reports has been
+  deprecated. Use "\totara_reportbuilder\event\scheduled_report_deleted" event instead.
+* Display method rb_display_deleted_status has been deprecated and replaced by
+  totara/reportbuilder/classes/rb/display/user_status.php

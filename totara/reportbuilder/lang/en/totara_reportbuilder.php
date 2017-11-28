@@ -30,8 +30,7 @@ $string['accessiblereportsonly'] = 'Only reports accessible to the report viewer
 $string['activateglobalrestriction'] = 'Activate';
 $string['activeglobalrestriction'] = 'Active';
 $string['activeglobalrestriction_help'] = 'This option determines if this restriction is active or not. Inactive restrictions are ignored.';
-$string['activeonly'] = 'Active users only';
-$string['activeuser'] = 'Active user';
+$string['activeuser'] = 'Active';
 $string['activities'] = 'Activities';
 $string['actions'] = 'Actions';
 $string['activitygroupdesc'] = 'Activity groups let you define sets of activites for the purpose of site-wide reporting.';
@@ -258,9 +257,8 @@ $string['delete'] = 'Delete';
 $string['deleterecord'] = 'Delete {$a}';
 $string['deletecheckschedulereport'] = 'Are you sure you would like to delete the \'{$a}\' scheduled report?';
 $string['deletedescrhtml'] = 'Report "{$a}" will be completely deleted.';
-$string['deletedonly'] = 'Deleted users only';
 $string['deletedscheduledreport'] = 'Successfully deleted Scheduled Report \'{$a}\'';
-$string['deleteduser'] = 'Deleted user';
+$string['deleteduser'] = 'Deleted';
 $string['deletereport'] = 'Report Deleted';
 $string['deletescheduledreport'] = 'Delete scheduled report?';
 $string['descending'] = 'Descending (Z to A, 9 to 1)';
@@ -1046,9 +1044,9 @@ from the report.
 
 **Changing multiple filter types:** You can modify multiple filter types at the same time by selecting a different filter
 from the dropdown menu and clicking **Save changes**.';
+$string['status'] = 'Status';
 $string['suspendrecord'] = 'Suspend {$a}';
-$string['suspendedonly'] = 'Suspended users only';
-$string['suspendeduser'] = 'Suspended user';
+$string['suspendeduser'] = 'Suspended';
 $string['systemcontext'] = 'Users must have role in the system context';
 $string['systemusers'] = 'System users';
 $string['tagenable'] = 'Show records by tag';
@@ -1125,6 +1123,7 @@ $string['type_tags'] = 'Tags';
 $string['type_user'] = 'User';
 $string['type_userto'] = 'Recipient User';
 $string['type_user_profile'] = 'User Profile';
+$string['unconfirmeduser'] = 'Unconfirmed';
 $string['uniquename'] = 'Unique Name';
 $string['unknown'] = 'Unknown';
 $string['unknownlanguage'] = 'Unknown Language ({$a})';
@@ -1257,3 +1256,10 @@ $string['managereports'] = 'Manage reports';
 $string['pdf_landscapeformat'] = 'pdf format (landscape)';
 $string['pdf_portraitformat'] = 'pdf format (portrait)';
 
+/**
+ * @deprecated since Totara 11.0.
+ */
+
+$string['activeonly'] = 'Active users only';
+$string['deletedonly'] = 'Deleted users only';
+$string['suspendedonly'] = 'Suspended users only';

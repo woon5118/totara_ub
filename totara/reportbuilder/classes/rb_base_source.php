@@ -1653,8 +1653,18 @@ abstract class rb_base_source {
         return $code;
     }
 
-    // indicates if the user is deleted or not
+    /**
+     * Indicates if the user is deleted or not.
+     *
+     * @deprecated Since Totara 11.0.
+     *
+     * @param string $status User status value from the column data.
+     * @param stdclass $row The data from the report row.
+     * @return string Text denoting status.
+     */
     function rb_display_deleted_status($status, $row) {
+        debugging("The report builder display function 'deleted_status' has been deprecated. Please use 'user_status' instead.", DEBUG_DEVELOPER);
+
         switch($status) {
             case 1:
                 return get_string('deleteduser', 'totara_reportbuilder');
@@ -2558,10 +2568,15 @@ abstract class rb_base_source {
             $groupname,
             'deleted',
             get_string('userstatus', 'totara_reportbuilder'),
-            "CASE WHEN $join.deleted = 0 and $join.suspended = 1 THEN 2 ELSE $join.deleted END",
+            "CASE WHEN $join.deleted = 0 AND $join.suspended = 0 AND $join.confirmed = 1 THEN 0
+                WHEN $join.deleted = 1 THEN 1
+                WHEN $join.suspended = 1 THEN 2
+                WHEN $join.confirmed = 0 THEN 3
+                ELSE 0
+            END",
             array(
                 'joins' => $join,
-                'displayfunc' => 'deleted_status',
+                'displayfunc' => 'user_status',
                 'addtypetoheading' => $addtypetoheading
             )
         );
@@ -2834,9 +2849,11 @@ abstract class rb_base_source {
             get_string('userstatus', 'totara_reportbuilder'),
             'select',
             array(
-                'selectchoices' => array(0 => get_string('activeonly', 'totara_reportbuilder'),
-                                         1 => get_string('deletedonly', 'totara_reportbuilder'),
-                                         2 => get_string('suspendedonly', 'totara_reportbuilder')),
+                'selectchoices' => array(0 => get_string('activeuser', 'totara_reportbuilder'),
+                    1 => get_string('deleteduser', 'totara_reportbuilder'),
+                    2 => get_string('suspendeduser', 'totara_reportbuilder'),
+                    3 => get_string('unconfirmeduser', 'totara_reportbuilder'),
+                ),
                 'attributes' => $select_width_options,
                 'simplemode' => true,
                 'addtypetoheading' => $addtypetoheading
