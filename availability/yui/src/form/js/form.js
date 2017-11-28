@@ -88,7 +88,7 @@ M.core_availability.form = {
 
         // Get the availability field, hide it, and replace with the main div.
         this.field = Y.one('#id_availabilityconditionsjson');
-        this.field.setAttribute('aria-hidden', 'true');
+        this.field.setStyle('display', 'none');
         // The fcontainer class here is inappropriate, but is necessary
         // because otherwise it is impossible to make Behat work correctly on
         // these controls as Behat incorrectly decides they're a moodleform
@@ -566,20 +566,20 @@ M.core_availability.List.prototype.renumber = function(parentNumber) {
 M.core_availability.List.prototype.updateHtml = function() {
     // Control children appearing or not appearing.
     if (this.children.length > 0) {
-        this.inner.one('> .availability-children').removeAttribute('aria-hidden');
-        this.inner.one('> .availability-none').setAttribute('aria-hidden', 'true');
-        this.inner.one('> .availability-header').removeAttribute('aria-hidden');
+        this.inner.one('> .availability-children').setStyle('display', null);
+        this.inner.one('> .availability-none').setStyle('display', 'none');
+        this.inner.one('> .availability-header').setStyle('display', null);
         if (this.children.length > 1) {
-            this.inner.one('.availability-single').setAttribute('aria-hidden', 'true');
-            this.inner.one('.availability-multi').removeAttribute('aria-hidden');
+            this.inner.one('.availability-single').setStyle('display', 'none');
+            this.inner.one('.availability-multi').setStyle('display', null);
         } else {
-            this.inner.one('.availability-single').removeAttribute('aria-hidden');
-            this.inner.one('.availability-multi').setAttribute('aria-hidden', 'true');
+            this.inner.one('.availability-single').setStyle('display', null);
+            this.inner.one('.availability-multi').setStyle('display', 'none');
         }
     } else {
-        this.inner.one('> .availability-children').setAttribute('aria-hidden', 'true');
-        this.inner.one('> .availability-none').removeAttribute('aria-hidden');
-        this.inner.one('> .availability-header').setAttribute('aria-hidden', 'true');
+        this.inner.one('> .availability-children').setStyle('display', 'none');
+        this.inner.one('> .availability-none').setStyle('display', null);
+        this.inner.one('> .availability-header').setStyle('display', 'none');
     }
 
     // For root list, control eye icons.
@@ -590,17 +590,17 @@ M.core_availability.List.prototype.updateHtml = function() {
         for (var i = 0; i < this.children.length; i++) {
             var child = this.children[i];
             if (showEyes) {
-                child.eyeIcon.span.removeAttribute('aria-hidden');
+                child.eyeIcon.span.setStyle('visibility', null);
             } else {
-                child.eyeIcon.span.setAttribute('aria-hidden', 'true');
+                child.eyeIcon.span.setStyle('visibility', 'hidden');
             }
         }
 
         // Single icon is the inverse.
         if (showEyes) {
-            this.eyeIcon.span.setAttribute('aria-hidden', 'true');
+            this.eyeIcon.span.setStyle('visibility', 'hidden');
         } else {
-            this.eyeIcon.span.removeAttribute('aria-hidden');
+            this.eyeIcon.span.setStyle('visibility', null);
         }
     }
 
@@ -1051,24 +1051,47 @@ M.core_availability.Item.prototype.pluginNode = null;
 M.core_availability.EyeIcon = function(individual, shown) {
     this.individual = individual;
     this.span = Y.Node.create('<a class="availability-eye col-form-label" href="#" role="button">');
-    var icon = Y.Node.create('<img />');
-    this.span.appendChild(icon);
+    var that = this;
 
     // Set up button text and icon.
     var suffix = individual ? '_individual' : '_all',
         setHidden = function() {
-            var hiddenStr = M.util.get_string('hidden' + suffix, 'availability');
-            icon.set('src', M.util.image_url('i/show', 'core'));
-            icon.set('alt', hiddenStr);
-            this.span.set('title', hiddenStr + ' \u2022 ' +
-                    M.util.get_string('show_verb', 'availability'));
+            that.span.setAttribute('data-visible', 'false');
+            require(['core/str', 'core/templates'], function(stringlib, templatelib) {
+                var requiredstrings = [
+                    {key: 'hidden' + suffix, component: 'availability'},
+                    {key: 'show_verb', component: 'availability'}
+                ];
+                stringlib.get_strings(requiredstrings).then(function(strings) {
+                    if (that.isHidden()) {
+                        that.span.set('title', strings[0] + ' \u2022 ' + strings[1]);
+                    }
+                    return templatelib.renderIcon('show', strings[0]);
+                }).then(function(html) {
+                    if (that.isHidden()) {
+                        that.span.setContent(html);
+                    }
+                });
+            });
         },
         setShown = function() {
-            var shownStr = M.util.get_string('shown' + suffix, 'availability');
-            icon.set('src', M.util.image_url('i/hide', 'core'));
-            icon.set('alt', shownStr);
-            this.span.set('title', shownStr + ' \u2022 ' +
-                    M.util.get_string('hide_verb', 'availability'));
+            that.span.setAttribute('data-visible', 'true');
+            require(['core/str', 'core/templates'], function(stringlib, templatelib) {
+                var requiredstrings = [
+                    {key: 'shown' + suffix, component: 'availability'},
+                    {key: 'hide_verb', component: 'availability'}
+                ];
+                stringlib.get_strings(requiredstrings).then(function(strings) {
+                    if (!that.isHidden()) {
+                        that.span.set('title', strings[0] + ' \u2022 ' + strings[1]);
+                    }
+                    return templatelib.renderIcon('hide', strings[0]);
+                }).then(function(html) {
+                    if (!that.isHidden()) {
+                        that.span.setContent(html);
+                    }
+                });
+            });
         };
     if (shown) {
         setShown.call(this);
@@ -1116,9 +1139,7 @@ M.core_availability.EyeIcon.prototype.span = null;
  * @return {Boolean} True if this icon is set to 'hidden'
  */
 M.core_availability.EyeIcon.prototype.isHidden = function() {
-    var suffix = this.individual ? '_individual' : '_all',
-        compare = M.util.get_string('hidden' + suffix, 'availability');
-    return this.span.one('img').get('alt') === compare;
+    return this.span.getAttribute('data-visible') !== 'true';
 };
 
 
@@ -1130,11 +1151,16 @@ M.core_availability.EyeIcon.prototype.isHidden = function() {
  * @param {M.core_availability.Item|M.core_availability.List} toDelete Thing to delete
  */
 M.core_availability.DeleteIcon = function(toDelete) {
-    this.span = Y.Node.create('<a class="d-inline-block col-form-label availability-delete p-x-1" href="#" title="' +
-            M.util.get_string('delete', 'moodle') + '" role="button">');
-    var img = Y.Node.create('<img src="' + M.util.image_url('t/delete', 'core') +
-            '" alt="' + M.util.get_string('delete', 'moodle') + '" />');
-    this.span.appendChild(img);
+    var that = this;
+    this.span = Y.Node.create('<a class="d-inline-block col-form-label availability-delete p-x-1" href="#" role="button">');
+    require(['core/str', 'core/templates'], function(stringlib, templatelib) {
+        stringlib.get_string('delete', 'moodle').then(function(string) {
+            that.span.setAttribute('title', string);
+            return templatelib.renderIcon('delete', string);
+        }).then(function(html) {
+            that.span.appendChild(html);
+        });
+    });
     var click = function(e) {
         e.preventDefault();
         M.core_availability.form.rootList.deleteDescendant(toDelete);

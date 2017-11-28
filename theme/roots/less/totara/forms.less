@@ -316,9 +316,6 @@ input[type="checkbox"] {
 /* Section and module editing forms contain special JS components for the
    availability system (if enabled). */
 #fitem_id_availabilityconditionsjson {
-    *[aria-hidden=true] {
-        display: none;
-    }
     select,
     input[type=text] {
         width: auto;
@@ -344,7 +341,6 @@ input[type="checkbox"] {
 
     .availability-plugincontrols {
         padding: 5px;
-        margin: 0 8px;
         background: none repeat scroll 0 0 @well-bg;
         border: 1px solid @well-border;
         border-radius: @border-radius-base;
@@ -356,8 +352,8 @@ input[type="checkbox"] {
         display: inline;
         visibility: hidden;
     }
-    /* Eye icons in front of child lists are aligned specially. */
-    .availability-list > .availability-eye img {
+
+    .availability-children .availability-eye .flex-icon {
         vertical-align: top;
         margin-top: 12px;
     }
