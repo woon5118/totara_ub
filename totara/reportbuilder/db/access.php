@@ -53,5 +53,14 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW
         )
+    ),
+    // Ability to manage scheduled report builder reports
+    'totara/reportbuilder:managescheduledreports' => array(
+        'riskbitmask' => RISK_PERSONAL | RISK_DATALOSS | RISK_CONFIG,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        )
     )
 );

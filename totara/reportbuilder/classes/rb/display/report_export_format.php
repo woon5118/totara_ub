@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package totara_reportbuilder
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_reportbuilder\rb\display;
 
-$plugin->version  = 2017120800;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_reportbuilder';  // To check on upgrade, that module sits in correct place
+/**
+ * Class describing column display formatting.
+ *
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package totara_reportbuilder
+ */
+class report_export_format extends base {
+    public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        return get_string($value.'format', 'totara_reportbuilder');
+    }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return true;
+    }
+}

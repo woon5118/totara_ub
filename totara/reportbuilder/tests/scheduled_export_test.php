@@ -55,6 +55,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $schedule->nextreport = 0; // Means asap.
         $schedule->userid = $user->id;
+        $schedule->usermodified = $user->id;
+        $schedule->lastmodified = time();
         $schedule->id = $DB->insert_record('report_builder_schedule', $schedule);
         $schedule = $DB->get_record('report_builder_schedule', array('id' => $schedule->id));
 
@@ -116,6 +118,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule1->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE;
         $schedule1->nextreport = 0; // Means asap.
         $schedule1->userid = $admin->id;
+        $schedule1->usermodified = $admin->id;
+        $schedule1->lastmodified = time();
         $schedule1->id = $DB->insert_record('report_builder_schedule', $schedule1);
         $schedule1 = $DB->get_record('report_builder_schedule', array('id' => $schedule1->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule1->id, 'userid' => $user1->id));
@@ -138,6 +142,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule2->exporttofilesystem = REPORT_BUILDER_EXPORT_SAVE;
         $schedule2->nextreport = 0; // Means asap.
         $schedule2->userid = $admin->id;
+        $schedule2->usermodified = $admin->id;
+        $schedule2->lastmodified = time();
         $schedule2->id = $DB->insert_record('report_builder_schedule', $schedule2);
         $schedule2 = $DB->get_record('report_builder_schedule', array('id' => $schedule2->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule2->id, 'userid' => $user1->id));
@@ -160,6 +166,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule3->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $schedule3->nextreport = 0; // Means asap.
         $schedule3->userid = $admin->id;
+        $schedule3->usermodified = $admin->id;
+        $schedule3->lastmodified = time();
         $schedule3->id = $DB->insert_record('report_builder_schedule', $schedule3);
         $schedule3 = $DB->get_record('report_builder_schedule', array('id' => $schedule3->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule3->id, 'userid' => $user1->id));
@@ -183,6 +191,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule4->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $schedule4->nextreport = 0; // Means asap.
         $schedule4->userid = $user1->id;
+        $schedule4->usermodified = $user1->id;
+        $schedule4->lastmodified = time();
         $schedule4->id = $DB->insert_record('report_builder_schedule', $schedule4);
         $schedule4 = $DB->get_record('report_builder_schedule', array('id' => $schedule4->id));
         $this->setUser($user2);
@@ -262,6 +272,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule1->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE;
         $schedule1->nextreport = 0; // Means asap.
         $schedule1->userid = $admin->id;
+        $schedule1->usermodified = $admin->id;
+        $schedule1->lastmodified = time();
         $schedule1->id = $DB->insert_record('report_builder_schedule', $schedule1);
         $schedule1 = $DB->get_record('report_builder_schedule', array('id' => $schedule1->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule1->id, 'userid' => $admin->id));
@@ -361,6 +373,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule1->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $schedule1->nextreport = 0; // Means asap.
         $schedule1->userid = $user1->id;
+        $schedule1->usermodified = $user1->id;
+        $schedule1->lastmodified = time();
         $schedule1->id = $DB->insert_record('report_builder_schedule', $schedule1);
         $schedule1 = $DB->get_record('report_builder_schedule', array('id' => $schedule1->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule1->id, 'userid' => $user1->id));
@@ -374,6 +388,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule2->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $schedule2->nextreport = 0; // Means asap.
         $schedule2->userid = $user2->id;
+        $schedule2->usermodified = $user2->id;
+        $schedule2->lastmodified = time();
         $schedule2->id = $DB->insert_record('report_builder_schedule', $schedule2);
         $schedule2 = $DB->get_record('report_builder_schedule', array('id' => $schedule2->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule2->id, 'userid' => $user2->id));
@@ -387,6 +403,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule3->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $schedule3->nextreport = 0; // Means asap.
         $schedule3->userid = $user3->id;
+        $schedule3->usermodified = $user3->id;
+        $schedule3->lastmodified = time();
         $schedule3->id = $DB->insert_record('report_builder_schedule', $schedule3);
         $schedule3 = $DB->get_record('report_builder_schedule', array('id' => $schedule3->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule3->id, 'userid' => $user3->id));
@@ -464,6 +482,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule1->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE;
         $schedule1->nextreport = 0; // Means asap.
         $schedule1->userid = $admin->id;
+        $schedule1->usermodified = $admin->id;
+        $schedule1->lastmodified = time();
         $schedule1->id = $DB->insert_record('report_builder_schedule', $schedule1);
         $schedule1 = $DB->get_record('report_builder_schedule', array('id' => $schedule1->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule1->id, 'userid' => $admin->id));
@@ -534,6 +554,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule1->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE;
         $schedule1->nextreport = 0; // Means asap.
         $schedule1->userid = $user1->id;
+        $schedule1->usermodified = $user1->id;
+        $schedule1->lastmodified = time();
         $schedule1->id = $DB->insert_record('report_builder_schedule', $schedule1);
         $schedule1 = $DB->get_record('report_builder_schedule', array('id' => $schedule1->id));
         $DB->insert_record('report_builder_schedule_email_systemuser', array('scheduleid' => $schedule1->id, 'userid' => $user1->id));
@@ -606,6 +628,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
             $schedule->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE;
             $schedule->nextreport = 0; // Means asap.
             $schedule->userid = $admin->id;
+            $schedule->usermodified = $admin->id;
+            $schedule->lastmodified = time();
             $schedule->id = $DB->insert_record('report_builder_schedule', $schedule);
             $schedules[$schedule->id] = $DB->get_record('report_builder_schedule', array('id' => $schedule->id));
         }
@@ -637,6 +661,8 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $schedule->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE;
         $schedule->nextreport = 0; // Means asap.
         $schedule->userid = $admin->id;
+        $schedule->usermodified = $admin->id;
+        $schedule->lastmodified = time();
         $schedule->id = $DB->insert_record('report_builder_schedule', $schedule);
         $schedule = $DB->get_record('report_builder_schedule', array('id' => $schedule->id));
         ob_start(); // Verify diagnostic output.

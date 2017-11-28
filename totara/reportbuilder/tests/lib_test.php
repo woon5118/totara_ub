@@ -1568,6 +1568,8 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $todb->frequency = 1;
         $todb->schedule = 0;
         $todb->nextreport = 0;
+        $todb->usermodified = $user->id;
+        $todb->lastmodified = time();
         $newid = $DB->insert_record('report_builder_schedule', $todb);
 
         // Create scheduled report by the user.

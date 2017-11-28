@@ -183,12 +183,15 @@
         <FIELD NAME="exporttofilesystem" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="schedule" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="nextreport" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="user who last modified the scheduled report settings"/>
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp when the scheduled report settings was last modified"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="repobuilsche_rep_fk" TYPE="foreign" FIELDS="reportid" REFTABLE="report_builder" REFFIELDS="id"/>
         <KEY NAME="repobuilsche_use_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="repobuilsche_sav_fk" TYPE="foreign" FIELDS="savedsearchid" REFTABLE="report_builder_saved" REFFIELDS="id"/>
+        <KEY NAME="repobuilsche_usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="report_builder_schedule_email_audience" COMMENT="Storing audience to email in scheduled reports">

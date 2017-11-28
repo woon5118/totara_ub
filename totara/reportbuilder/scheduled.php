@@ -66,6 +66,8 @@ if ($newreport) {
     $schedule->exporttofilesystem = null;
     $schedule->userid = $USER->id;
     $schedule->sendtoself = 1; // New schedules are sent to the creating user by default.
+    $schedule->usermodified = $schedule->userid;
+    $schedule->lastmodified = \time();
 
     // Does this schedule belong to the current user. For new schedules its always yes.
     $myscheduledreport = true;
@@ -86,7 +88,7 @@ if (!reportbuilder::is_capable($schedule->reportid)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 if ($schedule->userid != $USER->id) {
-    require_capability('totara/reportbuilder:managereports', context_system::instance());
+    require_capability('totara/reportbuilder:managescheduledreports', context_system::instance());
 }
 
 $allowedscheduledrecipients = get_config('totara_reportbuilder', 'allowedscheduledrecipients');
@@ -261,6 +263,12 @@ if ($fromform = $mform->get_data()) {
     $todb->frequency = $fromform->frequency;
     $todb->schedule = $fromform->schedule;
     $todb->nextreport = $nextevent->get_scheduled_time();
+
+    // Record the person who *modified* the schedule report settings; the
+    // *creator* of the scheduled report is only captured when the scheduled
+    // report is first created.
+    $todb->usermodified = $USER->id;
+    $todb->lastmodified = \time();
 
     if ($newreport) {
         $newid = $DB->insert_record('report_builder_schedule', $todb);

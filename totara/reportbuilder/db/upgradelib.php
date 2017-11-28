@@ -352,3 +352,19 @@ function totara_reportbuilder_delete_scheduled_reports() {
 
     return true;
 }
+
+/**
+ * Populate the "usermodified" column introduced with the new scheduled report
+ * report source implementation.
+ */
+function totara_reportbuilder_populate_scheduled_reports_usermodified() {
+    global $DB;
+
+    $table = 'report_builder_schedule';
+    $records = $DB->get_records($table, null, '', 'id,userid,usermodified');
+    foreach ($records as $record) {
+        $record->usermodified = $record->userid;
+        $DB->update_record($table, $record);
+    }
+}
+

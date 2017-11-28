@@ -253,5 +253,27 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017111400, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2017120800) {
+
+        // Define field defaultvalue to be added to report_builder_filters.
+        $table = new xmldb_table('report_builder_schedule');
+        $field1 = new xmldb_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, true, null, 0, 'nextreport');
+        $field2 = new xmldb_field('lastmodified', XMLDB_TYPE_INTEGER, '10', null, true, null, 0, 'usermodified');
+
+        // Conditionally launch add field defaultvalue.
+        if (!$dbman->field_exists($table, $field1)) {
+            $dbman->add_field($table, $field1);
+        }
+        if (!$dbman->field_exists($table, $field2)) {
+            $dbman->add_field($table, $field2);
+        }
+
+        // Populate new columns.
+        totara_reportbuilder_populate_scheduled_reports_usermodified();
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2017120800, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

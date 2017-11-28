@@ -45,7 +45,7 @@ if (!reportbuilder::is_capable($scheduledreport->reportid)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 if ($scheduledreport->userid != $USER->id) {
-    require_capability('totara/reportbuilder:managereports', context_system::instance());
+    require_capability('totara/reportbuilder:managescheduledreports', context_system::instance());
 }
 
 $reportname = $DB->get_field('report_builder', 'fullname', array('id' => $scheduledreport->reportid));
