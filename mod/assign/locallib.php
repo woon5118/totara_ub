@@ -5176,7 +5176,8 @@ class assign {
                                                   $this->get_course_module()->id,
                                                   $this->count_submissions_need_grading(),
                                                   $instance->teamsubmission,
-                                                  $warnofungroupedusers);
+                                                  $warnofungroupedusers,
+                                                  $this->can_grade());
         } else {
             // The active group has already been updated in groups_print_activity_menu().
             $countparticipants = $this->count_participants($activitygroup);
@@ -5190,7 +5191,8 @@ class assign {
                                                   $this->get_course_module()->id,
                                                   $this->count_submissions_need_grading(),
                                                   $instance->teamsubmission,
-                                                  false);
+                                                  false,
+                                                  $this->can_grade());
 
         }
 
