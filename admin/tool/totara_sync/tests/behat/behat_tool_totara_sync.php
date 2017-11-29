@@ -218,6 +218,11 @@ class behat_tool_totara_sync extends behat_base {
             $dbdata = array ();
 
             foreach ($fields as $index => $field) {
+
+                if ($row_data[$index] === 'null') {
+                    $row_data[$index] = null;
+                }
+
                 if ($row_data[$index] === '' && in_array($field, $required_fields)) {
                     throw new PendingException("'{$field}' in row '{$row_number}' is mandatory and must have a value.");
                 } else {

@@ -1019,8 +1019,6 @@ class totara_sync_element_user extends totara_sync_element {
         if (empty($suser->email) && empty($user->email) && $usedefaultemail) {
             $user->email = $this->config->defaultsyncemail;
         }
-
-        $user->suspended = empty($suser->suspended) ? 0 : $suser->suspended;
     }
 
     /**

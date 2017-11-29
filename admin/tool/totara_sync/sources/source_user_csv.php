@@ -348,8 +348,14 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 $dbrow['deleted'] = empty($dbrow['deleted']) ? 0 : 1;
             }
 
+            $saveemptyfields = !empty($this->element->config->csvsaveemptyfields);
+
             if (isset($dbrow['suspended'])) {
-                $dbrow['suspended'] = empty($dbrow['suspended']) ? 0 : 1;
+                if ($dbrow['suspended'] === '' && !$saveemptyfields)  {
+                    $dbrow['suspended'] = null;
+                } else {
+                    $dbrow['suspended'] = empty($dbrow['suspended']) ? 0 : 1;
+                }
             }
 
             if (isset($dbrow['timezone'])) {

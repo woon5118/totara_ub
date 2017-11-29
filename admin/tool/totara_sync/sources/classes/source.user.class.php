@@ -272,7 +272,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $table->add_field('password', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_suspended)) {
-            $table->add_field('suspended', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('suspended', XMLDB_TYPE_INTEGER, '1');
         }
         if (!empty($this->config->import_emailstop)) {
             $table->add_field('emailstop', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
