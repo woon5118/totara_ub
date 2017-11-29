@@ -185,7 +185,7 @@ class block_totara_report_graph extends block_base {
             } else {
                 $objectattrs['style'] = join(';', $objectattrs['style']).';';
             }
-            $this->content->text = '<div class="rb-block-svggraph">' . html_writer::tag('object', $nosvg, $objectattrs) . '</div>';
+            $this->content->text = '<div class="block_totara_report_graph_svggraph">' . html_writer::tag('object', $nosvg, $objectattrs) . '</div>';
         }
 
         return $this->content;
