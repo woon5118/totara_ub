@@ -403,7 +403,7 @@ class rb_filter_type {
     /**
      * Saves data
      *
-     * @param int $data the data to set
+     * @param mixed $data the data to set
      */
     function set_data($data) {
         global $SESSION;

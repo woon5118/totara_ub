@@ -68,8 +68,8 @@ class rb_filter_enrol extends rb_filter_type {
         // set default values
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
             $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
-        } else {
-            $defaults = $defaultvalue;
+        } else if (!empty($defaultvalue)) {
+            $this->set_data($defaultvalue);
         }
 
         if (isset($defaults['value'])) {
