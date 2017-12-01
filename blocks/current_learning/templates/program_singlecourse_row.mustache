@@ -72,7 +72,12 @@
             <span class="label {{state}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{tooltip}}">{{#alert}}{{#flex_icon}}warning{{/flex_icon}}{{/alert}} {{duetext}}</span>
         {{/dueinfo}}
         {{#progress}}
-            <span class="label label-default">{{summary}}</span>
+            {{#pbar}}
+               {{> core/progress_bar }}
+            {{/pbar}}
+            {{^pbar}}
+                <span class="label label-default">{{summary}}</span>
+            {{/pbar}}
         {{/progress}}
     </div>
 </div>

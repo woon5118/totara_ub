@@ -349,6 +349,8 @@ class program {
         );
         $event->trigger();
 
+        \totara_program\progress\program_progress_cache::mark_program_cache_stale($this->id);
+
         return true;
     }
 
@@ -371,6 +373,8 @@ class program {
             $DB->delete_records('prog_completion', array('programid' => $this->id, 'userid' => $userid));
             prog_log_completion($this->id, $userid, 'Deleted prog_completion in deprecated function program::delete_completion_record');
         }
+
+        \totara_program\progress\program_progress_cache::mark_program_cache_stale($this->id);
 
         return true;
     }
@@ -400,6 +404,8 @@ class program {
         if (!prog_check_availability($this->availablefrom, $this->availableuntil)) {
             return PROG_UPDATE_ASSIGNMENTS_UNAVAILABLE;
         }
+
+        \totara_program\progress\program_progress_cache::mark_program_cache_stale($this->id);
 
         // Get program assignments.
         $progassignments = $this->assignments->get_assignments();
@@ -959,6 +965,8 @@ class program {
     public function unassign_learners($userids) {
         global $DB, $USER;
 
+        \totara_program\progress\program_progress_cache::mark_program_cache_stale($this->id);
+
         //get the courses in this program
         $sql = "SELECT DISTINCT courseid
                   FROM {prog_courseset_course} csc
@@ -1272,6 +1280,8 @@ class program {
 
         $progcompleted_eventtrigger = false;
 
+        \totara_program\progress\program_progress_cache::mark_program_cache_stale($this->id);
+
         // if the program is being marked as complete we need to trigger an
         // event to any listening modules
         if (array_key_exists('status', $completionsettings)) {
@@ -1420,26 +1430,8 @@ class program {
      * @return float
      */
     public function get_progress($userid) {
-        // first check if the whole program has been completed
-        if (prog_is_complete($this->id, $userid)) {
-            return (float)100;
-        }
-
-        $certifpath = get_certification_path_user($this->certifid, $userid);
-        $courseset_groups = $this->content->get_courseset_groups($certifpath, true);
-        $courseset_group_count = count($courseset_groups);
-        $courseset_group_complete_count = 0;
-
-        foreach ($courseset_groups as $courseset_group) {
-            if (prog_courseset_group_complete($courseset_group, $userid, false)) {
-                $courseset_group_complete_count++;
-            }
-        }
-
-        if ($courseset_group_count > 0) {
-            return (float)($courseset_group_complete_count / $courseset_group_count) * 100;
-        }
-        return 0;
+        $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo($this, $userid);
+        return $progressinfo->get_percentagecomplete();
     }
 
     /**

@@ -113,7 +113,12 @@
                 </span>
             {{/dueinfo}}
             {{#progress}}
-                <span class="label label-default">{{summary}}</span>
+                {{#pbar}}
+                   {{> core/progress_bar }}
+                {{/pbar}}
+                {{^pbar}}
+                    <span class="label label-default">{{summary}}</span>
+                {{/pbar}}
             {{/progress}}
         </div>
     </div>

@@ -585,10 +585,11 @@ class development_plan {
         }
 
         array_unshift($overall_strings, 'Plan Progress: ' . $overall_progress . "%\n\n");
-        $tooltipstr = implode(' | ', $overall_strings);
 
         // Get totara core renderer
         $totara_renderer = $PAGE->get_renderer('totara_core');
+
+        $tooltipstr = $OUTPUT->render_from_template('totara_plan/plan_status_summary', array('statuses' => $overall_strings));
 
         // Get relevant progress bar and return for display
         return $totara_renderer->progressbar($overall_progress, 'medium', false, $tooltipstr);

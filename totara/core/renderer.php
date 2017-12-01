@@ -178,6 +178,12 @@ class totara_core_renderer extends plugin_renderer_base {
             }
         }
 
+        if ($percent != 100 && $progressinfo->count_criteria() == 0) {
+            // Not completed without criteria, may be due to completion tracking changes
+            $data->statustext = get_string('statusnottracked', 'completion');
+            return $data;
+        }
+
         $data->statustext = get_string($COMPLETION_STATUS[$status], 'completion');
         $data->percent = $percent;
         $pbar = new \static_progress_bar('', '0');
@@ -588,46 +594,29 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return html string
      */
     public function progressbar($percent, $size='medium', $showlabel=false, $tooltip='DEFAULTTOOLTIP') {
+        global $OUTPUT;
+
         $percent = round($percent);
 
-        if ($percent < 0 || $percent > 100) {
-            return 'progress bar error- invalid value...';
-        }
-
-        // Add more sizes if as neccessary :)!
-        switch ($size) {
-        case 'large' :
-            $bar_foreground = 'progressbar-large';
-            $pixelvalue = ($percent / 100) * 121;
-            $pixeloffset = round($pixelvalue - 120);
-            $class = 'totara_progress_bar_large';
-            break;
-        case 'medium' :
-        default :
-            $bar_foreground = 'progressbar-medium';
-            $pixelvalue = ($percent / 100) * 61;
-            $pixeloffset = round($pixelvalue - 60);
-            $class = 'totara_progress_bar_medium';
-            break;
-        }
-
-        if ($tooltip == 'DEFAULTTOOLTIP') {
-            $tooltip = get_string('xpercent', 'totara_core', $percent);
-        }
-
-        // This is really unfortunate - in the future we should be using a dynamic progressbar model
-        // rather than switching icons and setting a background position.
-        $icon = $this->pix_icon($bar_foreground, $tooltip, 'totara_core', array('title' => $tooltip, 'style' => 'background-position: ' . $pixeloffset . 'px 0px;', 'class' => $class));
-
         $data = new stdClass();
-        $data->icon = $icon;
-        $data->percent = $percent;
 
-        if ($showlabel) {
-            $data->showlabel = true;
+        if ($percent < 0 || $percent > 100) {
+            $data->statustext = 'progress bar error- invalid value...';
+        } else {
+            $pbar = new \static_progress_bar('', '0');
+            $pbar->set_progress((string)$percent);
+
+            if ($tooltip == 'DEFAULTTOOLTIP') {
+                $statustext = get_string('xpercent', 'totara_core', $percent);
+            } else {
+                $statustext = $tooltip;
+            }
+
+            $pbar->add_popover(\core\output\popover::create_from_text($statustext));
+            $data->pbar = $pbar->export_for_template($OUTPUT);
         }
 
-        return $this->render_from_template('totara_core/progressbar', $data);
+        return $this->output->render_from_template('totara_core/course_progress_bar', $data);
     }
 
     /**

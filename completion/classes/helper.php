@@ -104,6 +104,9 @@ final class helper {
             $key = $coursecompletion->userid . '_' . $coursecompletion->course;
             $cache->delete($key);
 
+            // Mark progress caches stale
+            self::mark_progress_caches_stale($coursecompletion->course, $coursecompletion->userid);
+
             return $coursecompletion->id;
         } else {
             // Some error was detected, and it wasn't specified in $ignoreproblemkey.
@@ -230,6 +233,9 @@ final class helper {
 
         $transaction->allow_commit();
 
+        // Mark progress caches stale
+        self::mark_progress_caches_stale($critcompl->course, $critcompl->userid);
+
         return $critcompl->id;
     }
 
@@ -293,6 +299,9 @@ final class helper {
         self::log_course_module_completion($modulecompletion->id, $message);
 
         $transaction->allow_commit();
+
+        // Mark progress caches stale
+        \totara_program\progress\program_progress_cache::mark_user_cache_stale($modulecompletion->userid);
 
         return $modulecompletion->id;
     }
@@ -991,4 +1000,16 @@ final class helper {
         return !empty($usetimecompleted);
     }
 
+    /**
+     * Mark progressinfo caches stale to ensure completion data is re-read from the database on next view
+     *
+     * @param int @courseid
+     * @param int @userid
+     */
+    public static function mark_progress_caches_stale($courseid, $userid) {
+        $course = (object) array('id' => $courseid);
+        $info = new \completion_info($course);
+        $info->mark_progressinfo_stale($userid);
+        \totara_program\progress\program_progress_cache::mark_user_cache_stale($userid);
+    }
 }

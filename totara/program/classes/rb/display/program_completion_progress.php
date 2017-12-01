@@ -17,26 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Alastair Munro <alastair.munro@totaralearning.com>
- * @package totara_certification
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @package totara_reportbuilder
  */
 
-namespace totara_certification\rb\display;
+namespace totara_program\rb\display;
 
 /**
- * Display Certification progress.
+ * Class describing column display formatting.
  *
- * @package mod_facetoface
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @package totara_reportbuilder
  */
-class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
+class program_completion_progress extends \totara_reportbuilder\rb\display\base {
 
     /* @var totara_core_renderer $totara_renderer */
     static $totara_renderer;
 
     /**
-     * Displays the overall status.
+     * Displays the program completion progress.
      *
-     * @param string $value
+     * @param string $value - program status expected
      * @param string $format
      * @param \stdClass $row
      * @param \rb_column $column
@@ -44,39 +45,35 @@ class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+
         global $PAGE;
+
+        // Get the necessary fields out of the row.
 
         $isexport = ($format !== 'html');
         $extrafields = self::get_extrafields_row($row, $column);
 
-        $now = time();
+        $percentage = false;
 
-        if ($extrafields->window < $now) {
-            // The window is open, use the current record.
-            $vals = explode('|', $value);
-            $programid = $vals[0];
-            $userid = $vals[1];
-
-            $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($programid, $userid);
+        if (isset($extrafields->programid) && isset($extrafields->userid)) {
+            $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($extrafields->programid, $extrafields->userid);
             $percentage = $progressinfo->get_percentagecomplete();
+        }
 
-            if ($percentage === false) {
-                // No tracking, default to 0
-                $percentage = 0;
+        if ($percentage === false) {
+            // Can't calculate progress, use status instead
+            if (is_null($value)) {
+                return '';
             }
-        } else {
-            // The window is not open
-            if (!empty($extrafields->histcompletion) || !empty($extrafields->completion)) {
-                // But they have previously completed or currently completed.
-                $percentage = 100;
+            if ($value) {
+                return get_string('complete', 'totara_program');
             } else {
-                // They havent had a chance to do anything yet, or did not previously complete.
-                $percentage = 0;
+                return get_string('incomplete', 'totara_program');
             }
         }
 
         if ($isexport) {
-            if (isset($extrafields->stringexport) && $extrafields->stringexport)  {
+            if (isset($extrafields->stringexport) && $extrafields->stringexport) {
                 return get_string('xpercentcomplete', 'totara_core', $percentage);
             } else {
                 return $percentage;
@@ -88,18 +85,6 @@ class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
         }
 
         // Get relevant progress bar and return for display.
-        return self::$totara_renderer->progressbar($percentage, 'medium', $isexport, $percentage . '%');
-    }
-
-    /**
-     * Is this column graphable? No!
-     *
-     * @param \rb_column $column
-     * @param \rb_column_option $option
-     * @param \reportbuilder $report
-     * @return bool
-     */
-    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
-        return false;
+        return self::$totara_renderer->progressbar($percentage, 'medium', $isexport, 'DEFAULTTOOLTIP');
     }
 }

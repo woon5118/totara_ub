@@ -514,6 +514,69 @@ abstract class course_set {
 
     abstract public function delete_course($courseid);
 
+    abstract public function build_progressinfo();
+
+    public function set_progressinfo_course_scores($progressinfo, $userid) {
+        $sets = $progressinfo->search_criteria($this->get_progressinfo_key());
+        if (empty($sets)) {
+            return;
+        }
+
+        foreach ($sets as $setinfo) {
+            foreach ($this->get_courses() as $course) {
+                // For now all criteria have the same weight - 1
+                $weight = 1;
+
+                // Get user's progress in completing this course
+                $params = array(
+                    'userid' => $userid,
+                    'course' => $course->id,
+                );
+                $ccompletion = new completion_completion($params);
+                // Need score between 0 and 1 where 1 == complete
+                $percentagecomplete = $ccompletion->get_percentagecomplete();
+                if ($percentagecomplete === false) {
+                    $score = 0;
+                } else {
+                    $score = $percentagecomplete / 100.0;
+                }
+
+                // Each course can only appear once in a courseset
+                $courseinfo = $setinfo->get_criteria($this->get_progressinfo_course_key($course));
+                if ($courseinfo !== false) {
+                    $courseinfo->set_weight($weight);
+                    $courseinfo->set_score($score);
+
+                    // We store the course timestarted and timecompleted in courses' customdata to
+                    // allow us to use it when saving courseset completion status
+                    $customdata = array ('timestarted' => $ccompletion->timestarted,
+                                         'timecompleted' => $ccompletion->timecompleted);
+
+                    if ($this->completiontype == COMPLETIONTYPE_SOME) {
+                        if ($sumfield = customfield_get_field_instance($course, $this->coursesumfield, 'course', 'course')) {
+                            $sumfieldval = $sumfield->display_data();
+                            if ($sumfieldval === (string)(int)$sumfieldval) {
+                                $customdata['coursepoints'] = (int)$sumfieldval;
+                            } else {
+                                $customdata['coursepoints'] = 0;
+                            }
+                        }
+                    }
+
+                    $courseinfo->set_customdata($customdata);
+                }
+            }
+        }
+    }
+
+    public function get_progressinfo_key() {
+        return 'courseset_'.$this->id.'_'.$this->label;
+    }
+
+    public function get_progressinfo_course_key($course) {
+        return 'course_'.$course->id.'_'.$course->fullname;
+    }
+
 }
 
 class multi_course_set extends course_set {
@@ -1720,6 +1783,47 @@ class multi_course_set extends course_set {
         }
         return parent::is_considered_optional();
     }
+
+    /**
+     * Build progressinfo hierarchy for this courseset
+     *
+     * @return \totara_core\progressinfo\progressinfo
+     */
+    public function build_progressinfo() {
+        $agg_class = '';
+        $customdata = null;
+
+        switch ($this->completiontype) {
+            case COMPLETIONTYPE_ANY;
+                $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ANY;
+                break;
+
+            case COMPLETIONTYPE_SOME;
+                $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ALL;
+                $agg_class = '\totara_program\progress\progressinfo_aggregate_some';
+                $customdata = array('requiredcourses' => $this->mincourses,
+                                    'requiredpoints' => $this->coursesumfieldtotal,
+                                    'totalcourses' => 0,
+                                    'totalpoints' => 0);
+                break;
+
+            case COMPLETIONTYPE_OPTIONAL;
+                $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_NONE;
+                break;
+
+            default:
+                $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ALL;
+        }
+
+        $progressinfo = \totara_core\progressinfo\progressinfo::from_data($agg_method, 0, 0, $customdata, $agg_class);
+
+        // Add courses in the courseset
+        foreach ($this->get_courses() as $course) {
+            $progressinfo->add_criteria(parent::get_progressinfo_course_key($course));
+        }
+
+        return $progressinfo;
+    }
 }
 
 
@@ -1735,7 +1839,6 @@ class competency_course_set extends course_set {
                 $this->completiontype = COMPLETIONTYPE_ALL;
             }
         }
-
     }
 
     public function save_set() {
@@ -2285,6 +2388,32 @@ class competency_course_set extends course_set {
         //  carry on, but in case anything needs to know whether it was deleted, return false.
         return false;
     }
+
+    public function build_progressinfo() {
+        $agg_class = '';
+        $customdata = null;
+
+        switch ($this->completiontype) {
+            case COMPLETIONTYPE_ANY;
+                $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ANY;
+                break;
+
+            default:
+                $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ALL;
+        }
+
+        $progressinfo = \totara_core\progressinfo\progressinfo::from_data($agg_method, 0, 0, $customdata, $agg_class);
+
+        // Add courses in the courseset
+        $courses = $this->get_competency_courses();
+        if ($courses) {
+            foreach ($courses as $course) {
+                $progressinfo->add_criteria(parent::get_progressinfo_course_key($course));
+            }
+        }
+
+        return $progressinfo;
+    }
 }
 
 class recurring_course_set extends course_set {
@@ -2804,5 +2933,20 @@ class recurring_course_set extends course_set {
         }
 
         return false;
+    }
+
+    public function build_progressinfo() {
+        $agg_class = '';
+        $customdata = null;
+        $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ALL;
+
+        $progressinfo = \totara_core\progressinfo\progressinfo::from_data($agg_method, 0, 0, $customdata, $agg_class);
+
+        // Add courses in the courseset
+        if (is_object($this->course)) {
+            $progressinfo->add_criteria(parent::get_progressinfo_course_key($this->course));
+        }
+
+        return $progressinfo;
     }
 }

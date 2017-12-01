@@ -247,7 +247,7 @@ class behat_totara_core extends behat_base {
         \behat_hooks::set_step_readonly(true);
 
         $text = behat_context_helper::escape($text);
-        $xpath = "//div[@id = 'progressbar']//img[contains(@alt,{$text})]";
+        $xpath = "//div[@id = 'progressbar']//div[contains(@class, 'progressbar_container')]//div[contains(@class,'progress')]//span[contains(.,{$text})]";
         $node = $this->find(
             'xpath',
             $xpath,

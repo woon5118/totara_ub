@@ -363,7 +363,7 @@ class completion_info {
     /**
      * Course progress aggregation information
      * @since Totara 10
-     * @var \totara_core\progressinfo
+     * @var \totara_core\progressinfo\progressinfo
      */
     private $progressinfo;
 
@@ -1341,6 +1341,14 @@ class completion_info {
     }
 
     /**
+     * Purge all course progress caches
+     */
+    public static function purge_progress_caches() {
+        cache::make('totara_core', 'completion_progressinfo')->purge();
+        cache::make('core', 'coursecompletion')->purge();
+    }
+
+    /**
      * Obtains completion data for a particular activity and user (from the
      * MUC cache if available, or by SQL query)
      *
@@ -1993,11 +2001,11 @@ class completion_info {
     private function build_progressinfo() {
         global $CFG, $DB;
 
-        $agg_method = \totara_core\progressinfo::AGGREGATE_ANY;
+        $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ANY;
         if ($this->get_aggregation_method() == COMPLETION_AGGREGATION_ALL) {
-            $agg_method = \totara_core\progressinfo::AGGREGATE_ALL;
+            $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ALL;
         }
-        $progressinfo = \totara_core\progressinfo::from_data($agg_method);
+        $progressinfo = \totara_core\progressinfo\progressinfo::from_data($agg_method);
 
         if (!$this->is_enabled()) {
             $progressinfo->set_customdata(array('enabled' => false));
@@ -2046,9 +2054,9 @@ class completion_info {
             if (!$progressinfo->criteria_exist($key)) {
                 if (array_key_exists($key, $multi_activity_criteria)) {
 
-                    $agg_method = \totara_core\progressinfo::AGGREGATE_ANY;
+                    $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ANY;
                     if ($this->get_aggregation_method($key) == COMPLETION_AGGREGATION_ALL) {
-                        $agg_method = \totara_core\progressinfo::AGGREGATE_ALL;
+                        $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ALL;
                     }
                     $critinfo = $progressinfo->add_criteria($key, $agg_method, 0, 0, $customdata);
 
@@ -2085,7 +2093,7 @@ class completion_info {
                 }
 
                 if (!$critinfo->criteria_exist($type)) {
-                    $agg_method = \totara_core\progressinfo::AGGREGATE_ALL;
+                    $agg_method = \totara_core\progressinfo\progressinfo::AGGREGATE_ALL;
                     $critinfo->add_criteria($type, $agg_method, $criteria->get_weight(), 0, $customdata);
                 }
             }
@@ -2098,7 +2106,7 @@ class completion_info {
      * Return the progress aggregation information structure
      *
      * @since Totara 10
-     * @return \totara_core\progressinfo
+     * @return \totara_core\progressinfo\progressinfo
      */
     public function get_progressinfo() {
         if (empty($this->progressinfo)) {

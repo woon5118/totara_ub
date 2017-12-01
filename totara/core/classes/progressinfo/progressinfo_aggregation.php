@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package totara
- * @subpackage reportbuilder
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @package totara_core
  */
 
-// lang file for totara/plan/rb_sources/rb_source_dp_certification_history.php
-$string['sourcetitle'] = 'Record of Learning: Previous Certifications';
+namespace totara_core\progressinfo;
 
-$string['na'] = 'N/A'; // Abbreviation for not applicable.
-$string['progress'] = 'Progress';
-$string['progresspercentage'] = 'Progress (%)';
-$string['renewalstatus'] = 'Renewal status';
-$string['status'] = 'Status';
+defined('MOODLE_INTERNAL') || die();
 
-// column types for this source, as strings
-$string['type_base'] = 'Certification completion';
-$string['type_certif'] = 'Certification';
-$string['current'] = 'Current?';
+interface progressinfo_aggregation {
+
+    /**
+     * Function to aggregate the score and weight
+     *
+     * @param progressinfo $progressinfo Progress information to aggregate
+     * @return array $results Associative array containing the aggregated weight and score
+     */
+    public static function aggregate(progressinfo $progressinfo);
+}
+

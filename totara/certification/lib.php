@@ -300,6 +300,9 @@ function inprogress_certification_stage($courseid, $userid) {
             $DB->update_record('certif_completion', $todb);
         }
     }
+
+    \totara_program\progress\program_progress_cache::mark_user_cache_stale($userid);
+
     return true;
 }
 

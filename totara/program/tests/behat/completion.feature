@@ -1,4 +1,4 @@
-@totara @totara_program @totara_courseprogressbar
+@totara @totara_program @totara_courseprogressbar @totara_programprogressbar
 Feature: Users completion of programs and coursesets
   In order to view a program
   As a user
@@ -75,14 +75,14 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "0%" program progress
+    Then I should see "33%" program progress
     And I should see "100%" in the "Course 1" "table_row"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
-    Then I should see "50%" program progress
+    Then I should see "66%" program progress
     And I should see "100%" in the "Course 1" "table_row"
     And I should see "100%" in the "Course 2" "table_row"
 
@@ -205,7 +205,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Yes" "button"
     And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
-    And I should see "0%" program progress
+    And I should see "50%" program progress
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
@@ -450,7 +450,7 @@ Feature: Users completion of programs and coursesets
     And I should see "Course 3"
 
     # Check progress.
-    And I should see "0%" program progress
+    And I should see "50%" program progress
 
     When I log out
     And I run the "\totara_program\task\completions_task" task
@@ -569,7 +569,7 @@ Feature: Users completion of programs and coursesets
     And I press "Yes"
     And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
-    And I should see "0%" program progress
+    And I should see "66%" program progress
 
     And I click on "Course 2" "link"
     And I click on "Complete course" "link"

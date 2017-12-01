@@ -247,15 +247,30 @@ class rb_source_dp_program extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'program_completion',
             'status',
-            get_string('completionstatus', 'rb_source_dp_course'),
+            get_string('progress', 'rb_source_dp_course'),
             "program_completion.status",
             array(
                 'joins' => array('program_completion'),
                 'displayfunc' => 'program_completion_progress',
-                'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                 'extrafields' => array(
                     'programid' => "base.id",
-                    'userid' => "program_completion.userid"
+                    'userid' => "program_completion.userid",
+                    "stringexport" => 0
+                )
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'program_completion',
+            'progresspercentage',
+            get_string('progresspercentage', 'rb_source_dp_course'),
+            "program_completion.status",
+            array(
+                'joins' => array('program_completion'),
+                'displayfunc' => 'program_completion_progress',
+                'extrafields' => array(
+                    'programid' => "base.id",
+                    'userid' => "program_completion.userid",
+                    "stringexport" => 1
                 )
             )
         );
@@ -318,7 +333,7 @@ class rb_source_dp_program extends rb_base_source {
 
     public function rb_display_program_completion_progress($status, $row, $export=false) {
         $progress = prog_display_progress($row->programid, $row->userid, CERTIFPATH_STD, $export);
-        if ($export && is_numeric($progress)) {
+        if ($export && !is_empty($row->stringexport) && is_numeric($progress)) {
             return get_string('xpercentcomplete', 'totara_core', $progress);
         } else {
             return $progress;

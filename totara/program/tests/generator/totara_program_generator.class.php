@@ -348,6 +348,8 @@ class totara_program_generator extends component_generator_base {
         $programcontent = $program->get_content();
         $programcontent->setup_content($rawdata);
         $programcontent->save_content();
+
+        totara_program\progress\program_progress_cache::mark_program_cache_stale($programid);
     }
 
     /**
@@ -423,6 +425,8 @@ class totara_program_generator extends component_generator_base {
         $programcontent = $program->get_content();
         $programcontent->setup_content($rawdata);
         $programcontent->save_content();
+
+        totara_program\progress\program_progress_cache::mark_program_cache_stale($program->id);
     }
 
     private function complete_course($courseid, $userid) {
@@ -436,6 +440,9 @@ class totara_program_generator extends component_generator_base {
         $comp_man->timecompleted = $this->now;
         $comp_man->status = COMPLETION_STATUS_COMPLETE;
 
+        // Purge the course and program completion caches
+        completion_info::purge_progress_caches();
+        totara_program\progress\mark_user_cache_stale::mark_program_cache_stale($userid);
     }
 
     /**
@@ -513,6 +520,8 @@ class totara_program_generator extends component_generator_base {
 
         $program = new program($programid);
         $program->update_learner_assignments(true);
+
+        totara_program\progress\program_progress_cache::mark_program_cache_stale($programid);
     }
 
     /**
@@ -557,6 +566,8 @@ class totara_program_generator extends component_generator_base {
             $program = new program($programid);
             $program->update_learner_assignments(true);
         }
+
+        totara_program\progress\program_progress_cache::mark_program_cache_stale($programid);
     }
 
     public function fix_program_sortorder($categoryid = 0) {

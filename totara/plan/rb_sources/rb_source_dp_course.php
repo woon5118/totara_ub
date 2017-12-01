@@ -388,7 +388,6 @@ class rb_source_dp_course extends rb_base_source {
                 array(
                     'joins' => array('course_completion','dp_course'),
                     'displayfunc' => 'course_completion_progress',
-                    'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
             );
@@ -400,7 +399,6 @@ class rb_source_dp_course extends rb_base_source {
                 array(
                     'joins' => array('course_completion', 'dp_course'),
                     'displayfunc' => 'course_completion_progresspercentage',
-                    'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
             );

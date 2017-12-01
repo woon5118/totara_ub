@@ -21,9 +21,10 @@
  * @package totara_core
  */
 
-namespace totara_core;
+namespace totara_core\progressinfo;
 
 defined('MOODLE_INTERNAL') || die();
+
 
 /**
  * Totara progressinfo class
@@ -57,6 +58,12 @@ final class progressinfo implements \cacheable_object {
     private $customdata;
 
     /**
+     * Name of the class that implements progressinfo_aggregation to aggregate the progress
+     * @var string agg_class
+     */
+    private $agg_class = '';
+
+    /**
      * Completion criteria {@link progressinfo::get_criteria()}
      * $criteria can contain multiple progress nodes representing sets of criteria that
      *  must be aggregated in order to determine this node's weight and score.
@@ -75,6 +82,7 @@ final class progressinfo implements \cacheable_object {
             'weight' => $this->get_weight(),
             'score' => $this->get_score(),
             'customdata' => $this->get_customdata(),
+            'agg_class' => $this->get_agg_class(),
             'criteria' => []
         );
         foreach ($this->criteria as $key => $criterion) {
@@ -94,7 +102,8 @@ final class progressinfo implements \cacheable_object {
             $data['agg_method'],
             $data['weight'],
             $data['score'],
-            $data['customdata']
+            $data['customdata'],
+            $data['agg_class']
         );
         $progressinfo->criteria = [];
         foreach ($data['criteria'] as $key => $criterion) {
@@ -110,16 +119,17 @@ final class progressinfo implements \cacheable_object {
      * @param int $weight
      * @param float $score
      * @param null $customdata
+     * @param string $agg_class
      * @return progressinfo
      */
-    public static function from_data($agg_method = self::AGGREGATE_ALL, $weight = 0, $score = 0.0, $customdata = null) {
+    public static function from_data($agg_method = self::AGGREGATE_ALL, $weight = 0, $score = 0.0, $customdata = null, $agg_class = '') {
 
         // For now expect customdata to always be an array
         if (!is_null($customdata) && !is_array($customdata)) {
             $customdata = json_decode(json_encode($customdata), true);
         }
 
-        return new self($agg_method, $weight, $score, $customdata);
+        return new self($agg_method, $weight, $score, $customdata, $agg_class);
     }
 
     /**
@@ -131,12 +141,14 @@ final class progressinfo implements \cacheable_object {
      * @param int $weight
      * @param float $score
      * @param array $customdata
+     * @param string $agg_class
      */
-    private function __construct($agg_method = self::AGGREGATE_ALL, $weight = 0, $score = 0.0, $customdata = null) {
+    private function __construct($agg_method = self::AGGREGATE_ALL, $weight = 0, $score = 0.0, $customdata = null, $agg_class = '') {
         $this->set_agg_method($agg_method);
         $this->set_weight($weight);
         $this->set_score($score);
         $this->set_customdata($customdata);
+        $this->set_agg_class($agg_class);
         $this->criteria = array();
     }
 
@@ -217,14 +229,15 @@ final class progressinfo implements \cacheable_object {
      * @param int $weight Criteria weight
      * @param float $score Criteria score
      * @param array $customdata Custom data
+     * @param string $agg_class Name of the aggregation class to use
      * @return progressinfo Newly added progress criteria
      * @throws \coding_exception if the given key already exists.
      */
-    public function add_criteria($key, $agg_method = self::AGGREGATE_ALL, $weight = 0, $score = 00.0, $customdata = null) {
+    public function add_criteria($key, $agg_method = self::AGGREGATE_ALL, $weight = 0, $score = 00.0, $customdata = null, $agg_class = '') {
         if ($this->criteria_exist($key)) {
             throw new \coding_exception('Progress info criteria already exists', $key);
         }
-        $criteria = self::from_data($agg_method, $weight, $score, $customdata);
+        $criteria = self::from_data($agg_method, $weight, $score, $customdata, $agg_class);
         return $this->attach_criteria($key, $criteria);
     }
 
@@ -376,6 +389,41 @@ final class progressinfo implements \cacheable_object {
     }
 
 
+   /**
+     * Get the aggregation class name
+     *
+     * @return string agg_class value
+     */
+    public function get_agg_class() {
+        return $this->agg_class;
+    }
+
+
+    /**
+     * Set the agg_class value
+     *
+     * @param string $agg_class The name of the aggregation class to use
+     * @throws \coding_exception if the given function is not the name of a class that implements the progressinfo_aggregation interface
+     */
+    public function set_agg_class($agg_class) {
+        if (empty($agg_class)) {
+            $this->agg_class = '';
+            return;
+        }
+
+        try {
+            $cls = new \ReflectionClass($agg_class);
+            if ($cls->implementsInterface('\totara_core\progressinfo\progressinfo_aggregation')) {
+                $this->agg_class = $agg_class;
+            } else {
+                throw new \coding_exception('The agg_class is expected to be an implementation of the progressinfo_aggregation interface.', $agg_class);
+            }
+        } catch (\ReflectionException $e) {
+            throw new \coding_exception('The given agg_class is not a valid class.', $agg_class);
+        }
+    }
+
+
     /**
      * Returns percentage complete for this level of aggregation
      * If percentage is near (but not at) 0%, return 1%
@@ -397,14 +445,9 @@ final class progressinfo implements \cacheable_object {
 
 
     /**
-     * Recursive depth first function to aggregate this node's score and weight
+     * Aggregate this node's score and weight by calling the aggregate() method of the agg_class
      *
-     * Score and weight are aggregated up as follows:
-     *     If ALL must be completed - aggregated weight = sum (individual weights)
-     *                              - aggregated score = sum (individual scores)
-     *     If ANY must be completed - aggregated weight = max (weight) of items with max(score / weight)
-     *                              - aggregated score = score of item with max weight with max(score / weight)
-     * (TODO - we may need to re-check these if actual weights are provided by the user)
+     * @throws \coding_exception if the given aggregation implementation doesn't return a weight and score
      */
     public function aggregate_score_weight() {
 
@@ -417,57 +460,45 @@ final class progressinfo implements \cacheable_object {
             $criteria->aggregate_score_weight();
         }
 
-        $weight = 0;
-        $score = 0.0;
+        // Use the default aggregation classes if none were provided by the user
+        $agg_class = !empty($this->agg_class) ? $this->agg_class : $this->get_default_agg_class($this->agg_method);
 
-        switch ($this->agg_method) {
-
-            case self::AGGREGATE_ALL:
-                // score = sum (individual scores)
-                // weight = sum (individual weights)
-                foreach ($this->criteria as $critall) {
-                    // Simply add the weights
-                    $weight += $critall->get_weight();
-                    $score += $critall->get_score();
-                }
-                break;
-
-            case self::AGGREGATE_ANY:
-                // weight = max (weight) of items with max(score / weight)
-                // score = score of item with max weight with max(score / weight)
-                $weightedscore = 0;
-
-                foreach ($this->criteria as $critany) {
-                    if ($critany->get_weight() != 0) {
-                        $critscore = ($critany->get_score() / $critany->get_weight());
-                    } else {
-                        $critscore = $critany->get_score();
-                    }
-
-                    if ($critscore > $weightedscore) {
-                        $score = $critany->get_score();
-                        $weight = $critany->get_weight();
-                        $weightedscore = $critscore;
-                    } else if ($critscore == $weightedscore &&
-                               $critany->get_weight() > $weight) {
-                        $score = $critany->get_score();
-                        $weight = $critany->weight;
-                    }
-                }
-                break;
-
-            case self::AGGREGATE_NONE:
-                $weight = 0;
-                $score = 0.0;
-                break;
-
-            default:
-                debugging('Unexpected aggregation method provided '.(string)$this->agg_method, DEBUG_DEVELOPER);
-                break;
+        // Aggregated results are expected to be an array or object providing the weight and score
+        $agg_result = $agg_class::aggregate($this);
+        if (is_object($agg_result)) {
+            $agg_result = (array)$agg_result;
         }
 
-        $this->weight = $weight;
-        $this->score = $score;
+        if (!is_array($agg_result)) {
+            throw new \coding_exception('The provided aggregation implementation is expected to return and array containing the aggregated weight and score.', $this->agg_class);
+        }
+
+        if (!isset($agg_result['weight']) || !isset($agg_result['score'])) {
+            throw new \coding_exception('The provided aggregation implementation is expected to return the aggregated weight and score.', $this->agg_class);
+        }
+
+        $this->weight = $agg_result['weight'];
+        $this->score = $agg_result['score'];
     }
 
+
+    /**
+     * Return the name of the default progress_aggretion implementation to use with the specified aggregation method
+     *
+     * @param int @agg_method Aggregation method
+     * @return string Name of the default progress_aggregation class to use for this aggregation method
+     */
+    private function get_default_agg_class($agg_method) {
+        switch ($agg_method) {
+            case self::AGGREGATE_NONE:
+                return 'totara_core\progressinfo\progressinfo_aggregate_none';
+
+            case self::AGGREGATE_ANY:
+                return 'totara_core\progressinfo\progressinfo_aggregate_any';
+
+            case self::AGGREGATE_ALL:
+            default:
+                return 'totara_core\progressinfo\progressinfo_aggregate_all';
+        }
+    }
 }

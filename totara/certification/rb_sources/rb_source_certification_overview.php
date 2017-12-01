@@ -245,23 +245,36 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'certif_completion',
             'progress',
             get_string('programcompletionprogress', 'rb_source_program_overview'),
-            $DB->sql_concat_join(
-                "'|'",
-                array(
-                    $DB->sql_cast_2char('prog_courseset.id'),
-                    $DB->sql_cast_2char("prog_completion.status")
-                )
-            ),
+            $DB->sql_concat('base.programid', "'|'", 'base.userid'),
             array(
                 'extrafields' => array(
                     'completion' => "certif_completion.timecompleted",
                     'window' => "certif_completion.timewindowopens",
                     'histpath' => "history.certifpath",
                     'histcomp' => "history.timecompleted",
+                    'stringexport' => 0,
                 ),
                 'displayfunc' => 'certif_completion_progress',
-                'grouping' => 'comma_list',
                 'joins' => array('prog_completion', 'certif_completion', 'history'),
+                'nosort' => true,
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'certif_completion',
+            'progresspercentage',
+            get_string('programcompletionprogresspercentage', 'rb_source_program_overview'),
+            $DB->sql_concat('base.programid', "'|'", 'base.userid'),
+            array(
+                'extrafields' => array(
+                    'completion' => "certif_completion.timecompleted",
+                    'window' => "certif_completion.timewindowopens",
+                    'histpath' => "history.certifpath",
+                    'histcomp' => "history.timecompleted",
+                    'stringexport' => 1,
+                ),
+                'displayfunc' => 'certif_completion_progress',
+                'joins' => array('certif_completion', 'history'),
                 'nosort' => true,
             )
         );

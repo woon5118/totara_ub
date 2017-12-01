@@ -390,7 +390,7 @@ class rb_source_dp_certification extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'certif_completion',
             'progress',
-            get_string('progress', 'rb_source_dp_course'),
+            get_string('progressnumeric', 'rb_source_dp_course'),
             "certif_completion.status",
             array(
                 'joins' => array('certif_completion'),
@@ -399,7 +399,25 @@ class rb_source_dp_certification extends rb_base_source {
                 'extrafields' => array(
                     'programid' => "base.id",
                     'userid' => "certif_completion.userid",
-                    'certifpath' => "certif_completion.certifpath"
+                    'certifpath' => "certif_completion.certifpath",
+                    'stringexport' => 0
+                )
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'certif_completion',
+            'progresspercentage',
+            get_string('progresspercentage', 'rb_source_dp_course'),
+            "certif_completion.status",
+            array(
+                'joins' => array('certif_completion'),
+                'displayfunc' => 'progress',
+                'defaultheading' => get_string('progress', 'rb_source_dp_course'),
+                'extrafields' => array(
+                    'programid' => "base.id",
+                    'userid' => "certif_completion.userid",
+                    'certifpath' => "certif_completion.certifpath",
+                    'stringexport' => 1
                 )
             )
         );
@@ -713,7 +731,7 @@ class rb_source_dp_certification extends rb_base_source {
 
     function rb_display_progress($status, $row, $isexport = false) {
         $progress = prog_display_progress($row->programid, $row->userid, $row->certifpath, $isexport);
-        if ($isexport && is_numeric($progress)) {
+        if ($isexport && is_numeric($progress) && isset($row->stringexport) && $row->stringexport) {
             return get_string('xpercentcomplete', 'totara_core', $progress);
         } else {
             return $progress;

@@ -966,14 +966,14 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         // Get report.
         $report = new reportbuilder($rid, null, false, null, null, true);
-        $this->assertTrue($report->grouped);
-        $this->assertTrue($report->is_internally_grouped());
+        $this->assertFalse($report->grouped);
+        $this->assertFalse($report->is_internally_grouped());
 
-        // Check internally grouped report without user columns aggregation.
+        // Check grouped report with user columns aggregation.
         $this->add_column($report, 'certif_completion', 'renewalstatus', null, 'groupconcat', '', 0);
         $report = new reportbuilder($rid);
         $this->assertTrue($report->grouped);
-        $this->assertTrue($report->is_internally_grouped());
+        $this->assertFalse($report->is_internally_grouped());
     }
 
     /*

@@ -57,6 +57,7 @@ class rb_source_program_completion extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle','rb_source_program_completion');
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->get_source_joins();
+        $this->usedcomponents[] = "totara_program";
 
         parent::__construct();
     }
@@ -301,6 +302,36 @@ class rb_source_program_completion extends rb_base_source {
                 'displayfunc' => 'yes_or_no',
                 'dbdatatype' => 'boolean',
                 'defaultheading' => get_string('isuserassigned', 'rb_source_program_completion')
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
+            'progressnumeric',
+            get_string('programcompletionprogressnumeric','rb_source_program_completion'),
+            "base.status",
+            array(
+                'displayfunc' => 'program_completion_progress',
+                'extrafields' => array(
+                    'programid' => "base.programid",
+                    'userid' => "base.userid",
+                    'stringexport' => 0
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
+            'progresspercentage',
+            get_string('programcompletionprogresspercentage','rb_source_program_completion'),
+            "base.status",
+            array(
+                'displayfunc' => 'program_completion_progress',
+                'extrafields' => array(
+                    'programid' => "base.programid",
+                    'userid' => "base.userid",
+                    'stringexport' => 1
+                )
             )
         );
 

@@ -313,15 +313,32 @@ class rb_source_program_overview extends rb_base_source {
             $columnoptions[] = new rb_column_option(
                 'program_completion',
                 'progress',
-                get_string('programcompletionprogress', 'rb_source_program_overview'),
-                '1',
+                get_string('programcompletionprogressnumeric', 'rb_source_program_overview'),
+                'base.status',
                 array(
                     'displayfunc' => 'program_completion_progress',
                     'nosort' => true,
                     'extrafields' => array(
                         'programid' => "base.programid",
-                        'userid' => "base.userid"
-                    )
+                        'userid' => "base.userid",
+                        'stringexport' => 0
+                    ),
+                )
+            );
+
+            $columnoptions[] = new rb_column_option(
+                'program_completion',
+                'progresspercentage',
+                get_string('programcompletionprogresspercentage', 'rb_source_program_overview'),
+                'base.status',
+                array(
+                    'displayfunc' => 'program_completion_progress',
+                    'nosort' => true,
+                    'extrafields' => array(
+                        'programid' => "base.programid",
+                        'userid' => "base.userid",
+                        'stringexport' => 1
+                    ),
                 )
             );
         }
@@ -793,7 +810,12 @@ class rb_source_program_overview extends rb_base_source {
         return implode($items, "\n");
     }
 
+    /**
+     * @deprecated since Totara 11
+     */
     function rb_display_program_completion_progress($status, $row, $isexport = false) {
+        debugging('rb_source_program_overview::rb_display_program_completion_progress has been deprecated. Replaced by class totara_program\rb\display\program_completion_progress', DEBUG_DEVELOPER);
+
         global $CFG, $PAGE;
 
         if (!empty($row->programid) && !empty($row->userid)) {

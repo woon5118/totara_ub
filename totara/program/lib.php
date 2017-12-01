@@ -1348,6 +1348,9 @@ function prog_update_completion($userid, program $program = null, $courseid = nu
     /** @var program[] $programs */
     foreach ($programs as $program) {
 
+        // Clear the progressinfo cache to ensure it is calculated again
+        \totara_program\progress\program_progress_cache::mark_progressinfo_stale($program->id, $userid);
+
         // First check if the program is already marked as complete for this user and do nothing if it is.
         if ($useriscomplete !== null) {
             if ($useriscomplete === true) {
@@ -2297,11 +2300,9 @@ function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CER
         !empty($prog_completion->certifid) && $prog_completion->status != STATUS_PROGRAM_COMPLETE && empty($prog_completion->ccid)) {
         $out = get_string('notassigned', 'totara_program');
         return $out;
-    } else if ($prog_completion->status == STATUS_PROGRAM_COMPLETE) {
-        $overall_progress = 100;
     } else {
         $program = new program($programid);
-        $overall_progress = $program->get_progress($userid);
+        $overall_progress = (int)$program->get_progress($userid);
     }
 
     if ($export) {

@@ -154,6 +154,9 @@ if ($progcompletion && empty($exceptions) && !$dismissedexceptions) {
     }
 }
 
+// Mark the program progressinfo cache stale to ensure progress is re-read from database on next view
+\totara_program\progress\program_progress_cache::mark_progressinfo_stale($id, $userid);
+
 // Masquerade as the completion page for the sake of navigation.
 $PAGE->navigation->override_active_url(new moodle_url('/totara/program/completion.php', array('id' => $id)));
 // Add an item to the navbar to make it unique.

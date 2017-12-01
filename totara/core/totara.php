@@ -745,6 +745,26 @@ function totara_display_course_progress_bar($userid, $courseid, $status) {
 }
 
 /**
+ *  Calls module renderer to retrieve data for exporting the user's course progress
+ *
+ * @param int $userid User id
+ * @param int $courseid Course id
+ * @param int $status COMPLETION_STATUS_ constant
+ * @return string
+ */
+function totara_export_course_progress($userid, $courseid, $status) {
+    global $PAGE;
+
+    /** @var totara_core_renderer $renderer */
+    $renderer = $PAGE->get_renderer('totara_core');
+    $content = $renderer->export_course_progress_for_template($userid, $courseid, $status);
+    if (isset($content->percent)) {
+        return $content->percent;
+    }
+    return $content->statustext;
+}
+
+/**
  *  Adds the current icon and icon select dropdown to a moodle form
  *  replaces all the old totara/icon classes
  *

@@ -514,6 +514,11 @@ abstract class prog_assignment_category {
         // Store list of seen ids
         $seenids = array();
 
+        // Clear the completion caches in all cases
+        if (isset($data->id)) {
+            totara_program\progress\program_progress_cache::mark_program_cache_stale($data->id);
+        }
+
         // If theres inputs for this assignment category (this)
         if (isset($data->item[$this->id])) {
 
@@ -667,6 +672,9 @@ abstract class prog_assignment_category {
                                                AND assignmenttypeid = :assigntypeid)";
             $result &= $DB->execute($sql, $params);
         }
+
+        // Clear the program completion caches for this program
+        totara_program\progress\program_progress_cache::mark_program_cache_stale($programid);
 
         return $result;
     }

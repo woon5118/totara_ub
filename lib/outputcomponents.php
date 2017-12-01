@@ -4522,7 +4522,7 @@ class progress_bar implements renderable, templatable {
             $this->html_id  = 'pbar_'.uniqid();
         }
 
-        $this->width = $width;
+        $this->width = (int)$width;
 
         if ($autostart) {
             $this->create();

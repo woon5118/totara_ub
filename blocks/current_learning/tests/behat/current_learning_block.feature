@@ -1,4 +1,4 @@
-@totara @block @block_current_learning @totara_courseprogressbar
+@totara @block @block_current_learning @totara_courseprogressbar @totara_programprogressbar
 Feature: Test Current Learning block
 
   Background:
@@ -225,7 +225,7 @@ Feature: Test Current Learning block
   And I should not see "Course 5"
 
   @javascript
-  Scenario: Learner can see course progress in the Current Learning block
+  Scenario: Learner can see course and program progress in the Current Learning block
     Given the following "programs" exist in "totara_program" plugin:
       | fullname                | shortname |
       | Test Program 1          | program1  |
@@ -335,6 +335,7 @@ Feature: Test Current Learning block
     And I log in as "learner1"
     And I click on "Dashboard" in the totara menu
     Then I should see "Test Program 1" in the "Current Learning" "block"
+    And I should see "30%" in the "//li[contains(@class, 'block_current_learning-program')]/div[contains(., 'Test Program 1')]" "xpath_element"
     And I should not see "Course 1" in the "Current Learning" "block"
     And I should not see "Course 2" in the "Current Learning" "block"
     And I should not see "Course 3" in the "Current Learning" "block"

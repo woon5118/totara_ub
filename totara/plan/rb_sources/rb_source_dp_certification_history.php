@@ -303,7 +303,30 @@ class rb_source_dp_certification_history extends rb_base_source {
                     'completion' => 'base.timecompleted',
                     'window' => 'base.timewindowopens',
                     'histpath' => 'base.certifpath',
-                    'histcomp' => 'base.timecompleted'
+                    'histcomp' => 'base.timecompleted',
+                    'programid' => "prog.id",
+                    'userid' => "base.userid",
+                    'stringexport' => 0,
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'base',
+            'progresspercentage',
+            get_string('progresspercentage', 'rb_source_dp_certification_history'),
+            'base.status',
+            array(
+                'displayfunc' => 'certif_completion_progress',
+                'joins' => 'prog',
+                'extrafields' => array(
+                    'completion' => 'base.timecompleted',
+                    'window' => 'base.timewindowopens',
+                    'histpath' => 'base.certifpath',
+                    'histcomp' => 'base.timecompleted',
+                    'programid' => "prog.id",
+                    'userid' => "base.userid",
+                    'stringexport' => 1,
                 )
             )
         );
