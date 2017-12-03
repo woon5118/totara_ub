@@ -89,6 +89,7 @@ $string['shape_fullwidth'] = 'Full width';
 $string['shape_landscape'] = 'Landscape';
 $string['shape_portrait'] = 'Portrait';
 $string['shape_square'] = 'Square';
+$string['show_progress_bar'] = 'Show progress';
 $string['size_large'] = 'Large';
 $string['size_medium']  = 'Medium';
 $string['size_small'] = 'Small';

@@ -12,31 +12,6 @@
     And I add the "Featured Links" block
     And I click on "Add Tile" "link"
 
-    Scenario: Check Course Tile content form always has to have a course
-      When I start watching to see if a new page loads
-      And I set the following fields to these values:
-        | Tile type | Course Tile |
-      Then a new page should have loaded since I started watching
-      When I click on "Select Course" "button"
-      And I click on "Cancel" "button" in the "Select Course" "totaradialogue"
-      And I click on "Save changes" "button"
-      Then I should see "Please Select a course"
-
-    Scenario: Check Course Tile selecting a course
-      When I create a course with:
-        | Course full name  | Course 1 |
-        | Course short name | C1 |
-      And I follow "Dashboard"
-      And I click on "Add Tile" "link"
-      And I set the following fields to these values:
-        | Tile type | Course Tile |
-      And I click on "Select Course" "button"
-      And I click on "Miscellaneous" "link" in the "Select Course" "totaradialogue"
-      And I click on "Course 1" "link" in the "Select Course" "totaradialogue"
-      And I click on "OK" "button" in the "Select Course" "totaradialogue"
-      And I click on "Save changes" "button"
-      Then "Course 1" "text" should exist in the ".block_totara_featured_links" "css_element"
-
     Scenario: Gallery tile content
       When I start watching to see if a new page loads
       And I set the following fields to these values:

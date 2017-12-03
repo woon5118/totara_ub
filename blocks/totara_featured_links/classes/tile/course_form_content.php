@@ -26,6 +26,7 @@ namespace block_totara_featured_links\tile;
 use block_totara_featured_links\form\element\colorpicker;
 use block_totara_featured_links\form\validator\is_color;
 use block_totara_featured_links\form\validator\is_valid_course;
+use totara_form\form\element\checkbox;
 use totara_form\form\element\hidden;
 use totara_form\form\element\static_html;
 use totara_form\form\element\select;
@@ -77,6 +78,8 @@ class course_form_content extends base_form_content {
             'top' => get_string('top_heading', 'block_totara_featured_links'),
             'bottom' => get_string('bottom_heading', 'block_totara_featured_links')
         ]));
+
+        $group->add(new checkbox('progressbar', get_string('show_progress_bar', 'block_totara_featured_links')));
 
         $background = $group->add(
             new colorpicker(

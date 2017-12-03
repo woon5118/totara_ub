@@ -30,9 +30,10 @@ namespace block_totara_featured_links\tile;
 class course_tile extends base{
     protected $used_fields = ['courseid', // int The id of the course that the tile links to.
         'background_color', // string The hex value of the background color.
-        'heading_location']; // string Where the heading is located 'top' or 'bottom'.
+        'heading_location', // string Where the heading is located 'top' or 'bottom'.
+        'progressbar'];
     protected $content_form = '\block_totara_featured_links\tile\course_form_content';
-    protected $content_template = 'block_totara_featured_links/content';
+    protected $content_template = 'block_totara_featured_links/content_course';
     protected $content_class = 'block-totara-featured-links-content block-totara-featured-links-course';
 
     /** @var string This is the name of the class which defines the visibility form */
@@ -81,12 +82,22 @@ class course_tile extends base{
      * @return array
      */
     protected function get_content_template_data() {
+        global $USER, $DB;
         if (empty($this->get_course())) {
             return null;
         }
+        if (!$status = $DB->get_field('course_completions', 'status', array('userid' => $USER->id, 'course' => $this->data->courseid))) {
+            $status = null;
+        }
+        if (isset($this->data->progressbar) && $this->data->progressbar == '1') {
+            $progressbar = totara_display_course_progress_bar($USER->id, $this->data->courseid, $status);
+        } else {
+            $progressbar = false;
+        }
+
         return [
             'heading' => $this->get_course()->fullname,
-            'textbody' => false,
+            'progress_bar' =>  $progressbar,
             'content_class' => (empty($this->content_class) ? '' : $this->content_class),
             'heading_location' => (empty($this->data_filtered->heading_location) ? '' : $this->data_filtered->heading_location),
             'notempty' => true
@@ -123,6 +134,9 @@ class course_tile extends base{
         }
         if (isset($data->background_color)) {
             $this->data->background_color = $data->background_color;
+        }
+        if (isset($data->progressbar)) {
+            $this->data->progressbar = $data->progressbar;
         }
         return;
     }
