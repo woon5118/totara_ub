@@ -378,6 +378,9 @@ class webservice_test extends advanced_testcase {
 
         $user = $this->getDataGenerator()->create_user();
 
+        // Make sure there are no third party external services.
+        $DB->delete_records('external_services');
+
         // Give the user the ability to create a token.
         $userrole = $DB->get_record('role', array('shortname' => 'user'));
         assign_capability('moodle/webservice:createtoken', CAP_ALLOW, $userrole->id, context_system::instance()->id);
@@ -420,7 +423,8 @@ class webservice_test extends advanced_testcase {
         $userrole = $DB->get_record('role', array('shortname' => 'user'));
         assign_capability('moodle/webservice:createtoken', CAP_ALLOW, $userrole->id, context_system::instance()->id);
 
-        $this->assertEquals(0, $DB->count_records('external_services'));
+        // Make sure there are no third party external services.
+        $DB->delete_records('external_services');
 
         $webservice = new webservice();
         $webservice->generate_user_ws_tokens($user->id);
