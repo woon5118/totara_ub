@@ -211,7 +211,7 @@ class enrol_imsenterprise_testcase extends advanced_testcase {
         $this->set_xml_file(array($imsuser));
 
         $this->imsplugin->cron();
-        $this->assertEquals(1, $DB->get_field('user', 'deleted', array('id' => $user->id), '*', MUST_EXIST));
+        $this->assertEquals(1, $DB->get_field('user', 'deleted', array('id' => $user->id), MUST_EXIST));
     }
 
     /**
@@ -232,7 +232,7 @@ class enrol_imsenterprise_testcase extends advanced_testcase {
         $this->set_xml_file(array($imsuser));
 
         $this->imsplugin->cron();
-        $this->assertEquals(0, $DB->get_field('user', 'deleted', array('id' => $user->id), '*', MUST_EXIST));
+        $this->assertEquals(0, $DB->get_field('user', 'deleted', array('id' => $user->id), MUST_EXIST));
     }
 
     /**
