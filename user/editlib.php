@@ -326,6 +326,12 @@ function useredit_shared_definition(&$mform, $editoroptions, $filemanageroptions
         $mform->addElement('select', 'timezone', get_string('timezone'), $choices);
     }
 
+    if ($user->id == -1) {
+        $mform->addElement('select', 'lang', get_string('language', 'admin'), get_string_manager()->get_list_of_translations());
+        $mform->setDefault('lang', $CFG->lang);
+        $mform->addHelpButton('lang', 'language', 'admin');
+    }
+
     if (!empty($CFG->allowuserthemes)) {
         $choices = array();
         $choices[''] = get_string('default');
