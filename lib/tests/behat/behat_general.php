@@ -1428,7 +1428,7 @@ class behat_general extends behat_base {
     }
 
     /**
-     * This function is very similar to "the following should exist in the <table> table"
+     * This function is very similar to "the following should exist in the &lt;table&gt; table"
      * but does a 'contains' rather than an 'equals' match against the table data. This allows
      * superfluous cell content such as images to be ignored but a match to be achieved.
      *
