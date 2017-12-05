@@ -838,23 +838,7 @@ class auth_plugin_ldap extends auth_plugin_base {
 /// User Updates - time-consuming (optional)
         if ($do_updates) {
             // Narrow down what fields we need to update
-            $all_keys = array_keys(get_object_vars($this->config));
-            $updatekeys = array();
-            foreach ($all_keys as $key) {
-                if (preg_match('/^field_updatelocal_(.+)$/', $key, $match)) {
-                    // If we have a field to update it from
-                    // and it must be updated 'onlogin' we
-                    // update it on cron
-                    if (!empty($this->config->{'field_map_'.$match[1]})
-                         and $this->config->{$match[0]} === 'onlogin') {
-                        array_push($updatekeys, $match[1]); // the actual key name
-                    }
-                }
-            }
-            if ($this->config->suspended_attribute && $this->config->sync_suspended) {
-                $updatekeys[] = 'suspended';
-            }
-            unset($all_keys); unset($key);
+            $updatekeys = $this->get_profile_keys();
 
         } else {
             print_string('noupdatestobedone', 'auth_ldap');
@@ -873,7 +857,7 @@ class auth_plugin_ldap extends auth_plugin_base {
 
                 foreach ($users as $user) {
                     echo "\t"; print_string('auth_dbupdatinguser', 'auth_db', array('name'=>$user->username, 'id'=>$user->id));
-                    if (!$this->update_user_record($user->username, $updatekeys, true, true)) {
+                    if (!$this->update_user_record($user->username, $updatekeys, true)) {
                         echo ' - '.get_string('skipped');
                     }
                     echo "\n";
@@ -935,8 +919,12 @@ class auth_plugin_ldap extends auth_plugin_base {
                     set_user_preference('auth_forcepasswordchange', 1, $id);
                 }
 
+                // Save custom profile fields.
+                $updatekeys = $this->get_profile_keys(true);
+                $this->update_user_record($user->username, $updatekeys, false);
+
                 // Add roles if needed.
-                $this->sync_roles($user);
+                $this->sync_roles($euser);
 
             }
             $transaction->allow_commit();
@@ -963,11 +951,12 @@ class auth_plugin_ldap extends auth_plugin_base {
      * @param boolean $updatekeys true to update the local record with the external LDAP values.
      * @param bool $triggerevent set false if user_updated event should not be triggered.
      *             This will not affect user_password_updated event triggering.
-     * @param boolean $sync whether this is being called from sync and needs pre-preprocessing.
      * @return stdClass|bool updated user record or false if there is no new info to update.
      */
-    function update_user_record($username, $updatekeys = false, $triggerevent = false, $sync = false) {
+    function update_user_record($username, $updatekeys = false, $triggerevent = false) {
         global $CFG, $DB;
+
+        require_once($CFG->dirroot.'/user/profile/lib.php');
 
         // Just in case check text case
         $username = trim(core_text::strtolower($username));
@@ -983,6 +972,8 @@ class auth_plugin_ldap extends auth_plugin_base {
         // Protect the userid from being overwritten
         $userid = $user->id;
 
+        $needsupdate = false;
+
         if ($newinfo = $this->get_userinfo($username)) {
             $newinfo = truncate_userinfo($newinfo);
 
@@ -995,6 +986,9 @@ class auth_plugin_ldap extends auth_plugin_base {
                 $newuser->id = $userid;
                 // The cast to int is a workaround for MDL-53959.
                 $newuser->suspended = (int)$this->is_user_suspended((object) $newinfo);
+                // Get all custom fields.
+                $profilefields = (array) profile_user_record($user->id, false);
+                $newprofilefields = [];
 
                 foreach ($updatekeys as $key) {
                     if (isset($newinfo[$key])) {
@@ -1004,18 +998,50 @@ class auth_plugin_ldap extends auth_plugin_base {
                     }
 
                     if (!empty($this->config->{'field_updatelocal_' . $key})) {
-                        // Only update if it's changed.
-                        if ($user->{$key} != $value) {
+                        if (preg_match('/^profile_field_(.*)$/', $key, $match)) {
+                            // Custom field.
+                            $field = $match[1];
+                            $currentvalue = isset($profilefields[$field]) ? $profilefields[$field] : null;
+                            $newprofilefields[$field] = $value;
+                        } else {
+                            // Standard field.
+                            $currentvalue = isset($user->$key) ? $user->$key : null;
                             $newuser->$key = $value;
                         }
                     }
+
+                    // Only update if it's changed.
+                    if ($currentvalue !== $value) {
+                        $needsupdate = true;
+                    }
                 }
-                user_update_user($newuser, false, $triggerevent);
             }
-        } else {
-            return false;
+
+            if ($needsupdate) {
+                user_update_user($newuser, false, $triggerevent);
+
+                // Now, save the profile fields if the user has any.
+                if ($fields = $DB->get_records('user_info_field')) {
+                    foreach ($fields as $field) {
+                        if (isset($newprofilefields[$field->shortname])) {
+                            $conditions = array('fieldid' => $field->id, 'userid' => $newuser->id);
+                            $id = $DB->get_field('user_info_data', 'id', $conditions);
+                            $data = $newprofilefields[$field->shortname];
+                            if ($id) {
+                                $DB->set_field('user_info_data', 'data', $data, array('id' => $id));
+                            } else {
+                                $record = array('fieldid' => $field->id, 'userid' => $newuser->id, 'data' => $data);
+                                $DB->insert_record('user_info_data', $record);
+                            }
+                        }
+                    }
+                }
+
+                return $DB->get_record('user', array('id' => $userid, 'deleted' => 0));
+            }
         }
-        return $DB->get_record('user', array('id'=>$userid, 'deleted'=>0));
+
+        return false;
     }
 
     /**
@@ -1158,7 +1184,9 @@ class auth_plugin_ldap extends auth_plugin_base {
      *
      */
     function user_update($olduser, $newuser) {
-        global $USER;
+        global $CFG;
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         if (isset($olduser->username) and isset($newuser->username) and $olduser->username != $newuser->username) {
             error_log($this->errorlogtag.get_string('renamingnotallowed', 'auth_ldap'));
@@ -1203,6 +1231,14 @@ class auth_plugin_ldap extends auth_plugin_base {
             return false;
         }
 
+        // Load old custom fields.
+        $olduserprofilefields = (array) profile_user_record($olduser->id, false);
+
+        $fields = array();
+        foreach (profile_get_custom_fields(false) as $field) {
+            $fields[$field->shortname] = $field;
+        }
+
         $success = true;
         $user_info_result = ldap_read($ldapconnection, $user_dn, '(objectClass=*)', $search_attribs);
         if ($user_info_result) {
@@ -1221,19 +1257,24 @@ class auth_plugin_ldap extends auth_plugin_base {
             $user_entry = $user_entry[0];
 
             foreach ($attrmap as $key => $ldapkeys) {
-                $profilefield = '';
-                // Only process if the moodle field ($key) has changed and we
-                // are set to update LDAP with it
-                $customprofilefield = 'profile_field_' . $key;
-                if (isset($olduser->$key) and isset($newuser->$key)
-                    and ($olduser->$key !== $newuser->$key)) {
-                    $profilefield = $key;
-                } else if (isset($olduser->$customprofilefield) && isset($newuser->$customprofilefield)
-                    && $olduser->$customprofilefield !== $newuser->$customprofilefield) {
-                    $profilefield = $customprofilefield;
+                if (preg_match('/^profile_field_(.*)$/', $key, $match)) {
+                    // Custom field.
+                    $fieldname = $match[1];
+                    if (isset($fields[$fieldname])) {
+                        $class = 'profile_field_' . $fields[$fieldname]->datatype;
+                        $formfield = new $class($fields[$fieldname]->id, $olduser->id);
+                        $oldvalue = isset($olduserprofilefields[$fieldname]) ? $olduserprofilefields[$fieldname] : null;
+                    } else {
+                        $oldvalue = null;
+                    }
+                    $newvalue = $formfield->edit_save_data_preprocess($newuser->{$formfield->inputname}, new stdClass);
+                } else {
+                    // Standard field.
+                    $oldvalue = isset($olduser->$key) ? $olduser->$key : null;
+                    $newvalue = isset($newuser->$key) ? $newuser->$key : null;
                 }
 
-                if (!empty($profilefield) && !empty($this->config->{'field_updateremote_' . $key})) {
+                if ($newvalue !== null and $newvalue !== $oldvalue and !empty($this->config->{'field_updateremote_' . $key})) {
                     // For ldap values that could be in more than one
                     // ldap key, we will do our best to match
                     // where they came from
@@ -1246,9 +1287,9 @@ class auth_plugin_ldap extends auth_plugin_base {
                         $ambiguous = false;
                     }
 
-                    $nuvalue = core_text::convert($newuser->$profilefield, 'utf-8', $this->config->ldapencoding);
+                    $nuvalue = core_text::convert($newvalue, 'utf-8', $this->config->ldapencoding);
                     empty($nuvalue) ? $nuvalue = array() : $nuvalue;
-                    $ouvalue = core_text::convert($olduser->$profilefield, 'utf-8', $this->config->ldapencoding);
+                    $ouvalue = core_text::convert($oldvalue, 'utf-8', $this->config->ldapencoding);
 
                     foreach ($ldapkeys as $ldapkey) {
                         $ldapkey   = $ldapkey;
@@ -2171,5 +2212,31 @@ class auth_plugin_ldap extends auth_plugin_base {
             // LDAP is not even configured.
             echo $OUTPUT->notification(get_string('ldapnotconfigured', 'auth_ldap'), \core\output\notification::NOTIFY_INFO);
         }
+    }
+
+    /**
+     * Get the list of profile fields.
+     *
+     * @param   bool    $fetchall   Fetch all, not just those for update.
+     * @return  array
+     */
+    protected function get_profile_keys($fetchall = false) {
+        $keys = array_keys(get_object_vars($this->config));
+        $updatekeys = [];
+        foreach ($keys as $key) {
+            if (preg_match('/^field_updatelocal_(.+)$/', $key, $match)) {
+                // If we have a field to update it from and it must be updated 'onlogin' we update it on cron.
+                if (!empty($this->config->{'field_map_'.$match[1]})) {
+                    if ($fetchall || $this->config->{$match[0]} === 'onlogin') {
+                        array_push($updatekeys, $match[1]); // the actual key name
+                    }
+                }
+            }
+        }
+        if ($this->config->suspended_attribute && $this->config->sync_suspended) {
+            $updatekeys[] = 'suspended';
+        }
+
+        return $updatekeys;
     }
 } // End of the class
