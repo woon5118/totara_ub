@@ -234,14 +234,14 @@ echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'page',
 echo $table->out($perpage, true);
 
 if ($table->rawdata) {
-    echo html_writer::start_tag('p');
+    echo html_writer::start_tag('div', array('class' => 'btn-toolbar'));
     echo html_writer::tag('button', get_string('deleteselected', 'tag'),
             array('id' => 'tag-management-delete', 'type' => 'submit',
-                  'class' => 'tagdeleteselected btn btn-secondary', 'name' => 'bulkdelete'));
+                  'class' => 'tagdeleteselected btn btn-default', 'name' => 'bulkdelete'));
     echo html_writer::tag('button', get_string('combineselected', 'tag'),
         array('id' => 'tag-management-combine', 'type' => 'submit',
-              'class' => 'tagcombineselected btn btn-secondary', 'name' => 'bulkcombine'));
-    echo html_writer::end_tag('p');
+              'class' => 'tagcombineselected btn btn-default', 'name' => 'bulkcombine'));
+    echo html_writer::end_tag('div');
 }
 echo '</form>';
 

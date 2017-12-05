@@ -1,6 +1,10 @@
 This files describes API changes in tagging, information provided
 here is intended especially for developers.
 
+=== 11 ===
+
+* Updated delete and combine tags buttons to use standard bootstrap 3 markup
+
 === 10 ===
 
 * Each plugin must define the tag areas it uses in plugindir/db/tag.php
