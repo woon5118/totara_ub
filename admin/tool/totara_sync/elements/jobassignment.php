@@ -55,6 +55,7 @@ class totara_sync_element_jobassignment extends totara_sync_element {
 
         $mform->addElement('select', 'csvsaveemptyfields', get_string('emptyfieldsbehaviourhierarchy', 'tool_totara_sync'), $emptyfieldopt);
         $default = !empty($this->config->csvsaveemptyfields);
+        $mform->disabledIf('csvsaveemptyfields', 'source_jobassignment', 'neq', 'totara_sync_source_jobassignment_csv');
         $mform->setDefault('csvsaveemptyfields', $default);
         $mform->addHelpButton('csvsaveemptyfields', 'emptyfieldsbehaviourhierarchy', 'tool_totara_sync');
 
