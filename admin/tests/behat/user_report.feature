@@ -88,6 +88,8 @@ Feature: Verify functionality of user report.
   Scenario: Verify suspend and unsuspend of user in user report.
 
     Given I follow "Suspend Bob1 Learner1"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status    |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Suspended user |
@@ -105,6 +107,8 @@ Feature: Verify functionality of user report.
     Then I should see "Delete user"
 
     When I press "Delete"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "Browse list of users: 3 records shown"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
@@ -129,6 +133,8 @@ Feature: Verify functionality of user report.
     When I press "Delete"
     # A fully deleted user is not shown in the report.
     Then I should see "Browse list of users: 2 records shown"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should not see "Bob1 Learner1"
 
   Scenario: Verify 'seedeletedusers' capability is supported in user report.
@@ -152,6 +158,8 @@ Feature: Verify functionality of user report.
     Then I should see "Delete user"
 
     When I press "Delete"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "Browse list of users: 4 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
@@ -160,6 +168,8 @@ Feature: Verify functionality of user report.
     When I log out
     And I log in as "manager1"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status  |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted user |
@@ -170,6 +180,8 @@ Feature: Verify functionality of user report.
     And I log out
     And I log in as "manager1"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "Browse list of users: 3 records shown"
     And the following should not exist in the "reportbuilder-table" table:
       | User's Fullname | Username | User's Email              | User Status  |
@@ -199,6 +211,8 @@ Feature: Verify functionality of user report.
 
     When I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active user |

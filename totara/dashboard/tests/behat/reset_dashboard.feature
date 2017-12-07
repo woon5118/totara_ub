@@ -84,6 +84,8 @@ Feature: Reset dashboard layout for all users
 
     When I follow "Delete Bob1 Learner1"
     And I press "Delete"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "Bob1 Learner1"
     And "Undelete Bob1 Learner1" "link" should exist
 
@@ -102,6 +104,8 @@ Feature: Reset dashboard layout for all users
 
     When I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I follow "Undelete Bob1 Learner1"
     And I press "Undelete"
     Then I should see "Undeleted Bob1 Learner1"

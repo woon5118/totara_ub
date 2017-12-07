@@ -48,6 +48,8 @@ Feature: Test HR Import user csv suspended field import.
 
     # Check the user has the correct suspended setting.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I set the field "user-deleted" to "any value"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then the following should exist in the "system_browse_users" table:
       | Username | User's Email              | User Status                        |
       | user1    | user1@example.com         | <expected outcome suspended value> |
