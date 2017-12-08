@@ -159,6 +159,7 @@ class writer extends tabexport_writer {
             }
         }
 
+        $this->source->set_font($font);
         if ($this->portrait) {
             $svgdata = $this->source->get_svg_graph(800, 400);
             if ($svgdata) {

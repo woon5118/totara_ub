@@ -44,6 +44,9 @@ class tabexport_source extends \totara_core\tabexport_source {
     /** @var array $cache data caching info */
     protected $cache;
 
+    /** @var  string $font export font */
+    protected $font;
+
     public function __construct(\reportbuilder $report) {
         global $DB;
         $this->report = $report;
@@ -126,6 +129,8 @@ class tabexport_source extends \totara_core\tabexport_source {
         if (!$graph->is_valid()) {
             return null;
         }
+        // Get current language to set the font properly.
+        $graph->set_font($this->font);
 
         list($sql, $params) = $this->report->build_query(false, true, true);
 
@@ -142,6 +147,15 @@ class tabexport_source extends \totara_core\tabexport_source {
         }
 
         return $svgdata;
+    }
+
+    /**
+     * When exporting a report from the report builder as a PDF this is the font that will be used.
+     *
+     * @param string $font
+     */
+    public function set_font($font) {
+        $this->font = $font;
     }
 
     /**

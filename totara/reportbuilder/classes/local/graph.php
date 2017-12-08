@@ -621,4 +621,19 @@ class graph {
 
         return (bool)$this->series;
     }
+
+    /**
+     * Set all fonts used in svg graph to the specified font
+     *
+     * @param string $font Name of the font to use
+     */
+    public function set_font($font) {
+        // this place require set all font settings for pdf svg graph, see svggraph.ini file
+        $svgfonts = ['axis_font', 'tooltip_font', 'graph_title_font', 'legend_font', 'legend_title_font', 'data_label_font',
+                     'label_font', 'guideline_font', 'crosshairs_text_font', 'bar_total_font', 'inner_text_font'];
+        foreach ($svgfonts as $svgfont) {
+            $this->svggraphsettings[$svgfont] = $font;
+        }
+    }
+
 }
