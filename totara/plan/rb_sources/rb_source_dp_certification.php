@@ -711,8 +711,13 @@ class rb_source_dp_certification extends rb_base_source {
     }
 
 
-    function rb_display_progress($status, $row) {
-        return prog_display_progress($row->programid, $row->userid, $row->certifpath);
+    function rb_display_progress($status, $row, $isexport = false) {
+        $progress = prog_display_progress($row->programid, $row->userid, $row->certifpath, $isexport);
+        if ($isexport && is_numeric($progress)) {
+            return get_string('xpercentcomplete', 'totara_core', $progress);
+        } else {
+            return $progress;
+        }
     }
 
 

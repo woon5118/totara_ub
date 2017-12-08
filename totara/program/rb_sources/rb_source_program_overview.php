@@ -799,7 +799,12 @@ class rb_source_program_overview extends rb_base_source {
         if (!empty($row->programid) && !empty($row->userid)) {
             // If the extra fields are provided then use the same behaviour as the RoL:Programs report.
             require_once($CFG->dirroot . '/totara/program/lib.php');
-            return prog_display_progress($row->programid, $row->userid, CERTIFPATH_STD, $isexport);
+            $progress = prog_display_progress($row->programid, $row->userid, CERTIFPATH_STD, $isexport);
+            if ($isexport && is_numeric($progress)) {
+                return get_string('xpercentcomplete', 'totara_core', $progress);
+            } else {
+                return $progress;
+            }
         }
 
         debugging('rb_source_program_overview->rb_display_program_completion_progress() requires programid and userid extrafield to produce accurate results', DEBUG_DEVELOPER);
