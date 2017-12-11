@@ -48,5 +48,15 @@ function xmldb_totara_certification_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017020700, 'totara', 'certification');
     }
 
+    // TL-16521 Reset messages that must have been sent before the related event, which means they must not have been
+    // correctly reset when the recertification window opened (due to bug fixed in TL-10979).
+    if ($oldversion < 2017121100) {
+
+        totara_certification_upgrade_reset_messages();
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2017121100, 'totara', 'certification');
+    }
+
     return true;
 }
