@@ -47,6 +47,9 @@ $string['passgrade'] = 'Pass Grade';
 $string['requiredgrade'] = 'Grade and required grade';
 $string['timetocompletesinceenrol'] = 'Time to complete (since enrol date)';
 $string['timetocompletesincestart'] = 'Time to complete (since start date)';
+$string['progress'] = 'Progress';
+$string['progressnumeric'] = 'Progress (numeric)';
+$string['progresspercent'] = 'Progress (% complete)';
 // filters
 $string['datecompleted'] = 'Date Completed';
 $string['completionstatus'] = 'Completion Status';

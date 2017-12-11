@@ -318,7 +318,7 @@ class rb_source_dp_course extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'plan',
             'statusandapproval',
-            get_string('completionstatusandapproval', 'rb_source_dp_course'),
+            get_string('progressandapproval', 'rb_source_dp_course'),
             "course_completion.status",
             array(
                 'joins' => array('course_completion', 'dp_course'),
@@ -377,7 +377,7 @@ class rb_source_dp_course extends rb_base_source {
         $columnoptions[] = new rb_column_option(
                 'course_completion',
                 'status',
-                get_string('completionstatus', 'rb_source_dp_course'),
+                get_string('progressnumeric', 'rb_source_dp_course'),
                 // use 'live' values except for completed plans
                 "CASE WHEN dp_course.planstatus = " . DP_PLAN_STATUS_COMPLETE . "
                 THEN
@@ -388,6 +388,18 @@ class rb_source_dp_course extends rb_base_source {
                 array(
                     'joins' => array('course_completion','dp_course'),
                     'displayfunc' => 'course_completion_progress',
+                    'defaultheading' => get_string('progress', 'rb_source_dp_course'),
+                    'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
+                )
+            );
+        $columnoptions[] = new rb_column_option(
+                'course_completion',
+                'progresspercentage',
+                get_string('progresspercentage', 'rb_source_dp_course'),
+                "course_completion.status",
+                array(
+                    'joins' => array('course_completion', 'dp_course'),
+                    'displayfunc' => 'course_completion_progresspercentage',
                     'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
@@ -691,9 +703,15 @@ class rb_source_dp_course extends rb_base_source {
 
     function rb_display_course_completion_progress($status, $row, $isexport) {
         if ($isexport) {
-            global $COMPLETION_STATUS;
-            if (in_array($status, array_keys($COMPLETION_STATUS))) {
-                return get_string($COMPLETION_STATUS[$status], 'completion');
+            global $PAGE;
+
+            $renderer = $PAGE->get_renderer('totara_core');
+            $content = (array)$renderer->export_course_progress_for_template($row->userid, $row->courseid, $status);
+
+            if (isset($content['percent'])){
+                return $content['percent'];
+            } else if (isset($content['statustext'])) {
+                return $content['statustext'];
             } else {
                 return '';
             }
@@ -718,6 +736,21 @@ class rb_source_dp_course extends rb_base_source {
                 $content .= $this->rb_display_plan_item_status($approved);
             }
         }
+        return $content;
+    }
+
+    function rb_display_course_completion_progresspercentage($status, $row, $isexport) {
+
+        // get the progress percetage
+        $content = $this->rb_display_course_completion_progress($status, $row, $isexport);
+        if ($isexport) {
+            if (is_numeric($content)) {
+                return get_string('xpercentcomplete', 'totara_core', $content);
+            } else {
+                return $content;
+            }
+        }
+
         return $content;
     }
 

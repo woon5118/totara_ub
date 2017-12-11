@@ -40,9 +40,11 @@ $string['templatename'] = 'Plan template name';
 $string['templatestartdate'] = 'Plan template start date';
 $string['templateenddate'] = 'Plan template end date';
 $string['completionstatus'] = 'Completion status';
-$string['completionstatusandapproval'] = 'Completion status (and approval status)';
+$string['progressandapproval'] = 'Progress (and approval status)';
 $string['coursetypeicon'] = 'Type';
 $string['progress'] = 'Progress';
+$string['progressnumeric'] = 'Progress (numeric)';
+$string['progresspercentage'] = 'Progress (% complete)';
 // filters
 $string['userid'] = 'User ID';
 $string['coursetitle'] = 'Course Title';
@@ -61,3 +63,6 @@ $string['type_plan'] = 'Plan';
 $string['type_template'] = 'Plan Template';
 $string['type_course_completion'] = 'Course Completion';
 $string['type_course_completion_history'] = 'Previous Course Completions';
+
+// Deprecated since 10.3
+$string['completionstatusandapproval'] = 'Completion status (and approval status)';

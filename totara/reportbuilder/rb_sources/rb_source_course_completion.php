@@ -387,6 +387,28 @@ class rb_source_course_completion extends rb_base_source {
                     'defaultheading' => get_string('grade', 'rb_source_course_completion'),
                 )
             ),
+            new rb_column_option(
+                'course_completion',
+                'progressnumeric',
+                get_string('progressnumeric', 'rb_source_course_completion'),
+                'base.status',
+                array(
+                    'displayfunc' => 'course_progress',
+                    'extrafields' => array('numericonly' => 1, 'userid' => 'base.userid', 'courseid' => 'base.course'),
+                    'defaultheading' => get_string('progress', 'rb_source_course_completion'),
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'progresspercent',
+                get_string('progresspercent', 'rb_source_course_completion'),
+                'base.status',
+                array(
+                    'displayfunc' => 'course_progress',
+                    'extrafields' => array('numericonly' => 0, 'userid' => 'base.userid', 'courseid' => 'base.course'),
+                    'defaultheading' => get_string('progress', 'rb_source_course_completion'),
+                )
+            ),
         );
 
         // include some standard columns
@@ -766,6 +788,30 @@ class rb_source_course_completion extends rb_base_source {
         } else {
             return get_string($string, 'completion');
         }
+    }
+
+    function rb_display_course_progress($status, $row, $isexport) {
+        if ($isexport) {
+            global $PAGE;
+
+            $renderer = $PAGE->get_renderer('totara_core');
+            $content = (array)$renderer->export_course_progress_for_template($row->userid, $row->courseid, $status);
+
+            $percent = '';
+            if (isset($content['percent'])){
+                $percent = $content['percent'];
+            } else if (isset($content['statustext'])) {
+                $percent = $content['statustext'];
+            }
+
+            if ($row->numericonly || !is_numeric($percent)) {
+                return $percent;
+            }
+
+            return get_string('xpercentcomplete', 'totara_core', $percent);
+        }
+
+        return totara_display_course_progress_bar($row->userid, $row->courseid, $status);
     }
 
     //
