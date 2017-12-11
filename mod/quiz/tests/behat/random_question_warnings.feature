@@ -7,11 +7,11 @@ Feature: Warnings are shown on quiz with random questions and insufficient quest
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And the following "question categories" exist:
-      | contextlevel | reference | name           | parent           |
-      | Course       | C1        | MyCategory 1     | Top            |
-      | Course       | C1        | MyCategory 2     | Top            |
-      | Course       | C1        | MyCategory 2-1   | MyCategory 2   |
-      | Course       | C1        | MyCategory 2-1-1 | MyCategory 2-1 |
+      | contextlevel | reference | name             | questioncategory |
+      | Course       | C1        | MyCategory 1     | Top              |
+      | Course       | C1        | MyCategory 2     | Top              |
+      | Course       | C1        | MyCategory 2-1   | MyCategory 2     |
+      | Course       | C1        | MyCategory 2-1-1 | MyCategory 2-1   |
     And the following "questions" exist:
       | questioncategory | qtype     | name             | questiontext                         |
       | MyCategory 1     | truefalse | Question 1-A     | This is question in MyCategory 1     |

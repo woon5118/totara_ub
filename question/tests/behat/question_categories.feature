@@ -39,7 +39,7 @@ Feature: A teacher can put questions in categories in the question bank
     When I navigate to "Categories" node in "Course administration > Question bank"
     And I click on "Edit" "link" in the "Subcategory" "list_item"
     #Totara: TL-6117 adds prefix 'Default for' t odefault categories
-    And the field "parent" matches value "   Default for Default for C1"
+    And the field "parent" matches value "   Default for Default for C1 (0)"
     And I set the following fields to these values:
       | Name            | New name     |
       | Category info   | I was edited |
@@ -70,7 +70,7 @@ Feature: A teacher can put questions in categories in the question bank
     And I press "Move to >>"
     Then I should see "Test question to be moved"
     And the field "Select a category" matches value "&nbsp;&nbsp;&nbsp;Subcategory (1)"
-    And the "Select a category" select box should contain "Used category"
+    And the "Select a category" select box should contain "Used category (0)"
     And the "Select a category" select box should not contain "Used category (1)"
 
   @javascript
@@ -84,5 +84,5 @@ Feature: A teacher can put questions in categories in the question bank
     And I press "id_submitbutton"
     Then I should see "Test question to be moved"
     And the field "Select a category" matches value "&nbsp;&nbsp;&nbsp;Subcategory (1)"
-    And the "Select a category" select box should contain "Used category"
+    And the "Select a category" select box should contain "Used category (0)"
     And the "Select a category" select box should not contain "Used category (1)"

@@ -1119,7 +1119,7 @@ function question_category_options($contexts, $top = false, $currentcat = 0,
                     $a = new stdClass();
                     $a->name = format_string($category->name, true, array('context' => $context));
                     $a->count = !empty($category->questioncount) ? "$category->questioncount" : '0';
-                    $categoriesarray[$contextstring][$cid] = '<pre>' . $category->indentation . '</pre>' .
+                    $categoriesarray[$contextstring][$cid] = $category->indentation .
                         get_string('categorynameandcount', 'question', $a);
                 }
             }

@@ -555,9 +555,6 @@ class behat_data_generators extends behat_base {
     protected function process_question_category($data) {
         $context = $this->get_context($data['contextlevel'], $data['reference']);
         $data['contextid'] = $context->id;
-        if (isset($data['parent'])) {
-            $data['parent'] = $this->get_questioncategory_id($data['parent']);
-        }
         $this->datagenerator->get_plugin_generator('core_question')->create_question_category($data);
     }
 
