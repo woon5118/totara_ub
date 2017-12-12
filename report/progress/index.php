@@ -145,7 +145,7 @@ if ($total) {
         implode(' AND ', $where),
         $where_params,
         $group,
-        $firstnamesort ? 'u.firstname ASC' : 'u.lastname ASC',
+        $firstnamesort ? 'u.firstname ASC, u.lastname ASC' : 'u.lastname ASC, u.firstname ASC',
         $csv ? 0 : COMPLETION_REPORT_PAGE,
         $csv ? 0 : $page * COMPLETION_REPORT_PAGE, // TL-9502
         $context,
