@@ -41,8 +41,8 @@ Feature: Test appraisal stage completion with missing roles
       | appraisal   | stage      | name      |
       | Appraisal1  | App1_Stage | App1_Page |
      And the following "questions" exist in "totara_appraisal" plugin:
-      | appraisal   | stage      | page      | name     | type          | default | roles   | ExtraInfo                          |
-      | Appraisal1  | App1_Stage | App1_Page | App1-Q1  | ratingnumeric | 2       | manager | Range:1-10,Display:slider          |
+      | appraisal   | stage      | page      | name     | type          | default | roles   | ExtraInfo |
+      | Appraisal1  | App1_Stage | App1_Page | App1-Q1  | text          | 2       | manager |           |
 
     And the following "assignments" exist in "totara_appraisal" plugin:
       | appraisal   | type     | id     |
@@ -129,6 +129,7 @@ Feature: Test appraisal stage completion with missing roles
 
     When I press "Start"
     And "//input[@value='Complete stage']" "xpath_element" should exist
+    And I set the field "Your answer" to "My answer"
     And I click on "Complete stage" "button"
     Then I should see "Completed" in the ".appraisal-stagelist" "css_element"
     And "View" "button" should exist in the ".appraisal-stagelist" "css_element"
@@ -140,6 +141,7 @@ Feature: Test appraisal stage completion with missing roles
     And "//input[@value='Save progress' and @disabled]" "xpath_element" should exist
     And "//input[@value='Complete stage' and @disabled]" "xpath_element" should exist
     And "//input[@value='Save changes']" "xpath_element" should not exist
+    And "My answer" "text" should exist
 
   @javascript
   Scenario: Verify Manager is not required to complete the appraisal if he was assigned after the appraisal was completed
