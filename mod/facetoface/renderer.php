@@ -641,7 +641,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $signuplink .= get_string('none', 'facetoface');
             } else {
                 $facetoface = $DB->get_record('facetoface', ['id' => $session->facetoface], 'multiplesessions');
-                if (empty($session->cancelledstatus)) {
+                if (empty($session->cancelledstatus) && $registrationopen == true && $registrationclosed == false) {
                     if (!facetoface_has_unarchived_signups($session->facetoface, $USER->id)
                         || $facetoface->multiplesessions == "1") {
                         // Ok to register.
