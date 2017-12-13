@@ -1434,6 +1434,7 @@ class goal extends hierarchy {
         // @todo Get based on item type or better still, don't use inline styles :-(.
         $cssclass = !$record->visible ? 'dimmed' : '';
         $out = html_writer::start_tag('div', array('class' => 'hierarchyitem ' . $itemdepth));
+        $out .= $OUTPUT->flex_icon('navitem');
 
         if (isset($record->name)) {
             $out .= $OUTPUT->action_link(new moodle_url('/totara/hierarchy/prefix/goal/item/view.php',

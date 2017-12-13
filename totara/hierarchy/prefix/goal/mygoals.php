@@ -133,9 +133,7 @@ if ($edit !== -1) {
 $renderer = $PAGE->get_renderer('totara_hierarchy');
 
 $header = '';
-$header .= html_writer::start_tag('div', array('id' => 'mygoals_header'));
 $header .= $OUTPUT->heading($strmygoals);
-$header .= html_writer::end_tag('div');
 
 $company = '';
 if ($can_view_company) {

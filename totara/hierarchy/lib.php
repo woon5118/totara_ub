@@ -1360,6 +1360,7 @@ class hierarchy {
         // @todo get based on item type or better still, don't use inline styles :-(
         $cssclass = !$record->visible ? 'dimmed' : '';
         $out = html_writer::start_tag('div', array('class' => 'hierarchyitem ' . $itemdepth));
+        $out .= $OUTPUT->flex_icon('navitem');
         $systemcontext = context_system::instance();
         $canview = has_capability('totara/hierarchy:view' . $this->prefix, $systemcontext);
         if ($canview) {

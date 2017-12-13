@@ -580,8 +580,6 @@ div#dateselector-calendar-panel {
 // Fix multi-line user selection forms.
 //
 
-#hierarchy-bulk-actions-form label[for="addselect"],
-#hierarchy-bulk-actions-form label[for="removeselect"],
 .user-multiselect label[for="addselect"],
 .user-multiselect label[for="removeselect"] {
     display: block;
@@ -592,39 +590,22 @@ div#dateselector-calendar-panel {
     padding: 0;
 }
 
-#hierarchy-bulk-actions-form div.controls {
-    margin-top: @line-height-computed * 12;
-    padding: 0;
-}
-
 #id_remove_all_items {
     margin-bottom: @padding-small-vertical;
 }
 
-#hierarchy-bulk-actions-form .controls input,
 .user-multiselect .controls button,
 .user-multiselect .controls input {
     display: block;
     margin: @padding-large-vertical auto;
 }
 
-#hierarchy-bulk-actions-form select[multiple='multiple'],
 .user-multiselect select[multiple='multiple'] {
     max-width: none;
     width: 100%;
     margin-bottom: @line-height-computed;
     margin-left: 0;
     height: @line-height-computed * 20;
-}
-
-#hierarchy-bulk-actions-form .action {
-    text-align: center;
-    margin-top: @padding-large-vertical * 4;
-}
-
-#hierarchy-bulk-actions-form .action input,
-#hierarchy-bulk-actions-form .action select {
-    margin: 0 0 0 @padding-small-horizontal;
 }
 
 #assignform .userselector label,

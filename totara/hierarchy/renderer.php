@@ -586,10 +586,6 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     public function mygoals_company_table($userid, $can_edit, $display = false) {
         global $CFG, $DB, $PAGE;
 
-        $bgcolour = true;
-        $bglighter = 'mygoals_lighter';
-        $bgdarker = 'mygoals_darker';
-
         $assignments = goal::get_user_assignments($userid, $can_edit, $display);
         $company_table = new html_table();
 
@@ -670,11 +666,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $cells['status'] = new html_table_cell($scalevalue);
             $cells['assign'] = new html_table_cell($assignment->via);
 
-            $row_bg = $bgcolour ? $bglighter : $bgdarker;
-            $bgcolour = !$bgcolour;
-
             $row = new html_table_row($cells);
-            $row->attributes = array('class' => "company_row {$row_bg}");
+            $row->attributes = array('class' => "company_row ");
 
             $company_table->data[] = $row;
             $company_table->attributes = array('class' => 'company_table fullwidth generaltable');
@@ -696,10 +689,6 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     public function mygoals_personal_table($userid, $can_edit, $display = false) {
         global $CFG, $PAGE;
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
-
-        $bgcolour = true;
-        $bglighter = 'mygoals_lighter';
-        $bgdarker = 'mygoals_darker';
 
         // Set up the personal goal data.
         $assignments = goal::get_goal_items(array('userid' => $userid), goal::SCOPE_PERSONAL);
@@ -811,11 +800,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $cells['assign'] = new html_table_cell($assign);
             $cells['edit'] = new html_table_cell($edit_button . ' ' . $delete_button);
 
-            $row_bg = $bgcolour ? $bglighter : $bgdarker;
-            $bgcolour = !$bgcolour;
-
             $row = new html_table_row($cells);
-            $row->attributes = array('class' => "company_row {$row_bg}");
+            $row->attributes = array('class' => "company_row");
 
             $personal_table->data[] = $row;
             $personal_table->attributes = array('class' => 'personal_table fullwidth generaltable');

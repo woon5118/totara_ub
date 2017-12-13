@@ -2176,6 +2176,7 @@ $deprecated = array(
     'core|i/import' => 'download',
     'core|i/info' => 'info-circle',
     'core|i/invalid' => 'times-danger',
+    'core|i/item' => 'navitem',
     'core|i/key' => 'key',
     'core|i/loading' => 'loading',
     'core|i/loading_small' => 'loading',
