@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2014 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @author Murali Nair <murali.nair@totaralms.com>
  * @package totara_reportbuilder
  */
 
@@ -26,68 +26,54 @@ namespace totara_reportbuilder\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The report updated event class.
- *
- * @property-read array $other {
- *      Extra information about the event.
- *
- *      - string shortname: Short name of report.
- *      - string $area: part of reportbuilder affected
- * }
- *
- * @author Petr Skoda <petr.skoda@totaralms.com>
- * @package totara_reportbuilder
+ * The scheduled report deleted event class.
  */
-class report_updated extends \core\event\base {
+class scheduled_report_deleted extends \core\event\base {
     /**
-     * Flag for prevention of direct create() call.
-     * @var bool
+     * @var bool flag for prevention of direct create() call.
      */
     protected static $preventcreatecall = true;
 
-    /** @var \reportbuilder */
-    protected $report;
+    /** @var \stdClass */
+    protected $scheduledreport;
 
     /**
      * Create instance of event.
      *
-     * @param \reportbuilder $report
-     * @param string $area what area of report was updated
-     * @return report_updated
+     * @param \stdClass $scheduledreport scheduled report details.
+     * @return scheduled_report_deleted
      */
-    public static function create_from_report(\reportbuilder $report, $area) {
-        // Triggering of "\totara_reportbuilder\event\report_updated" for deletion of scheduled
-        // reports has been deprecated and will be removed.
-        // Use "\totara_reportbuilder\event\scheduled_report_deleted" instead
+    public static function create_from_schedule(\stdClass $scheduledreport) {
+        $other = [
+            'reportid' => $scheduledreport->reportid
+        ];
 
-        $data = array(
+        $data = [
             'context' => \context_system::instance(),
-            'objectid' => $report->_id,
-            'other' => array(
-                'shortname' => $report->shortname,
-                'area' => $area,
-            ),
-        );
+            'objectid' => $scheduledreport->id,
+            'other' => $other
+        ];
+
         self::$preventcreatecall = false;
-        /** @var report_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
-        $event->report = $report;
+
+        $event->scheduledreport = $scheduledreport;
         return $event;
     }
 
     /**
-     * Get report instance.
+     * Get scheduler instance.
      *
      * NOTE: to be used from observers only.
      *
-     * @return \reportbuilder
+     * @return \stdClass
      */
-    public function get_report() {
+    public function get_scheduled_report() {
         if ($this->is_restored()) {
-            throw new \coding_exception('get_report() is intended for event observers only');
+            throw new \coding_exception('get_scheduled_report() is intended for event observers only');
         }
-        return $this->report;
+        return $this->scheduledreport;
     }
 
     /**
@@ -96,9 +82,9 @@ class report_updated extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['crud'] = 'u';
+        $this->data['crud'] = 'd';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'report_builder';
+        $this->data['objecttable'] = 'report_builder_schedule';
     }
 
     /**
@@ -107,7 +93,7 @@ class report_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventreportupdated', 'totara_reportbuilder');
+        return get_string('eventscheduledreportdeleted', 'totara_reportbuilder');
     }
 
     /**
@@ -116,9 +102,14 @@ class report_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $shortname = s($this->other['shortname']);
-        $area = $this->other['area'];
-        return "The user with id '$this->userid' updated ($area) the report '$this->objectid' ($shortname).";
+        global $USER;
+        $report = $this->other['reportid'];
+
+        $msg = sprintf(
+            "The user with id '%s' deleted a scheduled report (scheduleid='%d', reportid='%s')",
+            $USER->id, $this->objectid, $report
+        );
+        return $msg;
     }
 
     /**
@@ -130,7 +121,7 @@ class report_updated extends \core\event\base {
         global $CFG;
         $logurl = $this->get_url()->out(false);
         $logurl = str_replace($CFG->wwwroot . '/totara/reportbuilder/', '', $logurl);
-        return array(SITEID, 'reportbuilder', 'update report', $logurl, $this->report->fullname . ' (ID=' . $this->objectid . ')');
+        return [SITEID, 'reportbuilder', 'deleted scheduled report', $logurl, 'schedule ID=' . $this->objectid];
     }
 
     /**
@@ -139,7 +130,7 @@ class report_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/totara/reportbuilder/report.php', array('id' => $this->objectid));
+        return new \moodle_url('/totara/reportbuilder/deletescheduled.php', ['id' => $this->objectid]);
     }
 
     /**
@@ -149,7 +140,7 @@ class report_updated extends \core\event\base {
      */
     protected function validate_data() {
         if (self::$preventcreatecall) {
-            throw new \coding_exception('cannot call report_updated::create() directly, use report_updated::create_from_report() instead.');
+            throw new \coding_exception('cannot call scheduled_report_deleted::create() directly, use scheduled_report_created::create_from_schedule() instead.');
         }
 
         parent::validate_data();

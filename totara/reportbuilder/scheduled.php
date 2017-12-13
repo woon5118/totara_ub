@@ -345,6 +345,13 @@ if ($fromform = $mform->get_data()) {
 
     $transaction->allow_commit();
 
+    if ($newreport) {
+        $todb->id = $newid;
+        \totara_reportbuilder\event\scheduled_report_created::create_from_schedule($todb)->trigger();
+    } else {
+        \totara_reportbuilder\event\scheduled_report_updated::create_from_schedule($todb)->trigger();
+    }
+
     $noticekey = ($newreport) ? 'addedscheduledreport' : 'updatescheduledreport';
     totara_set_notification(get_string($noticekey, 'totara_reportbuilder'), $myreportsurl, array('class' => 'notifysuccess'));
 }
