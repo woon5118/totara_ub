@@ -317,15 +317,6 @@ function totara_version_info() {
 }
 
 /**
- * Import the latest timezone information - code taken from admin/tool/timezoneimport
- * @deprecated since Totara 2.7.2
- * @return bool success or failure
- */
-function totara_import_timezonelist() {
-    return true;
-}
-
-/**
  * gets a clean timezone array compatible with PHP DateTime, DateTimeZone etc functions
  * @param bool $assoc return a simple numerical index array or an associative array
  * @return array a clean timezone list that can be used safely
@@ -1686,18 +1677,6 @@ function totara_print_edit_button($settingname, $params = array()) {
     return $OUTPUT->single_button(new moodle_url(qualified_me(), $params), $label, 'get');
 }
 
-
-/**
- * Return a language string in the local language for a given user
- *
- * @deprecated Use get_string() with 4th parameter instead
- *
- */
-function get_string_in_user_lang($user, $identifier, $module='', $a=NULL, $extralocations=NULL) {
-    debugging('get_string_in_user_lang() is deprecated. Use get_string() with 4th param instead', DEBUG_DEVELOPER);
-    return get_string($identifier, $module, $a, $user->lang);
-}
-
 /**
  * Returns the SQL to be used in order to CAST one column to CHAR
  *
@@ -1783,17 +1762,6 @@ function mssql_get_collation($casesensitive = true, $accentsensitive = true) {
     }
 
     return $collation;
-}
-
-/**
- * Assign a user a position assignment and create/delete role assignments as required
- *
- * @deprecated since 9.0.
- * @param $assignment
- * @param bool $unittest set to true if using for unit tests (optional)
- */
-function assign_user_position($assignment, $unittest=false) {
-    throw new coding_exception('assign_user_position has been deprecated since 9.0. You will need to use \totara_job\job_assignment methods instead.');
 }
 
 /**
