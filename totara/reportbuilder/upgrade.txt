@@ -41,4 +41,6 @@ information provided here is intended especially for developers.
 
 * rb_base_source::rb_display_user_email_unobscured() has been deprecated, use the totara/reportbuilder/classes/rb/display/user_email_unobscured class instead.
 
+=== 11.0 ===
 
+* Triggering of "\totara_reportbuilder\event\report_updated" event for deletion of scheduled reports has been deprecated. Use "\totara_reportbuilder\event\scheduled_report_deleted" event instead.
