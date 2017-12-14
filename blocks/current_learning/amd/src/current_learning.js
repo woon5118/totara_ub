@@ -126,7 +126,7 @@ define(['jquery',
 
             filter_data_for_paging(_blockData, page).done(function(filteredData) {
                 templates.render('block_current_learning/main_content', filteredData).done(function(rendered) {
-                    $(instanceselector+' .current-learning-content').html(rendered).trigger("block_current_learning:content_updated");
+                    $(instanceselector+' .current-learning-content').replaceWith(rendered).trigger("block_current_learning:content_updated");
                 }).fail(function(error) {
                     notification.exception(error);
                 });
