@@ -436,7 +436,7 @@ function glossary_get_recent_mod_activity(&$activities, &$index, $timestart, $co
                 'mode' => 'entry',
                 'hook' => $entry->entryid];
         } else {
-            $urlparams = ['id' => $$cm->id,
+            $urlparams = ['id' => $cm->id,
                 'mode' => 'approval',
                 'hook' => format_text($entry->concept, true)];
         }

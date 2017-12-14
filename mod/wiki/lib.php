@@ -374,12 +374,11 @@ function wiki_get_recent_mod_activity(&$activities, &$index, $timestart, $course
     $sql = "SELECT p.id as id, p.timemodified, p.subwikiid, sw.wikiid, w.name, w.wikimode, sw.userid, sw.groupid, u.id as editorid, $userpicturefields
             FROM {wiki_pages} p
                 JOIN {wiki_subwikis} sw ON sw.id = p.subwikiid
-                JOIN {wiki_pages} wp ON wp.subwikiid = sw.id
                 INNER JOIN (
                       SELECT smpv.pageid, MAX(version) AS version
                       FROM {wiki_versions} smpv
                       GROUP BY smpv.pageid) AS versionmax ON versionmax.version > 0
-                JOIN {wiki_versions} swv ON swv.pageid = versionmax.pageid AND swv.version = versionmax.version AND swv.pageid = wp.id
+                JOIN {wiki_versions} swv ON swv.pageid = versionmax.pageid AND swv.version = versionmax.version AND swv.pageid = p.id
                 JOIN {user} u ON u.id = swv.userid
                 JOIN {wiki} w ON w.id = sw.wikiid
             WHERE p.timemodified > :timestart AND w.course = :courseid $groupselect $userselect

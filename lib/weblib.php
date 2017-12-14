@@ -2537,7 +2537,6 @@ function render_recent_activity_notes(array $activities, bool $viewfullnames = n
     foreach ($activities as $activity) {
         assert(isset($activity->text), 'The text property on the activity is used to display nicely');
         assert(isset($activity->link), 'Activities can have a link associated with them');
-        assert(isset($activity->user), 'Fillout the user property to show the username');
         assert(isset($activity->timestamp), 'Set the timestamp property to show the time in the activity note');
 
         $output .= print_recent_activity_note(

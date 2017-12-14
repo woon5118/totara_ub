@@ -436,7 +436,7 @@ if (!empty($activities)) {
             }
 
             // TOTARA CHANGES.
-            if (isset($activity->text) && isset($activity->link)) {
+            if (isset($activity->text)) {
                 // Try new way if it doesnt work try old way
                 print_recent_activity_note($activity->timestamp,
                     $activity->user,
