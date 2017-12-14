@@ -59,8 +59,8 @@ function totara_certification_upgrade_reset_messages() {
     );
     list($messagetypesql, $params) = $DB->get_in_or_equal($messagetypes, SQL_PARAMS_NAMED);
 
-    $sql = "DELETE {prog_messagelog}
-              FROM {prog_messagelog}
+    $sql = "SELECT DISTINCT pml.id
+              FROM {prog_messagelog} pml
               JOIN {prog_message} pm
                 ON pm.id = {prog_messagelog}.messageid AND pm.messagetype {$messagetypesql}
               JOIN {prog} p ON pm.programid = p.id
@@ -68,7 +68,12 @@ function totara_certification_upgrade_reset_messages() {
              WHERE {prog_messagelog}.timeissued < cc.timewindowopens
                AND cc.renewalstatus = :due";
     $params['due'] = CERTIFRENEWALSTATUS_DUE;
-    $DB->execute($sql, $params);
+
+    $pmlrs = $DB->get_recordset_sql($sql, $params);
+    foreach ($pmlrs as $pmlid) {
+        $DB->delete_records('prog_messagelog', array('id' => $pmlid));
+    }
+    $pmlrs->close();
 
     // 2) Reset messages where the user is expired and the message type couldn't have been sent since window opened.
     $messagetypes = array(
@@ -80,8 +85,8 @@ function totara_certification_upgrade_reset_messages() {
     );
     list($messagetypesql, $params) = $DB->get_in_or_equal($messagetypes, SQL_PARAMS_NAMED);
 
-    $sql = "DELETE {prog_messagelog}
-              FROM {prog_messagelog}
+    $sql = "SELECT DISTINCT pml.id
+              FROM {prog_messagelog} pml
               JOIN {prog_message} pm
                 ON pm.id = {prog_messagelog}.messageid AND pm.messagetype {$messagetypesql}
               JOIN {prog} p ON pm.programid = p.id
@@ -90,7 +95,12 @@ function totara_certification_upgrade_reset_messages() {
              WHERE {prog_messagelog}.timeissued < pc.timedue
                AND cc.renewalstatus = :expired";
     $params['expired'] = CERTIFRENEWALSTATUS_EXPIRED;
-    $DB->execute($sql, $params);
+
+    $pmlrs = $DB->get_recordset_sql($sql, $params);
+    foreach ($pmlrs as $pmlid) {
+        $DB->delete_records('prog_messagelog', array('id' => $pmlid));
+    }
+    $pmlrs->close();
 
     // 3) Reset messages where the user is certified and the message type couldn't have been sent since window opened.
     $messagetypes = array(
@@ -100,8 +110,8 @@ function totara_certification_upgrade_reset_messages() {
     );
     list($messagetypesql, $params) = $DB->get_in_or_equal($messagetypes, SQL_PARAMS_NAMED);
 
-    $sql = "DELETE {prog_messagelog}
-              FROM {prog_messagelog}
+    $sql = "SELECT DISTINCT pml.id
+              FROM {prog_messagelog} pml
               JOIN {prog_message} pm
                 ON pm.id = {prog_messagelog}.messageid AND pm.messagetype {$messagetypesql}
               JOIN {prog} p ON pm.programid = p.id
@@ -109,5 +119,10 @@ function totara_certification_upgrade_reset_messages() {
              WHERE {prog_messagelog}.timeissued < cc.timecompleted
                AND cc.renewalstatus = :notdue";
     $params['notdue'] = CERTIFRENEWALSTATUS_NOTDUE;
-    $DB->execute($sql, $params);
+
+    $pmlrs = $DB->get_recordset_sql($sql, $params);
+    foreach ($pmlrs as $pmlid) {
+        $DB->delete_records('prog_messagelog', array('id' => $pmlid));
+    }
+    $pmlrs->close();
 }
