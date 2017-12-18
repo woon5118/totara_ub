@@ -50,6 +50,7 @@ Feature: In a lesson activity, teacher can add an essay question
     And I follow "Test lesson name"
     And I follow "Grade essays"
     And I should see "Student 1"
+    And I should see "Not graded" in the "Student 1" "table_row"
     And I should see "Essay question"
     And I follow "Essay question"
     And I should see "Student 1's response"
@@ -59,6 +60,7 @@ Feature: In a lesson activity, teacher can add an essay question
       | Essay score | 1 |
     And I press "Save changes"
     And I should see "Changes saved"
+    And I should see "Graded" in the "Student 1" "table_row"
     And I follow "Reports"
     And I should see "Student 1"
     And I click on ".lesson-attempt-link" "css_element" in the "Student 1" "table_row"
