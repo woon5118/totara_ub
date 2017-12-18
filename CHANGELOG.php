@@ -3,6 +3,384 @@
 
 Totara Learn Changelog
 
+Release Evergreen (21st December 2017):
+=======================================
+
+Key:           + Evergreen only
+
+Security issues:
+
+    TL-16270       360° Feedback now correctly disposes of the user's access token when no longer needed
+
+                   Previously if a user accessed a 360° Feedback instance using a token, that
+                   token would be stored in the user's session and would allow them to access
+                   the 360° Feedback as a user (not with a token).
+                   The token used to access the first 360° Feedback instance is now disposed
+                   of correctly.
+
+    TL-16451       Fixed permissions not being checked when performing actions on the Seminar attendees page
+    TL-16550       Deletion of a job assignment now removes the staff manager role from the manager in the job assignment
+
+New features:
+
+    TL-9004    +   New report source: scheduled reports
+
+                   This new report source provides details about existing scheduled reports,
+                   their frequencies and recipients.
+
+                   A new capability "totara/reportbuilder:managescheduledreports" has been
+                   defined to allow people to edit and delete scheduled reports (NB: the
+                   scheduling and recipients, not the linked reports themselves). Note that
+                   users with the new capability should also be given the
+                   "moodle/cohort:view" and "moodle/user:viewdetails" capabilities so that
+                   they can add audiences and individuals as recipients of scheduled reports.
+
+Improvements:
+
+    TL-9277        Added additional options when selecting the maximum Feedback activity reminder time
+    TL-12805   +   Archived Seminar attendance within certifications no longer prevents future signups
+
+                   Previously, multiple attendance needed to be turned on in Seminars
+                   contained within certifications. This is no longer required, and the
+                   warning has been removed. Note that users will now be able to sign up to
+                   Seminars after course reset (when the recertification window opens) even if
+                   the Seminar is not a requirement for course completion and multiple
+                   attendance is turned off.
+
+    TL-14745   +   The recent activity block and recent activity page now show the same activity
+    TL-14937       Added popover UI component
+
+                   This UI component is based off the bootstrap 3 popover component. This can
+                   be viewed through the core/progress_bar template in the template library
+                   (Site administration > Development > Template library)
+
+    TL-14963   +   Added an Organisation assignment restriction for conditional activity access
+
+                   Access to an activity can now be restricted based on the Organisation that
+                   a learner has been assigned to via Job Assignments.
+
+    TL-14964   +   Added a Position assignment restriction for conditional activity access
+
+                   Access to an activity can now be restricted based on the Position that a
+                   learner has been assigned to via Job Assignments.
+
+    TL-14965   +   Added an Audience membership restriction for conditional activity access
+    TL-15044   +   Menu type custom fields now display a hyphen when the field is locked and empty
+    TL-15798   +   Report Builder filters can now have default values
+    TL-15832   +   Updated xpath when matching against html tables using Behat to allow non-exact matches
+    TL-15856   +   Improved styling of the modal JavaScript library
+    TL-15895   +   Added the 'Send to self' option to Email settings for Scheduled reports
+    TL-15896   +   Added a report builder administration setting to control what scheduled report email options are available
+    TL-15907       Improved how evidence custom field data is saved when importing completion history
+    TL-15920       Activities required for course completion are now shown in the progressbar popover
+
+                   When a user clicks on the progressbar for a specific course, the activities
+                   required to complete the course are now listed in a popover.
+
+    TL-15992       A warning message is now shown when a Quiz may require more random questions than there are questions available
+
+                   When creating or editing a quiz, warning messages are now shown when adding
+                   random questions from categories that don't contain enough questions. It is
+                   only a warning to highlight the risk and doesn't prevent the course
+                   administrator from creating the quiz.
+
+                   If a learner attempts to take a quiz with insufficient questions,
+                   the system behaves as before.
+
+    TL-15995   +   Improved the indexes on the Custom Fields *_info_data tables to ensure best performance and create consistency
+    TL-16138   +   The Featured links block now allows the tile shape to be configured (portrait, landscape and full width)
+    TL-16142   +   Added Progress bars to Course Tiles in the Featured links block
+    TL-16152   +   Improved the layout of the recent learning block by removing a layout table
+    TL-16154       Improved CSS of the last course accessed block, increasing the width of the progress bar
+    TL-16176   +   Converted maintenance countdown timer to use the correct notification template and AMD module
+    TL-16241       Fixed breadcrumb trail when viewing a user's completion report
+    TL-16256       Allowed appraisal messages to be set to "0 days" before or after event
+
+                   Some immediate appraisals messages were causing performance issues when
+                   sending to a lot of users.
+                   This improvement allows you to set almost immediate messages that will send
+                   on the next cron run after the action was triggered to avoid any
+                   performance hits. The appraisal closure messages have also been changed to
+                   work this way since they don't have any scheduling options.
+
+    TL-16372       Added support for utf8mb4 collations with full Unicode support
+    TL-16373       Added screen reader text to the block actions menu
+    TL-16380   +   Hide competencies in Learning plans when the competency Framework they are within is hidden
+
+                   When competencies are individually hidden in the hierarchy admin, they are
+                   automatically hidden in any learning plans. This change ensures that when
+                   competency frameworks are hidden, all competencies within the framework are
+                   also hidden within learning plans.
+
+    TL-16432       Course completion history records are now included in course backups and can be restored
+    TL-16452   +   Dashboard, course and report name fields have been increased up to 1333 characters
+    TL-16478   +   Removed unnecessary CSS in Totara plan
+    TL-16489   +   Standardised HTML in Alerts block
+    TL-16494       Improved embedded reports test coverage
+    TL-16497   +   Updated the Quicklinks block to use standard HTML elements
+    TL-16503   +   Improved the HTML markup consistency within the Tasks block
+    TL-16505   +   Updated the Report table block to use LESS instead of CSS
+    TL-16506   +   Updated the Report graph block to use LESS instead of CSS
+    TL-16508   +   Standardised HTML and CSS in the my learning navigation block
+    TL-16524   +   Fixed redirect after a user confirms new account creation via email-based self registration
+
+                   If a user clicks a link to a page within Totara but is not logged in they
+                   are redirected to the login page. If a user then creates a new account via
+                   email-based self registration they are redirected to the home page after
+                   confirming account. This patch ensures they are redirected back to the page
+                   they originally requested.
+
+    TL-16551   +   Converted the activity restriction icons into flex icons
+    TL-16624       Improved exported course progress values within two Report Builder sources
+
+                   The 'Record of Learning: Courses' and 'Course Completion' report sources
+                   have been updated to enable a user's progress towards course completion to
+                   be exported as a percentage.
+
+    TL-16632       Admin categories are no longer links by default
+
+                   If you want to change this you can do so by searching for
+                   linkadmincategories in the site administration block.
+
+Bug fixes:
+
+    TL-8062        Fixed Seminar notifications not being sent when the room has been changed
+    TL-9360        Managers approving Seminar booking requests are now redirected back to the approvals page
+
+                   Previously, when a manager approved staff requests for bookings into a
+                   Seminar event, they would then be redirected to a page saying 'You can not
+                   enrol yourself in this course' (assuming they were not enrolled or did not
+                   have other permissions to view the attendees page). Following any approvals
+                   (by a manager or any other user), the page will now refresh onto the
+                   approval required page, with a message confirming the update was
+                   successful.
+
+    TL-9462        Improved page layout when confirming a learning plan template workflow change
+    TL-9885        Fixed validation for sending an extension request for a program
+
+                   When a learner opened the page to request an extension, and in the
+                   meanwhile an admin deactivated the possibility to send a request, the
+                   learner could still send the request. The validation was fixed and made
+                   consistent to prevent these cases. The same goes for direct calls to the
+                   sending url.
+
+    TL-10897       Fixed incomplete validation message for recertification window period
+    TL-13934       Fixed 'user' join not in join list for content in the message report
+    TL-14776       Fixed quickform error when using a multiselect custom field
+    TL-15029       Fixed brief positioning issue when scrolling a 360° Feedback page
+    TL-15804       Feedback Reminder periods help text has been clarified to explain it counts weekdays and not weekends
+
+                   The Feedback Reminder period is calculated only using weekdays. All
+                   weekends will be skipped and added to the period. To make this existing
+                   behaviour clearer we modified the help text accordingly.
+
+    TL-15956       Set the RPL fields on the course completion report to read only when appropriate
+
+                   Previously, the RPL fields were allowing data to be entered/edited when
+                   users were already complete. The form will now set them to read only in
+                   this situation. There is also now a column with a link to the course
+                   completion editor, which should be used if changes are required.
+
+    TL-15962   +   Removed disabled embedded reports from embedded reports list.
+
+                   Some functional areas can be disabled, for example, Record of Learning. If
+                   they contain embedded reports, these reports will no longer be listed in
+                   the main embedded report list.
+
+    TL-16015       Goal Custom fields are disabled in appraisals where applicable
+
+                   If a user cannot answer the appraisal or does not have the necessary
+                   permissions to edit a goal's custom fields then they will not be able to
+                   edit the form fields for the custom field in the appraisal.
+
+    TL-16173       Program error messages are now rendered as standard notifications
+    TL-16218       Fixed a typo in the certification completion checker
+    TL-16220       Fixed multisco SCORM completion with learning objects grading method (based on MDL-44712)
+
+                   MDL-44712 introduced the "Require all scos to return 'completed'" setting.
+                   This had been originally introduced into v10 and 11. Now it has been
+                   backported to v9 and v2.9.
+
+                   However note the following:
+                   * A multisco SCORM might send back "cmi.core.lesson_status" (or equivalent)
+                     values for every SCO. However, if there is a status condition completion
+                     setting, then Totara (and Moodle) marks the whole SCORM activity as long as
+                     any SCO has a "cmi.core.lesson_status" value of "completed".
+                   * Things get especially confusing when a minimum score _condition_ is used
+                     with a _grading_ method of "Learning Objects" (ie multisco).
+                     * The minimum score condition uses the "cmi.score.raw" (or equivalent) to
+                       compute whether the activity is complete.
+                     * If the SCORM does not send back a "cmi.score.raw" attribute and the
+                       minimum score completion value is set, then the activity *never completes,
+                       even if the student goes through the entire SCORM*.
+                     * In other words, _the minimum score completion setting has got nothing to
+                       do with the "learning objects" grading method_. It is very
+                       counter-intuitive but all along, there has been no code in SCORM module to
+                       check the total no of "completed" learning objects against an expected
+                       count. It is to address this problem that the new "Require all scos to
+                       return "completed" status" setting is there.
+                   * The TL patch also fixes a problem with MDL-4471 patch in which multiple,
+                     simultaneous completion conditions were not evaluated properly. In this
+                     case, if a multisco SCORM returned both "cmi.core.lesson_status" and
+                     "cmi.score.raw" and the completion settings were for _both_ status and
+                     minimum score, the activity would be marked as complete if the student
+                     clicked through the entire SCORM but got less than the minimum score.
+
+    TL-16253       HTML pasted into Atto is now sanitised to remove markup known to cause display issues
+
+                   When copying HTML into an Atto editor instance, script, iframe and head
+                   HTML tags are now removed. These tags can be added manually when editing
+                   the text in source mode.
+
+    TL-16287       Fixed renaming of user profile fields breaking HR Import user source settings
+
+                   If the HR Import user source (CSV or Database) was configured to import a
+                   custom profile field and the field short name was changed then HR Import
+                   would no longer import data to it. In some situations it would then be
+                   impossible to re-add the field. This has now been fixed.
+
+    TL-16296       Fixed a bug leading to schedule changes for reports being forgotten
+    TL-16300       Fixed automated backup when using specified directory for automated backups setting
+    TL-16312       Fixed formatting of text area fields in the Database course activity when exporting
+
+                   When exporting text area field data from the Database activity the field
+                   content included HTML tags. It now converts the HTML to standard text.
+
+    TL-16318       Fixed calendar events for single Seminar sessions with multiple dates
+    TL-16320       The standard loading icon is now used when managing course groups
+    TL-16323       Fixed global search error when search is done a second time
+    TL-16376       Fixed LDAP sync for user profile custom menu field
+
+                   TL-14170 fixed a problem where custom user profile fields were not being
+                   synced with an LDAP backend. The fix worked for all user profile custom
+                   fields except for menu dropdowns which required an extra processing step
+                   during the LDAP syncing. This has now been fixed.
+
+    TL-16386       Fixed dashboard reset error with deleted users
+    TL-16395       Fixed role custom names not restored when course is recycled
+
+                   This change additionally means that custom names of roles which were not in
+                   use at the time a backup is created will be stored in the backup anyway,
+                   and will be restored only when restoring the course to a new course, as was
+                   the behaviour previously with in-use roles.
+
+    TL-16396       Fixed an SQL error occurring due to a missing default
+
+                   This may have affected sites that have upgraded through Totara 2.5, and
+                   which were using Seminar room functionality.
+                   A missing upgrade step may have led to an incorrect null default value
+                   existing in the facetoface_room table.
+                   The fix for this issue has added the missing upgrade step which correctly
+                   removes the null values and replaces them with the expected "0".
+
+    TL-16404       Prevented default content being duplicated when restoring a course from the recycle bin
+    TL-16405       Added RPL data to course backup and restore
+
+                   This in turn means that RPL data will be restored on courses retrieved from
+                   the recycle bin.
+
+    TL-16411       Fixed unused custom grade scales not included in course backups
+    TL-16417       Added missing include in the features link block external tests
+    TL-16420       Course tiles are hidden in Featured Links blocks when the referenced course is deleted
+    TL-16422       Fixed and removed forgotten deprecated location code in Seminar
+    TL-16428       Ensured all HR Import sources run regardless of any error detected in the previous source
+
+                   Previously, if an error occurred while importing an HR Import source, the
+                   following sources would not be processed. Now, the following sources will
+                   be processed, regardless of the result of earlier source imports.
+
+    TL-16429       Fixed Seminar session details missing from Trainer confirmation email
+    TL-16430       Fixed alphabetical order user list when selecting a manager
+    TL-16435       Fixed missing "Notification does not exist" string
+    TL-16436       Fixed missing sesskey in Seminar notifications
+    TL-16443       Fixed an SQL error in the Appraisal details report due to multi-select questions
+    TL-16449       Fixed Multi-language filter issue on custom fields when admin tries to view a Seminar sign-up note
+    TL-16458       Fixed Totara Connect SSO login process to update login dates and trigger login event
+    TL-16462       Fixed display of custom dashboard menu item in the Totara menu
+    TL-16472       Fixed Seminar direct enrolment not honouring restricted access
+    TL-16473       Fixed Seminar trainers not receiving booking time/date changed notifications
+    TL-16474       Removed all global filtering for user email values in Report Builder sources
+    TL-16475       Fixed false unit test failure when an external service exists
+    TL-16476       Fixed custom favicon in Basis theme
+    TL-16492       Allow less privileged reviewers and respondents to a 360° Feedback to access the files added to a response
+    TL-16504       Report builder block loading icon is now shown in the correct location
+    TL-16512       Fixed "Back to the list of all roles" link for Assign system roles page
+    TL-16515       Fixed upgrade problem in langimport due to moodle merge
+    TL-16521       Fixed certification messages that were not reset before upgrading to TL-10979
+
+                   When patch TL-10979 was included in Totara 2.9.13 and 9.1, it did not
+                   include an upgrade to reset messages which were not reset when the
+                   recertification window opened before the upgrade. This patch resets those
+                   messages, where possible, allowing the messages to be sent again. Users
+                   whose recertification windows have reopened since upgrading to the above
+                   mentioned versions will not be affected because they should already be in
+                   the correct state.
+
+    TL-16530       Fixed report builder cache generator
+
+                   Previously the Report Builder source cache was removing the old cache table
+                   before creating a new one, which was creating a problem whereby the user
+                   couldn't use the old cache table and the new one wasn't ready.
+                   The fix was to keep the old table until the new table was ready, at which
+                   point the old table is removed.
+
+    TL-16534       Fixed race condition when using the autocomplete text field
+    TL-16552       Fixed the Empty string behaviour setting when used with the suspended field in the user HR Import element
+    TL-16553       Fixed lock timeout value for memcached 3.x being too long
+    TL-16554       Added language menu when creating new user via form
+
+                   When a user is created a language menu is now displayed in the form to
+                   allow the creator to set the user's language.
+                   This ensures that any notifications the user is sent during or immediately
+                   after the creation of their account are sent in their language.
+
+    TL-16584       Site administration and Navigation blocks can be set to show on all pages after removal
+    TL-16585       Progress bar percentages are displayed correctly in the current learning block when changing pages
+    TL-16597       Exporting the old style progress bar no longer includes the HTML for it
+    TL-16603       Ported MDL-55469 to allow learners to completely finish a final SCORM attempt
+
+                   Important consideration: This fix relies on correct data submitted by the
+                   SCORM package. If the SCORM reported that "cmi.core.lesson_status" is
+                   either "completed", "failed", or "passed", then the attempt will be counted
+                   as final even if user exited the activity without submitting/finalising the
+                   attempt.
+
+    TL-16604       Improved the UI of the 'Empty string behaviour in CSV' HR Import Job Assignment element so that it's disabled if the source is not CSV
+    TL-16605       Fixed report title alignment for right-to-left languages when exporting to PDF in Report Builder
+    TL-16606       Fixed legend font for exporting graphical reports to PDF
+    TL-16610       Fixed exporting of progress in Record of Learning: Certification
+    TL-16614       Fixed event roles from a cancelled event preventing users being assigned to a new event with the same date and time
+    TL-16623       Fixed exported ID in the Course Completion report
+    TL-16629       Fixed the incorrect resolution of promises when loading forms via AJAX fails
+
+Database upgrades:
+
+    TL-16437       Changed column type from text to char in block_totara_featured_links_tiles table
+
+API changes:
+
+    TL-16217   +   Removed deprecated custom menu functionality
+
+                   Please use Site administration > Appearance > Main menu instead
+
+    TL-16383   +   Converted Dynamic audience CSS to LESS
+    TL-16509   +   Dashboard block now uses LESS instead of CSS and standard HTML
+
+Miscellaneous Moodle fixes:
+
+    TL-16076       MDL-59504: Updated the Mahara logo
+
+Contributions:
+
+    * Barry Oosthuizen at Learning Pool - TL-9277
+    * Eugene Venter at Catalyst NZ - TL-16524, TL-16597, TL-16610, TL-16623
+    * Francis Devine at Catalyst NZ - TL-16417
+    * Grace Cooper at Kineo UK - TL-16396
+    * Jo Jones at Kineo UK - TL-16474, TL-16530
+    * Kenneth Hendricks at Catalyst AU - TL-16475
+    * Richard Eastbury at Think Associates - TL-16376, TL-16436
+
+
 Release Evergreen (22nd November 2017):
 =======================================
 
