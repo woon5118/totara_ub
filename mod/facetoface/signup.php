@@ -29,6 +29,7 @@ $backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 $PAGE->set_context($context);
+$PAGE->set_url('/mod/facetoface/signup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions));
 
 /** @var enrol_totara_facetoface_plugin $enrol */
 $enrol = enrol_get_plugin('totara_facetoface');
@@ -64,7 +65,6 @@ if($CFG->enableavailability) {
 $pagetitle = format_string($facetoface->name);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/facetoface/signup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions));
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
