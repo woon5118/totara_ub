@@ -17,12 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ben Lobo <ben.lobo@kineo.com>
- * @package totara_program
+ * @author David Curry <david.curry@totaralearning.com>
+ * @package totara
+ * @subpackage program
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2018022600;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_program'; // To check on upgrade, that module sits in correct place
+$tagareas = array(
+    array(
+        'itemtype' => 'prog',
+        'component' => 'totara_program',
+        'callback' => 'prog_get_tagged_programs',
+        'callbackfile' => '/totara/program/lib.php',
+    ),
+);

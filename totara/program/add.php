@@ -260,6 +260,10 @@ if ($data = $form->get_data()) {
         // Needs to be called at the very end!
         prog_fix_program_sortorder($data->category);
 
+        if (isset($data->tags)) {
+            core_tag_tag::set_item_tags('totara_program', 'prog', $newid, $programcontext, $data->tags);
+        }
+
         $event = \totara_program\event\program_created::create(
             array(
                 'objectid' => $newid,

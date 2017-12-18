@@ -3765,3 +3765,51 @@ function prog_create_completion($programid, $userid, $data = array(), $message =
 
     return prog_write_completion($progcompletion, $message);
 }
+
+/**
+ * Returns programs tagged with a specified tag.
+ *
+ * @param core_tag_tag $tag
+ * @param bool $exclusivemode if set to true it means that no other entities tagged with this tag
+ *             are displayed on the page and the per-page limit may be bigger
+ * @param int $fromctx context id where the link was displayed, may be used by callbacks
+ *            to display items in the same context first
+ * @param int $ctx context id where to search for records
+ * @param bool $rec search in subcontexts as well
+ * @param int $page 0-based number of page being displayed
+ * @return \core_tag\output\tagindex
+ */
+function prog_get_tagged_programs($tag, $exclusivemode = false, $fromctx = 0, $ctx = 0, $rec = 1, $page = 0) {
+
+    $count = $tag->count_tagged_items('totara_program', 'prog', '', array());
+    $perpage = $exclusivemode ? 24 : 5;
+    $content = '';
+    $displaycount = 0;
+
+    if ($count) {
+        $items = array();
+        $proglist = $tag->get_tagged_items('totara_program', 'prog', $page * $perpage, $perpage, '', array());
+        foreach ($proglist as $prog) {
+            $program = new program($prog->id);
+
+            if (empty($ctx) || $ctx == context_system::instance()->id) {
+                $ctxmatch = true;
+            } else {
+                $context = $program->get_context();
+                $regex = '/^(\/\d+)*(\/'.$ctx.')(\/\d+)*$/';
+                $ctxmatch = ($context->id == $ctx || preg_match($regex, $context->path));
+            }
+
+            if ($program->is_viewable() && $ctxmatch) {
+                $displaycount++;
+                $url = new moodle_url('/totara/program/view.php', array('id' => $prog->id));
+                $items[] = html_writer::link($url, $prog->fullname);
+            }
+        }
+        $content .= html_writer::alist($items);
+    }
+    $totalpages = ceil($displaycount / $perpage);
+
+    return new core_tag\output\tagindex($tag, 'totara_program', 'prog', $content,
+            $exclusivemode, $fromctx, $ctx, $rec, $page, $totalpages);
+}

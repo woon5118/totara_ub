@@ -971,6 +971,7 @@ $string['successfullyresolvedexceptions'] = 'Successfully resolved exceptions';
 $string['summary'] = 'Summary';
 $string['summary_help'] = 'Summary description of the program';
 $string['switchrecurringcourses'] = 'Switch recurring courses in programs';
+$string['tagarea_prog'] = 'Programs & Certifications';
 $string['then'] = 'then';
 $string['therearenoprogramstodisplay'] = 'There are no programs to display.';
 $string['thisactioncannotbeundone'] = 'This action cannot be undone';

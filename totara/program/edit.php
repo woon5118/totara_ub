@@ -162,6 +162,9 @@ $overviewfilesoptions = prog_program_overviewfiles_options($program);
 if ($overviewfilesoptions) {
     file_prepare_standard_filemanager($program, 'overviewfiles', $overviewfilesoptions, $programcontext, 'totara_program', 'overviewfiles', 0);
 }
+
+$program->tags = core_tag_tag::get_item_tags_array('totara_program', 'prog', $program->id);
+
 $detailsform = new program_edit_form($currenturl,
                 array('program' => $program, 'overviewfiles' => $overviewfiles, 'action' => $action, 'category' => $progcategory,
                         'summaryeditoroptions' => $summaryeditoroptions, 'endnoteeditoroptions' => $endnoteeditoroptions, 'nojs' => $nojs, 'iscertif' =>  $iscertif),
@@ -241,6 +244,10 @@ if ($data = $detailsform->get_data()) {
                     totara_cohort_add_association($cohortid, $program->id, $instancetype, COHORT_ASSN_VALUE_VISIBLE);
                 }
             }
+        }
+
+        if (isset($data->tags)) {
+            core_tag_tag::set_item_tags('totara_program', 'prog', $program->id, $programcontext, $data->tags);
         }
 
         $other = array('certifid' => empty($program->certifid) ? 0 : $program->certifid);

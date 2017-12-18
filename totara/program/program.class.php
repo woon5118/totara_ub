@@ -329,6 +329,9 @@ class program {
             certif_delete(CERTIFTYPE_PROGRAM, $this->certifid);
         }
 
+        // delete all tag instances.
+        core_tag_tag::remove_all_item_tags('totara_program', 'prog', $this->id);
+
         // delete the program itself
         $DB->delete_records('prog', array('id' => $this->id));
 

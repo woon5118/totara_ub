@@ -280,6 +280,15 @@ class program_edit_form extends moodleform {
         $programicon = ($program && !empty($program->icon)) ? $program->icon : 'default';
         totara_add_icon_picker($mform, $action, 'program', $programicon, $nojs, false);
 
+        if (core_tag_tag::is_enabled('totara_program', 'prog')) {
+            if ($action == 'view') {
+                $mform->addElement('html', $OUTPUT->tag_list(core_tag_tag::get_item_tags('totara_program', 'prog', $program->id), null, 'programtags'));
+            } else {
+                $mform->addElement('header', 'tagshdr', get_string('tags', 'tag'));
+                $mform->addElement('tags', 'tags', get_string('tags'), array('itemtype' => 'prog', 'component' => 'totara_program'));
+            }
+        }
+
         // If program extension request is ON, show setting to allow request extension in this program.
         if (!empty($CFG->enableprogramextensionrequests)) {
             $label = get_string('allowextensionrequests', 'totara_program');
