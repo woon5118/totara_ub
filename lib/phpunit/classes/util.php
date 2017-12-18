@@ -518,11 +518,6 @@ class phpunit_util extends testing_util {
         // Disable all logging for performance and sanity reasons.
         set_config('enabled_stores', '', 'tool_log');
 
-        // Disable Totara registrations.
-        set_config('registrationenabled', 0);
-        set_config('sitetype', 'development');
-        set_config('registrationcode', '');
-
         // Undo Totara changed defaults to allow upstream testing without hacks.
         // NOTE: completion is automatically enabled since Moodle 3.1
         set_config('forcelogin', 0);

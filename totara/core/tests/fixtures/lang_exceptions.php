@@ -33,7 +33,6 @@ $exceptions = array(
         'eventshandlersinuse', // Link to docs
         'profilevisible_help', // Capabilities for profile editing
         'unsupporteddbfileformat', // Link to docs
-        'moodlerelease', // Reference to real Moodle version in registration data
     ),
     'core_cohort' => array('visible_help'), // Caps.
     'core_completion' => array('err_noroles', 'manualcompletionbynote', 'err_noroles'), // Caps.

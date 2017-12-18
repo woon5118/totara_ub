@@ -148,11 +148,6 @@ class behat_util extends testing_util {
         // Set noreplyaddress to an example domain, as it should be valid email address and test site can be a localhost.
         set_config('noreplyaddress', 'noreply@example.com');
 
-        // Disable Totara registrations.
-        set_config('registrationenabled', 0);
-        set_config('sitetype', 'development');
-        set_config('registrationcode', '');
-
         // Totara: purge log tables to speed up DB resets.
         $DB->delete_records('config_log');
         $DB->delete_records('log_display');

@@ -42,5 +42,4 @@ tempmanagerselectionallusers,totara_core
 tempmanagerselectiononlymanagers,totara_core
 tempmanagersupporttext,totara_core
 timecompleted,totara_core
-totararegistrationinfo,totara_core
 updatetemporarymanagerstask,totara_core
