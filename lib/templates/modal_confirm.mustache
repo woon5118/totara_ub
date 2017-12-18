@@ -39,7 +39,17 @@
     {{$title}}{{#str}} confirm {{/str}}{{/title}}
     {{$body}}{{#str}} areyousure {{/str}}{{/body}}
     {{$footer}}
-        <button type="button" class="btn btn-primary" data-action="yes">{{#str}} yes {{/str}}</button>
-        <button type="button" class="btn btn-secondary" data-action="no">{{#str}} no {{/str}}</button>
+        {{#yesstr}}
+            <button type="button" class="btn btn-primary" data-action="yes">{{.}}</button>
+        {{/yesstr}}
+        {{^yesstr}}
+            <button type="button" class="btn btn-primary" data-action="yes">{{#str}} yes {{/str}}</button>
+        {{/yesstr}}
+        {{#nostr}}
+            <button type="button" class="btn btn-secondary" data-action="no">{{.}}</button>
+        {{/nostr}}
+        {{^nostr}}
+            <button type="button" class="btn btn-secondary" data-action="no">{{#str}} no {{/str}}</button>
+        {{/nostr}}
     {{/footer}}
 {{/ core/modal }}
