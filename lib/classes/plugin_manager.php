@@ -127,7 +127,8 @@ class core_plugin_manager {
         $cache = cache::make('core', 'plugin_manager');
         $cache->purge();
 
-        // Totara report builder.
+        // Totara: We need to purge report builder caches for plugins that are disabled so they can be ignored.
+        // This is required for the 'Manage embedded reports' report, see TL-15962
         totara_rb_purge_ignored_reports();
     }
 
