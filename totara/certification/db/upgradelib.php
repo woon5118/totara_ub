@@ -62,10 +62,10 @@ function totara_certification_upgrade_reset_messages() {
     $sql = "SELECT DISTINCT pml.id
               FROM {prog_messagelog} pml
               JOIN {prog_message} pm
-                ON pm.id = {prog_messagelog}.messageid AND pm.messagetype {$messagetypesql}
+                ON pm.id = pml.messageid AND pm.messagetype {$messagetypesql}
               JOIN {prog} p ON pm.programid = p.id
-              JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = {prog_messagelog}.userid
-             WHERE {prog_messagelog}.timeissued < cc.timewindowopens
+              JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = pml.userid
+             WHERE pml.timeissued < cc.timewindowopens
                AND cc.renewalstatus = :due";
     $params['due'] = CERTIFRENEWALSTATUS_DUE;
 
@@ -88,11 +88,11 @@ function totara_certification_upgrade_reset_messages() {
     $sql = "SELECT DISTINCT pml.id
               FROM {prog_messagelog} pml
               JOIN {prog_message} pm
-                ON pm.id = {prog_messagelog}.messageid AND pm.messagetype {$messagetypesql}
+                ON pm.id = pml.messageid AND pm.messagetype {$messagetypesql}
               JOIN {prog} p ON pm.programid = p.id
-              JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = {prog_messagelog}.userid
-              JOIN {prog_completion} pc ON pc.programid = p.id AND pc.userid = {prog_messagelog}.userid AND pc.coursesetid = 0
-             WHERE {prog_messagelog}.timeissued < pc.timedue
+              JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = pml.userid
+              JOIN {prog_completion} pc ON pc.programid = p.id AND pc.userid = pml.userid AND pc.coursesetid = 0
+             WHERE pml.timeissued < pc.timedue
                AND cc.renewalstatus = :expired";
     $params['expired'] = CERTIFRENEWALSTATUS_EXPIRED;
 
@@ -113,10 +113,10 @@ function totara_certification_upgrade_reset_messages() {
     $sql = "SELECT DISTINCT pml.id
               FROM {prog_messagelog} pml
               JOIN {prog_message} pm
-                ON pm.id = {prog_messagelog}.messageid AND pm.messagetype {$messagetypesql}
+                ON pm.id = pml.messageid AND pm.messagetype {$messagetypesql}
               JOIN {prog} p ON pm.programid = p.id
-              JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = {prog_messagelog}.userid
-             WHERE {prog_messagelog}.timeissued < cc.timecompleted
+              JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = pml.userid
+             WHERE pml.timeissued < cc.timecompleted
                AND cc.renewalstatus = :notdue";
     $params['notdue'] = CERTIFRENEWALSTATUS_NOTDUE;
 
