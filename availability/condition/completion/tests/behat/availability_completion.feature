@@ -41,7 +41,7 @@ Feature: availability_completion
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Activity completion" "button" in the "Add restriction..." "dialogue"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the field "Activity or resource" to "Page 1"
     And I press "Save and return to course"
 

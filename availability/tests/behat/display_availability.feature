@@ -69,7 +69,7 @@ Feature: display_availability
     And I set the field "direction" to "until"
     And I set the field "x[year]" to "2013"
     And I set the field "x[month]" to "March"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I press "Add restriction..."
     And I click on "User profile" "button" in the "Add restriction..." "dialogue"
     And I set the field "User profile field" to "Email address"
@@ -143,7 +143,7 @@ Feature: display_availability
     And I click on "Date" "button" in the "Add restriction..." "dialogue"
     And I set the field "direction" to "until"
     And I set the field "x[year]" to "2013"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I press "Save changes"
 
     # This is necessary because otherwise it fails in Chrome, see MDL-44959

@@ -74,18 +74,18 @@ Feature: edit_availability
     And I should not see "None" in the "Restrict access" "fieldset"
     And "Restriction type" "select" should be visible
     And I should see "Date" in the "Restrict access" "fieldset"
-    And ".availability-item .availability-eye img" "css_element" should be visible
-    And ".availability-item .availability-delete img" "css_element" should be visible
-    And the "alt" attribute of ".availability-item .availability-eye img" "css_element" should contain "Displayed greyed-out"
+    And ".availability-item .availability-eye" "css_element" should be visible
+    And ".availability-item .availability-delete" "css_element" should be visible
+    And I should see "Displayed greyed-out" in the ".availability-item .availability-eye" "css_element"
 
     # Toggle the eye icon.
-    When I click on ".availability-item .availability-eye img" "css_element"
-    Then the "alt" attribute of ".availability-item .availability-eye img" "css_element" should contain "Hidden entirely"
-    When I click on ".availability-item .availability-eye img" "css_element"
-    Then the "alt" attribute of ".availability-item .availability-eye img" "css_element" should contain "Displayed greyed-out"
+    When I click on ".availability-item .availability-eye" "css_element"
+    And I should see "Hidden entirely" in the ".availability-item .availability-eye" "css_element"
+    When I click on ".availability-item .availability-eye" "css_element"
+    And I should see "Displayed greyed-out" in the ".availability-item .availability-eye" "css_element"
 
     # Click the delete button.
-    When I click on ".availability-item .availability-delete img" "css_element"
+    When I click on ".availability-item .availability-delete" "css_element"
     Then I should not see "Date" in the "Restrict access" "fieldset"
 
     # Add a nested restriction set and check it appears.
@@ -104,12 +104,12 @@ Feature: edit_availability
     And I should see "Date" in the ".availability-children .availability-list" "css_element"
 
     # OK, let's delete the date inside the nested set...
-    When I click on ".availability-item .availability-delete img" "css_element" in the ".availability-item" "css_element"
+    When I click on ".availability-item .availability-delete" "css_element" in the ".availability-item" "css_element"
     Then I should not see "Date" in the ".availability-children .availability-list" "css_element"
     And I should see "None" in the ".availability-children .availability-list" "css_element"
 
     # ...and the nested set itself.
-    When I click on ".availability-none .availability-delete img" "css_element"
+    When I click on ".availability-none .availability-delete" "css_element"
     Then ".availability-children .availability-list" "css_element" should not exist
 
     # Add two dates so we can check the connectors.
@@ -126,7 +126,7 @@ Feature: edit_availability
     And I should see "or" in the "Restrict access" "fieldset"
 
     # Now delete one of the dates and check the connector goes away.
-    When I click on ".availability-item .availability-delete img" "css_element"
+    When I click on ".availability-item .availability-delete" "css_element"
     Then I should not see "or" in the "Restrict access" "fieldset"
 
     # Add a nested restriction set with two dates so there will be inner connector.

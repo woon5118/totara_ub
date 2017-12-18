@@ -49,7 +49,7 @@ Feature: availability_group
     # Page P1 any group.
     Given I click on "Group" "button"
     And I set the field "Group" to "(Any group)"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the following fields to these values:
       | Name         | P1 |
       | Description  | x  |
@@ -66,7 +66,7 @@ Feature: availability_group
     And I click on "Add restriction..." "button"
     And I click on "Group" "button"
     And I set the field "Group" to "G1"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I click on "Save and return to course" "button"
 
     # Page P3 with group G2
@@ -79,7 +79,7 @@ Feature: availability_group
     And I click on "Add restriction..." "button"
     And I click on "Group" "button"
     And I set the field "Group" to "G2"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I click on "Save and return to course" "button"
 
     # Log back in as student.

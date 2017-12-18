@@ -45,7 +45,7 @@ Feature: Adding organisation assignment activity access restriction
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Assigned to Organisation" "button" in the "Add restriction..." "dialogue"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the field "Assigned to Organisation" to "Organisation 1"
     And I press key "13" in the field "Assigned to Organisation"
     Then I should see "Organisation 1"
@@ -61,7 +61,7 @@ Feature: Adding organisation assignment activity access restriction
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Assigned to Organisation" "button" in the "Add restriction..." "dialogue"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the field "Assigned to Organisation" to "Organisation 2"
     And I press key "13" in the field "Assigned to Organisation"
     Then I should see "Organisation 2"

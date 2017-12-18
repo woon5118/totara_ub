@@ -59,7 +59,7 @@ Feature: Restrict activity availability through date conditions
       | x[year] | 2013 |
       | Direction | until |
     # Click eye icon to hide it when not available.
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I press "Save and return to course"
     And I log out
     When I log in as "student1"

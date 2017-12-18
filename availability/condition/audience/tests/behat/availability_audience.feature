@@ -42,7 +42,7 @@ Feature: Adding audience membership activity access restriction
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Audience" "button" in the "Add restriction..." "dialogue"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the field "Member of Audience" to "Audience1"
     And I press key "13" in the field "Member of Audience"
     And I press "Save and return to course"
@@ -56,7 +56,7 @@ Feature: Adding audience membership activity access restriction
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Audience" "button" in the "Add restriction..." "dialogue"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the field "Member of Audience" to "Audience2"
     And I press key "13" in the field "Member of Audience"
     And I press "Save and return to course"

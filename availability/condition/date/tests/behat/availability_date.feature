@@ -34,7 +34,7 @@ Feature: availability_date
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Date" "button" in the "Add restriction..." "dialogue"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the field "year" to "2013"
     And I press "Save and return to course"
 
@@ -47,7 +47,7 @@ Feature: availability_date
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Date" "button" in the "Add restriction..." "dialogue"
-    And I click on ".availability-item .availability-eye img" "css_element"
+    And I click on ".availability-item .availability-eye" "css_element"
     And I set the field "Direction" to "until"
     And I set the field "year" to "2013"
     And I press "Save and return to course"
