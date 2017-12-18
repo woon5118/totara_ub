@@ -275,11 +275,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
             }
 
             if (isset($dbrow['suspended'])) {
-                if ($dbrow['suspended'] === '') {
-                    $dbrow['suspended'] = 0;
-                } else{
-                    $dbrow['suspended'] = empty($dbrow['suspended']) ? 0 : 1;
-                }
+                $dbrow['suspended'] = empty($dbrow['suspended']) ? 0 : 1;
             }
 
             // Custom fields are special - needs to be json-encoded
