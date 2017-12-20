@@ -81,7 +81,7 @@ Feature: Check the 'Record of Learning: Courses' report displays content correct
     And I switch to "Columns" tab
     And I delete the "Plan name (linked to plan page)" column from the report
     And I delete the "Course due date" column from the report
-    And I delete the "Completion status (and approval status)" column from the report
+    And I delete the "Progress (and approval status)" column from the report
     Then I log out
 
     # Login as the user and check the course report shows just one row.
