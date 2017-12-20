@@ -136,7 +136,12 @@ echo $OUTPUT->heading($heading);
 $items = $recyclebin->get_items();
 
 // TOTARA TL-16427.
-echo $OUTPUT->notification(get_string('crondelaymodule', 'tool_recyclebin'), 'notifymessage');
+if ($context->contextlevel == CONTEXT_COURSE) {
+    $deletingmodules = $DB->count_records('course_modules', array('course' => $context->instanceid, 'deletioninprogress' => 1));
+    if ($deletingmodules > 0) {
+        echo $OUTPUT->notification(get_string('crondelaymodule', 'tool_recyclebin'), 'notifymessage');
+    }
+}
 
 // Nothing to show? Bail out early.
 if (empty($items)) {
