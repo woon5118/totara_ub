@@ -157,14 +157,21 @@ echo html_writer::tag('title', 'LoadSCO');
             var e = document.getElementById("countdown");
             var cSeconds = parseInt(e.innerHTML);
             var timer = setInterval(function() {
-                                            if( cSeconds && myGetAPIHandle() == null ) {
-                                                e.innerHTML = --cSeconds;
-                                            } else {
-                                                clearInterval(timer);
-                                                document.body.innerHTML = "<p><?php echo get_string('activitypleasewait', 'scorm');?></p>";
-                                                location = "<?php echo $scolaunchurl ?>";
-                                            }
-                                        }, 1000);
+                if( cSeconds && myGetAPIHandle() == null ) {
+                    e.innerHTML = --cSeconds;
+                } else {
+                    clearInterval(timer);
+                    document.body.innerHTML = "<p><?php echo get_string('activitypleasewait', 'scorm');?></p>";
+                    <?php
+                    // Totara: open in popup (simple) option.
+                    if ($scorm->popup == 2) {
+                        echo 'openContentWindow();';
+                    } else {
+                        echo 'location = "'. $scolaunchurl .'";';
+                    }
+                    ?>
+                }
+            }, 1000);
         }
     }
     <?php // Totara: BOF open in popup (simple) option. ?>
