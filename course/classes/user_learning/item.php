@@ -176,6 +176,7 @@ class item extends item_base implements item_has_progress {
             $this->progress_canbecompleted = false;
             $this->progress_hascompletioncriteria = false;
             $this->progress_summary = new \lang_string('statusnottracked', 'completion');
+            $this->progress_complete = false;
 
             if (!\completion_info::is_enabled_for_site()) {
                 // Completion is disabled at the site level.
@@ -192,6 +193,16 @@ class item extends item_base implements item_has_progress {
 
             // The user may be enrolled via the program only or was marked completed via rpl.
             // In this case it may not be tracked for completion, but we still want to show progress
+
+            if (!$info->is_tracked_user($this->user->id)) {
+                // The user is not being tracked for completion, but may have been marked completed via rpl
+
+                $completion = new \completion_completion(['userid' => $this->user->id, 'course' => $this->id]);
+                $status = \completion_completion::get_status($completion);
+                if ($status != 'complete' && $status != 'completeviarpl') {
+                    return;
+                }
+            }
 
             $this->progress_canbecompleted = true;
             // But they may not already be complete.
