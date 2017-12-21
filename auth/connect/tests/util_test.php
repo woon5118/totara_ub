@@ -650,12 +650,14 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($serveruser1['firstname'], $user1->firstname);
         $this->assertSame($serveruser1['lastname'], $user1->lastname);
         $this->assertSame($serveruser1['email'], $user1->email);
+        $this->assertSame('en', $user1->lang);
 
         // Update existing user.
         $serveruser1['username']  = 'xxx';
         $serveruser1['firstname'] = 'XX';
         $serveruser1['lastname']  = 'ZZ';
         $serveruser1['email']     = 'xx@example.com';
+        $serveruser1['lang']      = 'cs';
         $user1b = util::update_local_user($server, $serveruser1);
         $this->assertEquals(3, $DB->count_records('user', array()));
         $this->assertTrue($DB->record_exists('auth_connect_users', array('serverid' => $server->id, 'serveruserid' => $serveruser1['id'])));
@@ -668,6 +670,7 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($serveruser1['firstname'], $user1b->firstname);
         $this->assertSame($serveruser1['lastname'], $user1b->lastname);
         $this->assertSame($serveruser1['email'], $user1b->email);
+        $this->assertSame($user1->lang, $user1b->lang);
     }
 
     public function test_update_local_user_with_password() {

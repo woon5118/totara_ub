@@ -668,6 +668,13 @@ class util {
         $olduser = false;
 
         if ($userinfo) {
+            // Unset all ancient user preferences that are stored directly in user table
+            // because user preferences are not supposed to be synced after initial user creation.
+            unset($user->trackforums);
+            unset($user->maildigest);
+            unset($user->autosubscribe);
+            unset($user->lang);
+
             $olduser = $DB->get_record('user', array('id' => $userinfo->userid), '*', MUST_EXIST);
 
             if ($olduser->deleted != 0) {
