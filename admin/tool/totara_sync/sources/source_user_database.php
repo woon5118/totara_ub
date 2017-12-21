@@ -26,6 +26,7 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.user.
 require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
+require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/user.php');
 
 class totara_sync_source_user_database extends totara_sync_source_user {
 
@@ -137,6 +138,12 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         // Get list of fields to be imported
         $fields = array();
         foreach ($this->fields as $f) {
+            // Prevent allow_delete == SUSPEND_USERS and suspended column being set
+            // at the same time.
+            if ($f == 'suspended' && $this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
+                unset($this->config->import_suspended);
+            }
+
             if (!empty($this->config->{'import_'.$f})) {
                 $fields[] = $f;
             }
@@ -342,7 +349,15 @@ class totara_sync_source_user_database extends totara_sync_source_user {
      * @return string Notifications HTML.
      */
     public function get_notifications() {
-        return $this->get_common_db_notifications();
-    }
+        global $OUTPUT;
 
+        $notifications = $this->get_common_db_notifications();
+        // Show a notification about delete suspending/unsuspending users
+        if ($this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
+            $suspenddelete = get_string('suspendcolumndisabled', 'tool_totara_sync');
+            $notifications .= $OUTPUT->notification($suspenddelete, \core\output\notification::NOTIFY_WARNING);
+        }
+
+        return $notifications;
+    }
 }

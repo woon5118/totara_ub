@@ -164,6 +164,7 @@ $string['managerjobassignmentidnumber'] = 'Manager\'s job assignment';
 $string['appraiseridnumber'] = 'Appraiser';
 $string['auth'] = 'Auth';
 $string['password'] = 'Password';
+$string['suspendcolumndisabled'] = 'The suspended column is disabled and will not be imported while the Delete setting is "Suspend internal user".';
 $string['suspended'] = 'Suspended';
 $string['emailstop'] = 'Turn email off';
 $string['customfields'] = 'Custom fields';
