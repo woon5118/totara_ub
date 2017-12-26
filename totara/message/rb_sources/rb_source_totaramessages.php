@@ -417,20 +417,6 @@ class rb_source_totaramessages extends rb_base_source {
         return $out;
     }
 
-    /**
-     * Generate task message links.
-     *
-     * @deprecated Since Totara 9.0
-     */
-    function rb_display_task_links($id, $row) {
-         debugging("The display function rb_display_taks_links() has been deprecated because it is no longer used in the codebase.", DEBUG_DEVELOPER);
-
-        $out = totara_message_accept_reject_action($id);
-        $out .= totara_message_dismiss_action($id);
-
-        return $out;
-    }
-
     // generate message checkbox
     function rb_display_message_checkbox($id, $row) {
         return html_writer::checkbox('totara_message_' . $id, $id, false, '', array('id' => 'totara_message', 'class' => "selectbox"));

@@ -4180,23 +4180,6 @@ function facetoface_get_customfielddata($sessionid) {
     return $out;
 }
 
-/**
- * Get custom fields and their data, this is a short version of customfield_get_data, which does not return default values
- * if there no record for customfield
- *
- * @param stdClass $item The Item associated with the customfield
- * @param string $tableprefix the table prefix of the customfield
- * @param string $prefix The prefix of the custom field
- * @param array $options customfield_file::display_item_data requires some additional extradata.
- * @return array Array with the customfield and its associated value
- *
- * @deprecated since Totara 10.0
- */
-function facetoface_get_customfield_data($item, $tableprefix, $prefix, $options = array()) {
-    debugging('facetoface_get_customfield_data() is deprecated. Use customfield_get_data() instead.', DEBUG_DEVELOPER);
-    return customfield_get_data($item, $tableprefix, $prefix, true, $options);
-}
-
 function facetoface_update_trainers($facetoface, $session, $form) {
     global $DB;
 
@@ -5173,21 +5156,6 @@ function facetoface_eventhandler_role_unassigned($ra) {
 
     return true;
 }
-
-
-/**
- * Kohl's KW - WP06A - Google calendar integration
- *
- * If the unassigned user belongs to a course with an upcoming
- * face-to-face session and they are signed-up to attend, cancel
- * the sign-up (and trigger notification).
- *
- * @deprecated since 10.0
- */
-function facetoface_eventhandler_role_unassigned_bulk($event) {
-    throw new coding_exception('facetoface_eventhandler_role_unassigned_bulk has been deprecated since 10.');
-}
-
 
 /**
  * Adds module specific settings to the settings block

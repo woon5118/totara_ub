@@ -698,20 +698,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $filteroptions;
     }
 
-    /**
-     * @deprecated since 9.0
-     * @return mixed
-     */
-    public function rb_filter_position_types_list() {
-        global $CFG, $POSITION_TYPES;
-        include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
-
-        debugging('rb_source_facetoface_sessions::rb_filter_position_types_list has been deprecated since 9.0. You will need to rewrite your code to use job assignments instead.',
-            DEBUG_DEVELOPER);
-
-        return $POSITION_TYPES;
-    }
-
     public function rb_filter_cancel_status() {
         $selectchoices = array(
             '1' => get_string('cancelled', 'rb_source_facetoface_sessions')
@@ -1066,43 +1052,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             );
         }
         return $result;
-    }
-
-    /**
-     * @deprecated since 9.0
-     * @param $position
-     * @param $row
-     * @return string
-     */
-    public function rb_display_position_type($position, $row) {
-        global $POSITION_TYPES;
-
-        debugging('rb_source_facetoface_sessions::rb_display_position_type has been deprecated since 9.0. You will need to rewrite your code to use job assignments instead.',
-            DEBUG_DEVELOPER);
-
-        // If position type does not exists just return the value.
-        if (!isset($POSITION_TYPES[$position])) {
-            return $position;
-        }
-        // Otherwise return the string.
-        return get_string('type' . $POSITION_TYPES[$position], 'totara_hierarchy');
-    }
-
-    /**
-     * Convert a f2f activity name into a link to that activity.
-     * @deprecated Since Totara 9.2
-     *
-     * @param $name Seminar name
-     * @param $row Extra data from the report row.
-     * @return string The content to display.
-     */
-    function rb_display_link_f2f($name, $row) {
-        global $OUTPUT;
-
-        debugging('The rb_display_link_f2f function has been deprecated. Please use \'seminar_name_link\' for the display function instead.', DEBUG_DEVELOPER);
-
-        $activityid = $row->activity_id;
-        return $OUTPUT->action_link(new moodle_url('/mod/facetoface/view.php', array('f' => $activityid)), $name);
     }
 
     // Override user display function to show 'Reserved' for reserved spaces.

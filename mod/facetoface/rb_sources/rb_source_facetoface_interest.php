@@ -253,21 +253,4 @@ class rb_source_facetoface_interest extends rb_base_source {
 
         return $defaultcolumns;
     }
-
-    /**
-     * Convert a f2f activity name into a link to that activity.
-     * @deprecated since Totara 9.2
-     *
-     * @param $name Seminar name
-     * @param $row Extra data from the report row.
-     * @return string The content to display.
-     */
-    public function rb_display_link_f2f($name, $row) {
-        global $OUTPUT;
-
-        debugging('The rb_display_link_f2f function has been deprecated. Please use \'seminar_name_link\' for the display function instead.', DEBUG_DEVELOPER);
-
-        $activityid = $row->activity_id;
-        return $OUTPUT->action_link(new moodle_url('/mod/facetoface/view.php', array('f' => $activityid)), $name);
-    }
 }

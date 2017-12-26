@@ -509,34 +509,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         return $defaultcolumns;
     }
 
-    /**
-     * Convert a f2f date into a link to that session with timezone.
-     * @deprecated since Totara 10. Please user event_date_time instead
-     *
-     * @param string $date Date of session
-     * @param object $row Report row
-     * @param bool $isexport
-     * @return string Display html
-     */
-    function rb_display_link_f2f_session_in_timezone($date, $row, $isexport = false) {
-        global $OUTPUT;
-        debugging('Function rb_display_link_f2f_session_in_timezone is deprecated. Use event_date_link instead ', DEBUG_DEVELOPER);
-        $sessionid = $row->session_id;
-        if ($date && is_numeric($date)) {
-            $date = $this->rb_display_nice_datetime_in_timezone($date, $row);
-            if ($isexport) {
-                return $date;
-            }
-            return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $date);
-        } else {
-            $unknownstr = get_string('unknowndate', 'rb_source_facetoface_summary');
-             if ($isexport) {
-                return $unknownstr;
-            }
-            return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $unknownstr);
-        }
-    }
-
     public function rb_display_actions($session, $row, $isexport = false) {
         global $OUTPUT;
 

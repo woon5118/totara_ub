@@ -662,31 +662,6 @@ abstract class rb_base_source {
         return implode($items, "\n");
     }
 
-    /**
-     * Displays a delimited list of strings as one string per line.
-     * Assumes you used "'grouping' => 'sql_aggregate'", which concatenates with $uniquedelimiter to construct a pre-ordered string.
-     *
-     * @deprecated Since 9.0
-     * @param $list
-     * @param $row
-     * @return string
-     */
-    function rb_display_orderedlist_to_newline($list, $row) {
-        debugging('The orderedlist_to_newline report builder display function has been deprecated and replaced by totara_reportbuilder\rb\display\orderedlist_to_newline', DEBUG_DEVELOPER);
-
-        $output = array();
-        $items = explode($this->uniquedelimiter, $list);
-        foreach ($items as $item) {
-            $item = trim($item);
-            if (empty($item) || $item === '-') {
-                $output[] = '-';
-            } else {
-                $output[] = format_string($item);
-            }
-        }
-        return implode($output, "\n");
-    }
-
     // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
     function rb_display_delimitedlist_to_newline($list, $row) {
         $delimiter = $this->uniquedelimiter;
@@ -1668,20 +1643,6 @@ abstract class rb_base_source {
         return format_time($seconds);
     }
 
-    /**
-     * Convert an integer number of minutes into a
-     * formatted duration (e.g. 90 mins => 1h 30m).
-     *
-     * @deprecated Since 9.0
-     * @param $mins
-     * @param $row
-     * @return mixed
-     */
-    function rb_display_hours_minutes($mins, $row) {
-        debugging('The hours_minutes report builder display function has been deprecated and replaced by totara_reportbuilder\rb\display\duration_hours_minutes', DEBUG_DEVELOPER);
-        return $mins;
-    }
-
     // convert a 2 digit country code into the country name
     function rb_display_country_code($code, $row) {
         $countries = get_string_manager()->get_list_of_countries();
@@ -1803,44 +1764,6 @@ abstract class rb_base_source {
         }
     }
 
-    /**     *
-     * @deprecated Since 10.2; replaced by totara/reportbuilder/classes/rb/display/user_email class.
-     */
-    function rb_display_user_email($email, $row, $isexport = false) {
-        debugging('rb_base_source::rb_display_user_email has been deprecated. Please use the totara/reportbuilder/classes/rb/display/user_email class instead', DEBUG_DEVELOPER);
-        if (empty($email)) {
-            return '';
-        }
-        $maildisplay = $row->maildisplay;
-        $emaildisabled = $row->emailstop;
-
-        // respect users email privacy setting
-        // at some point we may want to allow admins to view anyway
-        if ($maildisplay != 1) {
-            return get_string('useremailprivate', 'totara_reportbuilder');
-        }
-
-        if ($isexport) {
-            return $email;
-        } else {
-            // obfuscate email to avoid spam if printing to page
-            return obfuscate_mailto($email, '', (bool) $emaildisabled);
-        }
-    }
-
-    /**     *
-     * @deprecated Since 10.2; replaced by totara/reportbuilder/classes/rb/display/user_email_unobscured class.
-     */
-    public function rb_display_user_email_unobscured($email, $row, $isexport = false) {
-        debugging('rb_base_source::rb_display_user_email_unobscured has been deprecated. Please use the totara/reportbuilder/classes/rb/display/user_email_unobscured class instead', DEBUG_DEVELOPER);
-        if ($isexport) {
-            return $email;
-        } else {
-            // Obfuscate email to avoid spam if printing to page.
-            return obfuscate_mailto($email);
-        }
-    }
-
     public function rb_display_orderedlist_to_newline_email($list, $row, $isexport = false) {
         $output = array();
         $emails = explode($this->uniquedelimiter, $list);
@@ -1878,59 +1801,6 @@ abstract class rb_base_source {
             $icon . $program, null, array('class' => $class)
         );
         return $link;
-    }
-
-    /**
-     * Generates the HTML to display the due/expiry date of a program/certification.
-     *
-     * @deprecated since 2.7 - use $this->usedcomponents[] = 'totara_program' and 'displayfunc' => 'programduedate' instead
-     * @param int $time     The duedate of the program
-     * @param record $row   The whole row, including some required fields
-     * @return html
-     */
-    public function rb_display_program_duedate($time, $row, $isexport = false) {
-        // Get the necessary fields out of the row.
-        $duedate = $time;
-        $userid = $row->userid;
-        $progid = $row->programid;
-        $status = $row->status;
-        $certifpath = isset($row->certifpath) ? $row->certifpath : null;
-        $certifstatus = isset($row->certifstatus) ? $row->certifstatus : null;
-
-        return prog_display_duedate($duedate, $progid, $userid, $certifpath, $certifstatus, $status, $isexport);
-    }
-
-    /**
-     * Generates the HTML to display the due/expiry date of a certification.
-     *
-     * @deprecated since 2.7 - use $this->usedcomponents[] = 'totara_program' and 'displayfunc' => 'programduedate' instead
-     * @param int $time     The duedate of the program
-     * @param record $row   The whole row, including some required fields
-     * @return html
-     */
-    public function rb_display_certification_duedate($time, $row) {
-        global $OUTPUT, $CFG;
-
-        if (empty($row->timeexpires)) {
-            if (empty($row->timedue) || $row->timedue == COMPLETION_TIME_NOT_SET) {
-                // There is no time due set.
-                return get_string('duedatenotset', 'totara_program');
-            } else if ($row->timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
-                // User is still in the first stage of certification, not overdue yet.
-                return $this->rb_display_program_duedate($time, $row);
-            } else {
-                // Looks like the certification has expired, overdue!
-                $out = '';
-                $out .= userdate($row->timedue, get_string('strfdateshortmonth', 'langconfig'), 99, false);
-                $out .= html_writer::empty_tag('br');
-                $out .= $OUTPUT->error_text(get_string('overdue', 'totara_program'));
-                return $out;
-            }
-        } else {
-            return $this->rb_display_program_duedate($time, $row);
-        }
-
-        return '';
     }
 
     // Display grade along with passing grade if it is known.
@@ -1998,17 +1868,6 @@ abstract class rb_base_source {
             $out[$mod->name] = $icon . $mod->localname;
         }
         return $out;
-    }
-
-    /**
-     * @deprecated Since 10.0
-     */
-    function rb_filter_tags_list() {
-        global $DB, $OUTPUT, $CFG;
-
-        debugging('rb_filter_tags_list() is deprecated. This function was used in the tags filter and is no longer needed.', DEBUG_DEVELOPER);
-
-        return $DB->get_records_menu('tag', array('isstandard' => 1), 'name', 'id, name');
     }
 
     function rb_filter_organisations_list($report) {
@@ -3974,56 +3833,6 @@ abstract class rb_base_source {
     }
 
     /**
-     * Adds position assignment tables to the joinlist.
-     *
-     * @deprecated since 9.0 - use $this->add_job_assignment_tables_to_joinlist() instead.
-     * @param array  $joinlist
-     * @param string $join
-     * @param string $field
-     * @return boolean
-     */
-    protected function add_position_tables_to_joinlist(&$joinlist, $join, $field) {
-        debugging('The rb_base_source function add_position_tables_to_joinlist() has been replaced and is now deprecated.
-                   Please use the add_job_assignment_tables_to_joinlist() instead', DEBUG_DEVELOPER);
-        $this->add_job_assignment_tables_to_joinlist($joinlist, $join, $field);
-
-        return false;
-    }
-
-    /**
-     * Adds position assignment columns to the columnoptions list.
-     *
-     * @deprecated since 9.0 - use $this->add_job_assignment_fields_to_columns() instead.
-     * @param array  $columnoptions
-     * @param string $posassign
-     * @param string $org
-     * @param string $pos
-     * @return boolean
-     */
-    protected function add_position_fields_to_columns(&$columnoptions, $posassign='', $org='', $pos='') {
-        debugging('The rb_base_source function add_position_fields_to_columns() has been replaced and is now deprecated.
-                   Please use the add_job_assignment_fields_to_columns() instead', DEBUG_DEVELOPER);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-
-        return false;
-    }
-
-    /**
-     * Adds position assignment filters to the filteroptions list.
-     *
-     * @deprecated since 9.0 - use $this->add_job_assignment_fields_to_filteroptions() instead.
-     * @param array $filteroptions
-     * @return boolean
-     */
-    protected function add_position_fields_to_filters(&$filteroptions) {
-        debugging('The rb_base_source function add_position_fields_to_filters() has been replaced and is now deprecated.
-                   Please use the add_job_assignment_fields_to_filters() instead', DEBUG_DEVELOPER);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
-
-        return false;
-    }
-
-    /**
      * Adds the job_assignment, pos and org tables to the $joinlist array. All job assignments belonging to the user are returned.
      *
      * @param array &$joinlist Array of current join options
@@ -5848,19 +5657,6 @@ abstract class rb_base_source {
 
     }
 
-
-    /**
-     * DEPRECATED: The tag API has changed and your code needs to be updated.
-     *
-     * Please call add_core_tag_tables_to_joinlist instead.
-     *
-     * @deprecated since Totara 10
-     */
-    protected function add_tag_tables_to_joinlist() {
-        throw new coding_exception('add_tag_tables_to_joinlist has been deprecated due to tag API changes, please upgrade your code to call add_core_tag_tables_to_joinlist instead.', DEBUG_DEVELOPER);
-    }
-
-
     /**
      * Adds the tag tables to the $joinlist array
      *
@@ -5929,19 +5725,6 @@ abstract class rb_base_source {
         return true;
     }
 
-
-    /**
-     * DEPRECATED: The tag API has changed and your code needs to be updated.
-     *
-     * Please call add_core_fields_to_columns instead.
-     *
-     * @deprecated since Totara 10
-     */
-    protected function add_tag_fields_to_columns() {
-        throw new coding_exception('add_tag_fields_to_columns has been deprecated due to tag API changes, please upgrade your code to call add_core_tag_fields_to_columns instead.', DEBUG_DEVELOPER);
-    }
-
-
     /**
      * Adds some common tag info to the $columnoptions array
      *
@@ -5997,19 +5780,6 @@ abstract class rb_base_source {
         }
         return true;
     }
-
-
-    /**
-     * DEPRECATED: The tag API has changed and your code needs to be updated.
-     *
-     * Please call add_core_fields_to_filters instead.
-     *
-     * @deprecated since Totara 10
-     */
-    protected function add_tag_fields_to_filters($component, $itemtype, &$filteroptions) {
-        throw new coding_exception('add_tag_fields_to_filters has been deprecated due to tag API changes, please upgrade your code to call add_core_tag_fields_to_filters instead.', DEBUG_DEVELOPER);
-    }
-
 
     /**
      * Adds some common tag filters to the $filteroptions array
