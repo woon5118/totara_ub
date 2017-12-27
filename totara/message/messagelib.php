@@ -799,8 +799,8 @@ function tm_set_preference_defaults() {
     set_config('totara_task_provider_totara_message_task_permitted', 'permitted', 'message');
     set_config('totara_alert_provider_totara_message_alert_permitted', 'permitted', 'message');
     set_config('totara_alert_provider_totara_message_task_permitted', 'disallowed', 'message');
-    set_config('message_provider_totara_message_alert_loggedin', 'totara_alert,email', 'message');
-    set_config('message_provider_totara_message_alert_loggedoff', 'totara_alert,email', 'message');
+    set_config('message_provider_totara_message_alert_loggedin', 'totara_alert,popup,email', 'message');
+    set_config('message_provider_totara_message_alert_loggedoff', 'totara_alert,popup,email', 'message');
     set_config('message_provider_totara_message_task_loggedin', 'totara_task,email', 'message');
     set_config('message_provider_totara_message_task_loggedoff', 'totara_task,email', 'message');
     set_config('popup_provider_totara_message_task_permitted', 'disallowed', 'message');
