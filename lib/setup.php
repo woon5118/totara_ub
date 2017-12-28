@@ -143,6 +143,7 @@ if (defined('BEHAT_SITE_RUNNING')) {
         $CFG->wwwroot = $CFG->behat_wwwroot;
         $CFG->prefix = $CFG->behat_prefix;
         $CFG->dataroot = $CFG->behat_dataroot;
+        $CFG->dboptions = isset($CFG->behat_dboptions) ? $CFG->behat_dboptions : $CFG->dboptions;
     }
 }
 
