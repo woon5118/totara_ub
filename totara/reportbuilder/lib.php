@@ -572,6 +572,14 @@ class reportbuilder {
                 'form' => array('close')
             );
             $js[] = $jsdetails;
+
+            $jsdetails = new \stdClass();
+            $jsdetails->initcall = 'M.totara_reportbuilder_export.init';
+            $jsdetails->jsmodule = array(
+                'name' => 'totara_reportbuilder_export',
+                'fullpath' => '/totara/reportbuilder/js/export.js'
+            );
+            $js[] = $jsdetails;
         }
 
         local_js($code);
