@@ -507,13 +507,6 @@ if (isset($SESSION->pluginuninstallreturn)) {
 }
 
 // Everything should now be set up, and the user is an admin
-
-// Totara: Check to see if we are downloading latest errors
-$geterrors = optional_param('geterrors', 0, PARAM_BOOL);
-if ($geterrors) {
-    totara_errors_download();
-    die();
-}
 // Print default admin page with notifications.
 $errorsdisplayed = defined('WARN_DISPLAY_ERRORS_ENABLED');
 
@@ -548,10 +541,6 @@ $sql = "SELECT COUNT(id)
           FROM {user}
          WHERE currentlogin > ?";
 $activeusers = $DB->count_records_sql($sql, array($oneyearago));
-// Check if any errors in log
-$errorrecords = $DB->get_records_sql("SELECT id, timeoccured FROM {errorlog} ORDER BY id DESC", null, 0, 1);
-
-$latesterror = array_shift($errorrecords);
 
 require_once("$CFG->dirroot/$CFG->admin/registerlib.php");
 if (is_registration_required()) {
@@ -566,4 +555,4 @@ $output = $PAGE->get_renderer('core', 'admin');
 
 echo $output->admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed, $cronoverdue, $dbproblems,
                                        $maintenancemode, null, null, $buggyiconvnomb,
-                                       $registered, $cachewarnings, $eventshandlers, $themedesignermode, $devlibdir, $latesterror, $activeusers, $TOTARA->release);
+                                       $registered, $cachewarnings, $eventshandlers, $themedesignermode, $devlibdir, null, $activeusers, $TOTARA->release);

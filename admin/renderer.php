@@ -258,13 +258,14 @@ class core_admin_renderer extends plugin_renderer_base {
      * @param array $eventshandlers Events 1 API handlers.
      * @param bool $themedesignermode Warn about the theme designer mode.
      * @param bool $devlibdir Warn about development libs directory presence.
+     * @param null $unused_latesterror Deprecated and unused since Totara 11.
      *
      * @return string HTML to output.
      */
     public function admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed,
             $cronoverdue, $dbproblems, $maintenancemode, $availableupdates, $availableupdatesfetch,
             $buggyiconvnomb, $registered, array $cachewarnings = array(), $eventshandlers = 0,
-            $themedesignermode = false, $devlibdir = false, $latesterror, $activeusers, $totara_release) {
+            $themedesignermode = false, $devlibdir = false, $unused_latesterror = null, $activeusers, $totara_release) {
         global $CFG, $PAGE;
         $output = '';
         /** @var totara_core_renderer $totara_renderer */
@@ -285,9 +286,6 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->events_handlers($eventshandlers);
         $output .= $totara_renderer->is_registered();
 
-        if ($latesterror) {
-            $output .= $totara_renderer->errorlog_link($latesterror);
-        }
         // list count of active users
         $output .= $totara_renderer->active_users($activeusers);
         /// Display Totara version information

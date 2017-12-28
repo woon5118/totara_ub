@@ -58,24 +58,14 @@ class totara_core_renderer extends plugin_renderer_base {
     /**
      * Displays a link to download error log
      *
-     * @deprecated since 9.0
+     * @deprecated since Totara 11
      * @param object $latesterror Object containing information about the last site error
-     *
-     * @return string HTML to output.
-     */
-    public function totara_print_errorlog_link($latesterror) {
-        debugging('totara_print_errorlog_link has been deprecated please use errorlog_link', DEBUG_DEVELOPER);
-        return $this->errorlog_link($latesterror);
-    }
-
-    /**
-     * Displays a link to download error log
-     *
-     * @param object $latesterror Object containing information about the last site error
-     *
      * @return string HTML to output.
      */
     public function errorlog_link($latesterror) {
+
+        debugging(__METHOD__ . 'has been deprecated since Totara 11 and will be removed in a future release. There is no alternative.', DEBUG_DEVELOPER);
+
         $data = new stdClass();
         $data->timeoccured = userdate($latesterror->timeoccured);
         $data->downloadbutton = $this->output->single_button(new moodle_url('/admin/index.php', array('geterrors' => 1)), get_string('downloaderrorlog', 'totara_core'), 'post');

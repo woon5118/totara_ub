@@ -1551,11 +1551,12 @@ function totara_is_post_request() {
 /**
  * Download stored errorlog as a zip
  *
- * @access  public
- * @return  void
+ * @deprecated since Totara 11
  */
 function totara_errors_download() {
     global $DB;
+
+    debugging(__FUNCTION__ . ' was deprecated in Totara 11 and will be removed in a future version. There is no alternative.', DEBUG_DEVELOPER);
 
     // Load errors from database
     $errors = $DB->get_records('errorlog');
