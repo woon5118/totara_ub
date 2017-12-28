@@ -511,6 +511,7 @@ class behat_forms extends behat_base {
         // guess the type properly as it is a select tag.
         $field = behat_field_manager::get_form_field_from_label($fieldlocator, $this);
         $field->set_value($value);
+        $this->wait_for_pending_js();
     }
 
     /**

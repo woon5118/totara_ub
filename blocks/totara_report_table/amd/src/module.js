@@ -127,6 +127,9 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlconfig, temp
                 }
 
                 savedListControl.attr('disabled', 'disabled');
+
+                M.util.js_pending('block_totara_report_table-populatelist');
+
                 // Make an AJAX request to get the saved searches.
                 $.ajax({
                     type: 'POST',
@@ -148,6 +151,8 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlconfig, temp
 
                         // Enable the control.
                         savedListControl.removeAttr('disabled');
+
+                        M.util.js_complete('block_totara_report_table-populatelist');
                     }
                 });
             });
