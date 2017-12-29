@@ -2914,6 +2914,7 @@ class course_request {
         $data->visibleold         = $data->visible;
         $data->lang               = $courseconfig->lang;
         $data->enablecompletion   = $courseconfig->enablecompletion;
+        $data->startdate          = usergetmidnight(time());
 
         $course = create_course($data);
         $context = context_course::instance($course->id, MUST_EXIST);
