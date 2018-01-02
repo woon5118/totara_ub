@@ -84,7 +84,7 @@ class util {
 
         if ($reportorsavedid > 0) {
             $sql = "SELECT r.id, r.fullname, r.timemodified AS rtimemodified, g.type,
-                           NULL AS savedid, NULL AS userid, 0 AS gtimemodified, r.globalrestriction
+                           NULL AS savedid, NULL AS userid, 0 AS gtimemodified, r.globalrestriction, r.contentmode
                      FROM {report_builder} r
                      JOIN {report_builder_graph} g ON g.reportid = r.id
                     WHERE r.id = :reportid";
@@ -92,7 +92,7 @@ class util {
 
         } else if ($reportorsavedid < 0) {
             $sql = "SELECT r.id, s.name AS fullname, r.timemodified AS rtimemodified, g.type,
-                           s.id AS savedid, s.userid, g.timemodified AS gtimemodified, r.globalrestriction
+                           s.id AS savedid, s.userid, g.timemodified AS gtimemodified, r.globalrestriction, r.contentmode
                       FROM {report_builder} r
                       JOIN {report_builder_graph} g ON g.reportid = r.id
                       JOIN {report_builder_saved} s ON s.reportid = r.id
@@ -133,7 +133,12 @@ class util {
         $cache = \cache::make('block_totara_report_graph', 'graph');
         $key = self::get_cache_key($config->reportorsavedid, $config->reportfor);
 
-        if ($cacheddata = $cache->get($key)) {
+        // Allow plugins to tweak keys in special cases, such as custom dynamic content restrictions.
+        $hook = new \block_totara_report_graph\hook\get_svg_data_cache_key($key, $config->reportorsavedid, $config->reportfor, $rawreport);
+        $hook->execute();
+        $key = $hook->key;
+
+        if ($key and $cacheddata = $cache->get($key)) {
             if (empty($cacheddata->svgdata)) {
                 // No cache yet.
             } else if ($cacheddata->rtimemodified != $rawreport->rtimemodified or $cacheddata->gtimemodified != $rawreport->gtimemodified) {
@@ -162,18 +167,20 @@ class util {
                 die;
             }
 
-            // If we go this far than make sure we save the result to the cache no matter what the user does.
-            ignore_user_abort(true);
-            $cacheddata = new \stdClass();
-            $cacheddata->svgdata = $svgdata;
-            $cacheddata->timecreated = time();
-            $cacheddata->rtimemodified = $rawreport->rtimemodified;
-            $cacheddata->gtimemodified = $rawreport->gtimemodified;
-            $cache->set($key, $cacheddata);
-            if (connection_aborted()) {
-                die;
+            if ($key) {
+                // If we go this far than make sure we save the result to the cache no matter what the user does.
+                ignore_user_abort(true);
+                $cacheddata = new \stdClass();
+                $cacheddata->svgdata = $svgdata;
+                $cacheddata->timecreated = time();
+                $cacheddata->rtimemodified = $rawreport->rtimemodified;
+                $cacheddata->gtimemodified = $rawreport->gtimemodified;
+                $cache->set($key, $cacheddata);
+                if (connection_aborted()) {
+                    die;
+                }
+                ignore_user_abort(false);
             }
-            ignore_user_abort(false);
 
             // Finally return the SVG data.
             return $svgdata;
