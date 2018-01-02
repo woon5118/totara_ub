@@ -340,7 +340,8 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
         $course = $DB->get_record('course', array('id' => $this->course6->id));
 
         $enddate = strtotime("+1 week");
-        $strdate = strftime('%d %b %Y', $enddate);
+        $format = get_string('strfdateshortmonth', 'langconfig');
+        $strdate = userdate($enddate, $format, null, false);
         $this->completion_generator->enable_completion_tracking($course);
         $completioncriteria = array();
         $completioncriteria[COMPLETION_CRITERIA_TYPE_DATE] = $enddate;
@@ -540,8 +541,10 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
         $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
         $info = $learning_items->export_for_template();
 
-        $strdate = strftime('%d %b %Y', time());
-        $this->validateExportInfo($info, null, array(), 'Completed on ' . $strdate);
+        $format = get_string('strfdateshortmonth', 'langconfig');
+        $a = array('timecompleted' => userdate(time(), $format));
+        $strdate = get_string('completed-on', 'completion', $a);
+        $this->validateExportInfo($info, null, array(), $strdate);
     }
 
     public function test_export_for_template_completed_via_rpl() {
@@ -566,8 +569,13 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
         $learning_items = \core_course\user_learning\item::one($this->user1->id, $course->id);
         $info = $learning_items->export_for_template();
 
-        $strdate = strftime('%d %b %Y', time());
-        $this->validateExportInfo($info, null, array(), 'Completed via rpl (Course completed via rpl in user_learning_item_test) on ' . $strdate);
+        $format = get_string('strfdateshortmonth', 'langconfig');
+        $a = array(
+            'timecompleted' => userdate(time(), $format),
+            'rpl' => $completion->rpl
+        );
+        $strdate = get_string('completedviarpl-on', 'completion', $a);
+        $this->validateExportInfo($info, null, array(), $strdate);
     }
 
     /**
