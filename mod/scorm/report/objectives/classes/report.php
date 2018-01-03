@@ -91,31 +91,12 @@ class report extends \mod_scorm\report {
         // if the user has permissions and if the report mode is showing attempts.
         $candelete = has_capability('mod/scorm:deleteresponses', $contextmodule)
                 && ($attemptsmode != SCORM_REPORT_ATTEMPTS_STUDENTS_WITH_NO);
-        // Select the students.
+        // Totara: checking existence of students may be expensive, do not do it here.
         $nostudents = false;
 
-        if (empty($currentgroup)) {
-            // All users who can attempt scoes.
-            if (!$students = get_users_by_capability($contextmodule, 'mod/scorm:savetrack', 'u.id', '', '', '', '', '', false)) {
-                echo $OUTPUT->notification(get_string('nostudentsyet'));
-                $nostudents = true;
-                $allowedlist = '';
-            } else {
-                $allowedlist = array_keys($students);
-            }
-            unset($students);
-        } else {
-            // All users who can attempt scoes and who are in the currently selected group.
-            $groupstudents = get_users_by_capability($contextmodule, 'mod/scorm:savetrack',
-                                                     'u.id', '', '', '', $currentgroup, '', false);
-            if (!$groupstudents) {
-                echo $OUTPUT->notification(get_string('nostudentsingroup'));
-                $nostudents = true;
-                $groupstudents = array();
-            }
-            $allowedlist = array_keys($groupstudents);
-            unset($groupstudents);
-        }
+        // Totara: We must not use get_users_by_capability() here for performance reasons!
+        list($enrolledsql, $enrolledparams) = get_enrolled_sql($contextmodule, 'mod/scorm:savetrack', $currentgroup);
+
         if ( !$nostudents ) {
             // Now check if asked download of data.
             $coursecontext = \context_course::instance($course->id);
@@ -161,8 +142,7 @@ class report extends \mod_scorm\report {
                 }
             }
 
-            $params = array();
-            list($usql, $params) = $DB->get_in_or_equal($allowedlist, SQL_PARAMS_NAMED);
+            $params = $enrolledparams;
             // Construct the SQL.
             $select = 'SELECT DISTINCT '.$DB->sql_concat('u.id', '\'#\'', 'COALESCE(st.attempt, 0)').' AS uniqueid, ';
             $select .= 'st.scormid AS scormid, st.attempt AS attempt, ' .
@@ -175,15 +155,15 @@ class report extends \mod_scorm\report {
             switch ($attemptsmode) {
                 case SCORM_REPORT_ATTEMPTS_STUDENTS_WITH:
                     // Show only students with attempts.
-                    $where = ' WHERE u.id ' .$usql. ' AND st.userid IS NOT NULL';
+                    $where = ' WHERE u.id IN (' .$enrolledsql. ') AND st.userid IS NOT NULL';
                     break;
                 case SCORM_REPORT_ATTEMPTS_STUDENTS_WITH_NO:
                     // Show only students without attempts.
-                    $where = ' WHERE u.id ' .$usql. ' AND st.userid IS NULL';
+                    $where = ' WHERE u.id IN (' .$enrolledsql. ') AND st.userid IS NULL';
                     break;
                 case SCORM_REPORT_ATTEMPTS_ALL_STUDENTS:
                     // Show all students with or without attempts.
-                    $where = ' WHERE u.id ' .$usql. ' AND (st.userid IS NOT NULL OR st.userid IS NULL)';
+                    $where = ' WHERE u.id IN (' .$enrolledsql. ') AND (st.userid IS NOT NULL OR st.userid IS NULL)';
                     break;
             }
 
