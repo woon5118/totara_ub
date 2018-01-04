@@ -1164,6 +1164,14 @@ function calendar_time_representation($time) {
     if(empty($timeformat)){
         $timeformat = get_config(NULL,'calendar_site_timeformat');
     }
+
+    // Allow language customization of selected time format.
+    if ($timeformat === CALENDAR_TF_12) {
+        $timeformat = get_string('strftimetime12', 'langconfig');
+    } else if ($timeformat === CALENDAR_TF_24) {
+        $timeformat = get_string('strftimetime24', 'langconfig');
+    }
+
     // The ? is needed because the preference might be present, but empty
     return userdate($time, empty($timeformat) ? $langtimeformat : $timeformat);
 }
