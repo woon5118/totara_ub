@@ -141,15 +141,6 @@ if ($anchor && isset($SESSION->wantsurl) && strpos($SESSION->wantsurl, '#') === 
     $SESSION->wantsurl = $wantsurl->out();
 }
 
-// Restore the #anchor to the original wantsurl. Note that this
-// will only work for internal auth plugins, SSO plugins such as
-// SAML / CAS / OIDC will have to handle this correctly directly.
-if ($anchor && isset($SESSION->wantsurl) && strpos($SESSION->wantsurl, '#') === false) {
-    $wantsurl = new moodle_url($SESSION->wantsurl);
-    $wantsurl->set_anchor(substr($anchor, 1));
-    $SESSION->wantsurl = $wantsurl->out();
-}
-
 /// Check if the user has actually submitted login data to us
 
 if ($frm and isset($frm->username)) {                             // Login WITH cookies
