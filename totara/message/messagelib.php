@@ -309,6 +309,8 @@ function tm_alert_send($eventdata) {
     if (!isset($eventdata->contexturl)) {
         $eventdata->contexturl     = '';
         $eventdata->contexturlname = '';
+    } else {
+        $eventdata->fullmessagehtml .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('viewdetailshere', 'totara_message', $eventdata->contexturl);
     }
 
     $result = tm_message_send($eventdata);
@@ -327,10 +329,6 @@ function tm_alert_send($eventdata) {
         // Send alert email
         if (empty($eventdata->subject)) {
             $eventdata->subject = strlen($eventdata->fullmessage) > 80 ? substr($eventdata->fullmessage, 0, 78).'...' : $eventdata->fullmessage;
-        }
-
-        if ($eventdata->contexturl) {
-            $eventdata->fullmessagehtml .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . $string_manager->get_string('viewdetailshere', 'totara_message', $eventdata->contexturl, $eventdata->userto->lang);
         }
 
         // Add footer to email in the recipient language explaining how to change email preferences. However, this is only for system users.
