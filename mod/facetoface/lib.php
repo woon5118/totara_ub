@@ -1682,6 +1682,8 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             f.course,
             ss.grade,
             ss.statuscode,
+            u.deleted,
+            u.suspended,
             (
                 SELECT MAX(timecreated)
                 FROM {facetoface_signups_status} ss2
@@ -6665,6 +6667,29 @@ function facetoface_validate_user_import($user, $context, $facetoface, $session,
 
     // No errors, so just return an empty array.
     return array();
+}
+
+/**
+ * Returns detailed information about booking conflicts for the passed users
+ *
+ * @param array $dates Array of dates defining time periods
+ * @param array $users Array of user objects that will be checked for booking conflicts
+ * @param string $extrawhere SQL fragment to be added to the where clause in facetoface_get_sessions_within
+ * @param array $extraparams Paramaters used by the $extrawhere To be used in facetoface_get_sessions_within
+ * @return array The booking conflicts.
+ */
+function facetoface_get_booking_conflicts(array $dates, array $users, string $extrawhere, array $extraparams) {
+    $bookingconflicts = array();
+    foreach ($users as $user) {
+        if ($availability = facetoface_get_sessions_within($dates, $user->id, $extrawhere, $extraparams)) {
+            $bookingconflicts[] = array(
+                'id' => $user->id,
+                'name' => fullname($user),
+                'result' => facetoface_get_session_involvement($user, $availability),
+            );
+        }
+    }
+    return $bookingconflicts;
 }
 
 /**

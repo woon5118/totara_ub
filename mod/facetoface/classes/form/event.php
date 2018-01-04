@@ -609,6 +609,25 @@ class event extends \moodleform {
             }
         }
 
+        // Check that there is not booking conflicts for current attendees.
+        if ($dates) {
+            $wheresql = '';
+            $whereparams = array();
+            if (!empty($this->_customdata['s'])) {
+                $wheresql = ' AND s.id != ?';
+                $whereparams[] = $this->_customdata['s'];
+            }
+            $currentattendees = facetoface_get_attendees($sessid);
+            $conflictsdetails = facetoface_get_booking_conflicts($dates, $currentattendees, $wheresql, $whereparams);
+            $conflictscount = count($conflictsdetails);
+            if ($conflictscount > 0) {
+                $a = new \stdClass();
+                $a->users = $conflictscount;
+                $a->link = \html_writer::link('#', get_string('viewdetails', 'facetoface'), array('id' => 'viewbookingconflictdetails', 'class' => 'viewbulkresults'));
+                $errors['sessiondates'] = get_string('error:sessiondatesbookingconflict', 'facetoface', $a);
+            }
+        }
+
         // Process the data for a custom field and validate it.
         $errors += customfield_validation((object)$data, 'facetofacesession', 'facetoface_session');
 

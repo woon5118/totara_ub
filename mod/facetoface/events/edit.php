@@ -53,7 +53,7 @@ $PAGE->set_url('/mod/facetoface/events/add.php', array('f' => $f, 'backtoallsess
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
 $PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
-    'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
+    'createnewasset', 'editasset', 'createnewroom', 'editroom', 'bookingconflict'), 'facetoface');
 $PAGE->set_title($facetoface->name);
 $PAGE->set_heading($course->fullname);
 
