@@ -221,7 +221,7 @@ class customfield_multiselect extends customfield_base {
         }
         $formdata = isset($itemnew->{$this->inputname}) ? $itemnew->{$this->inputname} : array();
         $values = $this->prepare_data($formdata);
-        $groupname = 'grp_'.$this->fieldid.'_0';
+        $groupname = 'grp_'.$this->fieldid;
         if ($this->is_unique() && count($values)) {
             $unique = true;
             $count = count($values);
@@ -348,7 +348,7 @@ class customfield_multiselect extends customfield_base {
      */
     public function edit_field_set_required(&$mform) {
         if ($this->is_required()) {
-            $mform->addRule('grp_' . $this->fieldid . '_0',
+            $mform->addRule('grp_' . $this->fieldid,
                     get_string('customfieldrequired', 'totara_customfield'), 'required', null,
                     'client');
         }
