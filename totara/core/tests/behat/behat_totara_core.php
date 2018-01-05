@@ -505,4 +505,32 @@ class behat_totara_core extends behat_base {
         $this->ensure_node_is_visible($node);
         $node->click();
     }
+
+    /**
+     * @Given /^I use magic for persistent login to open the login page/
+     */
+    public function visit_login_page() {
+        \behat_hooks::set_step_readonly(false);
+        // Visit login page.
+        $this->getSession()->visit($this->locate_path('login/index.php'));
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * @Given /^I use magic for persistent login to simulate session timeout$/
+     */
+    public function session_timeout() {
+        \behat_hooks::set_step_readonly(false);
+        // Visit login page.
+        $this->getSession()->visit($this->locate_path('totara/core/tests/fixtures/session_timeout.php'));
+    }
+
+    /**
+     * @Given /^I use magic for persistent login to purge cookies$/
+     */
+    public function purge_cookies() {
+        \behat_hooks::set_step_readonly(false);
+        // Visit login page.
+        $this->getSession()->visit($this->locate_path('totara/core/tests/fixtures/purge_cookies.php'));
+    }
 }

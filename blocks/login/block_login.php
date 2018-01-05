@@ -76,26 +76,39 @@ class block_login extends block_base {
                 $strusername = get_string('usernameemail');
             }
 
-            $this->content->text .= "\n".'<form class="loginform" id="login" method="post" action="'.get_login_url().'" '.$autocomplete.'>';
+            $this->content->text .= "\n".'<form id="login" method="post" action="'.get_login_url().'" '.$autocomplete.'><div class="loginform">';
 
-            $this->content->text .= '<div class="form-group"><label for="login_username">'.$strusername.'</label>';
-            $this->content->text .= '<input type="text" name="username" id="login_username" class="form-control" value="'.s($username).'" /></div>';
+            $this->content->text .= '<div class="form-label"><label for="login_username">'.$strusername.'</label></div>';
+            $this->content->text .= '<div class="form-input"><input type="text" name="username" id="login_username" value="'.s($username).'" /></div>';
+            $this->content->text .= '<div class="clearer"><!-- --></div>';
+            $this->content->text .= '<div class="form-label"><label for="login_password">'.get_string('password').'</label></div>';
+            $this->content->text .= '<div class="form-input"><input type="password" name="password" id="login_password" value="" '.$autocomplete.' /></div>';
+            $this->content->text .= '<div class="clearer"><!-- --></div>';
 
-            $this->content->text .= '<div class="form-group"><label for="login_password">'.get_string('password').'</label>';
-
-            $this->content->text .= '<input type="password" name="password" id="login_password" class="form-control" value="" '.$autocomplete.' /></div>';
-
-            if (isset($CFG->rememberusername) and $CFG->rememberusername == 2) {
-                $checked = $username ? 'checked="checked"' : '';
-                $this->content->text .= '<div class="form-check">';
-                $this->content->text .= '<label class="form-check-label">';
-                $this->content->text .= '<input type="checkbox" name="rememberusername" id="rememberusername"
-                        class="form-check-input" value="1" '.$checked.'/> ';
-                $this->content->text .= get_string('rememberusername', 'admin').'</label>';
-                $this->content->text .= '</div>';
+            $rememberme = false;
+            $remembermelabel = null;
+            $checked = '';
+            if (!empty($CFG->persistentloginenable)) {
+                $rememberme = true;
+                $remembermelabel = get_string('persistentloginlabel', 'totara_core');
+            } else if (isset($CFG->rememberusername) and $CFG->rememberusername == 2) {
+                $rememberme = true;
+                $remembermelabel = get_string('rememberusername', 'admin');
+                if ($username) {
+                    $checked = 'checked="checked"';
+                }
             }
 
-            $this->content->text .= '<div class="form-group">';
+            if ($rememberme) {
+                $this->content->text .= '<div class="rememberpass">';
+                $this->content->text .= '<input type="checkbox" name="rememberusernamechecked" id="rememberusernamechecked"
+                        class="form-check-input" value="1" '.$checked.'/> ';
+                $this->content->text .= '<label for="rememberusernamechecked">';
+                $this->content->text .= $remembermelabel.'</label>';
+                $this->content->text .= '</div>';
+                $this->content->text .= '<div class="clearer"><!-- --></div>';
+            }
+
             $this->content->text .= '<input type="submit" class="btn btn-primary btn-block" value="'.get_string('login').'" />';
             $this->content->text .= '</div>';
 

@@ -629,6 +629,19 @@ class auth_plugin_base {
      */
     public function postlogout_hook($user) {
     }
+
+    /**
+     * Does the auth plugin allow this user to use persistent login?
+     *
+     * This method is called after initial login before setting up
+     * persistent login cookie and before automatic relogin via the cookie.
+     *
+     * @param stdClass $user
+     * @return bool
+     */
+    public function allow_persistent_login(stdClass $user) {
+        return true;
+    }
 }
 
 /**

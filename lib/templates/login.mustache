@@ -34,6 +34,7 @@
         "loginurl": "http://example.com/stable_master/login/index.php",
         "rememberusername": true,
         "rememberusernamechecked": true,
+        "rememberusernamelabel": 'Remeber username'
         "passwordautocomplete": false,
         "signupurl": "http://localhost/stable_master/login/signup.php",
         "cookieshelpiconformatted": "",
@@ -91,7 +92,7 @@
                 {{#rememberusername}}
                     <div class="rememberpass">
                         <input type="checkbox" name="rememberusernamechecked" id="rememberusernamechecked" value="1" {{#rememberusernamechecked}}checked="checked"{{/rememberusernamechecked}} />
-                        <label for="rememberusernamechecked">{{#str}} rememberusername, admin {{/str}}</label>
+                        <label for="rememberusernamechecked">{{rememberusernamelabel}}</label>
                     </div>
                 {{/rememberusername}}
                 <div class="clearer"><!-- --></div>

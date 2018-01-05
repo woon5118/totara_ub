@@ -249,6 +249,8 @@ if ($usernew = $userform->get_data()) {
                 if (!empty($usernew->signoutofotherservices)) {
                     webservice::delete_user_ws_tokens($usernew->id);
                 }
+                // Totara: always force users to login again after closing browser or normal session timeout.
+                \totara_core\persistent_login::kill_user($usernew->id);
             }
         }
 

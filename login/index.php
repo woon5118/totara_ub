@@ -24,6 +24,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+if (!empty($_POST)) {
+    // Totara: no permanent auto login here via cookie if the login and password come from a post request.
+    define('PERSISTENT_LOGIN_SKIP', true);
+}
+
 require('../config.php');
 require_once('lib.php');
 
@@ -123,7 +128,7 @@ if ($user !== false or $frm !== false or $errormsg !== '') {
     if (isset($frm->username)) {
         $SESSION->login_username = $frm->username;
         $SESSION->login_remember = !empty($frm->rememberusernamechecked);
-        if (!$SESSION->login_remember && ((int)$CFG->rememberusername !== 1)) {
+        if (!$SESSION->login_remember && ((int)$CFG->rememberusername !== 1) && empty($CFG->persistentloginenable)) {
             set_moodle_cookie('');
         }
     } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -212,8 +217,16 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
 
         \core\session\manager::apply_concurrent_login_limit($user->id, session_id());
 
-        // sets the username cookie
-        if (!empty($CFG->nolastloggedin)) {
+        // Set the persistent login or username cookie.
+        if (!empty($CFG->persistentloginenable)) {
+            if (!empty($frm->rememberusernamechecked)) {
+                \totara_core\persistent_login::start();
+            } else {
+                \totara_core\persistent_login::delete_cookie();
+                set_moodle_cookie('');
+            }
+
+        } else if (!empty($CFG->nolastloggedin)) {
             // do not store last logged in user in cookie
             // auth plugins can temporarily override this from loginpage_hook()
             // do not save $CFG->nolastloggedin in database!
@@ -350,7 +363,7 @@ if (empty($frm->username) && $authsequence[0] != 'shibboleth') {  // See bug 518
     } elseif (!empty($_GET["username"])) {
         // we do not want data from _POST here
         $frm->username = clean_param($_GET["username"], PARAM_RAW); // we do not want data from _POST here
-    } else {
+    } else if (empty($CFG->persistentloginenable)) {
         // returning a username in the line below has always meant remember username checkbox should be checked.
         $frm->username = get_moodle_cookie();
         if (!empty($frm->username)){

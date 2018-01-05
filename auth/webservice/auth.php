@@ -164,4 +164,13 @@ class auth_plugin_webservice extends auth_plugin_base {
         return AUTH_CONFIRM_ERROR;
     }
 
+    /**
+     * No login.
+     *
+     * @param stdClass $user
+     * @return bool
+     */
+    public function allow_persistent_login(stdClass $user) {
+        return false;
+    }
 }

@@ -104,6 +104,10 @@ Do not make the requirements too strict though, as this can result in users not 
 $string['check_passwordpolicy_error'] = 'Password policy not set.';
 $string['check_passwordpolicy_name'] = 'Password policy';
 $string['check_passwordpolicy_ok'] = 'Password policy enabled.';
+$string['check_persistentlogin_details'] = '<p>If enabled persistent logins ignore standard session timeouts and set a permanent browser cookie. This cookie is later used to automatically re-login user after browser restart or session timeout.</p>';
+$string['check_persistentlogin_name'] = 'Persistent login';
+$string['check_persistentlogin_ok'] = 'Persistent login is disabled.';
+$string['check_persistentlogin_warning'] = 'Persistent logins may be considered to be a security risk.';
 $string['check_repositoryurl_details'] = '<p>Enabling the URL downloader can allow external users to access URLs within your internal network. You should not enable this feature if you have users who are allowed to access your LMS but not allowed to access other resources within your internal network that are accessible from the LMS server.</p>';
 $string['check_repositoryurl_warning'] = 'URL downloader repository is enabled.';
 $string['check_repositoryurl_name'] = 'URL downloader repository';

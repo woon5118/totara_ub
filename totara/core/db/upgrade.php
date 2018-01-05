@@ -247,5 +247,39 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018020500, 'totara', 'core');
     }
 
+    if ($oldversion < 2018021300) {
+
+        // Define table persistent_login to be created.
+        $table = new xmldb_table('persistent_login');
+
+        // Adding fields to table persistent_login.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('cookie', XMLDB_TYPE_CHAR, '128', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timeautologin', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('useragent', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('sid', XMLDB_TYPE_CHAR, '128', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('lastaccess', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('lastip', XMLDB_TYPE_CHAR, '45', null, null, null, null);
+
+        // Adding keys to table persistent_login.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+        // Adding indexes to table persistent_login.
+        $table->add_index('cookie', XMLDB_INDEX_UNIQUE, array('cookie'));
+        $table->add_index('sid', XMLDB_INDEX_UNIQUE, array('sid'));
+
+        // Conditionally launch create table for persistent_login.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018021300, 'totara', 'core');
+    }
+
+
     return true;
 }

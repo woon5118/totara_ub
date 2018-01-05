@@ -947,6 +947,12 @@ if (!empty($CFG->moodlepageclass)) {
 $PAGE = new $classname();
 unset($classname);
 
+// Totara: login user automatically via persistent login if not forbidden..
+if (!defined('PERSISTENT_LOGIN_SKIP') or !PERSISTENT_LOGIN_SKIP) {
+    if (!empty($CFG->persistentloginenable) and session_id() and !isloggedin()) {
+        \totara_core\persistent_login::attempt_auto_login();
+    }
+}
 
 if (!empty($CFG->debugvalidators) and !empty($CFG->guestloginbutton)) {
     if ($CFG->theme == 'standard') {    // Temporary measure to help with XHTML validation

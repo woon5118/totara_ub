@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aaron Barnes <aaron.barnes@totaralms.com>
+ * @author Petr Skoda <petr.skoda@totaralearning.com>
  * @package totara_core
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_core\task;
 
-/* NOTE: the following version number must be bumped during each major or minor Totara release. */
+class persistent_login extends \core\task\scheduled_task {
 
-$plugin->version  = 2018021300;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_core';   // To check on upgrade, that module sits in correct place
+    public function get_name() {
+        return get_string('persistentlogintask', 'totara_core');
+    }
+
+    public function execute() {
+        global $CFG;
+
+        if (empty($CFG->persistentloginenable)) {
+            mtrace("Persistent login is disabled");
+            return;
+        }
+
+        mtrace("Deleting expired persistent logins:");
+        \totara_core\persistent_login::gc();
+        mtrace("done");
+    }
+}

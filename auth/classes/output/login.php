@@ -68,9 +68,11 @@ class login implements renderable, templatable {
     /** @var bool Whether the password can be auto completed. */
     public $passwordautocomplete;
     /** @var bool Whether the username should be remembered. */
-    public $rememberusername;
+    public $rememberusername = false;
     /** @var bool Whether the "remember me" option was selected. */
     public $rememberusernamechecked = false;
+    /** @var string label for checkbox */
+    public $rememberusernamelabel;
     /** @var moodle_url The sign-up URL. */
     public $signupurl;
     /** @var string The user name to pre-fill the form with. */
@@ -103,7 +105,14 @@ class login implements renderable, templatable {
 
         $this->autofocusform = !empty($CFG->loginpageautofocus);
         $this->passwordautocomplete = !empty($CFG->loginpasswordautocomplete);
-        $this->rememberusername = isset($CFG->rememberusername) && $CFG->rememberusername == 2;
+
+        if (!empty($CFG->persistentloginenable)) {
+            $this->rememberusername = true;
+            $this->rememberusernamelabel = get_string('persistentloginlabel', 'totara_core');
+        } else if (isset($CFG->rememberusername) and $CFG->rememberusername == 2) {
+            $this->rememberusername = true;
+            $this->rememberusernamelabel = get_string('rememberusername', 'admin');
+        }
         $this->rememberusernamechecked = !empty($frm->rememberusernamechecked);
 
         $this->forgotpasswordurl = new moodle_url($CFG->httpswwwroot . '/login/forgot_password.php');
@@ -166,6 +175,7 @@ class login implements renderable, templatable {
         $data->loginurl = $this->loginurl->out(false);
         $data->rememberusername = $this->rememberusername;
         $data->rememberusernamechecked = $this->rememberusernamechecked;
+        $data->rememberusernamelabel = $this->rememberusernamelabel;
         $data->passwordautocomplete = $this->passwordautocomplete;
         $data->signupurl = $this->signupurl->out(false);
         $data->username = $this->username;

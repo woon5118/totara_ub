@@ -103,6 +103,16 @@ class auth_plugin_nologin extends auth_plugin_base {
     function can_be_manually_set() {
         return true;
     }
+
+    /**
+     * No login allowed.
+     *
+     * @param stdClass $user
+     * @return bool
+     */
+    public function allow_persistent_login(stdClass $user) {
+        return false;
+    }
 }
 
 

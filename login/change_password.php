@@ -127,6 +127,9 @@ if ($mform->is_cancelled()) {
         webservice::delete_user_ws_tokens($USER->id);
     }
 
+    // Totara: always force users to login again after closing browser or normal session timeout.
+    \totara_core\persistent_login::kill_user($USER->id);
+
     // Reset login lockout - we want to prevent any accidental confusion here.
     login_unlock_account($USER);
 

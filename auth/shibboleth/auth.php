@@ -332,6 +332,16 @@ class auth_plugin_shibboleth extends auth_plugin_base {
 
         return $clean_string;
     }
+
+    /**
+     * SSO plugins are not compatible with persistent logins.
+     *
+     * @param stdClass $user
+     * @return bool
+     */
+    public function allow_persistent_login(stdClass $user) {
+        return false;
+    }
 }
 
 

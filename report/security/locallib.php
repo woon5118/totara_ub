@@ -54,6 +54,7 @@ function report_security_get_issue_list() {
         'report_security_check_https',
         'report_security_check_cookiesecure',
         'report_security_check_cookiehttponly',
+        'report_security_check_persistentlogin',
         'report_security_check_configrw',
         'report_security_check_riskxss',
         'report_security_check_riskadmin',
@@ -1060,6 +1061,36 @@ function report_security_check_cookiehttponly($detailed = false) {
 
     if ($detailed) {
         $result->details = get_string('check_cookiehttponly_details', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Verifies if the persistentloginenabled setting is enabled on this site.
+ *
+ * @param bool $detailed
+ * @return stdClass result
+ */
+function report_security_check_persistentlogin($detailed = false) {
+    global $CFG;
+
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_persistentlogin';
+    $result->name    = get_string('check_persistentlogin_name', 'report_security');
+    $result->details = null;
+    $result->link    = "<a href=\"$CFG->wwwroot/$CFG->admin/settings.php?section=sitepolicies\">".get_string('sitepolicies', 'admin').'</a>';
+
+    if (empty($CFG->persistentloginenable)) {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info = get_string('check_persistentlogin_ok', 'report_security');
+    } else {
+        $result->status = REPORT_SECURITY_WARNING;
+        $result->info = get_string('check_persistentlogin_warning', 'report_security');
+    }
+
+    if ($detailed) {
+        $result->details = get_string('check_persistentlogin_details', 'report_security');
     }
 
     return $result;

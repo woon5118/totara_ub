@@ -105,6 +105,9 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $temp->add(new admin_setting_configcheckbox('groupenrolmentkeypolicy', new lang_string('groupenrolmentkeypolicy', 'admin'), new lang_string('groupenrolmentkeypolicy_desc', 'admin'), 1));
     $temp->add(new admin_setting_configcheckbox('disableuserimages', new lang_string('disableuserimages', 'admin'), new lang_string('configdisableuserimages', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('emailchangeconfirmation', new lang_string('emailchangeconfirmation', 'admin'), new lang_string('configemailchangeconfirmation', 'admin'), 1));
+    $setting = new admin_setting_configcheckbox('persistentloginenable', new lang_string('persistentloginenable', 'totara_core'), new lang_string('persistentloginenable_desc', 'totara_core'), 0);
+    $setting->set_updatedcallback('\totara_core\persistent_login::settings_updated');
+    $temp->add($setting);
     $temp->add(new admin_setting_configselect('rememberusername', new lang_string('rememberusername','admin'), new lang_string('rememberusername_desc','admin'), 2, array(1=>new lang_string('yes'), 0=>new lang_string('no'), 2=>new lang_string('optional'))));
     $temp->add(new admin_setting_configcheckbox('strictformsrequired', new lang_string('strictformsrequired', 'admin'), new lang_string('configstrictformsrequired', 'admin'), 0));
     $ADMIN->add('security', $temp);

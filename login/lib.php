@@ -245,6 +245,8 @@ function core_login_process_password_set($token) {
         if (!empty($CFG->passwordchangelogout)) {
             \core\session\manager::kill_user_sessions($user->id, session_id());
         }
+        // Totara: always force users to login again after closing browser or normal session timeout.
+        \totara_core\persistent_login::kill_user($user->id);
         // Reset login lockout (if present) before a new password is set.
         login_unlock_account($user);
         // Clear any requirement to change passwords.

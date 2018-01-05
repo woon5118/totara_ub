@@ -154,6 +154,11 @@ function get_moodle_cookie() {
         return '';
     }
 
+    if (!empty($CFG->persistentloginenable)) {
+        // Totara: persistent login disables this.
+        return '';
+    }
+
     if (empty($CFG->rememberusername)) {
         return '';
     }

@@ -27,6 +27,15 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
     array(
+        'classname' => 'totara_core\task\persistent_login',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => '3',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+    array(
         'classname' => 'totara_core\task\send_registration_data_task',
         'blocking' => 0,
         'minute' => '0',

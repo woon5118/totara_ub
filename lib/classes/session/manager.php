@@ -46,6 +46,9 @@ class manager {
     /** @var bool $sessionactive Is the session active? */
     protected static $sessionactive = null;
 
+    /** @var int the maximum timeout for session data, anything unused for longer than this can be safely purged without any other checks */
+    public const MAX_SESSION_GC_TIMEOUT = 60*60*24*4;
+
     /**
      * Start user session.
      *
@@ -262,7 +265,7 @@ class manager {
         // Moodle does normal session timeouts, this is for leftovers only.
         ini_set('session.gc_probability', 1);
         ini_set('session.gc_divisor', 1000);
-        ini_set('session.gc_maxlifetime', 60*60*24*4);
+        ini_set('session.gc_maxlifetime', self::MAX_SESSION_GC_TIMEOUT);
     }
 
     /**
@@ -313,17 +316,29 @@ class manager {
 
             } else if ($record->timemodified < time() - $maxlifetime) {
                 $timeout = true;
-                $authsequence = get_enabled_auth_plugins(); // Auths, in sequence.
-                foreach ($authsequence as $authname) {
-                    $authplugin = get_auth_plugin($authname);
-                    if ($authplugin->ignore_timeout_hook($_SESSION['USER'], $record->sid, $record->timecreated, $record->timemodified)) {
-                        $timeout = false;
-                        break;
+                // Totara: persistent login extends session for as long as possible in active browser.
+                if (!empty($CFG->persistentloginenable)) {
+                    if ($DB->record_exists('persistent_login', array('userid' => $userid, 'sid' => session_id()))) {
+                        if ($record->timemodified > time() - self::MAX_SESSION_GC_TIMEOUT) {
+                            $timeout = false;
+                        }
                     }
-                    // Totara Connect hack - client SSO sessions extend master session.
+                }
+                // Standard timeout hook for auth plugins.
+                if ($timeout) {
+                    $authsequence = get_enabled_auth_plugins(); // Auths, in sequence.
+                    foreach ($authsequence as $authname) {
+                        $authplugin = get_auth_plugin($authname);
+                        if ($authplugin->ignore_timeout_hook($_SESSION['USER'], $record->sid, $record->timecreated, $record->timemodified)) {
+                            $timeout = false;
+                            break;
+                        }
+                    }
+                }
+                // Totara Connect hack - client SSO sessions extend master session.
+                if ($timeout) {
                     if (\totara_connect\util::ignore_timeout_hook($_SESSION['USER'], $record->sid, $record->timecreated, $record->timemodified)) {
                         $timeout = false;
-                        break;
                     }
                 }
             }
@@ -505,6 +520,8 @@ class manager {
             // Probably install/upgrade - ignore this problem.
         }
 
+        \totara_core\persistent_login::kill(session_id());
+
         // Initialize variable to pass-by-reference to headers_sent(&$file, &$line).
         $file = null;
         $line = null;
@@ -605,6 +622,8 @@ class manager {
 
         self::terminate_current();
 
+        \totara_core\persistent_login::kill_all();
+
         self::load_handler();
         self::$handler->kill_all_sessions();
 
@@ -618,9 +637,14 @@ class manager {
     /**
      * Terminate give session unconditionally.
      * @param string $sid
+     * @param bool $keeppersistentlogin
      */
-    public static function kill_session($sid) {
+    public static function kill_session($sid, $keeppersistentlogin = false) {
         global $DB;
+
+        if (!$keeppersistentlogin) {
+            \totara_core\persistent_login::kill($sid);
+        }
 
         self::load_handler();
 
@@ -760,9 +784,10 @@ class manager {
             $rs->close();
 
             // Now get a list of time-out candidates - real users only.
-            $sql = "SELECT u.*, s.sid, s.timecreated AS s_timecreated, s.timemodified AS s_timemodified
+            $sql = "SELECT u.*, s.sid, s.timecreated AS s_timecreated, s.timemodified AS s_timemodified, s.lastip AS s_lastip, pl.id AS pl_id
                       FROM {user} u
                       JOIN {sessions} s ON s.userid = u.id
+                 LEFT JOIN {persistent_login} pl ON pl.sid = s.sid AND pl.userid = u.id  
                      WHERE s.timemodified < :purgebefore AND u.id <> :guestid";
             $params = array('purgebefore' => (time() - $maxlifetime), 'guestid'=>$CFG->siteguest);
 
@@ -772,17 +797,25 @@ class manager {
             }
             $rs = $DB->get_recordset_sql($sql, $params);
             foreach ($rs as $user) {
+                // Totara: persistent login extends session for as long as possible in active browser.
+                if (!empty($CFG->persistentloginenable) and $user->pl_id) {
+                    if ($user->s_timemodified > time() - self::MAX_SESSION_GC_TIMEOUT) {
+                        continue;
+                    }
+                }
                 foreach ($authplugins as $authplugin) {
                     /** @var \auth_plugin_base $authplugin*/
                     if ($authplugin->ignore_timeout_hook($user, $user->sid, $user->s_timecreated, $user->s_timemodified)) {
                         continue 2;
                     }
-                    // Totara Connect hack - client SSO sessions extend master session.
-                    if (\totara_connect\util::ignore_timeout_hook($user, $user->sid, $user->s_timecreated, $user->s_timemodified)) {
-                        continue;
-                    }
                 }
-                self::kill_session($user->sid);
+                // Totara Connect hack - client SSO sessions extend master session.
+                if (\totara_connect\util::ignore_timeout_hook($user, $user->sid, $user->s_timecreated, $user->s_timemodified)) {
+                    continue;
+                }
+                // Totara: this is one of the two places where we want to keep persistent logins when killing session.
+                \totara_core\persistent_login::session_timeout($user);
+                self::kill_session($user->sid, true);
             }
             $rs->close();
 
@@ -849,6 +882,9 @@ class manager {
             return;
         }
 
+        // Totara: we must require real login afterwards for security reasons!
+        \totara_core\persistent_login::kill(session_id());
+
         // Switch to fresh new $_SESSION.
         $_SESSION = array();
         $_SESSION['REALSESSION'] = clone($GLOBALS['SESSION']);
@@ -897,15 +933,15 @@ class manager {
      * @param string $identifier The string identifier for the message to show on failure.
      * @param string $component The string component for the message to show on failure.
      * @param int $frequency The update frequency in seconds.
-     * @throws coding_exception IF the frequency is longer than the session lifetime.
      */
     public static function keepalive($identifier = 'sessionerroruser', $component = 'error', $frequency = null) {
         global $CFG, $PAGE;
 
         if ($frequency) {
             if ($frequency > $CFG->sessiontimeout) {
-                // Sanity check the frequency.
-                throw new \coding_exception('Keepalive frequency is longer than the session lifespan.');
+                // Totara: do NOT throw exceptions here, debugging is enough for developers, we have to use short lifetimes when testing sessions!
+                debugging('Keepalive frequency is longer than the session lifespan.', DEBUG_DEVELOPER);
+                $frequency = $CFG->sessiontimeout / 3;
             }
         } else {
             // A frequency of sessiontimeout / 3 allows for one missed request whilst still preserving the session.

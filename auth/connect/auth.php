@@ -274,6 +274,16 @@ class auth_plugin_connect extends auth_plugin_base {
     public function process_config($config) {
         return false;
     }
+
+    /**
+     * SSO plugins are not compatible with persistent logins.
+     *
+     * @param stdClass $user
+     * @return bool
+     */
+    public function allow_persistent_login(stdClass $user) {
+        return false;
+    }
 }
 
 
