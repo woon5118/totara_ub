@@ -1,5 +1,5 @@
 /**
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *

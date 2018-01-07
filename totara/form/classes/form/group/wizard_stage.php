@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
@@ -82,7 +82,7 @@ class wizard_stage extends group {
      * Sets the parent wizard for this stage.
      *
      * @param item|null $parent
-     * @throws \coding_exception
+     * @throws \coding_exception when trying to add to a parent that is not a wizard.
      */
     public function set_parent(item $parent = null) {
         if (!$parent instanceof wizard) {
@@ -94,7 +94,7 @@ class wizard_stage extends group {
     /**
      * Set stage hidden.
      *
-     * @param bool|true $value
+     * @param bool $value
      */
     public function set_hidden(bool $value = true) {
         $this->hidden = $value;

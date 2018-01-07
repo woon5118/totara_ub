@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
@@ -37,6 +37,8 @@ use totara_form\item;
 class wizard extends group {
 
     const FORM_CANCELLED = 'cancelled';
+    const CHANGE_STAGE_NEXT = 'Next';
+    const CHANGE_STAGE_PREV = 'Prev';
 
     /**
      * Currently visible stage.
@@ -82,11 +84,13 @@ class wizard extends group {
      * @return wizard_stage $stage
      */
     public function add_stage(wizard_stage $stage, int $position = null) {
-        /** @var wizard_stage $stage */
         $stage = parent::add($stage, $position);
         return $stage;
     }
 
+    /**
+     * Finalise set up of the wizard. Call this at the end of wizard definition.
+     */
     public function finalise() {
         $this->correct_selected_stage();
     }
@@ -118,12 +122,15 @@ class wizard extends group {
     }
 
     /**
+     * Find the first stage that has validation errors so we know
+     * which stage to jump to when presenting the form again.
+     *
      * @return wizard_stage|null
      */
     private function get_first_invalid_stage() {
+        /** @var wizard_stage $stage */
         foreach ($this->get_items() as $stage) {
             if (!$stage->is_valid()) {
-                /** @var wizard_stage $stage */
                 return $stage;
             }
         }
@@ -140,9 +147,9 @@ class wizard extends group {
         $changestagename = $this->get_changestage_name();
         if (isset($data[$changestagename])) {
             $newstage = $data[$changestagename];
-            if ($newstage === 'Next' && isset($data[$this->get_name() . '__nextstage'])) {
+            if ($newstage === self::CHANGE_STAGE_NEXT && isset($data[$this->get_name() . '__nextstage'])) {
                 $newstage = $data[$this->get_name() . '__nextstage'];
-            } else if ($newstage === 'Prev' && isset($data[$this->get_name() . '__prevstage'])) {
+            } else if ($newstage === self::CHANGE_STAGE_PREV && isset($data[$this->get_name() . '__prevstage'])) {
                 $newstage = $data[$this->get_name() . '__prevstage'];
             }
             return $newstage;
@@ -173,7 +180,7 @@ class wizard extends group {
     /**
      * Get current stage name.
      *
-     * @return string
+     * @return string|null
      */
     public function get_current_stage_name() {
         if (!$this->currentstage) {
@@ -259,6 +266,7 @@ class wizard extends group {
             'currentstage' => $this->get_current_stage_name(),
             'previousstage' => null,
             'nextstage' => null,
+            'next_stage_data_attr' => self::CHANGE_STAGE_NEXT,
             'preventjumpahead' => $this->preventjumpahead,
             'amdmodule' => 'totara_form/form_group_wizard',
             'numberofstages' => count($this->get_items()),

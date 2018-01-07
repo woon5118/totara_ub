@@ -1,5 +1,5 @@
 {{!
-   This file is part of Totara LMS
+   This file is part of Totara Learn
 
    Copyright (C) 2017 onwards Totara Learning Solutions LTD
 
@@ -122,7 +122,7 @@
                                  name="changestage"
                                  value="{{wizardnextbtn}}"
                                  class="btn btn_next btn_primary"
-                                 data-jump-to-stage="Next"/>{{/isonlaststage}}
+                                 data-jump-to-stage="{{next_stage_data_attr}}"/>{{/isonlaststage}}
         {{#isonlaststage}}<input type="submit"
                                  name="submitbutton"
                                  value="{{wizardsubmitbtn}}"
