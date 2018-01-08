@@ -27,7 +27,7 @@ Feature: The course tile should work as expected
     And I am on site homepage
     And I click on "Add Tile" "link"
 
-    When I set the field "Tile type" to "Course Tile"
+    When I set the field "Tile type" to "Course"
     And I click on "Select course" "button"
     And I click on "Miscellaneous" "link" in the "Select course" "totaradialogue"
 
@@ -48,14 +48,14 @@ Feature: The course tile should work as expected
     And "DifferentTestCour" "link" in the "#search-tab" "css_element" should not be visible
 
   Scenario: Check course tile has to always have a course
-    When I set the field "Tile type" to "Course Tile"
+    When I set the field "Tile type" to "Course"
     And I click on "Select course" "button"
     And I click on "Cancel" "button" in the "Select course" "totaradialogue"
     And I click on "Save changes" "button"
     Then I should see "Please select a course"
 
   Scenario: Check course Tile selecting a course
-    When I set the field "Tile type" to "Course Tile"
+    When I set the field "Tile type" to "Course"
     And I click on "Select course" "button"
     And I click on "Miscellaneous" "link" in the "Select course" "totaradialogue"
     And I click on "TestCourseName" "link" in the "Select course" "totaradialogue"
@@ -64,19 +64,19 @@ Feature: The course tile should work as expected
     Then "TestCourseName" "text" should exist in the ".block_totara_featured_links" "css_element"
 
   Scenario: Check heading location is saved
-    When I set the field "Tile type" to "Course Tile"
+    When I set the field "Tile type" to "Course"
     And I click on "Select course" "button"
     And I click on "Miscellaneous" "link" in the "Select course" "totaradialogue"
     And I click on "TestCourseName" "link" in the "Select course" "totaradialogue"
     And I click on "OK" "button" in the "Select course" "totaradialogue"
 
-    And I set the field "Heading location" to "bottom"
+    And I set the field "Bottom" to "1"
     And I click on "Save changes" "button"
 
     Then ".block-totara-featured-links-content-bottom" "css_element" should exist
 
   Scenario: Check that the tile takes the user to the course
-    When I set the field "Tile type" to "Course Tile"
+    When I set the field "Tile type" to "Course"
     And I click on "Select course" "button"
     And I click on "Miscellaneous" "link" in the "Select course" "totaradialogue"
     And I click on "TestCourseName" "link" in the "Select course" "totaradialogue"
@@ -90,7 +90,7 @@ Feature: The course tile should work as expected
     And "Featured Links" "block" should not exist
 
   Scenario: Check that the visibility form shows the visibility of the course
-    When I set the field "Tile type" to "Course Tile"
+    When I set the field "Tile type" to "Course"
     And I click on "Select course" "button"
     And I click on "Miscellaneous" "link" in the "Select course" "totaradialogue"
     And I click on "TestCourseName" "link" in the "Select course" "totaradialogue"
@@ -120,7 +120,7 @@ Feature: The course tile should work as expected
     Then I should see "Course has been deleted"
 
     And I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-    And I click on "Content" "link"
+    And I click on "Edit" "link" in the "Featured Links" "block"
     Then I should see "Course has been deleted"
     When I click on "Cancel" "button"
 
@@ -150,7 +150,7 @@ Feature: The course tile should work as expected
     When I am on site homepage
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | Tile type | Course Tile |
+      | Tile type | Course |
     And I click on "Select course" "button"
     And I click on "Miscellaneous" "link" in the "Select course" "totaradialogue"
     And I click on "Course 1" "link" in the "Select course" "totaradialogue"

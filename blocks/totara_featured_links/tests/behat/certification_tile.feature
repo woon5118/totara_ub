@@ -70,7 +70,7 @@ Feature: The certification tile should work as expected
     And I click on "TestCertificationName" "link" in the "Select certification" "totaradialogue"
     And I click on "OK" "button" in the "Select certification" "totaradialogue"
 
-    And I set the field "Heading location" to "bottom"
+    And I set the field "Bottom" to "1"
     And I click on "Save changes" "button"
 
     Then ".block-totara-featured-links-content-bottom" "css_element" should exist
@@ -120,7 +120,7 @@ Feature: The certification tile should work as expected
     Then I should see "Certification has been deleted"
 
     And I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-    And I click on "Content" "link"
+    And I click on "Edit" "link" in the "Featured Links" "block"
     Then I should see "Certification has been deleted"
     When I click on "Cancel" "button"
 

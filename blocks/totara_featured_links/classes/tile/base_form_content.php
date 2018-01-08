@@ -45,9 +45,9 @@ abstract class base_form_content extends base_form {
     public function definition () {
         global $DB;
 
-        /** @var section $group */
-        $group = $this->model->add(new section('group', get_string('content_edit', 'block_totara_featured_links')));
-        $group->set_collapsible(false);
+        /** @var section $maingroup */
+        $maingroup = $this->model->add(new section('maingroup', get_string('content_edit', 'block_totara_featured_links')));
+        $maingroup->set_collapsible(false);
 
         /** @var \block_totara_featured_links\tile\base[] $classes */
         $classes = \core_component::get_namespace_classes('tile', 'block_totara_featured_links\tile\base');
@@ -62,9 +62,7 @@ abstract class base_form_content extends base_form {
         $tile_types = $this->model->add(new select('type', get_string('tile_types', 'block_totara_featured_links'), $class_options));
         $tile_types->add_validator(new is_subclass_of_tile_base());
 
-        $this->specific_definition($group);
-
-        $position = $this->model->add(new number('sortorder', get_string('tile_position', 'block_totara_featured_links')));
+        $position = $this->model->add(new number('sortorder', get_string('tile_position', 'block_totara_featured_links')), 100);
         $max = $DB->count_records('block_totara_featured_links_tiles', ['blockid' => $this->get_parameters()['blockinstanceid']]);
         if ($DB->count_records('block_totara_featured_links_tiles', ['id' => $this->get_parameters()['tileid']]) == 0) {
             $max++;
@@ -72,6 +70,9 @@ abstract class base_form_content extends base_form {
         $position->set_attribute('max', max(1, $max));
         $position->set_attribute('min', 1);
         $position->set_attribute('required', true);
+
+        $this->specific_definition($maingroup);
+
         parent::definition();
     }
 

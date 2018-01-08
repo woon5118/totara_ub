@@ -28,6 +28,7 @@ use block_totara_featured_links\form\validator\is_color;
 use totara_form\element_validator;
 use totara_form\form\element\checkbox;
 use totara_form\form\element\hidden;
+use totara_form\form\element\radios;
 use totara_form\form\element\select;
 use totara_form\form\element\static_html;
 use totara_form\group;
@@ -66,12 +67,12 @@ abstract class learning_item_form_content extends base_form_content {
     public function specific_definition(group $group) {
         $this->add_learning_item_picker($group);
 
-        $group->add(new select('heading_location', get_string('heading_location', 'block_totara_featured_links'), [
-            'top' => get_string('top_heading', 'block_totara_featured_links'),
-            'bottom' => get_string('bottom_heading', 'block_totara_featured_links')
-        ]));
-
         $group->add(new checkbox('progressbar', get_string('show_progress_bar', 'block_totara_featured_links')));
+
+        $group->add(new radios('heading_location', get_string('heading_location', 'block_totara_featured_links'), [
+            base::HEADING_TOP => get_string('top_heading', 'block_totara_featured_links'),
+            base::HEADING_BOTTOM => get_string('bottom_heading', 'block_totara_featured_links')
+        ]));
 
         $background = $group->add(
             new colorpicker(
@@ -80,6 +81,7 @@ abstract class learning_item_form_content extends base_form_content {
                 PARAM_TEXT
             )
         );
+
         $background->add_validator(new is_color());
     }
 

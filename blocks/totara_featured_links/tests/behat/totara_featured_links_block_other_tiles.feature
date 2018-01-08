@@ -15,10 +15,10 @@
     Scenario: Gallery tile content
       When I start watching to see if a new page loads
       And I set the following fields to these values:
-        | Tile type | Gallery Tile |
+        | Tile type | Gallery |
       And I set the following Totara form fields to these values:
-        | URL | www.example.com |
-        | Title | this is a title |
+        | URL         | www.example.com       |
+        | Title       | this is a title       |
         | Description | this is a description |
       Then a new page should have loaded since I started watching
       When I set the following Totara form fields to these values:
@@ -33,9 +33,9 @@
         | Alternate text | this is the alt text |
       And I click on "Save changes" "button"
       And I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-      And I click on "Content" "link"
+      And I click on "Edit" "link" in the "Featured Links" "block"
       And I set the following fields to these values:
-        | Tile type | Gallery Tile |
+        | Tile type | Gallery |
       Then the following fields match these values:
         | URL | http://www.example.com |
         | Title | this is the title |
@@ -48,9 +48,9 @@
         | Alternate text | this is the alt text2 |
       And I click on "Save changes" "button"
       And I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-      And I click on "Content" "link"
+      And I click on "Edit" "link" in the "Featured Links" "block"
       And I set the following fields to these values:
-        | Tile type | Static Tile |
+        | Tile type | Static |
       Then the following fields match these values:
         | URL | http://www.example2.com |
         | Title | this is the title2 |

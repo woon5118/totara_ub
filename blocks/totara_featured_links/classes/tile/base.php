@@ -40,8 +40,12 @@ abstract class base {
     const VISIBILITY_CUSTOM = 2;
     /** Defines the value for the aggregation option that the user meets all of the defined rules.*/
     const AGGREGATION_ALL = 1;
-    /**Defines the value for the aggregation option where the user only has to match one of the rules.*/
+    /** Defines the value for the aggregation option where the user only has to match one of the rules.*/
     const AGGREGATION_ANY = 0;
+
+    /** Location of headings in the tiles. */
+    const HEADING_TOP = 'top';
+    const HEADING_BOTTOM = 'bottom';
 
 
     /** @var int id of the tile */

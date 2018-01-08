@@ -94,18 +94,21 @@ class default_tile extends base{
      * @return \stdClass
      */
     public function get_content_form_data() {
-        $data_obj = parent::get_content_form_data();
+        $dataobj = parent::get_content_form_data();
         // Move background file to the draft area.
         if (isset($this->data->background_img)) {
-            $data_obj->background_img = new file_area(\context_block::instance($this->blockid),
+            $dataobj->background_img = new file_area(\context_block::instance($this->blockid),
                 'block_totara_featured_links',
                 'tile_background',
                 $this->id);
         }
-        if (!isset($data_obj->background_appearance)) {
-            $data_obj->background_appearance = default_tile::COVER_BACKGROUND_APPEARANCE;
+        if (!isset($dataobj->background_appearance)) {
+            $dataobj->background_appearance = default_tile::COVER_BACKGROUND_APPEARANCE;
         }
-        return $data_obj;
+        if (!isset($this->data->heading_location)) {
+            $dataobj->heading_location = self::HEADING_TOP;
+        }
+        return $dataobj;
     }
 
     /**

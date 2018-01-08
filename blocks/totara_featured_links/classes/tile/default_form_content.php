@@ -30,10 +30,10 @@ use block_totara_featured_links\form\validator\is_color;
 use totara_form\form\element\checkbox;
 use totara_form\form\element\filemanager;
 use totara_form\form\element\radios;
-use totara_form\form\element\select;
 use totara_form\form\element\text;
 use totara_form\form\element\textarea;
 use \block_totara_featured_links\form\element\colorpicker;
+use totara_form\form\group\section;
 use totara_form\form\validator\element_filemanager;
 use totara_form\group;
 
@@ -57,16 +57,26 @@ class default_form_content extends base_form_content{
 
         $group->add(new checkbox('target', get_string('link_target_label', 'block_totara_featured_links'), '_blank', '_self'));
 
-        $group->add(new text('heading', get_string('tile_title', 'block_totara_featured_links'), PARAM_TEXT));
+        /** @var section $textgroup */
+        $textgroup = $this->model->add(new section('textgroup', get_string('text', 'block_totara_featured_links')));
+        $textgroup->set_expanded(true);
+        $textgroup->set_collapsible(true);
 
-        $group->add(new textarea('textbody', get_string('tile_description', 'block_totara_featured_links'), PARAM_TEXT));
+        $textgroup->add(new text('heading', get_string('tile_title', 'block_totara_featured_links'), PARAM_TEXT));
 
-        $group->add(new select('heading_location', get_string('heading_location', 'block_totara_featured_links'), [
-            'top' => get_string('top_heading', 'block_totara_featured_links'),
-            'bottom' => get_string('bottom_heading', 'block_totara_featured_links')
+        $textgroup->add(new textarea('textbody', get_string('tile_description', 'block_totara_featured_links'), PARAM_TEXT));
+
+        $textgroup->add(new radios('heading_location', get_string('heading_location', 'block_totara_featured_links'), [
+            base::HEADING_TOP => get_string('top_heading', 'block_totara_featured_links'),
+            base::HEADING_BOTTOM => get_string('bottom_heading', 'block_totara_featured_links')
         ]));
 
-        $file = $group->add(
+        /** @var section $backgroundgroup */
+        $backgroundgroup = $this->model->add(new section('backgroundgroup', get_string('background', 'block_totara_featured_links')));
+        $backgroundgroup->set_expanded(true);
+        $backgroundgroup->set_collapsible(true);
+
+        $file = $backgroundgroup->add(
             new filemanager(
                 'background_img',
                 get_string('tile_background', 'block_totara_featured_links'),
@@ -84,18 +94,18 @@ class default_form_content extends base_form_content{
             ['cover' => get_string('backgroundcover', 'block_totara_featured_links'),
                 'contain' => get_string('backgroundcontain', 'block_totara_featured_links')]));
 
-        $alt_text = $group->add(new text('alt_text', get_string('tile_alt_text', 'block_totara_featured_links'), PARAM_TEXT));
+        $alt_text = $backgroundgroup->add(new text('alt_text', get_string('tile_alt_text', 'block_totara_featured_links'), PARAM_TEXT));
         $alt_text->add_validator(new alt_text_required(null, 'background_img'));
         $alt_text->add_help_button('tile_alt_text', 'block_totara_featured_links');
 
-        $background = $group->add(
+        $backgroundcolor = $backgroundgroup->add(
             new colorpicker(
                 'background_color',
                 get_string('tile_background_color', 'block_totara_featured_links'),
                 PARAM_TEXT
             )
         );
-        $background->add_validator(new is_color());
+        $backgroundcolor->add_validator(new is_color());
         return;
     }
 

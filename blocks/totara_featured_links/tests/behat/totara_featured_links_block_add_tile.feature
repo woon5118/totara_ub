@@ -45,7 +45,7 @@
         | Description | default description3 |
       And I click on "Save changes" "button"
       And I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-      And I click on "Content" "link"
+      And I click on "Edit" "link" in the "Featured Links" "block"
       And I set the following fields to these values:
         | Description | not default |
         | Title | test heading |

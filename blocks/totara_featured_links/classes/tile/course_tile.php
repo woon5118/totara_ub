@@ -66,6 +66,9 @@ class course_tile extends learning_item_tile {
         if (isset($this->data_filtered->courseid)) {
             $dataobj->course_name_id = $this->data_filtered->courseid;
         }
+        if (!isset($this->data->heading_location)) {
+            $dataobj->heading_location = self::HEADING_TOP;
+        }
         return $dataobj;
     }
 

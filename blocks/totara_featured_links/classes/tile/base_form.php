@@ -26,8 +26,8 @@ namespace block_totara_featured_links\tile;
 defined('MOODLE_INTERNAL') || die();
 
 use \totara_form\form;
-use totara_form\group;
-use totara_form\item;
+use \totara_form\group;
+use \totara_form\item;
 
 /**
  * Class base_form
@@ -47,7 +47,7 @@ abstract class base_form extends form {
 
     /**
      * contains the tile defined form
-     * @param \totara_form\group $group
+     * @param group $group
      * @return null
      */
     protected abstract function specific_definition(group $group);

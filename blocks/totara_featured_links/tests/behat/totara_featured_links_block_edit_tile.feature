@@ -22,7 +22,7 @@ Feature: Block edit test block
 
   Scenario Outline: Editing the for actually changes the values in the tile
     When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-    And I click on "Content" "link"
+    And I click on "Edit" "link" in the "Featured Links" "block"
 
     # There doesnt seem to be a way of testing file uploads in a totara form
     # TODO check upload of file works once files can be uploaded in totara form
@@ -40,16 +40,16 @@ Feature: Block edit test block
     Then I should not see "totara"
 
     Examples:
-      | heading | link | body |
-      | | http://www.example.com | textbody |
+      | heading      | link                   | body      |
+      |              | http://www.example.com | textbody  |
       | Some Heading | http://www.example.com | some body |
-      | heading  | http://www.example.com | |
+      | heading      | http://www.example.com |           |
 
   Scenario: Can the admin get to the edit form and cancel without effecting anything
     When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-    When I click on "Content" "link"
+    And I click on "Edit" "link" in the "Featured Links" "block"
     And I set the following fields to these values:
-      | Title | Some Heading |
+      | Title    | Some Heading |
       | textbody | some body |
       | URL      | http://www.example.com |
     And I press "Cancel"
@@ -60,7 +60,7 @@ Feature: Block edit test block
 
   Scenario: Check that the background appearance uses the right classes
     When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-    And I click on "Content" "link"
+    And I click on "Edit" "link" in the "Featured Links" "block"
     And I set the following fields to these values:
       | Title       | title       |
       | Description | description |
@@ -72,7 +72,7 @@ Feature: Block edit test block
     And ".background-contain" "css_element" should not exist
 
     When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-    And I click on "Content" "link"
+    And I click on "Edit" "link" in the "Featured Links" "block"
     And I set the following fields to these values:
       | Fit inside tile | 1 |
     And I click on "Save changes" "button"
