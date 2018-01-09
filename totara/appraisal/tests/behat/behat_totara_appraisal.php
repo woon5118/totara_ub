@@ -69,13 +69,4 @@ class behat_totara_appraisal extends behat_base {
         }
         $this->execute("behat_forms::i_set_the_field_to_multiline", array($fieldname, new PyStringNode([$placholdertext], 0)));
     }
-
-    /**
-     * @Given /^I go to the missing roles page for the "([^"]*)" appraisal$/
-     */
-    public function iGoToTheMissingRolesPageForTheAppraisal($appraisalname) {
-        global $DB;
-        $appraisalid = $DB->get_record('appraisal', array('name' => $appraisalname));
-        $this->getSession()->visit($this->locate_path('/totara/appraisal/missing.php?appraisalid=' . $appraisalid->id));
-    }
 }
