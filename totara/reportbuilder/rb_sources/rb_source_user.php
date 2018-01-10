@@ -123,29 +123,8 @@ class rb_source_user extends rb_base_source {
      * @return array The SQL and parmeters that defines the WHERE for the source.
      */
     protected function define_sourcewhere() {
-        global $DB;
-
-        $sql = '';
-        $params = array ();
-
-        // If the user doesn't have permission to see deleted users ensure they can't.
-        if (!has_capability('totara/core:seedeletedusers', context_system::instance())) {
-            $sql = 'deleted = 0';
-        } else {
-            // Always exclude fully deleted users but not partially deleted ones.
-            // Fully deleted users can be identified by their MD5ed email field.
-            if ($DB->sql_regex_supported()) {
-                $sql .= 'email ' . $DB->sql_regex(false) . ' :user_source_deleted_user_md5';
-                $params['user_source_deleted_user_md5'] = "^[a-f0-9]{32}$";
-            } else {
-                $sql = 'NOT' . $DB->sql_length('email') . ' = :user_source_deleted_user_len';
-                $sql .= ' AND ' . $DB->sql_like('email', ':user_source_deleted_user_email');
-                $params['user_source_deleted_user_len'] = 32;
-                $params['user_source_deleted_user_email'] = '%@%';
-            }
-        }
-
-        return array($sql, $params);
+        // There is now a separate report for deleted user accounts.
+        return array("base.deleted = 0", array());
     }
 
 
@@ -212,6 +191,29 @@ class rb_source_user extends rb_base_source {
             )
         );
 
+        $joinlist[] = new rb_join(
+            'user_extra',
+            'LEFT',
+            '{totara_userdata_user}',
+            'base.id = user_extra.userid');
+
+        $joinlist[] = new rb_join(
+            'suspended_purge_type',
+            'LEFT',
+            '{totara_userdata_purge_type}',
+            'user_extra.suspendedpurgetypeid = suspended_purge_type.id',
+            null,
+            'user_extra');
+
+        $joinlist[] = new rb_join(
+            'deleted_purge_type',
+            'LEFT',
+            '{totara_userdata_purge_type}',
+            'user_extra.deletedpurgetypeid = deleted_purge_type.id',
+            null,
+            'user_extra');
+
+
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'id');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'id', 'basecohort');
 
@@ -266,6 +268,50 @@ class rb_source_user extends rb_base_source {
                             'noexport' => true,
                             'defaultheading' => get_string('options', 'rb_source_user')
                         )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'suspended_purge_type',
+            'fullname',
+            get_string('suspendedpurgetype', 'totara_userdata'),
+            'suspended_purge_type.fullname',
+            array(
+                'displayfunc' => 'format_string',
+                'joins' => array('suspended_purge_type')
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'suspended_purge_type',
+            'id',
+            'ID',
+            'suspended_purge_type.id',
+            array(
+                'addtypetoheading' => true,
+                'joins' => array('suspended_purge_type')
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'deleted_purge_type',
+            'fullname',
+            get_string('deletedpurgetype', 'totara_userdata'),
+            'deleted_purge_type.fullname',
+            array(
+                'displayfunc' => 'format_string',
+                'joins' => array('deleted_purge_type')
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'deleted_purge_type',
+            'id',
+            'ID',
+            'deleted_purge_type.id',
+            array(
+                'addtypetoheading' => true,
+                'joins' => array('deleted_purge_type')
+            )
         );
 
         // A column to display the number of achieved competencies for a user
@@ -386,12 +432,48 @@ class rb_source_user extends rb_base_source {
         return $columnoptions;
     }
 
+    public function rb_filter_purge_type_suspended_list() {
+        global $DB;
+        $options = $DB->get_records_menu('totara_userdata_purge_type', array('userstatus' => \totara_userdata\userdata\target_user::STATUS_SUSPENDED), '', 'id, fullname');
+        $options = array_map('format_string', $options);
+        \core_collator::asort($options);
+        return $options;
+    }
+
+    public function rb_filter_purge_type_deleted_list() {
+        global $DB;
+        $options = $DB->get_records_menu('totara_userdata_purge_type', array('userstatus' => \totara_userdata\userdata\target_user::STATUS_DELETED), '', 'id, fullname');
+        $options = array_map('format_string', $options);
+        \core_collator::asort($options);
+        return $options;
+    }
+
     /**
      * Creates the array of rb_filter_option objects required for $this->filteroptions
      * @return array
      */
     protected function define_filteroptions() {
         $filteroptions = array();
+
+        $filteroptions[] = new rb_filter_option(
+            'suspended_purge_type',
+            'id',
+            get_string('suspendedpurgetype', 'totara_userdata'),
+            'select',
+            array(
+                'selectfunc' => 'purge_type_suspended_list',
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'deleted_purge_type',
+            'id',
+            get_string('deletedpurgetype', 'totara_userdata'),
+            'select',
+            array(
+                'selectfunc' => 'purge_type_deleted_list',
+            )
+        );
 
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions, 'base');

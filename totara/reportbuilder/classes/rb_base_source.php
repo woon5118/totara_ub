@@ -2843,22 +2843,41 @@ abstract class rb_base_source {
             )
         );
 
-        $filteroptions[] = new rb_filter_option(
-            $groupname,
-            'deleted',
-            get_string('userstatus', 'totara_reportbuilder'),
-            'select',
-            array(
-                'selectchoices' => array(0 => get_string('activeuser', 'totara_reportbuilder'),
-                    1 => get_string('deleteduser', 'totara_reportbuilder'),
-                    2 => get_string('suspendeduser', 'totara_reportbuilder'),
-                    3 => get_string('unconfirmeduser', 'totara_reportbuilder'),
-                ),
-                'attributes' => $select_width_options,
-                'simplemode' => true,
-                'addtypetoheading' => $addtypetoheading
-            )
-        );
+        if ($this instanceof rb_source_user) {
+            // Deleted users are always excluded, we have a special deleted_users report now instead.
+            $filteroptions[] = new rb_filter_option(
+                $groupname,
+                'deleted',
+                get_string('userstatus', 'totara_reportbuilder'),
+                'select',
+                array(
+                    'selectchoices' => array(0 => get_string('activeuser', 'totara_reportbuilder'),
+                        2 => get_string('suspendeduser', 'totara_reportbuilder'),
+                        3 => get_string('unconfirmeduser', 'totara_reportbuilder'),
+                    ),
+                    'attributes' => $select_width_options,
+                    'simplemode' => true,
+                    'addtypetoheading' => $addtypetoheading
+                )
+            );
+        } else {
+            $filteroptions[] = new rb_filter_option(
+                $groupname,
+                'deleted',
+                get_string('userstatus', 'totara_reportbuilder'),
+                'select',
+                array(
+                    'selectchoices' => array(0 => get_string('activeuser', 'totara_reportbuilder'),
+                        1 => get_string('deleteduser', 'totara_reportbuilder'),
+                        2 => get_string('suspendeduser', 'totara_reportbuilder'),
+                        3 => get_string('unconfirmeduser', 'totara_reportbuilder'),
+                    ),
+                    'attributes' => $select_width_options,
+                    'simplemode' => true,
+                    'addtypetoheading' => $addtypetoheading
+                )
+            );
+        }
 
         $filteroptions[] = new rb_filter_option(
             $groupname,

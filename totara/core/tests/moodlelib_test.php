@@ -92,6 +92,25 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
 
         $user1 = $this->getDataGenerator()->create_user(array('idnumber' => 'abc'));
         $user2 = $this->getDataGenerator()->create_user(array('idnumber' => 'xyz'));
+        $user3 = $this->getDataGenerator()->create_user(array('idnumber' => 'opq'));
+
+        $this->assertTrue($DB->record_exists('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $user1->id)));
+        $this->assertTrue($DB->record_exists('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $user2->id)));
+        $this->assertTrue($DB->record_exists('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $user3->id)));
+
+        // Delete user the proper way.
+        $this->assertSame('fullproper', $CFG->authdeleteusers);
+        $result = delete_user($user3);
+
+        $this->assertTrue($result);
+        $deluser = $DB->get_record('user', array('id' => $user3->id), '*', MUST_EXIST);
+        $this->assertEquals(1, $deluser->deleted);
+        $this->assertEquals(0, $deluser->picture);
+        $this->assertSame('', $deluser->idnumber);
+        $this->assertSame('', $deluser->email);
+        $this->assertRegExp('/^deleted_[a-z0-9]+$/', $deluser->username);
+        $this->assertSame(AUTH_PASSWORD_NOT_CACHED, $deluser->password);
+        $this->assertFalse($DB->record_exists('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $user3->id)));
 
         // Delete user the Moodle way.
         $CFG->authdeleteusers = 'full';
@@ -105,6 +124,8 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('', $deluser->idnumber);
         $this->assertSame(md5($user1->username), $deluser->email);
         $this->assertRegExp('/^' . preg_quote($user1->email, '/') . '\.\d*$/', $deluser->username);
+        $this->assertSame($user1->password, $deluser->password);
+        $this->assertFalse($DB->record_exists('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $user1->id)));
 
         // Delete user the old Totara way.
         $CFG->authdeleteusers = 'partial';
@@ -119,6 +140,8 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame($user2->idnumber, $deluser->idnumber);
         $this->assertSame($user2->username, $deluser->username);
         $this->assertSame($user2->email, $deluser->email);
+        $this->assertSame($user2->password, $deluser->password);
+        $this->assertFalse($DB->record_exists('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $user2->id)));
     }
 
     /**

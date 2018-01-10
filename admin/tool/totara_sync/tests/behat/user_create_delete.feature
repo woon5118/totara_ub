@@ -7,7 +7,7 @@ Feature: An admin can import users through HR import
     Given I log in as "admin"
     And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
     And I set the following fields to these values:
-      | User deletion | Keep username, email and ID number |
+      | User deletion | Keep username, email and ID number (legacy) |
     And I press "Save changes"
     And I navigate to "General settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
@@ -179,7 +179,7 @@ Feature: An admin can import users through HR import
   Scenario: Import a deleted user through HR import using full deletion of users.
     Given I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
     And I set the following fields to these values:
-      | User deletion | Full |
+      | User deletion | Full (legacy) |
     And I press "Save changes"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I set the following fields to these values:

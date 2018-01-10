@@ -678,7 +678,7 @@ class util {
             $olduser = $DB->get_record('user', array('id' => $userinfo->userid), '*', MUST_EXIST);
 
             if ($olduser->deleted != 0) {
-                if (preg_match('/^[0-9a-f]{32}$/i', $olduser->email)) {
+                if (!is_undeletable_user($olduser)) {
                     // Undeleting regularly deleted user, we need to get some valid username and email.
                     $user->username = self::create_local_username($server, $serveruser);
                 } else {

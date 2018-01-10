@@ -33,6 +33,16 @@ class user_bulk_action_form extends moodleform {
         if (has_capability('moodle/user:update', $syscontext)) {
             $actions[9] = get_string('toggletotarasync', 'totara_core');
         }
+        if (\totara_userdata\userdata\manager::get_purge_types(\totara_userdata\userdata\target_user::STATUS_SUSPENDED, 'suspended')) {
+            if (has_capability('totara/userdata:purgesetsuspended', $syscontext)) {
+                $actions[10] = get_string('suspendedpurgetype', 'totara_userdata');
+            }
+        }
+        if (\totara_userdata\userdata\manager::get_purge_types(\totara_userdata\userdata\target_user::STATUS_DELETED, 'deleted')) {
+            if (has_capability('totara/userdata:purgesetdeleted', $syscontext)) {
+                $actions[11] = get_string('deletedpurgetype', 'totara_userdata');
+            }
+        }
         $objs = array();
         $objs[] =& $mform->createElement('select', 'action', get_string('dowhatwithselectedusers'), $actions);
         $objs[] =& $mform->createElement('submit', 'doaction', get_string('go'));

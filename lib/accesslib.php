@@ -6202,7 +6202,12 @@ class context_user extends context {
 
         if (!$record = $DB->get_record('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $userid))) {
             if ($user = $DB->get_record('user', array('id' => $userid, 'deleted' => 0), 'id', $strictness)) {
-                $record = context::insert_context_record(CONTEXT_USER, $user->id, '/'.SYSCONTEXTID, 0);
+                // Keep the context id the same when undeleting users.
+                $record = \totara_userdata\local\util::recover_user_context($userid);
+                if (!$record) {
+                    $record = context::insert_context_record(CONTEXT_USER, $user->id, '/'.SYSCONTEXTID);
+                    \totara_userdata\local\util::backup_user_context_id($record->instanceid, $record->id);
+                }
             }
         }
 
@@ -6213,6 +6218,16 @@ class context_user extends context {
         }
 
         return false;
+    }
+
+    /**
+     * Delete the context content and the context record itself
+     */
+    public function delete() {
+        // Totara: make sure we remember the origianl user id, it is needed for user data puring and undelete.
+        \totara_userdata\local\util::backup_user_context_id($this->_instanceid, $this->_id);
+
+        parent::delete();
     }
 
     /**
@@ -6230,7 +6245,12 @@ class context_user extends context {
                                         WHERE u.id = cx.instanceid AND cx.contextlevel=".CONTEXT_USER.")";
         $contextdata = $DB->get_recordset_sql($sql);
         foreach ($contextdata as $context) {
-            context::insert_context_record(CONTEXT_USER, $context->id, null);
+            // Keep the context id the same when undeleting users.
+            $record = \totara_userdata\local\util::recover_user_context($context->id);
+            if (!$record) {
+                $record = context::insert_context_record(CONTEXT_USER, $context->id, null);
+                \totara_userdata\local\util::backup_user_context_id($record->instanceid, $record->id);
+            }
         }
         $contextdata->close();
     }

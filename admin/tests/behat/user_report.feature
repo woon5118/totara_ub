@@ -7,12 +7,10 @@ Feature: Verify functionality of user report.
       | username | firstname | lastname | email                     | maildisplay |
       | learner1 | Bob1      | Learner1 | bob1.learner1@example.com | 0           |
 
-    When I log in as "admin"
+    And I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I press "Edit this report"
-    Then I should see "Edit Report 'Browse list of users'"
 
-    When I follow "View This Report"
+  Scenario: Verify expected users are in user report
     Then I should see "Browse list of users: 3 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status | Last Login                   |
@@ -99,31 +97,7 @@ Feature: Verify functionality of user report.
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
 
-  Scenario: Verify partial delete and undelete of user in user report.
-
-    Given the following config values are set as admin:
-      | authdeleteusers | partial |
-    When I follow "Delete Bob1 Learner1"
-    Then I should see "Delete user"
-
-    When I press "Delete"
-    And I set the field "user-deleted" to "any value"
-    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
-    Then I should see "Browse list of users: 3 records shown"
-    Then the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
-
-    When I follow "Undelete Bob1 Learner1"
-    Then I should see "Undelete User"
-
-    When I press "Undelete"
-    Then I should see "Browse list of users: 3 records shown"
-    And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
-
-  Scenario: Verify full delete of user in user report.
+  Scenario: Verify delete of user in user report.
 
     Given the following config values are set as admin:
       | authdeleteusers | full |
@@ -131,61 +105,10 @@ Feature: Verify functionality of user report.
     Then I should see "Delete user"
 
     When I press "Delete"
-    # A fully deleted user is not shown in the report.
     Then I should see "Browse list of users: 2 records shown"
     And I set the field "user-deleted" to "any value"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should not see "Bob1 Learner1"
-
-  Scenario: Verify 'seedeletedusers' capability is supported in user report.
-
-    Given the following config values are set as admin:
-      | authdeleteusers | partial |
-    And the following "users" exist:
-      | username | firstname | lastname | email                      |
-      | manager1 | Dave1     | Manager1 | dave1.manager1@example.com |
-    And the following "system role assigns" exist:
-      | user     | role    |
-      | manager1 | manager |
-    And I set the following system permissions of "Site Manager" role:
-      | capability                  | permission |
-      | totara/core:seedeletedusers | Allow      |
-
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    Then I should see "Browse list of users: 4 records shown"
-
-    When I follow "Delete Bob1 Learner1"
-    Then I should see "Delete user"
-
-    When I press "Delete"
-    And I set the field "user-deleted" to "any value"
-    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
-    Then I should see "Browse list of users: 4 records shown"
-    And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
-
-    When I log out
-    And I log in as "manager1"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I set the field "user-deleted" to "any value"
-    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
-    Then the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
-
-    When I set the following system permissions of "Site Manager" role:
-      | capability                  | permission |
-      | totara/core:seedeletedusers | Prevent    |
-    And I log out
-    And I log in as "manager1"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I set the field "user-deleted" to "any value"
-    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
-    Then I should see "Browse list of users: 3 records shown"
-    And the following should not exist in the "reportbuilder-table" table:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
 
   Scenario: Verify confirm new self-registration user in user report.
 

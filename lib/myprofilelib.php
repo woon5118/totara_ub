@@ -123,6 +123,20 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $tree->add_node($node);
     }
 
+    // Totara: user data overview
+    if (has_capability('totara/userdata:viewinfo', $usercontext)) {
+        $url = new \moodle_url('/totara/userdata/user_info.php', array('id' => $user->id));
+        $node = new  core_user\output\myprofile\node('administration', 'userinfo', get_string('userinfo', 'totara_userdata'), null, $url);
+        $tree->add_node($node);
+    }
+
+    // Totara: user data export
+    if ($iscurrentuser and get_config('totara_userdata', 'selfexportenable') and has_capability('totara/userdata:exportself', $usercontext)) {
+        $url = new moodle_url('/totara/userdata/export_request.php');
+        $node = new  core_user\output\myprofile\node('administration', 'userdataexport', get_string('exportrequest', 'totara_userdata'), null, $url);
+        $tree->add_node($node);
+    }
+
     // Contact details.
     if (has_capability('moodle/user:viewhiddendetails', $courseorusercontext)) {
         $hiddenfields = array();

@@ -34,8 +34,17 @@ namespace totara_reportbuilder\rb\display;
  */
 class user_email_unobscured extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        if (!$value) {
+            return '';
+        }
+
         if ($format !== 'html') {
-            return static::to_plaintext($value);
+            return $value;
+        }
+
+        if (!validate_email($value)) {
+            // Deleted user, show at least the hash to make it obvious we do not know the email any more.
+            return s($value);
         }
 
         // In reality, format_text() should not be called here since emails do

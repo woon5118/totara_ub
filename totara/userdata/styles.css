@@ -1,0 +1,27 @@
+/* TODO TL-16747 this is a temporary stylesheet, it has to be replaced before release with less stuff */
+#page-admin-totara-userdata-purge_types dt:after,
+#page-admin-totara-userdata-export_types dt:after,
+#page-totara-userdata-audit dt:after,
+#page-admin-totara-userdata-user_info dt:after,
+#page-totara-userdata-user_info dt:after {
+    content: ":";
+}
+#page-admin-totara-userdata-purge_types dt,
+#page-admin-totara-userdata-export_types dt,
+#page-totara-userdata-audit dt,
+#page-admin-totara-userdata-user_info dt,
+#page-totara-userdata-user_info dt {
+    clear: left;
+    float: left;
+    width: 320px;
+    text-align: right;
+    font-weight: bold;
+}
+#page-admin-totara-userdata-purge_types dd,
+#page-admin-totara-userdata-export_types dd,
+#page-totara-userdata-audit dd,
+#page-admin-totara-userdata-user_info dd,
+#page-totara-userdata-user_info dd {
+    margin: 0 0 0 340px;
+    padding: 0 0 0.1em 0;
+}

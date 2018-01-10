@@ -5,7 +5,7 @@ Feature: An admin can import different CSV enconding through HR import
     Given I log in as "admin"
     And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
     And I set the following fields to these values:
-      | User deletion | Keep username, email and ID number |
+      | User deletion | Keep username, email and ID number (legacy) |
     And I press "Save changes"
     And I navigate to "General settings" node in "Site administration > HR Import"
     And I set the following fields to these values:

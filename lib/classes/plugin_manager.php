@@ -1462,7 +1462,7 @@ class core_plugin_manager {
                 'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360', 'flavour',
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
-                'gap', 'job', 'completioneditor',
+                'gap', 'job', 'completioneditor', 'userdata',
             ),
             'tabexport' => array(
                 'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',

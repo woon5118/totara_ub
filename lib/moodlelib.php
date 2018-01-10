@@ -4266,37 +4266,45 @@ function delete_user(stdClass $user) {
     // Force logout - may fail if file based sessions used, sorry.
     \core\session\manager::kill_user_sessions($user->id);
 
-    // Generate username from email address, or a fake email.
-    $delemail = !empty($user->email) ? $user->email : $user->username . '.' . $user->id . '@unknownemail.invalid';
-    $delnameid = time();
-    $delname = clean_param($delemail . "." . $delnameid, PARAM_USERNAME);
-
-    // Workaround for bulk deletes of users with the same email address.
-    while ($DB->record_exists('user', array('username' => $delname))) { // No need to use mnethostid here.
-        $delnameid++;
-        $delname = clean_param($delemail . "." . $delnameid, PARAM_USERNAME);
-    }
-
-    // Mark internal user record as "deleted".
+    // Totara: we have 3 different delete types, keep all of them for backwards compatibility.
     $updateuser = new stdClass();
     $updateuser->id           = $user->id;
     $updateuser->deleted      = 1;
-    $updateuser->username     = $delname;            // Remember it just in case.
-    $updateuser->email        = md5($user->username);// Store hash of username, useful importing/restoring users.
-    $updateuser->idnumber     = '';                  // Clear this field to free it up.
     $updateuser->picture      = 0;
     $updateuser->timemodified = time();
 
-    // Legacy Totara user deleting - it is now recommended to suspend users instead.
-    if ($CFG->authdeleteusers === 'partial') {
-        unset($updateuser->username);
-        unset($updateuser->email);
-        unset($updateuser->idnumber);
-    }
-    // End of Totara hack.
+    if ($CFG->authdeleteusers === 'fullproper') {
+        // Do not leave any personal info behind!
+        do {
+            $updateuser->username = 'deleted_' . strtolower(random_string(32)); // We need something unique because null is not allowed.
+        } while ($DB->record_exists('user', array('username' => $updateuser->username))); // No need to use mnethostid here.
+        $updateuser->email = '';
+        $updateuser->idnumber = '';
+        $updateuser->password = AUTH_PASSWORD_NOT_CACHED;
 
-    // Don't trigger update event, as user is being deleted.
-    user_update_user($updateuser, false, false);
+    } else if ($CFG->authdeleteusers === 'partial') {
+        // Keep username, email and idnumber.
+        // There are two reasons to use this: block recreation of the same account and allow undelete hack later.
+
+    } else { // Legacy Moodle stuff.
+        // Generate username from email address, or a fake email.
+        $delemail = !empty($user->email) ? $user->email : $user->username . '.' . $user->id . '@unknownemail.invalid';
+        $delnameid = time();
+        $delname = clean_param($delemail . "." . $delnameid, PARAM_USERNAME);
+
+        // Workaround for bulk deletes of users with the same email address.
+        while ($DB->record_exists('user', array('username' => $delname))) { // No need to use mnethostid here.
+            $delnameid++;
+            $delname = clean_param($delemail . "." . $delnameid, PARAM_USERNAME);
+        }
+
+        $updateuser->username = $delname;            // Remember it just in case.
+        $updateuser->email    = md5($user->username);// Store hash of username, useful importing/restoring users.
+        $updateuser->idnumber = '';                  // Clear this field to free it up.
+    }
+
+    // Totara: do not use the sloppy user_update_ser(), this is account deletion!
+    $DB->update_record('user', $updateuser);
 
     // Now do a final accesslib cleanup - removes all role assignments in user context and context itself.
     context_helper::delete_instance(CONTEXT_USER, $user->id);
@@ -4332,6 +4340,48 @@ function delete_user(stdClass $user) {
 }
 
 /**
+ * Can this user be technically undeleted?
+ *
+ * @param stdClass $user
+ * @return bool
+ */
+function is_undeletable_user(stdClass $user) {
+    if (!$user->deleted) {
+        // User is not deleted, cannot undelete!
+        return false;
+    }
+
+    if (empty($user->email)) {
+        // Email is required field. Either proper full user delete or somebody purged it.
+        // If somebody misconfigures HR Sync to not require emails it is their fault if things break.
+        return false;
+    }
+
+    if (!validate_email($user->email)) {
+        // This account was deleted in Moodle
+        // or $CFG->authdeleteusers was not equal to 'partial'.
+        return false;
+    }
+
+    if (!clean_param($user->username, PARAM_USERNAME)) {
+        // Updating of user details would explode later...
+        return false;
+    }
+
+    if (strpos($user->username, 'deleted_') === 0) {
+        // The account was fully properly deleted or the username was purged.
+        return false;
+    }
+
+    if ($user->totarasync and trim($user->idnumber) === '') {
+        // HR sync requires idnumber, no undelete to prevent problems.
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Removes user deleted flag in internal user database and notifies the auth plugin.
  *
  * NOTE: this is a Totara feature, it does not work with accounts deleted from Moodle,
@@ -4343,13 +4393,7 @@ function delete_user(stdClass $user) {
 function undelete_user($user) {
     global $DB;
 
-    if (!$user->deleted) {
-        // User is not deleted, cannot undelete!
-        return false;
-    }
-
-    if (preg_match('/^[0-9a-f]{32}$/i', $user->email)) {
-        // This account was deleted in Moodle or $CFG->partialuserdelete was not active.
+    if (!is_undeletable_user($user)) {
         return false;
     }
 

@@ -44,7 +44,6 @@ require_login();
 $user = $DB->get_record('user', array('id' => $id, 'mnethostid' => $CFG->mnet_localhost_id), '*', MUST_EXIST);
 $returnurl = useredit_get_return_url($user, $returnto, null, $customreturn);
 
-$preg_emailhash = '/^[0-9a-f]{32}$/i';
 $fullname = fullname($user, true);
 
 // Process any actions first.
@@ -82,8 +81,21 @@ if ($action === 'delete') {
         echo $OUTPUT->heading(get_string('deleteuser', 'admin'));
         $continueurl = new moodle_url($PAGE->url, array('id' => $id, 'action' => 'delete', 'confirm' => md5($id), 'sesskey' => sesskey()));
         $continuebutton = new single_button($continueurl, get_string('delete'), 'post', true);
+        $extra = $DB->get_record('totara_userdata_user', array('userid' => $user->id));
+        $warning = get_string('deleteusercheckfull', 'totara_core', "'$fullname'");
+
+        $defaultdeletedpurgetypeid = get_config('totara_userdata', 'defaultdeletedpurgetypeid');
+        if ($defaultdeletedpurgetypeid or isset($extra->deletedpurgetypeid)) {
+            $purgetypeid = isset($extra->deletedpurgetypeid) ? $extra->deletedpurgetypeid : $defaultdeletedpurgetypeid;
+            $purgetypes = \totara_userdata\userdata\manager::get_purge_types(\totara_userdata\userdata\target_user::STATUS_DELETED, 'other'); // Other means any here.
+            if (isset($purgetypes[$purgetypeid])) {
+                // TODO: TL-16747 add better warning for purge types
+                $warning .= '<br /><br /><strong>' . get_string('deletedpurgetype', 'totara_userdata') . ':</strong> ' . $purgetypes[$purgetypeid];
+            }
+        }
+
         echo $OUTPUT->confirm(
-            get_string('deleteusercheckfull', 'totara_core', "'$fullname'"),
+            $warning,
             $continuebutton,
             $returnurl
         );
@@ -102,7 +114,7 @@ if ($action === 'delete') {
     } else {
         // The user has already been deleted.
         // If it was a partial deletion then we want to do a full deletion now.
-        if ($CFG->authdeleteusers !== 'partial' and !preg_match($preg_emailhash, $user->email)) {
+        if ($CFG->authdeleteusers !== 'partial' and strpos($user->email, '@') !== false) {
             // Do the real delete again - discard the username, idnumber and email.
             $trans = $DB->start_delegated_transaction();
             $DB->set_field('user', 'deleted', 0, array('id' => $user->id));
@@ -111,6 +123,10 @@ if ($action === 'delete') {
             $trans->allow_commit();
         }
     }
+
+    // Reload the user record and recalculate the return URL.
+    $user = $DB->get_record('user', array('id' => $user->id), '*', MUST_EXIST);
+    $returnurl = useredit_get_return_url($user, $returnto, null, $customreturn);
 
     redirect($returnurl);
 }
@@ -122,7 +138,7 @@ if ($action === 'undelete') {
         // Already not deleted!
         redirect($returnurl);
     }
-    if (preg_match($preg_emailhash, $user->email)) {
+    if (!is_undeletable_user($user)) {
         // ensure we're not trying to undelete a legacy-deleted (hash in email) user
         redirect($returnurl, get_string('cannotundeleteuser', 'totara_core'), null, \core\notification::ERROR);
     }
@@ -145,6 +161,9 @@ if ($action === 'undelete') {
     if (!undelete_user($user)) {
         redirect($returnurl, get_string('undeletednotx', 'totara_core', $fullname), null, \core\notification::ERROR);
     }
+
+    $user = $DB->get_record('user', array('id' => $user->id), '*', MUST_EXIST);
+    $returnurl = useredit_get_return_url($user, $returnto, null, $customreturn);
 
     redirect($returnurl, get_string('undeletedx', 'totara_core', $fullname), null, \core\notification::SUCCESS);
 }

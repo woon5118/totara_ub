@@ -251,11 +251,11 @@ class core_user_editlib_testcase extends advanced_testcase {
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($newuser, 'allusers', $site);
-        $expected = new moodle_url('/');
+        $expected = new moodle_url('/admin/user.php');
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($newuser, 'allusers', null);
-        $expected = new moodle_url('/');
+        $expected = new moodle_url('/admin/user.php');
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($deleteduser, '', $site);
@@ -283,11 +283,11 @@ class core_user_editlib_testcase extends advanced_testcase {
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($deleteduser, 'allusers', $site);
-        $expected = new moodle_url('/');
+        $expected = new moodle_url('/admin/user.php');
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($deleteduser, 'allusers', null);
-        $expected = new moodle_url('/');
+        $expected = new moodle_url('/admin/user.php');
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($user1, '', $site);

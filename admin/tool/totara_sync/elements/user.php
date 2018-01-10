@@ -401,7 +401,7 @@ class totara_sync_element_user extends totara_sync_element {
                 if (!empty($this->config->allow_create) && !empty($user->deleted)) {
                     // Revive previously-deleted user.
                     if (undelete_user($user)) {
-                        $user->deleted = 0;
+                        $user = $DB->get_record('user', array('id' => $suser->uid), '*', MUST_EXIST);
 
                         if (!$updatepassword && !empty($this->config->undeletepwreset)) {
                             // If the password wasn't supplied in the sync and reset is enabled then tag the revived
@@ -445,6 +445,12 @@ class totara_sync_element_user extends totara_sync_element {
                             $e->getMessage(), 'warn', 'updateusers');
                     $problemswhileapplying = true;
                     // Try to continue with other operations to this user.
+                }
+
+                if ($user->deleted) {
+                    // Now seriously, we cannot change deleted users' passwords and
+                    // we certainly cannot trigger user_updated or user_suspended event for deleted users!
+                    continue;
                 }
 
                 // Update user password.

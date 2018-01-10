@@ -72,39 +72,11 @@ class user_actions extends base {
         $actionurl = new \moodle_url('/user/action.php', array('id' => $user->id, 'returnurl' => $returnurl));
 
         $sitecontext = \context_system::instance();
-        if ($user->deleted) {
-            $usercontext = $sitecontext;
-        } else {
-            $usercontext = \context_user::instance($user->id, IGNORE_MISSING);
-            if (!$usercontext) {
-                // This should never happen.
-                return '';
-            }
-        }
 
         $buttons = array();
 
         if ($user->deleted) {
-            if (has_capability('totara/core:undeleteuser', $sitecontext)) {
-                // If the record has been marked as deleted, don't show any edit, suspend etc icons
-                $preg_emailhash = '/^[0-9a-f]{32}$/i';
-
-                $title = get_string('undeleterecord', 'totara_reportbuilder', $user->fullname);
-                $buttons[] = \html_writer::link(
-                    new \moodle_url($actionurl, array('action' => 'undelete')),
-                    $OUTPUT->flex_icon('recycle', array('alt' => $title)),
-                    array('title' => $title)
-                );
-
-                if ($CFG->authdeleteusers !== 'partial' && !preg_match($preg_emailhash, $user->email)) {
-                    $title = get_string('deleterecord', 'totara_reportbuilder', $user->fullname);
-                    $buttons[] = \html_writer::link(
-                        new \moodle_url($actionurl, array('action' => 'delete')),
-                        $OUTPUT->flex_icon('delete', array('alt' => $title)),
-                        array('title' => $title)
-                    );
-                }
-            }
+            // Deleted users are now in separate report.
 
         } else {
             // Here we want the icons to appear in a logical, useful order, and for their
@@ -112,6 +84,7 @@ class user_actions extends base {
             // the order to be: edit, suspend, delete; as these three are the three main
             // action icons, followed by: unlock and confirm.
 
+            $usercontext = \context_user::instance($userid);
             $issiteadmin = is_siteadmin($userid);
             $iscurrentuser = ($userid == $USER->id);
             $canupdate = has_capability('moodle/user:update', $sitecontext);
@@ -153,6 +126,13 @@ class user_actions extends base {
                         array('title' => $title)
                     );
                 }
+            }
+
+            // Add options to purge user data from any accounts.
+            if (has_capability('totara/userdata:viewinfo', $sitecontext) and !isguestuser($user)) {
+                $aurl = new \moodle_url('/totara/userdata/user_info.php', array('id' => $user->id));
+                $buttons[] = $OUTPUT->action_icon($aurl,
+                    new \core\output\flex_icon('totara_userdata|icon', array('alt' => get_string('userinfo', 'totara_userdata'))));
             }
 
             // Add delete action icon.

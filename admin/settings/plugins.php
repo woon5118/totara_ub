@@ -83,11 +83,12 @@ if ($ADMIN->fulltree) {
     $temp->add(new admin_setting_heading('manageauthscommonheading', new lang_string('commonsettings', 'admin'), ''));
     // Totara user delete hack.
     $options = array(
+        'fullproper' => get_string('authdeleteusersfullproper', 'totara_core'),
         'full' => get_string('authdeleteusersfull', 'totara_core'),
         'partial' => get_string('authdeleteuserspartial', 'totara_core'),
     );
     $temp->add(new admin_setting_configselect('authdeleteusers', new lang_string('authdeleteusers', 'totara_core'),
-        new lang_string('authdeleteusers_desc', 'totara_core'), 'full', $options));
+        new lang_string('authdeleteusers_desc', 'totara_core'), 'fullproper', $options));
     // End of Totara hack.
     $temp->add(new admin_setting_special_registerauth());
     $temp->add(new admin_setting_configcheckbox('authloginviaemail', new lang_string('authloginviaemail', 'core_auth'), new lang_string('authloginviaemail_desc', 'core_auth'), 0));

@@ -39,8 +39,17 @@ class user_email extends base {
             return get_string('useremailprivate', 'totara_reportbuilder');
         }
 
+        if (!$value) {
+            return '';
+        }
+
+        if (!validate_email($value)) {
+            // Deleted user most likely - do not show anything.
+            return '';
+        }
+
         if ($format !== 'html') {
-            return static::to_plaintext($value);
+            return $value;
         }
 
         // In reality, format_text() should not be called here since emails do

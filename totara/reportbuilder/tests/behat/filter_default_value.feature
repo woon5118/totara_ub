@@ -40,7 +40,8 @@ Feature: Filter default value works as expected
     When I set the field "user-deleted" to "Deleted"
     Then the field "user-deleted" matches value "Deleted"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
-    And I should see "User One"
+    # Deleted users now have a separate report
+    And I should not see "User One"
     And I should not see "User Two"
     And I should not see "User Three"
     And I should not see "User Four"
@@ -58,7 +59,8 @@ Feature: Filter default value works as expected
     When I set the field "user-deleted" to "any value"
     Then the field "user-deleted" matches value "any value"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
-    And I should see "User One"
+    # Deleted users now have a separate report
+    And I should not see "User One"
     And I should see "User Two"
     And I should see "User Three"
     And I should see "User Four"
@@ -68,7 +70,8 @@ Feature: Filter default value works as expected
     And the field "user-deleted" matches value "Active"
     When I click on "Clear" "button" in the ".fitem_actionbuttons" "css_element"
     Then the field "user-deleted" matches value "any value"
-    And I should see "User One"
+    # Deleted users now have a separate report
+    And I should not see "User One"
     And I should see "User Two"
     And I should see "User Three"
     And I should see "User Four"

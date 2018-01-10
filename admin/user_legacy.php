@@ -42,7 +42,6 @@ $strsuspend = get_string('suspenduser', 'admin');
 $strunsuspend = get_string('unsuspenduser', 'admin');
 $strunlock = get_string('unlockaccount', 'admin');
 $strconfirm = get_string('confirm');
-$preg_emailhash = '/^[0-9a-f]{32}$/i';
 
 if (empty($CFG->loginhttps)) {
     $securewwwroot = $CFG->wwwroot;
@@ -263,7 +262,7 @@ if (!$users) {
             $buttons[] = html_writer::link(new moodle_url($actionurl, array('action'=>'undelete')),
                 $OUTPUT->flex_icon('recycle', array('alt' => $strundelete)),
                 array('title' => $strundelete));
-            if ($CFG->authdeleteusers !== 'partial' and !preg_match($preg_emailhash, $user->email)) {
+            if ($CFG->authdeleteusers !== 'partial' and $user->email and validate_email($user->email)) {
                 $buttons[] = html_writer::link(new moodle_url($actionurl, array('action'=>'delete')),
                     $OUTPUT->flex_icon('delete', array('alt' => $strdelete)),
                     array('title' => $strdelete));

@@ -75,7 +75,7 @@ Feature: Reset dashboard layout for all users
     When I log in as "admin"
     And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
     And I set the following fields to these values:
-      | User deletion | Keep username, email and ID number |
+      | User deletion | Keep username, email and ID number (legacy) |
     And I press "Save changes"
 
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
@@ -84,8 +84,7 @@ Feature: Reset dashboard layout for all users
 
     When I follow "Delete Bob1 Learner1"
     And I press "Delete"
-    And I set the field "user-deleted" to "any value"
-    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
+    And I navigate to "Deleted user accounts" node in "Site administration > Users > User data management"
     Then I should see "Bob1 Learner1"
     And "Undelete Bob1 Learner1" "link" should exist
 
@@ -103,9 +102,7 @@ Feature: Reset dashboard layout for all users
     And I log out
 
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I set the field "user-deleted" to "any value"
-    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
+    And I navigate to "Deleted user accounts" node in "Site administration > Users > User data management"
     And I follow "Undelete Bob1 Learner1"
     And I press "Undelete"
     Then I should see "Undeleted Bob1 Learner1"

@@ -27,6 +27,8 @@ if ($data = $action_form->get_data()) {
         case 7: redirect($CFG->wwwroot.'/'.$CFG->admin.'/user/user_bulk_forcepasswordchange.php');
         case 8: redirect($CFG->wwwroot.'/'.$CFG->admin.'/user/user_bulk_cohortadd.php');
         case 9: redirect($CFG->wwwroot.'/'.$CFG->admin.'/user/user_bulk_toggletotarasync.php');
+        case 10: redirect($CFG->wwwroot.'/'.$CFG->admin.'/user/user_bulk_suspendedpurgetype.php');
+        case 11: redirect($CFG->wwwroot.'/'.$CFG->admin.'/user/user_bulk_deletedpurgetype.php');
     }
 }
 

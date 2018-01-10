@@ -49,5 +49,7 @@ $string['profile'] = 'Profile';
 $string['bookings'] = 'Bookings';
 
 // column types for this source, as strings
+$string['type_deleted_purge_type'] = 'Deleted user purge type';
+$string['type_suspended_purge_type'] = 'Suspended user purge type';
 $string['type_statistics'] = 'Statistics';
 $string['type_user'] = 'User';

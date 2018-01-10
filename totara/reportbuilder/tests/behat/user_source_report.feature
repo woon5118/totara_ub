@@ -63,88 +63,14 @@ Feature: Verify functionality of user source report.
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
 
-  Scenario: Verify partial delete and undelete of user in user source report.
+  Scenario: Verify delete of user in user source report.
 
-    Given the following config values are set as admin:
-      | authdeleteusers | partial |
     When I follow "Delete Bob1 Learner1"
     Then I should see "Delete user"
 
     When I press "Delete"
-    Then I should see "User Report: 6 records shown"
-    And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
-
-    When I follow "Undelete Bob1 Learner1"
-    Then I should see "Undelete User"
-
-    When I press "Undelete"
-    Then I should see "User Report: 6 records shown"
-    And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
-
-  Scenario: Verify full delete of user in user source report.
-
-    Given the following config values are set as admin:
-      | authdeleteusers | full |
-    When I follow "Delete Bob1 Learner1"
-    Then I should see "Delete user"
-
-    When I press "Delete"
-    # A fully deleted user is not shown in the report.
     Then I should see "User Report: 5 records shown"
     And I should not see "Bob1 Learner1"
-
-  Scenario: Verify 'seedeletedusers' capability is supported in user source report.
-
-    Given the following config values are set as admin:
-      | authdeleteusers | partial |
-    And the following "users" exist:
-      | username | firstname | lastname | email                      |
-      | manager1 | Dave1     | Manager1 | dave1.manager1@example.com |
-    And the following "system role assigns" exist:
-      | user     | role    |
-      | manager1 | manager |
-    And I set the following system permissions of "Site Manager" role:
-      | capability                  | permission |
-      | totara/core:seedeletedusers | Allow      |
-
-    When I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
-    And I click on "View" "link" in the "User Report" "table_row"
-    Then I should see "User Report: 7 records shown"
-
-    When I follow "Delete Bob1 Learner1"
-    Then I should see "Delete user"
-
-    When I press "Delete"
-    Then I should see "User Report: 7 records shown"
-    And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
-
-    When I log out
-    And I log in as "manager1"
-
-    When I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
-    And I click on "View" "link" in the "User Report" "table_row"
-    Then I should see "User Report: 7 records shown"
-    And the "reportbuilder-table" table should contain the following:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
-
-    When I set the following system permissions of "Site Manager" role:
-      | capability                  | permission |
-      | totara/core:seedeletedusers | Prevent    |
-    And I log out
-    And I log in as "manager1"
-    And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
-    And I click on "View" "link" in the "User Report" "table_row"
-    Then I should see "User Report: 6 records shown"
-    And the following should not exist in the "reportbuilder-table" table:
-      | User's Fullname | Username | User's Email              | User Status |
-      | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Deleted     |
 
   Scenario: Verify confirm new self-registration user in user source report.
 

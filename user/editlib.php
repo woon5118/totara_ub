@@ -522,6 +522,9 @@ function useredit_get_return_url(\stdClass $user, $returnto, \stdClass $course =
     if ($customreturn) {
         $returnurl = new moodle_url($customreturn);
 
+    } else if ($returnto === 'allusers') {
+        $returnurl = new moodle_url('/admin/user.php');
+
     } else if (empty($user->id) or $user->id < 1 or $user->deleted) {
         // Admin adding new user most likely.
         if (has_capability('moodle/user:update', context_system::instance())) {
@@ -536,9 +539,6 @@ function useredit_get_return_url(\stdClass $user, $returnto, \stdClass $course =
         } else {
             $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
         }
-
-    } else if ($returnto === 'allusers') {
-        $returnurl = new moodle_url('/admin/user.php');
 
     } else {
         $returnurl = new moodle_url('/user/preferences.php', array('userid' => $user->id));

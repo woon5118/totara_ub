@@ -1976,6 +1976,8 @@ class core_moodlelib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        $CFG->authdeleteusers = 'full'; // Totara: test legacy Moodle delete
+
         $guest = $DB->get_record('user', array('id'=>$CFG->siteguest), '*', MUST_EXIST);
         $admin = $DB->get_record('user', array('id'=>$CFG->siteadmins), '*', MUST_EXIST);
         $this->assertEquals(0, $DB->count_records('user', array('deleted'=>1)));

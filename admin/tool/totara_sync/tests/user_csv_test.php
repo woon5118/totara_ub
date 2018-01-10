@@ -111,7 +111,7 @@ class tool_totara_sync_user_csv_testcase extends advanced_testcase {
             'import_deleted' => '0',
             'import_department' => '0',
             'import_description' => '0',
-            'import_email' => '0',
+            'import_email' => '1', // Email is now required for user un-deleting.
             'import_emailstop' => '0',
             'import_firstname' => '1',
             'import_firstnamephonetic' => '0',
