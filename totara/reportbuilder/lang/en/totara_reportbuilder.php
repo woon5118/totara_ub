@@ -324,6 +324,7 @@ $string['error:groupnotcreated'] = 'Group could not be created';
 $string['error:groupnotcreatedinitfail'] = 'Group could not be created - failed to initialize tables!';
 $string['error:groupnotcreatedpreproc'] = 'Group could not be created - preprocessor not found!';
 $string['error:groupnotdeleted'] = 'Group could not be deleted';
+$string['error:invaliddate'] = 'Please enter a valid date or date range';
 $string['error:invalidreportid'] = 'Invalid report ID';
 $string['error:invalidreportscheduleid'] = 'Invalid scheduled report ID';
 $string['error:invalidsavedsearchid'] = 'Invalid saved search ID';

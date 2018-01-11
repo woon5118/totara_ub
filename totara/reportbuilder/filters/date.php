@@ -141,6 +141,10 @@ class rb_filter_date extends rb_filter_type {
             "{$this->name}daysafter" => array(array(get_string('maximumchars', '', 4), 'maxlength', 4, 'client'))
         ));
 
+        // Validate range of dates.
+        $mform->registerRule('validfilterdate', 'function', '_ruleCheckValidFilterDate', 'rb_filter_date');
+        $mform->addRule($this->name.'_grp', get_string('error:invaliddate', 'totara_reportbuilder'), 'validfilterdate', $this->name);
+
         $mform->disabledIf($this->name.'daysbefore', $this->name.'daysbeforechkbox', 'notchecked');
         $mform->disabledIf($this->name.'daysafter', $this->name.'daysafterchkbox', 'notchecked');
         $mform->disabledIf($this->name.'_sdt[day]', $this->name.'daysbeforechkbox', 'checked');
@@ -480,5 +484,48 @@ class rb_filter_date extends rb_filter_type {
         } else {
             return '';
         }
+    }
+
+    /**
+     * Function registered as rule to validate range of dates.
+     *
+     * @param array $elementValue element attributes
+     * @param string $name Containing name property of the filter
+     * @return bool True if the dates range is valid, false otherwise.
+     */
+    public static function _ruleCheckValidFilterDate($elementValue, $name) {
+        // Checkbox for 'is after' date option.
+        $sck = $name.'_sck';
+        // is after date.
+        $sdt = $name.'_sdt';
+        // Checkbox for 'is before' date option.
+        $eck = $name.'_eck';
+        // is before date.
+        $edt = $name.'_edt';
+
+        // Check if 'is after' and 'is before' are checked so we can validate the range.
+        if (array_key_exists($sck, $elementValue) && array_key_exists($eck, $elementValue)) {
+            // Format date values.
+            $beforeday = sprintf("%02d", $elementValue[$edt]['day']);
+            $beforemonth = sprintf("%02d", $elementValue[$edt]['month']);
+            $beforeyear = $elementValue[$edt]['year'];
+            $afterday = sprintf("%02d", $elementValue[$sdt]['day']);
+            $aftermonth = sprintf("%02d", $elementValue[$sdt]['month']);
+            $afteryear = $elementValue[$sdt]['year'];
+
+            $beforetime = DateTime::createFromFormat("Ymd", $beforeyear. $beforemonth. $beforeday);
+            $aftertime = DateTime::createFromFormat("Ymd", $afteryear. $aftermonth. $afterday);
+            if ($beforetime === false || $aftertime === false) {
+                // Invalidate date entered.
+                return false;
+            }
+            $beforetimestamp = $beforetime->getTimestamp();
+            $aftertimestamp = $aftertime->getTimestamp();
+            if ($beforetimestamp < $aftertimestamp) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

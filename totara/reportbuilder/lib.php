@@ -1532,9 +1532,12 @@ class reportbuilder {
         $mformstandard = new report_builder_standard_search_form(null,
                 array('fields' => $this->get_standard_filters()));
         $adddatastandard = $mformstandard->get_data(false);
-        if ($adddatastandard || $clearfilters) {
+        // Get submitted data as get_data could result in NUll if validation fails.
+        $standardsubmitteddata = $mformstandard->get_submitted_data();
+        $clearstandardfilters = $clearfilters || isset($standardsubmitteddata->submitgroupstandard['clearstandardfilters']);
+        if ($adddatastandard || $clearstandardfilters) {
             foreach ($this->get_standard_filters() as $field) {
-                if (isset($adddatastandard->submitgroupstandard['clearstandardfilters']) || $clearfilters) {
+                if ($clearstandardfilters) {
                     // Clear out any existing filters.
                     $field->unset_data();
                 } else {
@@ -1551,9 +1554,12 @@ class reportbuilder {
         $mformsidebar = new report_builder_sidebar_search_form(null,
                 array('report' => $this, 'fields' => $this->get_sidebar_filters(), 'nodisplay' => true));
         $adddatasidebar = $mformsidebar->get_data(false);
-        if ($adddatasidebar || $clearfilters) {
+        // Get submitted data as get_data could result in NUll if validation fails.
+        $sidebarsubmitteddata = $mformsidebar->get_submitted_data();
+        $clearsidebarfilters = $clearfilters || isset($sidebarsubmitteddata->submitgroupsidebar['clearsidebarfilters']);
+        if ($adddatasidebar || $clearsidebarfilters) {
             foreach ($this->get_sidebar_filters() as $field) {
-                if (isset($adddatasidebar->submitgroupsidebar['clearsidebarfilters']) || $clearfilters) {
+                if ($clearsidebarfilters) {
                     // Clear out any existing filters.
                     $field->unset_data();
                 } else {
@@ -1569,8 +1575,11 @@ class reportbuilder {
         }
         $mformtoolbar = new report_builder_toolbar_search_form(null);
         $adddatatoolbar = $mformtoolbar->get_data(false);
-        if ($adddatatoolbar || $clearfilters) {
-            if (isset($adddatatoolbar->cleartoolbarsearchtext) || $clearfilters) {
+        // Get submitted data as get_data could result in NUll if validation fails.
+        $toolbarsubmitteddata = $mformtoolbar->get_submitted_data();
+        $cleartoolbarsearchtext = $clearfilters || isset($toolbarsubmitteddata->cleartoolbarsearchtext);
+        if ($adddatatoolbar || $cleartoolbarsearchtext) {
+            if ($cleartoolbarsearchtext) {
                 // Clear out any existing data.
                 unset($SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext']);
                 unset($_POST['toolbarsearchtext']);
@@ -2039,6 +2048,8 @@ class reportbuilder {
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $mformstandard = new report_builder_standard_search_form($this->get_current_url(),
                 array('fields' => $standard_filters), 'post', '', array('class' => 'rb-search'));
+        // Calling get_data to get the form validated before displaying it, so we can see errors present in the form.
+        $mformstandard->get_data();
         $mformstandard->display();
     }
 
@@ -2167,6 +2178,8 @@ class reportbuilder {
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $mformsidebar = new report_builder_sidebar_search_form($this->get_current_url(),
                 array('report' => $this, 'fields' => $sidebarfilters), 'post', '', array('class' => 'rb-sidebar'));
+        // Calling get_data to get the form validated before displaying it, so we can see errors present in the form.
+        $mformsidebar->get_data();
         $mformsidebar->display();
 
         // If is_capable is not implemented on an embedded report then don't activate instant filters.
