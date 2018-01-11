@@ -57,6 +57,8 @@ class mustache_string_helper {
         // Split the text into an array of variables.
         $key = strtok($text, ",");
         $key = trim($key);
+        $key = $helper->render($key);
+
         $component = strtok(",");
         $component = trim($component);
         if (!$component) {

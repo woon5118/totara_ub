@@ -34,16 +34,21 @@
 
     Example context (json):
     {
-        "title": "hello"
+        "title": "hello",
+        "strkey": "viewmyteam"
     }
 }}
 <div id="template_string_check">
     <p>test simple string With no variables</p>
-    <p>{{#str}}viewmyteam, totara_core{{/str}}</p>
+    <p>{{#str}} viewmyteam, totara_core {{/str}}</p>
 </div>
 <div id="template_string_with_variable">
     <p>test string rendering with variable</p>
     <p>{{#str}} skipa, access, {{title}} {{/str}}</p>
+</div>
+<div id="template_string_with_variable_key">
+    <p>test string rendering with variable</p>
+    <p>{{#str}} {{strkey}}, totara_core {{/str}}</p>
 </div>
 <div id="template_pix">
     <p>test pix icon without flex equivilent and alt</p>

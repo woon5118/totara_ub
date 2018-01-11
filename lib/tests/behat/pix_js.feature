@@ -1,22 +1,25 @@
 @core @javascript
-Feature: Test pix rendering
+Feature: Javascript template rendering
 
   Background:
     Given I log in as "admin"
     And I navigate to "Template library" node in "Site administration > Development"
 
-  Scenario: Template library naviagtion is works
+  Scenario: Template library naviagtion works
     Given I set the field "Component" to "Current Learning"
     And I follow "block_current_learning/block"
     Then I should see "You do not have any current learning"
+
+  Scenario: Javascript string rendering
+    Given I follow "core/test"
+    Then I should see "View My Team" in the "#template_string_check" "css_element"
+    And I should see "Skip hello" in the "#template_string_with_variable" "css_element"
+    And I should see "View My Team" in the "#template_string_with_variable_key" "css_element"
 
   Scenario: Javascript pix/flex rendering works
     Given I set the field "Component" to "Subsystem (core)"
     Given I set the field "Search" to "test"
     And I follow "core/test"
-    Then I should see "View My Team" in the "#template_string_check" "css_element"
-    And I should see "Skip hello" in the "#template_string_with_variable" "css_element"
-    And "#template_pix img.smallicon" "css_element" should exist
 
     # Old style pix
     And "#template_pix_alt img[alt='argh']" "css_element" should exist
