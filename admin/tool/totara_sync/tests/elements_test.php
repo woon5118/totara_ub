@@ -26,6 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group tool_totara_sync
+ */
 class tool_totara_sync_elements_testcase extends advanced_testcase {
 
     /**

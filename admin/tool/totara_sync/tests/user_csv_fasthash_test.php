@@ -26,7 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/totara_sync/tests/user_csv_test.php');
 
-
+/**
+ * @group tool_totara_sync
+ */
 class tool_totara_sync_user_csv_fasthash_testcase extends advanced_testcase {
 
     private $filedir = null;

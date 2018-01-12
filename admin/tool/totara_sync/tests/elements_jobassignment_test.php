@@ -27,6 +27,9 @@ global $CFG;
 require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/jobassignment.php');
 require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/classes/source.jobassignment.class.php');
 
+/**
+ * @group tool_totara_sync
+ */
 class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase {
 
     /**

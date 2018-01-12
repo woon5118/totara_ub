@@ -33,6 +33,8 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
  *
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose tool_totara_sync_user_csv_testcase admin/tool/totara_sync/tests/user_csv_test.php
+ *
+ * @group tool_totara_sync
  */
 class tool_totara_sync_user_csv_testcase extends advanced_testcase {
 

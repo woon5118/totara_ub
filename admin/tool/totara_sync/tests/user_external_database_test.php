@@ -37,6 +37,8 @@ require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/databaselib.php');
  *
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose tool_totara_sync_user_external_database_testcase admin/tool/totara_sync/tests/user_external_database_test.php
+ *
+ * @group tool_totara_sync
  */
 class tool_totara_sync_user_external_database_testcase extends advanced_testcase {
 

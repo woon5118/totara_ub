@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_jobassignment_database.php');
 
+/**
+ * @group tool_totara_sync
+ */
 class tool_totara_sync_source_jobassignment_database_testcase extends advanced_testcase {
 
     /** @var moodle_database */
