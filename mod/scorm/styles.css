@@ -99,6 +99,9 @@
 
 #page-mod-scorm-player #scormpage #scorm_toc {
     position: relative;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #page-mod-scorm-player #scormpage #scorm_toc_title {
