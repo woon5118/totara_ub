@@ -105,6 +105,8 @@ $string['configgeneralusers'] = 'Sets the default for whether to include users i
 $string['configloglifetime'] = 'This specifies the length of time you want to keep backup logs information. Logs that are older than this age are automatically deleted. It is recommended to keep this value small, because backup logged information can be huge.';
 $string['confirmbackupdelete'] = 'Do you really want to delete file "{$a}"?';
 $string['confirmcancel'] = 'Cancel backup';
+$string['confirmcancelrestore'] = 'Cancel restore';
+$string['confirmcancelimport'] = 'Cancel import';
 $string['confirmcancelquestion'] = 'Are you sure you wish to cancel?
 Any information you have entered will be lost.';
 $string['confirmcancelyes'] = 'Cancel';
@@ -180,6 +182,7 @@ $string['importcurrentstage2'] = 'Schema settings';
 $string['importcurrentstage4'] = 'Confirmation and review';
 $string['importcurrentstage8'] = 'Perform import';
 $string['importcurrentstage16'] = 'Complete';
+$string['importrootsettings'] = 'Import settings';
 $string['importsettings'] = 'General import settings';
 $string['importsuccess'] = 'Import complete. Click continue to return to the course.';
 $string['includeactivities'] = 'Include:';
