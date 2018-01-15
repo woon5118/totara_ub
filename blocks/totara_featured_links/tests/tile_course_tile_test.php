@@ -156,6 +156,7 @@ class block_totara_featured_links_tile_course_tile_testcase extends test_helper 
 
         $this->assertFalse($this->call_protected_method($tile, 'user_can_view_content'));
         $this->setAdminUser();
+        $tile->get_course(true); // Reload the course data.
         $this->assertTrue($this->call_protected_method($tile, 'user_can_view_content'));
     }
 }
