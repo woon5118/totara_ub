@@ -469,6 +469,27 @@ function quiz_delete_previews($quiz, $userid = null) {
 }
 
 /**
+ * Set the preview flag of a partial attempt belonging to a user.
+ * @param int $attemptid Attempt to update
+ * @param int $quizid Quiz associated with attempt (added for validation)
+ * @param bool $ispreview Preview flag to set
+ */
+function quiz_set_unfinished_preview_flag($attemptid, $quizid, $ispreview) {
+    global $USER, $DB;
+
+    $conditions = array('id' => $attemptid, 'quiz' => $quizid, 'userid' => $USER->id);
+    if ($attempt = $DB->get_records('quiz_attempts', $conditions)) {
+        if ($attempt[$attemptid]->preview != $ispreview) {
+            $attempt[$attemptid]->preview = $ispreview;
+            $DB->update_record('quiz_attempts', $attempt[$attemptid]);
+        }
+    } else {
+        debugging("Trying to update preview flag of attempt $attemptid for user " . $USER->id . " and quiz " . $quizid .
+                " but attempt doesn't exist.");
+    }
+}
+
+/**
  * @param int $quizid The quiz id.
  * @return bool whether this quiz has any (non-preview) attempts.
  */

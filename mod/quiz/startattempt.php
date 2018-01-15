@@ -104,6 +104,7 @@ if ($currentattemptid) {
     if ($lastattempt->state == quiz_attempt::OVERDUE) {
         redirect($quizobj->summary_url($lastattempt->id));
     } else {
+        quiz_set_unfinished_preview_flag($currentattemptid, $quizobj->get_quiz()->id, $quizobj->is_preview_user());
         redirect($quizobj->attempt_url($currentattemptid, $page));
     }
 }
