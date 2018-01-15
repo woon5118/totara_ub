@@ -198,7 +198,7 @@ class course_tile extends base{
         global $DB;
 
         if (!isset($this->course) or $reload) {
-            if (!empty($this->data->courseid)) {
+            if (!empty($this->data->courseid) && totara_course_is_viewable($this->data->courseid)) {
                 $this->course = $DB->get_record('course', ['id' => $this->data->courseid]);
             } else {
                 $this->course = false;

@@ -52,5 +52,9 @@ class is_valid_course extends element_validator {
             $this->element->add_error(get_string('course_not_found', 'block_totara_featured_links'));
             return;
         }
+        if (!totara_course_is_viewable($id)) {
+            $this->element->add_error(get_string('course_not_found', 'block_totara_featured_links'));
+            return;
+        }
     }
 }
