@@ -287,6 +287,11 @@ abstract class question_base {
     protected $values = array();
 
     /**
+     * @var bool True if a collapsible header should be added when rendering this question.
+     */
+    protected $addheader = true;
+
+    /**
      * Instantiate new field
      *
      * @param question_storage $storage storage of element definition
@@ -299,6 +304,9 @@ abstract class question_base {
         $this->storage->datatype = $this->get_type();
         $this->subjectid = ($subjectid > 0) ? $subjectid : $USER->id;
         $this->answerid = $answerid;
+
+        // add_header() may have been overridden so we're getting the value for the current type of question.
+        $this->addheader = $this->add_header();
     }
 
     /**
@@ -461,13 +469,26 @@ abstract class question_base {
     }
 
     /**
+     * If you want to override the default header behaviour for an instance of a question, the desired value
+     * of addheader can be set here.
+     *
+     * @param bool $addheader True to add a collapsible header when rendering this question.
+     * @return question_base $this
+     */
+    public function set_addheader(bool $addheader) : question_base {
+        $this->addheader = $addheader;
+
+        return $this;
+    }
+
+    /**
      * Populate edit form with question elements
      * @param MoodleQuickForm $form
      */
     public function add_field_form_elements(MoodleQuickForm $form) {
         $this->formsent = true;
 
-        if ($this->add_header()) {
+        if ($this->addheader) {
             $form->addElement('header', 'question', format_string($this->name));
         } else {
             $form->addElement('static', 'header-placeholder' . $this->answerid);
@@ -495,7 +516,7 @@ abstract class question_base {
             }
         }
 
-        if (!$this->add_header()) {
+        if (!$this->addheader) {
             // Close the div with class = totara-question-nonfieldset-item.
             $form->addElement('html', html_writer::end_div());
         }

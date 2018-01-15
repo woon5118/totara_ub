@@ -190,6 +190,7 @@ class feedback360_answer_form extends moodleform {
                 $elem->set_required(true);
             }
             $elem->label = $quest->name;
+            $elem->set_addheader(false);
             $elem->add_field_form_elements($mform);
         }
         if (!$readonly && !$preview) {

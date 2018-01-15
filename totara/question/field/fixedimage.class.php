@@ -141,8 +141,8 @@ class question_fixedimage extends question_base{
             }
         }
 
-        $form->addElement('static', $this->get_prefix_form(), $this->name, $content);
-        $form->addElement('static', $this->get_prefix_form().'description', '', format_string($this->param1['description']));
+        $form->addElement('static', $this->get_prefix_form(), $this->name, html_writer::div($content, 'totara-question-without-label'));
+        $form->addElement('static', $this->get_prefix_form().'description', '', html_writer::div(format_string($this->param1['description']), 'totara-question-without-label'));
 
         // Remove label from form elements to get rid of empty space.
         $this->render_without_label($form, $this->get_prefix_form());

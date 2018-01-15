@@ -133,6 +133,10 @@ select.aggregateselector[multiple] {
     margin-left: 10px;
     margin-right: 10px;
 }
-.totara-question-group .totara-question-nonfieldset-item .fitemtitle.fitemtitle {
+.path-totara-appraisal .totara-question-group .totara-question-nonfieldset-item .fitemtitle.fitemtitle {
     padding-left: 0;
+}
+/* The label has some padding applied by default that we are missing when we don't use it. */
+.path-totara-feedback360 .totara-question-nonfieldset-item .fitem .totara-question-without-label {
+    padding-left: 15px;
 }
