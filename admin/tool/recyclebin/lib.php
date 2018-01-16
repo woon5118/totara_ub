@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die;
  * @return void|null return null if we don't want to display the node.
  */
 function tool_recyclebin_extend_navigation_course($navigation, $course, $context) {
-    global $PAGE;
+    global $DB, $PAGE;
 
     // Only add this settings item on non-site course pages.
     if (!$PAGE->course || $PAGE->course->id == SITEID || !\tool_recyclebin\course_bin::is_enabled()) {
@@ -58,7 +58,7 @@ function tool_recyclebin_extend_navigation_course($navigation, $course, $context
     $autohide = get_config('tool_recyclebin', 'autohide');
     if ($autohide) {
         $items = $coursebin->get_items();
-        if (empty($items)) {
+        if (empty($items) && !tool_recyclebin_course_has_deletion_pending($PAGE->course->id)) {
             return null;
         }
     }
@@ -80,6 +80,18 @@ function tool_recyclebin_extend_navigation_course($navigation, $course, $context
     }
 
     $navigation->add_node($node);
+}
+
+/**
+ * Determine if there are any activities or resources pending deletion in a course.
+ *
+ * @param int $courseid
+ * @return bool
+ */
+function tool_recyclebin_course_has_deletion_pending($courseid) {
+    global $DB;
+
+    return $DB->record_exists('course_modules', array('course' => $courseid, 'deletioninprogress' => 1));
 }
 
 /**
