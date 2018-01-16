@@ -1438,7 +1438,7 @@ class behat_general extends behat_base {
      *        | Header 1 | Header 2 | Header 3 |
      *        | Value 1  | Value 2  | Value 3  |
      */
-    public function the_table_should_contain_fhe_following($table, TableNode $data) {
+    public function the_table_should_contain_the_following($table, TableNode $data) {
         $this->following_should_exist_in_the_table($table, $data, false);
     }
 
@@ -1475,6 +1475,21 @@ class behat_general extends behat_base {
     }
 
     /**
+     * This function is very similar to "the following should not exist in the &lt;table&gt; table"
+     * but does a 'contains' rather than an 'equals' match against the table data. This allows
+     * superfluous cell content such as images to be ignored but a match to be achieved.
+     *
+     * @Then /^the "(?P<table_string>[^"]*)" table should not contain the following:$/
+     * @param string $table name of table
+     * @param TableNode $data table with first row as header and following values
+     *        | Header 1 | Header 2 | Header 3 |
+     *        | Value 1  | Value 2  | Value 3  |
+     */
+    public function the_table_should_not_contain_the_following($table, TableNode $data) {
+        $this->following_should_not_exist_in_the_table($table, $data, false);
+    }
+
+    /**
      * Checks that the provided value exist in table.
      * More info in http://docs.moodle.org/dev/Acceptance_testing#Providing_values_to_steps.
      *
@@ -1483,9 +1498,10 @@ class behat_general extends behat_base {
      * @param string $table name of table
      * @param TableNode $data table with first row as header and following values
      *        | Header 1 | Header 2 | Header 3 |
-     *        | Value 1 | Value 2 | Value 3|
+     *        | Value 1  | Value 2  | Value 3  |
+     * @param bool $mustequal Indicates of the match must equal or contain the data.
      */
-    public function following_should_not_exist_in_the_table($table, TableNode $data) {
+    public function following_should_not_exist_in_the_table($table, TableNode $data, $mustequal = true) {
         \behat_hooks::set_step_readonly(true);
         $datahash = $data->getHash();
 
@@ -1493,7 +1509,7 @@ class behat_general extends behat_base {
             $row = array_shift($value);
             foreach ($value as $column => $value) {
                 try {
-                    $this->row_column_of_table_should_contain($row, $column, $table, $value);
+                    $this->row_column_of_table_should_contain($row, $column, $table, $value, $mustequal);
                     // Throw exception if found.
                 } catch (ElementNotFoundException $e) {
                     // Table row/column doesn't contain this value. Nothing to do.

@@ -8,8 +8,8 @@ information provided here is intended especially for developers.
 
 === 11.0 ===
 
-* New $mustequal parameter added to the following methods to control whether a table call data
-  must 'equal' or 'contain' the data to be matched.
+* New $mustequal parameter added to the following methods in lib/tests/behat/behat_general.php
+  to control whether a table call data must 'equal' or 'contain' the data to be matched.
     - following_should_exist_in_the_table
     - row_column_of_table_should_contain
 * Removed deprecated custom menu functionality

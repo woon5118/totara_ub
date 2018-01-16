@@ -79,7 +79,7 @@ class rb_source_user extends rb_base_source {
         // Remember the active global restriction set.
         $this->globalrestrictionset = $globalrestrictionset;
 
-        // Allow the actions column to be used in the user source, bul allow
+        // Allow the actions column to be used in the user source
         if (!isset($this->allow_actions_column)) {
             $this->allow_actions_column = (get_class($this) === 'rb_source_user');
         }
@@ -476,6 +476,24 @@ class rb_source_user extends rb_base_source {
         );
 
         $this->add_user_fields_to_filters($filteroptions);
+
+        $roles = get_roles_used_in_context(context_system::instance());
+
+        // We only want this filter to be available on reports that user the user source.
+        $filteroptions[] = new rb_filter_option(
+            'user',
+            'roleid',
+            get_string('usersystemrole', 'totara_reportbuilder'),
+            'system_role',
+            [
+                'selectchoices' => [
+                    '' => get_string('chooserole', 'totara_reportbuilder'),
+                    '0' => get_string('anyrole', 'totara_reportbuilder')
+                ] + role_fix_names($roles, null, null, true),
+            ],
+            'base.id'
+        );
+
         $this->add_job_assignment_fields_to_filters($filteroptions, 'base');
 
         return $filteroptions;
