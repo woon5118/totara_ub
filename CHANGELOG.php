@@ -3,6 +3,103 @@
 
 Totara Learn Changelog
 
+Release Evergreen (18th January 2018):
+======================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-9352        New site registration form
+
+                   In this release we have added a site registration page under Site
+                   administration > Totara registration. Users with the 'site:config'
+                   capability will be redirected to the page after upgrade until registration
+                   has been completed.
+
+                   Please ensure you have the registration code available for each site before
+                   you upgrade. Partners can obtain the registration code for their customers'
+                   sites via the Subscription Portal. Direct subscribers will receive their
+                   registration code directly from Totara Learning.
+
+                   For more information see the help documentation:
+
+                   https://help.totaralearning.com/display/TLE/Totara+registration
+
+Security issues:
+
+    TL-16757       Fixed issue where names of hidden courses could be displayed
+
+                   Previously the names of hidden courses could be displayed in the Featured
+                   links Block edit form if a hidden ID field was altered
+
+New features:
+
+    TL-16589   +   Added new progress wizard form component
+
+Improvements:
+
+    TL-7553        Improved Report Builder support of Microsoft Excel CSV import with Id columns
+    TL-11305   +   Creating/modifying/deleting scheduled reports now generate events
+
+                   New event classes are: scheduled_report_created, scheduled_report_updated
+                   and scheduled_report_deleted.
+
+                   These events are also viewable in the system logs under 
+                   site administration > reports > logs.
+
+    TL-14071   +   Replaced calls to 'dirname' with '__DIR__' to improve performance
+    TL-15061   +   Improved styling of delete and combine tags buttons
+    TL-16441   +   Fixed signup information being displayed in attendees pages
+    TL-16479       Fixed inconsistent use of terminology in Seminar
+    TL-16485   +   Converted hierarchies CSS to LESS
+    TL-16487   +   Standardised HTML in statistics block
+    TL-16488   +   Set alert notifications for Totara Messages enabled by default
+    TL-16627       A user's current course completion record can now be deleted
+
+                   Using the course completion editor, it is now possible to delete a user's
+                   current course completion record. This is only possible if the user is no
+                   longer assigned to the course.
+
+    TL-16651   +   Added support for context variables in modal library
+    TL-16653       Reportbuilder now shows an empty graph instead of an error message when zero values are returned
+    TL-16690       Added hook for cache invalidation in Report graph block
+    TL-16694       All SCORM reports were altered to use recommended enrolment subquery for listing of users
+
+                   Please note this patch may change the results of scorm reports, only
+                   enrolled users with mod/scorm:savetrack capability are now displayed there.
+
+Bug fixes:
+
+    TL-1512    +   Changed Google Fusion export to open in a new window
+    TL-11097       Removed duplicated seminar attendees overbooking notification
+    TL-16016       Changed message on Appraisal missing roles page when a job assignment has not yet been selected
+    TL-16523       Set URL before require_login in the signup page
+    TL-16536       Added missing string on the Feature overview page
+    TL-16630       Fixed error caused by adding a role column as the first column to Seminar sessions report
+    TL-16631       Fixed SCORM package display in simple popup window when package does not provide player API
+    TL-16638       SCORM table of contents is now restricted to the height available to the SCORM package
+    TL-16676       Removed syncing of user's forum and language preferences to Totara Connect client sites
+    TL-16699       Deleted duplicate block of code in login/index.php
+    TL-16700       Added workaround in DML for fatal errors when get_in_or_equal() used with large number of items
+    TL-16705       Fixed a regression in the required option of the multi-select custom field
+    TL-16707       Fixed multi-lang support for dashboard names
+    TL-16740       Improved message displayed when guest user tries to sign up using seminar direct enrolment
+
+API changes:
+
+    TL-16677   +   Removed deprecated rb_display_* functions
+
+Miscellaneous Moodle fixes:
+
+    TL-16711       MDL-61143: Added check for all "A" records when testing blocked IPs
+
+Contributions:
+
+    * Dustin Brisebois at Lambda Solutions - TL-16707
+    * Eugene Venter at Catalyst NZ - TL-16523
+
+
 Release Evergreen (21st December 2017):
 =======================================
 
