@@ -689,11 +689,11 @@ M.core_availability.List.prototype.clickAdd = function() {
         // Add entry for plugin.
         li = Y.Node.create('<li class="clearfix row"></li>');
         id = 'availability_addrestriction_' + type;
-        button = Y.Node.create('<button type="button" class="btn btn-default col-xs-6"' +
+        button = Y.Node.create('<button type="button" class="btn btn-default col-xs-5"' +
                 'id="' + id + '">' + M.util.get_string('title', 'availability_' + type) + '</button>');
         button.on('click', this.getAddHandler(type, dialogRef), this);
         li.appendChild(button);
-        label = Y.Node.create('<label for="' + id + '" class="col-xs-6">' +
+        label = Y.Node.create('<label for="' + id + '" class="col-xs-7">' +
                 M.util.get_string('description', 'availability_' + type) + '</label>');
         li.appendChild(label);
         ul.appendChild(li);
@@ -701,11 +701,11 @@ M.core_availability.List.prototype.clickAdd = function() {
     // Extra entry for lists.
     li = Y.Node.create('<li class="clearfix row"></li>');
     id = 'availability_addrestriction_list_';
-    button = Y.Node.create('<button type="button" class="btn btn-default col-xs-6"' +
+    button = Y.Node.create('<button type="button" class="btn btn-default col-xs-5"' +
             'id="' + id + '">' + M.util.get_string('condition_group', 'availability') + '</button>');
     button.on('click', this.getAddHandler(null, dialogRef), this);
     li.appendChild(button);
-    label = Y.Node.create('<label for="' + id + '" class="col-xs-6">' +
+    label = Y.Node.create('<label for="' + id + '" class="col-xs-7">' +
             M.util.get_string('condition_group_info', 'availability') + '</label>');
     li.appendChild(label);
     ul.appendChild(li);
