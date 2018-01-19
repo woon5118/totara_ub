@@ -28,6 +28,12 @@ $s = required_param('s', PARAM_INT); // facetoface session ID
 $backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
+
+if (!!$session->cancelledstatus) {
+    redirect(new moodle_url('/course/view.php', ['id' => $course->id]),
+        get_string('error:cannotsignupforacancelledevent', 'facetoface'));
+}
+
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/signup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions));
 
