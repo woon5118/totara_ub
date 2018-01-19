@@ -463,7 +463,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         }
 
         // TOTARA TL-16427.
-        confirmstring += '<br/>' + M.util.get_string('deletecheckrecyclebin', 'tool_recyclebin');
+        if (this.get('config').showrecyclebinwarning) {
+            confirmstring += '<br/>' + M.util.get_string('deletecheckrecyclebin', 'tool_recyclebin');
+        }
 
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({

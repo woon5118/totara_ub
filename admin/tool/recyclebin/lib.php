@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die;
  * @return void|null return null if we don't want to display the node.
  */
 function tool_recyclebin_extend_navigation_course($navigation, $course, $context) {
-    global $DB, $PAGE;
+    global $PAGE;
 
     // Only add this settings item on non-site course pages.
     if (!$PAGE->course || $PAGE->course->id == SITEID || !\tool_recyclebin\course_bin::is_enabled()) {

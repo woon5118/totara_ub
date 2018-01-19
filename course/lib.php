@@ -3104,6 +3104,11 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
         $config->pageparams = array();
     }
 
+    // The URL to use for resource changes.
+    if (!isset($config->showrecyclebinwarning)) {
+        $config->showrecyclebinwarning = get_config('tool_recyclebin', 'coursebinenable');
+    }
+
     // Include toolboxes
     $PAGE->requires->yui_module('moodle-course-toolboxes',
             'M.course.init_resource_toolbox',
