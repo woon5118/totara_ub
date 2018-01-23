@@ -2102,6 +2102,9 @@ The following students were removed from events:<br>{$a}';
 $string['upgradefixstatusapprovedlimbousersdetail'] = '{$a->user} was removed from seminar {$a->f2f}';
 $string['upgradeprocessinggrades'] = 'Processing seminar grades, this may take a while if there are many events...';
 $string['usercancelledon'] = 'User cancelled on {$a}';
+$string['userdataitemcustomfields'] = 'Sign up & cancellation custom fields';
+$string['userdataiteminterest'] = 'Declared interest';
+$string['userdataitemsignups'] = 'Attendance records';
 $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not exist';
 $string['useriddoesnotexist'] = 'User with ID "{$a}" does not exist';
 $string['useroomcapacity'] = 'Use room capacity';
@@ -2116,6 +2119,7 @@ $string['allowbookingscancellationsdefault_help'] = 'Set the default cancellatio
 $string['usercalentry'] = 'Show entry on user\'s calendar';
 $string['usercancelled'] = 'User cancellation';
 $string['usercancellationnoteheading'] = '{$a} - Cancellation note';
+$string['userdatapurgedcancel'] = 'User data has been purged';
 $string['userdeletedcancel'] = 'User has been deleted';
 $string['userjobassignmentheading'] = '{$a} - update selected job assignment';
 $string['usersuspendedcancel'] = 'User has been suspended';

@@ -27,6 +27,8 @@
  *
  */
 
+use totara_job\job_assignment;
+
 defined('MOODLE_INTERNAL') || die();
 
 class mod_facetoface_generator extends testing_module_generator {
@@ -42,6 +44,19 @@ class mod_facetoface_generator extends testing_module_generator {
      * @var int
      */
     protected $assetinstancecount = 0;
+
+    /**
+     * Cache to reduce lookups.
+     * @var array
+     */
+    protected $mapsessioncourse = [];
+
+    /**
+     * Cache to reduce lookups.
+     * @var array
+     */
+    protected $mapsessionf2f = [];
+
 
     /**
      * Create new facetoface module instance
@@ -331,5 +346,173 @@ class mod_facetoface_generator extends testing_module_generator {
             );
 
         return $this->add_session($record);
+    }
+
+    /**
+     * Create a session for the given course.
+     * Creates facetoface for the session as well.
+     *
+     * @param stdClass $course
+     * @return stdClass
+     */
+    public function create_session_for_course(stdClass $course): stdClass {
+        // Set up facetoface.
+        $facetofacedata = [
+            'name' => 'facetoface1',
+            'course' => $course->id
+        ];
+        $facetoface = $this->create_instance($facetofacedata);
+
+        // Set up session.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + 60;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = [
+            'facetoface' => $facetoface->id,
+            'sessiondates' => [$sessiondate],
+        ];
+        $sessionid = $this->add_session($sessiondata);
+
+        $this->mapsessioncourse[$sessionid] = $course;
+        $this->mapsessionf2f[$sessionid] = $facetoface;
+
+        return facetoface_get_session($sessionid);
+    }
+
+    /**
+     * Create a signup for given student and session.
+     *
+     * @param stdClass $student
+     * @param stdClass $session
+     * @param int $customfields
+     * @param int $customfieldparams
+     * @return stdClass
+     */
+    public function create_signup(stdClass $student, stdClass $session, $customfields = 0, $customfieldparams = 0): stdClass {
+        global $DB;
+
+        $this->create_job_assignment_if_not_exists($student);
+
+        $discountcode = 'disc1';
+        $notificationtype = 1;
+        $statuscode = MDL_F2F_STATUS_REQUESTED;
+        facetoface_user_signup(
+            $session,
+            $this->mapsessionf2f[$session->id],
+            $this->mapsessioncourse[$session->id],
+            $discountcode,
+            $notificationtype,
+            $statuscode,
+            $student->id
+        );
+
+        $signup = $DB->get_record('facetoface_signups', ['userid' => $student->id, 'sessionid' => $session->id]);
+
+        if ($customfields > 0) {
+            $this->create_customfield_data($signup, 'signup', $customfields, $customfieldparams);
+        }
+
+        return $signup;
+    }
+
+    /**
+     * @param stdClass $student
+     * @param stdClass $session
+     * @param int $customfields
+     * @param int $customfieldparams
+     */
+    public function create_cancellation(stdClass $student, stdClass $session, $customfields = 0, $customfieldparams = 0) {
+
+        facetoface_user_cancel($session, $student->id);
+
+        if ($customfields > 0) {
+            global $DB;
+            $signup = $DB->get_record('facetoface_signups', ['userid' => $student->id, 'sessionid' => $session->id]);
+            $this->create_customfield_data($signup, 'cancellation', $customfields, $customfieldparams);
+        }
+    }
+
+    /**
+     * @param stdClass $signup
+     * @param string $type
+     * @param string $filename
+     * @param int $itemid  Any integer. Use the same number if you want multiple files for
+     *  the same field. See totara_customfield_generator::create_test_file_from_content().
+     */
+    public function create_file_customfield(stdClass $signup, string $type, string $filename, int $itemid) {
+        $datagenerator = phpunit_util::get_data_generator();
+        $cfgenerator = $datagenerator->get_plugin_generator('totara_customfield');
+        $cfid = $cfgenerator->create_file("facetoface_{$type}", ['f2ffile' => []]);
+
+        $filecontent = 'Test file content';
+        $cfgenerator->create_test_file_from_content($filename, $filecontent, $itemid, '/', $signup->userid);
+
+        $cfgenerator->set_file($signup, $cfid['f2ffile'], $itemid, "facetoface{$type}", "facetoface_{$type}");
+    }
+
+    /**
+     * Create some customfield data that results in the given amount of field and parameter data.
+     *
+     * @param stdClass $signup
+     * @param string $type
+     * @param int $fieldcount
+     * @param int $paramcount
+     */
+    protected function create_customfield_data(stdClass $signup, string $type, int $fieldcount, int $paramcount) {
+        $datagenerator = phpunit_util::get_data_generator();
+        $cfgenerator = $datagenerator->get_plugin_generator('totara_customfield');
+
+        if ($fieldcount < 1) {
+            return;
+        }
+
+        if ($paramcount) {
+            // If we want data in the *info_data_param table, we need one multiselect field with the desired number of options.
+
+            // Create options.
+            $options = array_map(function($i) use ($type) {
+                return "{$type}_option_{$i}";
+            }, range(1, $paramcount));
+
+            // Create customfield
+            $uniquefieldname = "{$type}_multi_{$signup->id}";
+            $cfid = $cfgenerator->create_multiselect("facetoface_{$type}", [$uniquefieldname => $options]);
+
+            // Create customfield data with all options selected.
+            $cfgenerator->set_multiselect($signup, $cfid[$uniquefieldname], $options, "facetoface{$type}", "facetoface_{$type}");
+
+            $fieldcount --;
+        }
+
+        // Use text field for the other customfields that don't need data in the *info_data_param table.
+        for ($i = 1; $i <= $fieldcount; $i ++) {
+            $uniquefieldname = "{$type}_text_{$signup->id}_{$i}";
+            $cfid = $cfgenerator->create_text("facetoface_{$type}", [$uniquefieldname]);
+            $cfgenerator->set_text($signup, $cfid[$uniquefieldname], "value_{$i}", "facetoface{$type}", "facetoface_{$type}");
+        }
+    }
+
+    /**
+     * Students need job assignments with manager so we can sign them up to a facetoface session.
+     *
+     * @param stdClass $student
+     */
+    protected function create_job_assignment_if_not_exists(stdClass $student) {
+        global $DB;
+        // Skip if we already created it.
+        if (!$DB->record_exists('job_assignment', ['userid' => $student->id])) {
+            $datagenerator = phpunit_util::get_data_generator();
+            $manager = $datagenerator->create_user();
+            $managerja = job_assignment::create_default($manager->id);
+            $data = [
+                'userid' => $student->id,
+                'fullname' => 'student1ja',
+                'shortname' => 'student1ja',
+                'idnumber' => 'student1ja',
+                'managerjaid' => $managerja->id,
+            ];
+            job_assignment::create($data);
+        }
     }
 }

@@ -35,8 +35,10 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/completion/cron.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
+require_once($CFG->dirroot . '/mod/facetoface/tests/facetoface_testcase.php');
 
-class mod_facetoface_lib_testcase extends advanced_testcase {
+class mod_facetoface_lib_testcase extends facetoface_testcase {
+
     /** @var mod_facetoface_generator */
     protected $facetoface_generator;
 
@@ -1312,6 +1314,108 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // Check the customfield data for session 2 is intact.
         $this->assertEquals(3, $DB->count_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup22->id)));
         $this->assertEquals(3, $DB->count_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup32->id)));
+    }
+
+    function test_facetoface_delete_signups_for_session() {
+        global $DB;
+
+        $f2fgenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+
+        $session1 = $f2fgenerator->create_session_for_course($course);
+        $session2 = $f2fgenerator->create_session_for_course($course);
+
+        $signups = [];
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1, 0, 0);
+        $f2fgenerator->create_cancellation($student1, $session1, 1, 2);
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2, 3, 4);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1, 5, 3);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2, 2, 1);
+        $f2fgenerator->create_cancellation($student2, $session2, 1, 1);
+
+        // Check initial data.
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session2->id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
+        $this->assert_count_signups_status($session1->id, 3);
+        $this->assert_count_signups_status($session2->id, 3);
+        // Check customfield data for session1.
+        $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[21]->id], 5, 3);
+        $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[21]->id], 1, 2);
+        // Check customfield data for session2.
+        $this->assert_count_customfield_data('signup', [$signups[12]->id, $signups[22]->id], 5, 5);
+        $this->assert_count_customfield_data('cancellation', [$signups[12]->id, $signups[22]->id], 1, 1);
+
+        facetoface_delete_signups_for_session($session2->id);
+
+        // Check data after deletion.
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session2->id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
+        $this->assertCount(0, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
+        $this->assert_count_signups_status($session1->id, 3);
+        $this->assert_count_signups_status($session2->id, 0);
+        // Check customfield data for session1.
+        $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[21]->id], 5, 3);
+        $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[21]->id], 1, 2);
+        // Check customfield data for session2.
+        $this->assert_count_customfield_data('signup', [$signups[12]->id, $signups[22]->id], 0, 0);
+        $this->assert_count_customfield_data('cancellation', [$signups[12]->id, $signups[22]->id], 0, 0);
+    }
+
+    function test_facetoface_delete_signups() {
+        global $DB;
+
+        $f2fgenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+
+        $session1 = $f2fgenerator->create_session_for_course($course);
+        $session2 = $f2fgenerator->create_session_for_course($course);
+
+        $signups = [];
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1, 3, 0);
+        $f2fgenerator->create_cancellation($student1, $session1, 1, 2);
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2, 4, 1);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1, 5, 3);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2, 2, 3);
+        $f2fgenerator->create_cancellation($student2, $session2, 2, 1);
+
+        // Check initial data.
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session2->id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
+        $this->assert_count_signups_status($session1->id, 3);
+        $this->assert_count_signups_status($session2->id, 3);
+        // Check customfield data for session1.
+        $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[21]->id], 8, 3);
+        $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[21]->id], 1, 2);
+        // Check customfield data for session2.
+        $this->assert_count_customfield_data('signup', [$signups[12]->id, $signups[22]->id], 6, 4);
+        $this->assert_count_customfield_data('cancellation', [$signups[12]->id, $signups[22]->id], 2, 1);
+
+        // Delete two signups covering both users and both sessions.
+        facetoface_delete_signups([$signups[11]->id, $signups[22]->id]);
+
+        // Check data after deletion.
+        $this->assertCount(1, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
+        $this->assertCount(1, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
+        $this->assert_count_signups_status($session1->id, 1);
+        $this->assert_count_signups_status($session2->id, 1);
+        // Check customfield data.
+        $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[22]->id], 0, 0);
+        $this->assert_count_customfield_data('signup', [$signups[12]->id], 4, 1);
+        $this->assert_count_customfield_data('signup', [$signups[21]->id], 5, 3);
+        $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[12]->id, $signups[21]->id, $signups[22]->id], 0, 0);
     }
 
     function test_facetoface_cron() {
@@ -2772,6 +2876,50 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertSame('Event under minimum bookings for: facetoface1', $message->subject);
         $this->assertContains('The following event is under minimum bookings:', $message->fullmessage);
         $this->assertContains('Capacity: 1 / 10 (minimum: 4)', $message->fullmessage);
+    }
+
+    public function test_facetoface_is_signup_cancelled() {
+        $learner = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+
+        // Create a session
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course->id));
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (YEARSECS * 2);
+        $sessiondate->timefinish = time() + (YEARSECS * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 5,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        // Sign the user up.
+        facetoface_user_signup(
+            $session,
+            $facetoface,
+            $course,
+            'discountcode1',
+            MDL_F2F_INVITE,
+            MDL_F2F_STATUS_BOOKED,
+            $learner->id
+        );
+
+        // Make sure learner is booked.
+        $booked = facetoface_get_attendees($session->id, MDL_F2F_STATUS_BOOKED, true);
+        $this->assertCount(1, $booked);
+        $booked = reset($booked);
+        $this->assertEquals($learner->id, $booked->id);
+
+        $this->assertFalse(facetoface_is_signup_cancelled($booked->signupid));
+
+        facetoface_user_cancel($session, $learner->id);
+
+        $this->assertTrue(facetoface_is_signup_cancelled($booked->signupid));
     }
 
     public function test_facetoface_waitlist() {

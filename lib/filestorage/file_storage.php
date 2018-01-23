@@ -818,7 +818,7 @@ class file_storage {
      * @return stored_file[] array of stored_files indexed by pathanmehash
      */
     public function get_area_files($contextid, $component, $filearea, $itemid = false, $sort = "itemid, filepath, filename",
-                                    $includedirs = true, $updatedsince = 0) {
+                                    $includedirs = true, $updatedsince = 0, $userid = false) {
         global $DB;
 
         list($areasql, $conditions) = $DB->get_in_or_equal($filearea, SQL_PARAMS_NAMED);
@@ -840,6 +840,12 @@ class file_storage {
             $updatedsincesql = 'AND f.timemodified > :time';
         }
 
+        $useridsql = '';
+        if ($userid !== false) {
+            $useridsql = ' AND f.userid = :userid ';
+            $conditions['userid'] = $userid;
+        }
+
         $sql = "SELECT ".self::instance_sql_fields('f', 'r')."
                   FROM {files} f
              LEFT JOIN {files_reference} r
@@ -848,7 +854,8 @@ class file_storage {
                        AND f.component = :component
                        AND f.filearea $areasql
                        $updatedsincesql
-                       $itemidsql";
+                       $itemidsql
+                       $useridsql";
         if (!empty($sort)) {
             $sql .= " ORDER BY {$sort}";
         }

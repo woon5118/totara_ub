@@ -1044,42 +1044,6 @@ function facetoface_delete_session($session) {
         $DB->delete_records_select('facetoface_session_info_data', "id {$sqlin}", $inparams);
     }
 
-    // Get all associated signup customfield data to delete.
-    $signupparams = array();
-    $signupparams['sessionid'] = $session->id;
-    $signupids = $DB->get_fieldset_select(
-        'facetoface_signup_info_data',
-        'id',
-        "facetofacesignupid IN (SELECT s.id
-                                  FROM {facetoface_signups} s
-                                 WHERE s.sessionid = :sessionid)",
-        $signupparams
-    );
-
-    if (!empty($signupids)) {
-        list($sqlin, $inparams) = $DB->get_in_or_equal($signupids);
-        $DB->delete_records_select('facetoface_signup_info_data_param', "dataid {$sqlin}", $inparams);
-        $DB->delete_records_select('facetoface_signup_info_data', "id {$sqlin}", $inparams);
-    }
-
-    // Get all associated cancellation customfield data to delete.
-    $cancelparams = array();
-    $cancelparams['sessionid'] = $session->id;
-    $cancellationids = $DB->get_fieldset_select(
-        'facetoface_cancellation_info_data',
-        'id',
-        "facetofacecancellationid IN (SELECT s.id
-                                        FROM {facetoface_signups} s
-                                       WHERE s.sessionid = :sessionid)",
-        $cancelparams
-    );
-
-    if (!empty($cancellationids)) {
-        list($sqlin, $inparams) = $DB->get_in_or_equal($cancellationids);
-        $DB->delete_records_select('facetoface_cancellation_info_data_param', "dataid {$sqlin}", $inparams);
-        $DB->delete_records_select('facetoface_cancellation_info_data', "id {$sqlin}", $inparams);
-    }
-
     $sessioncancelparams = array('sessionid' => $session->id);
     $sessioncancelids = $DB->get_fieldset_select(
         'facetoface_sessioncancel_info_data',
@@ -1093,10 +1057,8 @@ function facetoface_delete_session($session) {
         $DB->delete_records_select('facetoface_sessioncancel_info_data', "id {$sqlin}", $inparams);
     }
 
-    $DB->delete_records_select(
-        'facetoface_signups_status',
-        "signupid IN (SELECT id FROM {facetoface_signups} WHERE sessionid = {$session->id})");
-    $DB->delete_records('facetoface_signups', array('sessionid' => $session->id));
+    // Delete signups and related data.
+    facetoface_delete_signups_for_session((int)$session->id);
 
     // Notifications.
     $DB->delete_records('facetoface_notification_sent', array('sessionid' => $session->id));
@@ -1111,6 +1073,69 @@ function facetoface_delete_session($session) {
     $transaction->allow_commit();
 
     return true;
+}
+
+/**
+ * Delete all signups and related data for given session id.
+ *
+ * @param int $sessionid
+ */
+function facetoface_delete_signups_for_session(int $sessionid) {
+    global $DB;
+
+    $signupids = $DB->get_fieldset_select(
+        'facetoface_signups',
+        'id',
+        'sessionid = :sessionid',
+        ['sessionid' => $sessionid]
+    );
+    facetoface_delete_signups($signupids);
+}
+
+/**
+ * Delete signups and related data.
+ *
+ * @param array $signupids
+ */
+function facetoface_delete_signups(array $signupids) {
+    global $DB;
+
+    if (empty($signupids)) {
+        return;
+    }
+
+    list($signupsqlin, $signupinparams) = $DB->get_in_or_equal($signupids);
+
+    // Get all associated signup customfield data to delete.
+    $signupinfoids = $DB->get_fieldset_select(
+        'facetoface_signup_info_data',
+        'id',
+        "facetofacesignupid {$signupsqlin}",
+        $signupinparams
+    );
+
+    if (!empty($signupinfoids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($signupinfoids);
+        $DB->delete_records_select('facetoface_signup_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_signup_info_data', "id {$sqlin}", $inparams);
+    }
+
+    // Get all associated cancellation customfield data to delete.
+    $cancellationids = $DB->get_fieldset_select(
+        'facetoface_cancellation_info_data',
+        'id',
+        "facetofacecancellationid {$signupsqlin}",
+        $signupinparams
+    );
+
+    if (!empty($cancellationids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($cancellationids);
+        $DB->delete_records_select('facetoface_cancellation_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_cancellation_info_data', "id {$sqlin}", $inparams);
+    }
+
+    $DB->delete_records_select('facetoface_signups_status', "signupid {$signupsqlin}", $signupinparams);
+    $DB->delete_records_select('facetoface_signups', "id {$signupsqlin}", $signupinparams);
 }
 
 /**
@@ -2604,7 +2629,7 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $gr
 /**
  * Cancel a user who signed up earlier
  *
- * @param class $session       Record from the facetoface_sessions table
+ * @param stdClass $session    Record from the facetoface_sessions table
  * @param integer $userid      ID of the user to remove from the session
  * @param bool $forcecancel    Forces cancellation of sessions that have already occurred
  * @param string $errorstr     Passed by reference. For setting error string in calling function
@@ -3347,9 +3372,7 @@ function facetoface_user_cancel_submission($sessionid, $userid, $cancelreason=''
     }
 
     // If user status already changed to cancelled.
-    $sql = "signupid = ? AND superceded = ? AND statuscode = ? ORDER BY id DESC";
-    $params = array($signup->id, 0, MDL_F2F_STATUS_USER_CANCELLED);
-    if ($signupstatus = $DB->get_record_select('facetoface_signups_status', $sql, $params, 'id')) {
+    if (facetoface_is_signup_cancelled((int)$signup->id)) {
         debugging('User status already changed to cancelled.', DEBUG_DEVELOPER);
         return true;
     }
@@ -3374,6 +3397,21 @@ function facetoface_user_cancel_submission($sessionid, $userid, $cancelreason=''
     }
 
     return $result;
+}
+
+/**
+ * Find out if signup for the given id is cancelled.
+ *
+ * @param int $signupid
+ * @return bool
+ */
+function facetoface_is_signup_cancelled(int $signupid): bool {
+    global $DB;
+
+    $sql = "signupid = ? AND superceded = ? AND statuscode = ?";
+    $params = [$signupid, 0, MDL_F2F_STATUS_USER_CANCELLED];
+
+    return $DB->record_exists_select('facetoface_signups_status', $sql, $params);
 }
 
 /**

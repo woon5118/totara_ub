@@ -408,6 +408,7 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $file1->filepath  = '/';
         $file1->filename  = '1.txt';
         $file1->source    = 'test';
+        $file1->userid    = 1;
 
         $fs = get_file_storage();
         $userfile1 = $fs->create_file_from_string($file1, 'file1 content');
@@ -420,6 +421,7 @@ class core_files_file_storage_testcase extends advanced_testcase {
 
         $file3 = clone($file1);
         $file3->filename = '3.txt';
+        $file3->userid = 2;
         $userfile3 = $fs->create_file_from_storedfile($file3, $userfile2);
         $this->assertInstanceOf('stored_file', $userfile3);
 
@@ -470,6 +472,14 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $areafiles = $fs->get_area_files($user->ctxid, 'user', 'private', 666, 'sortorder', false);
         // Should be none.
         $this->assertEmpty($areafiles);
+
+        // Test with a userid.
+        $areafiles = $fs->get_area_files($user->ctxid, 'user', 'private', false, "itemid, filepath, filename", false, 0, 1);
+        $this->assertCount(2, $areafiles);
+        foreach ($areafiles as $key => $file) {
+            $this->assertInstanceOf('stored_file', $file);
+            $this->assertContains($file->get_filename(), ['1.txt', '2.txt']);
+        }
     }
 
     public function test_get_area_tree() {

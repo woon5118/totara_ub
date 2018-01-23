@@ -288,7 +288,7 @@ class totara_customfield_generator extends testing_data_generator {
      * @throws file_exception
      * @throws stored_file_creation_exception
      */
-    public function create_test_file_from_content($filename, $filecontent, $itemid, $filepath = '/') {
+    public function create_test_file_from_content($filename, $filecontent, $itemid, $filepath = '/', $userid = null) {
         $fs = get_file_storage();
 
         $syscontext = context_system::instance();
@@ -304,6 +304,7 @@ class totara_customfield_generator extends testing_data_generator {
             'filepath'  => $filepath,
             'filename'  => $filename,
             'source'    => $sourcefield,
+            'userid'    => $userid,
         );
 
         return $fs->create_file_from_string($filerecord, $filecontent);
