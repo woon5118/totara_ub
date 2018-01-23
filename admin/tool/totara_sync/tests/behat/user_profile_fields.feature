@@ -172,8 +172,3 @@ Feature: User profile fields set as unique can be used via HR Import.
     When I navigate to "Run HR Import" node in "Site administration > HR Import"
     And I press "Run HR Import"
     Then I should see "Running HR Import cron...Done!"
-    And I should not see "However, there have been some problems"
-
-    # Confirm the new user is added.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    Then I should see "Upload User 2"

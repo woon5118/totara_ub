@@ -194,8 +194,8 @@ abstract class totara_sync_source_pos extends totara_sync_source {
         $table->add_field('fullname', XMLDB_TYPE_CHAR, '255');
         $table->add_field('shortname', XMLDB_TYPE_CHAR, '100');
         $table->add_field('description', XMLDB_TYPE_TEXT, 'medium');
-        $table->add_field('frameworkidnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
-        $table->add_field('parentidnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
+        $table->add_field('frameworkidnumber', XMLDB_TYPE_CHAR, '100');
+        $table->add_field('parentidnumber', XMLDB_TYPE_CHAR, '100');
         $table->add_field('typeidnumber', XMLDB_TYPE_CHAR, '100');
         $table->add_field('customfields', XMLDB_TYPE_TEXT, 'big');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null);

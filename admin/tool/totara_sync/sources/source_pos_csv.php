@@ -253,6 +253,9 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
 
+        // Convert setting into a boolean.
+        $csvsaveemptyfields = isset($this->element->config->csvsaveemptyfields) && $this->element->config->csvsaveemptyfields == 1;
+
         while ($csvrow = fgetcsv($file, 0, $this->config->delimiter)) {
             $fieldcount->rownum++;
             // Skip empty rows
@@ -285,9 +288,25 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                 }
             }
 
-            // The condition must use a combination of isset and !== '' because it needs to process 0 as a valid parentidnumber.
-            $row['parentidnumber'] = isset($row['parentidnumber']) && $row['parentidnumber'] !== '' ? $row['parentidnumber'] : '';
-            $row['parentidnumber'] = $row['parentidnumber'] === $row['idnumber'] ? '' : $row['parentidnumber'];
+            // Empty string from file and save empty string = erase
+            if (isset($row['parentidnumber']) && $row['parentidnumber'] === '') {
+                if ($csvsaveemptyfields) {
+                    // Saving empty fields (erase data).
+                    $row['parentidnumber'] = '';
+                } else {
+                    // Not saving (set to null and the element will get the existing value).
+                    $row['parentidnumber'] = null;
+                }
+            }
+
+            if (isset($row['frameworkidnumber']) && $row['frameworkidnumber'] === '') {
+                if ($csvsaveemptyfields) {
+                    // Cannot erase existing value
+                    $row['frameworkidnumber'] = '';
+                } else{
+                    $row['frameworkidnumber'] = null;
+                }
+            }
 
             if ($this->config->{'import_typeidnumber'} == '0') {
                 unset($row['typeidnumber']);
@@ -305,6 +324,15 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                 }
             }
 
+            // Unset fields we are not saving since they are empty
+            if (!$csvsaveemptyfields) {
+                foreach ($row as $key => $value) {
+                    if ($value === '') {
+                        $row[$key] = null;
+                    }
+                }
+            }
+
             // Custom fields - need to handle custom field formats like dates here
             $customfieldkeys = preg_grep('/^customfield_.*/', $fields);
             if (!empty($customfieldkeys)) {
@@ -312,7 +340,13 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                 foreach ($customfieldkeys as $key) {
                     // Get shortname and check if we need to do field type processing
                     $value = trim($csvrow[$key]);
-                    if (!empty($value)) {
+                    // Deal with empty strings first
+                    if ($value === '') {
+                        if (!$csvsaveemptyfields) {
+                            // If we are not saving empty fields then set null
+                            $value = null;
+                        }
+                    } else if (isset($value)) {
                         $shortname = str_replace('customfield_', '', $key);
                         $datatype = $DB->get_field('pos_type_info_field', 'datatype', array('shortname' => $shortname));
                         switch ($datatype) {
@@ -323,10 +357,14 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                                     $value = $parsed_date;
                                 }
                                 break;
+                            case 'checkbox':
+                                $value = $value == '0' ? 0 : 1;
+                                break;
                             default:
                                 break;
                         }
                     }
+
                     $customfields[$key] = $value;
                     unset($csvrow[$key]);
                 }

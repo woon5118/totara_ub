@@ -29,6 +29,7 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/user.php');
 abstract class totara_sync_source_user extends totara_sync_source {
 
     protected $fields;
+    protected $required_fields;
     protected $customfields, $customfieldtitles;
     protected $element;
 
@@ -77,6 +78,16 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'auth',
             'password',
             'suspended',
+        );
+
+        // Fields that require a value if they are included.
+        $this->required_fields = array(
+            'idnumber',
+            'username',
+            'firstname',
+            'lastname',
+            'email',
+            'auth'
         );
 
         // Custom fields
@@ -220,7 +231,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
         $table->add_field('idnumber', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('username', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
+        $table->add_field('username', XMLDB_TYPE_CHAR, '100');
         if (!empty($this->config->import_deleted)) {
             $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         }
@@ -289,7 +300,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $table->add_field('suspended', XMLDB_TYPE_INTEGER, '1');
         }
         if (!empty($this->config->import_emailstop)) {
-            $table->add_field('emailstop', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('emailstop', XMLDB_TYPE_INTEGER, '1');
         }
         $table->add_field('customfields', XMLDB_TYPE_TEXT, 'big');
 

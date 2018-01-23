@@ -352,9 +352,6 @@ class totara_sync_element_user extends totara_sync_element {
             $rsupdateaccounts = $DB->get_recordset_sql($sql);
         }
 
-        $iscsvimport = substr(get_class($this->get_source()), -4) === '_csv';
-        $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
-
         if (!empty($this->config->allow_create)) {
             // Get accounts that must be created.
             $sql = "SELECT s.*
@@ -376,7 +373,7 @@ class totara_sync_element_user extends totara_sync_element {
             $previousidnumber = false;
             foreach ($rscreateaccounts as $suser) {
                 try {
-                    $this->create_user($suser, $saveemptyfields);
+                    $this->create_user($suser);
                     $this->addlog(get_string('createduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'createuser');
                 } catch (Exception $e) {
                     // We don't need to (and don't want to) do any rollback here because we trust that create_user has done it.
@@ -438,7 +435,7 @@ class totara_sync_element_user extends totara_sync_element {
                 }
 
                 // Update user.
-                $this->set_sync_user_fields($user, $suser, $saveemptyfields);
+                $this->set_sync_user_fields($user, $suser);
 
                 try {
                     $DB->update_record('user', $user);
@@ -492,7 +489,7 @@ class totara_sync_element_user extends totara_sync_element {
                 unset($userauth);
 
                 // Update custom field data.
-                $user = $this->put_custom_field_data($user, $suser, $saveemptyfields);
+                $user = $this->put_custom_field_data($user, $suser);
 
                 $this->addlog(get_string('updateduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'updateusers');
 
@@ -517,12 +514,16 @@ class totara_sync_element_user extends totara_sync_element {
      * Create a user
      *
      * @param stdClass $suser escaped sync user object
-     * @param bool $saveemptyfields true if empty strings should erase data, false if the field should be ignored
+     * @param bool $unused @deprecated 12.0 No longer in use by internal code.
      * @return boolean true if successful
      * @throws totara_sync_exception
      */
-    function create_user($suser, $saveemptyfields) {
+    function create_user($suser, $unused = false) {
         global $CFG, $DB;
+
+        if ($unused !== false) {
+            debugging('The second parameter of create_user is deprecated', DEBUG_DEVELOPER);
+        }
 
         $transaction = $DB->start_delegated_transaction();
 
@@ -537,7 +538,7 @@ class totara_sync_element_user extends totara_sync_element {
             $user->lang = $CFG->lang;
             $user->timecreated = time();
             $user->auth = isset($suser->auth) ? $suser->auth : 'manual';
-            $this->set_sync_user_fields($user, $suser, $saveemptyfields);
+            $this->set_sync_user_fields($user, $suser);
 
             // Add user default fields where appropriate
             $user->maildisplay = core_user::get_property_default('maildisplay');
@@ -581,7 +582,7 @@ class totara_sync_element_user extends totara_sync_element {
             }
             unset($userauth);
             // Update custom field data.
-            $user = $this->put_custom_field_data($user, $suser, $saveemptyfields);
+            $user = $this->put_custom_field_data($user, $suser);
 
         } catch (totara_sync_exception $e) {
             // One of the totara sync exceptions above was triggered. Rollback has already occurred. Just pass on the exception.
@@ -609,11 +610,15 @@ class totara_sync_element_user extends totara_sync_element {
      *
      * @param stdClass $user existing user object
      * @param stdClass $suser escaped sync user object
-     * @param bool $saveemptyfields true if empty strings should erase data, false if the field should be ignored
+     * @param bool $unused @deprecated 12.0 No longer in use by internal code.
      * @return stdClass
      */
-    public function put_custom_field_data($user, $suser, $saveemptyfields) {
+    public function put_custom_field_data($user, $suser, $unused = false) {
         global $CFG;
+
+        if ($unused !== false) {
+            debugging('The third parameter of put_custom_field_data is deprecated', DEBUG_DEVELOPER);
+        }
 
         $customfields = json_decode($suser->customfields);
 
@@ -623,10 +628,6 @@ class totara_sync_element_user extends totara_sync_element {
             foreach ($customfields as $name => $value) {
                 if ($value === null) {
                     continue; // Null means "don't update the existing data", so skip this field.
-                }
-
-                if ($value === "" && !$saveemptyfields) {
-                    continue; // CSV import and empty fields are not saved, so skip this field.
                 }
 
                 $profile = str_replace('customfield_', 'profile_field_', $name);
@@ -642,10 +643,14 @@ class totara_sync_element_user extends totara_sync_element {
     /**
      * @param stdClass $user existing user object
      * @param stdClass $suser escaped sync user object
-     * @param bool $saveemptyfields true if empty strings should erase data, false if the field should be ignored
+     * @param bool $unused @deprecated 12.0 No longer in use by internal code.
      */
-    function set_sync_user_fields(&$user, $suser, $saveemptyfields) {
+    function set_sync_user_fields(&$user, $suser, $unused = false) {
         global $CFG;
+
+        if ($unused !== false) {
+            debugging('The third parameter of set_sync_user_fields is deprecated', DEBUG_DEVELOPER);
+        }
 
         $fields = array('address', 'city', 'country', 'department', 'description',
             'email', 'firstname', 'institution', 'lang', 'lastname', 'firstnamephonetic',
@@ -657,10 +662,6 @@ class totara_sync_element_user extends totara_sync_element {
         foreach ($fields as $field) {
             if (!isset($suser->$field)) {
                 continue; // Null means "don't update the existing data", so skip this field.
-            }
-
-            if ($suser->$field === "" && !$saveemptyfields) {
-                continue; // CSV import and empty fields are not saved, so skip this field.
             }
 
             if (in_array($field, $requiredfields) && trim($suser->$field) === "") {
@@ -761,6 +762,12 @@ class totara_sync_element_user extends totara_sync_element {
         // Check usernames against the DB to avoid saving repeated values.
         $badids = $this->check_values_in_db($synctable, 'username', 'duplicateusernamexdb');
         $invalidids = array_merge($invalidids, $badids);
+
+        // Get empty auth.
+        if (property_exists($syncfields, 'auth')) {
+            $badids = $this->check_empty_values($synctable, 'auth', 'emptyvalueauthx');
+            $invalidids = array_merge($invalidids, $badids);
+        }
 
         // Get empty firstnames. If it is provided then it must have a non-empty value.
         if (property_exists($syncfields, 'firstname')) {

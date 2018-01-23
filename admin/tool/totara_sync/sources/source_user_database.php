@@ -228,6 +228,14 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                 $dbrow['deleted'] = empty($dbrow['deleted']) ? 0 : $dbrow['deleted'];
             }
 
+            if (empty($dbrow['firstname'])) {
+                $dbrow['firstname'] = '';
+            }
+
+            if (empty($dbrow['lastname'])) {
+                $dbrow['lastname'] = '';
+            }
+
             if (empty($dbrow['username'])) {
                 $dbrow['username'] = '';
             }
@@ -250,13 +258,14 @@ class totara_sync_source_user_database extends totara_sync_source_user {
             if (!empty($this->customfields)) {
                 $cfield_data = array();
                 foreach (array_keys($this->customfields) as $cf) {
-                    if (!empty($this->config->{'import_'.$cf})) {
+                    if (!empty($this->config->{'import_'.$cf})) { // Not importing
                         if (!empty($this->config->{'fieldmapping_'.$cf})) {
-                            $value = trim($extdbrow[$this->config->{'fieldmapping_'.$cf}]);
+                            $dbvalue = $extdbrow[$this->config->{'fieldmapping_'.$cf}];
+                            $value = is_null($dbvalue) ? null : trim($dbvalue);
                         } else {
-                            $value = trim($extdbrow[$cf]);
+                            $value = is_null($extdbrow[$cf]) ? null : trim($extdbrow[$cf]);
                         }
-                        if (!empty($value)) {
+                        if (isset($value)) {
                             //get shortname and check if we need to do field type processing
                             $shortname = str_replace("customfield_", "", $cf);
                             $datatype = $DB->get_field('user_info_field', 'datatype', array('shortname' => $shortname));

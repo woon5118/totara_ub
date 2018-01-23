@@ -202,23 +202,13 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
                 }
             }
 
-            // The condition must use a combination of isset and !== '' because it needs to process 0 as a valid parentidnumber.
-            $dbrow['parentidnumber'] = isset($dbrow['parentidnumber']) && $dbrow['parentidnumber'] !== '' ? $dbrow['parentidnumber'] : '';
-            $dbrow['parentidnumber'] = $dbrow['parentidnumber'] === $dbrow['idnumber'] ? '' : $dbrow['parentidnumber'];
-
             // Treat nulls in the 'deleted' database column as not deleted.
             if (!empty($this->config->import_deleted)) {
                 $dbrow['deleted'] = empty($dbrow['deleted']) ? 0 : $dbrow['deleted'];
             }
 
-            if ($this->config->{'import_typeidnumber'} == '0') {
-                unset($dbrow['typeidnumber']);
-            } else {
-                $dbrow['typeidnumber'] = !empty($dbrow['typeidnumber']) ? $dbrow['typeidnumber'] : '0';
-            }
-
             if (empty($extdbrow['timemodified'])) {
-                $dbrow['timemodified'] = $now; // This should probably be 0, but it causes repeated sync_item calls to parents.
+                $dbrow['timemodified'] = 0;
             } else {
                 //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
                 $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow['timemodified']), true);
@@ -232,11 +222,12 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
                 foreach (array_keys($this->customfields) as $cf) {
                     if (!empty($this->config->{'import_'.$cf})) {
                         if (!empty($this->config->{'fieldmapping_'.$cf})) {
-                            $value = trim($extdbrow[$this->config->{'fieldmapping_'.$cf}]);
+                            $dbvalue = $extdbrow[$this->config->{'fieldmapping_'.$cf}];
+                            $value = is_null($dbvalue) ? null : trim($dbvalue);
                         } else {
-                            $value = trim($extdbrow[$cf]);
+                            $value = is_null($extdbrow[$cf]) ? null : trim($extdbrow[$cf]);
                         }
-                        if (!empty($value)) {
+                        if (isset($value)) {
                             //get shortname and check if we need to do field type processing
                             $shortname = str_replace("customfield_", "", $cf);
                             $datatype = $DB->get_field('pos_type_info_field', 'datatype', array('shortname' => $shortname));

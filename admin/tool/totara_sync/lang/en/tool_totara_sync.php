@@ -258,6 +258,7 @@ $string['cannotdeletex'] = 'cannot delete {$a} (might already be deleted)';
 $string['deletedx'] = 'deleted {$a}';
 $string['deletefieldmissingnotallrecords'] = 'The delete field is missing, this is a required field if the file does not contain all records';
 $string['suspendeduserx'] = 'suspended {$a}';
+$string['existingitemxframeworkidnotfound'] = 'item {$a} does not have a framework id number, this is required when framework id of the existing item is empty';
 $string['frameworkxnotfound'] = 'framework {$a} not found...';
 $string['parentxnotfound'] = 'parent {$a} not found...';
 $string['cannotsyncitemparent'] = 'cannot import item\'s parent {$a}';
@@ -301,6 +302,7 @@ $string['duplicateuserswithemailx'] = 'Duplicate users with email {$a->email}. S
 $string['duplicateusernamexdb'] = 'Username {$a->username} is already registered. Skipped user {$a->idnumber}';
 $string['duplicateusersemailxdb'] = 'Email {$a->email} is already registered. Skipped user {$a->idnumber}';
 $string['duplicateidnumberx'] = 'Duplicate idnumber {$a}';
+$string['emptyvalueauthx'] = 'Auth cannot be empty. Skipped user {$a->idnumber}';
 $string['emptyvalueemailx'] = 'Email cannot be empty (duplicates not allowed). Skipped user {$a->idnumber}';
 $string['emptyvaluefirstnamex'] = 'First name cannot be empty. Skipped user {$a->idnumber}';
 $string['emptyvalueidnumberx'] = 'Idnumber cannot be empty. Skipped user {$a->idnumber}';
@@ -386,8 +388,20 @@ $string['emptyfieldsbehaviouruser_help'] = 'When set to **Empty strings are igno
 When set to **Empty strings erase existing data** empty strings within your CSV file will lead to the current value being deleted.
 
 Please note that some fields are required, and some fields utilise a default value.
-If **Empty strings erase existing data** is selected and you attempt to delete the current value for a required field, the user in the CSV file will be skipped as a value must be provided.
-If **Empty strings erase existing data** is selected and you delete the current value of a field that utilises a default value, the default value will be used as the current value.';
+
+* If **Empty strings erase existing data** is selected and you attempt to delete the current value for a required field, the user in the CSV file will be skipped as a value must be provided.
+* If **Empty strings erase existing data** is selected and you delete the current value of a field that utilises a default value, the default value will be used as the current value.
+
+Fields that cannot be empty are:
+
+* idnumber
+* username
+* firstname
+* lastname
+* password
+* deleted (depending on the source contains all records setting)
+* auth
+';
 $string['enablescheduledsync'] = 'Enable scheduled HR Importing';
 $string['files'] = 'Files';
 $string['filesdir'] = 'Files directory';

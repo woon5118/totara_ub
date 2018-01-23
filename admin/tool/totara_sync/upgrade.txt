@@ -1,7 +1,7 @@
 This files describes API changes in HR Import,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 12.0 ===
 
 * Removed deprecated methods:
   * totara_sync_element_user::sync_user_assignments()
@@ -11,6 +11,11 @@ information provided here is intended especially for developers.
   * totara_sync_element_user::get_invalid_start_end_dates()
   * totara_sync_element_user::get_invalid_roles()
   * totara_sync_element_user::check_self_assignment()
+* The following functions now assume empty fields are processed in the source before being passed to the element:
+  * sync_item() the third parameter is no longer used. Behaviour of the function has not changed.
+  * create_user() the second parameter is no longer used. Behaviour of the function has not changed.
+  * set_sync_user_fields the third parameter is no longer used. Behaviour of the function has not changed.
+  * put_custom_field_data() the third parameter is no longer used. Behaviour of the function has not changed.
 
 
 === 11.0 ===
