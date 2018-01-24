@@ -433,8 +433,11 @@ final class executable implements \Serializable {
         }
 
         // For Clam AV (anti-virus program).
-        if (isset($CFG->pathtoclam)) {
-            $whitelist[$CFG->pathtoclam] = true;
+        // MDL-50887 moved antivirus scanning to a plugin; so must read plugin
+        // config settings for executable path instead of the old $CFG->pathtoclam.
+        $antiviruspath = \get_config('antivirus_clamav', 'pathtoclam');
+        if (!empty($antiviruspath)) {
+            $whitelist[$antiviruspath] = true;
         }
 
         // For the function get_directory_size().

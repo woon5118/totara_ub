@@ -183,7 +183,7 @@ class core_command_executable_testcase extends advanced_testcase {
         $this->enable_fake_pcntl(false);
 
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         $command = new \core\command\executable($execpath);
         $this->match_generated_command(escapeshellarg($execpath), $command);
@@ -197,7 +197,7 @@ class core_command_executable_testcase extends advanced_testcase {
         $this->enable_fake_pcntl(true);
 
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         $command = new \core\command\executable($execpath);
         $expected = "<?php\n" . "pcntl_exec(" . escapeshellarg($execpath) . ", array (\n));";
@@ -281,7 +281,7 @@ class core_command_executable_testcase extends advanced_testcase {
 
         $execpath = $this->get_path_to_exec_file();
 
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
         $command = new \core\command\executable($execpath);
 
         $this->treat_as_web_request();
@@ -297,7 +297,7 @@ class core_command_executable_testcase extends advanced_testcase {
 
         $execpath = $this->get_path_to_exec_file();
 
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
         $command = new \core\command\executable($execpath);
 
         $this->treat_as_web_request();
@@ -351,7 +351,7 @@ class core_command_executable_testcase extends advanced_testcase {
 
         $execpath = $this->get_path_to_exec_file();
 
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
         $command = new \core\command\executable($execpath);
 
         $this->treat_as_cli();
@@ -367,7 +367,7 @@ class core_command_executable_testcase extends advanced_testcase {
 
         $execpath = $this->get_path_to_exec_file();
 
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
         $command = new \core\command\executable($execpath);
 
         $this->treat_as_cli();
@@ -591,12 +591,12 @@ class core_command_executable_testcase extends advanced_testcase {
 
         // Let's try the other way. pathtoclam is allowed on the web, so we'll set a path for that.
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
         $command = new \core\command\executable($execpath);
         $this->match_generated_command(escapeshellarg($execpath), $command);
 
         // Perhaps someone only ever wants it to be run on the cli.
-        $CFG->thirdpartyexeclist = array($CFG->pathtoclam => false);
+        $CFG->thirdpartyexeclist = array($execpath => false);
         unset($command);
 
         try {
@@ -621,7 +621,7 @@ class core_command_executable_testcase extends advanced_testcase {
         global $CFG;
         $this->enable_fake_pcntl(false);
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         // Add several arguments, values and switches. Confirm each is escaped (or not) where expected and order is correct.
         $command = new \core\command\executable($execpath);
@@ -649,7 +649,7 @@ class core_command_executable_testcase extends advanced_testcase {
         global $CFG;
         $this->enable_fake_pcntl(true);
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         // Add several arguments, values and switches. Confirm each is escaped (or not) where expected and order is correct.
         $command = new \core\command\executable($execpath);
@@ -678,7 +678,7 @@ class core_command_executable_testcase extends advanced_testcase {
         global $CFG;
         $this->enable_fake_pcntl(false);
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         // This time we'll add a few non-standard parameters.
         // I can set the default operator to use for add_argument and it can basically be anything.
@@ -719,7 +719,7 @@ class core_command_executable_testcase extends advanced_testcase {
         global $CFG;
         $this->enable_fake_pcntl(true);
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         // This time we'll add a few non-standard parameters.
         // I can set the default operator to use for add_argument and it can basically be anything.
@@ -761,7 +761,7 @@ class core_command_executable_testcase extends advanced_testcase {
     public function test_add_value_invalid_values_throw_exceptions() {
         global $CFG;
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         // First test a valid value.
         $command = new \core\command\executable($execpath);
@@ -790,7 +790,7 @@ class core_command_executable_testcase extends advanced_testcase {
     public function test_add_argument_invalid_values_throw_exceptions() {
         global $CFG;
         $execpath = $this->get_path_to_exec_file();
-        $CFG->pathtoclam = $execpath;
+        \set_config('pathtoclam', $execpath, 'antivirus_clamav');
 
         // First test a valid value.
         $command = new \core\command\executable($execpath);
