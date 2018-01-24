@@ -54,6 +54,7 @@ class rb_source_cohort_associations_visible extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort_associations_visible');
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 
@@ -112,9 +113,9 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             p.fullname AS name, p.icon, " .
             " CASE WHEN p.certifid > 0 THEN " . COHORT_ASSN_ITEMTYPE_CERTIF .
             " ELSE " . COHORT_ASSN_ITEMTYPE_PROGRAM .
-            " END AS instancetype" .
-            ", p.audiencevisible
-            FROM {prog} p )",
+            " END AS instancetype, " .
+            "p.audiencevisible
+            FROM {prog} p)",
             'base.instancetype = associations.instancetype AND base.instanceid = associations.instanceid',
             REPORT_BUILDER_RELATION_MANY_TO_ONE
         );
@@ -206,19 +207,6 @@ class rb_source_cohort_associations_visible extends rb_base_source {
                   'displayfunc' => 'plaintext',
                   'dbdatatype' => 'char',
                   'outputformat' => 'text')
-        );
-        $columnoptions[] = new rb_column_option(
-            'associations',
-            'programcompletionlink',
-            get_string('associationprogramcompletionlink', 'totara_cohort'),
-            'base.instanceid',
-            array(
-                'displayfunc' => 'programcompletionlink',
-                'extrafields' => array(
-                    'type' => 'base.instancetype',
-                    'cohortid' => 'base.cohortid'
-                )
-            )
         );
 
         return $columnoptions;
@@ -435,9 +423,10 @@ class rb_source_cohort_associations_visible extends rb_base_source {
      * Helper function to display the "Set completion date" link for a program (should only be used with enrolled items)
      * @param $instanceid
      * @param $row
+     * @deprecated Since 11; no replacement; program completion is for enrolled audience, NOT visible audiences.
      */
     public function rb_display_programcompletionlink($instanceid, $row) {
-
+        debugging('rb_display_programcompletionlink() has been deprecated with no replacement', DEBUG_DEVELOPER);
         static $canedit = null;
         if ($canedit === null) {
             $canedit = has_capability('moodle/cohort:manage', context_system::instance());

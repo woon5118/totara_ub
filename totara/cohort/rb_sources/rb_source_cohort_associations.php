@@ -45,19 +45,22 @@ class rb_source_cohort_associations extends rb_base_source {
      */
     public function __construct() {
         $this->base = "(SELECT e.id, e.customint1 AS cohortid, e.courseid AS instanceid,
-                c.fullname AS name, c.icon, " . COHORT_ASSN_ITEMTYPE_COURSE . " AS instancetype
+                c.fullname AS name, c.icon, " . COHORT_ASSN_ITEMTYPE_COURSE . " AS instancetype,
+                0 AS duedate, 0 AS completionevent, 0 AS completioninstance
             FROM {enrol} e
             JOIN {course} c ON e.courseid = c.id
             WHERE e.enrol = 'cohort'
             UNION ALL
             SELECT pa.id, pa.assignmenttypeid AS cohortid, p.id AS instanceid,
-                p.fullname AS name, p.icon, " . COHORT_ASSN_ITEMTYPE_PROGRAM . " AS instancetype
+                p.fullname AS name, p.icon, " . COHORT_ASSN_ITEMTYPE_PROGRAM . " AS instancetype,
+                pa.completiontime AS duedate, pa.completionevent AS completionevent, pa.completioninstance AS completioninstance
             FROM {prog_assignment} pa
             JOIN {prog} p ON pa.programid = p.id
             WHERE pa.assignmenttype = " . ASSIGNTYPE_COHORT . " AND p.certifid IS NULL
             UNION ALL
             SELECT pa.id, pa.assignmenttypeid AS cohortid, p.id AS instanceid,
-                p.fullname AS name, p.icon, " . COHORT_ASSN_ITEMTYPE_CERTIF . " AS instancetype
+                p.fullname AS name, p.icon, " . COHORT_ASSN_ITEMTYPE_CERTIF . " AS instancetype,
+                pa.completiontime AS duedate, pa.completionevent AS completionevent, pa.completioninstance AS completioninstance
             FROM {prog_assignment} pa
             JOIN {prog} p ON pa.programid = p.id
             WHERE pa.assignmenttype = " . ASSIGNTYPE_COHORT . " AND p.certifid IS NOT NULL)";
@@ -70,6 +73,7 @@ class rb_source_cohort_associations extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort_associations');
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 
@@ -189,13 +193,16 @@ class rb_source_cohort_associations extends rb_base_source {
             'associations',
             'programcompletionlink',
             get_string('assignmentduedate', 'totara_program'),
-            'base.instanceid',
+            'base.duedate',
             array(
-                'displayfunc' => 'programcompletionlink',
-                'extrafields' => array(
+                'displayfunc' => 'cohort_association_duedate',
+                'extrafields' => [
+                    'programid' => 'base.instanceid',
+                    'completionevent' => 'base.completionevent',
+                    'completioninstance' => 'base.completioninstance',
                     'type' => 'base.instancetype',
                     'cohortid' => 'base.cohortid'
-                )
+                ]
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -387,8 +394,10 @@ class rb_source_cohort_associations extends rb_base_source {
      * @param $instanceid
      * @param $row
      * @return string
+     * @deprecated Since 11; replaced by totara/cohort/classes/rb/display/cohort_association_duedate class.
      */
     public function rb_display_programcompletionlink($instanceid, $row) {
+        debugging('rb_display_programcompletionlink() has been deprecated replaced by totara/cohort/classes/rb/display/cohort_association_duedate class', DEBUG_DEVELOPER);
         static $canedit = null;
         if ($canedit === null) {
             $canedit = has_capability('moodle/cohort:manage', context_system::instance());
