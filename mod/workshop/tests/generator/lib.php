@@ -158,4 +158,54 @@ class mod_workshop_generator extends testing_module_generator {
 
         return $id;
     }
+
+    /**
+     * @param $assessmentid
+     * @param $dimensionid - for the grading dimension. Use the generator method get_accumulative_dimensionid()
+     *   if you are not concerned with the actual dimension will do.
+     * @param $grade
+     * @return int
+     * @throws dml_exception
+     */
+    public function create_grade($assessmentid, $dimensionid, $grade, $comment = null) {
+        global $DB;
+
+        $record = new stdClass();
+        $record->assessmentid = $assessmentid;
+        $record->strategy = 'accumulative';
+        $record->dimensionid = $dimensionid;
+        $record->grade = $grade;
+        $record->peercomment = empty($comment) ? 'Test comment' : $comment;
+        $record->peercommentformat = FORMAT_MOODLE;
+
+        return $DB->insert_record('workshop_grades', $record);
+    }
+
+    /**
+     * If you need a grading dimension id to create a grade, this will return one if it exists
+     * for a given workshop, or create one.
+     *
+     * @param $workshop
+     * @return int
+     * @throws dml_exception
+     */
+    public function get_accumulative_dimensionid($workshop) {
+        global $DB;
+
+        $dimensionid = $DB->get_field('workshopform_accumulative', 'id', ['workshopid' => $workshop->id]);
+
+        if ($dimensionid) {
+            return $dimensionid;
+        }
+
+        $record = new stdClass();
+        $record->workshopid = $workshop->id;
+        $record->sort = 1;
+        $record->description = '';
+        $record->descriptionformat = FORMAT_MOODLE;
+        $record->grade = 10;
+        $record->weight = 1;
+
+        return $DB->insert_record('workshopform_accumulative', $record);
+    }
 }
