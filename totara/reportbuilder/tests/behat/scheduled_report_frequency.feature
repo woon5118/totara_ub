@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder @javascript
+@totara @totara_reportbuilder @totara_scheduledreports @javascript
 Feature: Test scheduled reports with new frequency setting
   Create a report
   Go to Reports

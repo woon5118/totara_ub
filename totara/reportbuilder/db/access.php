@@ -62,5 +62,17 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW,
         )
+    ),
+    // Ability to *create* scheduled report builder reports as opposed to
+    // totara/reportbuilder:managescheduledreports that allows the user to edit
+    // and delete scheduled reports.
+    'totara/reportbuilder:createscheduledreports' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'user' => CAP_ALLOW
+        )
     )
 );

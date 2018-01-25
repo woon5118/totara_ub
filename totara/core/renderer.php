@@ -385,6 +385,7 @@ class totara_core_renderer extends plugin_renderer_base {
         $dataobject = $table->export_for_template($this);
         $dataobject->scheduled_reports_count = count($scheduledreports);
         $dataobject->scheduled_report_form = $addform;
+        $dataobject->scheduled_reports_visible = has_capability('totara/reportbuilder:createscheduledreports', \context_system::instance());
 
         return $dataobject;
     }

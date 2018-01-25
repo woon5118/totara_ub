@@ -647,6 +647,7 @@ $string['report:startdate'] = 'Start date';
 $string['reportaccess'] = 'Report access';
 $string['reportactions'] = 'Actions';
 $string['reportbuilder'] = 'Report builder';
+$string['reportbuilder:createscheduledreports'] = 'Create scheduled reports';
 $string['reportbuilder:manageembeddedreports'] = 'Create, edit and reset report builder embedded reports';
 $string['reportbuilder:managereports'] = 'Create, edit and delete report builder reports';
 $string['reportbuilder:managescheduledreports'] = 'Manage scheduled reports';

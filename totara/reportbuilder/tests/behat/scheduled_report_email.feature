@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder @tabexport @javascript
+@totara @totara_reportbuilder @totara_scheduledreports @tabexport @javascript
 Feature: Test that report builder reports can be scheduled to be emailed
   Create a report
   Go to Reports

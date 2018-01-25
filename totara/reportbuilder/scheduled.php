@@ -87,7 +87,11 @@ if ($newreport) {
 if (!reportbuilder::is_capable($schedule->reportid)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
+
+require_capability('totara/reportbuilder:createscheduledreports', context_system::instance());
 if ($schedule->userid != $USER->id) {
+    // Since TL-9004, it is possible for an admin to adjust scheduled report settings even if
+    // he is not the scheduled report owner. Hence the check for the required capability here.
     require_capability('totara/reportbuilder:managescheduledreports', context_system::instance());
 }
 

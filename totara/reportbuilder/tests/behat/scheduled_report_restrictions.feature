@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder @javascript
+@totara @totara_reportbuilder @totara_scheduledreports @javascript
 Feature: Test that report builder scheduled report recipient settings restrict who can be added as a recipient
 
   Background:
