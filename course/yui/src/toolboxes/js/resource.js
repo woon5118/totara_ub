@@ -260,7 +260,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         }
 
         // TOTARA TL-16427.
-        if (this.get('config').showrecyclebinwarning) {
+        if (parseInt(this.get('config').showrecyclebinwarning)) {
             confirmstring += '<br/>' + M.util.get_string('deletecheckrecyclebin', 'tool_recyclebin');
         }
 
