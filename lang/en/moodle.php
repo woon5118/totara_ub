@@ -1962,6 +1962,7 @@ $string['userconfirmed'] = 'Confirmed {$a}';
 $string['useractivity'] = 'Activity';
 $string['userdata'] = 'User data';
 $string['userdataitem-user-customfields'] = 'All custom profile fields';
+$string['userdataitem-user-devices'] = 'Registered mobile devices (push notification)';
 $string['userdataitem-user-email'] = 'Email';
 $string['userdataitem-user-email_help'] = 'Email is a required field for all active and suspended accounts.';
 $string['userdataitem-user-idnumber'] = 'ID number';
