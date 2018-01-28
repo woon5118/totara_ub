@@ -473,18 +473,19 @@ function quiz_delete_previews($quiz, $userid = null) {
  * @param int $attemptid Attempt to update
  * @param int $quizid Quiz associated with attempt (added for validation)
  * @param bool $ispreview Preview flag to set
+ * @throws coding_exception
  */
 function quiz_set_unfinished_preview_flag($attemptid, $quizid, $ispreview) {
     global $USER, $DB;
 
     $conditions = array('id' => $attemptid, 'quiz' => $quizid, 'userid' => $USER->id);
-    if ($attempt = $DB->get_records('quiz_attempts', $conditions)) {
-        if ($attempt[$attemptid]->preview != $ispreview) {
-            $attempt[$attemptid]->preview = $ispreview;
-            $DB->update_record('quiz_attempts', $attempt[$attemptid]);
+    if ($attempt = $DB->get_record('quiz_attempts', $conditions)) {
+        if ($attempt->preview != $ispreview) {
+            $attempt->preview = $ispreview;
+            $DB->update_record('quiz_attempts', $attempt);
         }
     } else {
-        debugging("Trying to update preview flag of attempt $attemptid for user " . $USER->id . " and quiz " . $quizid .
+        throw new coding_exception("Trying to update preview flag of attempt $attemptid for user " . $USER->id . " and quiz " . $quizid .
                 " but attempt doesn't exist.");
     }
 }
