@@ -23,6 +23,7 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,6 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * Users interests.
  */
 class interests extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
@@ -72,15 +74,16 @@ class interests extends \totara_userdata\userdata\item {
         global $DB;
         // Moodle tags API can be considered to be less than good enough for our purposes, this is not going to be pretty...
 
-        $taginstances = $DB->get_records('tag_instance', array('component' => 'core', 'itemtype' => 'user', 'itemid' => $user->id));
+        $taginstances = $DB->get_records('tag_instance', ['component' => 'core', 'itemtype' => 'user', 'itemid' => $user->id]);
         foreach ($taginstances as $taginstance) {
-            $DB->delete_records('tag_instance', array('id' => $taginstance->id));
-            if (!$DB->record_exists('tag_instance', array('tagid' => $taginstance->tagid))) {
-                $tag = $DB->get_record('tag', array('id' => $taginstance->tagid, 'userid' => $user->id));
+            $DB->delete_records('tag_instance', ['id' => $taginstance->id]);
+            if (!$DB->record_exists('tag_instance', ['tagid' => $taginstance->tagid])) {
+                // Remove any unused tags, even if it wasn't created by the target user (consistent with API functions).
+                $tag = $DB->get_record('tag', ['id' => $taginstance->tagid]);
                 if ($tag) {
                     // Delete the tag only if nothing is using the tag any more and user created it.
-                    $DB->delete_records('tag_correlation', array('tagid' => $tag->id));
-                    $DB->delete_records('tag', array('id' => $tag->id));
+                    $DB->delete_records('tag_correlation', ['tagid' => $tag->id]);
+                    $DB->delete_records('tag', ['id' => $tag->id]);
                 }
             }
         }
@@ -102,12 +105,13 @@ class interests extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
         global $DB;
 
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
+        $export->data['interests'] = [];
 
         $sql = "SELECT DISTINCT t.name
                   FROM {tag_instance} i
@@ -137,11 +141,11 @@ class interests extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;
 
-        return (int)$DB->count_records('tag_instance', array('component' => 'core', 'itemtype' => 'user', 'itemid' => $user->id));
+        return $DB->count_records('tag_instance', ['component' => 'core', 'itemtype' => 'user', 'itemid' => $user->id]);
     }
 }
