@@ -5481,7 +5481,9 @@ function sql_table_from_select($table, $select, array $params) {
             $rowformat = "ROW_FORMAT = Compressed";
 
             $sql = "CREATE TABLE \"{$table}\" $enginesql $collationsql $rowformat $select";
+            $trans = $DB->start_delegated_transaction();
             $result = $DB->execute($sql, $params);
+            $trans->allow_commit();
             break;
         case 'mssql':
             $viewname = 'tmp_'.$hashtablename;
