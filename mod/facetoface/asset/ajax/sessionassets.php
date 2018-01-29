@@ -128,6 +128,6 @@ echo $dialog->generate_markup();
 // This will allow to remove offset parameter from url.
 if (!$search) {
     $addassetlinkhtml =  html_writer::link('#', get_string('createnewasset', 'facetoface'),
-        array('id' => 'show-editcustomasset' . $offset . '-dialog', 'class' => 'dialog-footer'));
-    echo html_writer::span($addassetlinkhtml, 'dialog-nobind');
+        array('id' => 'show-editcustomasset' . $offset . '-dialog'));
+    echo html_writer::div($addassetlinkhtml, 'dialog-nobind dialog-footer');
 }

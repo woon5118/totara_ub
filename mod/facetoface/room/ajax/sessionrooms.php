@@ -131,6 +131,6 @@ echo $dialog->generate_markup();
 // This will allow to remove offset parameter from url.
 if (!$search) {
     $addroomlinkhtml =  html_writer::link('#', get_string('createnewroom', 'facetoface'),
-        array('id' => 'show-editcustomroom' . $offset . '-dialog', 'class' => 'dialog-footer'));
-    echo html_writer::span($addroomlinkhtml, 'dialog-nobind');
+        array('id' => 'show-editcustomroom' . $offset . '-dialog'));
+    echo html_writer::div($addroomlinkhtml, 'dialog-nobind dialog-footer');
 }

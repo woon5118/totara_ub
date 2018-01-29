@@ -22,6 +22,8 @@
  * @package mod_facetoface
  */
 
+ /* global $, totaraDialog, totaraDialogs */
+
 M.totara_f2f_room = M.totara_f2f_room || {
 
     Y: null,
@@ -401,6 +403,15 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 sessionid = 0;
             }
 
+            handler.oldLoad = handler.load;
+            handler.load = function() {
+                handler.oldLoad();
+                var context = $(".ui-dialog [id^='selectroom'][id$='-dialog']"),
+                    height = context.height() - $('.dialog-footer', context).outerHeight();
+
+                $('.select', context).outerHeight(height);
+            };
+
             totaraDialogs['selectroom'+offset] = new totaraDialog(
                 'selectroom'+offset+'-dialog',
                 $(this).attr('id'),
@@ -584,6 +595,16 @@ M.totara_f2f_room = M.totara_f2f_room || {
             var buttonsObj = {};
             buttonsObj[M.util.get_string('ok','moodle')] = function() { handler._update(); };
             buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
+
+            handler.oldLoad = handler.load;
+
+            handler.load = function(response) {
+                handler.oldLoad(response);
+                var context = $(".ui-dialog [id^='selectassets'][id$='-dialog']"),
+                    height = context.height() - $('.dialog-footer', context).outerHeight();
+
+                $('.select', context).outerHeight(height);
+            };
 
             totaraDialogs['selectassets'+offset] = new totaraDialog(
                 'selectassets'+offset+'-dialog',
