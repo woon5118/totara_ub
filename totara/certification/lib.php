@@ -2769,7 +2769,7 @@ function certif_fix_unassigned_certif_completions($programid = 0, $userid = 0) {
 }
 
 /**
- * Create or update certif_completion and prog_completion records. Checks are performed to ensure that the data
+ * Insert or update certif_completion and prog_completion records. Checks are performed to ensure that the data
  * is valid before it can be written to the db.
  *
  * NOTE: $ignoreproblemkey should only be used by certif_fix_completions!!! If specified, the records will be
@@ -3287,6 +3287,7 @@ function certif_calculate_completion_description($certcompletion, $progcompletio
         '<ul><li>Status: ' . $CERTIFSTATUS[$certcompletion->status] . ' (' . $certcompletion->status . ')</li>' .
         '<li>Renewal status: ' . $CERTIFRENEWALSTATUS[$certcompletion->renewalstatus] . ' (' . $certcompletion->renewalstatus . ')</li>' .
         '<li>Certification path: ' . $CERTIFPATH[$certcompletion->certifpath] . ' (' . $certcompletion->certifpath . ')</li>' .
+        '<li>Time started: ' . prog_format_log_date($progcompletion->timestarted) . '</li>' .
         '<li>Due date: ' . prog_format_log_date($progcompletion->timedue) . '</li>' .
         '<li>Completion date: ' . prog_format_log_date($certcompletion->timecompleted) . '</li>' .
         '<li>Window open date: ' . prog_format_log_date($certcompletion->timewindowopens) . '</li>' .

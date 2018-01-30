@@ -711,4 +711,76 @@ class totara_program_completions_task_testcase extends advanced_testcase {
 
         return ['module' => $module, 'cm' => $cm];
     }
+
+    public function test_prog_mark_started() {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/lib/completionlib.php');
+
+        $CFG->enablecompletion = true;
+        $this->resetAfterTest();
+
+        // Create a couple of users.
+        $users = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $idnumber = 'u'.$i;
+            $users[$idnumber] = $this->generator->create_user(['idnumber' => $idnumber]);
+        }
+
+        // Create a course.
+        $course = $this->generator->create_course([
+            'idnumber' => 'c1',
+            'enablecompletion' => COMPLETION_ENABLED,
+            'completionstartonenrol' => 1,
+            'completionprogressonview' => 1
+        ], array('createsections' => true));
+        $module = $this->prepare_course_completion_for_module_view($course);
+
+        // Add the courses to a program and assign some users.
+        $prog = $this->generator_program->create_program(['idnumber' => 'p1']);
+        $this->generator_program->add_courses_and_courseset_to_program($prog, [[$course]]);
+        $this->generator_program->assign_program($prog->id, [$users['u1']->id, $users['u2']->id]);
+
+        $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u1']->id));
+        foreach ($progcomps as $progcomp) {
+            $this->assertEmpty($progcomp->timestarted);
+        }
+
+        // Start the course and check the timestarted has been set.
+        $this->access_and_complete_course($users['u1'], $course, $module);
+        $crscomp1 = $DB->get_record('course_completions', array('userid' => $users['u1']->id, 'course' => $course->id));
+        $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u1']->id));
+        foreach ($progcomps as $progcomp) {
+            $this->assertEquals($crscomp1->timestarted, $progcomp->timestarted);
+        }
+
+        $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u2']->id));
+        foreach ($progcomps as $progcomp) {
+            $this->assertEquals(0, $progcomp->timestarted);
+        }
+
+        // Enrol the second user and set them to in progress, with a different timestarted.
+        $result = prog_can_enter_course($users['u2'], $course);
+        $this->assertObjectHasAttribute('enroled', $result);
+        $this->assertTrue($result->enroled, "User({$users['u2']->idnumber}) could not be enroled in course({$course->idnumber})");
+
+        $crscomp2 = $DB->get_record('course_completions', array('userid' => $users['u2']->id));
+        $crscomp2->timestarted = 1234567890;
+        $DB->update_record('course_completions', $crscomp2);
+        cache_helper::purge_all(); // The completions cache causes some problems with manual edits here.
+
+        // Run the task and check the cron has put the new time in the timestarted.
+        $task = new \totara_program\task\completions_task();
+        $this->assertTrue($task->execute());
+
+        $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u1']->id));
+        foreach ($progcomps as $progcomp) {
+            $this->assertEquals($crscomp1->timestarted, $progcomp->timestarted);
+        }
+
+        $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u2']->id));
+        foreach ($progcomps as $progcomp) {
+            $this->assertEquals($crscomp2->timestarted, $progcomp->timestarted);
+        }
+    }
 }

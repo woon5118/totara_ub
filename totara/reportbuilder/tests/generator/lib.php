@@ -248,6 +248,7 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
         $defaults = array(
             'fullname' => 'Program ' . self::$programcount,
             'usermodified' => 2,
+            'timestarted' => 0,
             'category' => 1,
         );
         $properties = array_merge($defaults, $data);

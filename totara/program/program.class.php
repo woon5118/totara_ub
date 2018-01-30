@@ -213,6 +213,7 @@ class program {
 
         $defaults = array(
             'timecreated' => $now,
+            'timestarted' => 0,
             'timemodified' => $now,
             'usermodified' => $USER->id,
             'sortorder' => $sortorder,
@@ -871,6 +872,7 @@ class program {
             $pc->coursesetid = 0;
             $pc->status = STATUS_PROGRAM_INCOMPLETE;
             $pc->timecreated = $now;
+            $pc->timestarted = 0;
             $pc->timecompleted = 0;
             $pc->timedue = $assigndata['timedue'];
             $prog_completions[] = $pc;

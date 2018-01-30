@@ -294,7 +294,6 @@ abstract class course_set {
                         certif_write_completion($certcomp, $progcomp, 'Marked program as started');
                     }
                 }
-
             }
 
             if ($update_success = $DB->update_record('prog_completion', $completion)) {
@@ -804,7 +803,7 @@ class multi_course_set extends course_set {
                 if ($completiontype == COMPLETIONTYPE_ANY) {
                     $completionsettings = array(
                         'status'        => STATUS_COURSESET_COMPLETE,
-                        'timestarted' => $completion_completion->timestarted,
+                        'timestarted'   => $completion_completion->timestarted,
                         'timecompleted' => $completion_completion->timecompleted
                     );
                     return $this->update_courseset_complete($userid, $completionsettings);
@@ -829,15 +828,14 @@ class multi_course_set extends course_set {
                     }
                 }
 
-                if (!empty($completion_completion->timestarted) && $completion_completion->timestarted < $timestarted) {
+                if (!empty($completion_completion->timestarted) && (empty($timestarted) || $completion_completion->timestarted < $timestarted)) {
                     $timestarted = $completion_completion->timestarted;
                 }
             } else {
                 $incomplete = true;
-                if (!empty($completion_completion->timestarted) && $completion_completion->timestarted < $timestarted) {
+                if (!empty($completion_completion->timestarted) && (empty($timestarted) || $completion_completion->timestarted < $timestarted)) {
                     $timestarted = $completion_completion->timestarted;
                 }
-
             }
 
             // Now we have the earliest time started, mark the courseset as started.
@@ -860,50 +858,71 @@ class multi_course_set extends course_set {
         return false;
     }
 
+    /**
+     * Set the timestarted field in the user's program completion record.
+     *
+     * If the user doesn't currently have a program completion record then it will be created. Certifications
+     * may be restored from history.
+     *
+     * @param int $userid
+     * @param int $timestarted
+     */
     private function mark_started($userid, $timestarted) {
         global $DB;
 
-        $now = time();
-        $defaultdata = new stdClass();
-        $defaultdata->programid = $this->programid;
-        $defaultdata->userid = $userid;
-        $defaultdata->coursesetid = $this->id;
-        $defaultdata->status = STATUS_COURSESET_INCOMPLETE;
-        $defaultdata->timecreated = $now;
-        $defaultdata->timestarted = $now;
-        $defaultdata->timedue = 0;
+        // Check what to do with the course set completion record.
+        $csetcomp = prog_load_courseset_completion($this->id, $userid, false);
 
-        $csetparams = array('pid' => $this->programid, 'uid' => $userid, 'csid' => $this->id);
-        if ($csetcomp = $DB->get_fieldset_select('prog_completion', 'id, timestarted, timecreated', 'programid = :pid AND userid = :uid AND coursesetid = :csid', $csetparams)) {
+        if (!empty($csetcomp)) {
+            // Course set completion record exists, so we might update it.
             if (empty($csetcomp->timestarted)) {
-                // Don't let the timestarted be set before the timecreated.
-                if ($timestarted < $csetcomp->timecreated) {
-                    $timestarted = $csetcomp->timecreated;
-                }
-
                 $csetcomp->timestarted = $timestarted;
-                prog_write_completion($csetcomp, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
-            } else {
-                return true; // No need to do anything.
+
+                prog_write_courseset_completion($csetcomp, "Courseset completion marked as started");
             }
         } else {
-            prog_write_completion($defaultdata, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
-            $timestarted = $defaultdata->timestarted;
+            // Course set completion record doesn't exist, so we create it and set time started.
+            $data = array('timestarted' => $timestarted);
+            prog_create_courseset_completion($this->id, $userid, $data, "Courseset completion created and marked as started");
         }
 
-        // Check if the courseset 0 record needs updating/creating.
-        $progparams = array('pid' => $this->programid, 'uid' => $userid, 'csid' => 0);
-        if ($csetcomp = $DB->get_fieldset_select('prog_completion', 'id, timestarted, timecreated', 'programid = :pid AND userid = :uid AND coursesetid = :csid', $csetparams)) {
+        $sql = "SELECT id FROM {prog} WHERE id = :programid AND certifid IS NOT NULL";
+        $iscertif = $DB->record_exists_sql($sql, array('programid' => $this->programid));
+
+        // Check what to do with the program completion record.
+        if ($iscertif) {
+            list($certcomp, $progcomp) = certif_load_completion($this->programid, $userid, false);
+        } else {
+            $progcomp = prog_load_completion($this->programid, $userid, false);
+        }
+
+        if (!empty($progcomp)) {
+            // Program completion record exists, so we might update it.
             if (empty($progcomp->timestarted)) {
                 $progcomp->timestarted = $timestarted;
-                prog_write_completion($csetcomp, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
-            } else {
-                return true; // No need to do anything.
+
+                $message = "Program completion marked as started for courseset {$this->id}";
+                if (!empty($certcomp)) {
+                    certif_write_completion($certcomp, $progcomp, $message);
+                } else {
+                    prog_write_completion($progcomp, $message);
+                }
             }
         } else {
-            $defaultdata->coursesetid = 0;
-            $defaultdata->status = STATUS_PROGRAM_INCOMPLETE;
-            prog_write_completion($defaultdata, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
+            // Program completion record doesn't exist, so we create it and set time started.
+            if ($iscertif) {
+                // Certif_create_completion may restore a previous assignment.
+                certif_create_completion($this->programid, $userid, "Completion created in mark_started");
+                list($certcomp, $progcomp) = certif_load_completion($this->programid, $userid);
+                // Double-check in case we restored a previous completion that already had a timestarted.
+                if (empty($progcomp->timestarted)) {
+                    $progcomp->timestarted = $timestarted;
+                    certif_write_completion($certcomp, $progcomp, "Program completion marked as started due to courseset {$this->id}");
+                }
+            } else {
+                $data = array('timestarted' => $timestarted);
+                prog_create_completion($this->programid, $userid, $data, "Program completion created and marked as started due to courseset {$this->id}");
+            }
         }
     }
 

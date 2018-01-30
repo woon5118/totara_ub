@@ -2862,7 +2862,7 @@ function prog_fix_orphaned_exceptions_recalculate($programid = 0, $userid = 0, $
 }
 
 /**
- * Create or update prog_completion record. Checks are performed to ensure that the data is valid before it
+ * Insert or update prog_completion record. Checks are performed to ensure that the data is valid before it
  * can be written to the db.
  *
  * NOTE: $ignoreproblemkey should only be used by prog_fix_completions!!! If specified, the record will be
@@ -2910,6 +2910,10 @@ function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey
         if (!$DB->record_exists_sql($sql, $params)) {
             print_error(get_string('error:updatinginvalidcompletionrecord', 'totara_program'));
         }
+
+        if (empty($message)) {
+            $message = "Completion record updated";
+        }
     }
 
     // Before applying the changes, verify that the new record is in a valid state.
@@ -2930,6 +2934,8 @@ function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey
         return true;
     } else {
         // Some error was detected, and it wasn't specified in $ignoreproblemkey.
+        prog_log_completion($progcompletion->programid, $progcompletion->userid,
+            'An attempt was made to write changes, but the data was invalid. Message of caller was:<br>' . $message);
         return false;
     }
 }
@@ -3004,10 +3010,89 @@ function prog_calculate_completion_description($progcompletion, $message = '') {
 
     $description = $message . '<br>' .
         '<ul><li>Status: ' . $progstatus . '</li>' .
+        '<li>Time started: ' . prog_format_log_date($progcompletion->timestarted) . '</li>' .
         '<li>Due date: ' . prog_format_log_date($progcompletion->timedue) . '</li>' .
         '<li>Completion date: ' . prog_format_log_date($progcompletion->timecompleted) . '</li></ul>';
 
     return $description;
+}
+
+/**
+ * Insert or update a (non-zero id) course set completion record.
+ *
+ * Do not use this function for writing course completion records (course set id 0). It will fail.
+ *
+ * @param stdClass $cscompletion A prog_completion record to be saved, including 'id' if this is an update.
+ * @param string $message If provided, will be added to the program completion log message.
+ * @return True if the record was successfully created or updated.
+ */
+function prog_write_courseset_completion($cscompletion, $message = '') {
+    global $DB;
+
+    if (empty($cscompletion->coursesetid)) {
+        print_error("Tried to use prog_write_courseset_completion with program completion data or missing course set id");
+    }
+
+    // Decide if this is an insert or update.
+    $isinsert = empty($cscompletion->id);
+
+    // Ensure the record matches the database records.
+    if ($isinsert) {
+        $sql = "SELECT pcs.id, pc.id AS pcid
+                  FROM {prog_courseset} pcs
+                  JOIN {prog} p ON p.id = pcs.programid
+             LEFT JOIN {prog_completion} pc
+                    ON pc.coursesetid = pcs.id AND pc.userid = :userid AND pc.coursesetid = pcs.id
+                 WHERE pcs.id = :coursesetid AND p.id = :programid";
+        $params = array(
+            'coursesetid' => $cscompletion->coursesetid,
+            'programid' => $cscompletion->programid,
+            'userid' => $cscompletion->userid
+        );
+        $pcs = $DB->get_record_sql($sql, $params);
+        if (empty($pcs) || !empty($pcs->pcid)) {
+            print_error('Call to prog_write_courseset_completion insert with completion record that does not match the existing record');
+        }
+
+        if (empty($message)) {
+            $message = "Course set completion record created";
+        }
+    } else {
+        $sql = "SELECT pc.id
+                  FROM {prog_completion} pc
+                 WHERE pc.id = :pcid
+                   AND pc.programid = :programid
+                   AND pc.userid = :userid
+                   AND pc.coursesetid = :coursesetid";
+        $params = array(
+            'pcid' => $cscompletion->id,
+            'coursesetid' => $cscompletion->coursesetid,
+            'programid' => $cscompletion->programid,
+            'userid' => $cscompletion->userid
+        );
+        if (!$DB->record_exists_sql($sql, $params)) {
+            print_error('Call to prog_write_courseset_completion update with completion record that does not match the existing record');
+        }
+
+        if (empty($message)) {
+            $message = "Course set completion record updated";
+        }
+    }
+
+    if (!in_array($cscompletion->status, array(STATUS_COURSESET_COMPLETE, STATUS_COURSESET_INCOMPLETE))) {
+        prog_log_completion($cscompletion->programid, $cscompletion->userid,
+            'An attempt was made to write changes, but the data was invalid. Message of caller was:<br>' . $message);
+        return false;
+    }
+
+    if ($isinsert) {
+        $DB->insert_record('prog_completion', $cscompletion);
+    } else {
+        $DB->update_record('prog_completion', $cscompletion);
+    }
+
+    prog_log_completion($cscompletion->programid, $cscompletion->userid, $message);
+    return true;
 }
 
 /**
@@ -3120,6 +3205,96 @@ function prog_load_completion($programid, $userid, $mustexist = true) {
     }
 
     return $progcompletion;
+}
+
+/**
+ * Load a (non-zero id) course set completion record out of the db.
+ *
+ * Use this function to make sure you get the correct course set completion record.
+ *
+ * @param int $coursesetid
+ * @param int $userid
+ * @param bool $mustexist If records are missing, default true causes an error, false returns false
+ * @return mixed
+ */
+function prog_load_courseset_completion($coursesetid, $userid, $mustexist = true) {
+    global $DB;
+
+    if ($coursesetid == 0) {
+        print_error("Tried to use prog_load_courseset_completion to load a program completion record");
+    }
+
+    $cscompletion = $DB->get_record('prog_completion', array('coursesetid' => $coursesetid, 'userid' => $userid));
+
+    if (empty($cscompletion)) {
+        if ($mustexist) {
+            print_error("Tried to load course set completion record which doesn't exist for coursesetid: {$coursesetid}, userid: {$userid}");
+        } else {
+            return false;
+        }
+    }
+
+    return $cscompletion;
+}
+
+/**
+ * Create a (non-zero id) course set completion record for the user in the program.
+ *
+ * $data keys can contain status, timestarted, timecreated, timedue, timecompleted, organisationid, positionid
+ * Any other data keys will prevent the record being created and will return false.
+ *
+ * If $data is specified, the resulting prog_completion record must be error-free, or else the record will
+ * not be created! Check the result of this function to ensure that the record was successfully created.
+ *
+ * @param int $coursesetid
+ * @param int $userid
+ * @param array $data containing any field => values that should be set, overriding the defaults
+ * @param string $message If provided, will override the default record creation message
+ * @return true if the record was successfully created or updated.
+ */
+function prog_create_courseset_completion($coursesetid, $userid, $data = array(), $message = '') {
+    global $DB;
+
+    if ($coursesetid == 0) {
+        print_error("Tried to use prog_create_courseset_completion to create a program completion record");
+    }
+
+    $now = time();
+
+    $programid = $DB->get_field('prog_courseset', 'programid', array('id' => $coursesetid));
+
+    $progcompletion = new stdClass();
+    $progcompletion->programid = $programid;
+    $progcompletion->userid = $userid;
+    $progcompletion->coursesetid = $coursesetid;
+    $progcompletion->status = STATUS_COURSESET_INCOMPLETE;
+    $progcompletion->timestarted = 0;
+    $progcompletion->timecreated = $now;
+    $progcompletion->timedue = COMPLETION_TIME_NOT_SET;
+    $progcompletion->timecompleted = 0;
+
+    $alloweddatafields = array(
+        'status',
+        'timestarted',
+        'timecreated',
+        'timedue',
+        'timecompleted',
+        'organisationid',
+        'positionid',
+    );
+
+    foreach ($data as $field => $value) {
+        if (!in_array($field, $alloweddatafields)) {
+            prog_log_completion($progcompletion->programid, $progcompletion->userid,
+                'prog_create_courseset_completion was provided unknown data (' . $field . '). Message of caller was:<br>' . $message);
+            return false;
+        }
+        $progcompletion->$field = $value;
+    }
+
+    prog_write_courseset_completion($progcompletion, $message);
+
+    return true;
 }
 
 /**

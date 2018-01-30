@@ -2166,6 +2166,71 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals($data['positionid'], $progcompletion->positionid);
     }
 
+    public function test_prog_create_courseset_completion() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        $user = $this->getDataGenerator()->create_user();
+        $program = $this->getDataGenerator()->create_program();
+        $coursesetdata = array(
+            array(
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_CERT,
+                'timeallowed' => 123123,
+                'courses' => array($this->getDataGenerator()->create_course()),
+            ),
+        );
+        $this->getDataGenerator()->create_coursesets_in_program($program, $coursesetdata);
+        $coursesetid = $DB->get_field('prog_courseset', 'id', array('programid' => $program->id));
+
+        // Test defaults.
+        $timebefore = time();
+        $this->assertTrue(prog_create_courseset_completion($coursesetid, $user->id));
+        $timeafter = time();
+
+        $cscompletion = prog_load_courseset_completion($coursesetid, $user->id);
+        $this->assertEquals(STATUS_COURSESET_INCOMPLETE, $cscompletion->status);
+        $this->assertGreaterThanOrEqual($timebefore, $cscompletion->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $cscompletion->timecreated);
+        $this->assertEquals(COMPLETION_TIME_NOT_SET, $cscompletion->timedue);
+        $this->assertEquals(0, $cscompletion->timecompleted);
+
+        $DB->delete_records('prog_completion', array('programid' => $program->id, 'userid' => $user->id));
+
+        // Test providing data with invalid fields.
+        $data = array(
+            'dodgyfield' => 789,
+        );
+        $this->assertFalse(prog_create_courseset_completion($coursesetid, $user->id, $data));
+
+        $cscompletion = prog_load_courseset_completion($coursesetid, $user->id, false);
+        $this->assertTrue($cscompletion === false);
+
+        // Test providing data with only valid fields.
+        $data = array(
+            'status' => STATUS_COURSESET_COMPLETE,
+            'timestarted' => 123,
+            'timecreated' => 234,
+            'timedue' => 345,
+            'timecompleted' => 456,
+            'organisationid' => 567,
+            'positionid' => 678,
+        );
+        $this->assertTrue(prog_create_courseset_completion($coursesetid, $user->id, $data));
+
+        $cscompletion = prog_load_courseset_completion($coursesetid, $user->id);
+        $this->assertEquals($data['status'], $cscompletion->status);
+        $this->assertEquals($data['timestarted'], $cscompletion->timestarted);
+        $this->assertEquals($data['timecreated'], $cscompletion->timecreated);
+        $this->assertEquals($data['timedue'], $cscompletion->timedue);
+        $this->assertEquals($data['timecompleted'], $cscompletion->timecompleted);
+        $this->assertEquals($data['organisationid'], $cscompletion->organisationid);
+        $this->assertEquals($data['positionid'], $cscompletion->positionid);
+    }
+
     public function test_prog_find_missing_completions_with_program_assignments() {
         global $DB;
 
