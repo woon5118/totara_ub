@@ -85,6 +85,9 @@ class purge_type_edit extends \totara_form\form {
         $purgeitemselection->set_collapsible(false);
         $this->model->add($purgeitemselection);
 
+        $itemdescription = new \totara_form\form\element\static_html('itemselection_desc', '', get_string('purgeitemselection_desc', 'totara_userdata'));
+        $this->model->add($itemdescription);
+
         $groupeditems = \totara_userdata\local\purge::get_purgeable_items_grouped_list((int)$purgetype->userstatus);
         foreach ($groupeditems as $maincomponent => $items) {
             $options = array();

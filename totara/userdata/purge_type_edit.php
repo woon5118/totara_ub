@@ -49,6 +49,8 @@ if ($data = $form->get_data()) {
     redirect(new moodle_url('/totara/userdata/purge_types.php'));
 }
 
+$PAGE->requires->js_call_amd('totara_userdata/item_select', 'init', array('name' => 'itemselection_desc', 'form' => 'purge'));
+
 echo $OUTPUT->header();
 if ($id) {
     echo $OUTPUT->heading(get_string('purgetypeupdate', 'totara_userdata'));

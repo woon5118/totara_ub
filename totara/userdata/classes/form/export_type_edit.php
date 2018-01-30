@@ -65,6 +65,9 @@ class export_type_edit extends \totara_form\form {
         $exportitemselection->set_collapsible(false);
         $this->model->add($exportitemselection);
 
+        $itemdescription = new \totara_form\form\element\static_html('itemselection_desc', '', get_string('exportitemselection_desc', 'totara_userdata'));
+        $this->model->add($itemdescription);
+
         $groupeditems = \totara_userdata\local\export::get_exportable_items_grouped_list();
         foreach ($groupeditems as $maincomponent => $items) {
             $options = array();
