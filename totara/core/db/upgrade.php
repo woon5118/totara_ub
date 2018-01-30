@@ -238,5 +238,14 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017122201, 'totara', 'core');
     }
 
+    if ($oldversion < 2018020500) {
+        // Fixed a bug in lib/db/access.php which won't be processed unless the main version file is bumped, which
+        // we don't want to do.
+        // However it is easy to trigger this ourselves in the same way that upgrade does.
+        update_capabilities('moodle');
+
+        upgrade_plugin_savepoint(true, 2018020500, 'totara', 'core');
+    }
+
     return true;
 }

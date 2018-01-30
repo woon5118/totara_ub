@@ -573,7 +573,7 @@ $capabilities = array(
     // can the user manage the system default profile page?
     'moodle/user:managesyspages' => array(
 
-        'riskbitmap' => RISK_SPAM | RISK_PERSONAL | RISK_CONFIG,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_CONFIG,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -585,7 +585,7 @@ $capabilities = array(
     // can the user manage another user's profile page?
     'moodle/user:manageblocks' => array(
 
-        'riskbitmap' => RISK_SPAM | RISK_PERSONAL,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER
@@ -594,7 +594,7 @@ $capabilities = array(
     // can the user manage their own profile page?
     'moodle/user:manageownblocks' => array(
 
-        'riskbitmap' => RISK_SPAM | RISK_PERSONAL,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -606,7 +606,7 @@ $capabilities = array(
     // can the user manage their own files?
     'moodle/user:manageownfiles' => array(
 
-        'riskbitmap' => RISK_SPAM | RISK_PERSONAL,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -618,7 +618,7 @@ $capabilities = array(
     // Can the user ignore the setting userquota?
     // The permissions are cloned from ignorefilesizelimits as it was partly used for that purpose.
     'moodle/user:ignoreuserquota' => array(
-        'riskbitmap' => RISK_SPAM,
+        'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'clonepermissionsfrom' => 'moodle/course:ignorefilesizelimits'
@@ -627,7 +627,7 @@ $capabilities = array(
     // can the user manage the system default dashboard page?
     'moodle/my:configsyspages' => array(
 
-        'riskbitmap' => RISK_SPAM | RISK_PERSONAL | RISK_CONFIG,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_CONFIG,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -1948,7 +1948,7 @@ $capabilities = array(
 
     // Manage badges on own private badges page.
     'moodle/badges:manageownbadges' => array(
-        'riskbitmap'    => RISK_SPAM,
+        'riskbitmask'    => RISK_SPAM,
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_USER,
         'archetypes'    => array(
@@ -1958,7 +1958,7 @@ $capabilities = array(
 
     // View public badges in other users' profiles.
     'moodle/badges:viewotherbadges' => array(
-        'riskbitmap'    => RISK_PERSONAL,
+        'riskbitmask'    => RISK_PERSONAL,
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_USER,
         'archetypes'    => array(
