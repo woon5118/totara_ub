@@ -29,6 +29,7 @@ use block_totara_featured_links\form\validator\alt_text_required;
 use block_totara_featured_links\form\validator\is_color;
 use totara_form\form\element\checkbox;
 use totara_form\form\element\filemanager;
+use totara_form\form\element\radios;
 use totara_form\form\element\select;
 use totara_form\form\element\text;
 use totara_form\form\element\textarea;
@@ -78,6 +79,10 @@ class default_form_content extends base_form_content{
         );
         $file->add_validator(new element_filemanager());
         $file->add_help_button('tile_background', 'block_totara_featured_links');
+
+        $group->add(new radios('background_appearance', get_string('backgroundappearance', 'block_totara_featured_links'),
+            ['cover' => get_string('backgroundcover', 'block_totara_featured_links'),
+                'contain' => get_string('backgroundcontain', 'block_totara_featured_links')]));
 
         $alt_text = $group->add(new text('alt_text', get_string('tile_alt_text', 'block_totara_featured_links'), PARAM_TEXT));
         $alt_text->add_validator(new alt_text_required(null, 'background_img'));

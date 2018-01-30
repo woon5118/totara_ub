@@ -22,7 +22,7 @@ Feature: Block edit test block
 
   Scenario Outline: Editing the for actually changes the values in the tile
     When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
-    When I click on "Content" "link"
+    And I click on "Content" "link"
 
     # There doesnt seem to be a way of testing file uploads in a totara form
     # TODO check upload of file works once files can be uploaded in totara form
@@ -57,3 +57,25 @@ Feature: Block edit test block
     Then I should see "default description"
     And I should not see "Some Heading"
     And I should not see "some body"
+
+  Scenario: Check that the background appearance uses the right classes
+    When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
+    And I click on "Content" "link"
+    And I set the following fields to these values:
+      | Title       | title       |
+      | Description | description |
+      | URL         | /           |
+      | Fill tile   | 1           |
+    And I click on "Save changes" "button"
+
+    Then ".background-cover" "css_element" should exist
+    And ".background-contain" "css_element" should not exist
+
+    When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
+    And I click on "Content" "link"
+    And I set the following fields to these values:
+      | Fit inside tile | 1 |
+    And I click on "Save changes" "button"
+
+    Then ".background-contain" "css_element" should exist
+    And ".background-cover" "css_element" should not exist

@@ -40,6 +40,7 @@
      * background_img array an array containing the url to the background image
      * alt_text array and array that contains the text used for accessibility and is not shown
      * background_color string the color of the background
+     * background_appearance string the style of the background image ("cover"|"contains")
      * url string the url that the tile should link to
      * controls string html code for an action menu
 
@@ -59,11 +60,12 @@
             "sr-only": "sr only text"
         },
         "background_color": "#11FFaa",
+        "background_appearance": "cover"
         "url": "http://www.google.com",
         "controls": "rendered html for an action menu"
       }
 }}
-<div class="block-totara-featured-links-tile-{{size}} block-totara-featured-links-tile-{{tile_id}}{{#editing}} block-totara-featured-links-editing-tile{{/editing}}"
+<div class="block-totara-featured-links-tile-{{size}} block-totara-featured-links-tile-{{tile_id}}{{#editing}} block-totara-featured-links-editing-tile{{/editing}} background-{{background_appearance}}"
      id="block-totara-featured-links-tile-{{tile_id}}"
      style="{{#background_img}}background-image: url('{{background_img}}');{{/background_img}}{{#background_color}}background-color: {{background_color}};{{/background_color}}"
      {{#alt_text.tile_title}}title="{{alt_text.tile_title}}"{{/alt_text.tile_title}}>

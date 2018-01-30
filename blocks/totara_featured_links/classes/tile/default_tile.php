@@ -34,15 +34,18 @@ use \totara_form\file_area;
  */
 class default_tile extends base{
     protected $used_fields = ['heading', // string The title for the tile.
-        'textbody', // string The description for the tile.
-        'url', // string The url that the tile links to.
-        'background_color', // string The hex value of the background color.
-        'background_img', // string The filename  for the background image.
-        'alt_text', // string The text to go in the sr-only span in the anchor tag.
-        'target', // string The target for the link either '_self' or '_blank'.
-        'heading_location']; // string The location of the heading either 'top' or 'bottom'.
+        'textbody',                      // string The description for the tile.
+        'url',                           // string The url that the tile links to.
+        'background_color',              // string The hex value of the background color.
+        'background_img',                // string The filename  for the background image.
+        'alt_text',                      // string The text to go in the sr-only span in the anchor tag.
+        'target',                        // string The target for the link either '_self' or '_blank'.
+        'heading_location',              // string The location of the heading either 'top' or 'bottom'.
+        'background_appearance'];        // string The background size style 'cover' or 'contain' currently.
     protected $content_class = 'block-totara-featured-links-content';
     protected $content_template = 'block_totara_featured_links/content';
+
+    private const COVER_BACKGROUND_APPEARANCE = 'cover';
 
     /**
      * {@inheritdoc}
@@ -99,6 +102,9 @@ class default_tile extends base{
                 'tile_background',
                 $this->id);
         }
+        if (!isset($data_obj->background_appearance)) {
+            $data_obj->background_appearance = default_tile::COVER_BACKGROUND_APPEARANCE;
+        }
         return $data_obj;
     }
 
@@ -147,6 +153,9 @@ class default_tile extends base{
             false);
         $data['url'] = (!empty($this->url_mod) ? $this->url_mod : false);
         $data['target'] = (!empty($this->data_filtered->target) ? $this->data_filtered : false);
+        $data['background_appearance'] = (empty($this->data_filtered->background_appearance) ?
+            'cover' :
+            $this->data_filtered->background_appearance);
 
         return $data;
     }
@@ -224,6 +233,9 @@ class default_tile extends base{
         }
         if (isset($data->heading_location)) {
             $this->data->heading_location = $data->heading_location;
+        }
+        if (isset($data->background_appearance)) {
+            $this->data->background_appearance = $data->background_appearance;
         }
         return;
     }
