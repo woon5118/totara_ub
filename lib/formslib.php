@@ -2353,10 +2353,15 @@ require(["core/event", "jquery"], function(Event, $) {
       }
     }
 
-    document.getElementById(\'' . $elem->_attributes['id'] . '\').addEventListener(\'blur\', function(ev) {
+    var validationElement = document.getElementById(\'fitem_' . $elem->_attributes['id'] . '\');
+    if (validationElement === null) {
+        validationElement = document.getElementById(\'' . $elem->_attributes['id'] . '\');
+    }
+
+    validationElement.addEventListener(\'blur\', function(ev) {
         ' . $valFunc . '
     });
-    document.getElementById(\'' . $elem->_attributes['id'] . '\').addEventListener(\'change\', function(ev) {
+    validationElement.addEventListener(\'change\', function(ev) {
         ' . $valFunc . '
     });
 ';
