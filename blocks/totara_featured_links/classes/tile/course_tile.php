@@ -23,40 +23,40 @@
 
 namespace block_totara_featured_links\tile;
 
-/**
- * Class course_tile
- * @package block_totara_featured_links
- */
-class course_tile extends base{
+class course_tile extends learning_item_tile {
     protected $used_fields = ['courseid', // int The id of the course that the tile links to.
         'background_color', // string The hex value of the background color.
         'heading_location', // string Where the heading is located 'top' or 'bottom'.
         'progressbar'];
-    protected $content_form = '\block_totara_featured_links\tile\course_form_content';
-    protected $content_template = 'block_totara_featured_links/content_course';
-    protected $content_class = 'block-totara-featured-links-content block-totara-featured-links-course';
-
-    /** @var string This is the name of the class which defines the visibility form */
+    /** @var string Class for the visibility form */
     protected $visibility_form = '\block_totara_featured_links\tile\course_form_visibility';
+    /** @var string Class for the visibility form*/
+    protected $content_form = '\block_totara_featured_links\tile\course_form_content';
+    /** @var string The classes that get added to the content of the tile */
+    protected $content_class = 'block-totara-featured-links-course';
 
     /**
-     * @var \stdClass $course the database row of the course
+     * @var \stdClass|false $course the database row of the course
      *
      * Call $this->get_course() to load this property.
      */
     protected $course = null;
 
     /**
-     * Does the custom adding of the tile
-     * this tile however doesn't need anything run
+     * returns the name of the tile that will be displayed in the edit content form
+     *
+     * @return string
      */
-    public function add_tile() {
-
+    public static function get_name() {
+        return get_string('course_name', 'block_totara_featured_links');
     }
 
     /**
-     * returns the name and id in the right indexes
-     * @inheritdoc
+     * Gets the data for the learning item content form and adds the
+     * course name and id.
+     *
+     * {@inheritdoc}
+     * @return \stdClass
      */
     public function get_content_form_data() {
         $dataobj = parent::get_content_form_data();
@@ -70,15 +70,9 @@ class course_tile extends base{
     }
 
     /**
-     * returns the name of the tile that will be displayed
-     * @return string NAME
-     */
-    public static function get_name() {
-        return get_string('course_name', 'block_totara_featured_links');
-    }
-
-    /**
-     * Puts the data from the class in a way which the template can render
+     * Adds heading to the content data for a learning item tile.
+     *
+     * {@inheritdoc}
      * @return array
      */
     protected function get_content_template_data() {
@@ -95,50 +89,39 @@ class course_tile extends base{
             $progressbar = false;
         }
 
-        return [
-            'heading' => $this->get_course()->fullname,
-            'progress_bar' =>  $progressbar,
-            'content_class' => (empty($this->content_class) ? '' : $this->content_class),
-            'heading_location' => (empty($this->data_filtered->heading_location) ? '' : $this->data_filtered->heading_location),
-            'notempty' => true
-        ];
-    }
+        $data = parent::get_content_template_data();
+        $data['heading'] = $this->get_course()->fullname;
+        $data['progress_bar'] = $progressbar;
 
-    /**
-     * Gets the data for the wrapper eg url and background color
-     * @param \renderer_base $renderer
-     * @return array
-     */
-    public function get_content_wrapper_template_data(\renderer_base $renderer) {
-        global $CFG;
-        $data = parent::get_content_wrapper_template_data($renderer);
-        $data['background_color'] = (!empty($this->data_filtered->background_color) ?
-            $this->data_filtered->background_color :
-            false);
-        $data['alt_text'] = $this->get_accessibility_text();
-        $data['url'] = (!empty($this->get_course()) ? $CFG->wwwroot.'/course/view.php?id='.$this->get_course()->id : false);
         return $data;
     }
 
     /**
-     * moves a file from the draft area to a defined area
-     * @param \stdClass $data
-     * @return void
+     * Gets the data for the content_wrapper template from {@learning_item}
+     * and add the url to the course if the course can be retrieved.
+     *
+     * @param \renderer_base $renderer
+     * @return array
      */
-    public function save_content_tile($data) {
+    protected function get_content_wrapper_template_data(\renderer_base $renderer) {
+        global $CFG;
+        $data = parent::get_content_wrapper_template_data($renderer);
+        if (!empty($this->get_course())) {
+            $data['url'] = $CFG->wwwroot.'/course/view.php?id='.$this->get_course()->id;
+        }
+        return $data;
+    }
+
+    /**
+     * Sets the course id into the data property
+     *
+     * @param \stdClass $data
+     */
+    public function save_content_tile ($data) {
         if (isset($data->course_name_id)) {
             $this->data->courseid = $data->course_name_id;
         }
-        if (isset($data->heading_location)) {
-            $this->data->heading_location = $data->heading_location;
-        }
-        if (isset($data->background_color)) {
-            $this->data->background_color = $data->background_color;
-        }
-        if (isset($data->progressbar)) {
-            $this->data->progressbar = $data->progressbar;
-        }
-        return;
+        parent::save_content_tile($data);
     }
 
     /**
@@ -152,37 +135,11 @@ class course_tile extends base{
      * @return bool
      */
     protected function user_can_view_content() {
-        if (empty($this->get_course())) {
-            // This function is used when viewing the content, not when modifying the tile.
-            // So return false as there is no content to view.
-            return false;
-        } else {
-            return totara_course_is_viewable($this->get_course());
-        }
+        return boolval($this->get_course());
     }
 
     /**
-     * Gets whether the tile is visible to the user by the custom rules defined by the tile.
-     * This should only be used by the is_visible() function.
-     * @return int (-1 = hidden, 0 = no rule, 1 = showing)
-     */
-    public function is_visible_tile() {
-        return 0;
-    }
-
-    /**
-     * Saves the data for the custom visibility.
-     * Should only modify the custom_rules variable so the reset of the visibility and tile options are left the same
-     * when its saved to the database
-     * @param \stdClass $data all the data from the form
-     * @return string
-     */
-    public function save_visibility_tile($data) {
-        return '';
-    }
-
-    /**
-     * Returns an array that the template will uses to put in text to help with accessibility
+     * {@inheritdoc}
      * @return array
      */
     public function get_accessibility_text() {
@@ -197,18 +154,26 @@ class course_tile extends base{
     public function get_course($reload = false) {
         global $DB;
 
+        if (empty($this->data->courseid)) {
+            return false;
+        }
+        if (!$DB->record_exists('course', ['id' => $this->data->courseid])) {
+            return false;
+        }
+
         if (!isset($this->course) or $reload) {
-            if (!empty($this->data->courseid) && totara_course_is_viewable($this->data->courseid)) {
+            if (totara_course_is_viewable($this->data->courseid)) {
                 $this->course = $DB->get_record('course', ['id' => $this->data->courseid]);
             } else {
                 $this->course = false;
             }
         }
-
         return $this->course;
     }
 
     /**
+     * {@inheritdoc}
+     *
      * We'll return that the course was deleted if that is the case.
      *
      * @return string of text shown if a tile is hidden but being viewed in edit mode.

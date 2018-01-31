@@ -43,7 +43,7 @@ class gallery_tile extends base {
         'heading_location']; // string The location of the heading either 'top' or 'bottom'.
     protected $content_template = 'block_totara_featured_links/content';
     protected $content_wrapper_template = 'block_totara_featured_links/content_wrapper_gallery';
-    protected $content_class = 'block-totara-featured-links-content block-totara-featured-links-content-gallery';
+    protected $content_class = 'block-totara-featured-links-content-gallery';
     protected $content_form = '\block_totara_featured_links\tile\gallery_form_content';
     protected $visibility_form = '\block_totara_featured_links\tile\default_form_visibility';
 

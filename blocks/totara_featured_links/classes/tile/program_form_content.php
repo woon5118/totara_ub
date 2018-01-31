@@ -21,27 +21,34 @@
  * @package block_totara_featured_links
  */
 
-namespace block_totara_featured_links\form\validator;
+namespace block_totara_featured_links\tile;
 
-defined('MOODLE_INTERNAL') || die();
-
-use \totara_form\element_validator;
+use block_totara_featured_links\form\validator\is_valid_program;
+use totara_form\element_validator;
 
 /**
- * Class is_color
- * Makes sure the value passed by the color input is a 3 or 6 long hexadecimal string starting with a hash
- * @package block_totara_featured_links
+ * Class program_content
+ * Defines the content form for a program tile
+ * Relies heavily on {@link learning_item_content}
+ * @package block_totara_featured_links\tile
  */
-class is_color extends element_validator {
+class program_form_content extends learning_item_form_content {
 
     /**
-     * this makes sure the color is a hash followed by 6 numbers
+     * Tels the parent class what learning item this is for.
      *
-     * @return void adds errors to element
+     * @return string 'program'
      */
-    public function validate() {
-        if (preg_match('/^#([0-9a-fA-F]{3}){1,2}$/', $this->element->get_data()['background_color']) == 0) {
-            $this->element->add_error(get_string('color_error', 'block_totara_featured_links'));
-        }
+    protected function get_learning_item_type(): string {
+        return 'program';
+    }
+
+    /**
+     * Tells the parent class what validator to use to validate the certification
+     *
+     * @return element_validator
+     */
+    protected function get_validator(): element_validator {
+        return new is_valid_program();
     }
 }

@@ -39,7 +39,7 @@ class valid_interval extends element_validator {
      *
      * @return void adds errors to element
      */
-    public function validate () {
+    public function validate() {
         if (!is_numeric($this->element->get_data()['interval']) || $this->element->get_data()['interval'] < 0) {
             $this->element->add_error(get_string('interval_error', 'block_totara_featured_links'));
         }

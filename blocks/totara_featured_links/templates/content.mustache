@@ -43,7 +43,7 @@
 
     Example context (json):
       {
-        "content_class": "block-totara-featured-links-content"
+        "content_class": "block-totara-featured-links-foo block-totara-featured-links-bar"
         "heading_location": "top",
         "heading": "example heading",
         "textbody": "this is the description",
@@ -51,7 +51,7 @@
       }
 }}
 {{#notempty}}
-    <div class="{{content_class}} block-totara-featured-links-content-{{heading_location}}">
+    <div class="{{content_class}} block-totara-featured-links-content block-totara-featured-links-content-{{heading_location}}">
         {{#heading}}
         <h3>{{heading}}</h3>
         {{/heading}}

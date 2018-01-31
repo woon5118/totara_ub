@@ -56,10 +56,3 @@
         | Title | this is the title2 |
         | Description | this is the description2 |
         | Alternate text | this is the alt text2 |
-
-
-
-
-
-
-

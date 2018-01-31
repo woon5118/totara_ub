@@ -21,27 +21,34 @@
  * @package block_totara_featured_links
  */
 
-namespace block_totara_featured_links\form\validator;
+namespace block_totara_featured_links\tile;
 
-defined('MOODLE_INTERNAL') || die();
-
-use \totara_form\element_validator;
+use totara_form\group;
 
 /**
- * Class is_color
- * Makes sure the value passed by the color input is a 3 or 6 long hexadecimal string starting with a hash
- * @package block_totara_featured_links
+ * Class learning_item_visibility
+ * The learning items by default have no extra visibility rules.
+ * @package block_totara_featured_links\tile
  */
-class is_color extends element_validator {
+abstract class learning_item_form_visibility extends base_form_visibility {
+    /**
+     * Learning items do not have any custom rules by default.
+     *
+     * {@inheritdoc}
+     * @return false
+     */
+    public function has_custom_rules() {
+        return false;
+    }
 
     /**
-     * this makes sure the color is a hash followed by 6 numbers
+     * Since there are no custom rules there are no form elements for them.
      *
-     * @return void adds errors to element
+     * {@inheritdoc}
+     * @param group $group
+     * @return array
      */
-    public function validate() {
-        if (preg_match('/^#([0-9a-fA-F]{3}){1,2}$/', $this->element->get_data()['background_color']) == 0) {
-            $this->element->add_error(get_string('color_error', 'block_totara_featured_links'));
-        }
+    public function specific_definition(group $group) {
+        return [];
     }
 }

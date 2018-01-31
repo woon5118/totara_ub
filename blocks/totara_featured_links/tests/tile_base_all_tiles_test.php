@@ -21,6 +21,8 @@
  * @package block_totara_featured_links
  */
 
+use block_totara_featured_links\tile\course_tile;
+
 require_once('test_helper.php');
 
 defined('MOODLE_INTERNAL') || die();
@@ -118,12 +120,12 @@ class block_totara_featured_links_tile_base_all_tiles_testcase extends test_help
         $this->resetAfterTest();
         $this->setAdminUser();
         $blockinstance = $this->blockgenerator->create_instance();
-        $course = $this->getDataGenerator()->create_course();
         foreach ($this->tile_types as $tile_type) {
             $tile_instance = $this->blockgenerator->create_tile($blockinstance->id, $tile_type);
 
-            if ($tile_type == 'block_totara_featured_links\tile\course_tile') {
+            if ($tile_type == course_tile::class) {
                 $data = new \stdclass();
+                $course = $this->getDataGenerator()->create_course();
                 $data->course_name_id = $course->id;
                 $tile_instance->save_content($data);
                 $this->refresh_tiles($tile_instance);
@@ -156,18 +158,18 @@ class block_totara_featured_links_tile_base_all_tiles_testcase extends test_help
         $this->resetAfterTest();
         $this->setAdminUser();
         $blockinstance = $this->blockgenerator->create_instance();
-        $course = $this->getDataGenerator()->create_course();
         foreach ($this->tile_types as $tile_type) {
-            $tile1 = $this->blockgenerator->create_tile($blockinstance->id, $tile_type);
+            $tile = $this->blockgenerator->create_tile($blockinstance->id, $tile_type);
 
-            if ($tile_type == 'block_totara_featured_links\tile\course_tile') {
+            if ($tile_type == course_tile::class) {
                 $data = new \stdclass();
+                $course = $this->getDataGenerator()->create_course();
                 $data->course_name_id = $course->id;
-                $tile1->save_content($data);
-                $this->refresh_tiles($tile1);
+                $tile->save_content($data);
+                $this->refresh_tiles($tile);
             }
 
-            $content = $tile1->render_content_wrapper($PAGE->get_renderer('core'), []);
+            $content = $tile->render_content_wrapper($PAGE->get_renderer('core'), []);
             $this->assertStringStartsWith('<div', $content);
             $this->assertStringEndsWith('</div>', $content);
         }

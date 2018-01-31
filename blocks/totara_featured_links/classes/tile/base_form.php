@@ -26,6 +26,8 @@ namespace block_totara_featured_links\tile;
 defined('MOODLE_INTERNAL') || die();
 
 use \totara_form\form;
+use totara_form\group;
+use totara_form\item;
 
 /**
  * Class base_form
@@ -48,7 +50,7 @@ abstract class base_form extends form {
      * @param \totara_form\group $group
      * @return null
      */
-    protected abstract function specific_definition(\totara_form\group $group);
+    protected abstract function specific_definition(group $group);
 
     /**
      * gets the requirements for the form eg css and javascript
@@ -56,5 +58,30 @@ abstract class base_form extends form {
      */
     public function requirements() {
         return;
+    }
+
+    /**
+     * Replaces an element with a new element
+     *
+     * @param item $parent
+     * @param item $olditem item that will be removed
+     * @param item $item item that will be added
+     */
+    protected function replace(item $parent, item $olditem, item $newitem) {
+        $position = array_search($olditem, $parent->get_items());
+        $parent->remove($olditem);
+        $parent->add($newitem, $position);
+    }
+
+    /**
+     * Overloaded version of {@link base_form::replace}
+     * finds the item with the name given
+     *
+     * @param item $parent
+     * @param string $olditemname
+     * @param item $newitem
+     */
+    protected function replace_with_name(item $parent, string $olditemname, item $newitem) {
+        $this->replace($parent, $parent->find($olditemname, 'get_name', '\totara_form\item'), $newitem);
     }
 }

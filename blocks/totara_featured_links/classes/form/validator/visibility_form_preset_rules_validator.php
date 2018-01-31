@@ -37,7 +37,7 @@ class visibility_form_preset_rules_validator extends element_validator {
     /**
      * does the validation to make sure a preset rule is chosen
      */
-    public function validate () {
+    public function validate() {
         $preset_showing = $this->element->get_model()->get_data()['preset_showing'] == '1' && $this->element->get_model()->get_data()['visibility'] == '2';
         $checkboxes = $this->element->get_data()['presets_checkboxes'];
         if (empty($checkboxes) && $preset_showing) {

@@ -28,7 +28,7 @@ define([
     /* global totaraSingleSelectDialog */
 
     var selectedHtml = '';
-    var configDialog = {};
+    var learningItem = '';
     var strings = {
         ok: '',
         cancel: '',
@@ -37,28 +37,26 @@ define([
 
     var makeDialog = function() {
 
-        var url = config.wwwroot + '/blocks/totara_featured_links/course_dialog.php?';
+        var url = config.wwwroot + '/blocks/totara_featured_links/' + learningItem + '_dialog.php?';
 
-        totaraSingleSelectDialog('course',
+        totaraSingleSelectDialog(learningItem,
             strings.title + selectedHtml,
             url,
-            'course_name_id',
-            'course-name'
+            learningItem + '_name_id',
+            learningItem + '-name'
         );
 
-        $('input[name="course_name"]').attr('readonly', 'readonly');
+        $('input[name="' + learningItem + '_name"]').attr('readonly', 'readonly');
     };
 
     return {
-        init: function(instancetype, instanceid, sesskey, selected) {
+        init: function(selected, learningItemType) {
+            learningItem = learningItemType;
             selectedHtml = selected;
-            configDialog.instancetype = instancetype;
-            configDialog.instanceid = instanceid;
-            configDialog.sesskey = sesskey;
 
             var requiredStrings = [];
             requiredStrings.push({key: 'cancel', component: 'moodle'});
-            requiredStrings.push({key: 'course_select', component: 'block_totara_featured_links'});
+            requiredStrings.push({key: learningItem + '_select', component: 'block_totara_featured_links'});
 
             mdlstr.get_strings(requiredStrings).done(function(stringResults) {
                 strings = {

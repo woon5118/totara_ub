@@ -25,24 +25,33 @@ namespace block_totara_featured_links\form\validator;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/totara/program/program.class.php');
+
 use \totara_form\element_validator;
 
-/**
- * Class visibility_form_audience_validator
- * This class makes sure that the auth form doesn't submit when no audiences have being selected but the tile
- * was set to restrict visibility based off audiences
- * @package block_totara_featured_links
- */
-class visibility_form_audience_validator extends element_validator{
+class is_valid_program extends element_validator {
 
     /**
-     * does the validation to make sure an audience is chosen
+     * Validate the element.
+     *
+     * @return void adds errors to element
      */
     public function validate() {
-        $audiences_showing = $this->element->get_model()->get_data()['audience_showing'] == '1' && $this->element->get_model()->get_data()['visibility'] == '2';
-        $element_data = $this->element->get_model()->get_data()['audiences_visible'];
-        if (empty($element_data) && $audiences_showing) {
-            $this->element->add_error(get_string('error_no_rule', 'block_totara_featured_links'));
+        global $DB;
+        $data = $this->element->get_model()->get_raw_post_data();
+        $id = $data['program_name_id'];
+        if (empty($id)) {
+            $this->element->add_error(get_string('program_not_found', 'block_totara_featured_links'));
+            return;
+        }
+        if (!$DB->record_exists_sql('SELECT id FROM {prog} WHERE id = :id AND certifid IS NULL', ['id' => $id])) {
+            $this->element->add_error(get_string('program_not_found', 'block_totara_featured_links'));
+            return;
+        }
+        $program = new \program($id);
+        if (!$program->is_viewable()) {
+            $this->element->add_error(get_string('program_not_found', 'block_totara_featured_links'));
+            return;
         }
     }
 }

@@ -46,7 +46,7 @@ class audience_list extends static_html {
      * @param string $tileid
      * @param array $ids an array of the initial audience ids of the list
      */
-    public function __construct ($name, $label, $tileid, $ids = null) {
+    public function __construct($name, $label, $tileid, $ids = null) {
         parent::__construct($name, $label, '');
         $this->tileid = $tileid;
         $this->initial_ids = $ids;
@@ -122,7 +122,7 @@ class audience_list extends static_html {
      * @param \renderer_base $output
      * @return array
      */
-    public function export_for_template (\renderer_base $output) {
+    public function export_for_template(\renderer_base $output) {
         $result = parent::export_for_template($output);
         $this->render();
         $attributes = [];

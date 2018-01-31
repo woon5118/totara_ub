@@ -21,28 +21,36 @@
  * @package block_totara_featured_links
  */
 
-namespace block_totara_featured_links\form\validator;
+namespace block_totara_featured_links\tile;
 
 defined('MOODLE_INTERNAL') || die();
 
-use \totara_form\element_validator;
+use block_totara_featured_links\form\validator\is_valid_certification;
+use totara_form\element_validator;
 
 /**
- * Class visibility_form_audience_validator
- * This class makes sure that the auth form doesn't submit when no audiences have being selected but the tile
- * was set to restrict visibility based off audiences
- * @package block_totara_featured_links
+ * Class certification_content
+ * Defines the content form for a certification tile
+ * relies heavily on {@link learning_item_content}
+ * @package block_totara_featured_links\tile
  */
-class visibility_form_audience_validator extends element_validator{
+class certification_form_content extends learning_item_form_content {
 
     /**
-     * does the validation to make sure an audience is chosen
+     * Tels the parent class what learning item this is for.
+     *
+     * @return string 'certification'
      */
-    public function validate() {
-        $audiences_showing = $this->element->get_model()->get_data()['audience_showing'] == '1' && $this->element->get_model()->get_data()['visibility'] == '2';
-        $element_data = $this->element->get_model()->get_data()['audiences_visible'];
-        if (empty($element_data) && $audiences_showing) {
-            $this->element->add_error(get_string('error_no_rule', 'block_totara_featured_links'));
-        }
+    protected function get_learning_item_type(): string {
+        return 'certification';
+    }
+
+    /**
+     * Tells the parent class what validator to use to validate the certification
+     *
+     * @return element_validator
+     */
+    protected function get_validator(): element_validator {
+        return new is_valid_certification();
     }
 }

@@ -37,7 +37,7 @@ class visibility_form_custom_validator extends element_validator {
     /**
      * Does the validation to make sure that a custom rule is chosen
      */
-    public function validate () {
+    public function validate() {
         $data = $this->element->get_model()->get_data();
         $visibility_type = $data['visibility'];
         $preset_showing = empty($data['preset_showing']) ? 0 : $data['preset_showing'];

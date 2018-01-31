@@ -243,7 +243,7 @@ abstract class base {
      * @param int|\stdClass $tile_data
      * @return base
      */
-    final public static function get_tile_instance ($tile_data) {
+    final public static function get_tile_instance($tile_data) {
         global $DB;
         if (is_int($tile_data) || is_numeric($tile_data)) {
             $tile = $DB->get_record('block_totara_featured_links_tiles', ['id' => $tile_data], '*', MUST_EXIST);
@@ -683,9 +683,9 @@ abstract class base {
 
         // The blocks in My Moodle are a special case.  We want them to inherit from the user context.
         if (!empty($USER->id)
-            && $parent_context_data->contextlevel == CONTEXT_USER             // Page belongs to a user
-            && $parent_context_data->instanceid == $USER->id                  // Page belongs to this user
-            && $USER->id == $this->userid) {                                  // Tile belongs to the user
+            && $parent_context_data->contextlevel == CONTEXT_USER       // Page belongs to a user.
+            && $parent_context_data->instanceid == $USER->id            // Page belongs to this user.
+            && $USER->id == $this->userid) {                            // Tile belongs to the user.
             return has_capability('moodle/my:manageblocks', $page_context);
         }
         return false;

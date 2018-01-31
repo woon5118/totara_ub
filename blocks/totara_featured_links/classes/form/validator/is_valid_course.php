@@ -23,7 +23,6 @@
 
 namespace block_totara_featured_links\form\validator;
 
-
 defined('MOODLE_INTERNAL') || die();
 
 use \totara_form\element_validator;
@@ -40,7 +39,7 @@ class is_valid_course extends element_validator {
      *
      * @return void adds errors to element
      */
-    public function validate () {
+    public function validate() {
         global $DB;
         $data = $this->element->get_model()->get_raw_post_data();
         $id = $data['course_name_id'];

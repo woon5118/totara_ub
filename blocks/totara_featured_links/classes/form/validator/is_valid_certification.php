@@ -23,25 +23,33 @@
 
 namespace block_totara_featured_links\form\validator;
 
-defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/totara/program/program.class.php');
 
-use \totara_form\element_validator;
+use totara_form\element_validator;
 
-/**
- * Class is_color
- * Makes sure the value passed by the color input is a 3 or 6 long hexadecimal string starting with a hash
- * @package block_totara_featured_links
- */
-class is_color extends element_validator {
+class is_valid_certification extends element_validator {
 
     /**
-     * this makes sure the color is a hash followed by 6 numbers
+     * Validate the element.
      *
      * @return void adds errors to element
      */
     public function validate() {
-        if (preg_match('/^#([0-9a-fA-F]{3}){1,2}$/', $this->element->get_data()['background_color']) == 0) {
-            $this->element->add_error(get_string('color_error', 'block_totara_featured_links'));
+        global $DB, $USER;
+        $data = $this->element->get_model()->get_raw_post_data();
+        $id = $data['certification_name_id'];
+        if (empty($id)) {
+            $this->element->add_error(get_string('certification_not_found', 'block_totara_featured_links'));
+            return;
+        }
+        if (!$DB->record_exists_sql('SELECT id FROM {prog} WHERE id = :id AND certifid IS NOT NULL', ['id' => $id])) {
+            $this->element->add_error(get_string('certification_not_found', 'block_totara_featured_links'));
+            return;
+        }
+        $program = new \program($id);
+        if (!$program->is_viewable()) {
+            $this->element->add_error(get_string('program_not_found', 'block_totara_featured_links'));
+            return;
         }
     }
 }

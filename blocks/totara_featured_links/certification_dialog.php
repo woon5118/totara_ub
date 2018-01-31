@@ -21,27 +21,22 @@
  * @package block_totara_featured_links
  */
 
-namespace block_totara_featured_links\form\validator;
+require_once('../../config.php');
+require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_certifications.class.php');
+require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
-defined('MOODLE_INTERNAL') || die();
+$parentid = optional_param('parentid', 'cat0', PARAM_ALPHANUM);
+preg_match('/([0-9]+)$/', $parentid, $matches);
+$parentid = $matches[1];
 
-use \totara_form\element_validator;
+require_login();
 
-/**
- * Class is_color
- * Makes sure the value passed by the color input is a 3 or 6 long hexadecimal string starting with a hash
- * @package block_totara_featured_links
- */
-class is_color extends element_validator {
+$PAGE->set_context(context_system::instance());
 
-    /**
-     * this makes sure the color is a hash followed by 6 numbers
-     *
-     * @return void adds errors to element
-     */
-    public function validate() {
-        if (preg_match('/^#([0-9a-fA-F]{3}){1,2}$/', $this->element->get_data()['background_color']) == 0) {
-            $this->element->add_error(get_string('color_error', 'block_totara_featured_links'));
-        }
-    }
-}
+// Load dialog content generator.
+$dialog = new totara_dialog_content_certifications($parentid);
+$dialog->searchtype = 'certification';
+$dialog->load_certifications();
+$dialog->customdata['instanceid'] = $parentid;
+// Display page.
+echo $dialog->generate_markup();

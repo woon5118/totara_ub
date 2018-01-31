@@ -43,12 +43,30 @@ class block_totara_featured_links_generator extends testing_block_generator {
     /**
      * Creates a new course tile
      * @param int $blockinstanceid
-     * @return \block_totara_featured_links\tile\course_tile
+     * @return \block_totara_featured_links\tile\learning_item
      */
     public function create_course_tile($blockinstanceid) {
-        /** @var \block_totara_featured_links\tile\course_tile $tile */
+        /** @var \block_totara_featured_links\tile\learning_item $tile */
         $tile = \block_totara_featured_links\tile\course_tile::add($blockinstanceid);
         return $tile;
+    }
+
+    /**
+     * Creates a new program tile
+     * @param $blockinstanceid
+     * @return \block_totara_featured_links\tile\base
+     */
+    public function create_program_tile($blockinstanceid) {
+        return \block_totara_featured_links\tile\program_tile::add($blockinstanceid);
+    }
+
+    /**
+     * Creates a new certification tile
+     * @param $blockinstanceid
+     * @return \block_totara_featured_links\tile\base
+     */
+    public function create_certification_tile($blockinstanceid) {
+        return \block_totara_featured_links\tile\certification_tile::add($blockinstanceid);
     }
 
     /**

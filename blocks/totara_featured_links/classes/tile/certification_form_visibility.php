@@ -28,43 +28,43 @@ use totara_form\form\element\static_html;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class course_form_visibility
- * Defines the visibility for the course tile
+ * Class certification_visibility
+ * Defines the visibility form of the certification tile
  * Relies heavily on {@link learning_item_visibility}
  * @package block_totara_featured_links\tile
  */
-class course_form_visibility extends learning_item_form_visibility {
+class certification_form_visibility extends learning_item_form_visibility {
 
     /**
-     * Overriding to that a message about the course visibility can be added at the top.
+     * Overriding to that a message about the certification visibility can be added at the top.
      */
     public function definition() {
         global $CFG, $COHORT_VISIBILITY;
 
         parent::definition();
 
-        /** @var course_tile $tile */
+        /** @var certification_tile $tile */
         $tile = $this->parameters['tile'];
 
-        if (empty($tile->get_course())) {
-            $state = get_string('course_has_been_deleted', 'block_totara_featured_links');
+        if (empty($tile->get_program())) {
+            $state = get_string('certification_has_been_deleted', 'block_totara_featured_links');
         } else {
             if (empty($CFG->audiencevisibility)) {
                 // This check is moved from require_login().
 
-                if ($tile->get_course()->visible) {
+                if ($tile->get_program()->visible) {
                     $state = get_string('visible');
                 } else {
-                    $state = get_string('course_hidden', 'block_totara_featured_links');
+                    $state = get_string('certification_hidden', 'block_totara_featured_links');
                 }
             } else {
-                $state = $COHORT_VISIBILITY[$tile->get_course()->audiencevisible];
+                $state = $COHORT_VISIBILITY[$tile->get_program()->audiencevisible];
             }
         }
         $this->model->get_items()[0]->add(
             new static_html(
                 'coursevisibility',
-                get_string('coursevisibility', 'block_totara_featured_links'),
+                get_string('certificationvisibility', 'block_totara_featured_links'),
                 $state
             ),
             0

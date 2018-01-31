@@ -80,17 +80,10 @@ abstract class base_form_content extends base_form {
      * Needed as the php script requires that the block and tile ids are set
      * @return \moodle_url
      */
-    public function get_action_url () {
+    public function get_action_url() {
         return new \moodle_url(
             '/blocks/totara_featured_links/edit_tile_content.php',
             $this->get_parameters()
         );
-    }
-
-    /**
-     * Gets the requirements for the form
-     */
-    public function requirements () {
-        parent::requirements();
     }
 }
