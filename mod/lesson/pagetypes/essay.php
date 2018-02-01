@@ -64,6 +64,16 @@ class lesson_page_type_essay extends lesson_page {
         return $essayinfo;
     }
 
+    /**
+     * This method gets called to export user answer to the question pages
+     * @param stdClass $attempt
+     * @return mixed
+     */
+    public function export(stdClass $attempt) {
+        $essayinfo = self::extract_useranswer($attempt->useranswer);
+        return $essayinfo->answer;
+    }
+
     public function display($renderer, $attempt) {
         global $PAGE, $CFG, $USER;
 

@@ -84,6 +84,32 @@ class lesson_page_type_multichoice extends lesson_page {
         return $answers;
     }
 
+    /**
+     * This method gets called to export user answer to the question pages
+     * @param stdClass $attempt
+     * @return mixed
+     */
+    public function export(stdClass $attempt) {
+        if (empty($this->properties->qoption)) {
+            return $attempt->useranswer;
+        }
+
+        $answersrecs = $this->get_answers();
+        $answers = [];
+        foreach ($answersrecs as $answersrec) {
+            $answers[$answersrec->id] = html_to_text($answersrec->answer);
+        }
+        $useranswers = explode(',', $attempt->useranswer);
+        $result = [];
+        foreach ($useranswers as $useranswer) {
+            if (isset($answers[$useranswer])) {
+                $result[] = $answers[$useranswer];
+
+            }
+        }
+        return $result;
+    }
+
     public function display($renderer, $attempt) {
         global $CFG, $PAGE;
         $answers = $this->get_used_answers();

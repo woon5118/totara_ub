@@ -47,6 +47,23 @@ class lesson_page_type_matching extends lesson_page {
     public function get_idstring() {
         return $this->typeidstring;
     }
+
+    /**
+     * This method gets called to export user answer to the question pages
+     * @param stdClass $attempt
+     * @return mixed
+     */
+    public function export(stdClass $attempt) {
+        $answers = array_slice($this->get_answers(), 2);
+        $useranswers = explode(',', $attempt->useranswer);
+        $result = [];
+        foreach ($answers as $ind => $answer) {
+            $answertxt = html_to_text($answer->answer);
+            $result[$answertxt] = $useranswers[$ind];
+        }
+        return $result;
+    }
+
     public function display($renderer, $attempt) {
         global $USER, $CFG, $PAGE;
         $mform = $this->make_answer_form($attempt);

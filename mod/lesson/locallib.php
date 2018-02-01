@@ -2258,6 +2258,14 @@ abstract class lesson_page extends lesson_base {
     abstract public function display($renderer, $attempt);
 
     /**
+     * This method gets called to export user answer to the question pages
+     * @param stdClass $attempt
+     * @return mixed
+     */
+    public function export(stdClass $attempt) {
+        return $attempt->useranswer;
+    }
+    /**
      * Creates a new lesson_page within the database and returns the correct pagetype
      * object to use to interact with the new lesson
      *

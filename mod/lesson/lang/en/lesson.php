@@ -510,6 +510,7 @@ $string['usemaximum'] = 'Use maximum';
 $string['usemean'] = 'Use mean';
 $string['usepassword'] = 'Password protected lesson';
 $string['usepassword_help'] = 'If enabled, a password is required in order to access the lesson.';
+$string['userdataitemattempts'] = 'Lessons attempts and grades';
 $string['useroverrides'] = 'User overrides';
 $string['useroverridesdeleted'] = 'User overrides deleted';
 $string['usersnone'] = 'No students have access to this lesson';
