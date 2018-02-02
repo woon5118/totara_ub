@@ -25,7 +25,7 @@
     * none
 
     Data attributes required for JS:
-    * none
+    * data-action="hide". This is required on the close button of the dialog.
 
     Context variables required for this template:
     * title A cleaned string (use clean_text()) to display.
@@ -46,7 +46,7 @@
         aria-labelledby="{{uniqid}}-modal-title"
         role="document">
         <div class="modal-header" data-region="header">
-            <span class="close">{{#flex_icon}} close, {"alt":"{{#str}} closebuttontitle {{/str}}"}{{/flex_icon}}</span>
+            <span class="close" data-action="hide">{{#flex_icon}} close, {"alt":"{{#str}} closebuttontitle {{/str}}"}{{/flex_icon}}</span>
             {{$header}}
                 <h3 id="{{uniqid}}-modal-title" data-region="title" tabindex="0">
                     {{$title}}{{title}}{{/title}}
