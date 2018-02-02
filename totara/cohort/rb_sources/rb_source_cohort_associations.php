@@ -397,7 +397,10 @@ class rb_source_cohort_associations extends rb_base_source {
      * @deprecated Since 11; replaced by totara/cohort/classes/rb/display/cohort_association_duedate class.
      */
     public function rb_display_programcompletionlink($instanceid, $row) {
-        debugging('rb_display_programcompletionlink() has been deprecated replaced by totara/cohort/classes/rb/display/cohort_association_duedate class', DEBUG_DEVELOPER);
+        // NB: no debugging() call here even though this function is deprecated.
+        // It is needed as a workaround (see cohort_association_duedate class
+        // notes). Other callers should not be using this function at all.
+
         static $canedit = null;
         if ($canedit === null) {
             $canedit = has_capability('moodle/cohort:manage', context_system::instance());

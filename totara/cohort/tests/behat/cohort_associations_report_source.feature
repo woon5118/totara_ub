@@ -106,10 +106,14 @@ Feature: Test the cohort associations report source.
     When I navigate to my "Audiences" report
     And I wait until "report_audiences" "table" exists
     Then the following should exist in the "report_audiences" table:
-      | Audience Name | Name (with icon and link) | Type          | Assignment due date | Id     | Actual due date |
-      | Audience #3   | Program #1                | Program       | No due date         | Aud #3 | View dates      |
-      | Audience #4   | Cert #1                   | Certification | No due date         | Aud #4 | View dates      |
-    And the following should exist in the "report_audiences" table:
+      | Audience Name | Name (with icon and link) | Type          | Assignment due date  | Id     | Actual due date |
+      | Audience #3   | Program #1                | Program       | Set due date         | Aud #3 | View dates      |
+      | Audience #4   | Cert #1                   | Certification | Set due date         | Aud #4 | View dates      |
+
+    # Note this behat step has to be used here instead of the similar "the following should exist in the "report_audiences" table".
+    # Currently, the assignment due date is rendered (wrongly) as a link WITH A trailing space; that space makes the other behat
+    # step very unhappy.
+    And the "report_audiences" table should contain the following:
       | Assignment due date                      | Audience Name | Name (with icon and link) | Type          | Id     | Actual due date |
       | Complete within 1 Day(s) of First login  | Audience #1   | Program #1                | Program       | Aud #1 | View dates      |
       | Complete by 9 Dec 2030 at 14:30          | Audience #2   | Program #1                | Program       | Aud #2 | View dates      |
@@ -137,7 +141,7 @@ Feature: Test the cohort associations report source.
       | cohort-idnumber      | Aud #1      |
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I wait until "report_audiences" "table" exists
-    Then the following should exist in the "report_audiences" table:
+    Then the "report_audiences" table should contain the following:
       | Assignment due date                      | Audience Name | Name (with icon and link) | Type          | Id     | Actual due date |
       | Complete within 1 Day(s) of First login  | Audience #1   | Program #1                | Program       | Aud #1 | View dates      |
       | Complete within 4 Week(s) of First login | Audience #1   | Cert #1                   | Certification | Aud #1 | View dates      |
@@ -174,7 +178,7 @@ Feature: Test the cohort associations report source.
     And I follow "Audience #1"
     And I switch to "Enrolled learning" tab
     And I wait until "cohort_associations_enrolled" "table" exists
-    Then the following should exist in the "cohort_associations_enrolled" table:
+    Then the "cohort_associations_enrolled" table should contain the following:
       | Assignment due date                      | Audience Name | Name       | Type          | Id     | Actual due date |
       | Complete within 1 Day(s) of First login  | Audience #1   | Program #1 | Program       | Aud #1 | View dates      |
       | Complete within 4 Week(s) of First login | Audience #1   | Cert #1    | Certification | Aud #1 | View dates      |
@@ -201,7 +205,7 @@ Feature: Test the cohort associations report source.
       | cohort-idnumber      | Aud #1      |
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I wait until "cohort_associations_enrolled" "table" exists
-    Then the following should exist in the "cohort_associations_enrolled" table:
+    Then the "cohort_associations_enrolled" table should contain the following:
       | Assignment due date                      | Audience Name | Name       | Type          | Id     | Actual due date |
       | Complete within 1 Day(s) of First login  | Audience #1   | Program #1 | Program       | Aud #1 | View dates      |
       | Complete within 4 Week(s) of First login | Audience #1   | Cert #1    | Certification | Aud #1 | View dates      |

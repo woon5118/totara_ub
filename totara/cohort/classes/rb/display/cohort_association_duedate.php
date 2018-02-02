@@ -28,6 +28,35 @@ namespace totara_cohort\rb\display;
  */
 class cohort_association_duedate extends \totara_reportbuilder\rb\display\base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        // TODO:
+        //
+        // This class was created in TL-16684. The original display function was
+        // in rb_source_cohort_associations::rb_display_programcompletionlink()
+        // and it has major problems: the link it renders does not work when the
+        // report source is used in a user generated report (see TL-16787). This
+        // is why this class renders due dates as strings instead. However, that
+        // causes a Behat test to fail (TL-16830). So until TL-16787 is fixed,
+        // this class has a split personality: for screen rendering, it defers
+        // to the legacy display function, otherwise the new string rendering is
+        // used.
+        //
+        // Once TL-16787 is finally done, the following needs to be done:
+        // - get rid of the legacy display function invocation in this class.
+        // - add a debugging() notice in the legacy display function
+        // - change what is checked in cohort_associations_report_source.feature
+        //   for the due date display
+        // - remove this TODO comment
+
+        if ($format === 'html') {
+            $extrafields = self::get_extrafields_row($row, $column);
+            $programid = empty($extrafields->programid) ? null : $extrafields->programid;
+            return $report->src->rb_display_programcompletionlink($programid, $extrafields);
+        }
+
+        return self::display_correct($value, $format, $row, $column, $report);
+    }
+
+    private static function display_correct($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
 
         $type = empty($extrafields->type) ? 0 : $extrafields->type;
