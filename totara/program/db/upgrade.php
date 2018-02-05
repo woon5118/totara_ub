@@ -177,7 +177,7 @@ function xmldb_totara_program_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2017112000, 'totara', 'totara_program');
+        upgrade_plugin_savepoint(true, 2017112000, 'totara', 'program');
     }
 
     // Does part of the fix from TL-6372 again as on certain execution paths it could be missed.
@@ -196,6 +196,20 @@ function xmldb_totara_program_upgrade($oldversion) {
 
         // Main savepoint reached.
         totara_upgrade_mod_savepoint(true, 2018010800, 'totara_program');
+    }
+
+    if ($oldversion < 2018020500) {
+
+        // We need to fix a regression from TL-15995. See TL-16826 for details.
+        // The wrong plugin name was used, 'totara_totara_program'. We need to remove it.
+        $params = array(
+            'plugin' => 'totara_totara_program',
+            'name' => 'version',
+            'value' => '2017112000'
+        );
+        $DB->delete_records_select('config_plugins', "plugin = :plugin AND name = :name AND value = :value", $params);
+
+        upgrade_plugin_savepoint(true, 2018020500, 'totara', 'program');
     }
 
     return true;
