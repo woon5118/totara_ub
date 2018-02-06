@@ -80,7 +80,7 @@ if ($user->deleted) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('audit', 'totara_userdata'));
 
-echo '<dl>';
+echo '<dl class="dl-horizontal">';
 echo '<dt>' . get_string('fullnameuser') . '</dt>';
 echo '<dd>' . fullname($user) . '</dd>';
 echo '<dt>' . get_string('idnumber') . '</dt>';
@@ -126,7 +126,7 @@ foreach (count::get_countable_items_grouped_list() as $maincomponent => $classes
             $prevcomponent = $maincomponent;
             $maincomponentname = \totara_userdata\local\util::get_component_name($maincomponent);
             echo $OUTPUT->heading($maincomponentname, 3);
-            echo '<dl>';
+            echo '<dl class="dl-horizontal">';
         }
 
         echo '<dt>' . $class::get_fullname() . '</dt>';
@@ -164,7 +164,7 @@ if ($prevcomponent) {
 }
 
 echo $OUTPUT->heading(get_string('auditsummary', 'totara_userdata'), 3);
-echo '<dl>';
+echo '<dl class="dl-horizontal">';
 echo '<dt>' . get_string('audititemsprocessed', 'totara_userdata') . '</dt>';
 echo '<dd>' . $stats['itemscount'] . '</dd>';
 echo '<dt>' . get_string('audititemserror', 'totara_userdata') . '</dt>';

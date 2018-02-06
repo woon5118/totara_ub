@@ -52,7 +52,7 @@ if ($purgetype->allowsuspended) {
 }
 $statuses = \totara_userdata\userdata\target_user::get_user_statuses();
 
-echo '<dl>';
+echo '<dl class="dl-horizontal">';
 echo '<dt>' . get_string('idnumber') . '</dt>';
 echo '<dd>' . (trim($purgetype->idnumber) === '' ? '&nbsp;' : s($purgetype->idnumber)) . '</dd>';
 echo '<dt>' . get_string('purgetypeuserstatus', 'totara_userdata') . '</dt>';

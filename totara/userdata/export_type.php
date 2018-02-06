@@ -45,7 +45,7 @@ if ($exporttype->allowself) {
     $availablefor[] = get_string('exportoriginself', 'totara_userdata');
 }
 
-echo '<dl>';
+echo '<dl class="dl-horizontal">';
 echo '<dt>' . get_string('idnumber') . '</dt>';
 echo '<dd>' . (trim($exporttype->idnumber) === '' ? '&nbsp;' : s($exporttype->idnumber)) . '</dd>';
 echo '<dt>' . get_string('description') . '</dt>';

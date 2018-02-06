@@ -74,7 +74,7 @@ $defaultdeletedpurgetypeid = get_config('totara_userdata', 'defaultdeletedpurget
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('userinfo', 'totara_userdata'));
 
-echo '<dl>';
+echo '<dl class="dl-horizontal">';
 echo '<dt>' . get_string('fullnameuser') . '</dt>';
 echo '<dd>' . fullname($user) . '</dd>';
 echo '<dt>' . get_string('idnumber') . '</dt>';
@@ -103,7 +103,7 @@ echo '</dd>';
 echo '</dl>';
 
 echo $OUTPUT->heading(get_string('purgeoriginmanual', 'totara_userdata'), 3);
-echo '<dl>';
+echo '<dl class="dl-horizontal">';
 if ($allcount > 0) {
     echo '<dt>' . get_string('purgesuserpending', 'totara_userdata') . '</dt>';
     echo '<dd>';
@@ -123,7 +123,7 @@ if (has_capability('totara/userdata:purgemanual', $syscontext) and manager::get_
 }
 
 echo $OUTPUT->heading(get_string('purgeautomatic', 'totara_userdata'), 3);
-echo '<dl>';
+echo '<dl class="dl-horizontal">';
 echo '<dt>' . get_string('purgeoriginsuspended', 'totara_userdata') . '</dt>';
 echo '<dd>';
 if ($extra->suspendedpurgetypeid) {
