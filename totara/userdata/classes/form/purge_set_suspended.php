@@ -45,7 +45,7 @@ class purge_set_suspended extends \totara_form\form {
         if ($suspendeddefault = get_config('totara_userdata', 'defaultsuspendedpurgetypeid')) {
             $none = get_string('purgeautodefault', 'totara_userdata', $options[$suspendeddefault]);
         } else {
-            get_string('none');
+            $none = get_string('none');
         }
         $options = array('' => $none) + $options;
         $suspendedpurgetypeid = new \totara_form\form\element\select('suspendedpurgetypeid', get_string('purgeoriginsuspended', 'totara_userdata'), $options);

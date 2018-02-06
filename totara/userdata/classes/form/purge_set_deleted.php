@@ -45,7 +45,7 @@ class purge_set_deleted extends \totara_form\form {
         if ($deleteddefault = get_config('totara_userdata', 'defaultdeletedpurgetypeid')) {
             $none = get_string('purgeautodefault', 'totara_userdata', $options[$deleteddefault]);
         } else {
-            get_string('none');
+            $none = get_string('none');
         }
         $options = array('' => $none) + $options;
         $deletedpurgetypeid = new \totara_form\form\element\select('deletedpurgetypeid', get_string('purgeorigindeleted', 'totara_userdata'), $options);
