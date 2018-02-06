@@ -274,9 +274,10 @@ function certificate_email_student($course, $certificate, $certrecord, $context,
  * @param int $certrecordid the certificate issue record id
  * @param string $filename pdf filename
  * @param int $contextid context id
+ * @param object $user Use to create the PDF for (introduced for testing).
  * @return bool return true if successful, false otherwise
  */
-function certificate_save_pdf($pdf, $certrecordid, $filename, $contextid) {
+function certificate_save_pdf($pdf, $certrecordid, $filename, $contextid, $user = null) {
     global $USER;
 
     if (empty($certrecordid)) {
@@ -301,7 +302,8 @@ function certificate_save_pdf($pdf, $certrecordid, $filename, $contextid) {
         'filepath'  => $filepath,     // any path beginning and ending in /
         'filename'  => $filename,    // any filename
         'mimetype'  => 'application/pdf',    // any filename
-        'userid'    => $USER->id);
+        'userid'    => ($user ? $user->id : $USER->id)
+    );
 
     // We do not know the previous file name, better delete everything here,
     // luckily there is supposed to be always only one certificate here.
