@@ -118,17 +118,27 @@ final class target_user extends \stdClass {
      * target_ser constructor.
      *
      * @param \stdClass $user record from user table
-     * @param int|null $contextid current user context id or backed up value for deleted users
      */
-    public function __construct(\stdClass $user, $contextid = null) {
+    public function __construct(\stdClass $user) {
         $this->user = $user;
-        $this->usercontextid = empty($contextid) ? null : (int)$contextid;
+
         if ($user->deleted) {
+            $extra = \totara_userdata\local\util::get_user_extras($user->id);
+            if ($extra->usercontextid) {
+                $this->usercontextid = (int)$extra->usercontextid;
+            } else {
+                $this->usercontextid = null;
+            }
             $this->userstatus = self::STATUS_DELETED;
-        } else if ($user->suspended) {
-            $this->userstatus = self::STATUS_SUSPENDED;
+
         } else {
-            $this->userstatus = self::STATUS_ACTIVE;
+            $usercontext = \context_user::instance($user->id);
+            $this->usercontextid = (int)$usercontext->id;
+            if ($user->suspended) {
+                $this->userstatus = self::STATUS_SUSPENDED;
+            } else {
+                $this->userstatus = self::STATUS_ACTIVE;
+            }
         }
     }
 

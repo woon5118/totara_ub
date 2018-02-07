@@ -140,8 +140,8 @@ class totara_userdata_item_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $deleteduser = $this->getDataGenerator()->create_user(array('deleted' => 1));
         $usercontext = context_user::instance($user->id);
-        $target = new target_user($user, $usercontext->id);
-        $targetdeleted = new target_user($deleteduser, null);
+        $target = new target_user($user);
+        $targetdeleted = new target_user($deleteduser);
 
         $result = testitemminimal::execute_purge($target, $syscontext);
         $this->assertSame(testitem::RESULT_STATUS_ERROR, $result);
@@ -163,7 +163,7 @@ class totara_userdata_item_testcase extends advanced_testcase {
         $syscontext = context_system::instance();
         $user = $this->getDataGenerator()->create_user();
         $usercontext = context_user::instance($user->id);
-        $target = new target_user($user, $usercontext->id);
+        $target = new target_user($user);
 
         $this->assertFalse($DB->is_transaction_started());
         $outertrans = $DB->start_delegated_transaction();
@@ -197,7 +197,7 @@ class totara_userdata_item_testcase extends advanced_testcase {
         $syscontext = context_system::instance();
         $user = $this->getDataGenerator()->create_user();
         $usercontext = context_user::instance($user->id);
-        $target = new target_user($user, $usercontext->id);
+        $target = new target_user($user);
 
         $result = testitemminimal::execute_export($target, $syscontext);
         $this->assertSame(testitem::RESULT_STATUS_ERROR, $result);
@@ -220,7 +220,7 @@ class totara_userdata_item_testcase extends advanced_testcase {
         $syscontext = context_system::instance();
         $user = $this->getDataGenerator()->create_user();
         $usercontext = context_user::instance($user->id);
-        $target = new target_user($user, $usercontext->id);
+        $target = new target_user($user);
 
         $result = testitemminimal::execute_count($target, $syscontext);
         $this->assertSame(testitem::RESULT_STATUS_ERROR, $result);

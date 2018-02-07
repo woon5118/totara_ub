@@ -149,27 +149,23 @@ class purge {
         // Make sure the expected userstatus does not change!
         $userstatus = (int)$purgetype->userstatus;
 
-        // Make sure the user context is valid, fail if not.
-        $usercontext = \context_user::instance($user->id, IGNORE_MISSING);
-        if ($usercontext) {
-            if ($usercontext->id != $purge->usercontextid) {
-                // User context id changed, weird!
-                return item::RESULT_STATUS_ERROR;
-            }
-        } else {
-            if ($purge->usercontextid) {
-                $uc = $DB->get_record('context', array('id' => $purge->usercontextid));
-                if ($uc) {
-                    if ($uc->contextlevel != CONTEXT_USER or $uc->instanceid != $user->id) {
-                        // Something reused the context, we cannot continue!
-                        return item::RESULT_STATUS_ERROR;
-                    }
+        // Make sure the user context is still valid, fail if not.
+        $extra = util::get_user_extras($user->id);
+        if ($extra->usercontextid != $purge->usercontextid) {
+            // User context id changed, weird!
+            return item::RESULT_STATUS_ERROR;
+        }
+        if ($extra->usercontextid) {
+            $uc = $DB->get_record('context', array('id' => $extra->usercontextid));
+            if ($uc) {
+                if ($uc->contextlevel != CONTEXT_USER or $uc->instanceid != $user->id) {
+                    // Something reused the context, we must not continue!
+                    return item::RESULT_STATUS_ERROR;
                 }
             }
         }
 
         // Normalise the data types.
-        $usercontextid = $purge->usercontextid ? (int)$purge->usercontextid : null;
         $context = \context::instance_by_id($purge->contextid, IGNORE_MISSING);
         if (!$context) {
             // The requested context was deleted in the meantime, stop!
@@ -221,7 +217,7 @@ class purge {
             }
             unset($user->purgeresult);
 
-            $targetuser = new target_user($user, $usercontextid);
+            $targetuser = new target_user($user);
             if ($targetuser->status !== $userstatus) {
                 // Somebody changed user status, better stop ASAP, we need to use different purge type.
                 return item::RESULT_STATUS_CANCELLED;

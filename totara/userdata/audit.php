@@ -51,7 +51,6 @@ if (!$context) {
 
 require_capability('totara/userdata:viewinfo', $context);
 
-$extra = \totara_userdata\local\util::get_user_extras($user->id);
 $targetuser = new target_user($user);
 $currentuser = ($user->id == $USER->id);
 

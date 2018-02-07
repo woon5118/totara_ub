@@ -130,9 +130,7 @@ class export {
         if (!$user) {
             return item::RESULT_STATUS_ERROR;
         }
-        $extra = util::get_user_extras($user->id);
-        $usercontextid = $extra->usercontextid ? (int)$extra->usercontextid : null;
-        $targetuser = new target_user($user, $usercontextid);
+        $targetuser = new target_user($user);
 
         $context = \context::instance_by_id($export->contextid, IGNORE_MISSING);
         if (!$context) {

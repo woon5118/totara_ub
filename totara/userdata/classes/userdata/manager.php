@@ -131,8 +131,7 @@ class manager {
         }
 
         $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-        $extra = \totara_userdata\local\util::get_user_extras($userid, '*');
-        $targetuser = new target_user($user, $extra->usercontextid);
+        $targetuser = new target_user($user);
 
         // NOTE: do not check allowxxx here, these options restrict future usage only.
 
@@ -143,7 +142,7 @@ class manager {
         $purge->purgetypeid = $purgetype->id;
         $purge->origin = $origin;
         $purge->userid = $user->id;
-        $purge->usercontextid = $extra->usercontextid;
+        $purge->usercontextid = $targetuser->contextid;
         $purge->contextid = $context->id;
         $purge->usercreated = $USER->id;
         $purge->timecreated = time();

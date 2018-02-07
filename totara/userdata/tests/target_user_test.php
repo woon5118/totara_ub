@@ -43,7 +43,7 @@ class totara_userdata_target_user_testcase extends advanced_testcase {
         delete_user($deleteduser);
         $deleteduser = $DB->get_record('user', array('id' => $deleteduser->id));
 
-        $target = new target_user($activeuser, $activeusercontext->id);
+        $target = new target_user($activeuser);
         $this->assertSame($activeusercontext->id, $target->contextid);
         $this->assertSame(target_user::STATUS_ACTIVE, $target->status);
         foreach ((array)$activeuser as $k => $v) {
@@ -62,15 +62,16 @@ class totara_userdata_target_user_testcase extends advanced_testcase {
             $this->assertInstanceOf('coding_exception', $ex);
         }
 
-        $target = new target_user($suspendeduser, $suspendedusercontext->id);
+        $target = new target_user($suspendeduser);
         $this->assertSame($suspendedusercontext->id, $target->contextid);
         $this->assertSame(target_user::STATUS_SUSPENDED, $target->status);
 
-        $target = new target_user($deleteduser, $deletedusercontext->id);
+        $target = new target_user($deleteduser);
         $this->assertSame($deletedusercontext->id, $target->contextid);
         $this->assertSame(target_user::STATUS_DELETED, $target->status);
 
-        $target = new target_user($deleteduser, null);
+        $DB->delete_records('totara_userdata_user', array('userid' => $deleteduser->id));
+        $target = new target_user($deleteduser);
         $this->assertNull($target->contextid);
         $this->assertSame(target_user::STATUS_DELETED, $target->status);
     }

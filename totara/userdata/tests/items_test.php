@@ -129,7 +129,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
 
         $contexts = array($syscontext, $usercontext, $categorycontext, $coursecontext, $blockcontext);
 
-        $targetuser = new target_user($user, $usercontext->id);
+        $targetuser = new target_user($user);
 
         foreach ($contexts as $context) {
             $result = $class::execute_count($targetuser, $context);
@@ -164,7 +164,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
 
         $contexts = array($syscontext, $usercontext, $categorycontext, $coursecontext, $blockcontext);
 
-        $targetuser = new target_user($user, $usercontext->id);
+        $targetuser = new target_user($user);
 
         foreach ($contexts as $context) {
             $export = $class::execute_export($targetuser, $context);
@@ -220,7 +220,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
 
         foreach ($contexts as $context) {
             $user = $DB->get_record('user', array('id' => $user->id));
-            $targetuser = new target_user($user, $usercontext->id);
+            $targetuser = new target_user($user);
             $result = $class::execute_purge($targetuser, $context);
 
             if (!$class::is_purgeable(target_user::STATUS_ACTIVE)) {
@@ -234,7 +234,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
             }
 
             $user = $DB->get_record('user', array('id' => $user->id));
-            $targetuser = new target_user($user, $usercontext->id);
+            $targetuser = new target_user($user);
             $result2 = $class::execute_purge($targetuser, $context);
             $this->assertSame($result, $result2, 'Repeated purge request must complete with the same result');
         }
@@ -242,7 +242,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
         $DB->set_field('user', 'suspended', 1, array('id' => $user->id));
         foreach ($contexts as $context) {
             $user = $DB->get_record('user', array('id' => $user->id));
-            $targetuser = new target_user($user, $usercontext->id);
+            $targetuser = new target_user($user);
             $result = $class::execute_purge($targetuser, $context);
 
             if (!$class::is_purgeable(target_user::STATUS_SUSPENDED)) {
@@ -256,7 +256,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
             }
 
             $user = $DB->get_record('user', array('id' => $user->id));
-            $targetuser = new target_user($user, $usercontext->id);
+            $targetuser = new target_user($user);
             $result2 = $class::execute_purge($targetuser, $context);
             $this->assertSame($result, $result2, 'Repeated purge request must complete with the same result');
         }
@@ -264,7 +264,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
         delete_user($user);
         foreach ($contexts as $context) {
             $user = $DB->get_record('user', array('id' => $user->id));
-            $targetuser = new target_user($user, $usercontext->id);
+            $targetuser = new target_user($user);
             $result = $class::execute_purge($targetuser, $context);
 
             if (!$class::is_purgeable(target_user::STATUS_DELETED)) {
@@ -278,7 +278,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
             }
 
             $user = $DB->get_record('user', array('id' => $user->id));
-            $targetuser = new target_user($user, $usercontext->id);
+            $targetuser = new target_user($user);
             $result2 = $class::execute_purge($targetuser, $context);
             $this->assertSame($result, $result2, 'Repeated purge request must complete with the same result');
         }
