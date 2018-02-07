@@ -23,21 +23,23 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * First, last and all other names.
+ * First and lastname.
  */
 class names extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['userdata_core_user_names', 'totara_userdata'];
+        return ['userdataitem-user-names', 'core'];
     }
 
     /**
@@ -71,23 +73,20 @@ class names extends \totara_userdata\userdata\item {
     protected static function purge(target_user $user, \context $context) {
         global $DB;
 
-        $update = array();
+        $update = [];
         if ($user->firstname !== '?') {
             // We need some sade non-whitespace character so that links can be still clicked and UI makes sense.
             $update['firstname'] = '?';
         }
-        if ($user->lastname !== ' ') {
+        if ($user->lastname !== '?') {
             // Regular places get stripped from fullname(), but do not trigger user_not_fully_set_up().
-            $update['lastname'] = ' ';
+            $update['lastname'] = '?';
         }
 
-        if (!$update) {
-            return self::RESULT_STATUS_SUCCESS;
+        if (!empty($update)) {
+            $update['id'] = $user->id;
+            $DB->update_record('user', (object)$update);
         }
-
-        $update['id'] = $user->id;
-        $DB->update_record('user', (object)$update);
-
         return self::RESULT_STATUS_SUCCESS;
     }
 
@@ -104,22 +103,23 @@ class names extends \totara_userdata\userdata\item {
      * Export user data from this item.
      *
      * @param target_user $user
-     * @param \context|null $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
+
+        $export->data = [
+            'firstname' => '',
+            'lastname' => ''
+        ];
 
         if (trim($user->firstname) !== '' and $user->firstname !== '?') {
             $export->data['firstname'] = $user->firstname;
-        } else {
-            $export->data['firstname'] = '';
         }
 
-        if (trim($user->lastname) !== '') {
+        if (trim($user->lastname) !== '' and $user->lastname !== '?') {
             $export->data['lastname'] = $user->lastname;
-        } else {
-            $export->data['lastname'] = '';
         }
 
         return $export;
@@ -140,19 +140,13 @@ class names extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
-        $count = 0;
-
-        if (trim($user->firstname) !== '' and $user->firstname !== '?') {
-            $count++;
-        }
-
-        if (trim($user->lastname) !== '') {
-            $count++;
-        }
-
-        return $count;
+        // Returns 1 if user has a first and/or last name filled in.
+        return intval(
+            (trim($user->firstname) !== '' && $user->firstname !== '?')
+            || (trim($user->lastname) !== '' && $user->lastname !== '?')
+        );
     }
 }
