@@ -3504,11 +3504,11 @@ function facetoface_user_complete($course, $user, $mod, $facetoface) {
 /**
  * Add a link to the session to the courses calendar.
  *
- * @param class   $session          Record from the facetoface_sessions table
- * @param class   $eventname        Name to display for this event
- * @param string  $calendartype     Which calendar to add the event to (user, course, site)
- * @param int     $userid           Optional param for user calendars
- * @param string  $eventtype        Optional param for user calendar (booking/session)
+ * @param stdclass $session      Output from {@see facetoface_get_session} function
+ * @param stdclass $eventname    Name to display for this event
+ * @param string   $calendartype Which calendar to add the event to (user, course, site)
+ * @param int      $userid       Optional param for user calendars
+ * @param string   $eventtype    Optional param for user calendar (booking/session)
  */
 function facetoface_add_session_to_calendar($session, $facetoface, $calendartype = 'none', $userid = 0, $eventtype = 'session') {
     global $CFG, $DB;
