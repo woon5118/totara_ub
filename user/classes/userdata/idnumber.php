@@ -23,6 +23,7 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,7 +38,7 @@ class idnumber extends \totara_userdata\userdata\item {
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['userdata_core_user_idnumber', 'totara_userdata'];
+        return ['userdataitem-user-idnumber', 'totara_userdata'];
     }
 
     /**
@@ -73,7 +74,7 @@ class idnumber extends \totara_userdata\userdata\item {
 
         if ($user->idnumber !== '') {
             // Do not touch timemodified, it is for active accounts only!
-            $DB->set_field('user', 'idnumber', '', array('id' => $user->id, 'deleted' => 0));
+            $DB->set_field('user', 'idnumber', '', ['id' => $user->id, 'deleted' => 1]);
         }
 
         return self::RESULT_STATUS_SUCCESS;
@@ -92,11 +93,11 @@ class idnumber extends \totara_userdata\userdata\item {
      * Export user data from this item.
      *
      * @param target_user $user
-     * @param \context|null $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
 
         if ($user->idnumber !== '') {
             $export->data['idnumber'] = $user->idnumber;
@@ -120,15 +121,9 @@ class idnumber extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
-        $count = 0;
-
-        if ($user->idnumber !== '') {
-            $count++;
-        }
-
-        return $count;
+        return intval($user->idnumber !== '');
     }
 }
