@@ -107,7 +107,7 @@ class util {
                     $record->depth = 2;
                     $record->path = '/' . SYSCONTEXTID . '/' . $record->id;
                     $DB->import_record('context', $record);
-                    $DB->get_manager()->reset_sequence('context');
+                    // Do not reset sequences here, we do not want to reuse deleted context ids!
                     $record = $DB->get_record('context', array('id' => $record->id), '*', MUST_EXIST);
                     return $record;
                 }

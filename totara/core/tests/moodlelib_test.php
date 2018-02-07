@@ -144,6 +144,38 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $user2->id)));
     }
 
+    public function test_undelete_user_context() {
+        global $DB, $CFG;
+        $this->resetAfterTest();
+
+        $CFG->authdeleteusers = 'partial';
+
+        $user1 = $this->getDataGenerator()->create_user(array());
+        $user2 = $this->getDataGenerator()->create_user(array());
+        $user3 = $this->getDataGenerator()->create_user(array());
+
+        $context1 = context_user::instance($user1->id);
+        $context2 = context_user::instance($user2->id);
+        $context3 = context_user::instance($user3->id);
+
+        delete_user($user2);
+        $deleteduser2 = $DB->get_record('user', array('id' => $user2->id));
+        delete_user($user3);
+        $deleteduser3 = $DB->get_record('user', array('id' => $user3->id));
+
+        $user4 = $this->getDataGenerator()->create_user(array());
+        $context4 = context_user::instance($user4->id);
+
+        $this->assertGreaterThan($context3->id, $context4->id);
+        undelete_user($deleteduser2);
+        undelete_user($deleteduser3);
+
+        $context2b = context_user::instance($user2->id);
+        $context3b = context_user::instance($user3->id);
+        $this->assertSame($context2->id, $context2b->id);
+        $this->assertSame($context3->id, $context3b->id);
+    }
+
     /**
      * Totara specific tests for sending of emails.
      */
