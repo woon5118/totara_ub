@@ -98,7 +98,7 @@
     <div class="block_current_learning-row-item">
         <span class="expand-collapse-icon-wrap collapsed" data-toggle="collapse" data-target="#block_current_learning-program-{{id}}-detail" aria-expanded="false" aria-controls="block_current_learning-program-{{id}}-detail">
             <span class="collapsed-icon">{{#flex_icon}}collapsed{{/flex_icon}}</span>
-            <span class="expanded-icon">{{#flex_icon}}caret-down{{/flex_icon}}</span>
+            <span class="expanded-icon">{{#flex_icon}}expanded{{/flex_icon}}</span>
         </span>
         <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">
             {{#flex_icon}}{{icon}}{{/flex_icon}}
@@ -106,7 +106,7 @@
         <a href="{{url_view}}">
             <h3>{{{fullname}}}</h3>
         </a>
-        <span class="pull-right info">
+        <div class="block_current_learning-row-item__status">
             {{#dueinfo}}
                 <span class="label {{state}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
                     {{#alert}}{{#flex_icon}}warning{{/flex_icon}}{{/alert}} {{duetext}}
@@ -115,7 +115,7 @@
             {{#progress}}
                 <span class="label label-default">{{summary}}</span>
             {{/progress}}
-        </span>
+        </div>
     </div>
     <div class="collapse" id="block_current_learning-program-{{id}}-detail">
         <div class="current_learning-bundle">
@@ -126,7 +126,7 @@
             {{/coursesets_header_text}}
             {{#coursesets}}
                 <div class="current_learning-set">
-                    <h4>{{{name}}}<span class="pull-right info">{{completion_text}}</span></h4>
+                    <h4>{{{name}}}<span class="block_current_learning-row-item__status">{{completion_text}}</span></h4>
                     {{#courses}}
                         <div class="current_learning-course">
                             <a href="{{url_view}}">{{{fullname}}}</a>
@@ -134,7 +134,7 @@
                                 <span class="points">{{points}}</span>
                             {{/points}}
                             {{#progress}}
-                                <span class="pull-right info">
+                                <div class="block_current_learning-row-item__status">
                                     {{#duetext}}
                                         <span class="label label-{{tooltip-state}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
                                             {{duetext}}
@@ -146,7 +146,7 @@
                                     {{^pbar}}
                                         <span class="label label-default">{{summarytext}}</span>
                                     {{/pbar}}
-                                </span>
+                                </div>
                             {{/progress}}
                         </div>
                     {{/courses}}

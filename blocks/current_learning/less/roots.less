@@ -54,6 +54,16 @@
                 padding: 0 5px;
             }
 
+            &__status {
+                min-width: 20%;
+                float: right;
+                text-align: right;
+
+                .progressbar_container {
+                    padding-top: 5px;
+                }
+            }
+
             > .expand-collapse-icon-wrap {
                 padding: 0.3em;
                 border-radius: @border-radius-default;
@@ -78,9 +88,6 @@
                         display: none;
                     }
                 }
-            }
-            .info {
-                margin: -2px 0;
             }
             > .ft-certificate {
                 font-size: 18px;
@@ -161,6 +168,10 @@
     }
     .current_learning-bundle {
         padding: 10px 40px;
+
+        .block_current_learning-row-item__status .progressbar_container {
+            padding-top: 0;
+        }
     }
     .current_learning-set {
         padding: @padding-large-vertical @padding-horizontal;
@@ -232,12 +243,17 @@
 
 // Course user learning items appearing at the top level and within programs.
 .block_current_learning .current_learning-course {
-    padding: @padding-vertical @padding-horizontal;
+    padding: @padding-vertical;
     background-color: @bg-default;
     border-radius: @border-radius-large;
     clear: both;
     display: inline-block;
     width: 100%;
+    margin-top: @padding-vertical;
+
+    &:first-child {
+        margin-top: 0;
+    }
 
     .flex-icon {
         float: right;
@@ -250,13 +266,5 @@
 
     .label .flex-icon {
         float: none;
-    }
-}
-
-.current_learning-course {
-    margin-top: 1em;
-
-    span {
-        margin-bottom: -1em;
     }
 }

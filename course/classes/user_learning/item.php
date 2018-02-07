@@ -262,7 +262,7 @@ class item extends item_base implements item_has_progress {
         $record->summarytext = (string)$this->progress_summary;
         if ($this->progress_canbecompleted && $this->progress_hascompletioncriteria) {
             // TODO: Need to get a better way to get the width right
-            $pbar = new \static_progress_bar('', '70');
+            $pbar = new \static_progress_bar('', '0');
             $pbar->set_progress((int)$this->progress_percentage);
             $completion = new \completion_completion(['userid' => $this->user->id, 'course' => $this->id]);
             $detaildata = $completion->export_completion_criteria_for_template();

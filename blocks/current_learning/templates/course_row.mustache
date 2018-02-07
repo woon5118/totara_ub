@@ -65,7 +65,9 @@
 }}
 <li id="block_current_learning-course-{{id}}" class="block_current_learning-item block_current_learning-course">
 <div class="block_current_learning-row-item">
-    <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{#str}} thisisacourse, block_current_learning {{/str}}">{{#flex_icon}}course{{/flex_icon}}</span><a href="{{url_view}}"><h3>{{{fullname}}}</h3></a><span class="pull-right">
+    <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{#str}} thisisacourse, block_current_learning {{/str}}">{{#flex_icon}}course{{/flex_icon}}</span>
+    <a href="{{url_view}}"><h3>{{{fullname}}}</h3></a>
+    <div class="block_current_learning-row-item__status">
         {{#dueinfo}}
             <span class="label {{state}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{tooltip}}">{{#alert}}{{#flex_icon}}warning{{/flex_icon}}{{/alert}} {{duetext}}</span>
         {{/dueinfo}}
@@ -77,6 +79,6 @@
                 <span class="label label-default">{{summarytext}}</span>
             {{/pbar}}
         {{/progress}}
-    </span>
+    </div>
 </div>
 </li>
