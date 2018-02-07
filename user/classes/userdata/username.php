@@ -23,6 +23,7 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,13 +32,14 @@ defined('MOODLE_INTERNAL') || die();
  * Replicate full proper user delete cleaning of username.
  */
 class username extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['userdata_core_user_username', 'totara_userdata'];
+        return ['userdataitem-user-username', 'core'];
     }
 
     /**
@@ -72,13 +74,13 @@ class username extends \totara_userdata\userdata\item {
         global $DB;
 
         if (!preg_match('/^deleted_[a-z0-9]+$/', $user->username)) {
-            // See delete_user();
+            // See delete_user().
             do {
                 $username = 'deleted_' . strtolower(random_string(32));
-            } while ($DB->record_exists('user', array('username' => $username)));
+            } while ($DB->record_exists('user', ['username' => $username]));
 
             // Do not touch timemodified, it is for active accounts only!
-            $DB->set_field('user', 'username', $username, array('id' => $user->id, 'deleted' => 0));
+            $DB->set_field('user', 'username', $username, ['id' => $user->id, 'deleted' => 1]);
         }
 
         return self::RESULT_STATUS_SUCCESS;
@@ -97,16 +99,15 @@ class username extends \totara_userdata\userdata\item {
      * Export user data from this item.
      *
      * @param target_user $user
-     * @param \context|null $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
 
-        if (!$user->deleted or !preg_match('/^deleted_[a-z0-9]+$/', $user->username)) {
+        $export->data['username'] = '';
+        if (!$user->deleted || !preg_match('/^deleted_[a-z0-9]+$/', $user->username)) {
             $export->data['username'] = $user->username;
-        } else {
-            $export->data['username'] = '';
         }
 
         return $export;
@@ -127,15 +128,10 @@ class username extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
-        $count = 0;
-
-        if (!$user->deleted or !preg_match('/^deleted_[a-z0-9]+$/', $user->username)) {
-            $count++;
-        }
-
-        return $count;
+        return intval(!$user->deleted || !preg_match('/^deleted_[a-z0-9]+$/', $user->username));
     }
+
 }
