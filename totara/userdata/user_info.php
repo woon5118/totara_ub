@@ -104,17 +104,15 @@ echo '</dl>';
 
 echo $OUTPUT->heading(get_string('purgeoriginmanual', 'totara_userdata'), 3);
 echo '<dl class="dl-horizontal">';
-if ($allcount > 0) {
-    echo '<dt>' . get_string('purgesuserpending', 'totara_userdata') . '</dt>';
-    echo '<dd>';
-    $pendingcount = $DB->count_records('totara_userdata_purge', array('userid' => $user->id, 'result' => null));
-    if (!$pendingcount) {
-        echo get_string('none');
-    } else {
-        echo $pendingcount;
-    }
-    echo '</dd>';
+echo '<dt>' . get_string('purgesuserpending', 'totara_userdata') . '</dt>';
+echo '<dd>';
+$pendingcount = $DB->count_records('totara_userdata_purge', array('userid' => $user->id, 'result' => null));
+if (!$pendingcount) {
+    echo get_string('none');
+} else {
+    echo $pendingcount;
 }
+echo '</dd>';
 echo '</dl>';
 
 if (has_capability('totara/userdata:purgemanual', $syscontext) and manager::get_purge_types($targetuser->status, 'manual')) {
