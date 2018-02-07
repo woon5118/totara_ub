@@ -23,14 +23,16 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * First, last and all other names.
+ * All additional names of a user, like middlename, alternatename, etc.
  */
 class additionalnames extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
@@ -71,7 +73,7 @@ class additionalnames extends \totara_userdata\userdata\item {
     protected static function purge(target_user $user, \context $context) {
         global $DB;
 
-        $update = array();
+        $update = [];
         if ($user->lastnamephonetic !== null) {
             $update['lastnamephonetic'] = null;
         }
@@ -85,20 +87,18 @@ class additionalnames extends \totara_userdata\userdata\item {
             $update['alternatename'] = null;
         }
 
-        if (!$update) {
-            return self::RESULT_STATUS_SUCCESS;
-        }
+        if (!empty($update)) {
+            if (!$user->deleted) {
+                // We do not want any unnecessary changes for deleted accounts.
+                $update['timemodified'] = time();
+            }
 
-        if (!$user->deleted) {
-            // We do not want any unnecessary changes for deleted accounts.
-            $update['timemodified'] = time();
-        }
+            $update['id'] = $user->id;
+            $DB->update_record('user', (object)$update);
 
-        $update['id'] = $user->id;
-        $DB->update_record('user', (object)$update);
-
-        if (!$user->deleted) {
-            \core\event\user_updated::create_from_userid($user->id)->trigger();
+            if (!$user->deleted) {
+                \core\event\user_updated::create_from_userid($user->id)->trigger();
+            }
         }
 
         return self::RESULT_STATUS_SUCCESS;
@@ -117,24 +117,18 @@ class additionalnames extends \totara_userdata\userdata\item {
      * Export user data from this item.
      *
      * @param target_user $user
-     * @param \context|null $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
 
-        if (trim($user->lastnamephonetic) !== '') {
-            $export->data['lastnamephonetic'] = $user->lastnamephonetic;
-        }
-        if (trim($user->firstnamephonetic) !== '') {
-            $export->data['firstnamephonetic'] = $user->firstnamephonetic;
-        }
-        if (trim($user->middlename) !== '') {
-            $export->data['middlename'] = $user->middlename;
-        }
-        if (trim($user->alternatename) !== '') {
-            $export->data['alternatename'] = $user->alternatename;
-        }
+        $export->data = [
+            'lastnamephonetic'  => trim($user->lastnamephonetic),
+            'firstnamephonetic' => trim($user->firstnamephonetic),
+            'middlename'        => trim($user->middlename),
+            'alternatename'     => trim($user->alternatename)
+        ];
 
         return $export;
     }
@@ -154,24 +148,17 @@ class additionalnames extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
-        $count = 0;
-        if (trim($user->lastnamephonetic) !== '') {
-            $count++;
-        }
-        if (trim($user->firstnamephonetic) !== '') {
-            $count++;
-        }
-        if (trim($user->middlename) !== '') {
-            $count++;
-        }
-        if (trim($user->alternatename) !== '') {
-            $count++;
-        }
+        $counts = [
+            intval(trim($user->lastnamephonetic) !== ''),
+            intval(trim($user->firstnamephonetic) !== ''),
+            intval(trim($user->middlename) !== ''),
+            intval(trim($user->alternatename) !== ''),
+        ];
 
-        return $count;
+        return array_sum($counts);
     }
 
 }
