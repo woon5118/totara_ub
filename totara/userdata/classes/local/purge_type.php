@@ -286,6 +286,43 @@ class purge_type {
     }
 
     /**
+     * Returns new items since last save of the type.
+     *
+     * @param int $purgetypeid
+     * @return string[] list of classes indexed by 'component-name'
+     */
+    public static function get_new_items($purgetypeid) {
+        global $DB;
+
+        $result = array();
+
+        if (!$purgetypeid) {
+            return $result;
+        }
+        $purgetype = $DB->get_record('totara_userdata_purge_type', array('id' => $purgetypeid));
+        if (!$purgetype) {
+            return $result;
+        }
+
+        $saveditems = $DB->get_records_menu('totara_userdata_purge_type_item',
+            array('purgetypeid' => $purgetypeid), '', $DB->sql_concat_join("'-'", array('component', 'name')) . ',id');
+
+        $groupeditems = \totara_userdata\local\purge::get_purgeable_items_grouped_list((int)$purgetype->userstatus);
+        foreach ($groupeditems as $maincomponent => $classes) {
+            /** @var \totara_userdata\userdata\item $class this is not an instance, but it helps with autocomplete */
+            foreach ($classes as $class) {
+                $key = $class::get_component() . '-' . $class::get_name();
+                if (isset($saveditems[$key])) {
+                    continue;
+                }
+                $result[$key] = $class;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Request manual user data purge.
      *
      * @param int $purgetypeid

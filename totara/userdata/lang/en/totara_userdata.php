@@ -78,6 +78,7 @@ $string['itempurgedata'] = 'Purge data';
 $string['messageprovider:purge_manual_finished'] = 'Manual user data purge finished';
 $string['messageprovider:export_self_finished'] = 'Export of own user data finished';
 $string['newitem'] = 'New';
+$string['newitems'] = 'New items';
 $string['notificationexportselfsubject'] = 'User data export completed';
 $string['notificationexportselfmessage'] = 'Export of your user data was completed: {$a->result}';
 $string['notificationpurgemanualsubject'] = 'Manual purge of user data completed';

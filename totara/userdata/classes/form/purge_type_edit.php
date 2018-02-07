@@ -33,13 +33,7 @@ class purge_type_edit extends \totara_form\form {
         global $DB, $OUTPUT;
 
         $purgetype = (object)$this->model->get_current_data(null);
-
-        if ($purgetype->id) {
-            $saveditems = $DB->get_records_menu('totara_userdata_purge_type_item',
-                array('purgetypeid' => $purgetype->id), '', $DB->sql_concat_join("'-'", array('component', 'name')) . ',purgedata');
-        } else {
-            $saveditems = array();
-        }
+        $newitems = \totara_userdata\local\purge_type::get_new_items($purgetype->id);
 
         $fullname = new \totara_form\form\element\text('fullname', get_string('fullname', 'totara_userdata'), PARAM_TEXT);
         $fullname->set_attributes(array('required'=> 1, 'maxlength' => 1333, 'size' => 100));
@@ -96,7 +90,7 @@ class purge_type_edit extends \totara_form\form {
             foreach ($items as $item) {
                 $value = $item::get_component() . '-' . $item::get_name();
                 $options[$value] = $item::get_fullname();
-                if (!isset($saveditems[$value])) {
+                if (isset($newitems[$value])) {
                     $options[$value] .= ' <span class="label label-info">' . get_string('newitem', 'totara_userdata') . '</span>';
                 }
                 if ($item::help_available()) {
@@ -113,19 +107,20 @@ class purge_type_edit extends \totara_form\form {
             $this->model->add($group);
         }
 
-        if ($purgetype->id and $purgetype->userstatus != target_user::STATUS_ACTIVE) {
-            $repurge = new \totara_form\form\element\checkbox('repurge', get_string('repurge', 'totara_userdata'));
-            $repurge->add_help_button('repurge', 'totara_userdata');
-            $this->model->add($repurge);
+        if ($purgetype->id) {
+            if ($purgetype->userstatus != target_user::STATUS_ACTIVE) {
+                $repurge = new \totara_form\form\element\checkbox('repurge', get_string('repurge', 'totara_userdata'));
+                $repurge->add_help_button('repurge', 'totara_userdata');
+                $this->model->add($repurge);
 
-            $repurgecount = purge_type::count_repurged_users($purgetype->id);
-            if ($repurgecount) {
-                $warning = $OUTPUT->notification(get_string('repurgewarning', 'totara_userdata', $repurgecount), 'warning');
-                $repurgewarning = new \totara_form\form\element\static_html('repurgewarningstatic', '', $warning);
-                $this->model->add($repurgewarning);
-                $this->model->add_clientaction(new \totara_form\form\clientaction\hidden_if($repurgewarning))->is_equal($repurge, '0');
+                $repurgecount = purge_type::count_repurged_users($purgetype->id);
+                if ($repurgecount) {
+                    $warning = $OUTPUT->notification(get_string('repurgewarning', 'totara_userdata', $repurgecount), 'warning');
+                    $repurgewarning = new \totara_form\form\element\static_html('repurgewarningstatic', '', $warning);
+                    $this->model->add($repurgewarning);
+                    $this->model->add_clientaction(new \totara_form\form\clientaction\hidden_if($repurgewarning))->is_equal($repurge, '0');
+                }
             }
-
             $this->model->add_action_buttons(true, get_string('update'));
         } else {
             $this->model->add_action_buttons(true, get_string('add'));

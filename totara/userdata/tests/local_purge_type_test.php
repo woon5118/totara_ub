@@ -306,6 +306,27 @@ class totara_userdata_local_purge_type_testcase extends advanced_testcase {
         $this->assertEquals(0, purge_type::count_repurged_users($activetype->id));
     }
 
+    public function test_get_new_items() {
+        global $DB;
+        $this->resetAfterTest();
+
+        /** @var totara_userdata_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_userdata');
+
+        $typeactive = $generator->create_purge_type(array('userstatus' => target_user::STATUS_ACTIVE, 'items' => 'core_user-additionalnames,core_user-otherfields'));
+        $typesuspended = $generator->create_purge_type(array('userstatus' => target_user::STATUS_SUSPENDED, 'items' => 'core_user-additionalnames,core_user-otherfields'));
+        $typedeleted = $generator->create_purge_type(array('userstatus' => target_user::STATUS_DELETED, 'items' => 'core-email'));
+
+        $this->assertSame(array(), purge_type::get_new_items($typeactive->id));
+        $this->assertSame(array(), purge_type::get_new_items($typesuspended->id));
+        $this->assertSame(array(), purge_type::get_new_items($typedeleted->id));
+
+        $DB->delete_records('totara_userdata_purge_type_item', array('name' => 'username', 'component' => 'core_user'));
+        $this->assertSame(array(), purge_type::get_new_items($typeactive->id));
+        $this->assertSame(array(), purge_type::get_new_items($typesuspended->id));
+        $this->assertSame(array('core_user-username' => 'core_user\\userdata\\username'), purge_type::get_new_items($typedeleted->id));
+    }
+
     public function test_trigger_manual_purge() {
         global $DB;
         $this->resetAfterTest();

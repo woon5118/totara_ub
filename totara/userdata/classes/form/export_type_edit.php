@@ -27,16 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 class export_type_edit extends \totara_form\form {
     public function definition() {
-        global $DB, $OUTPUT;
-
         $exporttype = (object)$this->model->get_current_data(null);
-
-        if ($exporttype->id) {
-            $saveditems = $DB->get_records_menu('totara_userdata_export_type_item',
-                array('exporttypeid' => $exporttype->id), '', $DB->sql_concat_join("'-'", array('component', 'name')) . ',exportdata');
-        } else {
-            $saveditems = array();
-        }
+        $newitems = \totara_userdata\local\export_type::get_new_items($exporttype->id);
 
         $fullname = new \totara_form\form\element\text('fullname', get_string('fullname', 'totara_userdata'), PARAM_TEXT);
         $fullname->set_attributes(array('required'=> 1, 'maxlength' => 1333, 'size' => 100));
@@ -76,7 +68,7 @@ class export_type_edit extends \totara_form\form {
             foreach ($items as $item) {
                 $value = $item::get_component() . '-' . $item::get_name();
                 $options[$value] = $item::get_fullname();
-                if (!isset($saveditems[$value])) {
+                if (isset($newitems[$value])) {
                     $options[$value] .= ' <span class="label label-info">' . get_string('newitem', 'totara_userdata') . '</span>';
                 }
                 if ($item::help_available()) {

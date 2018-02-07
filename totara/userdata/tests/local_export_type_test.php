@@ -195,6 +195,24 @@ class totara_userdata_local_export_type_testcase extends advanced_testcase {
         $this->assertTimeCurrent($otherfields->timechanged);
     }
 
+    public function test_get_new_items() {
+        global $DB;
+        $this->resetAfterTest();
+
+        /** @var totara_userdata_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_userdata');
+
+        $type1 = $generator->create_export_type(array('items' => 'core_user-additionalnames,core_user-otherfields'));
+        $type2 = $generator->create_export_type(array('items' => ''));
+
+        $this->assertSame(array(), export_type::get_new_items($type1->id));
+        $this->assertSame(array(), export_type::get_new_items($type2->id));
+
+        $DB->delete_records('totara_userdata_export_type_item', array('name' => 'username', 'component' => 'core_user'));
+        $this->assertSame(array('core_user-username' => 'core_user\\userdata\\username'), export_type::get_new_items($type1->id));
+        $this->assertSame(array('core_user-username' => 'core_user\\userdata\\username'), export_type::get_new_items($type2->id));
+    }
+
     public function test_trigger_self_export() {
         global $DB;
         $this->resetAfterTest();

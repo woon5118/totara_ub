@@ -210,6 +210,18 @@ trait export_type_trait {
 
         $this->columnoptions[] = new \rb_column_option(
             'export_type',
+            'newitems',
+            get_string('newitems', 'totara_userdata'),
+            "$join.id",
+            array(
+                'displayfunc' => 'export_type_newitems',
+                'nosort' => true,
+                'joins' => array($join),
+            )
+        );
+
+        $this->columnoptions[] = new \rb_column_option(
+            'export_type',
             'actions',
             get_string('actions', 'totara_userdata'),
             "$join.id",
