@@ -76,6 +76,9 @@ function totara_userdata_pluginfile($course, $cm, $context, $filearea, $args, $f
     $fs = get_file_storage();
     $file = $fs->get_file_instance($filerecord);
 
+    // Log each download!
+    $event = \totara_userdata\event\export_downloaded::create_from_download($export, $file);
+    $event->trigger();
 
     // Finally send the file.
     send_stored_file($file, null, 0, 1);

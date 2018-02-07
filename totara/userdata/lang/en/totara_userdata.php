@@ -42,6 +42,7 @@ $string['errorexporttypedelete'] = 'Purge type cannot be deleted';
 $string['errornoexporttypes'] = 'There is no export type suitable for export of own data at the moment.';
 $string['errorpurgecancel'] = 'Error cancelling purge';
 $string['errorpurgetypedelete'] = 'Purge type cannot be deleted';
+$string['eventexportdownloaded'] = 'User data export file downloaded';
 $string['export'] = 'User data export';
 $string['exportfiledownload'] = 'Download data export file';
 $string['exportfileready'] = 'Your data export is ready: {$a->file}
