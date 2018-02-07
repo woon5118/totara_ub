@@ -50,6 +50,11 @@ class purge_deleted extends \core\task\scheduled_task {
             if (!$info) {
                 break;
             }
+
+            // Create purges as admin.
+            $admin = get_admin();
+            cron_setup_user($admin);
+
             list($purgetypeid, $userid) = $info;
             $purgeid = manager::create_purge($userid, SYSCONTEXTID, $purgetypeid, 'deleted');
 
