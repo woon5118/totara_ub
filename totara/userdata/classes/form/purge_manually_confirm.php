@@ -32,16 +32,15 @@ defined('MOODLE_INTERNAL') || die();
 
 class purge_manually_confirm extends \totara_form\form {
     public function definition() {
-        global $DB, $OUTPUT;
+        global $DB, $OUTPUT, $PAGE;
         $currentdata = (object)$this->model->get_current_data(null);
 
         $user = $DB->get_record('user', array('id' => $currentdata->id));
         $syscontext = \context_system::instance();
 
-        $this->model->add(new \totara_form\form\element\static_html('staticfullname', get_string('userfullname', 'totara_reportbuilder'), fullname($user)));
-        $this->model->add(new \totara_form\form\element\static_html('staticusername', get_string('username', 'totara_reportbuilder'), $user->username));
-        $this->model->add(new \totara_form\form\element\static_html('staticidnumber', get_string('useridnumber', 'totara_reportbuilder'), $user->idnumber));
-        $this->model->add(new \totara_form\form\element\static_html('staticemail', get_string('useremail', 'totara_reportbuilder'), $user->email));
+        /** @var \totara_userdata_renderer $renderer */
+        $renderer = $PAGE->get_renderer('totara_userdata');
+        $this->model->add(new \totara_form\form\element\static_html('staticidcard', '', $renderer->user_id_card($user, true)));
 
         $targetuser = new target_user($user);
         $options = manager::get_purge_types($targetuser->status, 'manual');

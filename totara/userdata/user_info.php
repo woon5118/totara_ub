@@ -74,23 +74,11 @@ $defaultdeletedpurgetypeid = get_config('totara_userdata', 'defaultdeletedpurget
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('userinfo', 'totara_userdata'));
 
+/** @var \totara_userdata_renderer $renderer */
+$renderer = $PAGE->get_renderer('totara_userdata');
+echo $renderer->user_id_card($user, true);
+
 echo '<dl class="dl-horizontal">';
-echo '<dt>' . get_string('fullnameuser') . '</dt>';
-echo '<dd>' . fullname($user) . '</dd>';
-echo '<dt>' . get_string('idnumber') . '</dt>';
-echo '<dd>' . (trim($user->idnumber) === '' ? '&nbsp;' : s($user->idnumber)) . '</dd>';
-echo '<dt>' . get_string('email') . '</dt>';
-echo '<dd>' . (trim($user->email) === '' ? '&nbsp;' : s($user->email)) . '</dd>';
-echo '<dt>' . get_string('userstatus', 'totara_reportbuilder') . '</dt>';
-echo '<dd>';
-if ($targetuser->status == 0) {
-    echo get_string('activeuser', 'totara_reportbuilder');
-} else if ($targetuser->status == 1) {
-    echo get_string('deleteduser', 'totara_reportbuilder');
-} else if ($targetuser->status == 2) {
-    echo get_string('suspendeduser', 'totara_reportbuilder');
-}
-echo '</dd>';
 echo '<dt>' . get_string('purgesuserall', 'totara_userdata') . '</dt>';
 echo '<dd>';
 $allcount = $DB->count_records('totara_userdata_purge', array('userid' => $user->id));
@@ -98,6 +86,15 @@ if (!$allcount) {
     echo get_string('none');
 } else {
     echo html_writer::link(new moodle_url('/totara/userdata/purges.php', array('userid' => $user->id)), $allcount);
+}
+echo '</dd>';
+echo '<dt>' . get_string('exportsuserall', 'totara_userdata') . '</dt>';
+echo '<dd>';
+$allcount = $DB->count_records('totara_userdata_export', array('userid' => $user->id));
+if (!$allcount) {
+    echo get_string('none');
+} else {
+    echo html_writer::link(new moodle_url('/totara/userdata/exports.php', array('userid' => $user->id)), $allcount);
 }
 echo '</dd>';
 echo '</dl>';
