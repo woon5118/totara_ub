@@ -23,6 +23,7 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,13 +32,14 @@ defined('MOODLE_INTERNAL') || die();
  * All other standard profile fields.
  */
 class otherfields extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['userdata_core_user_otherfields', 'totara_userdata'];
+        return ['userdataitem-user-otherfields', 'core'];
     }
 
     /**
@@ -73,27 +75,25 @@ class otherfields extends \totara_userdata\userdata\item {
 
         $fields = self::get_other_fields();
 
-        $update = array();
+        $update = [];
         foreach ($fields as $field) {
-            if ($user->$field !== '') {
+            if (isset($user->$field) && $user->$field !== '') {
                 $update[$field] = '';
             }
         }
 
-        if (!$update) {
-            return self::RESULT_STATUS_SUCCESS;
-        }
+        if (!empty($update)) {
+            if (!$user->deleted) {
+                // We do not want any unnecessary changes for deleted accounts.
+                $update['timemodified'] = time();
+            }
 
-        if (!$user->deleted) {
-            // We do not want any unnecessary changes for deleted accounts.
-            $update['timemodified'] = time();
-        }
+            $update['id'] = $user->id;
+            $DB->update_record('user', (object)$update);
 
-        $update['id'] = $user->id;
-        $DB->update_record('user', (object)$update);
-
-        if (!$user->deleted) {
-            \core\event\user_updated::create_from_userid($user->id)->trigger();
+            if (!$user->deleted) {
+                \core\event\user_updated::create_from_userid($user->id)->trigger();
+            }
         }
 
         return self::RESULT_STATUS_SUCCESS;
@@ -113,17 +113,15 @@ class otherfields extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
         $fields = self::get_other_fields();
 
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
 
         foreach ($fields as $field) {
-            if ($user->$field !== '') {
-                $export->data[$field] = $user->$field;
-            }
+            $export->data[$field] = (isset($user->$field) && $user->$field !== '') ? $user->$field : '';
         }
 
         return $export;
@@ -144,14 +142,14 @@ class otherfields extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
         $fields = self::get_other_fields();
         $count = 0;
 
         foreach ($fields as $field) {
-            if ($user->$field !== '') {
+            if (isset($user->$field) && $user->$field !== '') {
                 $count++;
             }
         }
@@ -159,10 +157,25 @@ class otherfields extends \totara_userdata\userdata\item {
         return $count;
     }
 
-
-    public static function get_other_fields() {
-        return array(
-            'icq', 'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department',
-            'address', 'city', 'country', 'url', 'description');
+    /**
+     * @return array
+     */
+    public static function get_other_fields(): array {
+        return [
+            'icq',
+            'skype',
+            'yahoo',
+            'aim',
+            'msn',
+            'phone1',
+            'phone2',
+            'institution',
+            'department',
+            'address',
+            'city',
+            'country',
+            'url',
+            'description'
+        ];
     }
 }

@@ -141,7 +141,6 @@ $string['userdata:purgesetsuspended'] = 'Set suspended user purge type';
 $string['userdata:viewexports'] = 'View user data exports';
 $string['userdata:viewinfo'] = 'View user data configuration';
 $string['userdata:viewpurges'] = 'View user data purges';
-$string['userdata_core_user_otherfields'] = 'All other profile fields';
 $string['userdata_core_user_systemaccess'] = 'System access times';
 $string['userinfo'] = 'User data';
 $string['timecreated'] = 'Created';
