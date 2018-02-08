@@ -38,7 +38,7 @@ class idnumber extends \totara_userdata\userdata\item {
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['userdataitem-user-idnumber', 'totara_userdata'];
+        return ['userdataitem-user-idnumber', 'core'];
     }
 
     /**
