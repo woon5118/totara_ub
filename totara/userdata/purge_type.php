@@ -32,7 +32,6 @@ $id = required_param('id', PARAM_INT);
 admin_externalpage_setup('userdatapurgetypes');
 
 $purgetype = $DB->get_record('totara_userdata_purge_type', array('id' => $id), '*', MUST_EXIST);
-$items = $DB->get_records('totara_userdata_purge_type_item', array('purgetypeid' => $id, 'purgedata' => 1));
 $usercreated = $DB->get_record('user', array('id' => $purgetype->usercreated));
 
 $PAGE->navbar->add(format_string($purgetype->fullname));
@@ -101,30 +100,8 @@ echo '</dl>';
 
 echo $OUTPUT->heading(get_string('purgeitemselection', 'totara_userdata'), 3);
 
-$selecteditems = array();
-foreach ($items as $item) {
-    $selecteditems[$item->component . '-' . $item->name] = true;
-}
-$groups = \totara_userdata\local\purge::get_purgeable_items_grouped_list($purgetype->userstatus);
-$lastmaincomponent = null;
-foreach ($groups as $maincomponent => $classes) {
-    foreach ($classes as $class) {
-        /** @var item $class this is not a real instance, just autocomplete hint */
-        $component = $class::get_component();
-        $name = $class::get_name();
-        if (empty($selecteditems[$component . '-' . $name])) {
-            continue;
-        }
-        if ($lastmaincomponent !== $maincomponent) {
-            $lastmaincomponent = $maincomponent;
-            echo $OUTPUT->heading(totara_userdata\local\util::get_component_name($maincomponent), 4);
-            echo '<ul>';
-        }
-        echo '<li>' . $class::get_fullname() . '</li>';
-    }
-}
-if ($lastmaincomponent) {
-    echo '</ul>';
-}
+/** @var \totara_userdata_renderer $renderer */
+$renderer = $PAGE->get_renderer('totara_userdata');
+echo $renderer->purge_type_active_items($purgetype);
 
 echo $OUTPUT->footer();

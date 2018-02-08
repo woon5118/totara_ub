@@ -36,10 +36,11 @@ class purge_manually_confirm extends \totara_form\form {
         $currentdata = (object)$this->model->get_current_data(null);
 
         $user = $DB->get_record('user', array('id' => $currentdata->id));
-        $syscontext = \context_system::instance();
+        $purgetype = $DB->get_record('totara_userdata_purge_type', array('id' => $currentdata->purgetypeid), '*', MUST_EXIST);
 
         /** @var \totara_userdata_renderer $renderer */
         $renderer = $PAGE->get_renderer('totara_userdata');
+
         $this->model->add(new \totara_form\form\element\static_html('staticidcard', '', $renderer->user_id_card($user, true)));
 
         $targetuser = new target_user($user);
@@ -48,40 +49,7 @@ class purge_manually_confirm extends \totara_form\form {
         $this->model->add($purgetypestatic);
         $this->model->add(new \totara_form\form\element\hidden('purgetypeid', PARAM_INT));
 
-        // This is not pretty, maybe use renderers or something here.
-        $items = $DB->get_records('totara_userdata_purge_type_item', array('purgetypeid' => $currentdata->purgetypeid, 'purgedata' => 1));
-        $enabled = array();
-        foreach ($items as $item) {
-            $enabled[$item->component . '\\' . 'userdata' . '\\' . $item->name] = true;
-        }
-        $html = '';
-        $prevcomponent = null;
-        foreach (purge::get_purgeable_items_grouped_list($targetuser->status) as $maincomponent => $classes) {
-            foreach ($classes as $class) {
-                if (empty($enabled[$class])) {
-                    // Not enabled, skip it.
-                    continue;
-                }
-                /** @var item $class this is not an instance, but it helps with autocomplete */
-                if (!$class::is_compatible_context_level($syscontext->contextlevel)) {
-                    // Item not compatible with this level.
-                    continue;
-                }
-
-                if ($prevcomponent !== $maincomponent) {
-                    $prevcomponent = $maincomponent;
-                    $maincomponentname = \totara_userdata\local\util::get_component_name($maincomponent);
-                    $html .= $OUTPUT->heading($maincomponentname, 3);
-                    $html .= '<ul>';
-                }
-
-                $html .= '<li>' . $class::get_fullname() . '</li>';
-            }
-        }
-        if ($prevcomponent) {
-            $html .= '</ul>';
-        }
-        $itemsstatic = new \totara_form\form\element\static_html('itemsstatic', '', $html);
+        $itemsstatic = new \totara_form\form\element\static_html('itemsstatic', '', $renderer->purge_type_active_items($purgetype));
         $this->model->add($itemsstatic);
 
         $warning = $OUTPUT->notification(get_string('purgemanuallyconfirm', 'totara_userdata'), 'warning');

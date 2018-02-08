@@ -21,6 +21,8 @@
  * @package totara_userdata
  */
 
+use totara_userdata\userdata\item;
+
 defined('MOODLE_INTERNAL') || die();
 
 class totara_userdata_renderer extends plugin_renderer_base {
@@ -79,7 +81,86 @@ class totara_userdata_renderer extends plugin_renderer_base {
 
         return $html;
     }
+
+    /**
+     * Render listing of active export type items.
+     *
+     * @param stdClass $exporttype
+     * @return string HTML fragment
+     */
+    public function export_type_active_items(\stdClass $exporttype) {
+        global $DB;
+
+        $html = '';
+
+        $items = $DB->get_records('totara_userdata_export_type_item', array('exporttypeid' => $exporttype->id, 'exportdata' => 1));
+        $selecteditems = array();
+        foreach ($items as $item) {
+            $selecteditems[$item->component . '-' . $item->name] = true;
+        }
+        $groups = \totara_userdata\local\export::get_exportable_items_grouped_list();
+        $lastmaincomponent = null;
+        foreach ($groups as $maincomponent => $classes) {
+            foreach ($classes as $class) {
+                /** @var item $class this is not a real instance, just autocomplete hint */
+                $component = $class::get_component();
+                $name = $class::get_name();
+                if (empty($selecteditems[$component . '-' . $name])) {
+                    continue;
+                }
+                if ($lastmaincomponent !== $maincomponent) {
+                    $lastmaincomponent = $maincomponent;
+                    $html .= '<strong>' . totara_userdata\local\util::get_component_name($maincomponent) . '</strong>';
+                    $html .= '<ul>';
+                }
+                $html .= '<li>' . $class::get_fullname() . '</li>';
+            }
+        }
+        if ($lastmaincomponent) {
+            $html .= '</ul>';
+        }
+
+        return $html;
+    }
+
+    /**
+     * Render listing of active purge type items.
+     *
+     * @param stdClass $purgetype
+     * @return string HTML fragment
+     */
+    public function purge_type_active_items(\stdClass $purgetype) {
+        global $DB;
+
+        $html = '';
+
+        $items = $DB->get_records('totara_userdata_purge_type_item', array('purgetypeid' => $purgetype->id, 'purgedata' => 1));
+        $selecteditems = array();
+        foreach ($items as $item) {
+            $selecteditems[$item->component . '-' . $item->name] = true;
+        }
+        $groups = \totara_userdata\local\purge::get_purgeable_items_grouped_list($purgetype->userstatus);
+        $lastmaincomponent = null;
+        foreach ($groups as $maincomponent => $classes) {
+            foreach ($classes as $class) {
+                /** @var item $class this is not a real instance, just autocomplete hint */
+                $component = $class::get_component();
+                $name = $class::get_name();
+                if (empty($selecteditems[$component . '-' . $name])) {
+                    continue;
+                }
+                if ($lastmaincomponent !== $maincomponent) {
+                    $lastmaincomponent = $maincomponent;
+                    $html .= '<strong>' . totara_userdata\local\util::get_component_name($maincomponent) . '</strong>';
+                    $html .= '<ul>';
+                }
+                $html .= '<li>' . $class::get_fullname() . '</li>';
+            }
+        }
+        if ($lastmaincomponent) {
+            $html .= '</ul>';
+        }
+
+        return $html;
+    }
 }
-
-
-
