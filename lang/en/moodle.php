@@ -1969,6 +1969,7 @@ $string['userdataitem-user-idnumber'] = 'ID number';
 $string['userdataitem-user-idnumber_help'] = 'ID number is used by authentication plugins and HR Sync. It can be removed from deleted accounts only.';
 $string['userdataitem-user-names'] = 'First name and surname';
 $string['userdataitem-user-names_help'] = 'Fist name and surname and required fields. Instead of deleting the the names are replaced with placeholders.';
+$string['userdataitem-user-customfields'] = 'All custom profile fields';
 $string['userdeleted'] = 'This user account has been deleted';
 $string['userdescription'] = 'Description';
 $string['userdescription_help'] = 'This box enables you to enter some text about yourself which will then be displayed on your profile page for others to view.';

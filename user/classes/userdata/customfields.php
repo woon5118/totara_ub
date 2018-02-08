@@ -23,6 +23,7 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,13 +32,14 @@ defined('MOODLE_INTERNAL') || die();
  * All custom profile fields.
  */
 class customfields extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['userdata_core_user_customfields', 'totara_userdata'];
+        return ['userdataitem-user-customfields', 'core'];
     }
 
     /**
@@ -71,8 +73,8 @@ class customfields extends \totara_userdata\userdata\item {
     protected static function purge(target_user $user, \context $context) {
         global $DB;
 
-        if ($DB->record_exists('user_info_data', array('userid' => $user->id))) {
-            $DB->delete_records('user_info_data', array('userid' => $user->id));
+        if ($DB->record_exists('user_info_data', ['userid' => $user->id])) {
+            $DB->delete_records('user_info_data', ['userid' => $user->id]);
             if (!$user->deleted) {
                 \core\event\user_updated::create_from_userid($user->id)->trigger();
             }
@@ -95,20 +97,20 @@ class customfields extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
         global $DB;
 
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
 
         $sql = "SELECT f.shortname, d.data
                   FROM {user_info_data} d
                   JOIN {user_info_field} f ON f.id = d.fieldid
                  WHERE d.userid = :userid";
-        $fields = $DB->get_recordset_sql($sql, array('userid' => $user->id));
+        $fields = $DB->get_recordset_sql($sql, ['userid' => $user->id]);
         foreach ($fields as $field) {
-            $export->data[] = array('shortname' => $field->shortname, 'data' => $field->data);
+            $export->data[] = ['shortname' => $field->shortname, 'data' => $field->data];
         }
         $fields->close();
 
@@ -130,11 +132,11 @@ class customfields extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;
 
-        return (int)$DB->count_records('user_info_data', array('userid' => $user->id));
+        return (int)$DB->count_records('user_info_data', ['userid' => $user->id]);
     }
 }
