@@ -49,9 +49,9 @@ class mod_data_generator extends testing_module_generator {
     protected $databaserecordcount = 0;
 
     /**
-     * @var The field types which not handled by the generator as of now.
+     * @var array The field types which not handled by the generator as of now.
      */
-    protected $ignoredfieldtypes = array('latlong', 'file', 'picture');
+    protected $ignoredfieldtypes = [];
 
 
     /**
@@ -209,14 +209,16 @@ class mod_data_generator extends testing_module_generator {
      *
      * @param mod_data $data
      * @param array $contents
-     * @return data_field_{type}
+     * @param integer $groupid
+     * @param integer $userid
+     * @return integer record id
      */
-    public function create_entry($data, array $contents, $groupid = 0) {
+    public function create_entry($data, array $contents, $groupid = 0, $userid = 0) {
         global $DB;
 
         $this->databaserecordcount++;
 
-        $recordid = data_add_record($data, $groupid);
+        $recordid = data_add_record($data, $groupid, $userid);
 
         $fields = $DB->get_records('data_fields', array('dataid' => $data->id));
 
@@ -254,6 +256,7 @@ class mod_data_generator extends testing_module_generator {
                         $fieldhascontent = false;
                     }
                 }
+
             } else if ($field->type === 'textarea') {
                 $values = array();
 
@@ -284,6 +287,23 @@ class mod_data_generator extends testing_module_generator {
                     $fieldhascontent = false;
                 }
 
+            } else if ($field->type === 'latlong') {
+                $values = array();
+                $values['field_' . $fieldid . '_0'] = $contents[$fieldid][0];
+                $values['field_' . $fieldid . '_1'] = $contents[$fieldid][1];
+
+                $contents[$fieldid] = $values;
+
+                foreach ($values as $fieldname => $value) {
+                    if (!$field->notemptyfield($value, $fieldname)) {
+                        $fieldhascontent = false;
+                    }
+                }
+
+            } else if ($field->type == 'file' || $field->type == 'picture') {
+                // We're not following the usual process for file uploads so we don't want to do anything here.
+
+                $fieldhascontent = true;
             } else {
                 if ($field->notemptyfield($contents[$fieldid], 'field_' . $fieldid . '_0')) {
                     continue;
@@ -294,11 +314,31 @@ class mod_data_generator extends testing_module_generator {
                 return false;
             }
         }
-
         foreach ($contents as $fieldid => $content) {
             $field = data_get_field_from_id($fieldid, $data);
 
-            if (is_array($content) and in_array($field->type, array('date', 'textarea', 'url'))) {
+            if ($field->type == 'file' || $field->type == 'picture') {
+                // Get the files data. We'll update this with the data_content id below.
+                // There'll be two records, the first contains the filename.
+                $files = $DB->get_records('files', array('itemid' => $content), 'filename DESC');
+                $file = current($files);
+
+                // We're not going to execute the standard $field->update_content as we're not following the
+                // file upload process, we'll just create the data_content record and update the files record.
+                if (!$data_content = $DB->get_record('data_content', array('fieldid' => $field->field->id, 'recordid' => $recordid))) {
+                    $data_content = new stdClass();
+                    $data_content->fieldid  = $field->field->id;
+                    $data_content->recordid = $recordid;
+                    $data_content->content = $file->filename;
+                    $data_content_id = $DB->insert_record('data_content', $data_content);
+                }
+
+                // Update the files records with the data_content id for itemid.
+                foreach ($files as $id => $file) {
+                    $DB->update_record('files', (object) ['id'  => $id, 'itemid' => $data_content_id]);
+                }
+
+            } else if (is_array($content) && in_array($field->type, array('date', 'textarea', 'url', 'latlong'))) {
 
                 foreach ($content as $fieldname => $value) {
                     $field->update_content($recordid, $value, $fieldname);
