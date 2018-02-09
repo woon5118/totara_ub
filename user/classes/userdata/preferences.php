@@ -23,6 +23,7 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,13 +32,14 @@ defined('MOODLE_INTERNAL') || die();
  * Delete all user preferences with personal data.
  */
 class preferences extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['preferences', 'core'];
+        return ['userdataitem-user-preferences', 'core'];
     }
 
     /**
@@ -71,7 +73,7 @@ class preferences extends \totara_userdata\userdata\item {
     protected static function purge(target_user $user, \context $context) {
         global $DB;
 
-        $update = array();
+        $update = [];
         if ($user->lang != '') {
             $update['lang'] = '';
         }
@@ -86,22 +88,20 @@ class preferences extends \totara_userdata\userdata\item {
         }
         // NOTE: let's ignore mailformat and other non-personal preferences here, we cannot remove them completely anyway.
 
-        if (!$update) {
-            return self::RESULT_STATUS_SUCCESS;
-        }
+        if (!empty($update)) {
+            if (!$user->deleted) {
+                // We do not want any unnecessary changes for deleted accounts.
+                $update['timemodified'] = time();
+            }
 
-        if (!$user->deleted) {
-            // We do not want any unnecessary changes for deleted accounts.
-            $update['timemodified'] = time();
-        }
+            $update['id'] = $user->id;
+            $DB->update_record('user', (object)$update);
 
-        $update['id'] = $user->id;
-        $DB->update_record('user', (object)$update);
+            // There are some other user preferences, but hopefully those cannot be considered private or real user data.
 
-        // There are some other user preferneces, but hopefully those cannot be considered private or real user data.
-
-        if (!$user->deleted) {
-            \core\event\user_updated::create_from_userid($user->id)->trigger();
+            if (!$user->deleted) {
+                \core\event\user_updated::create_from_userid($user->id)->trigger();
+            }
         }
 
         return self::RESULT_STATUS_SUCCESS;
@@ -120,22 +120,18 @@ class preferences extends \totara_userdata\userdata\item {
      * Export user data from this item.
      *
      * @param target_user $user
-     * @param \context|null $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
 
-        if ($user->lang !== '') {
-            $export->data['lang'] = $user->lang;
-        }
-        $export->data['calendartype'] = $user->calendartype;
-        if ($user->theme !== '') {
-            $export->data['theme'] = $user->theme;
-        }
-        if ($user->timezone != '99') {
-            $export->data['timezone'] = $user->timezone;
-        }
+        $export->data = [
+            'lang'         => ($user->lang !== '') ? $user->lang : '',
+            'calendartype' => $user->calendartype,
+            'theme'        => ($user->theme !== '') ? $user->theme : '',
+            'timezone'     => ($user->timezone != '99') ? $user->timezone : '',
+        ];
 
         return $export;
     }
@@ -155,26 +151,13 @@ class preferences extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
-        $count = 0;
-
-        if ($user->lang !== '') {
-            $count++;
-        }
-        if ($user->calendartype and $user->calendartype !== 'gregorian') {
-            // The calendar code is very bad, let's just report non-default values.
-            $count++;
-        }
-        if ($user->theme !== '') {
-            $count++;
-        }
-        if ($user->timezone != '99') {
-            $count++;
-        }
-
-        return $count;
+        return intval($user->lang !== '')
+            + intval($user->calendartype && $user->calendartype !== 'gregorian')
+            + intval($user->theme !== '')
+            + intval($user->timezone != '99');
     }
 
 }
