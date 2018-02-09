@@ -23,6 +23,7 @@
 
 namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,6 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * First, last and all other names.
  */
 class picture extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
@@ -73,13 +75,10 @@ class picture extends \totara_userdata\userdata\item {
 
         if ($user->contextid) {
             $fs = get_file_storage();
-            $images = $fs->get_area_files($user->contextid, 'user', 'icon');
-            foreach ($images as $image) {
-                $image->delete();
-            }
+            $fs->delete_area_files($user->contextid, 'user', 'icon');
         }
 
-        $update = array();
+        $update = [];
         if ($user->imagealt !== '') {
             $update['imagealt'] = '';
         }
@@ -87,14 +86,11 @@ class picture extends \totara_userdata\userdata\item {
             $update['picture'] = 0;
         }
 
-        if (!$update) {
-            return self::RESULT_STATUS_SUCCESS;
+        if (!empty($update)) {
+            $update['id'] = $user->id;
+            $DB->update_record('user', (object)$update);
+            // Event not necessary here.
         }
-
-        $update['id'] = $user->id;
-        $DB->update_record('user', (object)$update);
-
-        // Event not necessary here.
 
         return self::RESULT_STATUS_SUCCESS;
     }
@@ -113,20 +109,25 @@ class picture extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
+        $export->data = [
+            'imagealt' => trim($user->imagealt),
+            'files' => []
+        ];
 
-        if ($user->imagealt !== '') {
-            $export->data['imagealt'] = $user->imagealt;
-        }
-
-        if ($user->contextid and $user->picture > 0) {
+        if ($user->contextid && $user->picture > 0) {
             $fs = get_file_storage();
             $avatars = $fs->get_area_files($user->contextid, 'user', 'icon', 0, 'filename ASC', false);
-            foreach($avatars as $avatar) {
-                $export->data['files'][] = array('id' => $avatar->get_id(), 'filename' => $avatar->get_filename());
+            foreach ($avatars as $avatar) {
+                $export->data['files'][] = [
+                    'id' => $avatar->get_id(),
+                    'filename' => $avatar->get_filename(),
+                    // With the hash we can identify the actual exported file in the export archive.
+                    'hash' => $avatar->get_pathnamehash()
+                ];
                 $export->files[] = $avatar;
             }
         }
@@ -149,18 +150,9 @@ class picture extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
-        $count = 0;
-
-        if ($user->imagealt !== '') {
-            $count++;
-        }
-        if ($user->picture > 0) {
-            $count++;
-        }
-
-        return $count;
+        return intval(!empty($user->imagealt) || $user->picture > 0);
     }
 }
