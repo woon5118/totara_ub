@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @group userdata
  * Test purging, exporting and counting of username
  */
-class core_user_userdata_username_testcase extends advanced_testcase {
+class core_user_userdata_systemaccess_testcase extends advanced_testcase {
 
     /**
      * test compatible context levels
