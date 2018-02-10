@@ -4270,7 +4270,7 @@ class reportbuilder {
             $records->close();
 
             if ($graph and ($pagestart != 0 or $perpage == $graph->count_records())) {
-                $graph->reset_records();
+                $graph = new \totara_reportbuilder\local\graph($this);
                 if ($records = $DB->get_recordset_sql($sql.$order, $params, 0, $graph->get_max_records())) {
                     foreach ($records as $record) {
                         $graph->add_record($record);

@@ -206,4 +206,106 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $data = $graph->fetch_svg();
         $this->assertContains('Empty pie chart', $data);
     }
+
+    public function test_remove_empty_series() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $notfirstdayofyear = 1485946800;
+        $DB->set_field('user', 'timecreated', $notfirstdayofyear, array());
+
+        // Remove all should result in null data.
+        $rid = $this->create_report('user', 'Test user report 1');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        $this->add_column($report, 'user', 'id', null, null, null, 0);
+        $this->add_column($report, 'user', 'username', null, null, null, 0);
+        $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
+        $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('statistics-coursescompleted'), 'remove_empty_series=0');
+        $graph = $this->init_graph($rid);
+        $data = $graph->fetch_svg();
+        $this->assertNotNull($data);
+        $this->assertContains($user1->username, $data);
+        $this->assertContains($user2->username, $data);
+        $this->assertContains('admin', $data);
+        $this->assertContains('guest', $data);
+
+        $graphrecord = reset($graphrecords);
+        $graphrecord->settings = 'remove_empty_series=1';
+        $DB->update_record('report_builder_graph', $graphrecord);
+        $graph = $this->init_graph($rid);
+        $data = $graph->fetch_svg();
+        $this->assertNull($data);
+
+        // No empty series the data has to be the same (not exactly the same because there are static properties in svggraph).
+
+        $rid = $this->create_report('user', 'Test user report 2a');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        $this->add_column($report, 'user', 'id', null, null, null, 0);
+        $this->add_column($report, 'user', 'username', null, null, null, 0);
+        $this->add_column($report, 'user', 'timecreated', 'dayyear', null, null, 0);
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        $column = $report->columns['user-timecreated'];
+        $this->assertTrue($column->is_graphable($report));
+        $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('user-timecreated'), 'remove_empty_series=0');
+
+        $graph = $this->init_graph($rid);
+        $data = $graph->fetch_svg();
+        $this->assertNotNull($data);
+        $this->assertContains($user1->username, $data);
+        $this->assertContains($user2->username, $data);
+        $this->assertContains('admin', $data);
+        $this->assertContains('guest', $data);
+
+        $graphrecord = reset($graphrecords);
+        $graphrecord->settings = 'remove_empty_series=1';
+        $DB->update_record('report_builder_graph', $graphrecord);
+        $graph = $this->init_graph($rid);
+        $this->assertNotNull($data);
+        $this->assertContains($user1->username, $data);
+        $this->assertContains($user2->username, $data);
+        $this->assertContains('admin', $data);
+        $this->assertContains('guest', $data);
+
+        // Removal of empty series.
+
+        $rid = $this->create_report('user', 'Test user report 3');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        $this->add_column($report, 'user', 'id', null, null, null, 0);
+        $this->add_column($report, 'user', 'username', null, null, null, 0);
+        $this->add_column($report, 'user', 'timecreated', 'dayyear', null, null, 0);
+        $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
+        $this->add_column($report, 'statistics', 'coursesstarted', null, null, null, 0);
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        $column = $report->columns['user-timecreated'];
+        $this->assertTrue($column->is_graphable($report));
+        $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('user-timecreated', 'statistics-coursescompleted', 'statistics-coursesstarted'), 'remove_empty_series=0');
+
+        $graph = $this->init_graph($rid);
+        $data = $graph->fetch_svg();
+        $this->assertNotNull($data);
+        $this->assertContains($user1->username, $data);
+        $this->assertContains($user2->username, $data);
+        $this->assertContains('admin', $data);
+        $this->assertContains('guest', $data);
+        $this->assertContains('User Creation Time - day of year', $data);
+        $this->assertContains('User\'s Courses Completed Count', $data);
+        $this->assertContains('User\'s Courses Started Count', $data);
+
+        $graphrecord = reset($graphrecords);
+        $graphrecord->settings = 'remove_empty_series=1';
+        $DB->update_record('report_builder_graph', $graphrecord);
+        $graph = $this->init_graph($rid);
+        $data = $graph->fetch_svg();
+        $this->assertNotNull($data);
+        $this->assertContains($user1->username, $data);
+        $this->assertContains($user2->username, $data);
+        $this->assertContains('admin', $data);
+        $this->assertContains('guest', $data);
+        $this->assertContains('User Creation Time - day of year', $data);
+        $this->assertNotContains('User\'s Courses Completed Count', $data);
+        $this->assertNotContains('User\'s Courses Started Count', $data);
+    }
 }

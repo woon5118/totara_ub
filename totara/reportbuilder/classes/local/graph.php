@@ -35,7 +35,7 @@ class graph {
     protected $values;
     /** @var int count of records processed - count() in PHP may be very slow */
     protected $processedcount;
-    /** @var int index of category, -1 means simple counter */
+    /** @var int index of category, -1 means simple counter, -2 means category in column */
     protected $category;
     /** @var array indexes of series columns */
     protected $series;
@@ -43,6 +43,8 @@ class graph {
     protected $legendcolumn;
     /** @var array SVGGraph settings */
     protected $svggraphsettings;
+    /** @var array SVGGraph settings supplied by user */
+    protected $usersettings;
     /** @var string SVGGraph type */
     protected $svggraphtype;
     /** @var string SVGGraph colours */
@@ -86,6 +88,13 @@ class graph {
             'label_shorten' => 40,
             'legend_shorten' => 80,
         );
+
+        // Load user settings.
+        if (isset($this->graphrecord->settings)) {
+            $this->usersettings = parse_ini_string($this->graphrecord->settings, false);
+        } else {
+            $this->usersettings = array();
+        }
 
         $this->processedcount = 0;
         $this->values = array();
@@ -140,12 +149,6 @@ class graph {
                 $i = $columnsmap[$colkey];
                 $this->series[$i] = $colkey;
             }
-
-            $legend = array();
-            foreach ($this->series as $i => $colkey) {
-                $legend[] = $this->report->format_column_heading($this->report->columns[$colkey], true);
-            }
-            $this->svggraphsettings['legend_entries'] = $legend;
         }
     }
 
@@ -164,7 +167,12 @@ class graph {
         }
     }
 
+    /**
+     * @deprecated since Totara 11
+     */
     public function reset_records() {
+        debugging('do not reset graph records, create a new graph instead', DEBUG_DEVELOPER);
+
         $this->processedcount = 0;
 
         if ($this->category == -2) {
@@ -282,7 +290,49 @@ class graph {
             $this->svggraphsettings['show_label_key'] = false;
             $this->svggraphsettings['show_label_amount'] = false;
             $this->svggraphsettings['show_label_percent'] = true;
+
+        } else {
+            // Optionally remove empty series.
+            if (!empty($this->usersettings['remove_empty_series'])) {
+                if ($this->category >= 0) { // Normal category setup only!
+                    foreach ($this->series as $i => $colkey) {
+                        if ($i == $this->category) {
+                            // Always keep te category item!
+                            continue;
+                        }
+                        $nonzero = false;
+                        foreach ($this->values as $j => $value) {
+                            if ($value[$i] != 0) {
+                                $nonzero = true;
+                                break;
+                            }
+                        }
+                        if ($nonzero) {
+                            continue;
+                        }
+                        unset($this->series[$i]);
+                        foreach ($this->values as $j => $value) {
+                            unset($this->values[$j][$i]);
+                        }
+                    }
+                }
+            }
+
+            if (empty($this->series)) {
+                // Nothing to plot.
+                return;
+            }
+
+            // Create legend items.
+            if ($this->category != -2) {
+                $legend = array();
+                foreach ($this->series as $i => $colkey) {
+                    $legend[] = $this->report->format_column_heading($this->report->columns[$colkey], true);
+                }
+                $this->svggraphsettings['legend_entries'] = $legend;
+            }
         }
+        unset($this->usersettings['remove_empty_series']);
 
         $this->svggraphsettings['structured_data'] = true;
         $this->svggraphsettings['structure'] = array('key' => $this->category, 'value' => array_keys($this->series));
@@ -407,11 +457,8 @@ class graph {
     protected function get_final_settings() {
         $settings = $this->svggraphsettings;
 
-        if (isset($this->graphrecord->settings)) {
-            $usersettings = parse_ini_string($this->graphrecord->settings, false);
-            foreach ($usersettings as $k => $v) {
-                $settings[$k] = $v;
-            }
+        foreach ($this->usersettings as $k => $v) {
+            $settings[$k] = $v;
         }
 
         if (right_to_left()) {
