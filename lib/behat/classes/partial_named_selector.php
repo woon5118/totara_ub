@@ -50,7 +50,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
     }
 
     /**
-     * @var Allowed types when using text selectors arguments.
+     * @var array Allowed types when using text selectors arguments.
      */
     protected static $allowedtextselectors = array(
         'activity' => 'activity',
@@ -71,10 +71,11 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
 
         // Totara
         'totaradialogue' => 'totaradialogue',
+        'definition' => 'definition',
     );
 
     /**
-     * @var Allowed types when using selector arguments.
+     * @var array Allowed types when using selector arguments.
      */
     protected static $allowedselectors = array(
         'activity' => 'activity',
@@ -108,6 +109,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
 
         // Totara
         'totaradialogue' => 'totaradialogue',
+        'definition' => 'definition',
     );
 
     /**
@@ -116,7 +118,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
      * xpaths that represents that names and includes a placeholder that
      * will be replaced by the locator. These are Moodle's own xpaths.
      *
-     * @var XPaths for moodle elements.
+     * @var string[] XPaths for moodle elements.
      */
     protected static $moodleselectors = array(
         'activity' => <<<XPATH
@@ -145,6 +147,9 @@ and
 and
   ./descendant::div[@id=%locator%]
 ]
+XPATH
+        , 'definition' => <<<XPATH
+.//dt[%tagTextMatch%]/following-sibling::dd[1]
 XPATH
         , 'dialogue' => <<<XPATH
 .//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue ') and

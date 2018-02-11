@@ -32,12 +32,27 @@
  */
 class behat_exact_named_selector extends \Behat\Mink\Selector\ExactNamedSelector {
     /**
-     * @var Allowed types when using text selectors arguments.
+     * Creates selector instance.
      */
-    protected static $allowedtextselectors = [];
+    public function __construct() {
+        foreach (self::$totaraselectors as $name => $xpath) {
+            $this->registerNamedXpath($name, $xpath);
+        }
+
+        // Call the constructor after adding any new selector or replacement values.
+        parent::__construct();
+    }
 
     /**
-     * @var Allowed types when using selector arguments.
+     * @var array Allowed types when using text selectors arguments.
+     */
+    protected static $allowedtextselectors = [
+        // Totara
+        'definition_exact' => 'definition',
+    ];
+
+    /**
+     * @var array Allowed types when using selector arguments.
      */
     protected static $allowedselectors = array(
         'button_exact' => 'button',
@@ -51,7 +66,16 @@ class behat_exact_named_selector extends \Behat\Mink\Selector\ExactNamedSelector
         'select_exact' => 'select',
         'table_exact' => 'table',
         'text_exact' => 'text',
+        // Totara
+        'definition_exact' => 'definition',
     );
+
+    /** @var string[] XPaths for Totara elements. */
+    protected static $totaraselectors = [
+        'definition' => <<<XPATH
+.//dt[%tagTextMatch%]/following-sibling::dd[1]
+XPATH
+    ];
 
     /**
      * Allowed selectors getter.
