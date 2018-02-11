@@ -1759,14 +1759,14 @@ class mod_forum_lib_testcase extends advanced_testcase {
      * Test forum_discussion_view.
      */
     public function test_forum_discussion_view() {
-        global $CFG, $USER;
-
         $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
 
         // Setup test data.
         $course = $this->getDataGenerator()->create_course();
         $forum = $this->getDataGenerator()->create_module('forum', array('course' => $course->id));
-        $discussion = $this->create_single_discussion_with_replies($forum, $USER, 2);
+        $discussion = $this->create_single_discussion_with_replies($forum, $user, 2);
 
         $context = context_module::instance($forum->cmid);
         $cm = get_coursemodule_from_instance('forum', $forum->id);
