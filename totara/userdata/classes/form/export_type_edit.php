@@ -100,7 +100,7 @@ class export_type_edit extends \totara_form\form {
 
         $existing = $DB->get_record_select('totara_userdata_export_type', "LOWER(idnumber) = LOWER(:idnumber)", array('idnumber' => $data['idnumber']));
         if ($existing and $existing->id != $data['id']) {
-            $errors['idnumber'] = get_string('error');
+            $errors['idnumber'] = get_string('errorduplicateidnumber', 'totara_userdata');
         }
 
         return $errors;

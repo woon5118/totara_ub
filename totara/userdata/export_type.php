@@ -35,7 +35,7 @@ $usercreated = $DB->get_record('user', array('id' => $exporttype->usercreated));
 $PAGE->navbar->add(format_string($exporttype->fullname));
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($exporttype->fullname));
+echo $OUTPUT->heading(get_string('exporttype', 'totara_userdata'));
 
 $availablefor = array();
 if ($exporttype->allowself) {
@@ -43,6 +43,8 @@ if ($exporttype->allowself) {
 }
 
 echo '<dl class="dl-horizontal">';
+echo '<dt>' . get_string('fullname', 'totara_userdata') . '</dt>';
+echo '<dd>' . format_string($exporttype->fullname) . '</dd>';
 echo '<dt>' . get_string('idnumber') . '</dt>';
 echo '<dd>' . (trim($exporttype->idnumber) === '' ? '&nbsp;' : s($exporttype->idnumber)) . '</dd>';
 echo '<dt>' . get_string('description') . '</dt>';

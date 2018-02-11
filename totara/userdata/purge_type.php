@@ -21,8 +21,6 @@
  * @package totara_userdata
  */
 
-use totara_userdata\userdata\item;
-
 require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
@@ -37,7 +35,7 @@ $usercreated = $DB->get_record('user', array('id' => $purgetype->usercreated));
 $PAGE->navbar->add(format_string($purgetype->fullname));
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($purgetype->fullname));
+echo $OUTPUT->heading(get_string('purgetype', 'totara_userdata'));
 
 $availablefor = array();
 if ($purgetype->allowmanual) {
@@ -52,6 +50,8 @@ if ($purgetype->allowsuspended) {
 $statuses = \totara_userdata\userdata\target_user::get_user_statuses();
 
 echo '<dl class="dl-horizontal">';
+echo '<dt>' . get_string('fullname', 'totara_userdata') . '</dt>';
+echo '<dd>' . format_string($purgetype->fullname) . '</dd>';
 echo '<dt>' . get_string('idnumber') . '</dt>';
 echo '<dd>' . (trim($purgetype->idnumber) === '' ? '&nbsp;' : s($purgetype->idnumber)) . '</dd>';
 echo '<dt>' . get_string('purgetypeuserstatus', 'totara_userdata') . '</dt>';

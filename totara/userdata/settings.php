@@ -44,10 +44,10 @@ $temp->add(new admin_setting_configcheckbox(
 $ADMIN->add('userdata', $temp);
 
 $ADMIN->add('userdata', new admin_externalpage('userdataexporttypes', get_string('exporttypes', 'totara_userdata'),
-    $CFG->wwwroot . '/totara/userdata/export_types.php', 'totara/userdata:viewinfo'));
+    $CFG->wwwroot . '/totara/userdata/export_types.php', 'totara/userdata:viewexports'));
 
 $ADMIN->add('userdata', new admin_externalpage('userdatapurgetypes', get_string('purgetypes', 'totara_userdata'),
-    $CFG->wwwroot . '/totara/userdata/purge_types.php', 'totara/userdata:viewinfo'));
+    $CFG->wwwroot . '/totara/userdata/purge_types.php', 'totara/userdata:viewpurges'));
 
 $ADMIN->add('userdata', new admin_externalpage('userdataexports', get_string('exports', 'totara_userdata'),
     $CFG->wwwroot . '/totara/userdata/exports.php', 'totara/userdata:viewexports'));

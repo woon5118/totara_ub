@@ -22,14 +22,21 @@
  */
 
 $capabilities = array(
-    /* Configure purge types */
+    /* Alter settings and configure purge and export types */
     'totara/userdata:config' => array(
         'riskbitmask' => RISK_DATALOSS | RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(),
     ),
-    /* View list of all purges */
+    /* View user data overview information - this does not control access to actual user data stored in system */
+    'totara/userdata:viewinfo' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => array(),
+    ),
+    /* View list of all purges and purge types */
     'totara/userdata:viewpurges' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -57,14 +64,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(),
     ),
-    /* View user data overview information - this does not control access to actual user data stored in system */
-    'totara/userdata:viewinfo' => array(
-        'riskbitmask' => RISK_PERSONAL,
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(),
-    ),
-    /* View list of all exports */
+    /* View list of all exports and export types */
     'totara/userdata:viewexports' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',

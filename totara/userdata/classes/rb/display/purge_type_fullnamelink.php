@@ -37,7 +37,7 @@ class purge_type_fullnamelink extends base {
             return $fullname;
         }
 
-        if (has_capability('totara/userdata:viewinfo', \context_system::instance())) {
+        if (has_capability('totara/userdata:viewpurges', \context_system::instance())) {
             $extra = self::get_extrafields_row($row, $column);
             $url = new \moodle_url('/totara/userdata/purge_type.php', array('id' => $extra->id));
             $fullname = \html_writer::link($url, $fullname);
