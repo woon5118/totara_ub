@@ -61,3 +61,4 @@ It could look something like this:
    del, student, 17, CF101
    add, student, 21, CF101, 1091115000, 1091215000
 </pre>';
+$string['userdataitempending_enrolments'] = 'Pending enrolments';

@@ -610,6 +610,7 @@ $string['userdoesnotexist'] = 'User does not exist';
 $string['userlearningdueonx'] = 'due on {$a}';
 $string['userlearningoverduesincex'] = 'overdue since {$a}';
 $string['userlearningoverduesincextooltip'] = 'Overdue since {$a}';
+$string['userdataitemcourse_enrolments'] = 'Course enrolments';
 $string['userdataitemexternal_services_users'] = 'External service user assignments';
 $string['userdataitemexternal_services_users_help'] = 'All assignments to external services of the user.';
 $string['userdataitemexternal_tokens'] = 'External tokens';
