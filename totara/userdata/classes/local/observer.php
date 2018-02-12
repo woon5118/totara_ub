@@ -23,7 +23,6 @@
 
 namespace totara_userdata\local;
 
-use totara_userdata\local\util;
 use totara_userdata\userdata\manager;
 use totara_userdata\userdata\target_user;
 
@@ -37,6 +36,10 @@ defined('MOODLE_INTERNAL') || die();
  * WARNING: this must match util::sync_totara_userdata_user_table() and util::sync_totara_userdata_user_table()
  */
 class observer {
+    /**
+     * Event observer.
+     * @param \core\event\user_created $event
+     */
     public static function user_created(\core\event\user_created $event) {
         global $DB;
         $now = time();
@@ -62,6 +65,10 @@ class observer {
         $DB->update_record('totara_userdata_user', $extra);
     }
 
+    /**
+     * Event observer.
+     * @param \core\event\user_updated $event
+     */
     public static function user_updated(\core\event\user_updated $event) {
         global $DB;
         $now = time();
@@ -97,6 +104,10 @@ class observer {
         $DB->update_record('totara_userdata_user', (object)$updates);
     }
 
+    /**
+     * Event observer.
+     * @param \totara_core\event\user_suspended $event
+     */
     public static function user_suspended(\totara_core\event\user_suspended $event) {
         global $DB;
         $now = time();
@@ -125,6 +136,10 @@ class observer {
         $DB->update_record('totara_userdata_user', $extra);
     }
 
+    /**
+     * Event observer.
+     * @param \core\event\user_deleted $event
+     */
     public static function user_deleted(\core\event\user_deleted $event) {
         global $DB;
         $now = time();
@@ -152,6 +167,10 @@ class observer {
         $DB->update_record('totara_userdata_user', $extra);
     }
 
+    /**
+     * Event observer.
+     * @param \totara_core\event\user_undeleted $event
+     */
     public static function user_undeleted(\totara_core\event\user_undeleted $event) {
         global $DB;
         $now = time();
