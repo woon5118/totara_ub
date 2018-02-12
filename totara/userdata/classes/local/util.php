@@ -81,7 +81,7 @@ class util {
                 $DB->insert_record('totara_userdata_user', $extra);
             }
         } catch (\Throwable $ex) {
-            // This can happen in upgrades only, just log the error and ignore it.
+            // This can happen in upgrades only, ignore it.
         }
 
         return;
@@ -113,7 +113,7 @@ class util {
                 }
             }
         } catch (\Throwable $ex) {
-            // This can happen in upgrades only, just log the error and ignore it.
+            // This can happen in upgrades only, ignore it.
         }
 
         return false;
