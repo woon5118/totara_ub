@@ -209,7 +209,7 @@ class util {
         $now = time();
         $sql = "SELECT u.id, u.suspended, u.deleted, u.timemodified, c.id AS usercontextid
                   FROM {user} u
-             LEFT JOIN {context} c ON (c.contextlevel = :userlevel AND c.instanceid = u.id)     
+             LEFT JOIN {context} c ON (c.contextlevel = :userlevel AND c.instanceid = u.id)
              LEFT JOIN {totara_userdata_user} tuu ON tuu.userid = u.id
                  WHERE tuu.id IS NULL";
         $params = array('userlevel' => CONTEXT_USER);
@@ -236,7 +236,7 @@ class util {
         // Fix changed and missing user context ids.
         $sql = "SELECT u.id, c.id AS usercontextid
                   FROM {user} u
-                  JOIN {context} c ON (c.contextlevel = :userlevel AND c.instanceid = u.id)     
+                  JOIN {context} c ON (c.contextlevel = :userlevel AND c.instanceid = u.id)
                   JOIN {totara_userdata_user} tuu ON tuu.userid = u.id
                  WHERE tuu.usercontextid IS NULL OR tuu.usercontextid <> c.id";
         $params = array('userlevel' => CONTEXT_USER);

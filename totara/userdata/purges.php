@@ -55,7 +55,7 @@ echo $output->heading(get_string('sourcetitle', 'rb_source_userdata_purges') . '
 $paraminfo = array();
 /** @var rb_param[] $params */
 $params = $report->get_current_params();
-foreach($params as $param) {
+foreach ($params as $param) {
     if ($param->name === 'userid') {
         $oneuser = $DB->get_record('user', array('id' => $param->value));
         if ($oneuser) {

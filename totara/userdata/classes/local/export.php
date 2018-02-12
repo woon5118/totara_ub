@@ -338,7 +338,7 @@ class export {
                        AND e.timefinished < :cutoff";
         $fs = get_file_storage();
         $filerecords = $DB->get_recordset_sql($sql, $params);
-        foreach($filerecords as $filerecord) {
+        foreach ($filerecords as $filerecord) {
             $file = $fs->get_file_instance($filerecord);
             $file->delete();
         }

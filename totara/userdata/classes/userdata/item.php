@@ -169,7 +169,7 @@ abstract class item {
         $module = clean_param($module, PARAM_ALPHANUMEXT);
 
         return "JOIN {{$module}} {$activityalias} ON {$activityalias}.id = $activityidfield
-                JOIN {modules} {$modulesalias} ON ({$modulesalias}.name = '{$module}') 
+                JOIN {modules} {$modulesalias} ON ({$modulesalias}.name = '{$module}')
                 JOIN {course_modules} {$cmalias} ON ({$cmalias}.module = {$modulesalias}.id AND {$cmalias}.instance = {$activityalias}.id)
                 ". self::get_activities_context_join($context, "{$cmalias}.id", $contextalias);
     }
