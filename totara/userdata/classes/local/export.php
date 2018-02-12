@@ -233,11 +233,8 @@ class export {
                 if (!($exportfile instanceof \stored_file)) {
                     continue;
                 }
-                if ($exportfile->get_userid() !== null and $exportfile->get_userid() != $targetuser->id) {
-                    // As extra safety do not allow export of files not added by user
-                    // even if plugins instruct us to do so.
-                    continue;
-                }
+                // NOTE: developers must make sure user is allowed to get the file,
+                //       we cannot test file authorship here because sometimes it is not recorded properly.
                 if (isset($filelist[$exportfile->get_id()])) {
                     continue;
                 }
