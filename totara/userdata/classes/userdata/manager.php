@@ -62,6 +62,11 @@ class manager {
             throw new \coding_exception('Invalid purge origin value');
         }
 
+        if ($userstatus != target_user::STATUS_ACTIVE and $userstatus != target_user::STATUS_SUSPENDED
+            and $userstatus != target_user::STATUS_DELETED) {
+            throw new \coding_exception('Invalid userstatus value');
+        }
+
         $select = "userstatus = :userstatus";
         $params = array('userstatus' => $userstatus);
         if (!$current) {
