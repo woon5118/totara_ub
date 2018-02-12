@@ -32,7 +32,7 @@ class purge_manual extends \core\task\adhoc_task {
     public function execute() {
         global $DB;
 
-        $purge = $DB->get_record('totara_userdata_purge', array('id' => $this->get_custom_data()));
+        $purge = $DB->get_record('totara_userdata_purge', array('id' => $this->get_custom_data(), 'origin' => 'manual'));
         if (!$purge) {
             // This should not happen!
             return;
