@@ -91,6 +91,12 @@ class otherfields extends \totara_userdata\userdata\item {
             $update['id'] = $user->id;
             $DB->update_record('user', (object)$update);
 
+            if ($user->contextid) {
+                // Delete all images uploaded in the profile, currently possible in the 'description' field.
+                $fs = get_file_storage();
+                $fs->delete_area_files($user->contextid, 'user', 'profile');
+            }
+
             if (!$user->deleted) {
                 \core\event\user_updated::create_from_userid($user->id)->trigger();
             }
@@ -119,9 +125,27 @@ class otherfields extends \totara_userdata\userdata\item {
         $fields = self::get_other_fields();
 
         $export = new export();
+        $export->data = [
+            'otherfields' => [],
+            'files' => []
+        ];
 
         foreach ($fields as $field) {
-            $export->data[$field] = (isset($user->$field) && $user->$field !== '') ? $user->$field : '';
+            $export->data['otherfields'][$field] = (isset($user->$field) && $user->$field !== '') ? $user->$field : '';
+        }
+
+        if ($user->contextid) {
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($user->contextid, 'user', 'profile', 0, 'filename ASC', false);
+            foreach ($files as $file) {
+                $export->data['files'][] = [
+                    'id' => $file->get_id(),
+                    'filename' => $file->get_filename(),
+                    // To identify the file within the export archive we need the hash.
+                    'hash' => $file->get_contenthash()
+                ];
+                $export->files[] = $file;
+            }
         }
 
         return $export;

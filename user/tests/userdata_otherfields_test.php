@@ -69,6 +69,47 @@ class core_user_userdata_otherfields_testcase extends advanced_testcase {
         $deleteduser = new target_user($this->setup_otherfields($deleteduser));
         $suspendeduser = new target_user($this->setup_otherfields($suspendeduser));
 
+        $fs = get_file_storage();
+        $fs->create_file_from_string(
+            [
+                'contextid' => $controluser->contextid,
+                'component' => 'user',
+                'filearea' => 'profile',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'controlfile.txt'
+            ],
+            'control file content'
+        );
+
+        $fs = get_file_storage();
+        $fs->create_file_from_string(
+            [
+                'contextid' => $activeuser->contextid,
+                'component' => 'user',
+                'filearea' => 'profile',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'testfile.txt'
+            ],
+            'test file content'
+        );
+        $fs->create_file_from_string(
+            [
+                'contextid' => $activeuser->contextid,
+                'component' => 'user',
+                'filearea' => 'profile',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'testfile2.txt'
+            ],
+            'test file 2 content'
+        );
+
+        // Make sure we have some files.
+        $this->assertNotEmpty($fs->get_area_files($activeuser->contextid, 'user', 'profile'));
+        $this->assertNotEmpty($fs->get_area_files($controluser->contextid, 'user', 'profile'));
+
         // To test if timemodified changed we need to pause for a second.
         sleep(1);
 
@@ -97,6 +138,9 @@ class core_user_userdata_otherfields_testcase extends advanced_testcase {
             $this->assertEquals('', $activeuserreloaded->$field);
         }
         $this->assertGreaterThan($activeuser->timemodified, $activeuserreloaded->timemodified);
+
+        // Files are purged as well.
+        $this->assertEmpty($fs->get_area_files($activeuser->contextid, 'user', 'profile'));
 
         /******************************
          * PURGE suspendeduser
@@ -146,6 +190,9 @@ class core_user_userdata_otherfields_testcase extends advanced_testcase {
         foreach ($fields as $field) {
             $this->assertEquals($controluser->$field, $controluserreloaded->$field);
         }
+
+        // Files are purged as well.
+        $this->assertNotEmpty($fs->get_area_files($controluser->contextid, 'user', 'profile'));
     }
 
     /**
@@ -185,18 +232,65 @@ class core_user_userdata_otherfields_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
 
         // Set up users.
-        $user1 = $this->setup_otherfields($this->getDataGenerator()->create_user(), 4);
+        $activeuser = $this->setup_otherfields($this->getDataGenerator()->create_user(), 4);
 
         $fields = otherfields::get_other_fields();
 
+        $activeuser = new target_user($activeuser);
+
+        // Create two test files.
+        $fs = get_file_storage();
+        $file1 = $fs->create_file_from_string(
+            [
+                'contextid' => $activeuser->contextid,
+                'component' => 'user',
+                'filearea' => 'profile',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'testfile.txt'
+            ],
+            'test file content'
+        );
+        $file2 = $fs->create_file_from_string(
+            [
+                'contextid' => $activeuser->contextid,
+                'component' => 'user',
+                'filearea' => 'profile',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'testfile2.txt'
+            ],
+            'test file 2 content'
+        );
+
         // Export data.
-        $result = otherfields::execute_export(new target_user($user1), context_system::instance());
+        $result = otherfields::execute_export($activeuser, context_system::instance());
         $this->assertInstanceOf(export::class, $result);
-        $this->assertCount(count($fields), $result->data);
+        $this->assertArrayHasKey('otherfields', $result->data);
+        $this->assertArrayHasKey('files', $result->data);
+        $this->assertCount(count($fields), $result->data['otherfields']);
         foreach ($fields as $field) {
-            $this->assertArrayHasKey($field, $result->data);
-            $this->assertEquals($user1->$field, $result->data[$field]);
+            $this->assertArrayHasKey($field, $result->data['otherfields']);
+            $this->assertEquals($activeuser->$field, $result->data['otherfields'][$field]);
         }
+        // The two files created previously should be in the export as well.
+        $this->assertCount(2, $result->data['files']);
+        $this->assertContains(
+            [
+                'id' => $file1->get_id(),
+                'filename' => $file1->get_filename(),
+                'hash' => $file1->get_contenthash()
+            ],
+            $result->data['files']
+        );
+        $this->assertContains(
+            [
+                'id' => $file2->get_id(),
+                'filename' => $file2->get_filename(),
+                'hash' => $file2->get_contenthash()
+            ],
+            $result->data['files']
+        );
     }
 
     /**
