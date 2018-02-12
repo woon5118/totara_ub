@@ -113,11 +113,6 @@ class export_type {
     public static function is_deletable($id) {
         global $DB;
 
-        $selfexportenable = get_config('totara_userdata', 'selfexportenable');
-        if ($selfexportenable and $id == $selfexportenable) {
-            return false;
-        }
-
         if ($DB->record_exists('totara_userdata_export', array('exporttypeid' => $id))) {
             return false;
         }

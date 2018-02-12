@@ -90,11 +90,6 @@ class totara_userdata_local_export_type_testcase extends advanced_testcase {
 
         $this->assertTrue(export_type::is_deletable($type->id));
 
-        set_config('selfexportenable', $type->id, 'totara_userdata');
-        $this->assertFalse(export_type::is_deletable($type->id));
-        set_config('selfexportenable', '', 'totara_userdata');
-        $this->assertTrue(export_type::is_deletable($type->id));
-
         manager::create_export($user->id, $syscontext->id, $type->id, 'self');
         $this->assertFalse(export_type::is_deletable($type->id));
     }
