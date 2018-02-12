@@ -49,6 +49,11 @@ class purge_manual extends \core\task\adhoc_task {
         $this->notify_result($purge);
     }
 
+    /**
+     * Send notification to user.
+     *
+     * @param \stdClass $purge
+     */
     protected function notify_result(\stdClass $purge) {
         global $DB;
 

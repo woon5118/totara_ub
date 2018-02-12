@@ -26,7 +26,7 @@ namespace totara_userdata\task;
 use \totara_userdata\userdata\manager;
 
 /**
- * Ad-hoc tack for manual purging of user data.
+ * Ad-hoc tack for export of user data.
  */
 class export extends \core\task\adhoc_task {
     public function execute() {
@@ -52,6 +52,11 @@ class export extends \core\task\adhoc_task {
         $this->notify_result($export);
     }
 
+    /**
+     * Send notification to user.
+     *
+     * @param \stdClass $export
+     */
     protected function notify_result(\stdClass $export) {
         global $DB;
 
