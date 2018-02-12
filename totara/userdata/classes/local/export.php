@@ -212,13 +212,26 @@ class export {
             $DB->update_record('totara_userdata_export_item', $record);
         }
 
+        set_time_limit($oldtimelimit);
+
         if (!$results) {
-            set_time_limit($oldtimelimit);
             mtrace('No user data returned from export ' . $export->id);
             return item::RESULT_STATUS_ERROR;
         }
 
         $results = json_encode($results);
+        $jsonerror = json_last_error();
+        if ($jsonerror != JSON_ERROR_NONE) {
+            mtrace('Json encoding error (' . $jsonerror . ') in export ' . $export->id);
+            return item::RESULT_STATUS_ERROR;
+        }
+        if ($results === false) {
+            mtrace('Unknown json encoding error in export ' . $export->id);
+            return item::RESULT_STATUS_ERROR;
+        }
+
+        set_time_limit(self::MAX_ZIP_EXECUTION_TIME);
+
         $tempdir = make_request_directory();
         file_put_contents($tempdir . '/data.json', $results);
         @chmod($tempdir . '/data.json', $CFG->filepermissions);
@@ -255,7 +268,6 @@ class export {
             unset($filelist);
         }
 
-        set_time_limit(self::MAX_ZIP_EXECUTION_TIME);
         $packer = get_file_packer('application/x-gzip');
         $storedfile = $packer->archive_to_storage($archivefiles, SYSCONTEXTID, 'totara_userdata', 'export', $export->id, '/', 'export.tgz');
 
