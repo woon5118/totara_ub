@@ -210,7 +210,7 @@ class core_user_userdata_picture_testcase extends advanced_testcase {
                 [
                     'id' => $file->get_id(),
                     'filename' => $file->get_filename(),
-                    'hash' => $file->get_pathnamehash()
+                    'hash' => $file->get_contenthash()
                 ],
                 $result->data['files']
             );

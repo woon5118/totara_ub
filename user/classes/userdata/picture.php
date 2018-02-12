@@ -126,7 +126,7 @@ class picture extends \totara_userdata\userdata\item {
                     'id' => $avatar->get_id(),
                     'filename' => $avatar->get_filename(),
                     // With the hash we can identify the actual exported file in the export archive.
-                    'hash' => $avatar->get_pathnamehash()
+                    'hash' => $avatar->get_contenthash()
                 ];
                 $export->files[] = $avatar;
             }
