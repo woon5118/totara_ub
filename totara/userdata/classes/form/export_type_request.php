@@ -31,6 +31,8 @@ class export_type_request extends \totara_form\form {
         $exporttypes = array('' => get_string('choosedots')) + $exporttypes;
         $exporttypeid = new \totara_form\form\element\select('exporttypeid', get_string('exporttype', 'totara_userdata'), $exporttypes);
         $this->model->add($exporttypeid);
+        $exporttypeid->set_attribute('required', 1);
+
         $this->model->add_action_buttons(true, get_string('exportrequest', 'totara_userdata'));
     }
 }
