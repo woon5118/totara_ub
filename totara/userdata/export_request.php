@@ -85,7 +85,7 @@ if ($canexport) {
 if ($action === 'deletefile' and $fileavailable and $lastexport) {
     require_sesskey();
     \totara_userdata\local\export::delete_result_file($lastexport->id);
-    redirect($PAGE->url);
+    redirect($PAGE->url, get_string('exportfiledeleted', 'totara_userdata'));
 }
 
 echo $OUTPUT->header();

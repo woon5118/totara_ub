@@ -45,6 +45,7 @@ $string['errorpurgecancel'] = 'Error cancelling purge';
 $string['errorpurgetypedelete'] = 'Purge type cannot be deleted';
 $string['eventexportdownloaded'] = 'User data export file downloaded';
 $string['export'] = 'User data export';
+$string['exportfiledeleted'] = 'Export file was deleted';
 $string['exportfiledownload'] = 'Download data export file';
 $string['exportfileready'] = 'Your data export is ready: {$a->file}
 

@@ -80,6 +80,11 @@ function totara_userdata_pluginfile($course, $cm, $context, $filearea, $args, $f
     $event = \totara_userdata\event\export_downloaded::create_from_download($export, $file);
     $event->trigger();
 
+    if (defined('BEHAT_SITE_RUNNING') and BEHAT_SITE_RUNNING) {
+        echo 'behat export file access success';
+        die;
+    }
+
     // Finally send the file.
     send_stored_file($file, null, 0, 1);
 }
