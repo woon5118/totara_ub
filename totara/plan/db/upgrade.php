@@ -86,14 +86,5 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017112000, 'totara', 'plan');
     }
 
-    if ($oldversion < 2017112800) {
-
-        require_once($CFG->libdir.'/db/upgradelib.php');
-
-        upgrade_menu_customfield_info_data('dp_plan_evidence');
-
-        upgrade_plugin_savepoint(true, 2017112800, 'totara', 'plan');
-    }
-
     return true;
 }

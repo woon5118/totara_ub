@@ -164,19 +164,5 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017112705, 'totara', 'hierarchy');
     }
 
-    if ($oldversion < 2017112800) {
-
-        require_once($CFG->libdir.'/db/upgradelib.php');
-
-        // List of supported customfield tables.
-        $customfieldtables = ['pos_type', 'org_type', 'goal_user', 'goal_type', 'comp_type'];
-
-        foreach($customfieldtables as $table) {
-            upgrade_menu_customfield_info_data($table);
-        }
-
-        upgrade_plugin_savepoint(true, 2017112800, 'totara', 'hierarchy');
-    }
-
     return true;
 }

@@ -198,14 +198,5 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2018010800, 'totara_program');
     }
 
-    if ($oldversion < 2018020100) {
-
-        require_once($CFG->libdir.'/db/upgradelib.php');
-
-        upgrade_menu_customfield_info_data('prog');
-
-        upgrade_plugin_savepoint(true, 2018020100, 'totara', 'program');
-    }
-
     return true;
 }

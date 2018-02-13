@@ -252,22 +252,6 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017112005, 'totara', 'facetoface');
     }
 
-    if ($oldversion < 2017112800) {
-
-        require_once($CFG->libdir.'/db/upgradelib.php');
-
-        // List of supported customfield tables.
-        $customfieldtables = ['facetoface_signup', 'facetoface_sessioncancel', 'facetoface_session', 'facetoface_room',
-            'facetoface_cancellation', 'facetoface_asset'];
-
-        foreach($customfieldtables as $table) {
-            upgrade_menu_customfield_info_data($table);
-        }
-
-        // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2017112800, 'facetoface');
-    }
-
     return true;
 
 }
