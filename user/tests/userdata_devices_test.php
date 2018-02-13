@@ -120,10 +120,6 @@ class core_user_userdata_devices_testcase extends advanced_testcase {
         $targetuser = new target_user($user3);
         $result = devices::execute_count($targetuser, context_system::instance());
         $this->assertEquals(3, $result);
-
-        // Invalid context.
-        $result = devices::execute_count($targetuser, context_user::instance($user1->id));
-        $this->assertEquals(item::RESULT_STATUS_SKIPPED, $result);
     }
 
     /**
