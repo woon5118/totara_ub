@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 12.0 ===
+
+* updated popover_region.mustache correcting role attribute
+
 === 11.0 ===
 
 * New $mustequal parameter added to the following methods to control whether a table call data
