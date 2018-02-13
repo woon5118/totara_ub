@@ -1151,7 +1151,7 @@ class job_assignment {
             throw new exception("Invalid field specified in job_assignment::get_all_by_criteria");
         }
 
-        $sql = "SELECT * FROM {job_assignment} WHERE {$field} = :value";
+        $sql = "SELECT * FROM {job_assignment} WHERE {$field} = :value ORDER BY id";
         $params = array('value' => $value);
 
         $records = $DB->get_records_sql($sql, $params);
