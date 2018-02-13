@@ -3487,9 +3487,15 @@ EOD;
         } else {
             if (!($tab->link instanceof moodle_url)) {
                 // Backward compatibility when link was passed as quoted string.
-                $link = "<a href=\"$tab->link\" title=\"$tab->title\">$tab->text</a>";
+                $title = $tab->title ? ' title="' . $tab->title . '"' : '';
+                $link = "<a href=\"$tab->link\"$title>$tab->text</a>";
             } else {
-                $link = html_writer::link($tab->link, $tab->text, array('title' => $tab->title));
+                $args = array();
+                if ($tab->title) {
+                    $args['title'] = $tab->title;
+                }
+
+                $link = html_writer::link($tab->link, $tab->text, $args);
             }
             return html_writer::tag('li', $link);
         }

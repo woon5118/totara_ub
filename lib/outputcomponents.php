@@ -3539,7 +3539,7 @@ class tabobject implements renderable, templatable {
         $this->id = $id;
         $this->link = $link;
         $this->text = $text;
-        $this->title = $title ? $title : $text;
+        $this->title = $title ? $title : false;
         $this->linkedwhenselected = $linkedwhenselected;
     }
 
