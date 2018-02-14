@@ -30,7 +30,7 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Users interests.
+ * Users private files.
  */
 class privatefiles extends \totara_userdata\userdata\item {
 
