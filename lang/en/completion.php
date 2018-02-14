@@ -295,3 +295,5 @@ $string['tooltipcompletionroleone'] = 'You must be marked as complete by a {$a}'
 $string['tooltipcompletionroleany'] = 'You must be marked as complete by <strong>{$a->aggregation}</strong> of the following roles: {$a->roles}';
 $string['tooltipcompletioncourseone'] = 'One other course needs to be completed';
 $string['tooltipcompletioncoursemany'] = '{$a} other courses need to be completed';
+$string['userdatacomponentname'] = 'Completion';
+$string['userdataitemcourse_completion'] = 'Course completions (including activity completion)';

@@ -59,6 +59,11 @@ final class util {
             case 'core_badges': return get_string('badges', 'core_badges');
         }
 
+        if ($component === 'core_completion') {
+            // Ideally, this sort of thing can be done without hacks. But for now, we're just defining it here.
+            return get_string('userdatacomponentname', 'completion');
+        }
+
         return get_component_string($component, CONTEXT_SYSTEM);
     }
 
