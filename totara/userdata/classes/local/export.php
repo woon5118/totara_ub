@@ -220,13 +220,9 @@ class export {
         }
 
         $results = json_encode($results);
-        $jsonerror = json_last_error();
-        if ($jsonerror != JSON_ERROR_NONE) {
-            mtrace('Json encoding error (' . $jsonerror . ') in export ' . $export->id);
-            return item::RESULT_STATUS_ERROR;
-        }
         if ($results === false) {
-            mtrace('Unknown json encoding error in export ' . $export->id);
+            $jsonerrormsg = json_last_error_msg();
+            mtrace('Json encoding error (' . $jsonerrormsg . ') in export ' . $export->id);
             return item::RESULT_STATUS_ERROR;
         }
 
