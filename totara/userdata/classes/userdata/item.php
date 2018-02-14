@@ -23,8 +23,6 @@
 
 namespace totara_userdata\userdata;
 
-use totara_userdata\userdata\export;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -130,7 +128,7 @@ abstract class item {
      * Returns join for all activities in given context.
      *
      * @param \context $context
-     * @param string $instanceidfield sql field used directly in SQL join
+     * @param string $activitycmidfield sql field used directly in SQL join
      * @param string $contextalias context table alias
      * @return null|string SQL join fragment
      */

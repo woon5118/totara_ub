@@ -23,8 +23,6 @@
 
 namespace totara_userdata\userdata;
 
-use totara_userdata\userdata\item;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**

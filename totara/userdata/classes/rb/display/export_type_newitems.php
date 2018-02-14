@@ -24,11 +24,10 @@
 namespace totara_userdata\rb\display;
 
 use \totara_reportbuilder\rb\display\base;
-use \core\output\flex_icon;
 use totara_userdata\local\export_type;
 
 class export_type_newitems extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return count(\totara_userdata\local\export_type::get_new_items($value));
+        return count(export_type::get_new_items($value));
     }
 }

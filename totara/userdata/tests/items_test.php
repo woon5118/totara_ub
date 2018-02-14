@@ -50,7 +50,7 @@ class totara_userdata_items_testcase extends advanced_testcase {
      * @dataProvider item_classes
      */
     public function test_get_fullname($class) {
-        $string = $class::get_fullname();
+        $class::get_fullname();
         $this->assertDebuggingNotCalled();
     }
 

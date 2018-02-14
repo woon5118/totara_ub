@@ -107,7 +107,7 @@ foreach (count::get_countable_items_grouped_list() as $maincomponent => $classes
 
         if ($prevcomponent !== $maincomponent) {
             $prevcomponent = $maincomponent;
-            $maincomponentname = \totara_userdata\local\util::get_component_name($maincomponent);
+            $maincomponentname = util::get_component_name($maincomponent);
             echo $OUTPUT->heading($maincomponentname, 3);
             echo '<dl class="dl-horizontal">';
         }

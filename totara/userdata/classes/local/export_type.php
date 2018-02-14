@@ -25,7 +25,6 @@ namespace totara_userdata\local;
 
 use \totara_userdata\userdata\item;
 use totara_userdata\userdata\manager;
-use totara_userdata\local\export;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -67,7 +66,6 @@ class export_type {
      * Prepare record for updating.
      *
      * @param int $id
-     * @param int|null $duplicate copy settings from
      * @return \stdClass
      */
     public static function prepare_for_update($id) {

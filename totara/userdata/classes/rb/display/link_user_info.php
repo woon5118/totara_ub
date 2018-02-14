@@ -24,7 +24,6 @@
 namespace totara_userdata\rb\display;
 
 use \totara_reportbuilder\rb\display\base;
-use \core\output\flex_icon;
 
 class link_user_info extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {

@@ -28,6 +28,7 @@ class rb_userdata_exports_embedded extends rb_base_embedded {
     public $url, $source, $fullname, $filters, $columns;
     public $contentmode, $contentsettings, $embeddedparams;
     public $hidden, $accessmode, $accesssettings, $shortname;
+    public $defaultsortcolumn, $defaultsortorder;
 
     public function __construct() {
         $this->url = '/totara/userdata/exports.php';

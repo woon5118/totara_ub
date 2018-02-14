@@ -24,9 +24,7 @@
 namespace totara_userdata\form;
 
 use totara_userdata\userdata\manager;
-use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
-use totara_userdata\local\purge;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -30,6 +30,7 @@ class rb_source_userdata_export_items extends rb_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
+    public $cacheable;
 
     public function __construct() {
         $this->usedcomponents[] = 'totara_userdata';

@@ -24,7 +24,6 @@
 
 use totara_userdata\local\export_type;
 use totara_userdata\userdata\manager;
-use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 

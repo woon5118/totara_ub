@@ -25,7 +25,6 @@ namespace totara_userdata\local;
 
 use \totara_userdata\userdata\item;
 use totara_userdata\userdata\manager;
-use totara_userdata\local\purge;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();

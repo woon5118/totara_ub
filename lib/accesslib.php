@@ -6224,7 +6224,7 @@ class context_user extends context {
      * Delete the context content and the context record itself
      */
     public function delete() {
-        // Totara: make sure we remember the origianl user id, it is needed for user data puring and undelete.
+        // Totara: make sure we remember the original user id, it is needed for user data puring and undelete.
         \totara_userdata\local\util::backup_user_context_id($this->_instanceid, $this->_id);
 
         parent::delete();

@@ -51,7 +51,7 @@ class testitempurgetransaction extends item {
         global $DB;
 
         // Let's simulate ppl forget to commit transaction.
-        $trans = $DB->start_delegated_transaction();
+        $DB->start_delegated_transaction();
         return self::RESULT_STATUS_SUCCESS;
     }
 
