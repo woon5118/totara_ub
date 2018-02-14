@@ -18,11 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package core_user
  */
 
-namespace block_private_files\userdata;
+namespace core_user\userdata;
 
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,6 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * Users interests.
  */
 class privatefiles extends \totara_userdata\userdata\item {
+
     /**
      * String used for human readable name of this item.
      *
@@ -38,15 +41,6 @@ class privatefiles extends \totara_userdata\userdata\item {
      */
     public static function get_fullname_string() {
         return ['privatefiles', 'core'];
-    }
-
-    /**
-     * Get main Frankenstyle component name (core subsystem or plugin).
-     * This is used for UI purposes to group items into components.
-     *
-     */
-    public static function get_main_component() {
-        return 'core_user';
     }
 
     /**
@@ -80,10 +74,7 @@ class privatefiles extends \totara_userdata\userdata\item {
     protected static function purge(target_user $user, \context $context) {
         if ($user->contextid) {
             $fs = get_file_storage();
-            $files = $fs->get_area_files($user->contextid, 'user', 'private');
-            foreach ($files as $file) {
-                $file->delete();
-            }
+            $fs->delete_area_files($user->contextid, 'user', 'private');
         }
         // Event not necessary here.
 
@@ -104,16 +95,20 @@ class privatefiles extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
 
         if ($user->contextid) {
             $fs = get_file_storage();
             $files = $fs->get_area_files($user->contextid, 'user', 'private', 0, 'filepath ASC, filename ASC', false);
             foreach ($files as $file) {
-                $export->data[] = array('fileid' => $file->get_id(), 'filename' => $file->get_filepath() . $file->get_filename());
+                $export->data[] = [
+                    'fileid' => $file->get_id(),
+                    'filename' => $file->get_filepath().$file->get_filename(),
+                    'hash' => $file->get_contenthash()
+                ];
                 $export->files[] = $file;
             }
         }
@@ -136,7 +131,7 @@ class privatefiles extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function count(target_user $user, \context $context) {
         if (!$user->contextid) {
