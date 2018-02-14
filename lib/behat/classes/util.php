@@ -440,5 +440,9 @@ class behat_util extends testing_util {
         // Initialise $CFG with default values. This is needed for behat cli process, so we don't have modified
         // $CFG values from the old run. @see set_config.
         initialise_cfg();
+
+        // Totara: make sure all browser caches are invalidated too.
+        js_reset_all_caches();
+        theme_reset_all_caches();
     }
 }

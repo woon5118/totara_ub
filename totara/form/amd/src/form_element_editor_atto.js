@@ -71,6 +71,7 @@ define(['jquery','core/yui', 'core/str', 'totara_form/form'], function($, Y, cor
      * @param {Function} done
      */
     AttoElement.prototype.init = function(done) {
+        M.util.js_pending('totara_form_element_editor_atto');
         var self = this;
         this.input = $('#' + this.id);
 
