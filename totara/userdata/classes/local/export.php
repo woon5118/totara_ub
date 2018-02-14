@@ -190,7 +190,16 @@ class export {
                     $result = item::RESULT_STATUS_SUCCESS;
                     $results[$record->component . '-' . $record->name] = $exportresult->data;
                     if (!empty($exportresult->files)) {
-                        $exportfiles = $exportfiles + $exportresult->files;
+                        foreach ($exportresult->files as $exportfile) {
+                            if (!($exportfile instanceof \stored_file)) {
+                                throw new \coding_exception('Invalid stored file instance returned from export method');
+                            }
+                            // NOTE: developers must make sure user is allowed to get the file,
+                            //       we cannot test file authorship here because sometimes it is not recorded properly.
+                            if ($exporttype->includefiledir) {
+                                $exportfiles[$exportfile->get_id()] = $exportfile;
+                            }
+                        }
                     }
                 }
                 unset($exportresult); // Release memory.
@@ -235,33 +244,25 @@ class export {
         $archivefiles = array('data.json' => $tempdir . '/data.json');
 
         if ($exportfiles) {
-            // Include list of files and the file contents.
-            $filelist = array();
+            // Include list of files sorted by id and optionally the file contents.
+            ksort($exportfiles, SORT_NUMERIC);
             mkdir($tempdir . '/filedir', $CFG->directorypermissions, true);
+            $filelist = array();
             foreach ($exportfiles as $exportfile) {
-                if (!($exportfile instanceof \stored_file)) {
-                    continue;
-                }
-                // NOTE: developers must make sure user is allowed to get the file,
-                //       we cannot test file authorship here because sometimes it is not recorded properly.
-                if (isset($filelist[$exportfile->get_id()])) {
-                    continue;
-                }
                 $contenthash = $exportfile->get_contenthash();
-                if ($exporttype->includefiledir and !in_array($contenthash, $filelist)) {
-                    $exportfile->copy_content_to($tempdir . '/filedir/' . $contenthash);
-                    @chmod($tempdir . '/filedir/' . $contenthash, $CFG->filepermissions);
-                    $archivefiles['filedir/' . $contenthash] = $tempdir . '/filedir/' . $contenthash;
+                $tempfilepath = $tempdir . '/filedir/' . $contenthash;
+                if (!file_exists($tempfilepath)) {
+                    $exportfile->copy_content_to($tempfilepath);
+                    @chmod($tempfilepath, $CFG->filepermissions);
+                    $archivefiles['filedir/' . $contenthash] = $tempfilepath;
                 }
-                $filelist[$exportfile->get_id()] = $contenthash;
+                $filelist[] = array('id' => $exportfile->get_id(), 'name' => $exportfile->get_filename(), 'content' => 'filedir/' . $contenthash);
             }
-            if ($filelist) {
-                $filelist = json_encode($filelist);
-                file_put_contents($tempdir . '/files.json', $filelist);
-                @chmod($tempdir . '/files.json', $CFG->filepermissions);
-                $archivefiles['files.json'] = $tempdir . '/files.json';
-            }
+            file_put_contents($tempdir . '/files.json', json_encode($filelist));
+            @chmod($tempdir . '/files.json', $CFG->filepermissions);
+            $archivefiles['files.json'] = $tempdir . '/files.json';
             unset($filelist);
+            unset($exportfiles);
         }
 
         $packer = get_file_packer('application/x-gzip');
