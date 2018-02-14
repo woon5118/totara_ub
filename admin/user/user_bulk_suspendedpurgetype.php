@@ -30,10 +30,13 @@ $confirmhash = optional_param('confirmhash', '', PARAM_ALPHANUM);
 admin_externalpage_setup('userbulk');
 require_capability('totara/userdata:purgesetsuspended', context_system::instance());
 
-$usersids = $SESSION->bulk_users;
-$currenthash = sha1(serialize($usersids));
-
 $returnurl = new moodle_url('/admin/user/user_bulk.php');
+
+$usersids = $SESSION->bulk_users;
+if (empty($usersids)) {
+    redirect($returnurl, get_string('error'), null, \core\output\notification::NOTIFY_ERROR);
+}
+$currenthash = sha1(serialize($usersids));
 
 if (!$confirmhash) {
     $confirmhash = $currenthash;
@@ -47,11 +50,12 @@ if ($form->is_cancelled()) {
     redirect($returnurl);
 }
 
-$data = $form->get_data();
-if ($data and $data->confirmhash !== $currenthash) {
-    totara_set_notification('User selection changed!'); // TODO: localise
+if ($data = $form->get_data()) {
+    if ($data->confirmhash !== $currenthash) {
+        // Somebody modified list of users!
+        redirect($returnurl, get_string('error'), null, \core\output\notification::NOTIFY_ERROR);
+    }
 
-} else if ($data) {
     if ($data->suspendedpurgetypeid == -1) {
         $suspendedpurgetypeid = null;
     } else {
@@ -67,7 +71,7 @@ if ($data and $data->confirmhash !== $currenthash) {
         $DB->set_field('totara_userdata_user', 'suspendedpurgetypeid', $suspendedpurgetypeid, array('id' => $extra->id));
     }
     $rs->close();
-    redirect($returnurl, 'Suspended purge type changed'); // TODO: localise
+    redirect($returnurl, get_string('changessaved'));
 }
 
 echo $OUTPUT->header();

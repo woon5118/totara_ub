@@ -45,7 +45,7 @@ class user_bulk_deletedpurgetype_form extends \totara_form\form {
         $deletedpurgetypeid->set_attribute('required', true);
         $this->model->add($deletedpurgetypeid);
 
-        $this->model->add_action_buttons(true, 'Update selected users'); // TODO: localise
+        $this->model->add_action_buttons(true, get_string('update'));
 
         $this->model->add(new \totara_form\form\element\hidden('confirmhash', PARAM_ALPHANUM));
     }

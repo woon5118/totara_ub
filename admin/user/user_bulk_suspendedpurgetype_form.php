@@ -45,7 +45,7 @@ class user_bulk_suspendedpurgetype_form extends \totara_form\form {
         $suspendedpurgetypeid->set_attribute('required', true);
         $this->model->add($suspendedpurgetypeid);
 
-        $this->model->add_action_buttons(true, 'Update selected users'); // TODO: localise
+        $this->model->add_action_buttons(true, get_string('update'));
 
         $this->model->add(new \totara_form\form\element\hidden('confirmhash', PARAM_ALPHANUM));
     }
