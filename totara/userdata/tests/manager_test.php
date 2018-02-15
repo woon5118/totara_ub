@@ -60,6 +60,11 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $this->assertArrayHasKey($typeactive1->id, $types);
         $this->assertArrayHasKey($typeactive2->id, $types);
 
+        $types = manager::get_purge_types(target_user::STATUS_ACTIVE);
+        $this->assertCount(2, $types);
+        $this->assertArrayHasKey($typeactive1->id, $types);
+        $this->assertArrayHasKey($typeactive2->id, $types);
+
         $types = manager::get_purge_types(target_user::STATUS_ACTIVE, 'manual', $typeactive2->id);
         $this->assertCount(2, $types);
         $this->assertArrayHasKey($typeactive1->id, $types);
@@ -81,6 +86,11 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $this->assertArrayHasKey($typesuspended1->id, $types);
 
         $types = manager::get_purge_types(target_user::STATUS_SUSPENDED, 'other');
+        $this->assertCount(2, $types);
+        $this->assertArrayHasKey($typesuspended1->id, $types);
+        $this->assertArrayHasKey($typesuspended2->id, $types);
+
+        $types = manager::get_purge_types(target_user::STATUS_SUSPENDED);
         $this->assertCount(2, $types);
         $this->assertArrayHasKey($typesuspended1->id, $types);
         $this->assertArrayHasKey($typesuspended2->id, $types);
@@ -112,6 +122,11 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $this->assertArrayHasKey($typedeleted1->id, $types);
 
         $types = manager::get_purge_types(target_user::STATUS_DELETED, 'other');
+        $this->assertCount(2, $types);
+        $this->assertArrayHasKey($typedeleted1->id, $types);
+        $this->assertArrayHasKey($typedeleted2->id, $types);
+
+        $types = manager::get_purge_types(target_user::STATUS_DELETED);
         $this->assertCount(2, $types);
         $this->assertArrayHasKey($typedeleted1->id, $types);
         $this->assertArrayHasKey($typedeleted2->id, $types);
@@ -167,6 +182,12 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $this->assertArrayHasKey($type3->id, $types);
 
         $types = manager::get_export_types('other');
+        $this->assertCount(3, $types);
+        $this->assertArrayHasKey($type1->id, $types);
+        $this->assertArrayHasKey($type2->id, $types);
+        $this->assertArrayHasKey($type3->id, $types);
+
+        $types = manager::get_export_types();
         $this->assertCount(3, $types);
         $this->assertArrayHasKey($type1->id, $types);
         $this->assertArrayHasKey($type2->id, $types);
@@ -246,6 +267,19 @@ class totara_userdata_manager_testcase extends advanced_testcase {
 
         $this->setCurrentTimeStart();
         $purgeid = manager::create_purge($activeuser->id, $syscontext->id, $typeactive1->id, 'other');
+        $purge = $DB->get_record('totara_userdata_purge', array('id' => $purgeid), '*', MUST_EXIST);
+        $this->assertSame($typeactive1->id, $purge->purgetypeid);
+        $this->assertSame('other', $purge->origin);
+        $this->assertSame((string)$activeusercontext->id, $purge->usercontextid);
+        $this->assertSame((string)$syscontext->id, $purge->contextid);
+        $this->assertSame($creator->id, $purge->usercreated);
+        $this->assertTimeCurrent($purge->timecreated);
+        $this->assertNull($purge->timestarted);
+        $this->assertNull($purge->timefinished);
+        $this->assertNull($purge->result);
+
+        $this->setCurrentTimeStart();
+        $purgeid = manager::create_purge($activeuser->id, $syscontext->id, $typeactive1->id);
         $purge = $DB->get_record('totara_userdata_purge', array('id' => $purgeid), '*', MUST_EXIST);
         $this->assertSame($typeactive1->id, $purge->purgetypeid);
         $this->assertSame('other', $purge->origin);
@@ -354,6 +388,25 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $this->assertSame((string)$result, $purge->result);
         $purgeditems = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purgeid));
         $this->assertCount(0, $purgeditems);
+
+        $this->setUser($creator);
+
+        $purgeid = manager::create_purge($activeuser->id, $syscontext->id, $typeactive1->id);
+        $this->setCurrentTimeStart();
+        $DB->set_field('totara_userdata_purge', 'result', item::RESULT_STATUS_CANCELLED, array('id' => $purgeid));
+        $result = manager::execute_purge($purgeid);
+        $purge = $DB->get_record('totara_userdata_purge', array('id' => $purgeid), '*', MUST_EXIST);
+        $this->assertSame(item::RESULT_STATUS_CANCELLED, $result);
+        $this->assertSame($typeactive1->id, $purge->purgetypeid);
+        $this->assertSame('other', $purge->origin);
+        $this->assertSame((string)$activeusercontext->id, $purge->usercontextid);
+        $this->assertSame((string)$syscontext->id, $purge->contextid);
+        $this->assertSame($creator->id, $purge->usercreated);
+        $this->assertNull($purge->timestarted);
+        $this->assertNull($purge->timefinished);
+        $this->assertSame((string)$result, $purge->result);
+        $purgeditems = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purgeid));
+        $this->assertCount(0, $purgeditems);
     }
 
     public function test_create_export() {
@@ -399,6 +452,18 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $this->assertNull($export->timefinished);
         $this->assertNull($export->result);
 
+        $this->setCurrentTimeStart();
+        $exportid = manager::create_export($deleteduser->id, $coursecontext->id, $type2->id);
+        $export = $DB->get_record('totara_userdata_export', array('id' => $exportid), '*', MUST_EXIST);
+        $this->assertSame($type2->id, $export->exporttypeid);
+        $this->assertSame('other', $export->origin);
+        $this->assertSame((string)$coursecontext->id, $export->contextid);
+        $this->assertSame($creator->id, $export->usercreated);
+        $this->assertTimeCurrent($export->timecreated);
+        $this->assertNull($export->timestarted);
+        $this->assertNull($export->timefinished);
+        $this->assertNull($export->result);
+
         try {
             manager::create_export($activeuser->id, $syscontext->id, $type1->id, 'xxx');
             $this->fail('coding_exception expected');
@@ -415,6 +480,7 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_userdata');
         $typeactive1 = $generator->create_export_type(array('allowself' => 1, 'items' => 'core_user-additionalnames'));
         $activeuser = $this->getDataGenerator()->create_user(array('middlename' => 'midddle'));
+        $otheruser = $this->getDataGenerator()->create_user(array());
         $syscontext = context_system::instance();
 
         $this->setUser($activeuser);
@@ -465,5 +531,29 @@ class totara_userdata_manager_testcase extends advanced_testcase {
         $this->assertSame((string)$result, $export->result);
         $exportditems = $DB->get_records('totara_userdata_export_item', array('exportid' => $exportid));
         $this->assertCount(0, $exportditems);
+
+        $this->setUser($otheruser);
+
+        $exportid = manager::create_export($activeuser->id, $syscontext->id, $typeactive1->id, 'other');
+        $this->setCurrentTimeStart();
+        $result = manager::execute_export($exportid);
+        $export = $DB->get_record('totara_userdata_export', array('id' => $exportid), '*', MUST_EXIST);
+        $this->assertSame(item::RESULT_STATUS_SUCCESS, $result);
+        $this->assertSame($typeactive1->id, $export->exporttypeid);
+        $this->assertSame('other', $export->origin);
+        $this->assertSame((string)$syscontext->id, $export->contextid);
+        $this->assertSame($otheruser->id, $export->usercreated);
+        $this->assertTimeCurrent($export->timestarted);
+        $this->assertGreaterThanOrEqual($export->timestarted, $export->timefinished);
+        $this->assertSame((string)$result, $export->result);
+        $exportditems = $DB->get_records('totara_userdata_export_item', array('exportid' => $exportid));
+        $this->assertCount(1, $exportditems);
+        $exportitem = reset($exportditems);
+        $this->assertSame('core_user', $exportitem->component);
+        $this->assertSame('additionalnames', $exportitem->name);
+        $this->assertGreaterThanOrEqual($export->timestarted, $exportitem->timestarted);
+        $this->assertGreaterThanOrEqual($exportitem->timestarted, $exportitem->timefinished);
+        $this->assertLessThanOrEqual($export->timefinished, $exportitem->timefinished);
+        $this->assertSame((string)item::RESULT_STATUS_SUCCESS, $exportitem->result);
     }
 }

@@ -49,15 +49,15 @@ class manager {
      * Returns human readable list of purge types as menu options.
      *
      * @param int $userstatus target_user::STATUS_xxx constant
-     * @param string $origin value 'manual', 'deleted', 'suspended' or 'other'
+     * @param string $origin purge origin, use 'other' for custom code
      * @param int $current current purge id, added to the list even if not available
      * @return string[] human readable names indexed by purgetypeid
      */
-    public static function get_purge_types($userstatus, $origin, $current = null) {
+    public static function get_purge_types($userstatus, $origin = 'other', $current = null) {
         global $DB;
 
         if (!in_array($origin, array('manual', 'deleted', 'suspended', 'other'))) {
-            throw new \coding_exception('Invalid purge origin value');
+            throw new \coding_exception('Invalid purge origin, user "other" for custom code');
         }
 
         if ($userstatus != target_user::STATUS_ACTIVE and $userstatus != target_user::STATUS_SUSPENDED
@@ -87,15 +87,15 @@ class manager {
     /**
      * Returns human readable list of export types as menu options.
      *
-     * @param string $origin value 'self' or 'other'
+     * @param string $origin export origin, use 'other' for custom code
      * @param int $current current export id, added to the list even if not available
      * @return string[] human readable names indexed by exporttypeid
      */
-    public static function get_export_types($origin, $current = null) {
+    public static function get_export_types($origin = 'other', $current = null) {
         global $DB;
 
         if (!in_array($origin, array('self', 'other'))) {
-            throw new \coding_exception('Invalid export origin value');
+            throw new \coding_exception('Invalid export origin, user "other" for custom code');
         }
 
         $select = "";
@@ -123,14 +123,14 @@ class manager {
      * @param int $userid user being purged
      * @param int $contextid restricts purging to the context and its subcontexts
      * @param int $purgetypeid type of purging
-     * @param string $origin value 'manual', 'deleted', 'suspended' or 'other'
+     * @param string $origin purge origin, use 'other' for custom code
      * @return int new purge id
      */
-    public static function create_purge($userid, $contextid, $purgetypeid, $origin) {
+    public static function create_purge($userid, $contextid, $purgetypeid, $origin = 'other') {
         global $DB, $USER;
 
         if (!in_array($origin, array('manual', 'deleted', 'suspended', 'other'))) {
-            throw new \coding_exception('Invalid purge origin value');
+            throw new \coding_exception('Invalid purge origin, user "other" for custom code');
         }
 
         $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
@@ -231,14 +231,14 @@ class manager {
      * @param int $userid user being exportd
      * @param int $contextid restricts exporting to the context and its subcontexts
      * @param int $exporttypeid type of exporting
-     * @param string $origin value 'self' or 'other'
+     * @param string $origin export origin, use 'other' for custom code
      * @return int new export id
      */
-    public static function create_export($userid, $contextid, $exporttypeid, $origin) {
+    public static function create_export($userid, $contextid, $exporttypeid, $origin = 'other') {
         global $DB, $USER;
 
         if (!in_array($origin, array('self', 'other'))) {
-            throw new \coding_exception('Invalid export origin value');
+            throw new \coding_exception('Invalid export origin, user "other" for custom code');
         }
 
         $conditions = array('id' => $exporttypeid);
