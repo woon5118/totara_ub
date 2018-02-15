@@ -226,6 +226,16 @@ class totara_userdata_local_purge_type_testcase extends advanced_testcase {
         $this->setCurrentTimeStart();
         $updatedtype = purge_type::edit($data);
         $this->assertTimeCurrent($updatedtype->timechanged);
+
+        // Simulate item removal during upgrade.
+        $oldfield = clone($username);
+        unset($oldfield->id);
+        $oldfield->name = 'xxxyyy';
+        $DB->insert_record('totara_userdata_purge_type_item', $oldfield);
+        $this->assertTrue($DB->record_exists('totara_userdata_purge_type_item', array('component' => $oldfield->component, 'name' => $oldfield->name)));
+        $data = purge_type::prepare_for_update($type->id);
+        purge_type::edit($data);
+        $this->assertFalse($DB->record_exists('totara_userdata_purge_type_item', array('component' => $oldfield->component, 'name' => $oldfield->name)));
     }
 
     public function test_purge_edit_update_active() {

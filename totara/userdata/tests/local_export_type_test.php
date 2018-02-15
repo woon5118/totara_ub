@@ -187,6 +187,16 @@ class totara_userdata_local_export_type_testcase extends advanced_testcase {
         $this->assertTimeCurrent($username->timechanged);
         $otherfields = $DB->get_record('totara_userdata_export_type_item', array('exporttypeid' => $type->id, 'component' => 'core_user', 'name' => 'otherfields', 'exportdata' => 0), '*', MUST_EXIST);
         $this->assertTimeCurrent($otherfields->timechanged);
+
+        // Simulate item removal during upgrade.
+        $oldfield = clone($username);
+        unset($oldfield->id);
+        $oldfield->name = 'xxxyyy';
+        $DB->insert_record('totara_userdata_export_type_item', $oldfield);
+        $this->assertTrue($DB->record_exists('totara_userdata_export_type_item', array('component' => $oldfield->component, 'name' => $oldfield->name)));
+        $data = export_type::prepare_for_update($type->id);
+        export_type::edit($data);
+        $this->assertFalse($DB->record_exists('totara_userdata_export_type_item', array('component' => $oldfield->component, 'name' => $oldfield->name)));
     }
 
     public function test_get_new_items() {
