@@ -25,7 +25,7 @@ Feature: Manage user data purge types
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
 
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active user"
+    And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -39,7 +39,7 @@ Feature: Manage user data purge types
     And I follow "First purge type"
     Then I should see "First purge type" in the "Full name" "definition_exact"
     And I should see "pt1id" in the "ID number" "definition_exact"
-    And I should see "Active user" in the "Restricted to user status" "definition_exact"
+    And I should see "Active" in the "Restricted to user status" "definition_exact"
     And I should see "Some first description" in the "Description" "definition_exact"
     And I should see "Manual data purge" in the "Available for" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
@@ -49,7 +49,7 @@ Feature: Manage user data purge types
 
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Suspended user"
+    And I set the "Restricted to user status" Totara form field to "Suspended"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -63,7 +63,7 @@ Feature: Manage user data purge types
     And I follow "Second purge type"
     Then I should see "Second purge type" in the "Full name" "definition_exact"
     And I should see "pt2id" in the "ID number" "definition_exact"
-    And I should see "Suspended user" in the "Restricted to user status" "definition_exact"
+    And I should see "Suspended" in the "Restricted to user status" "definition_exact"
     And I should see "Some second description" in the "Description" "definition_exact"
     And I should see "Manual data purge, Automatic purging after user is suspended" in the "Available for" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
@@ -73,7 +73,7 @@ Feature: Manage user data purge types
 
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Deleted user"
+    And I set the "Restricted to user status" Totara form field to "Deleted"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -91,7 +91,7 @@ Feature: Manage user data purge types
     And I follow "Third purge type"
     Then I should see "Third purge type" in the "Full name" "definition_exact"
     And I should see "pt3id" in the "ID number" "definition_exact"
-    And I should see "Deleted user" in the "Restricted to user status" "definition_exact"
+    And I should see "Deleted" in the "Restricted to user status" "definition_exact"
     And I should see "Some third description" in the "Description" "definition_exact"
     And I should see "Manual data purge, Automatic purging after user is deleted" in the "Available for" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
@@ -103,7 +103,7 @@ Feature: Manage user data purge types
     Given I log in as "manager"
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active user"
+    And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -131,7 +131,7 @@ Feature: Manage user data purge types
     And I follow "Prvni purge"
     Then I should see "Prvni purge" in the "Full name" "definition_exact"
     And I should see "xt1id" in the "ID number" "definition_exact"
-    And I should see "Active user" in the "Restricted to user status" "definition_exact"
+    And I should see "Active" in the "Restricted to user status" "definition_exact"
     And I should see "Some prvni description" in the "Description" "definition_exact"
     And I should see "0" in the "Number of purges" "definition_exact"
     And I should not see "Manual data purge"
@@ -143,7 +143,7 @@ Feature: Manage user data purge types
     Given I log in as "manager"
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active user"
+    And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -168,7 +168,7 @@ Feature: Manage user data purge types
     And I follow "Prvni purge"
     Then I should see "Prvni purge" in the "Full name" "definition_exact"
     And I should see "et1idx" in the "ID number" "definition_exact"
-    And I should see "Active user" in the "Restricted to user status" "definition_exact"
+    And I should see "Active" in the "Restricted to user status" "definition_exact"
     And I should see "Some first description" in the "Description" "definition_exact"
     And I should see "Manual data purge" in the "Available for" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
@@ -180,7 +180,7 @@ Feature: Manage user data purge types
     Given I log in as "manager"
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active user"
+    And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -192,7 +192,7 @@ Feature: Manage user data purge types
       | User          | Preferences,User picture |
     And I press "Add"
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Suspended user"
+    And I set the "Restricted to user status" Totara form field to "Suspended"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds

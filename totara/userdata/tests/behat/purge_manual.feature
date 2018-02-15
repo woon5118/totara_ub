@@ -29,7 +29,7 @@ Feature: Manual user data purging
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active user"
+    And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -41,7 +41,7 @@ Feature: Manual user data purging
     And I press "Add"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active user"
+    And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -53,7 +53,7 @@ Feature: Manual user data purging
     And I press "Add"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Suspended user"
+    And I set the "Restricted to user status" Totara form field to "Suspended"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
@@ -65,7 +65,7 @@ Feature: Manual user data purging
     And I press "Add"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Deleted user"
+    And I set the "Restricted to user status" Totara form field to "Deleted"
     And I press "Continue"
 # Wait for the Select all hack to load.
     And I wait "1" seconds
