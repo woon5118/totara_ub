@@ -50,7 +50,7 @@ class totara_userdata_local_export_type_testcase extends advanced_testcase {
             'items' => 'core_user-additionalnames,core_user-otherfields'));
         $data = export_type::prepare_for_add($type->id);
         $this->assertSame('0', $data->id);
-        $this->assertSame('', $data->fullname);
+        $this->assertSame('Copy of XX name', $data->fullname);
         $this->assertSame('', $data->idnumber);
         $this->assertSame($type->description, $data->description);
         $this->assertSame(array('allowself'), $data->availablefor);

@@ -34,18 +34,23 @@ class totara_userdata_renderer extends plugin_renderer_base {
      *
      * @param stdClass $user
      * @param bool $userinfopage true when printed on user information page
+     * @param bool $iscompletelist true to include the <dl> tags around the information
      * @return string html fragment
      */
-    public function user_id_card(\stdClass $user, $userinfopage = false) {
+    public function user_id_card(\stdClass $user, $userinfopage = false, $iscompletelist = true) {
         $context = \context_user::instance($user->id, IGNORE_MISSING);
         if (!$context) {
             $context = \context_system::instance();
         }
 
         $html = '';
-        $html .= '<dl class="dl-horizontal">';
+
+        if ($iscompletelist) {
+            $html .= '<dl class="dl-horizontal">';
+        }
+
         if ($user->deleted) {
-            $html .= '<dt>' . get_string('userid', 'totara_reportbuilder') . '</dt>';
+            $html .= '<dt>' . get_string('userid', 'totara_userdata') . '</dt>';
             $html .= '<dd>' . $user->id . '</dd>';
         }
         $fullname = fullname($user);
@@ -64,14 +69,14 @@ class totara_userdata_renderer extends plugin_renderer_base {
         }
         $html .= '<dt>' . get_string('fullnameuser') . '</dt>';
         $html .= '<dd>' . $fullname . '</dd>'; // link for not deleted
-        $html .= '<dt>' . get_string('userstatus', 'totara_reportbuilder') . '</dt>';
+        $html .= '<dt>' . get_string('userstatus', 'totara_userdata') . '</dt>';
         $html .= '<dd>';
         if ($user->deleted) {
-            $html .= get_string('deleteduser', 'totara_reportbuilder');
+            $html .= get_string('deleteduser', 'totara_userdata');
         } else if ($user->suspended) {
-            $html .= get_string('suspendeduser', 'totara_reportbuilder');
+            $html .= get_string('suspendeduser', 'totara_userdata');
         } else {
-            $html .= get_string('activeuser', 'totara_reportbuilder');
+            $html .= get_string('activeuser', 'totara_userdata');
         }
         $html .= '</dd>';
         $html .= '<dt>' . get_string('idnumber') . '</dt>';
@@ -80,7 +85,10 @@ class totara_userdata_renderer extends plugin_renderer_base {
         $html .= '<dd>' . (trim($user->email) === '' ? '&nbsp;' : s($user->email)) . '</dd>';
         $html .= '<dt>' . get_string('username') . '</dt>';
         $html .= '<dd>' . (trim($user->username) === '' ? '&nbsp;' : s($user->username)) . '</dd>';
-        $html .= '</dl>';
+
+        if ($iscompletelist) {
+            $html .= '</dl>';
+        }
 
         return $html;
     }

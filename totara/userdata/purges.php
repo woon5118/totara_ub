@@ -59,7 +59,7 @@ foreach ($params as $param) {
     if ($param->name === 'userid') {
         $oneuser = $DB->get_record('user', array('id' => $param->value));
         if ($oneuser) {
-            $paraminfo[] = get_string('user') . ': ' . fullname($oneuser);
+            $paraminfo[] = get_string('showingresultsforuser', 'totara_userdata', ['fullname' => fullname($oneuser)]);
         }
     }
     if ($param->name === 'purgetypeid') {

@@ -113,8 +113,10 @@ echo '</dd>';
 echo '</dl>';
 
 if (has_capability('totara/userdata:purgemanual', $syscontext) and manager::get_purge_types($targetuser->status, 'manual')) {
+    echo markdown_to_html(get_string('purgemanualschedule_desc', 'totara_userdata'));
+
     $url = new moodle_url('/totara/userdata/purge_manually.php', array('id' => $user->id));
-    echo $OUTPUT->single_button($url, get_string('purgemanually', 'totara_userdata'));
+    echo $OUTPUT->single_button($url, get_string('selectpurgetype', 'totara_userdata'));
 }
 
 echo $OUTPUT->heading(get_string('purgeautomatic', 'totara_userdata'), 3);
@@ -127,9 +129,9 @@ if ($extra->suspendedpurgetypeid) {
     if ($targetuser->status == $targetuser::STATUS_SUSPENDED) {
         $suspendedpurgetype = $DB->get_record('totara_userdata_purge_type', array('id' => $extra->suspendedpurgetypeid), '*', MUST_EXIST);
         if ($extra->timesuspendedpurged === null or $extra->timesuspendedpurged < $extra->timesuspended or $extra->timesuspendedpurged < $suspendedpurgetype->timechanged) {
-            echo get_string('purgeautopending', 'totara_userdata', array('purge' => $purgetypename));
+            echo $purgetypename . ' ' . html_writer::span(get_string('purgeautopending', 'totara_userdata'), 'dimmed');
         } else {
-            echo get_string('purgeautocompleted', 'totara_userdata', array('purge' => $purgetypename, 'timefinished' => userdate($extra->timesuspendedpurged, get_string('strftimedatetimeshort'))));
+            echo $purgetypename . ' ' . html_writer::span(get_string('purgeautocompleted', 'totara_userdata', array('timefinished' => userdate($extra->timesuspendedpurged, get_string('strftimedatetimeshort')))), 'dimmed_text');
         }
     } else {
         echo $purgetypename;
@@ -155,9 +157,9 @@ if ($extra->deletedpurgetypeid) {
     if ($targetuser->status == $targetuser::STATUS_DELETED) {
         $deletedpurgetype = $DB->get_record('totara_userdata_purge_type', array('id' => $extra->deletedpurgetypeid), '*', MUST_EXIST);
         if ($extra->timedeletedpurged === null or $extra->timedeletedpurged < $extra->timedeleted or $extra->timedeletedpurged < $deletedpurgetype->timechanged) {
-            echo get_string('purgeautopending', 'totara_userdata', array('purge' => $purgetypename));
+            echo $purgetypename . ' ' . html_writer::span(get_string('purgeautopending', 'totara_userdata'), 'dimmed_text');
         } else {
-            echo get_string('purgeautocompleted', 'totara_userdata', array('purge' => $purgetypename, 'timefinished' => userdate($extra->timedeletedpurged, get_string('strftimedatetimeshort'))));
+            echo $purgetypename . ' ' . html_writer::span(get_string('purgeautocompleted', 'totara_userdata', array('timefinished' => userdate($extra->timedeletedpurged, get_string('strftimedatetimeshort')))), 'dimmed_text');
         }
     } else {
         echo $purgetypename;

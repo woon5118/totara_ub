@@ -48,7 +48,7 @@ final class purge_set_deleted extends \totara_form\form {
         $this->model->add(new \totara_form\form\element\static_html('staticidcard', '', $renderer->user_id_card($user, true)));
 
         $options = manager::get_purge_types(target_user::STATUS_DELETED, 'deleted', $currentdata->deletedpurgetypeid);
-        if ($deleteddefault = get_config('totara_userdata', 'defaultdeletedpurgetypeid')) {
+        if ($deleteddefault = get_config('totara_userdata', 'defaultdeletedpurgetypeid') && $user->deleted == 0) {
             $none = get_string('purgeautodefault', 'totara_userdata', $options[$deleteddefault]);
         } else {
             $none = get_string('none');
@@ -60,5 +60,6 @@ final class purge_set_deleted extends \totara_form\form {
         $this->model->add_action_buttons(true, get_string('update'));
 
         $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
+        $this->model->add(new \totara_form\form\element\hidden('loadconfirmform', PARAM_BOOL));
     }
 }

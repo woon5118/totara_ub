@@ -29,13 +29,11 @@
 $icons = array(
     'totara_userdata|icon' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
                     'classes' =>
                         array(
-                            'fa-id-card-o ft-stack-main',
-                            'fa-database ft-stack-suffix'
+                            'fa-database'
                         ),
                 ),
         ),

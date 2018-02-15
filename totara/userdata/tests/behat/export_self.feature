@@ -31,14 +31,14 @@ Feature: Own user data exporting
     And I set the following Totara form fields to these values:
       | Full name     | Additional names export   |
       | idnumber      | etid1                     |
-      | Permitted for | Export of own user data   |
+      | Permitted use | User exporting own data   |
       | User          | core_user-additionalnames |
     And I press "Add"
     And I press "Add export type"
     And I set the following Totara form fields to these values:
       | Full name     | Picture exporting        |
       | idnumber      | etid2                    |
-      | Permitted for | Export of own user data  |
+      | Permitted use | User exporting own data  |
       | User          | core_user-picture        |
     And I press "Add"
     And I navigate to "Settings" node in "Site administration > Users > User data management"
@@ -53,7 +53,7 @@ Feature: Own user data exporting
     And I press "Request data export"
     And I should see "Data export in progress. You will receive a notification once the file is available for download."
     And I run the adhoc scheduled tasks "totara_userdata\task\export"
-    Then I should see "Your data export is ready"
+    Then I should see "Your data export file is available for download:"
     And I follow "export.tgz"
     And I should see "behat export file access success"
 
@@ -67,7 +67,7 @@ Feature: Own user data exporting
     And I press "Request data export"
     And I should see "Data export in progress. You will receive a notification once the file is available for download."
     And I run the adhoc scheduled tasks "totara_userdata\task\export"
-    Then I should see "Your data export is ready"
+    Then I should see "Your data export file is available for download:"
     And I log out
 
     When I log in as "username2"
@@ -83,10 +83,10 @@ Feature: Own user data exporting
     When I navigate to "Export types" node in "Site administration > Users > User data management"
     And I click on "Edit" "link" in the "Picture exporting" "table_row"
     And I set the following Totara form fields to these values:
-      | Permitted for |  |
+      | Permitted use |  |
     And I press "Update"
     And I log out
     And I log in as "username1"
     And I follow "Profile" in the user menu
     And I follow "Request data export"
-    Then I should not see "Your data export is ready"
+    Then I should not see "Your data export file is available for download:"

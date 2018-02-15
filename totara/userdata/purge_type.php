@@ -100,6 +100,8 @@ echo '</dl>';
 
 echo $OUTPUT->heading(get_string('purgeitemselection', 'totara_userdata'), 3);
 
+echo markdown_to_html(get_string('purgetypewhenitemsapplied', 'totara_userdata'));
+
 /** @var \totara_userdata_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_userdata');
 echo $renderer->purge_type_active_items($purgetype);

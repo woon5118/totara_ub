@@ -53,7 +53,7 @@ class totara_userdata_local_purge_type_testcase extends advanced_testcase {
         $data = purge_type::prepare_for_add(target_user::STATUS_SUSPENDED, $type->id);
         $this->assertSame('0', $data->id);
         $this->assertSame((string)target_user::STATUS_DELETED, $data->userstatus);
-        $this->assertSame('', $data->fullname);
+        $this->assertSame('Copy of XX name', $data->fullname);
         $this->assertSame('', $data->idnumber);
         $this->assertSame($type->description, $data->description);
         $this->assertSame(array('allowmanual', 'allowdeleted'), $data->availablefor);

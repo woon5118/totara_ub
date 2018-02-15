@@ -24,8 +24,11 @@
 require('../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once(__DIR__ . '/user_bulk_deletedpurgetype_form.php');
+require_once(__DIR__ . '/user_bulk_deletedpurgetype_confirm_form.php');
 
 $confirmhash = optional_param('confirmhash', '', PARAM_ALPHANUM);
+$loadconfirmform = optional_param('loadconfirmform', false, PARAM_BOOL);
+$deletedpurgetypeid = optional_param('deletedpurgetypeid', 0, PARAM_INT);
 
 admin_externalpage_setup('userbulk');
 require_capability('totara/userdata:purgesetdeleted', context_system::instance());
@@ -44,23 +47,36 @@ if (!$confirmhash) {
 
 $currentdata = new stdClass();
 $currentdata->confirmhash = $confirmhash;
+$currentdata->loadconfirmform = true;
 $form = new user_bulk_deletedpurgetype_form($currentdata);
 
 if ($form->is_cancelled()) {
     redirect($returnurl);
 }
 
-if ($data = $form->get_data()) {
+if (!$loadconfirmform) {
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('purgesetautomatic', 'totara_userdata'));
+    echo $form->render();
+    echo $OUTPUT->footer();
+    die;
+}
+
+$currentdata->deletedpurgetypeid = $deletedpurgetypeid;
+$confirmform = new user_bulk_deletedpurgetype_confirm_form($currentdata);
+
+if ($confirmform->is_cancelled()) {
+    redirect($returnurl);
+}
+
+if ($data = $confirmform->get_data()) {
     if ($data->confirmhash !== $currenthash) {
         // Somebody modified list of users!
         redirect($returnurl, get_string('error'), null, \core\output\notification::NOTIFY_ERROR);
     }
 
-    if ($data->deletedpurgetypeid == -1) {
-        $deletedpurgetypeid = null;
-    } else {
-        $deletedpurgetypeid = (string)$data->deletedpurgetypeid;
-    }
+    $deletedpurgetypeid = (string)$data->deletedpurgetypeid;
+
     list($in, $params) = $DB->get_in_or_equal($usersids);
     $rs = $DB->get_recordset_select('user', "id $in", $params);
     foreach ($rs as $user) {
@@ -75,8 +91,6 @@ if ($data = $form->get_data()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('deletedpurgetype', 'totara_userdata'));
-
-echo $form->render();
-
+echo $OUTPUT->heading(get_string('setpurgetypeconfirmbulk', 'totara_userdata'));
+echo $confirmform->render();
 echo $OUTPUT->footer();

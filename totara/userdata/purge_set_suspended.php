@@ -24,6 +24,8 @@
 require('../../config.php');
 
 $id = required_param('id', PARAM_INT);
+$loadconfirmform = optional_param('loadconfirmform', false, PARAM_BOOL);
+$suspendedpurgetypeid = optional_param('suspendedpurgetypeid', 0, PARAM_INT);
 
 $syscontext = context_system::instance();
 
@@ -46,6 +48,7 @@ $currentdata->suspendedpurgetypeid = '';
 if ($extra->suspendedpurgetypeid) {
     $currentdata->suspendedpurgetypeid = $extra->suspendedpurgetypeid;
 }
+$currentdata->loadconfirmform = true;
 
 $form = new \totara_userdata\form\purge_set_suspended($currentdata);
 
@@ -53,7 +56,22 @@ if ($form->is_cancelled()) {
     redirect($returnurl);
 }
 
-if ($data = $form->get_data()) {
+if (!$loadconfirmform) {
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('purgesetautomatic', 'totara_userdata'));
+    echo $form->render();
+    echo $OUTPUT->footer();
+    die;
+}
+
+$currentdata->suspendedpurgetypeid = $suspendedpurgetypeid;
+$confirmform = new \totara_userdata\form\purge_set_suspended_confirm($currentdata);
+
+if ($confirmform->is_cancelled()) {
+    redirect($returnurl);
+}
+
+if ($data = $confirmform->get_data()) {
     $updates = array();
     if ($data->suspendedpurgetypeid != $extra->suspendedpurgetypeid) {
         $updates['suspendedpurgetypeid'] = empty($data->suspendedpurgetypeid) ? null : $data->suspendedpurgetypeid;
@@ -67,6 +85,6 @@ if ($data = $form->get_data()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('purgesetsuspended', 'totara_userdata'));
-echo $form->render();
+echo $OUTPUT->heading(get_string('setpurgetypeconfirm', 'totara_userdata'));
+echo $confirmform->render();
 echo $OUTPUT->footer();

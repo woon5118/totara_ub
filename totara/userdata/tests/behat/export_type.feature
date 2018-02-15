@@ -29,14 +29,14 @@ Feature: Manage user data export types
     | idnumber      | et1id                   |
     | Description   | Some first description  |
     | Include files | 1                       |
-    | Permitted for | Export of own user data |
+    | Permitted use | User exporting own data |
     | User          | Username,Email          |
     And I press "Add"
     And I follow "First export type"
     Then I should see "First export type" in the "Full name" "definition_exact"
     And I should see "et1id" in the "ID number" "definition_exact"
     And I should see "Some first description" in the "Description" "definition_exact"
-    And I should see "Export of own user data" in the "Permitted for" "definition_exact"
+    And I should see "User exporting own data" in the "Permitted use" "definition_exact"
     And I should see "Yes" in the "Include files" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
     And I should see "0" in the "Number of exports" "definition_exact"
@@ -51,7 +51,7 @@ Feature: Manage user data export types
       | idnumber      | Et1id                   |
       | Description   | Some first description  |
       | Include files | 1                       |
-      | Permitted for | Export of own user data |
+      | Permitted use | User exporting own data |
       | User          | Username,Email          |
     And I press "Add"
     Then I should see "Same ID number already exists"
@@ -62,7 +62,7 @@ Feature: Manage user data export types
     Then I should see "First export type" in the "Full name" "definition_exact"
     And I should see "xt1id" in the "ID number" "definition_exact"
     And I should see "Some first description" in the "Description" "definition_exact"
-    And I should see "Export of own user data" in the "Permitted for" "definition_exact"
+    And I should see "User exporting own data" in the "Permitted use" "definition_exact"
     And I should see "Yes" in the "Include files" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
     And I should see "0" in the "Number of exports" "definition_exact"
@@ -78,7 +78,7 @@ Feature: Manage user data export types
       | idnumber      | et1id                              |
       | Description   | Some first description             |
       | Include files | 1                                  |
-      | Permitted for | Export of own user data            |
+      | Permitted use | User exporting own data            |
       | User          | core_user-username,core_user-email |
     And I press "Add"
     When I click on "Edit" "link" in the "First export type" "table_row"
@@ -87,14 +87,14 @@ Feature: Manage user data export types
       | idnumber      | et1id                              |
       | Description   | Some first description             |
       | Include files | 1                                  |
-      | Permitted for | Export of own user data            |
+      | Permitted use | User exporting own data            |
       | User          | core_user-username,core_user-email |
     And I set the following Totara form fields to these values:
       | Full name     | Prvni export                       |
       | idnumber      | et1id                              |
       | Description   | Some prvni description             |
       | Include files | 0                                  |
-      | Permitted for |                                    |
+      | Permitted use |                                    |
       | User          | core_user-interests                |
     And I press "Update"
     And I follow "Prvni export"
@@ -103,7 +103,7 @@ Feature: Manage user data export types
     And I should see "Some prvni description" in the "Description" "definition_exact"
     And I should see "No" in the "Include files" "definition_exact"
     And I should see "0" in the "Number of exports" "definition_exact"
-    And I should not see "Export of own user data"
+    And I should not see "User exporting own data"
     And I should not see "Username"
     And I should not see "Email"
     And I should see "Interests"
@@ -117,16 +117,16 @@ Feature: Manage user data export types
       | idnumber      | et1id                   |
       | Description   | Some first description  |
       | Include files | 1                       |
-      | Permitted for | Export of own user data |
+      | Permitted use | User exporting own data |
       | User          | Username,Email          |
     And I press "Add"
     When I click on "Duplicate" "link" in the "First export type" "table_row"
     And I should see the following Totara form fields having these values:
-      | Full name     |                                    |
+      | Full name     | Copy of First export type          |
       | idnumber      |                                    |
       | Description   | Some first description             |
       | Include files | 1                                  |
-      | Permitted for | Export of own user data            |
+      | Permitted use | User exporting own data            |
       | User          | core_user-username,core_user-email |
     And I set the following Totara form fields to these values:
       | Full name     | Prvni export                       |
@@ -136,7 +136,7 @@ Feature: Manage user data export types
     Then I should see "Prvni export" in the "Full name" "definition_exact"
     And I should see "et1idx" in the "ID number" "definition_exact"
     And I should see "Some first description" in the "Description" "definition_exact"
-    And I should see "Export of own user data" in the "Permitted for" "definition_exact"
+    And I should see "User exporting own data" in the "Permitted use" "definition_exact"
     And I should see "Yes" in the "Include files" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
     And I should see "0" in the "Number of exports" "definition_exact"
@@ -152,7 +152,7 @@ Feature: Manage user data export types
       | idnumber      | et1id                   |
       | Description   | Some first description  |
       | Include files | 1                       |
-      | Permitted for | Export of own user data |
+      | Permitted use | User exporting own data |
       | User          | Username,Email          |
     And I press "Add"
     And I press "Add export type"
@@ -161,7 +161,7 @@ Feature: Manage user data export types
       | idnumber      | et2id                   |
       | Description   | Some Second description |
       | Include files | 1                       |
-      | Permitted for | Export of own user data |
+      | Permitted use | User exporting own data |
       | User          | Username,Email          |
     And I press "Add"
     When I click on "Delete" "link" in the "First export type" "table_row"

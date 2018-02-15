@@ -29,54 +29,54 @@ Feature: Manual user data purging
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active"
+    And I set the "User status restriction" Totara form field to "Active"
     And I press "Continue"
     And I set the following Totara form fields to these values:
       | Full name     | Additional names purging  |
       | idnumber      | ptid1                     |
-      | Available for | Manual data purge         |
+      | Available use | Manual data purging       |
       | User          | core_user-additionalnames |
     And I press "Add"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active"
+    And I set the "User status restriction" Totara form field to "Active"
     And I press "Continue"
     And I set the following Totara form fields to these values:
       | Full name     | Picture purging          |
       | idnumber      | ptid2                    |
-      | Available for | Manual data purge        |
+      | Available use | Manual data purging      |
       | User          | core_user-picture        |
     And I press "Add"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Suspended"
+    And I set the "User status restriction" Totara form field to "Suspended"
     And I press "Continue"
     And I set the following Totara form fields to these values:
-      | Full name     | Suspended user purging                                      |
-      | idnumber      | ptid3                                                       |
-      | Available for | Manual data purge,Automatic purging after user is suspended |
-      | User          | core_user-picture,core_user-picture                         |
+      | Full name     | Suspended user purging                                        |
+      | idnumber      | ptid3                                                         |
+      | Available use | Manual data purging,Automatic purging once user is suspended  |
+      | User          | core_user-picture,core_user-picture                           |
     And I press "Add"
 
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Deleted"
+    And I set the "User status restriction" Totara form field to "Deleted"
     And I press "Continue"
     And I set the following Totara form fields to these values:
-      | Full name     | Deleted user purging                                      |
-      | idnumber      | ptid4                                                     |
-      | Available for | Manual data purge,Automatic purging after user is deleted |
-      | User          | core_user-username,core_user-email                        |
+      | Full name     | Deleted user purging                                        |
+      | idnumber      | ptid4                                                       |
+      | Available use | Manual data purging,Automatic purging once user is deleted  |
+      | User          | core_user-username,core_user-email                          |
     And I press "Add"
 
     When I navigate to "Deleted user accounts" node in "Site administration > Users > User data management"
     And I should see "bob4.learner@example.com"
     And I click on "User data" "link" in the "Bob4 Learner" "table_row"
-    And I press "Purge user data"
+    And I press "Select purge type"
     And I set the "Purge type" Totara form field to "Deleted user purging"
     And I press "Purge user data"
-    And I should see "Are you sure you want to purge the data?"
-    And I press "Purge user data"
-    And I should see "Ad-hoc task for user data purging was created, you will receive notification after it completes the execution."
+    And I should see "Are you sure you would like to delete this data?"
+    And I press "Proceed with purge"
+    And I should see "An ad hoc task for manual user data purging was created. You will receive a notification once it has completed successfully."
     And I should see "1" in the "All data purges" "definition_exact"
     And I should see "1" in the "Pending purges" "definition_exact"
     And I run the adhoc scheduled tasks "totara_userdata\task\purge_manual"
@@ -90,23 +90,23 @@ Feature: Manual user data purging
 
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "User data" "link" in the "Bob1 Learner" "table_row"
-    And I press "Purge user data"
+    And I press "Select purge type"
     And I set the "Purge type" Totara form field to "Additional names purging"
     And I press "Purge user data"
-    And I should see "Are you sure you want to purge the data?"
-    And I press "Purge user data"
-    And I should see "Ad-hoc task for user data purging was created, you will receive notification after it completes the execution."
+    And I should see "Are you sure you would like to delete this data?"
+    And I press "Proceed with purge"
+    And I should see "An ad hoc task for manual user data purging was created. You will receive a notification once it has completed successfully."
     And I should see "1" in the "All data purges" "definition_exact"
     And I should see "1" in the "Pending purges" "definition_exact"
-    And I press "Purge user data"
+    And I press "Select purge type"
     And I set the "Purge type" Totara form field to "Additional names purging"
     And I press "Purge user data"
     And I should see "This data purge is already scheduled for execution"
     And I set the "Purge type" Totara form field to "Picture purging"
     And I press "Purge user data"
-    And I should see "Are you sure you want to purge the data?"
-    And I press "Purge user data"
-    And I should see "Ad-hoc task for user data purging was created, you will receive notification after it completes the execution."
+    And I should see "Are you sure you would like to delete this data?"
+    And I press "Proceed with purge"
+    And I should see "An ad hoc task for manual user data purging was created. You will receive a notification once it has completed successfully."
     And I should see "2" in the "All data purges" "definition_exact"
     And I should see "2" in the "Pending purges" "definition_exact"
     And I run the adhoc scheduled tasks "totara_userdata\task\purge_manual"
@@ -121,12 +121,12 @@ Feature: Manual user data purging
     | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
     And I click on "User data" "link" in the "Bob3 Learner" "table_row"
-    And I press "Purge user data"
+    And I press "Select purge type"
     And I set the "Purge type" Totara form field to "Suspended user purging"
     And I press "Purge user data"
-    And I should see "Are you sure you want to purge the data?"
-    And I press "Purge user data"
-    And I should see "Ad-hoc task for user data purging was created, you will receive notification after it completes the execution."
+    And I should see "Are you sure you would like to delete this data?"
+    And I press "Proceed with purge"
+    And I should see "An ad hoc task for manual user data purging was created. You will receive a notification once it has completed successfully."
     And I should see "1" in the "All data purges" "definition_exact"
     And I should see "1" in the "Pending purges" "definition_exact"
     And I click on "1" "link" in the "All data purges" "definition_exact"
@@ -136,12 +136,12 @@ Feature: Manual user data purging
     And I follow "Bob3 Learner"
     And I should see "1" in the "All data purges" "definition_exact"
     And I should see "None" in the "Pending purges" "definition_exact"
-    And I press "Purge user data"
+    And I press "Select purge type"
     And I set the "Purge type" Totara form field to "Suspended user purging"
     And I press "Purge user data"
-    And I should see "Are you sure you want to purge the data?"
-    And I press "Purge user data"
-    And I should see "Ad-hoc task for user data purging was created, you will receive notification after it completes the execution."
+    And I should see "Are you sure you would like to delete this data?"
+    And I press "Proceed with purge"
+    And I should see "An ad hoc task for manual user data purging was created. You will receive a notification once it has completed successfully."
     And I should see "2" in the "All data purges" "definition_exact"
     And I should see "1" in the "Pending purges" "definition_exact"
     And I run the adhoc scheduled tasks "totara_userdata\task\purge_manual"

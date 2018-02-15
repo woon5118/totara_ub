@@ -24,6 +24,8 @@
 require('../../config.php');
 
 $id = required_param('id', PARAM_INT);
+$loadconfirmform = optional_param('loadconfirmform', false, PARAM_BOOL);
+$deletedpurgetypeid = optional_param('deletedpurgetypeid', 0, PARAM_INT);
 
 $syscontext = context_system::instance();
 
@@ -46,6 +48,7 @@ $currentdata->deletedpurgetypeid = '';
 if ($extra->deletedpurgetypeid) {
     $currentdata->deletedpurgetypeid = $extra->deletedpurgetypeid;
 }
+$currentdata->loadconfirmform = true;
 
 $form = new \totara_userdata\form\purge_set_deleted($currentdata);
 
@@ -53,7 +56,22 @@ if ($form->is_cancelled()) {
     redirect($returnurl);
 }
 
-if ($data = $form->get_data()) {
+if (!$loadconfirmform) {
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('purgesetautomatic', 'totara_userdata'));
+    echo $form->render();
+    echo $OUTPUT->footer();
+    die;
+}
+
+$currentdata->deletedpurgetypeid = $deletedpurgetypeid;
+$confirmform = new \totara_userdata\form\purge_set_deleted_confirm($currentdata);
+
+if ($confirmform->is_cancelled()) {
+    redirect($returnurl);
+}
+
+if ($data = $confirmform->get_data()) {
     $updates = array();
     if ($data->deletedpurgetypeid != $extra->deletedpurgetypeid) {
         $updates['deletedpurgetypeid'] = empty($data->deletedpurgetypeid) ? null : $data->deletedpurgetypeid;
@@ -67,6 +85,6 @@ if ($data = $form->get_data()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('purgesetdeleted', 'totara_userdata'));
-echo $form->render();
+echo $OUTPUT->heading(get_string('setpurgetypeconfirm', 'totara_userdata'));
+echo $confirmform->render();
 echo $OUTPUT->footer();

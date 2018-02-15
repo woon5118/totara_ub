@@ -44,7 +44,7 @@ final class export_type {
         if ($duplicate) {
             $exporttype = self::prepare_for_update($duplicate);
             $exporttype->id = '0';
-            $exporttype->fullname = '';
+            $exporttype->fullname = get_string('exporttypecopyof', 'totara_userdata', $exporttype);
             $exporttype->idnumber = '';
             unset($exporttype->usercreated);
             unset($exporttype->timecreated);

@@ -50,6 +50,9 @@ final class purge_type_actions extends base {
         $buttons = array();
 
         if (has_capability('totara/userdata:config', \context_system::instance())) {
+            $url = new \moodle_url('/totara/userdata/purge_type_edit.php', array('id' => $value));
+            $buttons[] = $OUTPUT->action_icon($url, new flex_icon('settings', array('alt' => get_string('edit'))));
+
             $url = new \moodle_url('/totara/userdata/purge_type_edit.php', array('id' => 0, 'duplicate' => $value));
             $buttons[] = $OUTPUT->action_icon($url, new flex_icon('duplicate', array('alt' => get_string('duplicate'))));
 
@@ -57,9 +60,6 @@ final class purge_type_actions extends base {
                 $url = new \moodle_url('/totara/userdata/purge_type_delete.php', array('id' => $value));
                 $buttons[] = $OUTPUT->action_icon($url, new flex_icon('delete', array('alt' => get_string('delete'))));
             }
-
-            $url = new \moodle_url('/totara/userdata/purge_type_edit.php', array('id' => $value));
-            $buttons[] = $OUTPUT->action_icon($url, new flex_icon('settings', array('alt' => get_string('edit'))));
         }
 
         return implode('', $buttons);

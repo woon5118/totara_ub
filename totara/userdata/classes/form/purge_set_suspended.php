@@ -48,7 +48,7 @@ final class purge_set_suspended extends \totara_form\form {
         $this->model->add(new \totara_form\form\element\static_html('staticidcard', '', $renderer->user_id_card($user, true)));
 
         $options = manager::get_purge_types(target_user::STATUS_SUSPENDED, 'suspended', $currentdata->suspendedpurgetypeid);
-        if ($suspendeddefault = get_config('totara_userdata', 'defaultsuspendedpurgetypeid')) {
+        if ($suspendeddefault = get_config('totara_userdata', 'defaultsuspendedpurgetypeid') && $user->suspended == 0) {
             $none = get_string('purgeautodefault', 'totara_userdata', $options[$suspendeddefault]);
         } else {
             $none = get_string('none');
@@ -60,5 +60,6 @@ final class purge_set_suspended extends \totara_form\form {
         $this->model->add_action_buttons(true, get_string('update'));
 
         $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
+        $this->model->add(new \totara_form\form\element\hidden('loadconfirmform', PARAM_BOOL));
     }
 }

@@ -46,7 +46,7 @@ final class purge_type {
         if ($duplicate) {
             $purgetype = self::prepare_for_update($duplicate);
             $purgetype->id = '0';
-            $purgetype->fullname = '';
+            $purgetype->fullname = get_string('purgetypecopyof', 'totara_userdata', $purgetype);
             $purgetype->idnumber = '';
             unset($purgetype->usercreated);
             unset($purgetype->timecreated);

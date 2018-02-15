@@ -25,21 +25,21 @@ Feature: Manage user data purge types
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
 
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active"
+    And I set the "User status restriction" Totara form field to "Active"
     And I press "Continue"
     And I set the following Totara form fields to these values:
     | Full name     | First purge type         |
     | idnumber      | pt1id                    |
     | Description   | Some first description   |
-    | Available for | Manual data purge        |
+    | Available use | Manual data purging      |
     | User          | Preferences,User picture |
     And I press "Add"
     And I follow "First purge type"
     Then I should see "First purge type" in the "Full name" "definition_exact"
     And I should see "pt1id" in the "ID number" "definition_exact"
-    And I should see "Active" in the "Restricted to user status" "definition_exact"
+    And I should see "Active" in the "User status restriction" "definition_exact"
     And I should see "Some first description" in the "Description" "definition_exact"
-    And I should see "Manual data purge" in the "Available for" "definition_exact"
+    And I should see "Manual data purging" in the "Available use" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
     And I should see "0" in the "Number of purges" "definition_exact"
     And I should see "User picture"
@@ -47,21 +47,21 @@ Feature: Manage user data purge types
 
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Suspended"
+    And I set the "User status restriction" Totara form field to "Suspended"
     And I press "Continue"
     And I set the following Totara form fields to these values:
-      | Full name     | Second purge type        |
-      | idnumber      | pt2id                    |
-      | Description   | Some second description  |
-      | Available for | Manual data purge,Automatic purging after user is suspended |
-      | User          | Preferences,User picture |
+      | Full name     | Second purge type                                            |
+      | idnumber      | pt2id                                                        |
+      | Description   | Some second description                                      |
+      | Available use | Manual data purging,Automatic purging once user is suspended |
+      | User          | Preferences,User picture                                     |
     And I press "Add"
     And I follow "Second purge type"
     Then I should see "Second purge type" in the "Full name" "definition_exact"
     And I should see "pt2id" in the "ID number" "definition_exact"
-    And I should see "Suspended" in the "Restricted to user status" "definition_exact"
+    And I should see "Suspended" in the "User status restriction" "definition_exact"
     And I should see "Some second description" in the "Description" "definition_exact"
-    And I should see "Manual data purge, Automatic purging after user is suspended" in the "Available for" "definition_exact"
+    And I should see "Manual data purging, Automatic purging once user is suspended" in the "Available use" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
     And I should see "0" in the "Number of purges" "definition_exact"
     And I should see "User picture"
@@ -69,14 +69,14 @@ Feature: Manage user data purge types
 
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Deleted"
+    And I set the "User status restriction" Totara form field to "Deleted"
     And I press "Continue"
     And I set the following Totara form fields to these values:
-      | Full name     | Third purge type         |
-      | idnumber      | pt2id                    |
-      | Description   | Some third description  |
-      | Available for | Manual data purge,Automatic purging after user is deleted |
-      | User          | Username,Email |
+      | Full name     | Third purge type                                           |
+      | idnumber      | pt2id                                                      |
+      | Description   | Some third description                                     |
+      | Available use | Manual data purging,Automatic purging once user is deleted |
+      | User          | Username,Email                                             |
     And I press "Add"
     Then I should see "Same ID number already exists"
     And I set the following Totara form fields to these values:
@@ -85,9 +85,9 @@ Feature: Manage user data purge types
     And I follow "Third purge type"
     Then I should see "Third purge type" in the "Full name" "definition_exact"
     And I should see "pt3id" in the "ID number" "definition_exact"
-    And I should see "Deleted" in the "Restricted to user status" "definition_exact"
+    And I should see "Deleted" in the "User status restriction" "definition_exact"
     And I should see "Some third description" in the "Description" "definition_exact"
-    And I should see "Manual data purge, Automatic purging after user is deleted" in the "Available for" "definition_exact"
+    And I should see "Manual data purging, Automatic purging once user is deleted" in the "Available use" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
     And I should see "0" in the "Number of purges" "definition_exact"
     And I should see "Username"
@@ -97,13 +97,13 @@ Feature: Manage user data purge types
     Given I log in as "manager"
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active"
+    And I set the "User status restriction" Totara form field to "Active"
     And I press "Continue"
     And I set the following Totara form fields to these values:
       | Full name     | First purge type         |
       | idnumber      | pt1id                    |
       | Description   | Some first description   |
-      | Available for | Manual data purge        |
+      | Available use | Manual data purging      |
       | User          | Preferences,User picture |
     And I press "Add"
     When I click on "Edit" "link" in the "First purge type" "table_row"
@@ -111,22 +111,22 @@ Feature: Manage user data purge types
       | Full name     | First purge type         |
       | idnumber      | pt1id                    |
       | Description   | Some first description   |
-      | Available for | Manual data purge        |
+      | Available use | Manual data purging      |
       | User          | Preferences,User picture |
     And I set the following Totara form fields to these values:
       | Full name     | Prvni purge                        |
       | idnumber      | xt1id                              |
       | Description   | Some prvni description             |
-      | Available for |                                    |
+      | Available use |                                    |
       | User          | Interests                          |
     And I press "Update"
     And I follow "Prvni purge"
     Then I should see "Prvni purge" in the "Full name" "definition_exact"
     And I should see "xt1id" in the "ID number" "definition_exact"
-    And I should see "Active" in the "Restricted to user status" "definition_exact"
+    And I should see "Active" in the "User status restriction" "definition_exact"
     And I should see "Some prvni description" in the "Description" "definition_exact"
     And I should see "0" in the "Number of purges" "definition_exact"
-    And I should not see "Manual data purge"
+    And I should not see "Manual data purging"
     And I should not see "Preferences"
     And I should not see "User picture"
     And I should see "Interests"
@@ -135,21 +135,21 @@ Feature: Manage user data purge types
     Given I log in as "manager"
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active"
+    And I set the "User status restriction" Totara form field to "Active"
     And I press "Continue"
     And I set the following Totara form fields to these values:
       | Full name     | First purge type         |
       | idnumber      | pt1id                    |
       | Description   | Some first description   |
-      | Available for | Manual data purge        |
+      | Available use | Manual data purging      |
       | User          | Preferences,User picture |
     And I press "Add"
     When I click on "Duplicate" "link" in the "First purge type" "table_row"
     And I should see the following Totara form fields having these values:
-      | Full name     |                                    |
+      | Full name     | Copy of First purge type           |
       | idnumber      |                                    |
       | Description   | Some first description             |
-      | Available for | Manual data purge                  |
+      | Available use | Manual data purging                |
       | User          | Preferences,User picture           |
     And I set the following Totara form fields to these values:
       | Full name     | Prvni purge                        |
@@ -158,9 +158,9 @@ Feature: Manage user data purge types
     And I follow "Prvni purge"
     Then I should see "Prvni purge" in the "Full name" "definition_exact"
     And I should see "et1idx" in the "ID number" "definition_exact"
-    And I should see "Active" in the "Restricted to user status" "definition_exact"
+    And I should see "Active" in the "User status restriction" "definition_exact"
     And I should see "Some first description" in the "Description" "definition_exact"
-    And I should see "Manual data purge" in the "Available for" "definition_exact"
+    And I should see "Manual data purging" in the "Available use" "definition_exact"
     And I should see "Paul Manager" in the "Created by" "definition_exact"
     And I should see "0" in the "Number of purges" "definition_exact"
     And I should see "Preferences"
@@ -170,24 +170,24 @@ Feature: Manage user data purge types
     Given I log in as "manager"
     And I navigate to "Purge types" node in "Site administration > Users > User data management"
     And I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Active"
+    And I set the "User status restriction" Totara form field to "Active"
     And I press "Continue"
     And I set the following Totara form fields to these values:
       | Full name     | First purge type         |
       | idnumber      | pt1id                    |
       | Description   | Some first description   |
-      | Available for | Manual data purge        |
+      | Available use | Manual data purging      |
       | User          | Preferences,User picture |
     And I press "Add"
     When I press "Add purge type"
-    And I set the "Restricted to user status" Totara form field to "Suspended"
+    And I set the "User status restriction" Totara form field to "Suspended"
     And I press "Continue"
     And I set the following Totara form fields to these values:
-      | Full name     | Second purge type        |
-      | idnumber      | pt2id                    |
-      | Description   | Some second description  |
-      | Available for | Manual data purge,Automatic purging after user is suspended |
-      | User          | Preferences,User picture |
+      | Full name     | Second purge type                                            |
+      | idnumber      | pt2id                                                        |
+      | Description   | Some second description                                      |
+      | Available use | Manual data purging,Automatic purging once user is suspended |
+      | User          | Preferences,User picture                                     |
     And I press "Add"
     When I click on "Delete" "link" in the "First purge type" "table_row"
     And I should see "Are you sure you want to delete purge type"

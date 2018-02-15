@@ -36,17 +36,25 @@ class user_bulk_deletedpurgetype_form extends \totara_form\form {
         foreach ($rs as $user) {
             $users[] = fullname($user);
         }
-        $users = implode(', ', $users);
+        $rs->close();
+        $users = implode(html_writer::empty_tag('br'), $users);
 
         $this->model->add(new \totara_form\form\element\static_html('staticusers', get_string('users'), $users));
 
-        $options = array('' => get_string('choosedots'), '-1' => get_string('none')) + manager::get_purge_types(target_user::STATUS_DELETED, 'deleted');
-        $deletedpurgetypeid = new \totara_form\form\element\select('deletedpurgetypeid', get_string('purgeorigindeleted', 'totara_userdata'), $options);
-        $deletedpurgetypeid->set_attribute('required', true);
+        $options = manager::get_purge_types(target_user::STATUS_DELETED, 'deleted');
+        if ($deleteddefault = get_config('totara_userdata', 'defaultdeletedpurgetypeid')) {
+            $none = get_string('purgeautodefault', 'totara_userdata', $options[$deleteddefault]);
+        } else {
+            $none = get_string('none');
+        }
+        $options = array('' => $none) + $options;
+
+        $deletedpurgetypeid = new \totara_form\form\element\select('deletedpurgetypeid', get_string('purgeorigindeletedbulkselect', 'totara_userdata'), $options);
         $this->model->add($deletedpurgetypeid);
 
-        $this->model->add_action_buttons(true, get_string('update'));
+        $this->model->add_action_buttons(true, get_string('applychanges', 'totara_userdata'));
 
         $this->model->add(new \totara_form\form\element\hidden('confirmhash', PARAM_ALPHANUM));
+        $this->model->add(new \totara_form\form\element\hidden('loadconfirmform', PARAM_BOOL));
     }
 }
