@@ -143,7 +143,7 @@ if ($extra->suspendedpurgetypeid) {
 }
 if (has_capability('totara/userdata:purgesetsuspended', $syscontext) and $suspendedypes) {
     $editurl = new moodle_url('/totara/userdata/purge_set_suspended.php', array('id' => $user->id));
-    echo $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('edit'))));
+    echo ' ' . $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('edit'))));
 
 }
 echo '</dd>';
@@ -171,7 +171,7 @@ if ($extra->deletedpurgetypeid) {
 }
 if (has_capability('totara/userdata:purgesetdeleted', $syscontext) and $deletedypes) {
     $editurl = new moodle_url('/totara/userdata/purge_set_deleted.php', array('id' => $user->id));
-    echo $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('edit'))));
+    echo ' ' . $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('edit'))));
 
 }
 echo '</dd>';
