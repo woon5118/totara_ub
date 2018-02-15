@@ -30,15 +30,15 @@ Feature: Filter default value works as expected
     And I should see "User Four"
     And I should not see "User One"
     And I should not see "User Two"
-    And the field "user-deleted" matches value "Active users only"
+    And the field "user-deleted" matches value "Active"
 
   Scenario: Changing default value for filter is possible
     Given I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And the field "user-deleted" matches value "Active users only"
+    And the field "user-deleted" matches value "Active"
 
     # Changing to deleted users only
-    When I set the field "user-deleted" to "Deleted users only"
-    Then the field "user-deleted" matches value "Deleted users only"
+    When I set the field "user-deleted" to "Deleted"
+    Then the field "user-deleted" matches value "Deleted"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "User One"
     And I should not see "User Two"
@@ -46,8 +46,8 @@ Feature: Filter default value works as expected
     And I should not see "User Four"
 
     # Changing to suspended users only
-    When I set the field "user-deleted" to "Suspended users only"
-    Then the field "user-deleted" matches value "Suspended users only"
+    When I set the field "user-deleted" to "Suspended"
+    Then the field "user-deleted" matches value "Suspended"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "User Two"
     And I should not see "User One"
@@ -65,7 +65,7 @@ Feature: Filter default value works as expected
 
   Scenario: Clear filter is working
     Given I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And the field "user-deleted" matches value "Active users only"
+    And the field "user-deleted" matches value "Active"
     When I click on "Clear" "button" in the ".fitem_actionbuttons" "css_element"
     Then the field "user-deleted" matches value "any value"
     And I should see "User One"

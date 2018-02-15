@@ -57,18 +57,18 @@ Feature: Test HR Import user csv suspended field import.
 
     Examples:
       | user suspended | empty string behaviour             | csv suspend value      | csv                   | expected outcome suspended value |
-      |  0             |  Empty strings are ignored         |  0                     |  user_suspended_1.csv |  Active user                     |
-      |  0             |  Empty strings are ignored         |  1                     |  user_suspended_2.csv |  Suspended user                  |
-      |  0             |  Empty strings are ignored         |                        |  user_suspended_3.csv |  Active user                     |
+      |  0             |  Empty strings are ignored         |  0                     |  user_suspended_1.csv |  Active                          |
+      |  0             |  Empty strings are ignored         |  1                     |  user_suspended_2.csv |  Suspended                       |
+      |  0             |  Empty strings are ignored         |                        |  user_suspended_3.csv |  Active                          |
 
-      |  0             |  Empty strings erase existing data |  0                     |  user_suspended_1.csv |  Active user                     |
-      |  0             |  Empty strings erase existing data |  1                     |  user_suspended_2.csv |  Suspended user                  |
-      |  0             |  Empty strings erase existing data |                        |  user_suspended_3.csv |  Active user                     |
+      |  0             |  Empty strings erase existing data |  0                     |  user_suspended_1.csv |  Active                          |
+      |  0             |  Empty strings erase existing data |  1                     |  user_suspended_2.csv |  Suspended                       |
+      |  0             |  Empty strings erase existing data |                        |  user_suspended_3.csv |  Active                          |
 
-      |  1             |  Empty strings are ignored         |  0                     |  user_suspended_1.csv |  Active user                     |
-      |  1             |  Empty strings are ignored         |  1                     |  user_suspended_2.csv |  Suspended user                  |
-      |  1             |  Empty strings are ignored         |                        |  user_suspended_3.csv |  Suspended user                  |
+      |  1             |  Empty strings are ignored         |  0                     |  user_suspended_1.csv |  Active                          |
+      |  1             |  Empty strings are ignored         |  1                     |  user_suspended_2.csv |  Suspended                       |
+      |  1             |  Empty strings are ignored         |                        |  user_suspended_3.csv |  Suspended                       |
 
-      |  1             |  Empty strings erase existing data |  0                     |  user_suspended_1.csv |  Active user                     |
-      |  1             |  Empty strings erase existing data |  1                     |  user_suspended_2.csv |  Suspended user                  |
-      |  1             |  Empty strings erase existing data |                        |  user_suspended_3.csv |  Active user                     |
+      |  1             |  Empty strings erase existing data |  0                     |  user_suspended_1.csv |  Active                          |
+      |  1             |  Empty strings erase existing data |  1                     |  user_suspended_2.csv |  Suspended                       |
+      |  1             |  Empty strings erase existing data |                        |  user_suspended_3.csv |  Active                          |

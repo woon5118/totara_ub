@@ -47,9 +47,9 @@ Feature: Test HR Import user database suspended field import.
 
     Examples:
       | user suspended |  source value  | expected outcome suspended value |
-      |  0             |   null         |  Active user                     |
-      |  0             |                |  Active user                     |
-      |  1             |   null         |  Suspended user                  |
-      |  1             |                |  Active user                     |
+      |  0             |   null         |  Active                          |
+      |  0             |                |  Active                          |
+      |  1             |   null         |  Suspended                       |
+      |  1             |                |  Active                          |
 
 
