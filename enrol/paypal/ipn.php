@@ -32,6 +32,7 @@
 // comment out when debugging or better look into error log!
 define('NO_DEBUG_DISPLAY', true);
 
+// @codingStandardsIgnoreLine This script does not require login.
 require("../../config.php");
 require_once("lib.php");
 require_once($CFG->libdir.'/eventslib.php');
@@ -42,14 +43,16 @@ require_once($CFG->libdir . '/filelib.php');
 // the custom handler just logs exceptions and stops.
 set_exception_handler(\enrol_paypal\util::get_exception_handler());
 
-// Make sure the enrollment plugin is enabled sitewide.
+// Make sure we are enabled in the first place.
 if (!enrol_is_enabled('paypal')) {
-    throw new moodle_exception('enrolmentplugindisabled', 'enrol_paypal');
+    http_response_code(503);
+    throw new moodle_exception('errdisabled', 'enrol_paypal');
 }
 
 /// Keep out casual intruders
 if (empty($_POST) or !empty($_GET)) {
-    print_error("Sorry, you can not use the script that way.");
+    http_response_code(400);
+    throw new moodle_exception('invalidrequest', 'core_error');
 }
 
 /// Read all the data from PayPal and get it ready for later;
@@ -62,11 +65,27 @@ $req = 'cmd=_notify-validate';
 $data = new stdClass();
 
 foreach ($_POST as $key => $value) {
+    if ($key !== clean_param($key, PARAM_ALPHANUMEXT)) {
+        throw new moodle_exception('invalidrequest', 'core_error', '', null, $key);
+    }
+    if (is_array($value)) {
+        throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Unexpected array param: '.$key);
+    }
     $req .= "&$key=".urlencode($value);
     $data->$key = fix_utf8($value);
 }
 
+if (empty($data->custom)) {
+    throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Missing request param: custom');
+}
+
 $custom = explode('-', $data->custom);
+unset($data->custom);
+
+if (empty($custom) || count($custom) < 3) {
+    throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Invalid value of the request param: custom');
+}
+
 $data->userid           = (int)$custom[0];
 $data->courseid         = (int)$custom[1];
 $data->instanceid       = (int)$custom[2];
@@ -74,27 +93,13 @@ $data->payment_gross    = $data->mc_gross;
 $data->payment_currency = $data->mc_currency;
 $data->timeupdated      = time();
 
-// Custom field is not needed anymore and should not be used anywhere.
-unset($data->custom);
-
 $user = $DB->get_record("user", array("id" => $data->userid), "*", MUST_EXIST);
 $course = $DB->get_record("course", array("id" => $data->courseid), "*", MUST_EXIST);
 $context = context_course::instance($course->id, MUST_EXIST);
 
 $PAGE->set_context($context);
 
-// Make sure paypal enrolment method is activated for this course.
-$plugin_instance = $DB->get_record(
-    "enrol",
-    [
-        "id" => $data->instanceid,
-        "courseid" => $course->id,
-        "enrol" => "paypal",
-        "status" => 0
-    ],
-    "*",
-    MUST_EXIST
-);
+$plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "enrol" => "paypal", "status" => 0), "*", MUST_EXIST);
 $plugin = enrol_get_plugin('paypal');
 
 /// Open a connection back to PayPal to validate the data
@@ -109,9 +114,9 @@ $options = array(
 $location = "https://$paypaladdr/cgi-bin/webscr";
 $result = $c->post($location, $req, $options);
 
-if (!empty($c->get_errno())) {
-    $debuginfo = sprintf("errocode: %s\n%s", $c->get_errno(), (string)$result);
-    throw new moodle_exception('ipnverificationconnectfailed', 'enrol_paypal', '', null, $debuginfo);
+if ($c->get_errno()) {
+    throw new moodle_exception('errpaypalconnect', 'enrol_paypal', '', array('url' => $paypaladdr, 'result' => $result),
+        json_encode($data));
 }
 
 /// Connection is OK, so now we post the data to validate it
@@ -313,6 +318,6 @@ if (strlen($result) > 0) {
 
     } else if (strcmp ($result, "INVALID") == 0) { // ERROR
         $DB->insert_record("enrol_paypal", $data, false);
-        throw new moodle_exception('ipnverificationfailed', 'enrol_paypal');
+        throw new moodle_exception('erripninvalid', 'enrol_paypal', '', null, json_encode($data));
     }
 }
