@@ -65,7 +65,7 @@ if ($user->deleted) {
         $userinfo->make_active();}
 }
 
-$suspendedypes = manager::get_purge_types(target_user::STATUS_SUSPENDED, 'suspended', $extra->suspendedpurgetypeid);
+$suspendedtypes = manager::get_purge_types(target_user::STATUS_SUSPENDED, 'suspended', $extra->suspendedpurgetypeid);
 $deletedtypes = manager::get_purge_types(target_user::STATUS_DELETED, 'deleted', $extra->deletedpurgetypeid);
 
 $defaultsuspendedpurgetypeid = get_config('totara_userdata', 'defaultsuspendedpurgetypeid');
@@ -123,7 +123,7 @@ echo '<dt>' . get_string('purgeoriginsuspended', 'totara_userdata') . '</dt>';
 echo '<dd>';
 if ($extra->suspendedpurgetypeid) {
     $url = new \moodle_url('/totara/userdata/purge_type.php', array('id' => $extra->suspendedpurgetypeid));
-    $purgetypename = html_writer::link($url, $suspendedypes[$extra->suspendedpurgetypeid]);
+    $purgetypename = html_writer::link($url, $suspendedtypes[$extra->suspendedpurgetypeid]);
     if ($targetuser->status == $targetuser::STATUS_SUSPENDED) {
         $suspendedpurgetype = $DB->get_record('totara_userdata_purge_type', array('id' => $extra->suspendedpurgetypeid), '*', MUST_EXIST);
         if ($extra->timesuspendedpurged === null or $extra->timesuspendedpurged < $extra->timesuspended or $extra->timesuspendedpurged < $suspendedpurgetype->timechanged) {
@@ -137,11 +137,11 @@ if ($extra->suspendedpurgetypeid) {
 } else if ($targetuser->status == $targetuser::STATUS_ACTIVE and $defaultsuspendedpurgetypeid) {
     // Defaults are applied to active accounts only
     $url = new \moodle_url('/totara/userdata/purge_type.php', array('id' => $defaultsuspendedpurgetypeid));
-    echo html_writer::link($url, get_string('purgeautodefault', 'totara_userdata', $suspendedypes[$defaultsuspendedpurgetypeid]));
+    echo html_writer::link($url, get_string('purgeautodefault', 'totara_userdata', $suspendedtypes[$defaultsuspendedpurgetypeid]));
 } else {
     echo get_string('none');
 }
-if (has_capability('totara/userdata:purgesetsuspended', $syscontext) and $suspendedypes) {
+if (has_capability('totara/userdata:purgesetsuspended', $syscontext) and $suspendedtypes) {
     $editurl = new moodle_url('/totara/userdata/purge_set_suspended.php', array('id' => $user->id));
     echo ' ' . $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('edit'))));
 
