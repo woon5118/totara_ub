@@ -84,6 +84,7 @@ class export_downloaded extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/totara/userdata/exports.php', array('exportid' => $this->objectid));
+        // There is no page with detail of one export yet, point to list of all exports for the user for now.
+        return new \moodle_url('/totara/userdata/exports.php', array('userid' => $this->relateduserid));
     }
 }

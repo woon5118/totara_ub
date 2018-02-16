@@ -67,6 +67,8 @@ class totara_userdata_event_export_downloaded_testcase extends advanced_testcase
         $this->assertSame($user->id, $event->relateduserid);
         $this->assertSame(array('fileid' => $file->get_id(), 'contenthash' => $file->get_contenthash()), $event->other);
         $this->assertEventContextNotUsed($event);
+        $url = new \moodle_url('/totara/userdata/exports.php', array('userid' => $user->id));
+        $this->assertEquals($url, $event->get_url());
 
     }
 }
