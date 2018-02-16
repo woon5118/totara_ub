@@ -67,7 +67,7 @@ class purge_manually extends \totara_form\form {
      */
     public function is_submitted() {
         if (!$this->model->is_finalised()) {
-            throw new \coding_exception('is_cancelled() cannot be used before the model is finalised');
+            throw new \coding_exception('is_submitted() cannot be used before the model is finalised');
         }
 
         return $this->model->is_form_submitted();
