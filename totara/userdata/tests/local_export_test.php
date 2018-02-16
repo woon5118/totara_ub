@@ -83,7 +83,8 @@ class totara_userdata_local_export_testcase extends advanced_testcase {
         $exportfile = $fs->get_file(SYSCONTEXTID, 'totara_userdata', 'export', $exportid, '/', 'export.tgz');
         $this->assertInstanceOf('stored_file', $exportfile);
         $this->assertGreaterThan(100, $exportfile->get_filesize());
-        $items = $DB->get_records('totara_userdata_export_item', array('exportid' => $export->id), 'component ASC,name ASC', 'name, {totara_userdata_export_item}.*');
+        $items = $DB->get_records('totara_userdata_export_item', array('exportid' => $export->id), 'component ASC,name ASC');
+        $items = array_combine(array_column($items, 'name'), $items);
         $this->assertCount(2, $items);
         $this->assertSame('core_user', $items['names']->component);
         $this->assertTimeCurrent($items['names']->timestarted);

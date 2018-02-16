@@ -167,7 +167,8 @@ class totara_userdata_local_purge_testcase extends advanced_testcase {
         $this->assertSame(item::RESULT_STATUS_SUCCESS, $result);
         $newpurge = $DB->get_record('totara_userdata_purge', array('id' => $purgeid), '*', MUST_EXIST);
         $this->assertEquals($purge, $newpurge);
-        $items = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purge->id), 'component ASC,name ASC', 'name, {totara_userdata_purge_item}.*');
+        $items = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purge->id), 'component ASC,name ASC');
+        $items = array_combine(array_column($items, 'name'), $items);
         $this->assertCount(2, $items);
         $this->assertSame('core_user', $items['additionalnames']->component);
         $this->assertTimeCurrent($items['additionalnames']->timestarted);
@@ -191,7 +192,8 @@ class totara_userdata_local_purge_testcase extends advanced_testcase {
         $this->assertSame(item::RESULT_STATUS_SUCCESS, $result);
         $newpurge = $DB->get_record('totara_userdata_purge', array('id' => $purgeid), '*', MUST_EXIST);
         $this->assertEquals($purge, $newpurge);
-        $items = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purge->id), 'component ASC,name ASC', 'name, {totara_userdata_purge_item}.*');
+        $items = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purge->id), 'component ASC,name ASC');
+        $items = array_combine(array_column($items, 'name'), $items);
         $this->assertCount(2, $items);
         $this->assertSame('core_user', $items['additionalnames']->component);
         $this->assertTimeCurrent($items['additionalnames']->timestarted);
@@ -215,7 +217,8 @@ class totara_userdata_local_purge_testcase extends advanced_testcase {
         $this->assertSame(item::RESULT_STATUS_SUCCESS, $result);
         $newpurge = $DB->get_record('totara_userdata_purge', array('id' => $purgeid), '*', MUST_EXIST);
         $this->assertEquals($purge, $newpurge);
-        $items = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purge->id), 'component ASC,name ASC', 'name, {totara_userdata_purge_item}.*');
+        $items = $DB->get_records('totara_userdata_purge_item', array('purgeid' => $purge->id), 'component ASC,name ASC');
+        $items = array_combine(array_column($items, 'name'), $items);
         $this->assertCount(2, $items);
         $this->assertSame('core_user', $items['additionalnames']->component);
         $this->assertTimeCurrent($items['additionalnames']->timestarted);
