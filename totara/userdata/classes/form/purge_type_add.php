@@ -30,11 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 class purge_type_add extends \totara_form\form {
     public function definition() {
 
-        $options = array(
-            target_user::STATUS_ACTIVE => get_string('activeuser', 'totara_reportbuilder'),
-            target_user::STATUS_SUSPENDED => get_string('suspendeduser', 'totara_reportbuilder'),
-            target_user::STATUS_DELETED => get_string('deleteduser', 'totara_reportbuilder'),
-        );
+        $options = target_user::get_user_statuses();
         $userstatus = new \totara_form\form\element\radios('userstatus', get_string('purgetypeuserstatus', 'totara_userdata'), $options);
         $userstatus->set_attribute('required', 1);
         $userstatus->add_help_button('purgetypeuserstatus', 'totara_userdata');
