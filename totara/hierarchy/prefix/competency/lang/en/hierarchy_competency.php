@@ -47,3 +47,4 @@ $string['eventupdatedscalevalue'] = 'Updated Competency Scale Value';
 $string['eventupdatedtype'] = 'Updated Competency Type';
 $string['eventvieweditem'] = 'Viewed Competency';
 $string['pluginname'] = 'Competency Hierarchies';
+$string['userdataitemcompetency_evidence'] = 'Status';
