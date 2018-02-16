@@ -222,48 +222,52 @@ class totara_userdata_local_util_testcase extends advanced_testcase {
         util::get_user_extras($activeuser->id);
         util::get_user_extras($suspendeduser->id);
         util::get_user_extras($deleteduser->id);
-        $records = $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*');
+        $records = $DB->get_records('totara_userdata_user', array(), 'userid ASC');
         util::sync_totara_userdata_user_table();
-        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*'));
+        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC'));
 
         // Test contexts are returned back if disappear.
         $DB->set_field('totara_userdata_user', 'usercontextid', null, array());
         util::backup_user_context_id($deleteduser->id, $deletedusercontext->id);
         util::sync_totara_userdata_user_table();
-        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*'));
+        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC'));
 
         // Test suspended time gets removed if user not suspended.
         $DB->set_field('totara_userdata_user', 'timesuspended', time(), array('userid' => $activeuser->id));
         util::sync_totara_userdata_user_table();
-        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*'));
+        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC'));
 
         // Test deleted time gets removed if user not deleted.
         $DB->set_field('totara_userdata_user', 'timedeleted', time(), array('userid' => $activeuser->id));
         util::sync_totara_userdata_user_table();
-        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*'));
+        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC'));
 
         // Test suspended time gets removed if user not suspended.
         $DB->set_field('totara_userdata_user', 'timesuspended', null, array('userid' => $suspendeduser->id));
         util::sync_totara_userdata_user_table();
-        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*'));
+        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC'));
 
         // Test deleted time gets removed if user not deleted.
-        $records[$deleteduser->id]->timedeleted = $deleteduser->timemodified;
+        foreach ($records as $k => $record) {
+            if ($record->userid == $deleteduser->id) {
+                $records[$k]->timedeleted = $deleteduser->timemodified;
+            }
+        }
         $DB->set_field('totara_userdata_user', 'timedeleted', null, array('userid' => $deleteduser->id));
         util::sync_totara_userdata_user_table();
-        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*'));
+        $this->assertEquals($records, $DB->get_records('totara_userdata_user', array(), 'userid ASC'));
 
         // Recreate everything.
         $DB->delete_records('totara_userdata_user', array());
         util::backup_user_context_id($deleteduser->id, $deletedusercontext->id);
         util::sync_totara_userdata_user_table();
-        $newrecords = $DB->get_records('totara_userdata_user', array(), 'userid ASC', 'userid, {totara_userdata_user}.*');
-        foreach ($newrecords as $k => $unused) {
+        $newrecords = $DB->get_records('totara_userdata_user', array(), 'userid ASC');
+        foreach ($newrecords as $k => $record) {
             unset($newrecords[$k]->id);
         }
         foreach ($records as $k => $unused) {
             unset($records[$k]->id);
         }
-        $this->assertEquals($records, $newrecords);
+        $this->assertEquals(array_values($records), array_values($newrecords));
     }
 }
