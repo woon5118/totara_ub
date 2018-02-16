@@ -30,7 +30,7 @@ use totara_userdata\local\purge;
 /**
  * Scheduled task for automatic purging of user data after user deletion.
  */
-class purge_deleted extends \core\task\scheduled_task {
+final class purge_deleted extends \core\task\scheduled_task {
     /**
      * Get a descriptive name for this task (shown to admins).
      *

@@ -28,7 +28,7 @@ use \totara_userdata\userdata\manager;
 /**
  * Ad-hoc tack for manual purging of user data.
  */
-class purge_manual extends \core\task\adhoc_task {
+final class purge_manual extends \core\task\adhoc_task {
     public function execute() {
         global $DB;
 
@@ -54,7 +54,7 @@ class purge_manual extends \core\task\adhoc_task {
      *
      * @param \stdClass $purge
      */
-    protected function notify_result(\stdClass $purge) {
+    private function notify_result(\stdClass $purge) {
         global $DB;
 
         $userto = $DB->get_record('user', array('id' => $purge->usercreated), '*', MUST_EXIST);

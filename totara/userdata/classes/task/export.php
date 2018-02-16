@@ -28,7 +28,7 @@ use \totara_userdata\userdata\manager;
 /**
  * Ad-hoc tack for export of user data.
  */
-class export extends \core\task\adhoc_task {
+final class export extends \core\task\adhoc_task {
     public function execute() {
         global $DB;
 
@@ -57,7 +57,7 @@ class export extends \core\task\adhoc_task {
      *
      * @param \stdClass $export
      */
-    protected function notify_result(\stdClass $export) {
+    private function notify_result(\stdClass $export) {
         global $DB;
 
         if ($export->origin !== 'self') {

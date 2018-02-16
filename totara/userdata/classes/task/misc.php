@@ -28,7 +28,7 @@ use totara_userdata\local\util;
 /**
  * Sync totara_userdata_user with user table.
  */
-class misc extends \core\task\scheduled_task {
+final class misc extends \core\task\scheduled_task {
     public function get_name() {
         return get_string('taskmisc', 'totara_userdata');
     }
