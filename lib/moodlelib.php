@@ -2846,8 +2846,20 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         return;
     }
 
+    // Site policies.
+    if (\tool_sitepolicy\userconsent::is_consent_needed($USER->id)) {
+        if ($preventredirect) {
+            throw new moodle_exception('sitepolicyconsentpending', 'tool_sitepolicy');
+        }
+        if ($setwantsurltome) {
+            $SESSION->wantsurl = qualified_me();
+        }
+
+        redirect(new moodle_url('/admin/tool/sitepolicy/userpolicy.php'));
+    }
+
     // Check that the user has agreed to a site policy if there is one - do not test in case of admins.
-    if (!$USER->policyagreed and !is_siteadmin()) {
+    if (empty($CFG->enablesitepolicies) && !$USER->policyagreed and !is_siteadmin()) {
         if (!empty($CFG->sitepolicy) and !isguestuser()) {
             if ($preventredirect) {
                 throw new moodle_exception('sitepolicynotagreed', 'error', '', $CFG->sitepolicy);

@@ -211,4 +211,8 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('setting:allowmultiplejobs', 'totara_job'),
         new lang_string('setting:allowmultiplejobs_description', 'totara_job'),
         1));
+
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enablesitepolicies',
+        new lang_string('enablesitepolicies', 'tool_sitepolicy'),
+        new lang_string('configenablesitepolicies', 'tool_sitepolicy'), 0));
 }

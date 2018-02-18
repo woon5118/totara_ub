@@ -254,7 +254,22 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'signup',
                 'required' => array()
             )
+        ),
+        'tool_sitepolicy' => array(
+            'draftpolicies' => array(
+                'datagenerator' => 'draft_policy',
+                    'required' => array(),
+            ),
+            'publishedpolicies' => array(
+                'datagenerator' => 'published_policy',
+                'required' => array(),
+            ),
+            'multiversionpolicies' => array(
+                'datagenerator' => 'multiversion_policy',
+                'required' => array(),
+            )
         )
+
     );
 
     /**

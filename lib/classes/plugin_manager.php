@@ -1456,7 +1456,7 @@ class core_plugin_manager {
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
                 'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'usertours', 'xmldb'
                 // Totara:
-                , 'totara_sync', 'totara_timezonefix'
+                , 'totara_sync', 'totara_timezonefix', 'sitepolicy'
             ),
 
             // Totara:

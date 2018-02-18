@@ -113,6 +113,16 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $tree->add_node($node);
     }
 
+    //Totara: Site policy consent
+    if (!empty($CFG->enablesitepolicies)) {
+        if ($iscurrentuser || $PAGE->settingsnav->can_view_user_preferences($user->id)) {
+            $url = new moodle_url('/admin/tool/sitepolicy/userlist.php', ['userid' => $user->id]);
+            $title = get_string('userlistuserconsent', 'tool_sitepolicy');
+            $node = new core_user\output\myprofile\node('administration', 'userconsent', $title, null, $url);
+            $tree->add_node($node);
+        }
+    }
+
     // Login as ...
     if (!$user->deleted && !$iscurrentuser &&
                 !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas',
