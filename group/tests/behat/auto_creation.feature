@@ -143,17 +143,21 @@ Feature: Automatic creation of groups
 
   Scenario: Exclude suspended users when auto-creating groups
     Given I set the field "Include only active enrolments" to "1"
+    And I set the field "Allocate members" to "Alphabetically by first name, last name"
     And I set the field "Auto create based on" to "Members per group"
     When I set the field "Group/member count" to "11"
     And I press "Preview"
     Then I should not see "Suspended Student 11"
+    And I should see "Student 1"
 
   Scenario: Include suspended users when auto-creating groups
     Given I set the field "Include only active enrolments" to "0"
+    And I set the field "Allocate members" to "Alphabetically by first name, last name"
     And I set the field "Auto create based on" to "Members per group"
     When I set the field "Group/member count" to "11"
     And I press "Preview"
     Then I should see "Suspended student 11"
+    And I should see "Student 1"
 
   Scenario: Do not display 'Include only active enrolments' if user does not have the 'moodle/course:viewsuspendedusers' capability
     Given I log out
@@ -167,6 +171,23 @@ Feature: Automatic creation of groups
     And I navigate to "Users > Groups" in current page administration
     When I press "Auto-create groups"
     Then I should not see "Include only active enrolments"
+    And I set the field "Allocate members" to "Alphabetically by first name, last name"
     And I set the field "Group/member count" to "11"
     And I press "Preview"
+    And I should see "Student 1"
     And I should not see "Suspended Student 11"
+
+  Scenario: Do not list user names when auto-creating groups randomly
+    Given I set the field "Allocate members" to "Randomly"
+    And I set the field "Auto create based on" to "Members per group"
+    When I set the field "Group/member count" to "4"
+    And I press "Preview"
+    Then I should not see "Student 1"
+    And I should not see "Student 2"
+    And I should not see "Student 10"
+    And I should not see "Student 11"
+    And I should see "Groups (3)"
+    And I should see "User count (10)"
+    And I should see "4" in the "Group A" "table_row"
+    And I should see "4" in the "Group B" "table_row"
+    And I should see "2" in the "Group C" "table_row"
