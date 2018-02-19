@@ -50,8 +50,6 @@ if ($data = $form->get_data()) {
 }
 
 $PAGE->requires->js_call_amd('totara_userdata/item_select', 'init', array('name' => 'itemselection_desc', 'form' => 'purge'));
-$PAGE->requires->string_for_js('selectall', 'core');
-$PAGE->requires->string_for_js('deselectall', 'core');
 
 echo $OUTPUT->header();
 if ($id) {

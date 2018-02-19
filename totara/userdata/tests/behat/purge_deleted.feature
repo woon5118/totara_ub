@@ -33,8 +33,6 @@ Feature: Deleted user data purging
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Deleted"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Minimal deleted user purging            |
       | idnumber      | ptid1                                   |
@@ -45,8 +43,6 @@ Feature: Deleted user data purging
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Deleted"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Maximal deleted user purging            |
       | idnumber      | ptid2                                   |

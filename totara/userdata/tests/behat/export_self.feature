@@ -28,8 +28,6 @@ Feature: Own user data exporting
     And I navigate to "Export types" node in "Site administration > Users > User data management"
 
     And I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Additional names export   |
       | idnumber      | etid1                     |
@@ -37,8 +35,6 @@ Feature: Own user data exporting
       | User          | core_user-additionalnames |
     And I press "Add"
     And I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Picture exporting        |
       | idnumber      | etid2                    |

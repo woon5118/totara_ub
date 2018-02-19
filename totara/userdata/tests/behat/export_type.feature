@@ -24,8 +24,6 @@ Feature: Manage user data export types
     Given I log in as "manager"
     And I navigate to "Export types" node in "Site administration > Users > User data management"
     When I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
     | Full name     | First export type       |
     | idnumber      | et1id                   |
@@ -48,8 +46,6 @@ Feature: Manage user data export types
     # Test duplicate id detection.
     When I navigate to "Export types" node in "Site administration > Users > User data management"
     And I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | First export type       |
       | idnumber      | Et1id                   |
@@ -77,8 +73,6 @@ Feature: Manage user data export types
     Given I log in as "manager"
     And I navigate to "Export types" node in "Site administration > Users > User data management"
     And I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | First export type                  |
       | idnumber      | et1id                              |
@@ -118,8 +112,6 @@ Feature: Manage user data export types
     Given I log in as "manager"
     And I navigate to "Export types" node in "Site administration > Users > User data management"
     And I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | First export type       |
       | idnumber      | et1id                   |
@@ -155,8 +147,6 @@ Feature: Manage user data export types
     Given I log in as "manager"
     And I navigate to "Export types" node in "Site administration > Users > User data management"
     And I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | First export type       |
       | idnumber      | et1id                   |
@@ -166,8 +156,6 @@ Feature: Manage user data export types
       | User          | Username,Email          |
     And I press "Add"
     And I press "Add export type"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Second export type      |
       | idnumber      | et2id                   |

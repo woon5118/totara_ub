@@ -27,8 +27,6 @@ Feature: Manage user data purge types
     When I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
     | Full name     | First purge type         |
     | idnumber      | pt1id                    |
@@ -51,8 +49,6 @@ Feature: Manage user data purge types
     When I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Suspended"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Second purge type        |
       | idnumber      | pt2id                    |
@@ -75,8 +71,6 @@ Feature: Manage user data purge types
     When I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Deleted"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Third purge type         |
       | idnumber      | pt2id                    |
@@ -105,8 +99,6 @@ Feature: Manage user data purge types
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | First purge type         |
       | idnumber      | pt1id                    |
@@ -145,8 +137,6 @@ Feature: Manage user data purge types
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | First purge type         |
       | idnumber      | pt1id                    |
@@ -182,8 +172,6 @@ Feature: Manage user data purge types
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | First purge type         |
       | idnumber      | pt1id                    |
@@ -194,8 +182,6 @@ Feature: Manage user data purge types
     When I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Suspended"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Second purge type        |
       | idnumber      | pt2id                    |

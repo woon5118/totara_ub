@@ -31,8 +31,6 @@ Feature: Manual user data purging
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Additional names purging  |
       | idnumber      | ptid1                     |
@@ -43,8 +41,6 @@ Feature: Manual user data purging
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Active"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Picture purging          |
       | idnumber      | ptid2                    |
@@ -55,8 +51,6 @@ Feature: Manual user data purging
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Suspended"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Suspended user purging                                      |
       | idnumber      | ptid3                                                       |
@@ -67,8 +61,6 @@ Feature: Manual user data purging
     And I press "Add purge type"
     And I set the "Restricted to user status" Totara form field to "Deleted"
     And I press "Continue"
-# Wait for the Select all hack to load.
-    And I wait "1" seconds
     And I set the following Totara form fields to these values:
       | Full name     | Deleted user purging                                      |
       | idnumber      | ptid4                                                     |
