@@ -72,6 +72,8 @@ Feature: Test the ability to set your own
     And I press "Continue"
     And I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I set the field "User Status" to "any value"
+    And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Gregory Nickleson" "table_row"
     And I click on "Gregory Nickleson" "link"
     And I follow "Unnamed job assignment (ID: 1)"
