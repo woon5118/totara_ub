@@ -276,6 +276,9 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
                     // If we use the standard change password form, this user preference will be reset when the password
                     // is changed. Until then it will prevent access to the site.
                     set_user_preference('auth_forcepasswordchange', 1, $USER);
+                    // Totara: going back to the same page after pressing "Cancel" is wrong, log out user instead.
+                    $urltogo = new moodle_url('/login/logout.php', array('sesskey' => sesskey()));
+                    $urltogo = new single_button($urltogo, get_string('logout'));
                 }
                 echo $OUTPUT->header();
                 echo $OUTPUT->confirm(get_string('auth_passwordisexpired', 'auth'), $passwordchangeurl, $urltogo);

@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2017 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,25 +19,15 @@
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
  *
- * @package auth_approved
+ * @package auth_manual
  */
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-class behat_auth_approved extends behat_base {
-    /**
-     * @When /^I confirm self-registration request from email "([^"]*)"$/
-     */
-    public function confirm_request($email) {
-        \behat_hooks::set_step_readonly(false);
-        global $DB;
-        $request = $DB->get_record('auth_approved_request', array('email' => $email));
-        $this->getSession()->visit($this->locate_path('auth/approved/confirm.php?token=' . $request->confirmtoken));
-        $this->wait_for_pending_js();
-    }
+class behat_auth_manual extends behat_base {
 
     /**
-     * @When /^I use magic for auth approved to set last password change to "([^"]*)" for user "([^"]*)"$/
+     * @When /^I use magic for auth manual to set last password change to "([^"]*)" for user "([^"]*)"$/
      */
     public function set_last_pasword_change($interval, $username) {
         \behat_hooks::set_step_readonly(true); // Backend action.
@@ -48,6 +38,6 @@ class behat_auth_approved extends behat_base {
         $interval = new DateInterval($interval);
         $date->sub($interval);
 
-        set_user_preference("auth_approved_passwordupdatetime", $date->getTimestamp(), $user->id);
+        set_user_preference("auth_manual_passwordupdatetime", $date->getTimestamp(), $user->id);
     }
 }
