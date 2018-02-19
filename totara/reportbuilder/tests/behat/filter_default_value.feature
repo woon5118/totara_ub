@@ -36,16 +36,6 @@ Feature: Filter default value works as expected
     Given I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And the field "user-deleted" matches value "Active"
 
-    # Changing to deleted users only
-    When I set the field "user-deleted" to "Deleted"
-    Then the field "user-deleted" matches value "Deleted"
-    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
-    # Deleted users now have a separate report
-    And I should not see "User One"
-    And I should not see "User Two"
-    And I should not see "User Three"
-    And I should not see "User Four"
-
     # Changing to suspended users only
     When I set the field "user-deleted" to "Suspended"
     Then the field "user-deleted" matches value "Suspended"
