@@ -45,7 +45,6 @@ class instant_messages_sent extends item {
      */
     public static function get_main_component() {
         // Currently grouping it under 'messages' is not possible so we put it under the user component for now.
-        // TODO: Change to core_message as soon as this is possible.
         return 'core_user';
     }
 
@@ -85,14 +84,10 @@ class instant_messages_sent extends item {
 
         $transaction = $DB->start_delegated_transaction();
 
-        try {
-            $helper = new messages_purging_helper();
-            $helper->delete_sent_messages($user->id, $eventtypes);
+        $helper = new messages_purging_helper();
+        $helper->delete_sent_messages($user->id, $eventtypes);
 
-            $transaction->allow_commit();
-        } catch (\Exception $exception) {
-            $transaction->rollback($exception);
-        }
+        $transaction->allow_commit();
 
         return item::RESULT_STATUS_SUCCESS;
     }

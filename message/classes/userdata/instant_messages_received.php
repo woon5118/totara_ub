@@ -85,14 +85,10 @@ class instant_messages_received extends item {
 
         $transaction = $DB->start_delegated_transaction();
 
-        try {
-            $helper = new messages_purging_helper();
-            $helper->delete_received_messages($user->id, $eventtypes);
+        $helper = new messages_purging_helper();
+        $helper->delete_received_messages($user->id, $eventtypes);
 
-            $transaction->allow_commit();
-        } catch (\Exception $exception) {
-            $transaction->rollback($exception);
-        }
+        $transaction->allow_commit();
 
         return item::RESULT_STATUS_SUCCESS;
     }
