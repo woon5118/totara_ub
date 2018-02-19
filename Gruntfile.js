@@ -126,7 +126,8 @@ module.exports = function(grunt) {
 
     // Non AMD JS which still needs to uglify through grunt
     var independentSrc = [
-        cwd + '/totara/core/js/lib/src/*.js'
+        cwd + '/totara/core/js/lib/src/*.js',
+        cwd + '/lib/javascript_polyfill/src/*.js'
     ];
 
     /**

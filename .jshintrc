@@ -12,6 +12,7 @@
     "eqnull":       false,
     "es5":          false,
     "esnext":       false,
+    "esversion":    6,
     "evil":         false,
     "expr":         false,
     "forin":        false,

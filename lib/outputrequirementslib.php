@@ -1573,6 +1573,7 @@ class page_requirements_manager {
      * @return string the HTML code to go at the start of the <body> tag.
      */
     public function get_top_of_body_code(core_renderer $renderer) {
+        global $CFG;
         // First the skip links.
         $output = $renderer->render_skip_links($this->skiplinks);
 
@@ -1581,6 +1582,15 @@ class page_requirements_manager {
 
         // Add hacked jQuery support, it is not intended for standard Moodle distribution!
         $output .= $this->get_jquery_headcode();
+
+        // IE11 Polyfill, includes a polyfill for events, promises & fetch to allow us to use native es6 JS
+        if (core_useragent::is_ie()) {
+            if ($CFG->debugdeveloper) {
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/src/polyfill_ie11.js'));
+            } else {
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/build/polyfill_ie11.min.js'));
+            }
+        }
 
         // Link our main JS file, all core stuff should be there.
         $output .= html_writer::script('', $this->js_fix_url('/lib/javascript-static.js'));
