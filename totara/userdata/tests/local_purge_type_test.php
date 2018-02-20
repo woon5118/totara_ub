@@ -349,9 +349,10 @@ class totara_userdata_local_purge_type_testcase extends advanced_testcase {
         $this->assertSame('midddle', $activeuser->middlename);
 
         $this->setUser($creator);
-        $purgeid = purge_type::trigger_manual_purge($typeactive->id, $activeuser->id, $syscontext->id);
-
-        $purge = $DB->get_record('totara_userdata_purge', array('id' => $purgeid), '*', MUST_EXIST);
+        $taskid = purge_type::trigger_manual_purge($typeactive->id, $activeuser->id, $syscontext->id);
+        $taskrecord = $DB->get_record('task_adhoc', array('id' => $taskid), '*', MUST_EXIST);
+        $task = \core\task\manager::adhoc_task_from_record($taskrecord);
+        $purge = $DB->get_record('totara_userdata_purge', array('id' => $task->get_custom_data()), '*', MUST_EXIST);
         $this->assertSame('manual', $purge->origin);
         $this->assertSame($activeuser->id, $purge->userid);
         $this->assertSame((string)$syscontext->id, $purge->contextid);

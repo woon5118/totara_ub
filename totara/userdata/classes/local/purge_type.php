@@ -327,7 +327,7 @@ final class purge_type {
      * @param int $purgetypeid
      * @param int $userid
      * @param int $contextid
-     * @return int $purgeid
+     * @return int adhoc task id
      */
     public static function trigger_manual_purge($purgetypeid, $userid, $contextid) {
         $purgeid = manager::create_purge($userid, $contextid, $purgetypeid, 'manual');
@@ -335,8 +335,6 @@ final class purge_type {
         $adhoctask = new \totara_userdata\task\purge_manual();
         $adhoctask->set_custom_data($purgeid);
         $adhoctask->set_component('totara_userdata');
-        \core\task\manager::queue_adhoc_task($adhoctask);
-
-        return $purgeid;
+        return \core\task\manager::queue_adhoc_task($adhoctask);
     }
 }

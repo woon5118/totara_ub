@@ -253,7 +253,7 @@ final class export_type {
     /**
      * Request user data self export.
      * @param int $exporttypeid
-     * @return int export id
+     * @return int adhoc task id
      */
     public static function trigger_self_export($exporttypeid) {
         global $USER;
@@ -263,8 +263,6 @@ final class export_type {
         $adhoctask = new \totara_userdata\task\export();
         $adhoctask->set_custom_data($exportid);
         $adhoctask->set_component('totara_userdata');
-        \core\task\manager::queue_adhoc_task($adhoctask);
-
-        return $exportid;
+        return \core\task\manager::queue_adhoc_task($adhoctask);
     }
 }

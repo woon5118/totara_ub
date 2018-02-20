@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Tests the target_user class.
  */
 class totara_userdata_target_user_testcase extends advanced_testcase {
-    public function test_class() {
+    public function test_instance() {
         global $DB;
         $this->resetAfterTest();
 
@@ -74,6 +74,18 @@ class totara_userdata_target_user_testcase extends advanced_testcase {
         $target = new target_user($deleteduser);
         $this->assertNull($target->contextid);
         $this->assertSame(target_user::STATUS_DELETED, $target->status);
+
+        // Test soon-to-be deprecated unconfirmed users too.
+        $unconfirmeduser = $this->getDataGenerator()->create_user(array('confirmed' => 0));
+        $unconfirmedsuspendeduser = $this->getDataGenerator()->create_user(array('confirmed' => 0, 'suspended' => 1));
+        $unconfirmedusercontext = context_user::instance($unconfirmeduser->id);
+        $unconfirmedsuspendedusercontext = context_user::instance($unconfirmedsuspendeduser->id);
+        $target = new target_user($unconfirmeduser);
+        $this->assertSame($unconfirmedusercontext->id, $target->contextid);
+        $this->assertSame(target_user::STATUS_ACTIVE, $target->status);
+        $target = new target_user($unconfirmedsuspendeduser);
+        $this->assertSame($unconfirmedsuspendedusercontext->id, $target->contextid);
+        $this->assertSame(target_user::STATUS_SUSPENDED, $target->status);
     }
 
     public function test_get_user_statuses() {

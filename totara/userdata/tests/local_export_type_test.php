@@ -228,9 +228,10 @@ class totara_userdata_local_export_type_testcase extends advanced_testcase {
         $syscontext = context_system::instance();
 
         $this->setUser($user);
-        $exportid = export_type::trigger_self_export($type->id);
-
-        $export = $DB->get_record('totara_userdata_export', array('id' => $exportid), '*', MUST_EXIST);
+        $taskid = export_type::trigger_self_export($type->id);
+        $taskrecord = $DB->get_record('task_adhoc', array('id' => $taskid), '*', MUST_EXIST);
+        $task = \core\task\manager::adhoc_task_from_record($taskrecord);
+        $export = $DB->get_record('totara_userdata_export', array('id' => $task->get_custom_data()), '*', MUST_EXIST);
         $this->assertSame('self', $export->origin);
         $this->assertSame($user->id, $export->userid);
         $this->assertSame((string)$syscontext->id, $export->contextid);
