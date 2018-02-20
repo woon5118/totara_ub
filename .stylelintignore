@@ -79,7 +79,6 @@ totara/core/js/lib/src/jquery.placeholder.js
 totara/core/js/lib/src/jquery.treeview.js
 totara/core/js/lib/i18n/
 totara/core/amd/src/jquery.dataTables-lazy.js
-totara/form/amd/src/modernizr.js
 # Custom theme ignores
 theme/basis/less/bootstrap3/
 theme/basis/style/settings-noprocess.css

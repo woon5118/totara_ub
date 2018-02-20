@@ -34,7 +34,7 @@ define('TOTARA_JS_TREEVIEW',       2);
 define('TOTARA_JS_DATEPICKER',     3);
 /**
  * TOTARA_JS_PLACEHOLDER - loads the jQuery placeholder library
- * @deprecated since 10.0
+ * @deprecated since 10.0, removed in 12.0
  */
 define('TOTARA_JS_PLACEHOLDER',    4);
 define('TOTARA_JS_ICON_PREVIEW',   5);
@@ -123,13 +123,6 @@ function local_js($options = array()) {
         }
 
 
-    }
-
-    // if placeholder enabled
-    if (in_array(TOTARA_JS_PLACEHOLDER, $options)) {
-        debugging('TOTARA_JS_PLACEHOLDER has been deprecated since Totara 10 as placeholders are implemented correctly in all supported browsers');
-        $PAGE->requires->js('/totara/core/js/lib/' . $directory . '/jquery.placeholder' . $min . '.js');
-        $PAGE->requires->js('/totara/core/js/lib/' . $directory . '/load.placeholder' . $min . '.js');
     }
 
     // If Icon preview is enabled

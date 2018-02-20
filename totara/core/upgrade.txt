@@ -7,6 +7,7 @@ information provided here is intended especially for developers.
 * Icon helpers are no longer used in the following templates, icon data is passed via context data:
 ** totara/core/templates/my_team_nav.mustache
 ** totara/core/templates/report_list.mustache
+* Removed deprecated placeholder polyfill
 
 === 11 ===
 

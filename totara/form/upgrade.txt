@@ -12,6 +12,7 @@ information provided here is intended especially for developers.
 * totara/form/templates/element_checkboxes.mustache has changed to use "data-required" instead of "required" HTML attribute
 * Checkboxes now validate clientside
 * utc10 date field now uses polyfil date pickers in desktop browsers
+* Removed custom build of modernizr and IE9 polyfil libraries (IE9 has not been supported since Totara 10)
 
 === 10 ===
 
