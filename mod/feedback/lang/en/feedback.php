@@ -333,3 +333,6 @@ $string['lastnamefilter'] = 'Last name contains';
 $string['maxdayshigherwarning'] = 'The global setting, \'Maximum days since completion\', is currently set to {$a} days. Any messages with a \'Period\' value greater than or equal to this will not be sent.';
 $string['setting_maxtimesincecomp_name'] = 'Maximum days since completion';
 $string['setting_maxtimesincecomp_desc'] = 'Course or activity completions older than this will not be considered when sending out feedback reminders. Zero or an empty value represents no limit.';
+$string['userdataitemcompleted'] = 'Completed';
+$string['userdataitemtemporary'] = 'Temporary';
+$string['userdataitemarchived'] = 'Archived';
