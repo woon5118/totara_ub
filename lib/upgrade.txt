@@ -4,6 +4,7 @@ information provided here is intended especially for developers.
 === 12.0 ===
 
 * updated popover_region.mustache correcting role attribute
+* Upgraded jQuery to 3.3.1
 
 === 11.0 ===
 
