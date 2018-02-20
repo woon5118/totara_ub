@@ -26,7 +26,20 @@ namespace totara_userdata\rb\display;
 use \totara_reportbuilder\rb\display\base;
 use \core\output\flex_icon;
 
-class purge_actions extends base {
+/**
+ * Purge related actions.
+ */
+final class purge_actions extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT, $USER;
 

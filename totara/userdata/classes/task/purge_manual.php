@@ -29,6 +29,9 @@ use \totara_userdata\userdata\manager;
  * Ad-hoc tack for manual purging of user data.
  */
 final class purge_manual extends \core\task\adhoc_task {
+    /**
+     * Execute task.
+     */
     public function execute() {
         global $DB;
 

@@ -21,8 +21,13 @@
  * @package totara_userdata
  */
 
+/**
+ * Execute installation code that precreates records
+ * in {totara_userdata_user} for all users and backs up user context ids.
+ *
+ * @return bool
+ */
 function xmldb_totara_userdata_install() {
-    // Precreate extra records for all users and back up user context ids.
     \totara_userdata\local\util::sync_totara_userdata_user_table();
     return true;
 }

@@ -25,7 +25,15 @@ namespace totara_userdata\form;
 
 defined('MOODLE_INTERNAL') || die();
 
-class export_type_edit extends \totara_form\form {
+/**
+ * Form to add and update an export type.
+ */
+final class export_type_edit extends \totara_form\form {
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
     public function definition() {
         $exporttype = (object)$this->model->get_current_data(null);
         $newitems = \totara_userdata\local\export_type::get_new_items($exporttype->id);
@@ -94,6 +102,13 @@ class export_type_edit extends \totara_form\form {
         $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
     }
 
+    /**
+     * Validation - makes sure the idnumber is unique.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array list of errors
+     */
     public function validation(array $data, array $files) {
         global $DB;
         $errors = parent::validation($data, $files);

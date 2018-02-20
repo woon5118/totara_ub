@@ -222,7 +222,6 @@ trait purge_type_trait {
             )
         );
 
-
         $this->columnoptions[] = new \rb_column_option(
             'purge_type',
             'actions',
@@ -238,6 +237,9 @@ trait purge_type_trait {
         );
     }
 
+    /**
+     * @return string[]
+     */
     public function rb_filter_purge_type_list() {
         global $DB;
         $options = $DB->get_records_menu('totara_userdata_purge_type', array(), '', 'id, fullname');

@@ -235,6 +235,9 @@ trait export_type_trait {
         );
     }
 
+    /**
+     * @return string[]
+     */
     public function rb_filter_export_type_list() {
         global $DB;
         $options = $DB->get_records_menu('totara_userdata_export_type', array(), '', 'id, fullname');

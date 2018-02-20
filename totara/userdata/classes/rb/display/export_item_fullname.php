@@ -25,7 +25,20 @@ namespace totara_userdata\rb\display;
 
 use \totara_reportbuilder\rb\display\base;
 
-class export_item_fullname extends base {
+/**
+ * Human readable export item name.
+ */
+final class export_item_fullname extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         if (!$value) {
             return '';

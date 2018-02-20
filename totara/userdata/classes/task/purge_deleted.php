@@ -40,6 +40,9 @@ final class purge_deleted extends \core\task\scheduled_task {
         return get_string('taskpurgedeleted', 'totara_userdata');
     }
 
+    /**
+     * Execute task.
+     */
     public function execute() {
         $results = manager::get_results();
 

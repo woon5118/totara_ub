@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * NOTE: This is not a public API - do not use in plugins or 3rd party code!
  */
-class count {
+final class count {
     /** How long do we allow count to run? */
     public const MAX_EXECUTION_DURATION = 60 * 30;
 

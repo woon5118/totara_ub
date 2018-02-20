@@ -23,7 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_source_userdata_purge_types extends rb_base_source {
+/**
+ * Reportbuildersource for purge types.
+ */
+final class rb_source_userdata_purge_types extends rb_base_source {
     use \totara_userdata\rb\source\purge_type_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
@@ -52,6 +55,10 @@ class rb_source_userdata_purge_types extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Are global restrictions implemented?
+     * @return null|bool always false
+     */
     public function global_restrictions_supported() {
         // Not related to individual users.
         return false;

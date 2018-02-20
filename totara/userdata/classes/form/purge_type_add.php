@@ -27,7 +27,15 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
-class purge_type_add extends \totara_form\form {
+/**
+ * Select user status before adding new purge type.
+ */
+final class purge_type_add extends \totara_form\form {
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
     public function definition() {
 
         $options = target_user::get_user_statuses();

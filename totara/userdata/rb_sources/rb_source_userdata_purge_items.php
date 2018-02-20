@@ -23,7 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_source_userdata_purge_items extends rb_base_source {
+/**
+ * Reportbuildersource for items that were purged.
+ */
+final class rb_source_userdata_purge_items extends rb_base_source {
     use \totara_userdata\rb\source\purge_trait,
         \totara_userdata\rb\source\purge_type_trait;
 
@@ -55,6 +58,10 @@ class rb_source_userdata_purge_items extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Are global restrictions implemented?
+     * @return null|bool
+     */
     public function global_restrictions_supported() {
         // Not easy because deleted users cannot be cohort members.
         return false;

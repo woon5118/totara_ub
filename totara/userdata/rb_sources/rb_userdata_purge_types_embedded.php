@@ -23,7 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_userdata_purge_types_embedded extends rb_base_embedded {
+/**
+ * Report of all purge types.
+ */
+final class rb_userdata_purge_types_embedded extends rb_base_embedded {
 
     public $url, $source, $fullname, $filters, $columns;
     public $contentmode, $contentsettings, $embeddedparams;
@@ -53,12 +56,19 @@ class rb_userdata_purge_types_embedded extends rb_base_embedded {
 
     /**
      * There is no user data here.
-     * @return null|boolean
+     * @return null|boolean always false
      */
     public function embedded_global_restrictions_supported() {
         return false;
     }
 
+    /**
+     * Check if the user is capable of accessing this report.
+     *
+     * @param int $reportfor id of the user that this report is being generated for
+     * @param reportbuilder $report the report object - can use get_param_value to get params
+     * @return bool true if the user can access this report
+     */
     public function is_capable($reportfor, $report) {
         $context = context_system::instance();
         return has_capability('totara/userdata:config', $context, $reportfor);

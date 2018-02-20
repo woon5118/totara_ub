@@ -25,7 +25,15 @@ namespace totara_userdata\form;
 
 defined('MOODLE_INTERNAL') || die();
 
-class export_type_request extends \totara_form\form {
+/**
+ * Form for user export request.
+ */
+final class export_type_request extends \totara_form\form {
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
     public function definition() {
         $exporttypes = \totara_userdata\userdata\manager::get_export_types('self');
         $exporttypes = array('' => get_string('choosedots')) + $exporttypes;

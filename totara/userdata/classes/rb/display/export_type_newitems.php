@@ -26,7 +26,20 @@ namespace totara_userdata\rb\display;
 use \totara_reportbuilder\rb\display\base;
 use totara_userdata\local\export_type;
 
-class export_type_newitems extends base {
+/**
+ * Are there any new items?
+ */
+final class export_type_newitems extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         return count(export_type::get_new_items($value));
     }

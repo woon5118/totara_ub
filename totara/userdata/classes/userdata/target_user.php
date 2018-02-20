@@ -153,6 +153,12 @@ final class target_user extends \stdClass {
         return clone($this->user);
     }
 
+    /**
+     * Emulation of user record with extra properties.
+     * @internal
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name) {
         if ($name === 'contextid') {
             return $this->usercontextid;
@@ -163,6 +169,12 @@ final class target_user extends \stdClass {
         return $this->user->{$name};
     }
 
+    /**
+     * Emulation of user record with extra properties.
+     * @internal
+     * @param string $name
+     * @return bool
+     */
     public function __isset($name) {
         if ($name === 'contextid') {
             return isset($this->usercontextid);
@@ -173,10 +185,21 @@ final class target_user extends \stdClass {
         return isset($this->user->{$name});
     }
 
+    /**
+     * Prevent all changes.
+     * @internal
+     * @param string $name
+     * @param mixed $value
+     */
     public function __set($name, $value) {
         throw new \coding_exception('target_user instance cannot be modified');
     }
 
+    /**
+     * Prevent all changes.
+     * @internal
+     * @param string $name
+     */
     public function __unset($name) {
         throw new \coding_exception('target_user instance cannot be modified');
     }

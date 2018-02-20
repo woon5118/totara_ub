@@ -24,16 +24,26 @@
 namespace totara_userdata\task;
 
 use totara_userdata\local\util;
+use totara_userdata\local\export;
 
 /**
- * Sync totara_userdata_user with user table.
+ * Maintenance and cleanup tasks.
  */
 final class misc extends \core\task\scheduled_task {
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('taskmisc', 'totara_userdata');
     }
 
+    /**
+     * Execute task.
+     */
     public function execute() {
         util::sync_totara_userdata_user_table();
+        export::internal_cleanup();
     }
 }

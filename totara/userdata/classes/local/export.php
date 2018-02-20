@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * NOTE: This is not a public API - do not use in plugins or 3rd party code!
  */
-class export {
+final class export {
     /* Maximum allowed time for execution of one item */
     public const MAX_ITEM_EXECUTION_TIME = 60 * 10;
 

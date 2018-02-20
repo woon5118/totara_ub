@@ -28,7 +28,15 @@ use totara_userdata\local\purge_type;
 
 defined('MOODLE_INTERNAL') || die();
 
-class purge_type_edit extends \totara_form\form {
+/**
+ * Add and update purge type form.
+ */
+final class purge_type_edit extends \totara_form\form {
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
     public function definition() {
         global $DB, $OUTPUT;
 
@@ -129,6 +137,13 @@ class purge_type_edit extends \totara_form\form {
         $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
     }
 
+    /**
+     * Validation - makes sure the idnumber is unique and type is not used anywhere before unsetting availablefor.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array list of errors
+     */
     public function validation(array $data, array $files) {
         global $DB;
         $errors = parent::validation($data, $files);

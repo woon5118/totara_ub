@@ -28,7 +28,15 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
-class purge_manually extends \totara_form\form {
+/**
+ * Manaul purging request.
+ */
+final class purge_manually extends \totara_form\form {
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
     public function definition() {
         global $DB, $PAGE;
         $currentdata = (object)$this->model->get_current_data(null);
@@ -50,6 +58,13 @@ class purge_manually extends \totara_form\form {
         $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
     }
 
+    /**
+     * Validation - makes sure the same purging is not already pending.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array list of errors
+     */
     public function validation(array $data, array $files) {
         $errors = parent::validation($data, $files);
         $syscontext = \context_system::instance();

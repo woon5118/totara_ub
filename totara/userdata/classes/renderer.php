@@ -25,6 +25,9 @@ use totara_userdata\userdata\item;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * User data manager renderer.
+ */
 class totara_userdata_renderer extends plugin_renderer_base {
     /**
      * UI widget for user identification purposes.

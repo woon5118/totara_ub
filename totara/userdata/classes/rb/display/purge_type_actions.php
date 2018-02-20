@@ -27,7 +27,20 @@ use \totara_reportbuilder\rb\display\base;
 use \core\output\flex_icon;
 use totara_userdata\local\purge_type;
 
-class purge_type_actions extends base {
+/**
+ * Actions for purge type.
+ */
+final class purge_type_actions extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT;
 

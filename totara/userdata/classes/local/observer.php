@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * WARNING: this must match util::sync_totara_userdata_user_table() and util::sync_totara_userdata_user_table()
  */
-class observer {
+final class observer {
     /**
      * Event observer.
      * @param \core\event\user_created $event

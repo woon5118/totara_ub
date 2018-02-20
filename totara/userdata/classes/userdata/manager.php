@@ -27,9 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * This is the public API for userdata plugin,
- * custom code and plugins should use this class only.
+ * custom code and plugins can use this class.
  */
-class manager {
+final class manager {
     /**
      * List of all result constants and their names.
      *

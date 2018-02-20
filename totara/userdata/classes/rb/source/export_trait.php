@@ -193,6 +193,9 @@ trait export_trait {
         }
     }
 
+    /**
+     * @return string[]
+     */
     public function rb_filter_export_list() {
         global $DB;
         $options = $DB->get_records_menu('totara_userdata_export', array(), '', 'id, fullname');
@@ -267,10 +270,16 @@ trait export_trait {
         $this->add_user_fields_to_filters($this->filteroptions, 'usercreated', true);
     }
 
+    /**
+     * @return string[]
+     */
     public function rb_filter_export_results() {
         return \totara_userdata\userdata\manager::get_results();
     }
 
+    /**
+     * @return string[]
+     */
     public function rb_filter_export_origins() {
         return \totara_userdata\local\export::get_origins();
     }

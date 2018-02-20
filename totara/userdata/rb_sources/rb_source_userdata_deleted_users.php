@@ -23,7 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_source_userdata_deleted_users extends rb_base_source {
+/**
+ * Reportbuildersource for deleted users.
+ */
+final class rb_source_userdata_deleted_users extends rb_base_source {
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -55,12 +58,15 @@ class rb_source_userdata_deleted_users extends rb_base_source {
 
     /**
      * We cannot apply restrictions to deleted users.
-     * @return null|bool
+     * @return null|bool always false
      */
     public function global_restrictions_supported() {
         return false;
     }
 
+    /**
+     * Purge column and filter options that are not applicable to deleted users.
+     */
     protected function purge_irrelevant_data() {
         foreach ($this->columnoptions as $key => $columnoption) {
             if ($columnoption->type === 'user' and $columnoption->value === 'usercohortids') {

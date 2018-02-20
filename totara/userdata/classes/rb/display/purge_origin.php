@@ -25,7 +25,20 @@ namespace totara_userdata\rb\display;
 
 use \totara_reportbuilder\rb\display\base;
 
-class purge_origin extends base {
+/**
+ * Name of purge origin.
+ */
+final class purge_origin extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $origins = \totara_userdata\local\purge::get_origins();
         if (isset($origins[$value])) {

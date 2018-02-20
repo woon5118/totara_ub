@@ -25,7 +25,20 @@ namespace totara_userdata\rb\display;
 
 use \totara_reportbuilder\rb\display\base;
 
-class link_user_info extends base {
+/**
+ * Link to userdata info page.
+ */
+final class link_user_info extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $user = self::get_extrafields_row($row, $column);
 

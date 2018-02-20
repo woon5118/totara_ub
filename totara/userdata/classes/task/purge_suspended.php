@@ -40,6 +40,9 @@ final class purge_suspended extends \core\task\scheduled_task {
         return get_string('taskpurgesuspended', 'totara_userdata');
     }
 
+    /**
+     * Execute task.
+     */
     public function execute() {
         $results = manager::get_results();
 

@@ -31,10 +31,20 @@ require_once($CFG->libdir . '/adminlib.php');
 
 /**
  * Class for selection of default deleted and suspended purge type.
+ *
+ * NOTE: This is not a public API - do not use in plugins or 3rd party code!
  */
-class totara_userdata_admin_setting_purge_type_select extends admin_setting_configselect {
+final class totara_userdata_admin_setting_purge_type_select extends admin_setting_configselect {
     private $origin;
 
+    /**
+     * Constructor.
+     *
+     * @param string $origin
+     * @param string $name
+     * @param string|lang_string $visiblename
+     * @param string|lang_string $description
+     */
     public function __construct($origin, $name, $visiblename, $description) {
         if ($origin !== 'deleted' and $origin !== 'suspended') {
             throw new \coding_exception('Invalid origin specified');
@@ -43,6 +53,11 @@ class totara_userdata_admin_setting_purge_type_select extends admin_setting_conf
         parent::__construct($name, $visiblename, $description, '', null);
     }
 
+    /**
+     * Load options.
+     *
+     * @return bool
+     */
     public function load_choices() {
         if (is_array($this->choices)) {
             return true;

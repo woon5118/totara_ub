@@ -23,7 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_source_userdata_export_types extends rb_base_source {
+/**
+ * Reportbuildersource for export types.
+ */
+final class rb_source_userdata_export_types extends rb_base_source {
     use \totara_userdata\rb\source\export_type_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
@@ -54,7 +57,7 @@ class rb_source_userdata_export_types extends rb_base_source {
 
     /**
      * There is no user data here.
-     * @return null|bool
+     * @return null|bool always false
      */
     public function global_restrictions_supported() {
         return false;

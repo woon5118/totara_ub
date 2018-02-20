@@ -28,7 +28,15 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
-class purge_set_suspended extends \totara_form\form {
+/**
+ * Set puging action after user is suspended.
+ */
+final class purge_set_suspended extends \totara_form\form {
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
     public function definition() {
         global $DB, $PAGE;
         $currentdata = (object)$this->model->get_current_data(null);

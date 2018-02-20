@@ -26,7 +26,20 @@ namespace totara_userdata\rb\display;
 use \totara_reportbuilder\rb\display\base;
 use \core\output\flex_icon;
 
-class deleted_user_actions extends base {
+/**
+ * Actions for deleted users.
+ */
+final class deleted_user_actions extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT, $CFG;
 
@@ -62,6 +75,12 @@ class deleted_user_actions extends base {
         return implode('', $buttons);
     }
 
+    /**
+     * Back to the report.
+     *
+     * @param \reportbuilder $report
+     * @return \moodle_url
+     */
     public static function get_return_url(\reportbuilder $report) {
         $returnurl = new \moodle_url($report->get_current_url());
         $spage = optional_param('spage', '', PARAM_INT);

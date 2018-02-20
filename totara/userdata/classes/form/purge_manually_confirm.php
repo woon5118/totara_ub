@@ -28,7 +28,15 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
-class purge_manually_confirm extends \totara_form\form {
+/**
+ * Confirmation of manual purging request.
+ */
+final class purge_manually_confirm extends \totara_form\form {
+    /**
+     * Form definition.
+     *
+     * @return void
+     */
     public function definition() {
         global $DB, $OUTPUT, $PAGE;
         $currentdata = (object)$this->model->get_current_data(null);

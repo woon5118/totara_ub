@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class representing exports of user data.
  */
-class rb_source_userdata_exports extends rb_base_source {
+final class rb_source_userdata_exports extends rb_base_source {
     use \totara_userdata\rb\source\export_trait,
         \totara_userdata\rb\source\export_type_trait;
 
@@ -57,6 +57,10 @@ class rb_source_userdata_exports extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Are global restrictions implemented?
+     * @return null|bool
+     */
     public function global_restrictions_supported() {
         // Not easy because deleted users cannot be cohort members.
         return false;

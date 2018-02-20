@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * NOTE: This is not a public API - do not use in plugins or 3rd party code!
  */
-class util {
+final class util {
 
     /**
      * Returns list of item classes available in the system.

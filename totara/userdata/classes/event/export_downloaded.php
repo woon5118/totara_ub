@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event triggered when user downloads data export file.
  */
-class export_downloaded extends \core\event\base {
+final class export_downloaded extends \core\event\base {
     /**
      * Create instance of event.
      *

@@ -27,8 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Instance of this class represents data returned fom export methods.
+ *
+ * This is intended to be used from export method of item classes.
  */
-class export {
+final class export {
     /** @var array data exported from item */
     public $data = array();
     /** @var \stored_file[] list of stored files referenced in data*/

@@ -25,7 +25,20 @@ namespace totara_userdata\rb\display;
 
 use \totara_reportbuilder\rb\display\base;
 
-class execution_result extends base {
+/**
+ * Name of the result.
+ */
+final class execution_result extends base {
+    /**
+     * Display data.
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $results = \totara_userdata\userdata\manager::get_results();
         if (isset($results[$value])) {

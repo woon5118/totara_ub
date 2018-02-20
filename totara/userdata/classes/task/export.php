@@ -29,6 +29,9 @@ use \totara_userdata\userdata\manager;
  * Ad-hoc tack for export of user data.
  */
 final class export extends \core\task\adhoc_task {
+    /**
+     * Execute task.
+     */
     public function execute() {
         global $DB;
 
