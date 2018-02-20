@@ -118,3 +118,56 @@ Feature: As a teacher I need to see an accurate list of subscribed users
     And I should see "Teacher Teacher"
     And I should not see "Student 2"
     And I should not see "Student 3"
+
+  @javascript
+  Scenario: Potential subscribers always excludes existing subscribers
+    When the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 2 | C2        | 0        |
+    And the following "course enrolments" exist:
+      | user     | course | role           |
+      | teacher  | C2     | editingteacher |
+      | student1 | C2     | student        |
+      | student2 | C2     | student        |
+      | student3 | C2     | student        |
+    And I click on "Courses" in the totara menu
+    And I follow "Course 2"
+    And I add a "Forum" to section "1" and I fill the form with:
+      | Forum name        | Subscription Forum 1           |
+      | Forum type        | Standard forum for general use |
+      | Description       | Subscription forum description |
+      | Subscription mode | Optional subscription          |
+    And I follow "Subscription Forum 1"
+    And I navigate to "Show/edit current subscribers" in current page administration
+    And I press "Turn editing on"
+    Then I should see "Student 1" in the "potentialsubscribers" "select"
+    And I should see "Student 2" in the "potentialsubscribers" "select"
+    And I should see "Student 3" in the "potentialsubscribers" "select"
+    And I should see "Teacher Teacher" in the "potentialsubscribers" "select"
+    And I should not see "Student 1" in the "existingsubscribers" "select"
+    And I should not see "Student 2" in the "existingsubscribers" "select"
+    And I should not see "Student 3" in the "existingsubscribers" "select"
+    And I should not see "Teacher Teacher" in the "existingsubscribers" "select"
+
+    When I set the field "potentialsubscribers" to "Student 2 (student.2@example.com)"
+    And I press "Add"
+    Then I should see "Student 1" in the "potentialsubscribers" "select"
+    And I should not see "Student 2" in the "potentialsubscribers" "select"
+    And I should see "Student 3" in the "potentialsubscribers" "select"
+    And I should see "Teacher Teacher" in the "potentialsubscribers" "select"
+    And I should not see "Student 1" in the "existingsubscribers" "select"
+    And I should see "Student 2" in the "existingsubscribers" "select"
+    And I should not see "Student 3" in the "existingsubscribers" "select"
+    And I should not see "Teacher Teacher" in the "existingsubscribers" "select"
+
+    When I set the field "potentialsubscribers_searchtext" to "st"
+    Then I should see "Student 1" in the "potentialsubscribers" "select"
+    And I should not see "Student 2" in the "potentialsubscribers" "select"
+    And I should see "Student 3" in the "potentialsubscribers" "select"
+    And I should not see "Teacher Teacher" in the "potentialsubscribers" "select"
+
+    When I press "potentialsubscribers_clearbutton"
+    Then I should see "Student 1" in the "potentialsubscribers" "select"
+    And I should not see "Student 2" in the "potentialsubscribers" "select"
+    And I should see "Student 3" in the "potentialsubscribers" "select"
+    And I should see "Teacher Teacher" in the "potentialsubscribers" "select"
