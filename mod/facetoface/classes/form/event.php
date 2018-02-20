@@ -638,7 +638,19 @@ class event extends \moodleform {
         return $errors;
     }
 
-    public static function prepare_data($session, $facetoface, $course, $context, $cntdates) {
+    /**
+     * Prepare form data
+     *
+     * @param \stdClass $session Facetoface session
+     * @param \stdClass $facetoface Facetoface instance
+     * @param \stdClass $course Course
+     * @param \context $context Context
+     * @param int $cntdates Dates count
+     * @param bool $clone A flag whether the session is being cloned from another session
+     * @return array Prepared form data
+     * @throws \coding_exception
+     */
+    public static function prepare_data($session, $facetoface, $course, $context, $cntdates, $clone = false) {
         global $TEXTAREA_OPTIONS;
 
         $defaulttimezone = '99';
@@ -698,7 +710,10 @@ class event extends \moodleform {
                         $date->sessiontimezone = \core_date::normalise_timezone($date->sessiontimezone);
                     }
 
-                    $sessiondata->$idfield = $date->id;
+                    if(!$clone) {
+                        $sessiondata->$idfield = $date->id;
+                    }
+
                     $sessiondata->$timestartfield = $date->timestart;
                     $sessiondata->$timefinishfield = $date->timefinish;
                     $sessiondata->$timezonefield = $date->sessiontimezone;
@@ -806,6 +821,8 @@ class event extends \moodleform {
             }
             if (!empty($fromform->timestart[$i]) && !empty($fromform->timefinish[$i])) {
                 $date = new \stdClass();
+
+                $date->id = isset($fromform->sessiondateid[$i]) ? $fromform->sessiondateid[$i] : null;
                 $date->sessiontimezone = $fromform->sessiontimezone[$i];
                 $date->timestart  = $fromform->timestart[$i];
                 $date->timefinish = $fromform->timefinish[$i];
@@ -818,8 +835,8 @@ class event extends \moodleform {
         $transaction = $DB->start_delegated_transaction();
 
         $update = false;
-        $c = optional_param('c', 0, PARAM_INT); // is copy session
-        if (!$c && (int)$session->id != 0) {
+        // Cloning the session from the existing one.
+        if (!$this->_customdata['c'] && (int)$session->id != 0) {
             $update = true;
             $todb->id  = $session->id;
             $sessionid = $session->id;

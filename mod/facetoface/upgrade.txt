@@ -1,6 +1,10 @@
 This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
+=== 11.1 ===
+
+* Deprecated function facetoface_get_ical_attachment. It was not working properly. Instead use facetoface_generate_ical(), note different arguments!
+
 === 10.0 ===
 
 * Hook is added for Seminar Sing-up link directly to calendar upcoming events block
