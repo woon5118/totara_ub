@@ -54,30 +54,12 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         $CFG->enablecompletion = true;
 
+        /** @var core_badges_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_badges');
+
         $user = $this->getDataGenerator()->create_user();
 
-        $fordb = new stdClass();
-        $fordb->id = null;
-        $fordb->name = "Test badge";
-        $fordb->description = "Testing badges";
-        $fordb->timecreated = time();
-        $fordb->timemodified = time();
-        $fordb->usercreated = $user->id;
-        $fordb->usermodified = $user->id;
-        $fordb->issuername = "Test issuer";
-        $fordb->issuerurl = "http://issuer-url.domain.co.nz";
-        $fordb->issuercontact = "issuer@example.com";
-        $fordb->expiredate = null;
-        $fordb->expireperiod = null;
-        $fordb->type = BADGE_TYPE_SITE;
-        $fordb->courseid = null;
-        $fordb->messagesubject = "Test message subject";
-        $fordb->message = "Test message body";
-        $fordb->attachment = 1;
-        $fordb->notification = 0;
-        $fordb->status = BADGE_STATUS_INACTIVE;
-
-        $this->badgeid = $DB->insert_record('badge', $fordb, true);
+        $this->badgeid = $generator->create_badge($user->id, ['status' => BADGE_STATUS_INACTIVE]);
 
         // Create a course with activity and auto completion tracking.
         $this->course = $this->getDataGenerator()->create_course(array('enablecompletion' => true));
@@ -96,11 +78,11 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $this->module = $this->getDataGenerator()->create_module('forum', array('course' => $this->course->id), $completionsettings);
 
         // Build badge and criteria.
-        $fordb->type = BADGE_TYPE_COURSE;
-        $fordb->courseid = $this->course->id;
-        $fordb->status = BADGE_STATUS_ACTIVE;
+        $this->coursebadge = $generator->create_badge($user->id, [
+            'type' => BADGE_TYPE_COURSE,
+            'courseid' => $this->course->id,
+        ]);
 
-        $this->coursebadge = $DB->insert_record('badge', $fordb, true);
         $this->assertion = new stdClass();
         $this->assertion->badge = '{"uid":"%s","recipient":{"identity":"%s","type":"email","hashed":true,"salt":"%s"},"badge":"%s","verify":{"type":"hosted","url":"%s"},"issuedOn":"%d","evidence":"%s"}';
         $this->assertion->class = '{"name":"%s","description":"%s","image":"%s","criteria":"%s","issuer":"%s"}';
@@ -407,7 +389,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $sink->close();
 
         // Check if badge is awarded.
-        $this->assertDebuggingCalled('Error baking badge image!');
         $this->assertTrue($badge->is_issued($this->user->id));
     }
 
@@ -437,7 +418,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $sink->close();
 
         // Check if badge is awarded.
-        $this->assertDebuggingCalled('Error baking badge image!');
         $this->assertTrue($badge->is_issued($this->user->id));
     }
 
@@ -475,7 +455,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $this->assertCount(1, $sink->get_messages());
         $sink->close();
         // Check if badge is awarded.
-        $this->assertDebuggingCalled('Error baking badge image!');
         $this->assertTrue($badge->is_issued($this->user->id));
     }
 
@@ -547,7 +526,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         // Assert the badge has been issued.
         $badge = new badge($this->badgeid);
         $badge->review_all_criteria();
-        $this->assertDebuggingCalled('Error baking badge image!');
         $this->assertTrue($badge->is_issued($this->user->id));
     }
 
@@ -678,7 +656,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         // Assert the badge has been issued.
         $badge = new badge($this->badgeid);
         $badge->review_all_criteria();
-        $this->assertDebuggingCalled('Error baking badge image!');
         $this->assertTrue($badge->is_issued($this->user->id));
     }
 
@@ -753,7 +730,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         // Assert the badge has been issued.
         $badge = new badge($this->badgeid);
         $badge->review_all_criteria();
-        $this->assertDebuggingCalled('Error baking badge image!');
         $this->assertTrue($badge->is_issued($this->user->id));
     }
 
@@ -824,7 +800,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         // Assert the badge has been issued.
         $badge = new badge($this->badgeid);
         $badge->review_all_criteria();
-        $this->assertDebuggingCalled('Error baking badge image!');
         $this->assertTrue($badge->is_issued($this->user->id));
     }
 
@@ -874,7 +849,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $this->assertCount(1, $sink->get_messages());
         $sink->close();
         // Check if badge is awarded.
-        $this->assertDebuggingCalled('Error baking badge image!');
         $awards = $badge->get_awards();
         $this->assertCount(1, $awards);
 

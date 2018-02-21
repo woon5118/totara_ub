@@ -50,8 +50,13 @@ final class util {
     public static function get_component_name($component) {
         // NOTE: override component names as necessary here to make the UI pretty and easy to understand.
 
-        if ($component === 'core_user') {
-            return get_string('user');
+        // DO NOT add strings for plugins here.
+        // Only core components need to be added here, and that is because they don't have the same structure as plugins.
+        // All plugins should be handled within the get_component_string() function below.
+        // Keep digging and you will find the answer to your question.
+        switch ($component) {
+            case 'core_user': return get_string('user');
+            case 'core_badges': return get_string('badges', 'core_badges');
         }
 
         return get_component_string($component, CONTEXT_SYSTEM);

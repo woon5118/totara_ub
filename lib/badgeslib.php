@@ -1062,10 +1062,15 @@ function badges_process_badge_image(badge $badge, $iconfile) {
         process_new_icon($badge->get_context(), 'badges', 'badgeimage', $badge->id, $iconfile, true);
         @unlink($iconfile);
     }
-    // Clean up file draft area after badge image has been saved.
-    $context = context_user::instance($USER->id, MUST_EXIST);
-    $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'user', 'draft');
+    // TOTARA: don't try this if we're withing a unit test.
+    // The current user may not have been set up (nor is it required to be other than this cleanup)
+    // There will be no draft area to delete.
+    if (!PHPUNIT_TEST) {
+        // Clean up file draft area after badge image has been saved.
+        $context = context_user::instance($USER->id, MUST_EXIST);
+        $fs = get_file_storage();
+        $fs->delete_area_files($context->id, 'user', 'draft');
+    }
 }
 
 /**
