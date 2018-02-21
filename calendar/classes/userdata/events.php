@@ -43,7 +43,7 @@ class events extends item {
      */
     private static function get_all_user_events(target_user $user): array {
         global $DB;
-        $sql = "userid = :userid AND ((courseid = 0 AND groupid = 0) || eventtype = :userevent)";
+        $sql = "userid = :userid AND ((courseid = 0 AND groupid = 0) OR eventtype = :userevent)";
         $params = [
             'userid' => $user->id,
             'userevent' => 'user'
