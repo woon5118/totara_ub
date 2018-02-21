@@ -332,7 +332,7 @@ function dp_get_plans($userid, $statuses=array(DP_PLAN_STATUS_APPROVED)) {
     $sql = "userid = ? AND status $insql";
     $params = array($userid);
     $params = array_merge($params, $inparams);
-    return $DB->get_records_select('dp_plan', $sql, $params);
+    return $DB->get_records_select('dp_plan', $sql, $params, 'name');
 }
 
 /**
