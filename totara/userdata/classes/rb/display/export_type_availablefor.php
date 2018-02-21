@@ -26,7 +26,7 @@ namespace totara_userdata\rb\display;
 use \totara_reportbuilder\rb\display\base;
 
 /**
- * Restrictoin for export type usage.
+ * Restriction for export type usage.
  */
 final class export_type_availablefor extends base {
     /**
