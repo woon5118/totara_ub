@@ -77,6 +77,8 @@ $string['resetdashboard'] = 'Reset dashboard to default';
 $string['resetdashboardconfirm'] = 'Do you really want to reset dashboard {$a} layout for all assigned users?';
 $string['savechanges'] = 'Save changes';
 $string['totaradashboarddisabled'] = 'Totara Dashboard is not enabled on this site';
+$string['userdataitemtotara_dashboard'] = 'Customised dashboards';
+$string['userdataitemtotara_dashboard_help'] = 'Purge will reset all the user\'s dashboards to their original state. Export will include the name and id of all the dashboards the user has customised.';
 $string['unpublish'] = 'Unpublish';
 $string['userhomepagechanged'] = 'Your default page was changed';
 
