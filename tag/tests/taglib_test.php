@@ -1065,4 +1065,50 @@ class core_tag_taglib_testcase extends advanced_testcase {
         sort($rv);
         return array_values($rv);
     }
+
+    /**
+     * Tests the {@see core_tag_remove_instances()} that is does definitely remove all tag instances
+     * that match the compenent itemtype and itemid.
+     */
+    public function test_core_tag_remove_instances() {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/tag/lib.php');
+
+        $this->resetAfterTest(true);
+
+        // Set up users with intertests. 'interest1' and 'generictag1' won't be deleted from the tag table, only tag_instance.
+        $user1 = $this->getDataGenerator()->create_user(['interests' => ['interest1', 'interest2', 'generictag1']]);
+        // Control user.
+        $this->getDataGenerator()->create_user(['interests' => ['interest1', 'interest3', 'generictag2']]);
+
+        // Set up a non-user tag.
+        $context = \context_system::instance();
+        \core_tag_tag::add_item_tag('core', 'course', 123, $context, 'generictag1', $user1->id);
+
+        // Get the expected data, by modifying the actual data.
+
+        // All tag instances belonging to the user should be deleted.
+        $expectedtaginstances = $DB->get_records('tag_instance', [], 'id');
+        foreach ($expectedtaginstances as $key => $expectedtaginstance) {
+            if ($expectedtaginstance->itemtype == 'user' && $expectedtaginstance->itemid == $user1->id) {
+                unset($expectedtaginstances[$key]);
+            }
+        }
+
+        // Tags created by the user which are no longer in use by any user or other thing should be deleted.
+        // 'interest1' and 'generictag1' won't be deleted.
+        $expectedtags = $DB->get_records('tag', [], 'id');
+        foreach ($expectedtags as $key => $expectedtag) {
+            if ($expectedtag->name == 'interest2') {
+                unset($expectedtags[$key]);
+            }
+        }
+
+        // Execute the purge.
+        core_tag_remove_instances('core', 'user', $user1->id);
+
+        // Check the results.
+        $this->assertEquals($expectedtags, $DB->get_records('tag', [], 'id'));
+        $this->assertEquals($expectedtaginstances, $DB->get_records('tag_instance', [], 'id'));
+    }
 }

@@ -167,6 +167,7 @@ $string['useblogassociations'] = 'Enable blog associations';
 $string['useexternalblogs'] = 'Enable external blogs';
 $string['userblog'] = 'User blog: {$a}';
 $string['userblogentries'] = 'Blog entries by {$a}';
+$string['userdataitemblog'] = 'Blogs';
 $string['valid'] = 'Valid';
 $string['viewallblogentries'] = 'All entries about this {$a}';
 $string['viewallmodentries'] = 'View all entries about this {$a->type}';

@@ -69,3 +69,30 @@ function core_tag_inplace_editable($itemtype, $itemid, $newvalue) {
         return \core_tag\output\tagisstandard::update($itemid, $newvalue);
     }
 }
+
+/**
+ * Function to delete a group of tags. Does not trigger events
+ * Made for userdata items as they need to work when user context has being deleted.
+ *
+ * @param string $component
+ * @param string $itemtype
+ * @param int $itemid
+ */
+function core_tag_remove_instances(string $component, string $itemtype, int $itemid) {
+    global $DB;
+
+    // Moodle tags API can be considered to be less than good enough for our purposes, this is not going to be pretty...
+    $taginstances = $DB->get_records('tag_instance', ['component' => $component, 'itemtype' => $itemtype, 'itemid' => $itemid]);
+    foreach ($taginstances as $taginstance) {
+        $DB->delete_records('tag_instance', ['id' => $taginstance->id]);
+        if (!$DB->record_exists('tag_instance', ['tagid' => $taginstance->tagid])) {
+            // Remove any unused tags, even if it wasn't created by the target user (consistent with API functions).
+            $tag = $DB->get_record('tag', ['id' => $taginstance->tagid]);
+            if ($tag) {
+                // Delete the tag only if nothing is using the tag any more and user created it.
+                $DB->delete_records('tag_correlation', ['tagid' => $tag->id]);
+                $DB->delete_records('tag', ['id' => $tag->id]);
+            }
+        }
+    }
+}

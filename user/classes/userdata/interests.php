@@ -28,6 +28,8 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/tag/lib.php');
+
 /**
  * Users interests.
  */
@@ -71,23 +73,7 @@ class interests extends \totara_userdata\userdata\item {
      * @return int result self::RESULT_STATUS_SUCCESS, self::RESULT_STATUS_ERROR or status::RESULT_STATUS_SKIPPED
      */
     protected static function purge(target_user $user, \context $context) {
-        global $DB;
-        // Moodle tags API can be considered to be less than good enough for our purposes, this is not going to be pretty...
-
-        $taginstances = $DB->get_records('tag_instance', ['component' => 'core', 'itemtype' => 'user', 'itemid' => $user->id]);
-        foreach ($taginstances as $taginstance) {
-            $DB->delete_records('tag_instance', ['id' => $taginstance->id]);
-            if (!$DB->record_exists('tag_instance', ['tagid' => $taginstance->tagid])) {
-                // Remove any unused tags, even if it wasn't created by the target user (consistent with API functions).
-                $tag = $DB->get_record('tag', ['id' => $taginstance->tagid]);
-                if ($tag) {
-                    // Delete the tag only if nothing is using the tag any more and user created it.
-                    $DB->delete_records('tag_correlation', ['tagid' => $tag->id]);
-                    $DB->delete_records('tag', ['id' => $tag->id]);
-                }
-            }
-        }
-
+        core_tag_remove_instances('core', 'user', $user->id);
         return self::RESULT_STATUS_SUCCESS;
     }
 
