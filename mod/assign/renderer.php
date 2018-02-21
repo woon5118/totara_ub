@@ -445,9 +445,9 @@ class mod_assign_renderer extends plugin_renderer_base {
                 $team = format_string($group->name, false, $status->context);
             } else if ($status->preventsubmissionnotingroup) {
                 if (count($status->usergroups) == 0) {
-                    $team = '<span class="alert alert-error">' . get_string('noteam', 'assign') . '</span>';
+                    $team = html_writer::span($this->pix_icon('i/warning', '') . get_string('noteam', 'assign'), 'mod_assign-group_warning');
                 } else if (count($status->usergroups) > 1) {
-                    $team = '<span class="alert alert-error">' . get_string('multipleteams', 'assign') . '</span>';
+                    $team = html_writer::span($this->pix_icon('i/warning', '') . get_string('multipleteams', 'assign'), 'mod_assign-group_warning');
                 }
             } else {
                 $team = get_string('defaultteam', 'assign');
@@ -647,12 +647,14 @@ class mod_assign_renderer extends plugin_renderer_base {
             } else if ($status->preventsubmissionnotingroup) {
                 if (count($status->usergroups) == 0) {
                     $cell2 = new html_table_cell(
-                        html_writer::span(get_string('noteam', 'assign'), 'alert alert-error')
+                        $this->pix_icon('i/warning', '') . get_string('noteam', 'assign')
                     );
+                    $cell2->attributes['class'] = 'mod_assign-group_warning';
                 } else if (count($status->usergroups) > 1) {
                     $cell2 = new html_table_cell(
-                        html_writer::span(get_string('multipleteams', 'assign'), 'alert alert-error')
+                        $this->pix_icon('i/warning', '') . get_string('multipleteams', 'assign')
                     );
+                    $cell2->attributes['class'] = 'mod_assign-group_warning';
                 }
             } else {
                 $cell2 = new html_table_cell(get_string('defaultteam', 'assign'));
