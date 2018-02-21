@@ -20,6 +20,8 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
+// This file has been deprecated and is no longer used.
+
 /*
  * @package    moodle
  * @subpackage registration
@@ -29,7 +31,6 @@
  *
  * The forms needed by registration pages.
  */
-
 
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/' . $CFG->admin . '/registration/lib.php');

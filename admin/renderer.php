@@ -725,6 +725,7 @@ class core_admin_renderer extends plugin_renderer_base {
     /**
      * Display a warning about not being registered on Moodle.org if necesary.
      *
+     * @deprecated
      * @param boolean $registered true if the site is registered on Moodle.org
      * @return string HTML to output.
      */

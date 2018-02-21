@@ -517,7 +517,8 @@ $dbproblems = $DB->diagnose();
 $maintenancemode = !empty($CFG->maintenance_enabled);
 
 $buggyiconvnomb = (!function_exists('mb_convert_encoding') and @iconv('UTF-8', 'UTF-8//IGNORE', '100'.chr(130).'€') !== '100€');
-//check if the site is registered on Moodle.org
+// check if the site is registered on Moodle.org
+// The hub registration functionality has been deprecated in version 11 and will be removed with version 12.
 $registered = $DB->count_records('registration_hubs', array('huburl' => HUB_MOODLEORGHUBURL, 'confirmed' => 1));
 // Check if there are any cache warnings.
 $cachewarnings = cache_helper::warnings();

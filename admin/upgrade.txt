@@ -1,5 +1,18 @@
 This files describes API changes in /admin/*.
 
+=== 11 ===
+
+* Hub functionality has been deprecated and will be removed entirely in the next major version.
+* \core_admin_renderer::registration_warning() has been deprecated, the functionality for registering hubs will be removed in the next major version
+* admin/registration/confirmregistration.php has been deprecated and should no longer be linked to.
+* admin/registration/forms.php has been deprecated and should no longer be linked to.
+* admin/registration/index.php has been deprecated and should no longer be linked to.
+* admin/registration/register.php has been deprecated and should no longer be linked to.
+* admin/registration/renderer.php has been deprecated and should no longer be linked to.
+* admin/registration/renewregistration.php has been deprecated and should no longer be linked to.
+* admin/registration/lib.php has been deprecated and should no longer be included anywhere.
+* Database table for hub registration 'registration_hubs' has been deprecated.
+
 === 10 ===
 
 * Admin settings have been refined to better support right-to-left languages. In RTL,

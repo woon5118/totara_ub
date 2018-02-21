@@ -608,7 +608,6 @@ $string['htmleditorsettings'] = 'HTML editor settings';
 $string['htmlsettings'] = 'HTML settings';
 $string['http'] = 'HTTP';
 $string['httpsecurity'] = 'HTTP security';
-$string['hubs'] = 'Hubs';
 $string['incompleteunicodesupport'] = 'The current setup of MySQL or MariaDB is using \'utf8\'. This character set does not support four byte characters which include some emoji. Trying to use these characters will result in an error when updating a record, and any information being sent to the database will be lost. Please consider changing your settings to \'utf8mb4\'. See the documentation for full details.';
 $string['change'] = 'change';
 $string['checkboxno'] = 'No';
@@ -1330,3 +1329,4 @@ Totara Partners|https://www.totaralms.com/partners
 </pre>';
 $string['custommenuitems'] = 'Custom menu items (Deprecated)';
 $string['custommenu'] = 'Custom menu';
+$string['hubs'] = 'Hubs';

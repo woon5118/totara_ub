@@ -174,7 +174,7 @@ $capabilities = array(
     ),
 
     'moodle/backup:backuptargethub' => array(
-
+        // Hub functionality has been deprecated and will be removed in the next major version.
         'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
 
         'captype' => 'write',
@@ -1892,7 +1892,7 @@ $capabilities = array(
         )
     ),
      'moodle/course:publish' => array(
-
+        // Hub functionality (includes course publishing) has been deprecated and will be removed in the next major version.
         'captype' => 'write',
         'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
         'contextlevel' => CONTEXT_SYSTEM,
@@ -1910,6 +1910,7 @@ $capabilities = array(
         )
     ),
     'moodle/community:add' => array(
+        // Hub functionality (includes course publishing) has been deprecated and will be removed in the next major version.
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
@@ -1919,6 +1920,7 @@ $capabilities = array(
         )
     ),
     'moodle/community:download' => array(
+        // Hub functionality (includes course publishing) has been deprecated and will be removed in the next major version.
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(

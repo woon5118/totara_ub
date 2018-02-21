@@ -30,6 +30,8 @@
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  */
 
+// This file has been deprecated and will be removed in version 12.
+
 define('NO_OUTPUT_BUFFERING', true);
 
 require_once('../../config.php');

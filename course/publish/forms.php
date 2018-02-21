@@ -30,6 +30,7 @@
  * The forms used for course publication
  */
 
+// This file has been deprecated and will be removed in version 12.
 
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . "/" . $CFG->admin . "/registration/lib.php");
@@ -37,8 +38,8 @@ require_once($CFG->dirroot . "/course/publish/lib.php");
 
 /*
  * Hub selector to choose on which hub we want to publish.
+ * @deprecated
  */
-
 class hub_publish_selector_form extends moodleform {
 
     public function definition() {
@@ -89,8 +90,8 @@ class hub_publish_selector_form extends moodleform {
 
 /*
  * Course publication form
+ * @deprecated
  */
-
 class course_publication_form extends moodleform {
 
     public function definition() {

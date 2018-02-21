@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// Hub functionality as been deprecated with version 11 and will be removed entirely in the next major version.
+
 /**
  *
  * Hub related strings
