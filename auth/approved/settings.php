@@ -181,6 +181,11 @@ if ($ADMIN->fulltree) {
         'auth_approved/expiration_warning',
         new lang_string('expiration_warning', 'auth_manual'),
         new lang_string('expiration_warning_desc', 'auth_manual'), 0, $options));
+
+    // Display locking of profile fields.
+    $authplugin = get_auth_plugin('approved');
+    display_auth_lock_options($settingspage, $authplugin->authtype,
+        $authplugin->userfields, get_string('auth_fieldlocks_help', 'auth'), false, false);
 }
 
 $ADMIN->add('authapprovedfolder', $settingspage);
