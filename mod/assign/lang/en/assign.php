@@ -515,6 +515,7 @@ $string['unsavedchangesquestion'] = 'There are unsaved changes to grades or feed
 $string['updategrade'] = 'Update grade';
 $string['updatetable'] = 'Save and update table';
 $string['upgradenotimplemented'] = 'Upgrade not implemented in plugin ({$a->type} {$a->subtype})';
+$string['userdataitemsingleassignments'] = 'Individual assignments';
 $string['userextensiondate'] = 'Extension granted until: {$a}';
 $string['useridlistnotcached'] = 'The grade changes were NOT saved, as it was not possible to determine which submission they were for.';
 $string['useroverrides'] = 'User overrides';
