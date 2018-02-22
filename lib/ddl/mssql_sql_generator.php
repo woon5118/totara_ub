@@ -102,13 +102,6 @@ class mssql_sql_generator extends sql_generator {
 
         $value = (int)$this->mdb->get_field_sql("SELECT MAX(id) FROM {$tablename}");
 
-        if ($value === 0 and get_class($this->mdb) === 'mssql_native_moodle_database') {
-            // There is no way to find current identity number via mssql driver
-            // because we do not know if there were any records inserted into the table,
-            // so let's do the old nasty hack that resets everything including the seed value.
-            $this->mdb->execute("TRUNCATE TABLE {$tablename}");
-        }
-
         $identityinfo = $this->mdb->get_identity_info($table->getName());
 
         $sqls = array();
@@ -123,11 +116,6 @@ class mssql_sql_generator extends sql_generator {
 
         // From http://msdn.microsoft.com/en-us/library/ms176057.aspx
         $sqls[] = "DBCC CHECKIDENT ('{$tablename}', RESEED, {$value})";
-
-        if (get_class($this->mdb) === 'mssql_native_moodle_database') {
-            // Method get_identity_info might have returned bogus info, so make sure we will never get id duplicate.
-            $sqls[] = "DBCC CHECKIDENT ('{$tablename}', RESEED)";
-        }
 
         return $sqls;
     }
@@ -344,7 +332,7 @@ class mssql_sql_generator extends sql_generator {
         }
 
         // NOTE: quiz_report table has a messed up nullable name field, ignore it.
-        
+
         if ($xmldb_index->getUnique() and count($xmldb_index->getFields()) === 1 and $xmldb_table->getName() !== 'quiz_reports') {
             $fields = $xmldb_index->getFields();
             $fieldname = reset($fields);
