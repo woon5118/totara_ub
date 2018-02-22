@@ -65,3 +65,7 @@ configcustommenuitems,core_admin
 custommenuitems,core_admin
 custommenu,core_admin
 hubs,core_admin
+moodleorghubname,core_admin
+statsmoodleorg,core_admin
+registrationwarning,core_admin
+registrationwarningcontactadmin,core_admin
