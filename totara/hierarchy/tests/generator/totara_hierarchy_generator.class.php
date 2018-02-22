@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
+require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
 /**
  * Hierarchy generator
@@ -184,6 +185,280 @@ class totara_hierarchy_generator extends component_generator_base {
         }
 
         return $framework;
+    }
+
+    /**
+     * Assign some learners to a company goal individually
+     *
+     * @param int $goalid - the id of a company level goal
+     * @param array(int) $userids - an array of userids to be assigned
+     * @return bool - whether the users were successfully assigned or not
+     */
+    public function goal_assign_individuals($goalid, $userids = array()) {
+        global $USER, $DB;
+
+        $goalinfo = goal::goal_assignment_type_info(GOAL_ASSIGNMENT_INDIVIDUAL, $goalid);
+        $field = $goalinfo->field;
+
+        // Set up the default scale value for the goal.
+        $sql = "SELECT s.defaultid
+                FROM {goal} g
+                JOIN {goal_scale_assignments} sa
+                    ON g.frameworkid = sa.frameworkid
+                JOIN {goal_scale} s
+                    ON sa.scaleid = s.id
+                WHERE g.id = :gid";
+        $scale = $DB->get_record_sql($sql, array('gid' => $goalid));
+
+        // There should always be a goal_scale, something is horribly wrong if there isn't.
+        if (empty($scale)) {
+            return false;
+        }
+
+        foreach ($userids as $uid) {
+
+            $scale_default = new stdClass();
+            $scale_default->goalid = $goalid;
+            $scale_default->userid = $uid;
+            $scale_default->scalevalueid = $scale->defaultid;
+
+            // Add the individual assignment.
+            $assignment = new stdClass();
+            $assignment->assignmentid = 0;
+            $assignment->$field = $uid;
+            $assignment->assigntype = GOAL_ASSIGNMENT_INDIVIDUAL;
+            $assignment->goalid = $goalid;
+            $assignment->timemodified = time();
+            $assignment->usermodified = $USER->id;
+            $assignment->includechildren = 0;
+
+            $assignment->id = $DB->insert_record($goalinfo->table, $assignment);
+
+            $goalrecords = goal::get_goal_items(array('goalid' => $goalid, 'userid' => $uid), goal::SCOPE_COMPANY);
+            if (empty($goalrecords)) {
+                goal::insert_goal_item($scale_default, goal::SCOPE_COMPANY);
+            }
+        }
+    }
+
+    /**
+     * Create a personal goal for a user
+     *
+     * @param int $userid       The id of the user to create the goal for
+     * @param array $goaldata   The data for the goal, anything not provided will use default data
+     *                          NOTE: Customfields can be passed through goaldata with the key 'cf_<fieldshortname>'
+     * @return stdClass         The database record for the created personal goal
+     */
+    public function create_personal_goal($userid, $goaldata = array()) {
+        global $USER, $DB;
+
+        $now = time();
+        $defaultdata = ['name' =>  'Personal Goal',
+                        'targetdate' => $now + (60 * DAYSECS),
+                        'assigntype' => GOAL_ASSIGNMENT_SELF,
+                        'timecreated' => $now,
+                        'usercreated' => $USER->id,
+                        'timemodified' => $now,
+                        'usermodified' => $USER->id,
+                        'deleted' => 0,
+                        'typeid' => null];
+        $goaldata = array_merge($defaultdata, $goaldata);
+        $goaldata['userid'] = $userid;
+
+        $goalid = $DB->insert_record('goal_personal', $goaldata);
+        $goal = $DB->get_record('goal_personal', ['id' => $goalid]);
+
+        if (!empty($goal->typeid)) {
+            $fields = $DB->get_records('goal_user_info_field', ['typeid' => $goal->typeid]);
+
+            // Initialize all the fields.
+            foreach ($fields as $field) {
+
+                $fieldname = 'cf_' . $field->shortname;
+                if (!empty($goaldata[$fieldname]) || !empty($field->defaultdata)) {
+                    $input = "customfield_{$field->datatype}{$field->typeid}";
+
+                    $item = new \stdClass();
+                    $item->id = $goal->id;
+                    $item->typeid = $goal->typeid;
+                    $item->{$input} = !empty($goaldata[$fieldname]) ? $goaldata[$fieldname] : $field->defaultdata;
+                    customfield_save_data($item, 'goal_user', 'goal_user');
+                }
+            }
+        }
+
+        return $goal;
+    }
+
+    /**
+     * Create a type for personal goals so custom fields can be added.
+     *
+     * @param array $typedata The data for the type, anything not provided will use default data
+     * @return stdClass       The database record for the created type
+     */
+    public function create_personal_goal_type($typedata = array()) {
+        global $USER, $DB;
+
+        $defaultdata = ['fullname' => 'Personal Goal Type',
+                        'shortname' => 'pgoaltype',
+                        'idnumber' => 'pgtype123',
+                        'timecreated' => time(),
+                        'timemodified' => time(),
+                        'usermodified' => $USER->id,
+                        'audience' => 0];
+        $typedata = array_merge($defaultdata, $typedata);
+
+        $typeid = $DB->insert_record('goal_user_type', $typedata);
+
+        return $DB->get_record('goal_user_type', ['id' => $typeid]);
+    }
+
+    /**
+     * Stub function to call create_personal_goal_type_customfield() with the correct
+     * variables to create a menu type custom field
+     *
+     * @param array $data - The basic data to create the customfield with
+     * @return void
+     */
+    public function create_personal_goal_type_menu($data) {
+        $customfield = $data;
+        $customfield['param1'] = "1234"."\n"."2345"."\n"."3456"."\n"."4567";
+        $this->create_personal_goal_type_customfield('menu', $customfield);
+    }
+
+    /**
+     * Stub function to call create_personal_goal_type_customfield() with the correct
+     * variables to create a text type custom field
+     *
+     * @param array $data - The basic data to create the customfield with
+     * @return void
+     */
+    public function create_personal_goal_type_text($data) {
+        $customfield = $data;
+        $customfield['param1'] = 30;
+        $customfield['param2'] = 2048;
+        $this->create_personal_goal_type_customfield('text', $customfield);
+    }
+
+    /**
+     * Stub function to call create_personal_goal_type_customfield() with the correct
+     * variables to create a datetime type custom field
+     *
+     * @param array $data - The basic data to create the customfield with
+     * @return void
+     */
+    public function create_personal_goal_type_datetime($data) {
+        $customfield = $data;
+        $customfield['param1'] = date("Y")-1; // Start year.
+        $customfield['param2'] = date("Y")+5; // End year.
+        $this->create_personal_goal_type_customfield('datetime', $customfield);
+    }
+
+    /**
+     * Stub function to call create_personal_goal_type_customfield() with the correct
+     * variables to create a checkbox type custom field
+     *
+     * @param array $data - The basic data to create the customfield with
+     * @return void
+     */
+    public function create_personal_goal_type_checkbox($data) {
+        $this->create_personal_goal_type_customfield('checkbox', $data);
+    }
+
+    /**
+     * Stub function to call create_personal_goal_type_customfield() with the correct
+     * variables to create a generic menu type custom field
+     *
+     * @param array $data - The basic data to create the customfield with
+     * @return void
+     */
+    public function create_personal_goal_type_generic_menu($data) {
+        $customfield = $data;
+        $customfield['param1'] = str_replace(',', "\n", $data['value']);
+        $customfield['value'] = '';
+        $this->create_personal_goal_type_customfield('menu', $customfield);
+    }
+
+    /**
+     * Create a custom field for a personal goal type
+     * Note: While this can be called directly, it's easier to go through the
+     *       setup functions above create_personal_goal_type_<cftype>()
+     *
+     * @param string $fieldtype  The type of customfield
+     * @param array $customfield The data for the customfield, anything not provided will use default data
+     */
+    private function create_personal_goal_type_customfield($fieldtype, $customfield) {
+        global $CFG, $DB;
+
+        if (!$typeid = $DB->get_field('goal_user_type', 'id', array('idnumber' => $customfield['typeidnumber']))) {
+            throw new coding_exception('Unknown personal_goal type idnumber '.$customfield['typeidnumber'].' in personal_goal definition');
+        }
+
+        $data = new \stdClass();
+        $data->id = 0;
+        $data->shortname = $fieldtype . $typeid;
+        $data->typeid = $typeid;
+        $data->datatype = $fieldtype;
+        $data->description_editor = array('text' => '', 'format' => '1', 'itemid' => time());
+        $data->hidden   = 0;
+        $data->locked   = 0;
+        $data->required = 0;
+        $data->forceunique = 0;
+        $data->defaultdata = $customfield['value'];
+        if (isset($customfield['param1'])) {
+            $data->param1 = $customfield['param1'];
+        }
+        if (isset($customfield['param2'])) {
+            $data->param2 = $customfield['param2'];
+        }
+        if (isset($customfield['param3'])) {
+            $data->param3 = $customfield['param3'];
+        }
+        if (isset($customfield['param4'])) {
+            $data->param4 = $customfield['param4'];
+        }
+        if (isset($customfield['param5'])) {
+            $data->param5 = $customfield['param5'];
+        }
+        $data->fullname  = 'Personal Goal ' . $fieldtype;
+
+        require_once($CFG->dirroot . '/totara/customfield/field/' . $fieldtype . '/define.class.php');
+        $customfieldclass = 'customfield_define_' . $fieldtype;
+        $field = new $customfieldclass();
+        $field->define_save($data, 'goal_user');
+    }
+
+    /**
+     * Update a users scale value for an existing company goal assignment, and create
+     * an associated history record for the change.
+     *
+     * @param int $userid
+     * @param int $goalid
+     * @param int $valueid - The id of the goal scale value record
+     * @return boolean
+     */
+    public function update_company_goal_user_scale_value($userid, $goalid, $valueid) {
+        global $DB, $USER;
+
+        if (!$todb = $DB->get_record('goal_record', ['userid' => $userid, 'goalid' => $goalid])) {
+            // You can't update something that isn't there.
+            return false;
+        }
+
+        // Update the goal record with the new valueid.
+        $todb->scalevalueid = $valueid;
+        $DB->update_record('goal_record', $todb);
+
+        // Create a history record for the change.
+        $history = new \stdClass();
+        $history->scope = \goal::SCOPE_COMPANY;
+        $history->itemid = $todb->id;
+        $history->scalevalueid = $valueid;
+        $history->timemodified = time();
+        $history->usermodified = $USER->id;
+
+        return $DB->insert_record('goal_item_history', $history);
+
     }
 
     /**
