@@ -54,7 +54,7 @@ final class rb_userdata_purges_embedded extends rb_base_embedded {
         );
 
         $this->defaultsortcolumn = 'purge_timecreated';
-        $this->defaultsortorder = SORT_ASC;
+        $this->defaultsortorder = SORT_DESC;
 
         // No restrictions.
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;

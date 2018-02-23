@@ -51,7 +51,7 @@ final class rb_userdata_exports_embedded extends rb_base_embedded {
         );
 
         $this->defaultsortcolumn = 'export_timecreated';
-        $this->defaultsortorder = SORT_ASC;
+        $this->defaultsortorder = SORT_DESC;
 
         // No restrictions.
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
