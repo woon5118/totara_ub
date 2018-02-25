@@ -51,7 +51,7 @@ function xmldb_totara_program_upgrade($oldversion) {
         }
 
         // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2016110900, 'totara_program');
+        upgrade_plugin_savepoint(true, 2016110900, 'totara', 'program');
     }
 
     // Set default scheduled tasks correctly.
@@ -163,7 +163,7 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_default_schedule($task, $incorrectschedule, $newschedule);
 
         // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2017042800, 'totara_program');
+        upgrade_plugin_savepoint(true, 2017042800, 'totara', 'program');
     }
 
     if ($oldversion < 2017112000) {
@@ -195,19 +195,14 @@ function xmldb_totara_program_upgrade($oldversion) {
         }
 
         // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2018010800, 'totara_program');
+        upgrade_plugin_savepoint(true, 2018010800, 'totara', 'program');
     }
 
     if ($oldversion < 2018020500) {
 
         // We need to fix a regression from TL-15995. See TL-16826 for details.
         // The wrong plugin name was used, 'totara_totara_program'. We need to remove it.
-        $params = array(
-            'plugin' => 'totara_totara_program',
-            'name' => 'version',
-            'value' => '2017112000'
-        );
-        $DB->delete_records_select('config_plugins', "plugin = :plugin AND name = :name AND value = :value", $params);
+        set_config('version', null, 'totara_totara_facetoface');
 
         upgrade_plugin_savepoint(true, 2018020500, 'totara', 'program');
     }

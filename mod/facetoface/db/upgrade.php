@@ -179,7 +179,7 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2017112000, 'totara', 'facetoface');
+        upgrade_mod_savepoint(true, 2017112000, 'facetoface');
     }
 
     if ($oldversion < 2017112001) {
@@ -193,7 +193,7 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2017112001, 'totara', 'facetoface');
+        upgrade_mod_savepoint(true, 2017112001, 'facetoface');
     }
 
     if ($oldversion < 2017112002) {
@@ -207,7 +207,7 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2017112002, 'totara', 'facetoface');
+        upgrade_mod_savepoint(true, 2017112002, 'facetoface');
     }
 
     if ($oldversion < 2017112003) {
@@ -221,7 +221,7 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2017112003, 'totara', 'facetoface');
+        upgrade_mod_savepoint(true, 2017112003, 'facetoface');
     }
 
     if ($oldversion < 2017112004) {
@@ -235,7 +235,7 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2017112004, 'totara', 'facetoface');
+        upgrade_mod_savepoint(true, 2017112004, 'facetoface');
     }
 
     if ($oldversion < 2017112005) {
@@ -249,9 +249,14 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2017112005, 'totara', 'facetoface');
+        upgrade_mod_savepoint(true, 2017112005, 'facetoface');
+    }
+
+    if ($oldversion < 2018022600) {
+        // Remove invalid plugin version introduced by wrong upgrade steps in TL-15995.
+        set_config('version', null, 'totara_facetoface');
+        upgrade_mod_savepoint(true, 2018022600, 'facetoface');
     }
 
     return true;
-
 }
