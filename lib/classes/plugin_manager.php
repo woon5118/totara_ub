@@ -1231,6 +1231,8 @@ class core_plugin_manager {
 
             'availability' => array(
                 'completion', 'date', 'grade', 'group', 'grouping', 'profile'
+                // Totara
+                , 'audience', 'hierarchy_organisation', 'hierarchy_position', 'language',
             ),
 
             'block' => array(
