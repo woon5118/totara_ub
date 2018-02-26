@@ -21,7 +21,7 @@ Feature: Restore Moodle 2 course backups
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Description | Test forum description |
-    And I add the "Community finder" block
+    And I add the "Course completion status" block
 
   @javascript
   Scenario: Restore a course in another existing course
@@ -29,7 +29,7 @@ Feature: Restore Moodle 2 course backups
       | Confirmation | Filename | test_backup.mbz |
     And I restore "test_backup.mbz" backup into "Course 2" course using this options:
     Then I should see "Course 2" in the page title
-    And I should see "Community finder" in the "Community finder" "block"
+    And I should see "Course completion status" in the "Course completion status" "block"
     And I should see "Test forum name"
 
   @javascript
@@ -39,7 +39,7 @@ Feature: Restore Moodle 2 course backups
     And I restore "test_backup.mbz" backup into a new course using this options:
       | Schema | Course name | Course 1 restored in a new course |
     Then I should see "Course 1 restored in a new course" in the page title
-    And I should see "Community finder" in the "Community finder" "block"
+    And I should see "Course completion status" in the "Course completion status" "block"
     And I should see "Test forum name"
     And I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
@@ -73,7 +73,7 @@ Feature: Restore Moodle 2 course backups
     Then I should see "Course 1" in the page title
     And I should not see "Section 3"
     And I should not see "Test forum post backup name"
-    And I should see "Community finder" in the "Community finder" "block"
+    And I should see "Course completion status" in the "Course completion status" "block"
     And I should see "Test forum name"
 
   @javascript
