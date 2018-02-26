@@ -539,6 +539,9 @@ class totara_sync_element_user extends totara_sync_element {
             $user->auth = isset($suser->auth) ? $suser->auth : 'manual';
             $this->set_sync_user_fields($user, $suser, $saveemptyfields);
 
+            // Add user default fields where appropriate
+            $user->maildisplay = core_user::get_property_default('maildisplay');
+
             try {
                 $user->id = $DB->insert_record('user', $user);  // Insert user.
             } catch (Exception $e) {

@@ -662,4 +662,27 @@ class tool_totara_sync_user_csv_emptyfields_setting_testcase extends advanced_te
         $this->markTestSkipped('HR Import user source auth field needs tests.');
     }
 
+    public function test_sync_user_defaults() {
+        global $DB;
+
+        // Set the config.
+        $config = array_merge($this->configcsv, $this->importfields());
+        $this->set_config($config, 'totara_sync_source_user_csv');
+        $config = array_merge($this->config, array('csvsaveemptyfields' => true));
+        $this->set_config($config, 'totara_sync_element_user');
+
+        set_config('defaultpreference_maildisplay', 1);
+
+        // Add users
+        $this->sync_add_users();
+
+        // Create the CSV file and run the sync.
+        $this->create_csv('emptydata'); // Create and upload our CSV data file with empty fields.
+        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+        $this->assertCount(3, $DB->get_records('user')); // Check the correct count of users.
+
+        $user = $this->get_user('1');
+        $this->assertEquals(1, $user->maildisplay);
+    }
+
 }
