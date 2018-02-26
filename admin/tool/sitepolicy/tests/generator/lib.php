@@ -282,8 +282,6 @@ class tool_sitepolicy_generator extends component_generator_base {
 
         $consentoptions = [];
 
-        $trans = $DB->start_delegated_transaction();
-
         $sitepolicy = new sitepolicy();
         $sitepolicy->set_timecreated($definition['time']);
         $sitepolicy->save();
@@ -331,8 +329,6 @@ class tool_sitepolicy_generator extends component_generator_base {
             }
         }
 
-        $trans->allow_commit();
-
         return $sitepolicy;
     }
 
@@ -343,7 +339,7 @@ class tool_sitepolicy_generator extends component_generator_base {
      * @param bool $hasconsented
      * @param int $userid
      */
-    private function add_userconsent(sitepolicy $sitepolicy, bool $hasconsented, int $userid, $language = null, $timeconsented = null) {
+    public function add_userconsent(sitepolicy $sitepolicy, bool $hasconsented, int $userid, $language = null, $timeconsented = null) {
         global $DB;
 
         $params = [
