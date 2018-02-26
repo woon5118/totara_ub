@@ -3,6 +3,462 @@
 
 Totara Learn Changelog
 
+Totara Learn 11 Release Candidate (28th February 2018):
+=======================================================
+
+Key:           + Release candidate only
+
+Security issues:
+
+    TL-16789       Added output filtering for event names within the calendar popup
+
+                   Previously event names when displayed within the calendar popup were not
+                   being cleaned accurately.
+                   They are now cleaned consistently and accurately before being output.
+
+    TL-16790       Fixed web-services vulnerability that could return quiz result correctness to user without required access level
+
+                   Quiz module web services used in mobile app allowed students to see results
+                   even if it was disabled in the settings.
+
+    TL-16814       Fixed a typo in Moodle capability definitions that was leading to risks not being correctly registered
+
+                   A typo had been introduced in 8 core capabilities that meant that the risks
+                   that wanted to register were not correctly registered.
+                   These capabilities may have been assigned to roles in the system without
+                   the assigner being aware that there were risks associated with them.
+                   We recommend you review the following capabilities and confirm that you are
+                   happy with the roles that they have been assigned to:
+                   * moodle/user:managesyspages
+                   * moodle/user:manageblocks
+                   * moodle/user:manageownblocks
+                   * moodle/user:manageownfiles
+                   * moodle/user:ignoreuserquota
+                   * moodle/my:configsyspages
+                   * moodle/badges:manageownbadges
+                   * moodle/badges:viewotherbadges
+
+    TL-16841       Removed the ability to preview random group allocations within Courses
+
+                   This functionality relied on setting the seed used by rand functions within
+                   PHP.
+                   A consequence of which was that for short periods of time the seed used by
+                   PHP would not be randomly generated, but preset.
+                   This could be used to make it easier to guess the result of randomised
+                   operations within several PHP functions, including some functions used by
+                   cryptographic routines within PHP and Totara.
+                   The seed is no longer forced, and is now always randomly generated.
+
+    TL-16844       Improved security and privacy of HTTP referrers
+
+                   We have improved the existing "Secure referrers" setting to
+                   be compatible with browsers implementing the latest referrer policy
+                   recommendation from W3C. This setting improves user privacy by preventing
+                   external sites from tracking users via referrers.
+
+    TL-16859       Prevented sending emails to admin before IPN request is verified by Paypal
+
+                   The IPN endpoint for the Paypal enrolment method was sending an email to
+                   the site admin when the basic validation of the request parameters failed.
+                   An attacker could have used this to send potential malicious emails to the
+                   admin. With this patch an email is sent to the admin only after the
+                   successful verification of the IPN request data with Paypal. Additionally
+                   the script now validates if there's an active Paypal enrolment method for
+                   the given course.
+
+                   The check for a connection error of the verification request to Paypal has
+                   been fixed. Now the CURL error of the last request stored in the CURL
+                   object is used instead of the return value of the request method which
+                   always returns either the response or an error.
+
+New features:
+
+    TL-16433   +   Added tool to manage terms and conditions and obtain user consent
+
+                   In order to facilitate GDPR subscriber compliance, a new admin tool is now
+                   available that allows the site administrator to create, edit,
+                   review/preview and delete terms and conditions.
+                   Each term and condition can have one or more consent related user
+                   confirmation which may or may not be required.
+
+                   The tool is not enabled by default, but can be enabled through
+                   the "enablesitepolicies" configuration setting.
+
+                   If enabled, users will be required to view and consent to any current terms
+                   and conditions that they have not viewed and consented to before.
+                   If the user doesn't accept all required terms and conditions they will be
+                   logged out.
+
+    TL-16747   +   Added the user data management plugin
+
+                   This plugin allows users and administrators to manage users' data. A new
+                   collection of links is located under "Site administration -> Users -> User
+                   data management". Here you can manage global user data settings, configure
+                   purge and export profiles, see logs of purges and exports that have been
+                   scheduled or performed, and manage deleted users.
+
+                   Note that deleted users are no longer listed under "Site administration ->
+                   Users -> Accounts -> Browse list of users". To manage deleted users
+                   (including undelete), you need to go to "Site administration -> Users ->
+                   User data management -> Deleted user accounts".
+
+                   Purge profiles can be configured by administrators, and allow them to
+                   specify which data will be deleted. The purge profiles can be applied to
+                   users, deleting the data. Purge profiles can be applied to users manually.
+                   Users can also be configured to have a specific purge profile automatically
+                   applied on the condition that they are suspended or deleted, and site
+                   defaults for these actions can also be configured. Note that existing
+                   behaviour when users are suspended or deleted is not affected - the data
+                   listed on the delete user confirmation page will still be deleted,
+                   regardless of any purge profile which might apply to the user.
+
+                   Export profiles can be configured by administrators, and allow them to
+                   specify which data can be exported. When granted
+                   the "totara/userdata:exportself" capability, users will then be able to
+                   run an export of their own data, which will create a downloadable file
+                   containing the specified data. Export must first be enabled in "Site
+                   administration -> Users -> User data management -> Settings".
+
+                   This new feature provides sites with tools which will support them becoming
+                   GDPR compliant. By configuring purge profiles and purging data, sites can
+                   comply to GDPR rules which indicate what data must be removed and
+                   which must be retained, given their particular circumstances. By
+                   configuring export profiles and giving users the capability to perform the
+                   exports, sites can comply to GDPR rules which indicate what data must be
+                   made available to users, and exclude data which is inappropriate given
+                   their particular circumstances.
+
+                   This initial release of the user data plugin contains many user data items
+                   (which each specify one type of data which can be deleted or exported),
+                   but is not a comprehensive collection. The sample of user data items
+                   shipped with this version, along with the core user data system, will
+                   provide third party developers with examples to start developing their own
+                   user data items. More user data items will be released in this branch over
+                   the next few releases. The intention is to provide user data items to
+                   allow purge and export of all user data which might be required to be
+                   deleted or exported to obtain GDPR compliance, before the GDPR rules come
+                   into effect.
+                   For more information on the technical implementation of user data purge and
+                   export see
+                   https://help.totaralearning.com/display/DEV/User+data+developer+documentation
+
+Performance improvements:
+
+    TL-16189       Moved audience learning plan creation from immediate execution onto adhoc task.
+
+                   Before this change, when learning plans were created via an audience, they
+                   would be created immediately. This change moves the plan creation to an
+                   adhoc task that is executed on the next cron run. This reduces any risk of
+                   database problems and the task failing.
+
+    TL-16314       Wrapped the Report builder create cache query in a transaction to relax locks on tables during cache regeneration in MySQL
+
+                   Report Builder uses CREATE TABLE SELECT query to database in order to
+                   generate cache which might take long time to execute for big data sets.
+
+                   In MySQL this query by default is executed in REPEATABLE READ isolation
+                   level and might lock certain tables included in the query. This leads to
+                   reduced performance, timeouts, and deadlocks of other areas that use same
+                   tables.
+
+                   To improve performance and avoid deadlocks this query is now wrapped into
+                   transaction, which will set READ COMMITTED isolation level and relax locks
+                   during cache generation.
+
+                   This will have no effect in other database engines.
+
+Improvements:
+
+    TL-15027   +   Added a new capability to control who can create scheduled reports
+
+                   There is a new "totara/reportbuilder:createscheduledreports" capability
+                   that allows a user to create scheduled reports. If a user does not have
+                   this capability, they will not see the "Scheduled Reports" section (ie with
+                   the "Create scheduled report" button) when they go to the "Reports" page
+                   via the Totara menubar.
+
+                   Note the capability is separate and NOT related to the
+                   "totara/reportbuilder:managescheduledreports" capability; that capability
+                   allows users to see, edit or delete all scheduled reports in the system.
+
+    TL-15091   +   Added a users language restriction for conditional activity access
+
+                   Access to an activity can now be restricted based on the users language.
+
+    TL-16137   +   The Background image on tiles in the featured links block can now be set to fill or fit in the tile
+    TL-16141   +   Added Program and Certification tiles to the Featured links block.
+    TL-16207   +   Removed support for obsolete "mssql" database driver
+
+                   Totara Learn 11 requires PHP 7.1, the old MSSQL driver is supported in PHP
+                   5.6 and below only, It is not available in PHP 7.1.
+                   The official sqlsrv driver is available for PHP 7.1, and is supported on
+                   all operating systems.
+                   Anyone using the old MSSQL driver should upgrade to the sqlsrv driver when
+                   they upgrade their server environment.
+
+    TL-16209   +   Removed fieldset headers from 360° Feedback questions
+    TL-16252   +   Added a new setting that allows persistent logins
+
+                   When enabled then a "Remember login" option will appear on the login page.
+
+                   Any user logging in can check this box to enable a persistent login,
+                   meaning that they won't get timed-out and have to log in again.
+
+    TL-16427       Added more information about the delay before items appear in the recycle bin
+
+                   * A message is displayed in the deletion confirmation dialog.
+                   * A message is displayed when viewing the recycle bin if there are
+                   activities or resources that are yet to be processed.
+
+    TL-16520   +   Added tags functionality to programs and certifications
+    TL-16622       Mustache string helper now accepts a variable for the string key
+
+                   Previously when using the string helper in a mustache template, the key for
+                   the string needed to be known when creating the template. This improvement
+                   allows the key for the string to be added as a parameter for the template.
+
+    TL-16684   +   Removed database queries from rb_display functions in cohort association report sources
+    TL-16696   +   Added email footer string with context URL to alert messages
+
+                   Some system alerts were missing URL to page with relevant details of the
+                   event. Now they are added in the message footer (when message is displayed
+                   in HTML format).
+
+    TL-16745   +   Imported Font Awesome 4.7.0
+    TL-16746   +   Added support for help icons next to checkboxes options
+    TL-16866   +   New Report builder graph setting "remove_empty_series"
+
+                   Note that this setting works for orientation with data series in columns
+                   only. It is also not compatible with pie charts.
+
+    TL-16867   +   Added password expiration settings to accounts created via Self-registration with approval
+    TL-16910   +   Unused group_concat emulation was removed from Report Builder installation code
+    TL-16919   +   Added profile locking options to "Self-registration with approval" plugin
+
+Bug fixes:
+
+    TL-10317       Fixed dialog JavaScript within the Element Library
+
+                   There was a JavaScript fault on the dialog page within the Element Library
+                   which stopped the dialogs used for testing purposes from opening.
+                   This has now been fixed.
+
+    TL-10727       Fixed next and previous month arrows in the calendar month block in RTL languages
+
+                   This affected both the basis and roots themes.
+                   Previously the next and previous arrows as used within the calendar month
+                   block pointed in the wrong direction when viewed using a RTL language.
+                   This was due to an incorrect RTL ignore compilation directive.
+                   The problem has been fixed in LESS, however those who have themes parenting
+                   the affected themes, and which use LESS from the parents will need to
+                   recompile.
+
+    TL-14423       Unconfirmed self registered users now have a distinct user status and can be filtered by it
+
+                   Users who have self registered but have not been confirmed now have a
+                   distinct 'unconfirmed' user status in report builder source that implements
+                   the common set of user fields. The user status filter now also contains an
+                   option to filter by unconfirmed users.
+
+    TL-14441       Fixed the function marking programs as started on the cron
+
+                   The program timestarted field was being correctly set by the
+                   course_in_progress event, however the mark_started() function was not
+                   running on existing records.
+
+    TL-15887   +   Fixed date filter validation with "after" and "before" options in Report Builder
+
+                   Before, no validation message was shown when selecting an invalid range of
+                   dates in the Date filter when using the "after" and "before" options in
+                   reports. Now a proper validation is in place to ensure a valid date range
+                   is entered before searching.
+
+    TL-16284       Standardised source field information as notification across all HR Import elements
+    TL-16499       Fixed name collision with form fields in Appraisals when there are multiple goal questions
+
+                   Added an extra parameter to the constructor of the customfield_base class
+                   which allows a custom suffix to be added along with the item id when the
+                   $suffix parameter is true. There is a default value for this parameter
+                   of an empty string so child classes will need to add this parameter to
+                   their constructors.
+
+                   The parameter has also been added to functions that make customfield_base
+                   objects. These are customfield_definition, customfield_load_data
+                   and customfield_save_data.
+
+    TL-16537   +   Prevented Seminar events from being saved if booking conflicts found
+
+                   Now, edition or creation of Seminar events that could result in booking
+                   conflict for some users are prevented and a warning about how many
+                   users will be in conflict will be displayed, as well as a link with the
+                   details of the users in conflict with the corresponding reason.
+
+    TL-16540       Fixed yes_or_no display function in Report Builder not handling null value correctly
+
+                   In the legacy version (rb_display_yes_or_no) nulls are handled by
+                   displaying an empty field, but in
+                   totara/reportbuilder/classes/rb/display/yes_or_no.php null values are
+                   displaying "No" as their output when it should be empty. This has been
+                   fixed.
+
+                   Please note that the filter behaves as expected and although null
+                   values were displaying 'No' they would have not matched the 'No' value in
+                   the filter.
+
+    TL-16592       Fixed typos in Seminar event minimum capacity help strings
+
+                   Previously the strings were pointing to an invalid location for the Seminar
+                   general settings.
+
+    TL-16662       Cleaned up orphaned data left after deleting empty course sets from within a Program or Certification
+
+                   The orphaned data happens when there are no orphaned program courses but
+                   there are orphaned program course sets.
+                   This is only known to affect sites running Totara Learn 2.7.3 or earlier.
+                   An upgrade step has been added to remove any orphaned records from the
+                   database.
+
+    TL-16673       Fixed error being thrown in Moodle course catalog when clicking "Expand all" with multiple layers of categories
+    TL-16689       Fixed quiz preview preventing a user from performing an actual attempt
+
+                   Previously a user who had previewed a quiz while holding a non-gradable
+                   role, could not attempt the same quiz when only holding a gradable role.
+                   Changes in a users role are now dealt with and users who had previously
+                   previewed a quiz can now attempt the same quiz if they can no longer
+                   preview, but do have permission to take the quiz.
+
+    TL-16721       Fixed seminar manager notifications not suppressed.
+
+                   When adding bulk attendees and notify manager checkbox is unticked, manager
+                   notification was sent anyway.
+
+    TL-16741       Inputs are no longer shown for questions the user cannot provide answers for within Appraisals
+    TL-16742       Fixed a fatal error within the quiz module statistics report after a multiple answer multichoice question was deleted
+    TL-16748       Prevented users from signing up to a cancelled Seminar sessions by following the emailed direct link
+    TL-16749       Fixed a regression from TL-14803 to allow HTML in mod certificate custom text
+
+                   This patch fixes a regression caused by TL-14803 which affected the display
+                   of the custom text when used with multilang content in all versions back to
+                   2.7.  Data has not been affected with the regression. The change updates
+                   the use of format_string() function to format_text().
+
+    TL-16754       Fixed alignment of buttons in Totara Forms
+
+                   This affected both the basis and roots themes. The problem has been fixed
+                   in LESS, those who have themes parenting the affected themes, and which use
+                   LESS from the parents will need to recompile.
+
+    TL-16759       Enabled answers in Appraisals to display for roles that have no user associated with them or the user has been deleted
+
+                   In the populate_roles_element function in the appraisal_question class
+                   empty question roles are no longer excluded from the appraisal question
+                   role info.
+
+    TL-16761       Fixed Seminar notification templates remaining enabled at a the Seminar level after being disabled globally
+
+                   This patch includes a fix for a local Seminar event registration
+                   notification not being disabled after propagating global settings for it.
+
+                   It also includes the fix for a case when notification is disabled, but a
+                   user still sees checkboxes or dropdown prompting whether the notification
+                   should be sent.
+
+    TL-16767       Fixed a layout problem when adding an activity restriction
+    TL-16776       Improved the display of the gradebook report in IE
+
+                   Previously column headers and users names were getting out of sync with
+                   their results in the gradebook with IE11. This is now fixed
+
+    TL-16791       Fixed Certificate generation when using Traditional Chinese (zh_tw)
+    TL-16793       Fixed an "action not allowed" error after setting executable path for ClamAV plugin
+    TL-16796       The link to create a new asset/room is no longer obstructed when editing a Seminar event
+    TL-16798       Fixed a pagination error when searching rooms within a Seminar activity
+    TL-16818       Email signup with a custom field validates correctly
+
+                   When a user custom field was added and a new user signed up using email
+                   signup, the validating JavaScript encountered an error that prevented
+                   correct validation.
+                   This has now been fixed and validation works correctly.
+
+    TL-16826   +   Fixed a regression from TL-15995 and created an upgrade step to remove an incorrect plugin name from the config_plugins table
+
+                   This is a regression that will affect anyone who has upgraded to the Dec
+                   2017, or Jan 2018 Evergreen releases. The regression was harmless other
+                   than leaving one incorrectly created config record which has been cleaned
+                   up by this change.
+
+    TL-16836       Close button on new modal library functions correctly and closes the dialog
+    TL-16847       Fixed the 'Event cancelled' status not being displayed if the Seminar sign-up period is specified
+
+                   When viewing information related to an event in a Seminar that had sign-up
+                   period specified the column status was not being updated if the event was
+                   cancelled.
+
+                   "Event cancelled" status should have priority over any other event status.
+
+    TL-16880       HTML title attribute is no longer displayed if not set on a tab object
+    TL-16896       Unit tests for LTI now pass when using a custom exttests URL
+
+                   This affected developers running PHPUnit against custom exttests
+                   directories.
+                   If done the LTI tests would have been failing due to a dynamic check
+                   against a hardcoded URL in a fixture.
+                   The test has been corrected.
+
+    TL-16900       Fixed subscribed users being shown in potential and existing forum subscriber lists
+
+                   When subscribing users to a forum users that are already subscribed are no
+                   longer shown in the potential subscribers list after clearing search
+                   options.
+
+    TL-16955       Added a workaround for sqlsrv driver locking up during restore
+
+                   In rare cases during the restoration of a large course MSSQL, would end up
+                   in a locked state whilst waiting for two conflicting deadlocks.
+                   This occurred due to a table being both read-from and written-to within a
+                   single transaction.
+
+API changes:
+
+    TL-16378   +   Hub functionality has been deprecated
+
+                   Community hub functionality has been deprecated in this release, and will
+                   be removed altogether in the next major release.
+
+                   The links to the community hub registration and the publish course page
+                   have been removed. The pages can still be accessed directly
+                   ('/admin/registration/index.php' and
+                   '/course/publish/index.php?id=COURSEID'). The block 'Community finder' will
+                   still be visible after upgrading an existing Totara Learn 11 installation.
+                   On a fresh installation however the block will be deactivated by default.
+                   There is the option to reactivate the block in the administration
+                   interface.
+
+    TL-16448   +   Report Builder transformation display names are now collected through a method
+
+                   Previously Report Builder transformations were expected to have a string
+                   within totara_core.
+                   The string used for transformations is now fetched through a method that
+                   can be overridden by the transformation.
+                   This allows strings to be co-located with their translations, and no longer
+                   requires non-core developers to make core changes when introducing
+                   transformations.
+
+    TL-16525       Fixed linting errors when copying Basis to create another theme
+
+                   Themes that were copied prior to this issue being resolved will need to
+                   adjust both theme/<themename>/bootswatch/bootswatch.less
+                   and theme/<themename>/bootswatch/variables.less to conform with lint rules
+                   (these have been updated in basis to pass lint rules)
+
+Contributions:
+
+    * Dmitrii Metelkin at Catalyst AU - TL-16448
+    * Eugene Venter at Catalyst NZ - TL-16696, TL-16721
+    * Learning Pool - TL-16791
+    * Pierre Guinoiseau at Catalyst NZ - TL-16896
+
+
 Release Evergreen (18th January 2018):
 ======================================
 
