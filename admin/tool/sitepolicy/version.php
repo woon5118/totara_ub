@@ -24,5 +24,5 @@
  * Site Policy Version
  */
 $plugin->component = 'tool_sitepolicy';
-$plugin->version = 2018022600;  //Date: YYYYMMDDHH
+$plugin->version = 2018022700;  //Date: YYYYMMDDHH
 $plugin->requires = 2016120505; //Date: YYYYMMDDHH
