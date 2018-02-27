@@ -160,8 +160,6 @@ if ($form->is_cancelled()) {
     $localisedpolicy->set_statements($formdata->statements);
     $localisedpolicy->save();
 
-    echo $OUTPUT->heading(get_string('translationtolang', 'tool_sitepolicy', $params));
-
     $successmsg = get_string('translationsaved', 'tool_sitepolicy', $strparams);
     redirect($redirect, $successmsg,
         null,
