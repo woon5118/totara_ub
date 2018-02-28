@@ -1759,6 +1759,9 @@ class backup_main_structure_step extends backup_structure_step {
         $info['name'] = $this->get_setting_value('filename');
         $info['moodle_version'] = $CFG->version;
         $info['moodle_release'] = $CFG->release;
+        $info['totara_version'] = $CFG->totara_version;
+        $info['totara_build']   = $CFG->totara_build;
+        $info['totara_release'] = $CFG->totara_release;
         $info['backup_version'] = $CFG->backup_version;
         $info['backup_release'] = $CFG->backup_release;
         $info['backup_date']    = time();
@@ -1788,7 +1791,7 @@ class backup_main_structure_step extends backup_structure_step {
         $moodle_backup = new backup_nested_element('moodle_backup');
 
         $information = new backup_nested_element('information', null, array(
-            'name', 'moodle_version', 'moodle_release', 'backup_version',
+            'name', 'moodle_version', 'moodle_release', 'totara_version', 'totara_build', 'totara_release', 'backup_version',
             'backup_release', 'backup_date', 'mnet_remoteusers', 'include_files', 'include_file_references_to_external_content', 'original_wwwroot',
             'original_site_identifier_hash', 'original_course_id', 'original_course_format',
             'original_course_fullname', 'original_course_shortname', 'original_course_startdate', 'original_course_enddate',
@@ -1977,7 +1980,7 @@ class backup_store_backup_file extends backup_execution_step {
         // Perform storage and return it (TODO: shouldn't be array but proper result object)
         return array(
             'backup_destination' => backup_helper::store_backup_file($this->get_backupid(), $zipfile,
-                    $this->task->get_progress()),
+                    $this->task->get_progress(), $this->get_logger()),
             'include_file_references_to_external_content' => $has_file_references
         );
     }

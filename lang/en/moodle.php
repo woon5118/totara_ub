@@ -196,7 +196,7 @@ $string['backupnonisowarning'] = 'Warning: this backup is from a non-Unicode ver
 $string['backupnotyetrun'] = 'Automated backup pending';
 $string['backuporiginalname'] = 'Backup name';
 $string['backuproleassignments'] = 'Backup role assignments for these roles';
-$string['backupsavetohelp'] = 'Full path to the directory where you want to save the backup files';
+$string['backupsavetohelp'] = 'Full path to the directory where you want to save the backup files. This directory must exist and be writable otherwise the backups will be skipped.';
 $string['backupsitefileshelp'] = 'If enabled then site files used in courses will be included in automated backups';
 $string['backuptakealook'] = 'Please take a look at your backup logs in:
   {$a}';

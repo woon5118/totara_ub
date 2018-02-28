@@ -423,3 +423,49 @@ function totara_core_upgrade_delete_moodle_plugins() {
     unset_config('updateminmaturity');
     unset_config('updatenotifybuilds');
 }
+
+/**
+ * Moodle developers incorrectly introduced multiple broken course backups areas,
+ * they were always supposed to live in course context only!!!
+ *
+ * @internal
+ * @param int $contextid
+ */
+function totara_core_migrate_bogus_course_backup_area($contextid) {
+    global $SITE, $DB;
+    $frontpagecontext = context_course::instance($SITE->id);
+    $fs = get_file_storage();
+
+    // Make sure we do all or nothing to prevent duplicate problems on rerun.
+    $trans = $DB->start_delegated_transaction();
+    $files = $fs->get_area_files($contextid, 'backup', 'course');
+    foreach ($files as $file) {
+        $newfile = array('contextid' => $frontpagecontext->id);
+        if ($fs->file_exists($frontpagecontext->id, 'course', 'backup', 0, $file->get_filepath(), $file->get_filename())) {
+            // The backup files must be unique, use some weird prefix to make sure we do not override anything.
+            $newfile['filename'] = 'ctx' . $contextid . '_' . $file->get_filename();
+        }
+        $fs->create_file_from_storedfile($newfile, $file);
+    }
+    $fs->delete_area_files($contextid, 'backup', 'course');
+    $trans->allow_commit();
+}
+
+/**
+ * Move contents of all non-functional backup areas to frontpage and drop them.
+ */
+function totara_core_migrate_bogus_course_backup_areas() {
+    global $DB;
+
+    $syscontext = context_system::instance();
+    totara_core_migrate_bogus_course_backup_area($syscontext->id);
+
+    $sql = "SELECT DISTINCT c.id
+              FROM {files} f
+              JOIN {context} c ON c.id = f.contextid
+             WHERE c.contextlevel <> :courselevel";
+    $contexids = $DB->get_records_sql($sql, array('courselevel' => CONTEXT_COURSE));
+    foreach ($contexids as $contextid => $unused) {
+        totara_core_migrate_bogus_course_backup_area($contextid);
+    }
+}

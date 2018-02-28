@@ -4993,8 +4993,9 @@ class settings_navigation extends navigation_node {
             $categorynode->add(get_string('filters', 'admin'), $url, self::TYPE_SETTING, null, 'filters', new pix_icon('i/filter', ''));
         }
 
-        // Restore.
-        if (has_capability('moodle/restore:restorecourse', $catcontext)) {
+        // Restore - note that this does not make much sense because there are no
+        // backup files at category level, the only possible way to restore is to upload file.
+        if (has_capability('moodle/restore:restorefile', $catcontext)) {
             $url = new moodle_url('/backup/restorefile.php', array('contextid' => $catcontext->id));
             $categorynode->add(get_string('restorecourse', 'admin'), $url, self::TYPE_SETTING, null, 'restorecourse', new pix_icon('i/restore', ''));
         }

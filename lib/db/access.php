@@ -133,7 +133,7 @@ $capabilities = array(
 
     'moodle/backup:backupcourse' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -147,7 +147,7 @@ $capabilities = array(
 
     'moodle/backup:backupsection' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -161,7 +161,7 @@ $capabilities = array(
 
     'moodle/backup:backupactivity' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -175,7 +175,7 @@ $capabilities = array(
 
     'moodle/backup:backuptargethub' => array(
         // Hub functionality has been deprecated and will be removed in the next major version.
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -189,7 +189,7 @@ $capabilities = array(
 
     'moodle/backup:backuptargetimport' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -201,7 +201,39 @@ $capabilities = array(
         'clonepermissionsfrom' =>  'moodle/backup:backupcourse'
     ),
 
+    // NOTE: this applies to course and activity areas only,
+    //       private user area is not restricted by this.
     'moodle/backup:downloadfile' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' =>  'moodle/site:backupdownload'
+    ),
+
+    // Totara: allows users to delete backup files, previously 'moodle/restore:uploadfile' was used for that.
+    'moodle/backup:deletebackupfiles' => array(
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' =>  'moodle/restore:uploadfile'
+    ),
+
+    // Totara: allows users to manage backup file areas, previously 'moodle/restore:uploadfile' was used for that,
+    //         this capability allows users to both delete and upload files when managing the area. Indirectly this
+    //         capability also allows users to download backup files via draft area.
+    'moodle/backup:managebackupfiles' => array(
 
         'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
 
@@ -212,12 +244,12 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
 
-        'clonepermissionsfrom' =>  'moodle/site:backupdownload'
+        'clonepermissionsfrom' =>  'moodle/restore:uploadfile'
     ),
 
     'moodle/backup:configure' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_PERSONAL,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -231,7 +263,7 @@ $capabilities = array(
 
         'riskbitmask' => RISK_PERSONAL,
 
-        'captype' => 'read',
+        'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'manager' => CAP_ALLOW
@@ -242,16 +274,50 @@ $capabilities = array(
 
         'riskbitmask' => RISK_PERSONAL,
 
-        'captype' => 'read',
+        'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'manager' => CAP_ALLOW
         )
     ),
 
-    'moodle/restore:restorecourse' => array(
+
+    // Totara: allows people to start the restore process with a file
+    //         from the context where user has this capability.
+    'moodle/restore:restorefile' => array(
 
         'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' =>  'moodle/restore:restorecourse'
+    ),
+
+    // Totara: allow users to restore backups that are not trusted
+    'moodle/restore:restoreuntrusted' => array(
+
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' =>  'moodle/restore:restorecourse'
+    ),
+
+    // Totara: this allows user to select target for restore,
+    //         previously this was used incorrectly also for picking file to be restored.
+    'moodle/restore:restorecourse' => array(
+
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_DATALOSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -293,9 +359,9 @@ $capabilities = array(
 
     'moodle/restore:viewautomatedfilearea' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_PERSONAL,
 
-        'captype' => 'write',
+        'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
     ),
 
@@ -327,6 +393,8 @@ $capabilities = array(
         'clonepermissionsfrom' =>  'moodle/site:import'
     ),
 
+    // Totara: this capability is used for direct backup file uploads and picking from user backup repository,
+    //         previously this was used for all file backup management which was covering too much.
     'moodle/restore:uploadfile' => array(
 
         'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,

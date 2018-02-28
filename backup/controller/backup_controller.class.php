@@ -350,6 +350,12 @@ class backup_controller extends base_controller {
         backup_controller_dbops::save_controller($this, $this->checksum, $includeobj, $cleanobj);
     }
 
+    /**
+     * Load backup controller.
+     *
+     * @param string $backupid
+     * @return backup_controller
+     */
     public static function load_controller($backupid) {
         // Load controller from persistent storage
         // TODO: flag the controller as available. Operations on it can continue

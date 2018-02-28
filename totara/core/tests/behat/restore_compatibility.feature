@@ -20,9 +20,10 @@ Feature: Restoring backups files must be backwards compatible
   Scenario: I must be able to restore a 1.1 backup without fatal errors
     When I upload "totara/core/tests/fixtures/backup-course-from-1.1.29.zip" file to "Files" filemanager
     And I press "Restore"
-    And I press "Continue"
-    And I click on "input[name='targetid']" "css_element" in the ".bcs-new-course" "css_element"
-    And I click on "Continue" "button" in the ".bcs-new-course" "css_element"
+    And I set the field "destinationnew" to "1"
+    And I press "Next"
+    And I set the field "Miscellaneous" to "1"
+    And I press "Next"
     And I press "Next"
     And I press "Next"
     And I press "Perform restore"
@@ -38,12 +39,11 @@ Feature: Restoring backups files must be backwards compatible
   Scenario: I must be able to restore a 2.2 backup without fatal errors
     When I upload "totara/core/tests/fixtures/backup-course-from-2.2.47.mbz" file to "Files" filemanager
     And I press "Restore"
-    And I press "Continue"
-    And I click on "input[name='targetid']" "css_element" in the ".bcs-new-course" "css_element"
-    And I click on "Continue" "button" in the ".bcs-new-course" "css_element"
+    And I set the field "destinationnew" to "1"
     And I press "Next"
-    And I set the following fields to these values:
-      | F2f | 0 |
+    And I set the field "Miscellaneous" to "1"
+    And I press "Next"
+    And I press "Next"
     And I press "Next"
     And I press "Perform restore"
     And I press "Continue"
@@ -57,12 +57,11 @@ Feature: Restoring backups files must be backwards compatible
   Scenario: I must be able to restore a 2.5 backup without fatal errors
     When I upload "totara/core/tests/fixtures/backup-course-from-2.5.39.mbz" file to "Files" filemanager
     And I press "Restore"
-    And I press "Continue"
-    And I click on "input[name='targetid']" "css_element" in the ".bcs-new-course" "css_element"
-    And I click on "Continue" "button" in the ".bcs-new-course" "css_element"
+    And I set the field "destinationnew" to "1"
     And I press "Next"
-    And I set the following fields to these values:
-      | F2f | 0 |
+    And I set the field "Miscellaneous" to "1"
+    And I press "Next"
+    And I press "Next"
     And I press "Next"
     And I press "Perform restore"
     And I press "Continue"
@@ -76,12 +75,11 @@ Feature: Restoring backups files must be backwards compatible
   Scenario: I must be able to restore a 2.7 backup without fatal errors
     When I upload "totara/core/tests/fixtures/backup-course-from-2.7.16.mbz" file to "Files" filemanager
     And I press "Restore"
-    And I press "Continue"
-    And I click on "input[name='targetid']" "css_element" in the ".bcs-new-course" "css_element"
-    And I click on "Continue" "button" in the ".bcs-new-course" "css_element"
+    And I set the field "destinationnew" to "1"
     And I press "Next"
-    And I set the following fields to these values:
-      | F2f | 0 |
+    And I set the field "Miscellaneous" to "1"
+    And I press "Next"
+    And I press "Next"
     And I press "Next"
     And I press "Perform restore"
     And I press "Continue"

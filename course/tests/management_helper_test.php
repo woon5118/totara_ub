@@ -1157,7 +1157,7 @@ class core_course_management_helper_test extends advanced_testcase {
             'moodle/course:enrolreview',
             'moodle/course:delete',
             'moodle/backup:backupcourse',
-            'moodle/restore:restorecourse'
+            'moodle/restore:restorefile'
         ), $roleid, $context->id);
 
         $actions = \core_course\management\helper::get_course_detail_actions(new course_in_list($course));
@@ -1190,7 +1190,7 @@ class core_course_management_helper_test extends advanced_testcase {
             'moodle/course:enrolreview',
             'moodle/course:delete',
             'moodle/backup:backupcourse',
-            'moodle/restore:restorecourse',
+            'moodle/restore:restorefile',
             'moodle/site:accessallgroups'
         ), $roleid, $context->id);
 

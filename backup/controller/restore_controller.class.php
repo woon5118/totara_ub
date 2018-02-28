@@ -420,6 +420,12 @@ class restore_controller extends base_controller {
         restore_controller_dbops::save_controller($this, $this->checksum, $includeobj, $cleanobj);
     }
 
+    /**
+     * Load restore controller.
+     *
+     * @param string $restoreid
+     * @return restore_controller|false
+     */
     public static function load_controller($restoreid) {
         // Load controller from persistent storage
         // TODO: flag the controller as available. Operations on it can continue
@@ -478,6 +484,43 @@ class restore_controller extends base_controller {
             $this->set_status(backup::STATUS_NEED_PRECHECK);
         }
         $this->progress->end_progress();
+    }
+
+    /**
+     * Cancel the restore and delete controller.
+     * @since Totara 11
+     * @param bool $purgelogs
+     */
+    public function cancel_restore($purgelogs) {
+        global $CFG, $DB;
+
+        if ($this->tempdir) {
+            $temp = $CFG->tempdir . '/backup/' . $this->tempdir;
+            remove_dir($temp);
+        }
+
+        if ($this->get_status() == self::STATUS_FINISHED_OK) {
+            // Do not delete already finished restore!
+            $this->destroy();
+            return;
+        }
+
+        if ($this->get_target() == self::TARGET_NEW_COURSE) {
+            $courseid = $this->get_courseid();
+            if ($courseid) {
+                $course = $DB->get_record('course', array('id' => $courseid));
+                if ($course) {
+                    $course->deletesource = 'restore';
+                    delete_course($courseid, false);
+                }
+            }
+        }
+        $this->destroy();
+
+        if ($purgelogs) {
+            $DB->delete_records('backup_logs', array('backupid' => $this->restoreid));
+            $DB->delete_records('backup_controllers', array('backupid' => $this->restoreid, 'operation' => backup::OPERATION_RESTORE));
+        }
     }
 
 // Protected API starts here

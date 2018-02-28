@@ -85,10 +85,11 @@ Feature: Enrolments are synchronised with meta courses
       | Link course  | C2C2      |
     When I backup "Course 3" course using this options:
       | Confirmation | Filename | test_backup.mbz |
-    And I click on "Restore" "link" in the "test_backup.mbz" "table_row"
-    And I press "Continue"
-    And I set the field "targetid" to "1"
-    And I click on "Continue" "button" in the ".bcs-new-course" "css_element"
+    And I click on "Restore" "button" in the "test_backup.mbz" "table_row"
+    And I set the field "destinationnew" to "1"
+    And I press "Next"
+    And I set the field "Miscellaneous" to "1"
+    And I press "Next"
     And I press "Next"
     And I set the field "Course name" to "Course 4"
     And I press "Next"

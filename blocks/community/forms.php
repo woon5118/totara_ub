@@ -206,7 +206,7 @@ class community_hub_search_form extends moodleform {
             $mform->setDefault('huburl', $huburl);
 
             //display enrol/download select box if the USER has the download capability on the course
-            if (has_capability('moodle/community:download',
+            if (has_all_capabilities(array('moodle/community:download', 'moodle/restore:restorefile'),
                             context_course::instance($this->_customdata['courseid']))) {
                 $options = array(0 => get_string('enrollable', 'block_community'),
                     1 => get_string('downloadable', 'block_community'));

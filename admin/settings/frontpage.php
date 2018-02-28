@@ -8,8 +8,6 @@ if (!during_initial_install()) { //do not use during installation
     if ($hassiteconfig or has_any_capability(array(
             'moodle/course:update',
             'moodle/role:assign',
-            'moodle/restore:restorecourse',
-            'moodle/backup:backupcourse',
             'moodle/course:managefiles',
             'moodle/question:add',
             'moodle/question:editmine',

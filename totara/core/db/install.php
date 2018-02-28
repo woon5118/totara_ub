@@ -268,5 +268,10 @@ function xmldb_totara_core_install() {
     // Remove settings for deleted Totara features.
     unset_config('allowedemaildomains');
 
+    // Tweak backup/restore stuff.
+    totara_core_migrate_bogus_course_backup_areas();
+    set_config('backup_auto_shortname', get_config('backup', 'backup_shortname'), 'backup');
+    set_config('backup_shortname', null, 'backup');
+
     return true;
 }

@@ -4041,7 +4041,7 @@ function course_get_user_administration_options($course, $context) {
                         count(filter_get_available_in_context($context)) > 0;
     $options->reports = has_capability('moodle/site:viewreports', $context);
     $options->backup = has_capability('moodle/backup:backupcourse', $context);
-    $options->restore = has_capability('moodle/restore:restorecourse', $context);
+    $options->restore = (has_capability('moodle/restore:restorefile', $context) or has_capability('moodle/backup:downloadfile', $context));
     $options->files = ($course->legacyfiles == 2 && has_capability('moodle/course:managefiles', $context));
 
     if (!$isfrontpage) {

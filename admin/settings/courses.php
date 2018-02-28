@@ -24,10 +24,11 @@
 
 $capabilities = array(
     'moodle/backup:backupcourse',
+    'moodle/backup:downloadfile',
     'moodle/category:manage',
     'moodle/course:create',
     'moodle/site:approvecourse',
-    'moodle/restore:restorecourse',
+    'moodle/restore:restorefile',
     'moodle/course:update',
     'totara/program:configuredetails',
     'totara/program:createprogram',
@@ -49,7 +50,7 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $ADMIN->add('courses',
         new admin_externalpage('restorecourse', new lang_string('restorecourse', 'admin'),
             new moodle_url('/backup/restorefile.php', array('contextid' => context_system::instance()->id)),
-            array('moodle/restore:restorecourse')
+            array('moodle/restore:restorefile', 'moodle/backup:downloadfile')
         )
     );
 
@@ -350,7 +351,7 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $temp->add(new admin_setting_configselect('backup/backup_auto_min_kept', new lang_string('automatedminkept', 'backup'),
             new lang_string('automatedminkepthelp', 'backup'), 0, $minkeptoptions));
 
-    $temp->add(new admin_setting_configcheckbox('backup/backup_shortname', new lang_string('backup_shortname', 'admin'), new lang_string('backup_shortnamehelp', 'admin'), 0));
+    $temp->add(new admin_setting_configcheckbox('backup/backup_auto_shortname', new lang_string('autoshortname', 'backup'), new lang_string('autoshortnamehelp', 'backup'), 0));
     $temp->add(new admin_setting_configcheckbox('backup/backup_auto_skip_hidden', new lang_string('skiphidden', 'backup'), new lang_string('skiphiddenhelp', 'backup'), 1));
     $temp->add(new admin_setting_configselect('backup/backup_auto_skip_modif_days', new lang_string('skipmodifdays', 'backup'), new lang_string('skipmodifdayshelp', 'backup'), 30, array(
         0 => new lang_string('never'),

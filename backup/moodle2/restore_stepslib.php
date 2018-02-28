@@ -3150,7 +3150,7 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 'course' => $data->course,
                 'criteriaid' => $data->criteriaid,
                 'timecompleted' => $this->apply_date_offset($data->timecompleted),
-                'rpl' => $data->rpl
+                'rpl' => isset($data->rpl) ? $data->rpl : null,
             );
             if (isset($data->gradefinal)) {
                 $params['gradefinal'] = $data->gradefinal;
@@ -3186,8 +3186,8 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 'timestarted' => $this->apply_date_offset($data->timestarted),
                 'timecompleted' => $this->apply_date_offset($data->timecompleted),
                 'reaggregate' => $data->reaggregate,
-                'rpl' => $data->rpl,
-                'rplgrade' => $data->rplgrade
+                'rpl' => isset($data->rpl) ? $data->rpl : null,
+                'rplgrade' => isset($data->rplgrade) ? $data->rplgrade : null,
             );
 
             if (!isset($data->status)) {

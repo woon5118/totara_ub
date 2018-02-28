@@ -75,8 +75,6 @@ $string['availableto'] = 'Available to';
 $string['availablelicenses'] = 'Available licences';
 $string['backgroundcolour'] = 'Transparent colour';
 $string['backups'] = 'Backups';
-$string['backup_shortname'] = 'Use course name in backup filename';
-$string['backup_shortnamehelp'] = 'Use the course name as part of the backup filename.';
 $string['badwordsconfig'] = 'Enter your list of bad words separated by commas.';
 $string['badwordsdefault'] = 'If the custom list is empty, a default list from the language pack will be used.';
 $string['badwordslist'] = 'Custom bad words list';
@@ -1328,3 +1326,5 @@ Totara Partners|https://www.totaralms.com/partners
 $string['custommenuitems'] = 'Custom menu items (Deprecated)';
 $string['custommenu'] = 'Custom menu';
 $string['moodleorghubname'] = 'Totara.net';
+$string['backup_shortname'] = 'Use course name in backup filename';
+$string['backup_shortnamehelp'] = 'Use the course name as part of the backup filename.';

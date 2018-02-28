@@ -193,12 +193,11 @@ class behat_backup extends behat_base {
     public function i_restore_backup_into_course_using_this_options($backupfilename, $existingcourse, $options = false) {
         \behat_hooks::set_step_readonly(false);
 
-        // Confirm restore.
-        $this->select_backup($backupfilename);
+        $this->execute("behat_general::i_click_on_in_the", array("Restore", "button", $backupfilename, "table_row"));
+        $this->execute("behat_forms::i_set_the_field_to", array("destinationexisting", "1"));
+        $this->execute("behat_forms::press_button", array("Next"));
 
-        // The argument should be converted to an xpath literal.
         $existingcourse = behat_context_helper::escape($existingcourse);
-
         // Selecting the specified course (we can not call behat_forms::select_radio here as is in another behat subcontext).
         $radionodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' bcs-existing-course ')]" .
             "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' restore-course-search ')]" .
@@ -206,10 +205,7 @@ class behat_backup extends behat_base {
             "/descendant::input[@type='radio']";
         $this->execute("behat_general::i_click_on", array($radionodexpath, 'xpath_element'));
 
-        // Pressing the continue button of the restore into an existing course section.
-        $continuenodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' bcs-existing-course ')]" .
-            "/descendant::input[@type='submit'][@value='" . get_string('continue') . "']";
-        $this->execute("behat_general::i_click_on", array($continuenodexpath, 'xpath_element'));
+        $this->execute("behat_forms::press_button", array("Next"));
 
         // Common restore process using provided key/value options.
         $this->process_restore($options);
@@ -227,8 +223,9 @@ class behat_backup extends behat_base {
     public function i_restore_backup_into_a_new_course_using_this_options($backupfilename, $options = false) {
         \behat_hooks::set_step_readonly(false);
 
-        // Confirm restore.
-        $this->select_backup($backupfilename);
+        $this->execute("behat_general::i_click_on_in_the", array("Restore", "button", $backupfilename, "table_row"));
+        $this->execute("behat_forms::i_set_the_field_to", array("destinationnew", "1"));
+        $this->execute("behat_forms::press_button", array("Next"));
 
         // The first category in the list.
         $radionodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' bcs-new-course ')]" .
@@ -236,10 +233,7 @@ class behat_backup extends behat_base {
             "/descendant::input[@type='radio']";
         $this->execute("behat_general::i_click_on", array($radionodexpath, 'xpath_element'));
 
-        // Pressing the continue button of the restore into an existing course section.
-        $continuenodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' bcs-new-course ')]" .
-            "/descendant::input[@type='submit'][@value='" . get_string('continue') . "']";
-        $this->execute("behat_general::i_click_on", array($continuenodexpath, 'xpath_element'));
+        $this->execute("behat_forms::press_button", array("Next"));
 
         // Common restore process using provided key/value options.
         $this->process_restore($options);
@@ -257,18 +251,10 @@ class behat_backup extends behat_base {
     public function i_merge_backup_into_the_current_course($backupfilename, $options = false) {
         \behat_hooks::set_step_readonly(false);
 
-        // Confirm restore.
-        $this->select_backup($backupfilename);
-
-        // Merge without deleting radio option.
-        $radionodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), 'bcs-current-course')]" .
-            "/descendant::input[@type='radio'][@name='target'][@value='1']";
-        $this->execute("behat_general::i_click_on", array($radionodexpath, 'xpath_element'));
-
-        // Pressing the continue button of the restore merging section.
-        $continuenodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), 'bcs-current-course')]" .
-            "/descendant::input[@type='submit'][@value='" . get_string('continue') . "']";
-        $this->execute("behat_general::i_click_on", array($continuenodexpath, 'xpath_element'));
+        $this->execute("behat_general::i_click_on_in_the", array("Restore", "button", $backupfilename, "table_row"));
+        $this->execute("behat_forms::i_set_the_field_to", array("destinationcurrent", "1"));
+        $this->execute("behat_forms::press_button", array("Next"));
+        $this->execute("behat_forms::press_button", array("Next"));
 
         // Common restore process using provided key/value options.
         $this->process_restore($options);
@@ -286,45 +272,14 @@ class behat_backup extends behat_base {
     public function i_merge_backup_into_current_course_deleting_its_contents($backupfilename, $options = false) {
         \behat_hooks::set_step_readonly(false);
 
-        // Confirm restore.
-        $this->select_backup($backupfilename);
-
-        // Delete contents radio option.
-        $radionodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), 'bcs-current-course')]" .
-            "/descendant::input[@type='radio'][@name='target'][@value='0']";
-        $this->execute("behat_general::i_click_on", array($radionodexpath, 'xpath_element'));
-
-        // Pressing the continue button of the restore merging section.
-        $continuenodexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), 'bcs-current-course')]" .
-            "/descendant::input[@type='submit'][@value='" . get_string('continue') . "']";
-        $this->execute("behat_general::i_click_on", array($continuenodexpath, 'xpath_element'));
+        $this->execute("behat_general::i_click_on_in_the", array("Restore", "button", $backupfilename, "table_row"));
+        $this->execute("behat_forms::i_set_the_field_to", array("destinationcurrent", "1"));
+        $this->execute("behat_forms::press_button", array("Next"));
+        $this->execute("behat_forms::i_set_the_field_to", array("Delete the contents of this course and then restore", "1"));
+        $this->execute("behat_forms::press_button", array("Next"));
 
         // Common restore process using provided key/value options.
         $this->process_restore($options);
-    }
-
-    /**
-     * Selects the backup to restore.
-     *
-     * @throws ExpectationException
-     * @param string $backupfilename
-     * @return void
-     */
-    protected function select_backup($backupfilename) {
-
-        // Using xpath as there are other restore links before this one.
-        $exception = new ExpectationException('The "' . $backupfilename . '" backup file can not be found in this page',
-            $this->getSession());
-
-        // The argument should be converted to an xpath literal.
-        $backupfilename = behat_context_helper::escape($backupfilename);
-
-        $xpath = "//tr[contains(., $backupfilename)]/descendant::a[contains(., '" . get_string('restore') . "')]";
-        $restorelink = $this->find('xpath', $xpath, $exception);
-        $restorelink->click();
-
-        // Confirm the backup contents.
-        $this->find_button(get_string('continue'))->press();
     }
 
     /**

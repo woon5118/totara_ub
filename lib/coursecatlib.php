@@ -3273,7 +3273,8 @@ class course_in_list implements IteratorAggregate {
     }
 
     /**
-     * Returns true if the current user can restore this course.
+     * Returns true if the current user can start restore from this course context
+     * or download backup file.
      *
      * Note: this function does not check that the current user can access the course.
      * To do that please call require_login with the course, or if not possible call {@see course_in_list::can_access()}
@@ -3281,7 +3282,7 @@ class course_in_list implements IteratorAggregate {
      * @return bool
      */
     public function can_restore() {
-        return has_capability('moodle/restore:restorecourse', $this->get_context());
+        return (has_capability('moodle/restore:restorefile', $this->get_context()) or has_capability('moodle/backup:downloadfile', $this->get_context()));
     }
 }
 

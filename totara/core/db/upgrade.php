@@ -238,15 +238,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017122201, 'totara', 'core');
     }
 
-    if ($oldversion < 2018020500) {
-        // Fixed a bug in lib/db/access.php which won't be processed unless the main version file is bumped, which
-        // we don't want to do.
-        // However it is easy to trigger this ourselves in the same way that upgrade does.
-        update_capabilities('moodle');
-
-        upgrade_plugin_savepoint(true, 2018020500, 'totara', 'core');
-    }
-
     if ($oldversion < 2018021300) {
 
         // Define table persistent_login to be created.
@@ -280,6 +271,50 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018021300, 'totara', 'core');
     }
 
+    if ($oldversion < 2018030501) {
+        totara_core_migrate_bogus_course_backup_areas();
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2018030501, 'totara', 'core');
+    }
+
+    if ($oldversion < 2018030502) {
+        // Migrate renamed setting.
+        set_config('backup_auto_shortname', get_config('backup', 'backup_shortname'), 'backup');
+        set_config('backup_shortname', null, 'backup');
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2018030502, 'totara', 'core');
+    }
+
+    if ($oldversion < 2018030503) {
+
+        // Define table backup_trusted_files to be created.
+        $table = new xmldb_table('backup_trusted_files');
+
+        // Adding fields to table backup_trusted_files.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('contenthash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('filesize', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('backupid', XMLDB_TYPE_CHAR, '32', null, null, null, null);
+        $table->add_field('timeadded', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table backup_trusted_files.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+        // Adding indexes to table backup_trusted_files.
+        $table->add_index('contenthash', XMLDB_INDEX_UNIQUE, array('contenthash'));
+
+        // Conditionally launch create table for backup_trusted_files.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018030503, 'totara', 'core');
+    }
 
     return true;
 }
