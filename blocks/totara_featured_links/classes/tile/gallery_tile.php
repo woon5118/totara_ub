@@ -140,14 +140,15 @@ class gallery_tile extends base {
         // Saves the Draft area.
         $draftitemid = file_get_submitted_draft_itemid('background_imgs');
         file_save_draft_area_files($draftitemid,
-            \context_block::instance($this->blockid)->__get('id'),
+            \context_block::instance($this->blockid)->id,
             'block_totara_featured_links', 'tile_backgrounds',
             $this->id,
             ['subdirs' => 0, 'maxbytes' => 0]);
 
         // Gets the url to the new file.
         $fs = get_file_storage();
-        $files = $fs->get_area_files(\context_block::instance($this->blockid)->__get('id'),
+        $files = $fs->get_area_files(
+            \context_block::instance($this->blockid)->id,
             'block_totara_featured_links',
             'tile_backgrounds',
             $this->id,
@@ -250,7 +251,7 @@ class gallery_tile extends base {
         $backgrounds = [];
         if (!empty($this->data_filtered->background_imgs)) {
             foreach ($this->data_filtered->background_imgs as $image) {
-                $backgrounds[] = (string)\moodle_url::make_pluginfile_url(\context_block::instance($this->blockid)->__get('id'),
+                $backgrounds[] = (string)\moodle_url::make_pluginfile_url(\context_block::instance($this->blockid)->id,
                     'block_totara_featured_links',
                     'tile_backgrounds',
                     $this->id,
@@ -285,7 +286,8 @@ class gallery_tile extends base {
         global $PAGE;
         $PAGE->requires->js_call_amd('block_totara_featured_links/switcher',
             'init',
-            [(!isset($this->data->interval) ? $this->default_interval*1000 : $this->data->interval*1000),
+            [
+                (!isset($this->data->interval) ? $this->default_interval*1000 : $this->data->interval*1000),
                 'block-totara-featured-links-gallery-tile-'.$this->id]
         );
     }

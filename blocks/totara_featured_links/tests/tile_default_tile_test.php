@@ -44,6 +44,11 @@ class block_totara_featured_links_tile_default_tile_testcase extends test_helper
         $this->blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
     }
 
+    public function tearDown() {
+        parent::tearDown();
+        $this->blockgenerator = null;
+    }
+
     /**
      * Tests the logic for the accessibility text
      */

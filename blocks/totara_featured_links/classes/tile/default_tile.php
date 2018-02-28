@@ -173,7 +173,7 @@ class default_tile extends base{
         // Saves the Draft area.
         $draftitemid = file_get_submitted_draft_itemid('background_img');
         file_save_draft_area_files($draftitemid,
-            \context_block::instance($this->blockid)->__get('id'),
+            \context_block::instance($this->blockid)->id,
             'block_totara_featured_links',
             'tile_background',
             $this->id,
@@ -181,7 +181,7 @@ class default_tile extends base{
 
         // Gets the url to the new file.
         $fs = get_file_storage();
-        $files = $fs->get_area_files(\context_block::instance($this->blockid)->__get('id'),
+        $files = $fs->get_area_files(\context_block::instance($this->blockid)->id,
             'block_totara_featured_links',
             'tile_background',
             $this->id,
