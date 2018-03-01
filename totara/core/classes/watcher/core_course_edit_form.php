@@ -245,24 +245,10 @@ class core_course_edit_form {
         $nojs = (isset($hook->customdata['nojs'])) ? $hook->customdata['nojs'] : 0 ;
 
         // For the next part we need the element AFTER 'Enable completion'.
-        $beforename = null;
-        $next = false;
-        foreach (array_keys($mform->_elementIndex) as $elname) {
-            if ($elname === 'enablecompletion') {
-                $next = true;
-            } else if ($next) {
-                $beforename = $elname;
-                break;
-            }
-        }
-
+        $beforename = 'image';
         $courseicon = isset($course->icon) ? $course->icon : 'default';
         $iconhtml = totara_icon_picker_preview('course', $courseicon);
 
-        $mform->insertElementBefore(
-            $mform->createElement('header', 'iconheader', get_string('courseicon', 'totara_core')),
-            $beforename
-        );
         if ($nojs == 1) {
             $mform->insertElementBefore(
                 $mform->createElement('static', 'currenticon', get_string('currenticon', 'totara_core'), $iconhtml),
@@ -301,7 +287,6 @@ class core_course_edit_form {
                 $beforename
             );
         }
-        $mform->setExpanded('iconheader');
     }
 
     /**

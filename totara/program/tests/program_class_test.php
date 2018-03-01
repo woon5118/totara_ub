@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
+require_once($CFG->dirroot . '/files/externallib.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
 
 /**
@@ -2192,5 +2193,127 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->assertSame(1, preg_match('/name=([\'"])t_number_test\1/', $html));
         $this->assertSame(1, preg_match('/value=([\'"])7\1/', $html));
 
+    }
+
+    public function test_get_image_program() {
+        global $CFG, $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $usercontext = context_user::instance($USER->id);
+        $program = $this->program_generator->create_program();
+
+        // Check that the default default is the image.
+        $this->assertEquals($CFG->wwwroot . '/totara/program/defaultimage.svg', $program->get_image());
+
+        // Upload a default.
+        $draftfile = core_files_external::upload(
+            $usercontext->id,
+            'user',
+            'draft',
+            0,
+            '/',
+            'defaultexample.txt',
+            'Some example file',
+            null,
+            null
+        );
+        $systemcontextid = context_system::instance()->id;
+        $itemid = 0;
+        file_save_draft_area_files(
+            $draftfile['itemid'],
+            $systemcontextid,
+            'totara_core',
+            'totara_program_default_image',
+            $itemid
+        );
+        $this->assertEquals(
+            $CFG->wwwroot .
+                "/pluginfile.php/$systemcontextid/totara_core/totara_program_default_image/$itemid/defaultexample.txt",
+            $program->get_image()
+        );
+
+        // Upload a image for the program.
+        $context = context_program::instance($program->id);
+        $draftfile = core_files_external::upload(
+            $usercontext->id,
+            'user',
+            'draft',
+            0,
+            '/',
+            'example.txt',
+            'Let us create a nice simple file',
+            null,
+            null
+        );
+        file_save_draft_area_files(
+            $draftfile['itemid'],
+            $context->id,
+            'totara_program',
+            'images',
+            $program->id
+        );
+        $this->assertEquals(
+            $CFG->wwwroot . "/pluginfile.php/{$context->id}/totara_program/images/{$program->id}/example.txt",
+            $program->get_image()
+        );
+    }
+
+    public function test_get_image_certification() {
+        global $CFG, $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $usercontext = context_user::instance($USER->id);
+        $certification = $this->getDataGenerator()->create_certification();
+
+        $this->assertEquals($CFG->wwwroot . '/totara/certification/defaultimage.svg', $certification->get_image());
+
+        $draftfile = core_files_external::upload(
+            $usercontext->id,
+            'user',
+            'draft',
+            0,
+            '/',
+            'defaultexample.txt',
+            'Some example file',
+            null,
+            null
+        );
+        file_save_draft_area_files(
+            $draftfile['itemid'],
+            context_system::instance()->id,
+            'totara_core',
+            'totara_certification_default_image',
+            0
+        );
+        $this->assertEquals(
+            $CFG->wwwroot . '/pluginfile.php/1/totara_core/totara_certification_default_image/0/defaultexample.txt',
+            $certification->get_image()
+        );
+
+        $context = context_program::instance($certification->id);
+        $draftfile = core_files_external::upload(
+            $usercontext->id,
+            'user',
+            'draft',
+            0,
+            '/',
+            'example.txt',
+            'Let us create a nice simple file',
+            null,
+            null
+        );
+        file_save_draft_area_files(
+            $draftfile['itemid'],
+            $context->id,
+            'totara_program',
+            'images',
+            $certification->id
+        );
+        $this->assertEquals(
+            $CFG->wwwroot . "/pluginfile.php/{$context->id}/totara_program/images/{$certification->id}/example.txt",
+            $certification->get_image()
+        );
     }
 }

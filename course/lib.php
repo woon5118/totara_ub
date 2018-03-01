@@ -4066,6 +4066,76 @@ function course_get_user_administration_options($course, $context) {
 }
 
 /**
+ * Saves the contents of the image field.
+ * Will remove any previous images and replace with the one uploaded
+ *
+ * @param course_edit_form $editform
+ * @param int $courseid
+ */
+function course_save_image($data, int $courseid) {
+    $context = context_course::instance($courseid, MUST_EXIST);
+    $image = course_get_image($courseid);
+    if ($image) {
+        $fs = get_file_storage();
+        $fs->delete_area_files(
+            $context->id,
+            'course',
+            'images',
+            $courseid
+        );
+    }
+    file_save_draft_area_files($data->image,
+        $context->id,
+        'course',
+        'images',
+        $courseid,
+        [
+            'maxfiles' => 1
+        ]
+    );
+}
+
+/**
+ * Return a url to the image associated with the course.
+ *
+ * @param int $courseid
+ * @return string|false
+ */
+function course_get_image(int $courseid) {
+    global $CFG;
+    $context = context_course::instance($courseid, MUST_EXIST);
+    $fs = get_file_storage();
+    $files = array_values(
+        $fs->get_area_files(
+            $context->id,
+            'course',
+            'images',
+            $courseid
+        )
+    );
+    $files = array_values(array_filter($files, function($file) {
+        return !$file->is_directory();
+    }));
+    if (empty($files)) {
+        if (get_config('course', 'defaultimage') != '') {
+            return get_config('course', 'defaultimage');
+        } else {
+            return $CFG->wwwroot . '/course/defaultimage.svg';
+        }
+    }
+    assert(count($files) <= 1, 'There should only be one image for the course but there was ' . count($files));
+    $file = moodle_url::make_pluginfile_url(
+        $files[0]->get_contextid(),
+        $files[0]->get_component(),
+        $files[0]->get_filearea(),
+        $files[0]->get_itemid(),
+        $files[0]->get_filepath(),
+        $files[0]->get_filename()
+    );
+    return $file->out();
+}
+
+/**
  * Validates course start and end dates.
  *
  * Checks that the end course date is not greater than the start course date.

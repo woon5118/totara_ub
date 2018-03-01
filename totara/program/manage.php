@@ -362,11 +362,22 @@ echo $OUTPUT->header();
 if (!empty($searchcriteria)) {
     echo $OUTPUT->heading(new lang_string('searchresults'));
 } else if (!$coursecat->id) {
+    echo html_writer::start_tag('ul', ['class' => 'buttons unlist']);
+
     if (!empty($CFG->enableprogramcompletioneditor) && has_capability('totara/program:editcompletion', context_system::instance())) {
         $checkallurl = new moodle_url('/totara/program/check_completion.php', array('progorcert' => $viewtype));
-        echo html_writer::tag('ul', html_writer::tag('li', html_writer::link($checkallurl,
-            get_string('checkcompletions', 'totara_program'))));
+        echo html_writer::tag('li', html_writer::link($checkallurl, get_string('checkcompletions', 'totara_program')));
     }
+
+    if ($viewtype == 'program') {
+        $url = new moodle_url('/totara/program/default_image_upload.php');
+        echo html_writer::tag('li', html_writer::link($url, get_string('imagedefaultlink', 'totara_program')));
+    } else if ($viewtype == 'certification') {
+        $url = new moodle_url('/totara/program/default_image_upload.php', ['iscertif' => true]);
+        echo html_writer::tag('li', html_writer::link($url, get_string('imagedefaultlink', 'totara_certification')));
+    }
+
+    echo html_writer::end_tag('ul');
 
     $catlist = array(0 => get_string('top')) + coursecat::make_categories_list('moodle/category:manage');
     $catlist = count($catlist) < MAX_MOVE_CATEGORY ? $catlist : false;

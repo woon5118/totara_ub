@@ -29,6 +29,7 @@ global $CFG;
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/course/tests/fixtures/course_capability_assignment.php');
 require_once($CFG->dirroot . '/enrol/imsenterprise/tests/imsenterprise_test.php');
+require_once($CFG->dirroot . '/files/externallib.php');
 
 class core_course_courselib_testcase extends advanced_testcase {
 
@@ -3751,5 +3752,43 @@ class core_course_courselib_testcase extends advanced_testcase {
         $this->assertEquals(COURSE_TIMELINE_FUTURE, course_classify_for_timeline($futurecourse));
         $this->assertEquals(COURSE_TIMELINE_PAST, course_classify_for_timeline($completedcourse));
         $this->assertEquals(COURSE_TIMELINE_INPROGRESS, course_classify_for_timeline($inprogresscourse));
+    }
+
+    public function test_course_get_image() {
+        global $USER, $CFG;
+        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course();
+
+        // Return false if there is not image anywhere.
+        $this->assertEquals($CFG->wwwroot . '/course/defaultimage.svg', course_get_image($course->id));
+
+        $defaultimageurl = 'foo';
+        set_config('defaultimage', $defaultimageurl, 'course');
+        // If the config variable is set then return that instead.
+        $this->assertEquals($defaultimageurl, course_get_image($course->id));
+
+        $this->setAdminUser();
+        $context = context_course::instance($course->id);
+        $usercontext = context_user::instance($USER->id);
+        $draftfile = core_files_external::upload(
+            $usercontext->id,
+            'user',
+            'draft',
+            0,
+            '/',
+            'example.txt',
+            'Let us create a nice simple file',
+            null,
+            null
+        );
+        file_save_draft_area_files(
+            $draftfile['itemid'],
+            $context->id,
+            'course',
+            'images',
+            $course->id
+        );
+        $this->assertEquals($CFG->wwwroot . "/pluginfile.php/{$context->id}/course/images/{$course->id}/example.txt", course_get_image($course->id));
     }
 }

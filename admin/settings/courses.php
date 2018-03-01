@@ -79,6 +79,19 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $temp = new admin_settingpage('coursesettings', new lang_string('coursesettings'));
     require_once($CFG->dirroot.'/course/lib.php');
 
+    // TOTARA changes.
+    // These settings are called images so it saves the file to the images filearea.
+    $temp->add(
+        new admin_setting_configfilepicker(
+            'course/defaultimage',
+            new lang_string('courseimagedefault'),
+            get_string('coursedefaultimage_help'),
+            '',
+            'web_image'
+        )
+    );
+    // End TOTARA changes.
+
     $choices = array();
     $choices['0'] = new lang_string('hide');
     $choices['1'] = new lang_string('show');

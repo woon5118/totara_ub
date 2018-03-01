@@ -190,6 +190,20 @@ class course_edit_form extends moodleform {
         // Appearance.
         $mform->addElement('header', 'appearancehdr', get_string('appearance'));
 
+        // TOTARA changes.
+        $mform->addElement(
+            'filemanager',
+            'image',
+            get_string('courseimage'),
+            null,
+            [
+                'accept_types' => 'web_image',
+                'maxfiles' => 1
+            ]
+        );
+        $mform->addHelpButton('image', 'courseimage');
+        // End TOTARA changes.
+
         if (!empty($CFG->allowcoursethemes)) {
             $themeobjects = get_list_of_themes();
             $themes=array();
@@ -340,6 +354,23 @@ class course_edit_form extends moodleform {
         // Called at the end of the definition, prior to data being set.
         $hook = new core_course\hook\edit_form_definition_complete($this, $this->_customdata);
         $hook->execute();
+
+        // TOTARA changes.
+        // Prepare the images.
+        $draftitemid = file_get_submitted_draft_itemid('images');
+        file_prepare_draft_area(
+            $draftitemid,
+            $context->id,
+            'course',
+            'images',
+            $course->id,
+            [
+                'subdirs' => 0,
+                'maxfiles' => 1
+            ]
+        );
+        $course->image = $draftitemid;
+        // End TOTARA changes.
 
         // Finally set the current form data
         $this->set_data($course);

@@ -4416,6 +4416,20 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
 
     // ========================================================================================================================
     } else if ($component === 'course') {
+
+        // TOTARA changes.
+        // Images does not require a course context as they can be the default image across multiple courses.
+        if ($filearea == 'defaultimage' || $filearea == 'images') {
+            $file = $fs->get_file($contextid, $component, $filearea, $args[0], '/', $args[1]);
+            if (!$file or $file->is_directory()) {
+                send_file_not_found();
+            }
+
+            \core\session\manager::write_close(); // Unlock session during file serving.
+            send_stored_file($file, 60 * 60, 0, $forcedownload, array('preview' => $preview));
+        }
+        // End TOTARA changes.
+
         if ($context->contextlevel != CONTEXT_COURSE) {
             send_file_not_found();
         }

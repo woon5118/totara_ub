@@ -210,6 +210,8 @@ if ($data = $detailsform->get_data()) {
         $data->id = $program->id;
         customfield_save_data($data, 'program', 'prog');
 
+        $program->save_image($data->image);
+
         if (isset($data->savechanges)) {
             $nexturl = $viewurl;
         }
@@ -260,6 +262,21 @@ if ($data = $detailsform->get_data()) {
     // Reload program to reflect any changes.
     $program = new program($id);
 }
+
+// Load the image in the file manager.
+$imagedraftitemid = file_get_submitted_draft_itemid('images');
+file_prepare_draft_area(
+    $imagedraftitemid,
+    $program->get_context()->id,
+    'totara_program',
+    'images',
+    $program->id,
+    [
+        'subdirs' => 0,
+        'maxfiles' => 1
+    ]
+);
+$program->image = $imagedraftitemid;
 
 // Trigger event.
 $dataevent = array('id' => $program->id, 'other' => array('section' => 'general'));

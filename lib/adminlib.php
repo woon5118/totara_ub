@@ -10022,9 +10022,13 @@ class admin_setting_configfilepicker extends admin_setting {
         $this->fp_options = $fp_options;
         $this->filecontext = context_system::instance();
 
-        $full_name_args = explode('_',$this->get_full_name());
-        $this->component = $full_name_args[1];
-        $this->filearea = $full_name_args[2];
+        $bits = explode('/', $name);
+        if (count($bits) != 2) {
+            debugging('The name of the admin settings file picker was not in the form {component}/{filearea}');
+            return;
+        }
+        $this->component = $bits[0];
+        $this->filearea = $bits[1];
     }
 
     /**

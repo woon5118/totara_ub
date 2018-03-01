@@ -190,6 +190,8 @@ if ($data = $form->get_data()) {
         $data->id = $newid;
         customfield_save_data($data, 'program', 'prog');
 
+        $program->save_image($data->image);
+
         $editoroptions = $TEXTAREA_OPTIONS;
         $editoroptions['context'] = context_program::instance($newid);
 

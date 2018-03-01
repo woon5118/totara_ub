@@ -276,9 +276,42 @@ class program_edit_form extends moodleform {
             }
         }
 
+        $mform->addElement('header', 'appearance', get_string('appearance'));
+        $mform->setExpanded('appearance');
+
         //replacement for old totara/core/icon classes
         $programicon = ($program && !empty($program->icon)) ? $program->icon : 'default';
         totara_add_icon_picker($mform, $action, 'program', $programicon, $nojs, false);
+
+        if ($action == 'view') {
+            if ($program && $program->get_image()) {
+                $mform->addElement(
+                    'static',
+                    null,
+                    get_string('image', 'totara_program'),
+                    html_writer::img($program->get_image(), get_string('imagealt', 'totara_program'))
+                );
+            } else {
+                $mform->addElement(
+                    'static',
+                    null,
+                    get_string('image', 'totara_program'),
+                    html_writer::span(get_string('imagenone', 'totara_program'))
+                );
+            }
+        } else {
+            $mform->addElement(
+                'filemanager',
+                'image',
+                get_string('image', 'totara_program'),
+                null,
+                [
+                    'accept_types' => 'web_image',
+                    'maxfiles' => 1
+                ]
+            );
+            $mform->addHelpButton('image', 'image', 'totara_program');
+        }
 
         if (core_tag_tag::is_enabled('totara_program', 'prog')) {
             if ($action == 'view') {

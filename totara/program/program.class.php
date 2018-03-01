@@ -2406,6 +2406,101 @@ class program {
 
         return has_any_capability($allowed_capabilities, $this->get_context(), $user);
     }
+
+    /**
+     * Saves the contents of the image field.
+     * Will remove any previous images and replace with the one uploaded
+     *
+     * @param int $imagedata the data from the image field on the form
+     */
+    public function save_image($imagedata) {
+        // Only upload if the module is enabled.
+        if ($this->is_certif()) {
+            if (totara_feature_disabled('certifications')) {
+                return;
+            }
+        } else {
+            if (totara_feature_disabled('programs')) {
+                return;
+            }
+        }
+
+        $image = $this->get_image();
+        if ($image) {
+            $fs = get_file_storage();
+            $fs->delete_area_files(
+                $this->context->id,
+                'totara_program',
+                'images',
+                $this->id
+            );
+        }
+        file_save_draft_area_files(
+            $imagedata,
+            $this->context->id,
+            'totara_program',
+            'images',
+            $this->id,
+            [
+                'maxfiles' => 1,
+            ]
+        );
+    }
+
+    /**
+     * Return a url to the image associated with the program.
+     *
+     * @return string
+     */
+    public function get_image() {
+        global $CFG;
+        $fs = get_file_storage();
+        $files = array_values(
+            $fs->get_area_files(
+                $this->context->id,
+                'totara_program',
+                'images',
+                $this->id
+            )
+        );
+        // There has not being any files uploaded to the program so check the defaults.
+        if (empty($files)) {
+
+            $filearea = $this->is_certif() ?
+                'totara_certification_default_image' :
+                'totara_program_default_image';
+
+            $files = array_values(
+                $fs->get_area_files(
+                    context_system::instance()->id,
+                    'totara_core',
+                    $filearea,
+                    0
+                )
+            );
+        }
+        // There have not being any files uploaded so return the default default image.
+        if (empty($files)) {
+            if ($this->is_certif()) {
+                return $CFG->wwwroot . '/totara/certification/defaultimage.svg';
+            } else {
+                return $CFG->wwwroot . '/totara/program/defaultimage.svg';
+            }
+        }
+        $files = array_values(array_filter($files, function($file) {
+            return !$file->is_directory();
+        }));
+        assert(count($files) <= 1, 'There should only be one image for the program but there was ' . count($files));
+        $file = moodle_url::make_pluginfile_url(
+            $files[0]->get_contextid(),
+            $files[0]->get_component(),
+            $files[0]->get_filearea(),
+            $files[0]->get_itemid(),
+            $files[0]->get_filepath(),
+            $files[0]->get_filename()
+        );
+        return $file->out();
+    }
 }
 
 /**

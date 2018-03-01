@@ -219,6 +219,7 @@ class format_topics_testcase extends advanced_testcase {
      */
     public function test_default_course_enddate() {
         global $CFG, $DB;
+        $this->setAdminUser();
 
         $this->resetAfterTest(true);
 
