@@ -49,14 +49,31 @@ Feature: Block edit test block
     When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
     And I click on "Edit" "link" in the "Featured Links" "block"
     And I set the following fields to these values:
-      | Title    | Some Heading |
-      | textbody | some body |
+      | Title    | Some Heading           |
+      | textbody | some body              |
       | URL      | http://www.example.com |
     And I press "Cancel"
     And I am on site homepage
     Then I should see "default description"
     And I should not see "Some Heading"
     And I should not see "some body"
+
+  Scenario: Selecting icons
+    When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
+    And I click on "Edit" "link" in the "Featured Links" "block"
+    And I set the following fields to these values:
+      | Title    | Some Heading           |
+      | textbody | some body              |
+      | URL      | http://www.example.com |
+    Then "Clear" "text" in the "//div[span[@class='icon-picker-delete-icon']]" "xpath_element" should not be visible
+    When I click on "Choose" "text"
+    And I click on "//li[contains(@class, 'icon-picker-item')][5]" "xpath_element"
+    And I click on "OK" "button"
+
+    Then "Remove" "text" in the "//div[span[@class='icon-picker-delete-icon']]" "xpath_element" should be visible
+
+    When I click on "Save changes" "button"
+    Then ".block-totara-featured-links-icon" "css_element" should exist
 
   Scenario: Check that the background appearance uses the right classes
     When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"

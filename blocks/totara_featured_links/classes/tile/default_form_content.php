@@ -25,6 +25,7 @@ namespace block_totara_featured_links\tile;
 
 defined('MOODLE_INTERNAL') || die();
 
+use block_totara_featured_links\form\element\iconpicker;
 use block_totara_featured_links\form\element\colorpicker;
 use block_totara_featured_links\form\validator\alt_text_required;
 use block_totara_featured_links\form\validator\is_color;
@@ -105,6 +106,23 @@ class default_form_content extends base_form_content{
             ]
         ));
 
+        $iconpicker = $group->add(
+            new iconpicker('icon', get_string('icon', 'block_totara_featured_links'))
+        );
+        $iconpicker->add_help_button('icon', 'block_totara_featured_links');
+
+        $iconsizeoptions = [
+            'large' => get_string('icon_size_large', 'block_totara_featured_links'),
+            'medium' => get_string('icon_size_medium', 'block_totara_featured_links'),
+            'small' => get_string('icon_size_small', 'block_totara_featured_links')
+        ];
+        $group->add(
+            new radios('icon_size',
+                get_string('icon_size', 'block_totara_featured_links'),
+                $iconsizeoptions
+            )
+        );
+
         $alt_text = $backgroundgroup->add(new text('alt_text', get_string('tile_alt_text', 'block_totara_featured_links'), PARAM_TEXT));
         $alt_text->add_validator(new alt_text_required(null, 'background_img'));
         $alt_text->add_help_button('tile_alt_text', 'block_totara_featured_links');
@@ -128,7 +146,8 @@ class default_form_content extends base_form_content{
         global $PAGE;
         $PAGE->requires->css(new \moodle_url('/blocks/totara_featured_links/spectrum/spectrum.css'));
         $PAGE->requires->strings_for_js(['less', 'clear_color'], 'block_totara_featured_links');
-        $PAGE->requires->strings_for_js(['cancel', 'choose', 'more'], 'moodle');
+        $PAGE->requires->strings_for_js(['cancel', 'ok', 'choose', 'more'], 'moodle');
+        $PAGE->requires->strings_for_js(['icon_choose'], 'block_totara_featured_links');
         $PAGE->requires->js_call_amd('block_totara_featured_links/spectrum', 'spectrum');
         $PAGE->add_body_class('contains-spectrum-colorpicker');
     }

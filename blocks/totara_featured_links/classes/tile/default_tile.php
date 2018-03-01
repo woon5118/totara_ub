@@ -25,6 +25,8 @@ namespace block_totara_featured_links\tile;
 
 defined('MOODLE_INTERNAL') || die();
 
+use core\output\flex_icon;
+use core\output\flex_icon_helper;
 use totara_form\file_area;
 
 /**
@@ -42,7 +44,9 @@ class default_tile extends base{
         'alt_text',                      // string The text to go in the sr-only span in the anchor tag.
         'target',                        // string The target for the link either '_self' or '_blank'.
         'heading_location',              // string The location of the heading either 'top' or 'bottom'.
-        'background_appearance'          // string The background size style 'cover' or 'contain' currently.
+        'background_appearance',         // string The background size style 'cover' or 'contain' currently.
+        'icon',
+        'icon_size'
     ];
     protected $content_class = 'block-totara-featured-links-content';
     protected $content_template = 'block_totara_featured_links/content';
@@ -122,6 +126,9 @@ class default_tile extends base{
         if (!isset($this->data->heading_location)) {
             $dataobj->heading_location = self::HEADING_TOP;
         }
+        if (empty($this->icon_size)) {
+            $dataobj->icon_size = 'large';
+        }
         return $dataobj;
     }
 
@@ -151,6 +158,9 @@ class default_tile extends base{
      * @return array
      */
     protected function get_content_wrapper_template_data(\renderer_base $renderer, array $settings = []): array {
+        global $PAGE, $CFG;
+        $PAGE->requires->js_call_amd('block_totara_featured_links/icon_sizer', 'resize', [$this->id]);
+
         $data = parent::get_content_wrapper_template_data($renderer, $settings);
 
         $data['background_img'] = false;
@@ -177,6 +187,25 @@ class default_tile extends base{
         $data['background_appearance'] = (empty($this->data_filtered->background_appearance) ?
             'cover' :
             $this->data_filtered->background_appearance);
+
+        $showicon = (isset($this->data_filtered->icon) &&
+            isset(flex_icon_helper::get_icons($CFG->theme)[$this->data_filtered->icon]));
+
+        if (!empty($this->data_filtered->icon) && $showicon) {
+            $icon = new flex_icon($this->data_filtered->icon);
+            $data['icon'] = [
+                'template' => $icon->get_template(),
+                'context' => $icon->export_for_template($renderer)
+            ];
+        } else {
+            $data['icon'] = false;
+        }
+
+        if (!empty($this->data_filtered->icon_size)) {
+            $data['icon_size'] = $this->data_filtered->icon_size;
+        } else {
+            $data['icon_size'] = 'large';
+        }
 
         return $data;
     }
@@ -262,6 +291,12 @@ class default_tile extends base{
         }
         if (isset($data->background_appearance)) {
             $this->data->background_appearance = $data->background_appearance;
+        }
+        if (isset($data->icon)) {
+            $this->data->icon = $data->icon;
+        }
+        if (isset($data->icon_size)) {
+            $this->data->icon_size = $data->icon_size;
         }
         return;
     }
