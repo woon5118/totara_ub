@@ -29,7 +29,6 @@ use block_totara_featured_links\tile\base;
  * @param $oldversion
  * @param $block
  * @return bool
- * @throws upgrade_exception
  */
 function xmldb_block_totara_featured_links_upgrade($oldversion, $block) {
     global $DB;

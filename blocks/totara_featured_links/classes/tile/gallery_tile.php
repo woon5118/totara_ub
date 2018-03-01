@@ -32,7 +32,15 @@ use core\output\flex_icon;
  * @package block_totara_featured_links
  */
 class gallery_tile extends base implements meta_tile {
-    protected $used_fields = ['interval'];
+    protected $used_fields = [
+        'transition',
+        'order',
+        'controls',
+        'autoplay',
+        'interval',
+        'repeat',
+        'pauseonhover',
+    ];
     protected $content_template = 'block_totara_featured_links/content';
     protected $content_wrapper_template = 'block_totara_featured_links/content_wrapper_gallery';
     protected $content_class = 'block-totara-featured-links-content-gallery';
@@ -43,7 +51,15 @@ class gallery_tile extends base implements meta_tile {
     protected $subtiles = [];
 
     /** @var int The default interval (seconds) */
-    protected $default_interval = 4;
+    const DEFAULT_INTERVAL = 4;
+
+    const TRANSITION_SLIDE = 'slide';
+    const TRANSITION_FADE = 'fade';
+    const ORDER_RANDOM = 'random';
+    const ORDER_SEQUENTIAL = 'sequential';
+    const CONTROLS_ARROWS = 'arrows';
+    const CONTROLS_POSITION = 'position_indicator';
+
 
     /**
      * Gets all the tiles that are contained by this tile.
@@ -55,13 +71,28 @@ class gallery_tile extends base implements meta_tile {
 
     /**
      * gallery_tile constructor.
-     * @param \stdClass|int|null $tile
+     * @param \stdClass|null $tile
      */
     public function __construct($tile = null) {
+        global $DB;
         parent::__construct($tile);
 
         if (!empty($this->id)) {
-            $this->build_subtiles();
+            $subtiles = $DB->get_records('block_totara_featured_links_tiles', ['parentid' => $this->id]);
+
+            usort($subtiles, function ($tile1, $tile2) {
+                if ($tile1->sortorder == $tile2->sortorder) {
+                    assert(false, 'There was two tiles with the same sort order');
+                    return 0;
+                }
+                return ($tile1->sortorder < $tile2->sortorder) ? -1 : 1;
+            });
+
+            foreach ($subtiles as $subtile) {
+                list($plugin_name, $class_name) = explode('-', $subtile->type, 2);
+                $type = "\\$plugin_name\\tile\\$class_name";
+                $this->subtiles[] = new $type($subtile);
+            }
         }
     }
 
@@ -112,8 +143,26 @@ class gallery_tile extends base implements meta_tile {
      */
     public function get_content_form_data(): \stdClass {
         $data_obj = parent::get_content_form_data();
+        if (!isset($data_obj->transition)) {
+            $data_obj->transition = self::TRANSITION_SLIDE;
+        }
+        if (!isset($data_obj->order)) {
+            $data_obj->order = self::ORDER_SEQUENTIAL;
+        }
+        if (!isset($data_obj->controls)) {
+            $data_obj->controls = [self::CONTROLS_ARROWS, self::CONTROLS_POSITION];
+        }
+        if (!isset($data_obj->autoplay)) {
+            $data_obj->autoplay = 1;
+        }
         if (!isset($data_obj->interval)) {
-            $data_obj->interval = 4;
+            $data_obj->interval = self::DEFAULT_INTERVAL;
+        }
+        if (!isset($data_obj->repeat)) {
+            $data_obj->repeat = 1;
+        }
+        if (!isset($data_obj->pauseonhover)) {
+            $data_obj->pauseonhover = 0;
         }
         return $data_obj;
     }
@@ -168,6 +217,24 @@ class gallery_tile extends base implements meta_tile {
                 $data->interval = 1;
             }
             $this->data->interval = $data->interval;
+        }
+        if (isset($data->transition)) {
+            $this->data->transition = $data->transition;
+        }
+        if (isset($data->order)) {
+            $this->data->order = $data->order;
+        }
+        if (isset($data->controls)) {
+            $this->data->controls = $data->controls;
+        }
+        if (isset($data->autoplay)) {
+            $this->data->autoplay = $data->autoplay;
+        }
+        if (isset($data->repeat)) {
+            $this->data->repeat = $data->repeat;
+        }
+        if (isset($data->pauseonhover)) {
+            $this->data->pauseonhover = $data->pauseonhover;
         }
         return;
     }
@@ -299,12 +366,28 @@ class gallery_tile extends base implements meta_tile {
      */
     protected function get_requirements(): void {
         global $PAGE;
+
+        $interval = $this->data->interval ?? self::DEFAULT_INTERVAL;
+
+        $transition = $this->data_filtered->transition ?? self::TRANSITION_SLIDE;
+        $order = $this->data_filtered->order ?? self::ORDER_SEQUENTIAL;
+        $controls = $this->data_filtered->controls ?? [self::CONTROLS_POSITION, self::CONTROLS_ARROWS];
+        $autoplay = $this->data_filtered->autoplay ?? '1';
+        $repeat = $this->data_filtered->repeat ?? '1';
+        $pauseonhover = $this->data_filtered->pauseonhover ?? '0';
+
         $PAGE->requires->js_call_amd(
             'block_totara_featured_links/switcher',
-            'init',
-            [
-                (!isset($this->data->interval) ? $this->default_interval*1000 : $this->data->interval*1000),
-                'block-totara-featured-links-gallery-tile-'.$this->id]
+            'init', [
+                $interval * 1000,
+                'block-totara-featured-links-gallery-tile-'.$this->id,
+                $transition,
+                $order,
+                $controls,
+                $autoplay,
+                $repeat,
+                $pauseonhover
+            ]
         );
     }
 }

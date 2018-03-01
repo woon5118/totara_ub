@@ -24,9 +24,13 @@
 namespace block_totara_featured_links\tile;
 
 use block_totara_featured_links\form\validator\valid_interval;
+use totara_form\form\clientaction\hidden_if;
 use totara_form\form\element\checkbox;
+use totara_form\form\element\checkboxes;
 use totara_form\form\element\filemanager;
+use totara_form\form\element\number;
 use totara_form\form\element\radios;
+use totara_form\form\element\select;
 use totara_form\form\element\text;
 use totara_form\group;
 
@@ -43,9 +47,62 @@ class gallery_form_content extends base_form_content {
      * @return void
      */
     public function specific_definition(group $group) {
+
+        $group->add(
+            new radios(
+                'transition',
+                get_string('transition', 'block_totara_featured_links'),
+                [
+                    gallery_tile::TRANSITION_SLIDE => get_string('slide', 'block_totara_featured_links'),
+                    gallery_tile::TRANSITION_FADE => get_string('fade', 'block_totara_featured_links')
+                ]
+            )
+        );
+        $group->add(
+            new radios(
+                'order',
+                get_string('order', 'block_totara_featured_links'),
+                [
+                    gallery_tile::ORDER_RANDOM => get_string('random', 'block_totara_featured_links'),
+                    gallery_tile::ORDER_SEQUENTIAL => get_string('sequential', 'block_totara_featured_links')
+                ]
+            )
+        );
+        $group->add(
+            new checkboxes(
+                'controls',
+                get_string('controls', 'block_totara_featured_links'),
+                [
+                    gallery_tile::CONTROLS_ARROWS => get_string('arrows', 'block_totara_featured_links'),
+                    gallery_tile::CONTROLS_POSITION => get_string('position_indicator', 'block_totara_featured_links')
+                ]
+            )
+        );
+        $group->add(
+            new checkbox(
+                'repeat',
+                get_string('repeat', 'block_totara_featured_links')
+            )
+        );
+        $autoplay = $group->add(
+            new checkbox(
+                'autoplay',
+                get_string('autoplay', 'block_totara_featured_links')
+            )
+        );
+
         $interval = $group->add(new text('interval', get_string('interval', 'block_totara_featured_links'), PARAM_TEXT));
         $interval->add_validator(new valid_interval());
         $interval->add_help_button('interval', 'block_totara_featured_links');
+        $this->model->add_clientaction(new hidden_if($interval))->is_equal($autoplay, '0');
+
+        $pauseonhover = $group->add(
+            new checkbox(
+                'pauseonhover',
+                get_string('pauseonhover', 'block_totara_featured_links')
+            )
+        );
+        $this->model->add_clientaction(new hidden_if($pauseonhover))->is_equal($autoplay, '0');
         return;
     }
 

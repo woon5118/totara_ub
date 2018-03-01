@@ -25,11 +25,11 @@ namespace block_totara_featured_links\tile;
 
 defined('MOODLE_INTERNAL') || die();
 
-use block_totara_featured_links\form\validator\is_subclass_of_tile_base;
 use totara_form\form\element\hidden;
-use totara_form\form\element\number;
-use totara_form\form\element\select;
-use totara_form\form\group\section;
+use \totara_form\form\element\select;
+use \totara_form\form\element\number;
+use \totara_form\form\group\section;
+use \block_totara_featured_links\form\validator\is_subclass_of_tile_base;
 
 /**
  * Class base_form_content

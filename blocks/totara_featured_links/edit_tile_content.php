@@ -78,12 +78,8 @@ if (!$tile_instance->can_edit_tile()) {
 }
 
 
-$edit_form = $tile_instance->get_content_form([
-    'blockinstanceid' => $blockinstanceid,
-    'tileid' => $tileid,
-    'return_url' => $return_url,
-    'parentid' => $parentid
-]);
+$edit_form = $tile_instance->get_content_form(['blockinstanceid' => $blockinstanceid, 'tileid' => $tileid, 'return_url' => $return_url,
+    'parentid' => $parentid]);
 
 if ($form_data = $edit_form->get_data()) {
     if (!empty($form_data->parentid)) {
