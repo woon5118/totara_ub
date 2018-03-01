@@ -30,21 +30,53 @@ defined('MOODLE_INTERNAL') || die();
  * Tests the base item class.
  */
 class totara_userdata_export_testcase extends advanced_testcase {
-    public function test_export_class() {
+
+    /**
+     * Test that no new properties can be added
+     */
+    public function test_property_set() {
         $export = new export();
-        $this->assertSame(array(), $export->data);
-        $this->assertSame(array(), $export->files);
-        try {
-            $export->xx = 1;
-            $this->fail('coding_exception expected');
-        } catch (Throwable $ex) {
-            $this->assertInstanceOf('coding_exception', $ex);
-        }
-        try {
-            unset($export->xx);
-            $this->fail('coding_exception expected');
-        } catch (Throwable $ex) {
-            $this->assertInstanceOf('coding_exception', $ex);
-        }
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('export instance cannot be modified');
+
+        $export->xx = 1;
     }
+
+    /**
+     * Check that adding a file adds it to the files property and returns the correct data
+     */
+    public function test_add_file() {
+        $this->resetAfterTest();
+
+        $syscontext = context_system::instance();
+
+        $fs = get_file_storage();
+
+        $filerecord = [
+            'component' => 'phpunit',
+            'filearea' => 'userdata',
+            'contextid' => $syscontext->id,
+            'itemid' => 0,
+            'filename' => 'mytestfile1.txt',
+            'filepath' => '/test1/'
+        ];
+        $file = $fs->create_file_from_string($filerecord, 'test1');
+
+        $export = new export();
+        $result = $export->add_file($file);
+
+        $this->assertEquals(
+            [
+                'fileid' => $file->get_id(),
+                'filename' => $file->get_filename(),
+                'contenthash' => $file->get_contenthash()
+            ],
+            $result
+        );
+
+        $this->assertArrayHasKey($file->get_id(), $export->files);
+        $this->assertContains($file, $export->files);
+    }
+
 }

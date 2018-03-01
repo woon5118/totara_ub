@@ -31,6 +31,9 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once("$CFG->dirroot/user/lib.php");
+
 /**
  * Tests the connected connectedbackpacks userdata.
  *

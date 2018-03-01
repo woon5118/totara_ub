@@ -133,7 +133,6 @@ class connectedbackpacks extends item {
 
         $result = new export();
         $result->data = $backpacks;
-        $result->files = []; // There are no files associated with backpacks.
 
         return $result;
     }

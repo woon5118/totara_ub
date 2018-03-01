@@ -104,12 +104,10 @@ class privatefiles extends \totara_userdata\userdata\item {
             $fs = get_file_storage();
             $files = $fs->get_area_files($user->contextid, 'user', 'private', 0, 'filepath ASC, filename ASC', false);
             foreach ($files as $file) {
-                $export->data[] = [
-                    'fileid' => $file->get_id(),
-                    'filename' => $file->get_filepath().$file->get_filename(),
-                    'hash' => $file->get_contenthash()
-                ];
-                $export->files[] = $file;
+                if (!isset($export->data[$file->get_filepath()])) {
+                    $export->data[$file->get_filepath()] = [];
+                }
+                $export->data[$file->get_filepath()][] = $export->add_file($file);
             }
         }
 

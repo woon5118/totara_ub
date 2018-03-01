@@ -399,7 +399,6 @@ class singleassignments extends item {
 
         $export = new \totara_userdata\userdata\export();
         foreach ($DB->get_recordset_sql($sql, $params) as $assignment) {
-            $assignmentid = $assignment->moduleid;
             $params = ['userid' => $userid, 'assignmentid' => $assignment->moduleid];
 
             $gradesql = "
@@ -441,30 +440,25 @@ class singleassignments extends item {
                 $onlinetext[] = ['submission text' => $text->onlinetext];
             }
 
-            $modulecontext = \context_module::instance($assignment->cmid);
-            $stored = get_file_storage()->get_area_files(
-                $modulecontext->id, 'assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA, $assignment->submissionid, "itemid, filename", false
-            );
-
-            $files = [];
-            foreach ($stored as $file) {
-                $files[] = [
-                    'id' => $file->get_id(),
-                    'file' => $file->get_filename(),
-                    'hash' => $file->get_contenthash()
-                ];
-
-                $export->files[] = $file;
-            }
-
-            $export->data[] = [
+            $data = [
                 'assignment' => $assignment->name,
                 'submission time' => $assignment->timemodified,
                 'submission text' => $onlinetext,
                 'grades' => $grades,
                 'comments' => $comments,
-                'files' => $files
+                'files' => []
             ];
+
+            $modulecontext = \context_module::instance($assignment->cmid);
+            $stored = get_file_storage()->get_area_files(
+                $modulecontext->id, 'assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA, $assignment->submissionid, "itemid, filename", false
+            );
+
+            foreach ($stored as $file) {
+                $data['files'][] = $export->add_file($file);
+            }
+
+            $export->data[] = $data;
         }
 
         return $export;

@@ -122,13 +122,7 @@ class picture extends \totara_userdata\userdata\item {
             $fs = get_file_storage();
             $avatars = $fs->get_area_files($user->contextid, 'user', 'icon', 0, 'filename ASC', false);
             foreach ($avatars as $avatar) {
-                $export->data['files'][] = [
-                    'id' => $avatar->get_id(),
-                    'filename' => $avatar->get_filename(),
-                    // With the hash we can identify the actual exported file in the export archive.
-                    'hash' => $avatar->get_contenthash()
-                ];
-                $export->files[] = $avatar;
+                $export->data['files'][] = $export->add_file($avatar);
             }
         }
 

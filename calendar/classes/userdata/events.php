@@ -142,7 +142,9 @@ class events extends item {
                     '',
                     false
                 );
-                $export->files += $files;
+                foreach ($files as $file) {
+                    $export->add_file($file);
+                }
                 $export->data[] = $event;
             }
         } else {

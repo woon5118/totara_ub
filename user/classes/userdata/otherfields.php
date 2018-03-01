@@ -138,13 +138,7 @@ class otherfields extends \totara_userdata\userdata\item {
             $fs = get_file_storage();
             $files = $fs->get_area_files($user->contextid, 'user', 'profile', 0, 'filename ASC', false);
             foreach ($files as $file) {
-                $export->data['files'][] = [
-                    'id' => $file->get_id(),
-                    'filename' => $file->get_filename(),
-                    // To identify the file within the export archive we need the hash.
-                    'hash' => $file->get_contenthash()
-                ];
-                $export->files[] = $file;
+                $export->data['files'][] = $export->add_file($file);
             }
         }
 

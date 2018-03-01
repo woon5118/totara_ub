@@ -208,9 +208,9 @@ class core_user_userdata_picture_testcase extends advanced_testcase {
         foreach ($files as $file) {
             $this->assertContains(
                 [
-                    'id' => $file->get_id(),
+                    'fileid' => $file->get_id(),
                     'filename' => $file->get_filename(),
-                    'hash' => $file->get_contenthash()
+                    'contenthash' => $file->get_contenthash()
                 ],
                 $result->data['files']
             );

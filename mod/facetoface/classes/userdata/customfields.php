@@ -66,7 +66,10 @@ class customfields extends signups_item {
         $export->data['signup'] = self::get_signup_customfield_data($user, $context);
         $export->data['cancellation'] = self::get_cancellation_customfield_data($user, $context);
 
-        $export->files = self::get_files($user, $export->data);
+        $files = self::get_files($user, $export->data);
+        foreach ($files as $file) {
+            $export->add_file($file);
+        }
 
         return $export;
     }

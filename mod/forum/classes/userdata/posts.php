@@ -156,7 +156,7 @@ class posts extends item {
         $params = ['userid' => $user->id];
         $posts = $DB->get_records_sql($sql, $params);
 
-        $exportdata = $exportfiles = [];
+        $export = new export();
 
         $fs = get_file_storage();
         foreach ($posts as $post) {
@@ -168,23 +168,15 @@ class posts extends item {
             if ($contextmodule) {
                 $files = $fs->get_area_files($contextmodule->id, 'mod_forum', 'attachment', $post->id, "timemodified", false);
                 foreach ($files as $file) {
-                    $exportfiles[] = $file;
-                    $file = ['id' => $file->get_id(), 'filename' => $file->get_filepath() . $file->get_filename()];
-                    $currpost->attachments[] = $file;
+                    $currpost->attachments[] = $export->add_file($file);
                 }
                 $files = $fs->get_area_files($contextmodule->id, 'mod_forum', 'post', $post->id, "timemodified", false);
                 foreach ($files as $file) {
-                    $exportfiles[] = $file;
-                    $file = ['id' => $file->get_id(), 'filename' => $file->get_filepath() . $file->get_filename()];
-                    $currpost->files[] = $file;
+                    $currpost->files[] = $export->add_file($file);
                 }
             }
-            $exportdata[] = $currpost;
+            $export->data[] = $currpost;
         }
-
-        $export = new export();
-        $export->data = $exportdata;
-        $export->files = $exportfiles;
 
         return $export;
     }

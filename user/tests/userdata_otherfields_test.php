@@ -277,17 +277,17 @@ class core_user_userdata_otherfields_testcase extends advanced_testcase {
         $this->assertCount(2, $result->data['files']);
         $this->assertContains(
             [
-                'id' => $file1->get_id(),
+                'fileid' => $file1->get_id(),
                 'filename' => $file1->get_filename(),
-                'hash' => $file1->get_contenthash()
+                'contenthash' => $file1->get_contenthash()
             ],
             $result->data['files']
         );
         $this->assertContains(
             [
-                'id' => $file2->get_id(),
+                'fileid' => $file2->get_id(),
                 'filename' => $file2->get_filename(),
-                'hash' => $file2->get_contenthash()
+                'contenthash' => $file2->get_contenthash()
             ],
             $result->data['files']
         );

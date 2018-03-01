@@ -123,8 +123,14 @@ class blog extends item {
         foreach ($export->data as $blog) {
             // Add the attachments.
             $fs = get_file_storage();
-            $export->files += $fs->get_area_files(SYSCONTEXTID, 'blog', 'attachment', $blog->id, '', false);
-            $export->files += $fs->get_area_files(SYSCONTEXTID, 'blog', 'post', $blog->id, '', false);
+            $files = $fs->get_area_files(SYSCONTEXTID, 'blog', 'attachment', $blog->id, '', false);
+            foreach ($files as $file) {
+                $export->add_file($file);
+            }
+            $files = $fs->get_area_files(SYSCONTEXTID, 'blog', 'post', $blog->id, '', false);
+            foreach ($files as $file) {
+                $export->add_file($file);
+            }
         }
         return $export;
     }

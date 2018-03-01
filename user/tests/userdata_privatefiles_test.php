@@ -218,7 +218,7 @@ class core_user_userdata_privatefiles_testcase extends advanced_testcase {
                 'component' => 'user',
                 'filearea'  => 'private',
                 'itemid'    => 0,
-                'filepath'  => '/',
+                'filepath'  => '/'.random_string(15).'/',
                 'filename'  => random_string(15).'.txt'
             ];
             return $fs->create_file_from_string($filerecord, random_string(30));
@@ -232,13 +232,14 @@ class core_user_userdata_privatefiles_testcase extends advanced_testcase {
      * @param export $export
      */
     private function assert_contains_file(stored_file $file, export $export) {
+        $this->assertArrayHasKey($file->get_filepath(), $export->data);
         $this->assertContains(
             [
                 'fileid' => $file->get_id(),
-                'filename' => $file->get_filepath().$file->get_filename(),
-                'hash' => $file->get_contenthash()
+                'filename' => $file->get_filename(),
+                'contenthash' => $file->get_contenthash()
             ],
-            $export->data
+            $export->data[$file->get_filepath()]
         );
 
         // Check that the correct file is in the files.

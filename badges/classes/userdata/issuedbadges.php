@@ -168,8 +168,6 @@ class issuedbadges extends item {
         $rawbadges = self::get_badges_issued_to_user($user, $context);
 
         $result = new export();
-        $result->data = [];
-        $result->files = [];
 
         $fs = get_file_storage();
 
@@ -199,13 +197,8 @@ class issuedbadges extends item {
                 $file = $fs->get_file($user->contextid, 'badges', 'userbadge', $rawbadge->id, '/', $rawbadge->uniquehash . '.png');
                 if ($file) {
                     // Add this file to the array of files to export.
-                    $result->files[$file->get_id()] = $file;
-
                     // And provide some data about it within the badge data that also gets exported.
-                    $badge->file = new \stdClass;
-                    $badge->file->fileid = $file->get_id();
-                    $badge->file->filename = $file->get_filename();
-                    $badge->file->contenthash = $file->get_contenthash();
+                    $badge->file = (object)$result->add_file($file);
                 }
             }
 

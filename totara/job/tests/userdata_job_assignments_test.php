@@ -180,14 +180,38 @@ class totara_job_userdata_job_assignments_testcase extends \advanced_testcase {
 
         // Check that the file table contains the correct files.
         $expectedfiles = [];
-        $expectedfiles['3a'] = $fs->get_area_files($TEXTAREA_OPTIONS['context']->id,
-            'totara_job', 'job_assignment', $data->ja3a->id, "timemodified, id", false);
-        $expectedfiles['3b'] = $fs->get_area_files($TEXTAREA_OPTIONS['context']->id,
-            'totara_job', 'job_assignment', $data->ja3b->id, "timemodified, id", false);
-        $expectedfiles['3c'] = $fs->get_area_files($TEXTAREA_OPTIONS['context']->id,
-            'totara_job', 'job_assignment', $data->ja3c->id, "timemodified, id", false);
-        $expectedfiles['2'] = $fs->get_area_files($TEXTAREA_OPTIONS['context']->id,
-            'totara_job', 'job_assignment', $data->ja2->id, "timemodified, id", false);
+        $expectedfiles['3a'] = $fs->get_area_files(
+            $TEXTAREA_OPTIONS['context']->id,
+            'totara_job',
+            'job_assignment',
+            $data->ja3a->id,
+            'timemodified, id',
+            false
+        );
+        $expectedfiles['3b'] = $fs->get_area_files(
+            $TEXTAREA_OPTIONS['context']->id,
+            'totara_job',
+            'job_assignment',
+            $data->ja3b->id,
+            'timemodified, id',
+            false
+        );
+        $expectedfiles['3c'] = $fs->get_area_files(
+            $TEXTAREA_OPTIONS['context']->id,
+            'totara_job',
+            'job_assignment',
+            $data->ja3c->id,
+            'timemodified, id',
+            false
+        );
+        $expectedfiles['2'] = $fs->get_area_files(
+            $TEXTAREA_OPTIONS['context']->id,
+            'totara_job',
+            'job_assignment',
+            $data->ja2->id,
+            'timemodified, id',
+            false
+        );
         $this->assertNotEmpty($expectedfiles['3a']);
         $this->assertNotEmpty($expectedfiles['3b']);
         $this->assertEmpty($expectedfiles['3c']);
@@ -220,9 +244,6 @@ class totara_job_userdata_job_assignments_testcase extends \advanced_testcase {
 
         $data = $this->setup_data();
 
-        // Get the expected data.
-        $expecteddata = $DB->get_records('job_assignment', array('userid' => $data->targetuser->id));
-
         // Execute the export.
         $result = job_assignments::execute_export($data->targetuser, context_system::instance());
 
@@ -230,7 +251,14 @@ class totara_job_userdata_job_assignments_testcase extends \advanced_testcase {
         $this->assertCount(0, $result->files);
         $this->assertCount(3, $result->data['job_assignments']);
 
-        $this->assertEquals($expecteddata, $result->data['job_assignments']);
+        $assignmentids = [];
+        foreach ($result->data['job_assignments'] as $assignment) {
+            $this->assertArrayHasKey('id', $assignment);
+            $assignmentids[] = $assignment['id'];
+        }
+        $this->assertContains($data->ja3a->id, $assignmentids);
+        $this->assertContains($data->ja3b->id, $assignmentids);
+        $this->assertContains($data->ja3c->id, $assignmentids);
     }
 
     /**
@@ -253,7 +281,7 @@ class totara_job_userdata_job_assignments_testcase extends \advanced_testcase {
             'filename' => 'testx.png',
             'timecreated' => time(),
             'timemodified' => time()];
-        $fs->create_file_from_string($filerecord, 'testfilecontents1');
+        $file1 = $fs->create_file_from_string($filerecord, 'testfilecontents1');
 
         $filerecord = ['contextid' => SYSCONTEXTID,
             'component' => 'totara_job',
@@ -263,7 +291,7 @@ class totara_job_userdata_job_assignments_testcase extends \advanced_testcase {
             'filename' => 'testz.png',
             'timecreated' => time(),
             'timemodified' => time()];
-        $fs->create_file_from_string($filerecord, 'testfilecontents1');
+        $file2 = $fs->create_file_from_string($filerecord, 'testfilecontents1');
 
         // Control's attachment.
         $filerecord = ['contextid' => SYSCONTEXTID,
@@ -274,27 +302,47 @@ class totara_job_userdata_job_assignments_testcase extends \advanced_testcase {
             'filename' => 'control.png',
             'timecreated' => time(),
             'timemodified' => time()];
-        $fs->create_file_from_string($filerecord, 'testfilecontents2');
+        $file3 = $fs->create_file_from_string($filerecord, 'testfilecontents2');
 
         // Check that the export contains only the target's file.
         $export = job_assignments::execute_export($data->targetuser, $systemcontext);
         $this->assertCount(2, $export->files);
-        $this->assertCount(2, $export->data['files']);
-        if ($export->files[0]->get_itemid() == $data->ja3a->id) {
-            $file3a = $export->files[0];
-            $file3b = $export->files[1];
-        } else {
-            $file3a = $export->files[1];
-            $file3b = $export->files[0];
+        $this->assertCount(3, $export->data['job_assignments']);
+
+        $expectedids = [$data->ja3a->id, $data->ja3b->id, $data->ja3c->id];
+        foreach ($export->data['job_assignments'] as $assignment) {
+            $this->assertContains($assignment['id'], $expectedids);
+            if ($assignment['id'] == $data->ja3a->id) {
+                $expectedfile = $file1;
+            } else if ($assignment['id'] == $data->ja3b->id) {
+                $expectedfile = $file2;
+            } else {
+                $this->assertEmpty($assignment['files']);
+                continue;
+            }
+            $expectedfileinfo = [
+                'fileid' => $expectedfile->get_id(),
+                'filename' => $expectedfile->get_filename(),
+                'contenthash' => $expectedfile->get_contenthash()
+            ];
+            $this->assertContains($expectedfileinfo, $assignment['files']);
         }
-        $this->assertEquals($data->ja3a->id, $file3a->get_itemid());
-        $this->assertEquals($data->ja3b->id, $file3b->get_itemid());
+
+        $this->assertArrayHasKey($file1->get_id(), $export->files);
+        $this->assertArrayHasKey($file2->get_id(), $export->files);
 
         $export = job_assignments::execute_export($data->targetuser2, $systemcontext);
         $this->assertCount(1, $export->files);
-        $this->assertCount(1, $export->data['files']);
-        $file = $export->files[0];
-        $this->assertEquals($data->ja2->id, $file->get_itemid());
+        $this->assertCount(1, $export->data['job_assignments']);
+        $this->assertArrayHasKey($file3->get_id(), $export->files);
+
+        $assignment = reset($export->data['job_assignments']);
+        $expectedfileinfo = [
+            'fileid' => $file3->get_id(),
+            'filename' => $file3->get_filename(),
+            'contenthash' => $file3->get_contenthash()
+        ];
+        $this->assertContains($expectedfileinfo, $assignment['files']);
 
         // Check that the export doesn't contain anything.
         job_assignments::execute_purge($data->targetuser, context_system::instance());

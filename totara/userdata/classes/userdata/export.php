@@ -31,16 +31,55 @@ defined('MOODLE_INTERNAL') || die();
  * This is intended to be used from export method of item classes.
  */
 final class export {
-    /** @var array data exported from item */
-    public $data = array();
-    /** @var \stored_file[] list of stored files referenced in data*/
-    public $files = array();
 
+    /**
+     * data exported from item
+     *
+     * @var array
+     */
+    public $data = [];
+
+    /**
+     * list of stored files referenced in data
+     *
+     * @var \stored_file[]
+     */
+    public $files = [];
+
+    /**
+     * Make sure no other properties can be added
+     *
+     * @param $name
+     * @param $value
+     */
     public function __set($name, $value) {
         throw new \coding_exception('export instance cannot be modified');
     }
 
-    public function __unset($name) {
-        throw new \coding_exception('export instance cannot be modified');
+    /**
+     * Adds a file to the export and returns data for the file
+     * which can be added to the exported data
+     *
+     * @param \stored_file $file
+     * @return array
+     */
+    public function add_file(\stored_file $file) {
+        $this->files[$file->get_id()] = $file;
+        return $this->prepare_file_info($file);
     }
+
+    /**
+     * Prepare file information for export to have consistent keys
+     *
+     * @param \stored_file $file
+     * @return array
+     */
+    private function prepare_file_info(\stored_file $file) {
+        return [
+            'fileid' => $file->get_id(),
+            'filename' => $file->get_filename(),
+            'contenthash' => $file->get_contenthash()
+        ];
+    }
+
 }

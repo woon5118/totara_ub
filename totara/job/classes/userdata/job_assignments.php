@@ -93,30 +93,36 @@ class job_assignments extends item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
         global $DB, $TEXTAREA_OPTIONS;
 
         $export = new export();
+        $export->data['job_assignments'] = [];
 
-        $export->data['job_assignments'] = $DB->get_records('job_assignment', array('userid' => $user->id));
+        $assignments = $DB->get_records('job_assignment', array('userid' => $user->id));
 
         $fs = get_file_storage();
 
         // Add the attachments.
-        foreach ($export->data['job_assignments'] as $jarecord) {
-            $files = $fs->get_area_files($TEXTAREA_OPTIONS['context']->id,
-                'totara_job', 'job_assignment', $jarecord->id, "timemodified", false);
+        foreach ($assignments as $assignment) {
+            $assignment = (array)$assignment;
+            $assignment['files'] = [];
+
+            $files = $fs->get_area_files(
+                $TEXTAREA_OPTIONS['context']->id,
+                'totara_job',
+                'job_assignment',
+                $assignment['id'],
+                'timemodified',
+                false
+            );
             foreach ($files as $file) {
-                $export->data['files'][] = [
-                    'id' => $file->get_id(),
-                    'filename' => $file->get_filename(),
-                    // To identify the file within the export archive we need the hash.
-                    'hash' => $file->get_contenthash()
-                ];
-                $export->files[] = $file;
+                $assignment['files'][] = $export->add_file($file);
             }
+
+            $export->data['job_assignments'][] = $assignment;
         }
 
         return $export;
