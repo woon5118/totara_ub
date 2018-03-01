@@ -72,7 +72,7 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->assertEquals('1', $filter->customname);
         $this->assertEquals('1', $filter->region);
         $this->assertEquals(['operator'=> 1, 'value' => 0], $filter->defaultvalue);
-        $this->assertEquals('User Status is equal to "Active users only"',
+        $this->assertEquals('User Status is equal to "Active"',
             $filter->get_label($filter->defaultvalue));
 
         // Testing custom course report.
@@ -139,7 +139,7 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->assertEquals('id', $filter->value);
         $this->assertEquals('1', $filter->advanced);
         $this->assertEquals(['operator'=> 1, 'value' => "{$course1->id},{$course2->id}"], $filter->defaultvalue);
-        $this->assertEquals('Course (multi-item) is equal to "Test course 1" or "Test course 2"',
+        $this->assertEquals('Course (multi-item) is equal to "' . $course1->fullname . '" or "' . $course2->fullname . '"',
             $filter->get_label($filter->defaultvalue));
 
         $filter = array_shift($filters);
@@ -147,7 +147,7 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->assertEquals('enrolledcoursecohortids', $filter->value);
         $this->assertEquals('1', $filter->advanced);
         $this->assertEquals(['value' => "{$audience1->id},{$audience2->id}"], $filter->defaultvalue);
-        $this->assertEquals('Course is enrolled in by audience "Cohort 1" or "Cohort 2"',
+        $this->assertEquals('Course is enrolled in by audience "' . $audience1->name . '" or "' . $audience2->name . '"',
             $filter->get_label($filter->defaultvalue));
     }
 }

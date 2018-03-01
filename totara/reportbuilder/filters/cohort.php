@@ -188,7 +188,7 @@ class rb_filter_cohort extends rb_filter_type {
 
         $selected = array();
         list($insql, $inparams) = $DB->get_in_or_equal($values);
-        if ($cohorts = $DB->get_records_select('cohort', "id {$insql}", $inparams)) {
+        if ($cohorts = $DB->get_records_select('cohort', "id {$insql}", $inparams, 'id')) {
             foreach ($cohorts as $cohort) {
                 $selected[] = '"' . format_string($cohort->name) . '"';
             }

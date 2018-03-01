@@ -226,7 +226,7 @@ class rb_filter_course_multi extends rb_filter_type {
 
         $selected = array();
         list($insql, $inparams) = $DB->get_in_or_equal($values);
-        if ($courses = $DB->get_records_select('course', "id ".$insql, $inparams)) {
+        if ($courses = $DB->get_records_select('course', "id ".$insql, $inparams, 'id')) {
             foreach ($courses as $course) {
                 $selected[] = '"' . format_string($course->fullname) . '"';
             }
