@@ -73,7 +73,7 @@ class rb_plan_programs_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'program_completion',
-                'value' => 'starteddate',
+                'value' => 'assigneddate',
                 'heading' => get_string('dateassigned', 'rb_source_dp_program'),
             ),
             array(

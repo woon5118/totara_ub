@@ -262,8 +262,15 @@ class rb_source_dp_program extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'program_completion',
             'starteddate',
-            get_string('dateassigned', 'rb_source_dp_program'),
+            get_string('datestarted', 'rb_source_dp_program'),
             'program_completion.timestarted',
+            array('joins' => array('program_completion'), 'displayfunc' => 'nice_date')
+        );
+        $columnoptions[] = new rb_column_option(
+            'program_completion',
+            'assigneddate',
+            get_string('dateassigned', 'rb_source_dp_program'),
+            'program_completion.timecreated',
             array('joins' => array('program_completion'), 'displayfunc' => 'nice_date')
         );
         $columnoptions[] = new rb_column_option(
