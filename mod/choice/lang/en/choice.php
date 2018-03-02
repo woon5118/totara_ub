@@ -128,5 +128,6 @@ $string['taken'] = 'Taken';
 $string['viewallresponses'] = 'View {$a} responses';
 $string['withselected'] = 'With selected';
 $string['userchoosethisoption'] = 'Users who chose this option';
+$string['userdataitemanswers'] = 'Answers';
 $string['yourselection'] = 'Your selection';
 $string['skipresultgraph'] = 'Skip result graph';
