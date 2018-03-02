@@ -26,6 +26,7 @@ namespace core_blog\userdata;
 defined('MOODLE_INTERNAL') || die();
 
 use comment;
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
@@ -114,23 +115,26 @@ class blog extends item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
         global $DB;
-        $export = new \totara_userdata\userdata\export();
-        $export->data = array_values($DB->get_records('post', ['userid' => $user->id, 'module' => 'blog']));
-        foreach ($export->data as $blog) {
+        $export = new export();
+        $blogs = $DB->get_records('post', ['userid' => $user->id, 'module' => 'blog']);
+        foreach ($blogs as $blog) {
+            $blog = (array)$blog;
+            $blog['files'] = ['attachments' => [], 'post' => []];
             // Add the attachments.
             $fs = get_file_storage();
-            $files = $fs->get_area_files(SYSCONTEXTID, 'blog', 'attachment', $blog->id, '', false);
+            $files = $fs->get_area_files(SYSCONTEXTID, 'blog', 'attachment', $blog['id'], '', false);
             foreach ($files as $file) {
-                $export->add_file($file);
+                $blog['files']['attachments'][] = $export->add_file($file);
             }
-            $files = $fs->get_area_files(SYSCONTEXTID, 'blog', 'post', $blog->id, '', false);
+            $files = $fs->get_area_files(SYSCONTEXTID, 'blog', 'post', $blog['id'], '', false);
             foreach ($files as $file) {
-                $export->add_file($file);
+                $blog['files']['post'][] = $export->add_file($file);
             }
+            $export->data[] = $blog;
         }
         return $export;
     }
@@ -150,7 +154,7 @@ class blog extends item {
      *
      * @param target_user $user
      * @param \context $context
-     * @return int|void
+     * @return int
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;

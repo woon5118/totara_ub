@@ -224,13 +224,37 @@ class core_blog_userdata_blog_testcase extends advanced_testcase {
     public function test_export_match_db() {
         $data = $this->get_data();
 
+        // Export activeuser.
         $export = blog::execute_export($data->activeuser, $data->systemcontext);
-        sort($export->data);
-        $this->assertEquals($data->activeuserblogs, $export->data);
 
+        $exportedbloguserids = [];
+        foreach ($export->data as $exporteddata) {
+            $this->assertArrayHasKey('id', $exporteddata);
+            $this->assertArrayHasKey('module', $exporteddata);
+            $this->assertArrayHasKey('userid', $exporteddata);
+            $this->assertEquals('blog', $exporteddata['module']);
+            $exportedbloguserids[] = $exporteddata['id'];
+        }
+        $this->assertEquals(count($data->activeuserblogs), count($export->data));
+        foreach ($data->activeuserblogs as $activeuserblog) {
+            $this->assertContains($activeuserblog->id, $exportedbloguserids);
+        }
+
+        // Export deleteduser.
         $export = blog::execute_export($data->deleteduser, $data->systemcontext);
-        sort($export->data);
-        $this->assertEquals($data->deleteduserblogs, $export->data);
+
+        $exportedbloguserids = [];
+        foreach ($export->data as $exporteddata) {
+            $this->assertArrayHasKey('id', $exporteddata);
+            $this->assertArrayHasKey('module', $exporteddata);
+            $this->assertArrayHasKey('userid', $exporteddata);
+            $this->assertEquals('blog', $exporteddata['module']);
+            $exportedbloguserids[] = $exporteddata['id'];
+        }
+        $this->assertEquals(count($data->deleteduserblogs), count($export->data));
+        foreach ($data->deleteduserblogs as $deleteduserblog) {
+            $this->assertContains($deleteduserblog->id, $exportedbloguserids);
+        }
     }
 
     /**
@@ -263,6 +287,33 @@ class core_blog_userdata_blog_testcase extends advanced_testcase {
 
         $this->assertContains($attachmentfile, $export->files, '', false, false);
         $this->assertContains($contentfile, $export->files, '', false, false);
+
+        foreach ($export->data as $exportedblogentry) {
+            $this->assertArrayHasKey('files', $exportedblogentry);
+            $this->assertArrayHasKey('attachments', $exportedblogentry['files']);
+            $this->assertArrayHasKey('post', $exportedblogentry['files']);
+            if ($exportedblogentry['id'] != $data->activeuserblogs[0]->id) {
+                $this->assertEmpty($exportedblogentry['files']['attachments']);
+                $this->assertEmpty($exportedblogentry['files']['post']);
+            } else {
+                $this->assertContains(
+                    [
+                        'fileid' => $attachmentfile->get_id(),
+                        'filename' => $attachmentfile->get_filename(),
+                        'contenthash' => $attachmentfile->get_contenthash()
+                    ],
+                    $exportedblogentry['files']['attachments']
+                );
+                $this->assertContains(
+                    [
+                        'fileid' => $contentfile->get_id(),
+                        'filename' => $contentfile->get_filename(),
+                        'contenthash' => $contentfile->get_contenthash()
+                    ],
+                    $exportedblogentry['files']['post']
+                );
+            }
+        }
     }
 
     /**
