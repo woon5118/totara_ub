@@ -90,9 +90,9 @@ class mod_feedback_userdata_completed_testcase extends advanced_testcase {
         $data->learner3 = self::getDataGenerator()->create_user();
 
         // Set up the target users.
-        $data->targetuser1 = new target_user($data->learner1, context_user::instance($data->learner1->id)->id);
-        $data->targetuser2 = new target_user($data->learner2, context_user::instance($data->learner2->id)->id);
-        $data->targetuser3 = new target_user($data->learner3, context_user::instance($data->learner3->id)->id);
+        $data->targetuser1 = new target_user($data->learner1);
+        $data->targetuser2 = new target_user($data->learner2);
+        $data->targetuser3 = new target_user($data->learner3);
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -103,7 +103,7 @@ class mod_feedback_userdata_completed_testcase extends advanced_testcase {
     /**
      * Create a course category
      *
-     * @return stdClass coursecat
+     * @return coursecat
      */
     public function create_course_catogory() {
         return $this->getDataGenerator()->create_category();

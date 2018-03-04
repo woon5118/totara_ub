@@ -97,7 +97,7 @@ class core_user_userdata_password_testcase extends \advanced_testcase {
         core_login_generate_password_reset($data->user2);
 
         // Set up the target user.
-        $data->targetuser = new target_user($data->user1, context_user::instance($data->user1->id)->id);
+        $data->targetuser = new target_user($data->user1);
 
         return $data;
     }

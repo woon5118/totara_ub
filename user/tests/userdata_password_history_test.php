@@ -99,7 +99,7 @@ class core_user_userdata_password_history_testcase extends \advanced_testcase {
         user_add_password_history($data->user2->id, 'thisisapassword4');
 
         // Set up the target user.
-        $data->targetuser = new target_user($data->user1, context_user::instance($data->user1->id)->id);
+        $data->targetuser = new target_user($data->user1);
 
         return $data;
     }
