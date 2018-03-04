@@ -100,7 +100,7 @@ class totara_userdata_renderer extends plugin_renderer_base {
      * @return string HTML fragment
      */
     public function export_type_active_items(\stdClass $exporttype) {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $html = '';
 
@@ -110,8 +110,8 @@ class totara_userdata_renderer extends plugin_renderer_base {
             $selecteditems[$item->component . '-' . $item->name] = true;
         }
         $groups = \totara_userdata\local\export::get_exportable_items_grouped_list();
-        $lastmaincomponent = null;
         foreach ($groups as $maincomponent => $classes) {
+            $items = array();
             foreach ($classes as $class) {
                 /** @var item $class this is not a real instance, just autocomplete hint */
                 $component = $class::get_component();
@@ -119,18 +119,14 @@ class totara_userdata_renderer extends plugin_renderer_base {
                 if (empty($selecteditems[$component . '-' . $name])) {
                     continue;
                 }
-                if ($lastmaincomponent !== $maincomponent) {
-                    $lastmaincomponent = $maincomponent;
-                    $html .= '<strong>' . totara_userdata\local\util::get_component_name($maincomponent) . '</strong>';
-                    $html .= '<ul>';
-                }
-                $html .= '<li>' . $class::get_fullname() . '</li>';
+                $items[] = $class::get_fullname();
             }
-        }
-        if ($lastmaincomponent) {
-            $html .= '</ul>';
-        }
+            if (count($items)) {
+                $html .= $OUTPUT->heading(totara_userdata\local\util::get_component_name($maincomponent), 4);
+                $html .= html_writer::alist($items);
+            }
 
+        }
         return $html;
     }
 
@@ -141,7 +137,7 @@ class totara_userdata_renderer extends plugin_renderer_base {
      * @return string HTML fragment
      */
     public function purge_type_active_items(\stdClass $purgetype) {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $html = '';
 
@@ -151,8 +147,8 @@ class totara_userdata_renderer extends plugin_renderer_base {
             $selecteditems[$item->component . '-' . $item->name] = true;
         }
         $groups = \totara_userdata\local\purge::get_purgeable_items_grouped_list($purgetype->userstatus);
-        $lastmaincomponent = null;
         foreach ($groups as $maincomponent => $classes) {
+            $items = array();
             foreach ($classes as $class) {
                 /** @var item $class this is not a real instance, just autocomplete hint */
                 $component = $class::get_component();
@@ -160,18 +156,14 @@ class totara_userdata_renderer extends plugin_renderer_base {
                 if (empty($selecteditems[$component . '-' . $name])) {
                     continue;
                 }
-                if ($lastmaincomponent !== $maincomponent) {
-                    $lastmaincomponent = $maincomponent;
-                    $html .= '<strong>' . totara_userdata\local\util::get_component_name($maincomponent) . '</strong>';
-                    $html .= '<ul>';
-                }
-                $html .= '<li>' . $class::get_fullname() . '</li>';
+                $items[] = $class::get_fullname();
             }
-        }
-        if ($lastmaincomponent) {
-            $html .= '</ul>';
-        }
+            if (count($items)) {
+                $html .= $OUTPUT->heading(totara_userdata\local\util::get_component_name($maincomponent), 4);
+                $html .= html_writer::alist($items);
+            }
 
+        }
         return $html;
     }
 }
