@@ -52,9 +52,9 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $emptyuser = $this->getDataGenerator()->create_user();
-        $data->user1 = new target_user($user1, context_user::instance($user1->id)->id);
-        $data->user2 = new target_user($user2, context_user::instance($user2->id)->id);
-        $data->emptyuser = new target_user($emptyuser, context_user::instance($emptyuser->id)->id);
+        $data->user1 = new target_user($user1);
+        $data->user2 = new target_user($user2);
+        $data->emptyuser = new target_user($emptyuser);
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -111,11 +111,10 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
      * TODO check
      *
      *
-     * @param stdClass $data the data from {@see getdata}
+     * @param object $data the data from {@see getdata}
      * @return stdClass
      */
     private function make_course_module_events($data): stdClass {
-        global $DB;
         $this->setAdminUser();
         $extradata = new stdClass();
         /** @var mod_facetoface_generator $facetofacegenerator */
@@ -236,22 +235,29 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
         $data = $this->get_data();
         $systemcontext = context_system::instance();
 
-        $extradata = $this->make_course_module_events($data);
+        // Creates two facetoface session events in the calendar.
+        $this->make_course_module_events($data);
 
         $export = events::execute_export($data->user1, $systemcontext);
-
-        // Make sure export didnt return an error code.
+        // Make sure export didn't return an error code.
         $this->assertTrue(is_object($export));
 
+        // Get all facetodace session events.
         $events = $DB->get_records('event', [
             'eventtype' => 'facetofacesession',
             'userid' => $data->user1->id,
             'courseid' => 0,
             'groupid' => 0
         ]);
-        $this->assertNotFalse($events);
-        foreach ($events as $sessionevent) {
-            $this->assertTrue(in_array($sessionevent, $export->data));
+        // 2 events where added to the three standard ones.
+        $this->assertEquals(5, count($export->data));
+        $eventidsfound = [];
+        foreach ($export->data as $event) {
+            $eventidsfound[] = $event->id;
+        }
+        // Make sure the facetofacesession events are found in the exported data.
+        foreach ($events as $event) {
+            $this->assertContains($event->id, $eventidsfound);
         }
     }
 
@@ -446,10 +452,8 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
         foreach ($export->data as $index => $event) {
             $eventdata = $DB->get_record('event', ['id' => $data->user1events[$index]->id]);
             $eventobject = calendar_event::load(clone($event));
-            $this->assertEquals(
-                $eventdata,
-                $event
-            );
+
+            $eventdata->files = [];
             $files = $fs->get_area_files(
                 $eventobject->context->id,
                 'calendar',
@@ -459,9 +463,20 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
                 false
             );
             foreach ($files as $file) {
-                $this->assertTrue(array_search($file, $export->files) !== false);
+                $this->assertArrayHasKey($file->get_id(), $export->files);
+
+                $filedata = [
+                    'fileid' => $file->get_id(),
+                    'filename' => $file->get_filename(),
+                    'contenthash' => $file->get_contenthash()
+                ];
+                $eventdata->files[] = (object)$filedata;
             }
 
+            $this->assertEquals(
+                $eventdata,
+                $event
+            );
         }
     }
 
@@ -483,9 +498,11 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
         $reloadeduser = new target_user($user);
 
         // Files get deleted so they will not be here.
-        $this->assertEquals(
-            $exportbefore->data,
-            events::execute_export($reloadeduser, $systemcontext)->data
-        );
+        foreach ($exportbefore->data as $expectedevent) {
+            unset($expectedevent->files);
+        }
+
+        $result = events::execute_export($reloadeduser, $systemcontext);
+        $this->assertEquals($exportbefore->data, $result->data);
     }
 }

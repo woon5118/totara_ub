@@ -136,7 +136,7 @@ class core_calendar_userdata_event_subscriptions_test extends advanced_testcase 
         $data = $this->get_data();
         $systemcontext = context_system::instance();
         $user = $this->getDataGenerator()->create_user();
-        $usertarget = new target_user($user, context_user::instance($user->id)->id);
+        $usertarget = new target_user($user);
         $this->assertEquals(
             event_subscriptions::RESULT_STATUS_SUCCESS,
             event_subscriptions::execute_purge($usertarget, $systemcontext)

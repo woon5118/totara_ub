@@ -134,6 +134,7 @@ class events extends item {
         if ($user->status != target_user::STATUS_DELETED) {
             $fs = get_file_storage();
             foreach ($events as $event) {
+                $event->files = [];
                 $files = $fs->get_area_files(
                     $user->contextid,
                     'calendar',
@@ -143,7 +144,7 @@ class events extends item {
                     false
                 );
                 foreach ($files as $file) {
-                    $export->add_file($file);
+                    $event->files[] = (object)$export->add_file($file);
                 }
                 $export->data[] = $event;
             }
