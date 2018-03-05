@@ -51,7 +51,8 @@ div.editor_atto_toolbar button[disabled] {
     cursor: default;
 }
 
-.editor_atto_toolbar button:hover {
+.editor_atto_toolbar button:hover,
+.editor_atto_toolbar button:focus {
     background-image: radial-gradient(ellipse at center, #fff 60%, #dfdfdf 100%);
     background-color: #ebebeb;
 }

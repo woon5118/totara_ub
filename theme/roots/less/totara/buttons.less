@@ -144,3 +144,12 @@ input.fp-btn-choose {
 button {
     margin: 0;
 }
+
+.gecko .editor_atto button {
+    .form-control-focus();
+
+    &:focus {
+        outline: 1px auto @input-border-focus;
+        outline-offset: -1px;
+    }
+}
