@@ -63,13 +63,14 @@ class customfields extends signups_item {
     protected static function export(target_user $user, context $context) {
         $export = new export();
 
-        $export->data['signup'] = self::get_signup_customfield_data($user, $context);
-        $export->data['cancellation'] = self::get_cancellation_customfield_data($user, $context);
+        $signup = self::get_signup_customfield_data($user, $context);
+        $cancellation = self::get_cancellation_customfield_data($user, $context);
 
-        $files = self::get_files($user, $export->data);
-        foreach ($files as $file) {
-            $export->add_file($file);
-        }
+        $fileareassignup = ['facetofacesignup_filemgr', 'facetofacesignup'];
+        $fileareascancellation = ['facetofacecancellation_filemgr', 'facetofacecancellation'];
+
+        $export->data['signup'] = self::add_files($export, $user, $signup, $fileareassignup);
+        $export->data['cancellation'] = self::add_files($export, $user, $cancellation, $fileareascancellation);
 
         return $export;
     }
@@ -146,36 +147,41 @@ class customfields extends signups_item {
     }
 
     /**
-     * Get relevant files for export.
+     * Add relevant files for export.
      *
+     * @param export $export
      * @param target_user $user
      * @param array $exportdata
+     * @param array $fileareas
      * @return array
      */
-    private static function get_files(target_user $user, array $exportdata): array {
-        // The itemid that gets stored in the files table points to facetoface_signup(cancellation)_info_data.id.
-        // So we have to use that to find the right files for the signup.
-        $infodataids = array_merge(array_keys($exportdata['signup']), array_keys($exportdata['cancellation']));
-
+    private static function add_files(export $export, target_user $user, array $exportdata, array $fileareas): array {
         // Custom field files are stored with system context, so we filter by userid.
         $fs = get_file_storage();
+        $systemcontext = context_system::instance();
+
         $files = $fs->get_area_files(
-            context_system::instance()->id,
+            $systemcontext->id,
             'totara_customfield',
-            ['facetofacesignup_filemgr', 'facetofacecancellation_filemgr', 'facetofacesignup', 'facetofacecancellation'],
-            false, 'filename ASC', false, 0,
+            $fileareas,
+            false,
+            'filename ASC',
+            false,
+            0,
             $user->id
         );
 
-        // Now filter by info_data_ids which we already know correspond to the given context.
-        $result = [];
-        foreach ($files as $file) {
-            if (in_array($file->get_itemid(), $infodataids)) {
-                $result[] = $file;
+        foreach ($exportdata as $id => $data) {
+            $exportdata[$id]['files'] = [];
+
+            foreach ($files as $file) {
+                if ($file->get_itemid() == $id) {
+                    $exportdata[$id]['files'][] = $export->add_file($file);
+                }
             }
         }
 
-        return $result;
+        return $exportdata;
     }
 
     /**

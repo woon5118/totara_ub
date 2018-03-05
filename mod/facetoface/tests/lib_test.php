@@ -1319,6 +1319,7 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
     function test_facetoface_delete_signups_for_session() {
         global $DB;
 
+        /** @var \mod_facetoface_generator $f2fgenerator */
         $f2fgenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
 
         $course = $this->getDataGenerator()->create_course();
@@ -1330,12 +1331,21 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
         $session2 = $f2fgenerator->create_session_for_course($course);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1, 0, 0);
-        $f2fgenerator->create_cancellation($student1, $session1, 1, 2);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2, 3, 4);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1, 5, 3);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2, 2, 1);
-        $f2fgenerator->create_cancellation($student2, $session2, 1, 1);
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1);
+
+        $f2fgenerator->create_cancellation($student1, $session1);
+        $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 2);
+
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2);
+
+        $f2fgenerator->create_customfield_data($signups[12], 'signup', 3, 4);
+        $f2fgenerator->create_customfield_data($signups[21], 'signup', 5, 3);
+        $f2fgenerator->create_customfield_data($signups[22], 'signup', 2, 1);
+
+        $f2fgenerator->create_cancellation($student2, $session2);
+        $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 1, 1);
 
         // Check initial data.
         $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));
@@ -1382,12 +1392,21 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
         $session2 = $f2fgenerator->create_session_for_course($course);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1, 3, 0);
-        $f2fgenerator->create_cancellation($student1, $session1, 1, 2);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2, 4, 1);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1, 5, 3);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2, 2, 3);
-        $f2fgenerator->create_cancellation($student2, $session2, 2, 1);
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1);
+        $f2fgenerator->create_customfield_data($signups[11], 'signup', 3, 0);
+
+        $f2fgenerator->create_cancellation($student1, $session1);
+        $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 2);
+
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2);
+        $f2fgenerator->create_customfield_data($signups[12], 'signup', 4, 1);
+        $f2fgenerator->create_customfield_data($signups[21], 'signup', 5, 3);
+        $f2fgenerator->create_customfield_data($signups[22], 'signup', 2, 3);
+
+        $f2fgenerator->create_cancellation($student2, $session2);
+        $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 2, 1);
 
         // Check initial data.
         $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));

@@ -385,11 +385,9 @@ class mod_facetoface_generator extends testing_module_generator {
      *
      * @param stdClass $student
      * @param stdClass $session
-     * @param int $customfields
-     * @param int $customfieldparams
      * @return stdClass
      */
-    public function create_signup(stdClass $student, stdClass $session, $customfields = 0, $customfieldparams = 0): stdClass {
+    public function create_signup(stdClass $student, stdClass $session): stdClass {
         global $DB;
 
         $this->create_job_assignment_if_not_exists($student);
@@ -407,30 +405,15 @@ class mod_facetoface_generator extends testing_module_generator {
             $student->id
         );
 
-        $signup = $DB->get_record('facetoface_signups', ['userid' => $student->id, 'sessionid' => $session->id]);
-
-        if ($customfields > 0) {
-            $this->create_customfield_data($signup, 'signup', $customfields, $customfieldparams);
-        }
-
-        return $signup;
+        return $DB->get_record('facetoface_signups', ['userid' => $student->id, 'sessionid' => $session->id]);
     }
 
     /**
      * @param stdClass $student
      * @param stdClass $session
-     * @param int $customfields
-     * @param int $customfieldparams
      */
-    public function create_cancellation(stdClass $student, stdClass $session, $customfields = 0, $customfieldparams = 0) {
-
+    public function create_cancellation(stdClass $student, stdClass $session) {
         facetoface_user_cancel($session, $student->id);
-
-        if ($customfields > 0) {
-            global $DB;
-            $signup = $DB->get_record('facetoface_signups', ['userid' => $student->id, 'sessionid' => $session->id]);
-            $this->create_customfield_data($signup, 'cancellation', $customfields, $customfieldparams);
-        }
     }
 
     /**
@@ -439,16 +422,39 @@ class mod_facetoface_generator extends testing_module_generator {
      * @param string $filename
      * @param int $itemid  Any integer. Use the same number if you want multiple files for
      *  the same field. See totara_customfield_generator::create_test_file_from_content().
+     * @return stored_file
      */
     public function create_file_customfield(stdClass $signup, string $type, string $filename, int $itemid) {
+        global $DB;
+
         $datagenerator = phpunit_util::get_data_generator();
+        /** @var totara_customfield_generator $cfgenerator */
         $cfgenerator = $datagenerator->get_plugin_generator('totara_customfield');
         $cfid = $cfgenerator->create_file("facetoface_{$type}", ['f2ffile' => []]);
 
         $filecontent = 'Test file content';
-        $cfgenerator->create_test_file_from_content($filename, $filecontent, $itemid, '/', $signup->userid);
+        $filepath = '/';
+        $cfgenerator->create_test_file_from_content($filename, $filecontent, $itemid, $filepath, $signup->userid);
 
         $cfgenerator->set_file($signup, $cfid['f2ffile'], $itemid, "facetoface{$type}", "facetoface_{$type}");
+
+        $customfieldid = $DB->get_field(
+            "facetoface_{$type}_info_data",
+            'id',
+            ["facetoface{$type}id" => $signup->id, 'fieldid' => $cfid['f2ffile']]
+        );
+
+        $syscontext = context_system::instance();
+        $fs = get_file_storage();
+        $file = $fs->get_file(
+            $syscontext->id,
+            'totara_customfield',
+            "facetoface{$type}_filemgr",
+            $customfieldid,
+            $filepath,
+            $filename
+        );
+        return $file;
     }
 
     /**
@@ -458,15 +464,20 @@ class mod_facetoface_generator extends testing_module_generator {
      * @param string $type
      * @param int $fieldcount
      * @param int $paramcount
+     * @return array array of facetoface_$type_info_data ids
      */
-    protected function create_customfield_data(stdClass $signup, string $type, int $fieldcount, int $paramcount) {
+    public function create_customfield_data(stdClass $signup, string $type, int $fieldcount, int $paramcount): array {
+        global $DB;
+
         $datagenerator = phpunit_util::get_data_generator();
+        /** @var totara_customfield_generator $cfgenerator */
         $cfgenerator = $datagenerator->get_plugin_generator('totara_customfield');
 
         if ($fieldcount < 1) {
-            return;
+            return [];
         }
 
+        $customfieldids = [];
         if ($paramcount) {
             // If we want data in the *info_data_param table, we need one multiselect field with the desired number of options.
 
@@ -475,22 +486,36 @@ class mod_facetoface_generator extends testing_module_generator {
                 return "{$type}_option_{$i}";
             }, range(1, $paramcount));
 
-            // Create customfield
+            // Create customfield.
             $uniquefieldname = "{$type}_multi_{$signup->id}";
-            $cfid = $cfgenerator->create_multiselect("facetoface_{$type}", [$uniquefieldname => $options]);
+            $cfids = $cfgenerator->create_multiselect("facetoface_{$type}", [$uniquefieldname => $options]);
 
             // Create customfield data with all options selected.
-            $cfgenerator->set_multiselect($signup, $cfid[$uniquefieldname], $options, "facetoface{$type}", "facetoface_{$type}");
+            $cfgenerator->set_multiselect($signup, $cfids[$uniquefieldname], $options, "facetoface{$type}", "facetoface_{$type}");
 
             $fieldcount --;
+
+            $customfieldids[] = $DB->get_field(
+                "facetoface_{$type}_info_data",
+                'id',
+                ["facetoface{$type}id" => $signup->id, 'fieldid' => $cfids[$uniquefieldname]]
+            );
         }
 
         // Use text field for the other customfields that don't need data in the *info_data_param table.
         for ($i = 1; $i <= $fieldcount; $i ++) {
             $uniquefieldname = "{$type}_text_{$signup->id}_{$i}";
-            $cfid = $cfgenerator->create_text("facetoface_{$type}", [$uniquefieldname]);
-            $cfgenerator->set_text($signup, $cfid[$uniquefieldname], "value_{$i}", "facetoface{$type}", "facetoface_{$type}");
+            $cfids = $cfgenerator->create_text("facetoface_{$type}", [$uniquefieldname]);
+            $cfgenerator->set_text($signup, $cfids[$uniquefieldname], "value_{$i}", "facetoface{$type}", "facetoface_{$type}");
+
+            $customfieldids[] = $DB->get_field(
+                "facetoface_{$type}_info_data",
+                'id',
+                ["facetoface{$type}id" => $signup->id, 'fieldid' => $cfids[$uniquefieldname]]
+            );
         }
+
+        return $customfieldids;
     }
 
     /**
