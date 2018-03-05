@@ -61,6 +61,11 @@ class datetime extends text {
             $text->getXPath(),
             "Syn.trigger('change', {}, {{ELEMENT}})"
         );
+        // Close the date picker by simulating a mousedown event elsewhere
+        $this->context->getSession()->getDriver()->triggerSynScript(
+            '//body',
+            "Syn.trigger('mousedown', {}, {{ELEMENT}})"
+        );
     }
 
     /**
