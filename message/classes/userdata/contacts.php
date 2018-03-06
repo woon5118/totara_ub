@@ -23,6 +23,7 @@
 
 namespace core_message\userdata;
 
+use context_user;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
@@ -84,7 +85,19 @@ class contacts extends item {
         // Use the existing method which fires an event.
         $records = $DB->get_records('message_contacts', ['userid' => $user->id]);
         foreach ($records as $record) {
-            message_remove_contact($record->contactid, $user->id);
+            $DB->delete_records('message_contacts', ['id' => $record->id]);
+
+            if ($user->status != target_user::STATUS_DELETED) {
+                // Trigger event for removing a contact.
+                $event = \core\event\message_contact_removed::create([
+                    'objectid' => $record->id,
+                    'userid' => $record->userid,
+                    'relateduserid' => $record->contactid,
+                    'context' => context_user::instance($record->userid)
+                ]);
+                $event->add_record_snapshot('message_contacts', $record);
+                $event->trigger();
+            }
         }
 
         return item::RESULT_STATUS_SUCCESS;
@@ -138,7 +151,7 @@ class contacts extends item {
     protected static function count(target_user $user, \context $context) {
         global $DB;
 
-        return $DB->count_records_select('message_contacts', 'userid = ?', [$user->id, $user->id]);
+        return $DB->count_records('message_contacts', ['userid' => $user->id]);
     }
 
 }

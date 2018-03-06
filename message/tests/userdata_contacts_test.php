@@ -24,7 +24,7 @@
 namespace core_message\userdata;
 
 use context_system;
-use context_user;
+use core\event\message_contact_removed;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
@@ -59,31 +59,64 @@ class core_message_userdata_contacts_testcase extends userdata_messages_testcase
         $this->resetAfterTest(true);
 
         // Set up users.
-        $user1 = $this->getDataGenerator()->create_user();
-        $user2 = $this->getDataGenerator()->create_user();
-        $user3 = $this->getDataGenerator()->create_user();
+        $activeuser = $this->getDataGenerator()->create_user();
+        $suspendeduser = $this->getDataGenerator()->create_user(['suspended' => 1]);
+        $deleteduser = $this->getDataGenerator()->create_user(['deleted' => 1]);
+        $controluser = $this->getDataGenerator()->create_user();
 
-        // User 1 blocked user 2.
-        $DB->insert_record('message_contacts', (object)['userid' => $user1->id, 'contactid' => $user2->id]);
-        // User 1 blocked user 3.
-        $DB->insert_record('message_contacts', (object)['userid' => $user1->id, 'contactid' => $user3->id]);
-        // User 2 blocked user 1.
-        $DB->insert_record('message_contacts', (object)['userid' => $user2->id, 'contactid' => $user1->id]);
-        // User 3 blocked user 2.
-        $DB->insert_record('message_contacts', (object)['userid' => $user3->id, 'contactid' => $user2->id]);
+        // Set up contacts.
+        $DB->insert_record('message_contacts', (object)['userid' => $activeuser->id,    'contactid' => $deleteduser->id]);
+        $DB->insert_record('message_contacts', (object)['userid' => $activeuser->id,    'contactid' => $suspendeduser->id]);
+        $DB->insert_record('message_contacts', (object)['userid' => $deleteduser->id,   'contactid' => $activeuser->id]);
+        $DB->insert_record('message_contacts', (object)['userid' => $suspendeduser->id, 'contactid' => $deleteduser->id]);
+        $DB->insert_record('message_contacts', (object)['userid' => $controluser->id,   'contactid' => $activeuser->id]);
+        $DB->insert_record('message_contacts', (object)['userid' => $controluser->id,   'contactid' => $suspendeduser->id]);
+        $DB->insert_record('message_contacts', (object)['userid' => $controluser->id,   'contactid' => $deleteduser->id]);
 
-        $targetuser = new target_user($user1);
-        // Purge data.
-        $result = contacts::execute_purge($targetuser, context_system::instance());
+        $sink = $this->redirectEvents();
+
+        // Purge active user.
+        $result = contacts::execute_purge(new target_user($activeuser), context_system::instance());
         $this->assertEquals(item::RESULT_STATUS_SUCCESS, $result);
 
-        // Check if expected data is there.
-        $this->assertEmpty($DB->get_record('message_contacts', ['userid' => $user1->id, 'contactid' => $user2->id]));
-        $this->assertEmpty($DB->get_record('message_contacts', ['userid' => $user1->id, 'contactid' => $user3->id]));
+        $events = $sink->get_events();
+        $this->assertCount(2, $events);
+        $this->assertContainsOnlyInstancesOf(message_contact_removed::class, $events);
+        $sink->clear();
 
-        // User 2 and 3 shouldn't be affected.
-        $this->assertNotEmpty($DB->get_record('message_contacts', ['userid' => $user2->id, 'contactid' => $user1->id]));
-        $this->assertNotEmpty($DB->get_record('message_contacts', ['userid' => $user3->id, 'contactid' => $user2->id]));
+        // Check if expected data is there.
+        $this->assertEmpty($DB->get_records('message_contacts', ['userid' => $activeuser->id]));
+        // Other users must not be affected.
+        $this->assertNotEmpty($DB->get_records('message_contacts', ['userid' => $deleteduser->id]));
+        $this->assertNotEmpty($DB->get_records('message_contacts', ['userid' => $suspendeduser->id]));
+
+        // Purge suspended user.
+        $result = contacts::execute_purge(new target_user($suspendeduser), context_system::instance());
+        $this->assertEquals(item::RESULT_STATUS_SUCCESS, $result);
+
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $this->assertContainsOnlyInstancesOf(message_contact_removed::class, $events);
+        $sink->clear();
+
+        // Check if expected data is there.
+        $this->assertEmpty($DB->get_records('message_contacts', ['userid' => $suspendeduser->id]));
+        // Other users must not be affected.
+        $this->assertNotEmpty($DB->get_records('message_contacts', ['userid' => $deleteduser->id]));
+
+        // Purge deleted user.
+        $result = contacts::execute_purge(new target_user($deleteduser), context_system::instance());
+        $this->assertEquals(item::RESULT_STATUS_SUCCESS, $result);
+
+        $events = $sink->get_events();
+        // No events fired if user is deleted.
+        $this->assertCount(0, $events);
+
+        // Check if expected data is there.
+        $this->assertEmpty($DB->get_records('message_contacts', ['userid' => $deleteduser->id]));
+
+        // Control users data must not be affected.
+        $this->assertCount(3, $DB->get_records('message_contacts', ['userid' => $controluser->id]));
     }
 
     /**
@@ -99,13 +132,10 @@ class core_message_userdata_contacts_testcase extends userdata_messages_testcase
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
 
-        // User 1 blocked user 2.
+        // Set up contacts.
         $DB->insert_record('message_contacts', (object)['userid' => $user1->id, 'contactid' => $user2->id]);
-        // User 1 blocked user 3.
         $DB->insert_record('message_contacts', (object)['userid' => $user1->id, 'contactid' => $user3->id]);
-        // User 2 blocked user 1.
         $DB->insert_record('message_contacts', (object)['userid' => $user2->id, 'contactid' => $user1->id]);
-        // User 3 blocked user 2.
         $DB->insert_record('message_contacts', (object)['userid' => $user3->id, 'contactid' => $user2->id]);
 
         // Count data for user 1.
@@ -132,13 +162,10 @@ class core_message_userdata_contacts_testcase extends userdata_messages_testcase
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
 
-        // User 1 blocked user 2.
+        // Set up contacts.
         $contactid1 = $DB->insert_record('message_contacts', (object)['userid' => $user1->id, 'contactid' => $user2->id]);
-        // User 1 blocked user 3.
         $contactid2 = $DB->insert_record('message_contacts', (object)['userid' => $user1->id, 'contactid' => $user3->id]);
-        // User 2 blocked user 1.
         $contactid3 = $DB->insert_record('message_contacts', (object)['userid' => $user2->id, 'contactid' => $user1->id]);
-        // User 3 blocked user 2.
         $contactid4 = $DB->insert_record('message_contacts', (object)['userid' => $user3->id, 'contactid' => $user2->id]);
 
         // Count data for user 1.
