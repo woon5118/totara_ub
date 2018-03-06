@@ -23,6 +23,8 @@
 
 namespace totara_userdata\form;
 
+use totara_form\form\element\hidden;
+use totara_form\form\element\static_html;
 use totara_userdata\userdata\manager;
 use totara_userdata\userdata\target_user;
 
@@ -51,7 +53,8 @@ class purge_set_suspended_confirm extends \totara_form\form {
         $options = manager::get_purge_types(target_user::STATUS_SUSPENDED, 'suspended', $currentdata->suspendedpurgetypeid);
 
         if (empty($currentdata->suspendedpurgetypeid)) {
-            if ($suspendeddefault = get_config('totara_userdata', 'defaultsuspendedpurgetypeid') && $user->suspended == 0) {
+            $suspendeddefault = get_config('totara_userdata', 'defaultsuspendedpurgetypeid');
+            if ($suspendeddefault && $user->suspended == 0) {
                 $name = get_string('purgeautodefault', 'totara_userdata', $options[$suspendeddefault]);
                 // If there is a default and the item 'None' was selected, we'll list items for the default.
                 $purgetype = $DB->get_record('totara_userdata_purge_type', array('id' => $suspendeddefault), '*', MUST_EXIST);
@@ -68,7 +71,7 @@ class purge_set_suspended_confirm extends \totara_form\form {
         $userdetailshtml .= '<dt>' .get_string('purgetype', 'totara_userdata') .'</dt>';
         $userdetailshtml .= '<dd>' . $name . '</dd></dl>';
 
-        $userdetails = new \totara_form\form\element\static_html('purgetypestatic', '', $userdetailshtml);
+        $userdetails = new static_html('purgetypestatic', '', $userdetailshtml);
         $this->model->add($userdetails);
 
         $datatopurgehtml = $renderer->heading(get_string('purgeitemselectionsuspended', 'totara_userdata'), 3);
@@ -79,13 +82,13 @@ class purge_set_suspended_confirm extends \totara_form\form {
             $datatopurgehtml .= $renderer->purge_type_active_items($purgetype);
         }
 
-        $datatopurge = new \totara_form\form\element\static_html('datatopurge', '', $datatopurgehtml);
+        $datatopurge = new static_html('datatopurge', '', $datatopurgehtml);
         $this->model->add($datatopurge);
 
         $this->model->add_action_buttons(true, get_string('savechanges'));
 
-        $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
-        $this->model->add(new \totara_form\form\element\hidden('suspendedpurgetypeid', PARAM_INT));
-        $this->model->add(new \totara_form\form\element\hidden('loadconfirmform', PARAM_BOOL));
+        $this->model->add(new hidden('id', PARAM_INT));
+        $this->model->add(new hidden('suspendedpurgetypeid', PARAM_INT));
+        $this->model->add(new hidden('loadconfirmform', PARAM_BOOL));
     }
 }

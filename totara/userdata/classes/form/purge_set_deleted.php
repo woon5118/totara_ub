@@ -23,6 +23,9 @@
 
 namespace totara_userdata\form;
 
+use totara_form\form\element\hidden;
+use totara_form\form\element\select;
+use totara_form\form\element\static_html;
 use totara_userdata\userdata\manager;
 use totara_userdata\userdata\target_user;
 
@@ -45,21 +48,22 @@ final class purge_set_deleted extends \totara_form\form {
 
         /** @var \totara_userdata_renderer $renderer */
         $renderer = $PAGE->get_renderer('totara_userdata');
-        $this->model->add(new \totara_form\form\element\static_html('staticidcard', '', $renderer->user_id_card($user, true)));
+        $this->model->add(new static_html('staticidcard', '', $renderer->user_id_card($user, true)));
 
         $options = manager::get_purge_types(target_user::STATUS_DELETED, 'deleted', $currentdata->deletedpurgetypeid);
-        if ($deleteddefault = get_config('totara_userdata', 'defaultdeletedpurgetypeid') && $user->deleted == 0) {
+        $deleteddefault = get_config('totara_userdata', 'defaultdeletedpurgetypeid');
+        if ($deleteddefault && $user->deleted == 0) {
             $none = get_string('purgeautodefault', 'totara_userdata', $options[$deleteddefault]);
         } else {
             $none = get_string('none');
         }
         $options = array('' => $none) + $options;
-        $deletedpurgetypeid = new \totara_form\form\element\select('deletedpurgetypeid', get_string('purgeorigindeleted', 'totara_userdata'), $options);
+        $deletedpurgetypeid = new select('deletedpurgetypeid', get_string('purgeorigindeleted', 'totara_userdata'), $options);
         $this->model->add($deletedpurgetypeid);
 
         $this->model->add_action_buttons(true, get_string('update'));
 
-        $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
-        $this->model->add(new \totara_form\form\element\hidden('loadconfirmform', PARAM_BOOL));
+        $this->model->add(new hidden('id', PARAM_INT));
+        $this->model->add(new hidden('loadconfirmform', PARAM_BOOL));
     }
 }

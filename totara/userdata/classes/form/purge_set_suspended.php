@@ -23,6 +23,9 @@
 
 namespace totara_userdata\form;
 
+use totara_form\form\element\hidden;
+use totara_form\form\element\select;
+use totara_form\form\element\static_html;
 use totara_userdata\userdata\manager;
 use totara_userdata\userdata\target_user;
 
@@ -45,21 +48,22 @@ final class purge_set_suspended extends \totara_form\form {
 
         /** @var \totara_userdata_renderer $renderer */
         $renderer = $PAGE->get_renderer('totara_userdata');
-        $this->model->add(new \totara_form\form\element\static_html('staticidcard', '', $renderer->user_id_card($user, true)));
+        $this->model->add(new static_html('staticidcard', '', $renderer->user_id_card($user, true)));
 
         $options = manager::get_purge_types(target_user::STATUS_SUSPENDED, 'suspended', $currentdata->suspendedpurgetypeid);
-        if ($suspendeddefault = get_config('totara_userdata', 'defaultsuspendedpurgetypeid') && $user->suspended == 0) {
+        $suspendeddefault = get_config('totara_userdata', 'defaultsuspendedpurgetypeid');
+        if ($suspendeddefault && $user->suspended == 0) {
             $none = get_string('purgeautodefault', 'totara_userdata', $options[$suspendeddefault]);
         } else {
             $none = get_string('none');
         }
         $options = array('' => $none) + $options;
-        $suspendedpurgetypeid = new \totara_form\form\element\select('suspendedpurgetypeid', get_string('purgeoriginsuspended', 'totara_userdata'), $options);
+        $suspendedpurgetypeid = new select('suspendedpurgetypeid', get_string('purgeoriginsuspended', 'totara_userdata'), $options);
         $this->model->add($suspendedpurgetypeid);
 
         $this->model->add_action_buttons(true, get_string('update'));
 
-        $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
-        $this->model->add(new \totara_form\form\element\hidden('loadconfirmform', PARAM_BOOL));
+        $this->model->add(new hidden('id', PARAM_INT));
+        $this->model->add(new hidden('loadconfirmform', PARAM_BOOL));
     }
 }
