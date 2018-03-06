@@ -31,7 +31,8 @@ $syscontext = context_system::instance();
 
 $PAGE->set_context($syscontext);
 $PAGE->set_url('/totara/userdata/purge_set_deleted.php', array('id' => $id));
-$PAGE->set_pagelayout('noblocks'); // There is no need for navigation here.
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(get_string('purgesetautomatic', 'totara_userdata'));
 
 require_login();
 require_capability('totara/userdata:purgesetdeleted', $syscontext);

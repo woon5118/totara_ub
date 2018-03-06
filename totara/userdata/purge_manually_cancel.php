@@ -30,7 +30,8 @@ $syscontext = context_system::instance();
 
 $PAGE->set_context($syscontext);
 $PAGE->set_url('/totara/userdata/purge_manually_cancel.php', array('id' => $id));
-$PAGE->set_pagelayout('noblocks'); // There is no need for navigation here.
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(''); // This page should always redirect
 
 require_login();
 require_capability('totara/userdata:purgemanual', \context_system::instance());

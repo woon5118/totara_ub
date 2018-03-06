@@ -35,7 +35,8 @@ $returnurl = new moodle_url('/totara/userdata/user_info.php', array('id' => $id)
 
 $PAGE->set_context($syscontext);
 $PAGE->set_url('/totara/userdata/purge_manually.php', array('id' => $id, 'purgetypeid' => $purgetypeid));
-$PAGE->set_pagelayout('noblocks'); // There is no need for navigation here.
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(get_string('purgemanually', 'totara_userdata'));
 
 require_login();
 require_capability('totara/userdata:purgemanual', $syscontext);
