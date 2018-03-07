@@ -24,8 +24,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
  * Class tool_sitepolicy_userdata_archived_testcase
+ *
+ * @group totara_userdata
  */
 class tool_sitepolicy_userdata_archived_testcase extends advanced_testcase {
     /**

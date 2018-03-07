@@ -37,7 +37,7 @@ require_once("$CFG->dirroot/user/lib.php");
 /**
  * Tests the connected connectedbackpacks userdata.
  *
- * @group userdata
+ * @group totara_userdata
  */
 class core_badges_userdata_backpack_testcase extends advanced_testcase {
 

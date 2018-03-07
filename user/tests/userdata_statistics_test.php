@@ -27,6 +27,9 @@ use core_user\userdata\statistics;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_userdata
+ */
 class core_user_userdata_statistics_testcase extends advanced_testcase {
 
     /**

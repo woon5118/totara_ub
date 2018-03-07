@@ -29,8 +29,9 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
  * Test exporting and counting of visible (for the user) custom fields
+ *
+ * @group totara_userdata
  */
 class core_user_userdata_customfields_uservisible_testcase extends advanced_testcase {
 

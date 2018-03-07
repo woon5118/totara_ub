@@ -36,6 +36,8 @@ require_once($CFG->dirroot . '/mod/chat/tests/chat_testcase.php');
  * sessions_helper class.
  *
  * Class mod_chat_userdata_sessions_test
+ *
+ * @group totara_userdata
  */
 class mod_chat_userdata_sessions_test extends chat_testcase {
 

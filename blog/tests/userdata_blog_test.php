@@ -28,6 +28,8 @@ use totara_userdata\userdata\target_user;
 
 /**
  * Tests the {@see \core_blog\userdata\blog} class
+ *
+ * @group totara_userdata
  */
 class core_blog_userdata_blog_testcase extends advanced_testcase {
 

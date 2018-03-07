@@ -27,6 +27,8 @@ use totara_userdata\userdata\target_user;
 
 /**
  * Tests the {@see competency_evidence} class
+ *
+ * @group totara_userdata
  */
 class totara_hierarchy_userdata_competency_evidence_testcase extends advanced_testcase {
 

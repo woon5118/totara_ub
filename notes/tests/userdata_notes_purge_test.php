@@ -26,6 +26,8 @@ use totara_userdata\userdata\target_user;
 
 /**
  * Tests the purging of the notes.
+ *
+ * @group totara_userdata
  */
 class core_notes_userdata_notes_purge_testcase extends advanced_testcase {
 

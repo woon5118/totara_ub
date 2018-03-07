@@ -25,6 +25,8 @@
  * Class core_completion_userdata_course_completion_testcase
  *
  * Tests purging, exporting and counting in the core_completion\userdata\course_completion item.
+ *
+ * @group totara_userdata
  */
 class core_completion_userdata_course_completion_testcase extends advanced_testcase {
 

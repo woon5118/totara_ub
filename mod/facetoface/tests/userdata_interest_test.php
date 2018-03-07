@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Test interest item.
  *
- * @group userdata
+ * @group totara_userdata
  */
 class mod_facetoface_userdata_interest_test extends advanced_testcase {
 

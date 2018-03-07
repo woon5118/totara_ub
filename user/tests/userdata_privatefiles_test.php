@@ -29,8 +29,9 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
  * Test purging, exporting and counting of users private files
+ *
+ * @group totara_userdata
  */
 class core_user_userdata_privatefiles_testcase extends advanced_testcase {
 

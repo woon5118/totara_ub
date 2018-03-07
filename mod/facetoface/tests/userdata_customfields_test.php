@@ -42,7 +42,7 @@ require_once($CFG->dirroot . '/mod/facetoface/tests/lib_test.php');
 /**
  * Test customfields item
  *
- * @group userdata
+ * @group totara_userdata
  */
 class mod_facetoface_userdata_customfields_test extends advanced_testcase {
 

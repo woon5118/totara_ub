@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose core_user_userdata_password_history_testcase user/tests/userdata_password_history_test.php
+ *
+ * @group totara_userdata
  */
 class core_user_userdata_password_history_testcase extends \advanced_testcase {
 

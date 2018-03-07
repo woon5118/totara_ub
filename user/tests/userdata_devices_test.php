@@ -33,7 +33,7 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
+ * @group totara_userdata
  */
 class core_user_userdata_devices_testcase extends advanced_testcase {
 

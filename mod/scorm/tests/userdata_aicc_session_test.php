@@ -23,6 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_userdata
+ */
 class mod_scorm_userdata_aicc_session_testcase extends advanced_testcase {
     /**
      * Test that purging still occurs when the module is not visible.

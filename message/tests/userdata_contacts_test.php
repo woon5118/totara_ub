@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__.'/userdata_messages_testcase.php');
 
 /**
- * @group userdata
+ * @group totara_userdata
  */
 class core_message_userdata_contacts_testcase extends userdata_messages_testcase {
 

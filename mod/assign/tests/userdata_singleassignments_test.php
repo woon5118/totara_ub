@@ -34,6 +34,8 @@ use totara_userdata\userdata\target_user;
 
 /**
  * Unit tests for mod/assign/classes/userdata/singleassigments.php.
+ *
+ * @group totara_userdata
  */
 class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
     /**

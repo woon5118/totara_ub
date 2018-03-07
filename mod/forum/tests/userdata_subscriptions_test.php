@@ -37,7 +37,7 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
+ * @group totara_userdata
  */
 class mod_forum_userdata_subscriptions_testcase extends advanced_testcase {
 

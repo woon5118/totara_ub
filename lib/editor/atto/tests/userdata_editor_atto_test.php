@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * General tests for atto editor userdata.
+ *
+ * @group totara_userdata
  */
 class editor_atto_userdata_editor_atto_testcase extends advanced_testcase {
     /**

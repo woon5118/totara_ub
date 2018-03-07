@@ -26,6 +26,8 @@ use totara_userdata\userdata\target_user;
 
 /**
  * Tests the {@see core_calendar\userdata\core_calendar_event_subscription} class
+ *
+ * @group totara_userdata
  */
 class core_calendar_userdata_event_subscriptions_test extends advanced_testcase {
 

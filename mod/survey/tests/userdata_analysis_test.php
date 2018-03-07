@@ -33,6 +33,9 @@ global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 require_once($CFG->dirroot . '/mod/survey/lib.php');
 
+/**
+ * @group totara_userdata
+ */
 class mod_survey_userdata_analysis_testcase extends externallib_advanced_testcase {
 
     /**

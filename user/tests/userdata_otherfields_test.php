@@ -29,9 +29,10 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
  * Test purging, exporting and counting of user other fields
  * Includes: ICQ, Skype, Yahoo, AIM, MSN, phone, mobile phone, institution, department, address, city, country, url, description
+ *
+ * @group totara_userdata
  */
 class core_user_userdata_otherfields_testcase extends advanced_testcase {
 

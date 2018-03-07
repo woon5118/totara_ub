@@ -28,8 +28,9 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
  * Test setting to keep or delete external_services_users
+ *
+ * @group totara_userdata
  */
 class totara_core_userdata_external_services_users_testcase extends advanced_testcase {
 

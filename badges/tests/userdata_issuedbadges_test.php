@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests the issued badges userdata.
  *
- * @group userdata
+ * @group totara_userdata
  */
 class core_badges_userdata_issuedbadges_testcase extends advanced_testcase {
 

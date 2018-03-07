@@ -31,6 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose totara_job_userdata_appraiser_assignments_testcase totara/job/tests/userdata_appraiser_assignments_test.php
+ *
+ * @group totara_userdata
  */
 class totara_job_userdata_appraiser_assignments_testcase extends \advanced_testcase {
 

@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose core_user_userdata_interests_testcase user/tests/userdata_interests_test.php
+ *
+ * @group totara_userdata
  */
 class core_user_userdata_interests_testcase extends \advanced_testcase {
 

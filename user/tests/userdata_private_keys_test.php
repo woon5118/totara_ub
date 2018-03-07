@@ -28,8 +28,9 @@ use totara_userdata\userdata\target_user;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
  * Test setting to keep or user_private_keys
+ *
+ * @group totara_userdata
  */
 class core_user_userdata_private_keys_test extends advanced_testcase {
 

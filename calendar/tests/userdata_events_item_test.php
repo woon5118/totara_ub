@@ -27,6 +27,8 @@ use totara_userdata\userdata\target_user;
 /**
  * Tests that the {@see core_calendar\userdata\core_calendar_events} class
  * purges, exports and counts the user events correctly.
+ *
+ * @group totara_userdata
  */
 class core_calendar_userdata_events_testcase extends advanced_testcase {
 

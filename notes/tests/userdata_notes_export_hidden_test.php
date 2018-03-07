@@ -27,6 +27,8 @@ use totara_userdata\userdata\target_user;
 
 /**
  * Tests that the core_notes dataitem purges and counts correctly
+ *
+ * @group totara_userdata
  */
 class core_notes_userdata_notes_export_hidden_testcase extends advanced_testcase {
 

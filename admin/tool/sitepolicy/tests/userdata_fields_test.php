@@ -24,8 +24,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @group userdata
  * Test userdata purgeable fields (like publisher or author)
+ *
+ * @group totara_userdata
  */
 class tool_sitepolicy_userdata_fields_testcase extends advanced_testcase {
 
