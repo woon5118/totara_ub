@@ -77,7 +77,12 @@ class notes_export_visible extends item {
         $notes = [];
 
         if ($context->contextlevel == CONTEXT_SYSTEM) {
-            $courseids = $DB->get_fieldset_select('post', 'DISTINCT(courseid)', 'userid = :userid', ['userid' => $user->id]);
+            $courseids = $DB->get_fieldset_select(
+                'post',
+                'DISTINCT(courseid)',
+                "userid = :userid AND module = 'notes'",
+                ['userid' => $user->id]
+            );
 
             // If the user has notes:view in system or a course context then they can see all site notes.
             $sitenotesvisible = has_capability('moodle/notes:view', \context_system::instance(), $user->id);
