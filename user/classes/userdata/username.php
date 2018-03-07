@@ -115,7 +115,6 @@ class username extends \totara_userdata\userdata\item {
 
     /**
      * Can user data of this item be somehow counted?
-     * How much date is there?
      *
      * @return bool
      */
@@ -128,7 +127,7 @@ class username extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
         return intval(!$user->deleted || !preg_match('/^deleted_[a-z0-9]+$/', $user->username));

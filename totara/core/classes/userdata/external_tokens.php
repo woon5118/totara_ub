@@ -46,7 +46,6 @@ class external_tokens extends item {
 
     /**
      * Can user data of this item be somehow counted?
-     * How much date is there?
      *
      * @return bool
      */
@@ -55,11 +54,11 @@ class external_tokens extends item {
     }
 
     /**
-     * Count data
+     * Count user data for this item.
      *
      * @param target_user $user
-     * @param \context $context
-     * @return int
+     * @param \context $context restriction for counting i.e., system context for everything and course context for course data
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;

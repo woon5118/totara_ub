@@ -51,7 +51,6 @@ class testitemminimal extends item {
 
     /**
      * Can user data of this item be somehow counted?
-     * How much date is there?
      *
      * @return bool
      */

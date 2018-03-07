@@ -203,8 +203,7 @@ class course_completion extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context
-     * @return int
-     * @throws \dml_exception
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;

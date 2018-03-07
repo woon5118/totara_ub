@@ -47,7 +47,6 @@ final class attempts extends item {
 
     /**
      * Can user data of this item be somehow counted?
-     * How much date is there?
      *
      * @return bool
      */
@@ -99,7 +98,7 @@ final class attempts extends item {
         $DB->delete_records_select('lesson_timer', $select, ['userid' => $user->id]);
         $DB->delete_records_select('lesson_branch', $select, ['userid' => $user->id]);
 
-        // Remove overrides
+        // Remove overrides.
         $overrides = $DB->get_records_select("lesson_overrides", $select, ["userid" => $user->id], 'lessonid');
         $lessonrec = null;
         foreach ($overrides as $override) {
@@ -142,7 +141,6 @@ final class attempts extends item {
      * @param target_user $user
      * @param \context $context
      * @return array
-     * @throws \dml_exception
      */
     private static function export_answers(target_user $user, \context $context) {
         global $DB, $CFG;
@@ -183,7 +181,6 @@ final class attempts extends item {
      * @param target_user $user
      * @param \context $context
      * @return array
-     * @throws \dml_exception
      */
     private static function export_grades(target_user $user, \context $context) {
         global $DB;
@@ -207,12 +204,13 @@ final class attempts extends item {
         }
         return array_values($grades);
     }
+
     /**
-     * Execute user data counting for this item.
+     * Count user data for this item.
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return null|int null if result unknown or counting does not make sense, integer is the count >= 0
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;

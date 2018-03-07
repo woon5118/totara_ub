@@ -150,11 +150,11 @@ class signups extends signups_item {
     }
 
     /**
-     * Count signups.
+     * Count user data for this item.
      *
      * @param target_user $user
-     * @param context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return null|int null if result unknown or counting does not make sense, integer is the count >= 0
+     * @param \context $context restriction for counting i.e., system context for everything and course context for course data
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, context $context) {
         return count(self::get_signups($user, $context));
