@@ -78,18 +78,19 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
         ];
         $this->assertEquals($totalsubmissions, $DB->count_records('comments', $commentsfilter));
 
-        // For some reason, uploading a file always creates 2 entries per file.
-        $filesfilter = [
-            'filearea' => ASSIGNSUBMISSION_FILE_FILEAREA,
-            'component' => 'assignsubmission_file'
+        $fileareas = [
+            [ASSIGNSUBMISSION_ONLINETEXT_FILEAREA, 'assignsubmission_onlinetext'],
+            [ASSIGNSUBMISSION_FILE_FILEAREA, 'assignsubmission_file'],
+            [ASSIGNFEEDBACK_FILE_FILEAREA, 'assignfeedback_file']
         ];
-        $this->assertEquals($totalsubmissions*2, $DB->count_records('files', $filesfilter));
+        foreach ($fileareas as $tuple) {
+            list($filearea, $component) = $tuple;
+            $filter = ['filearea' => $filearea, 'component' => $component];
 
-        $filesfilter = [
-            'filearea' => ASSIGNFEEDBACK_FILE_FILEAREA,
-            'component' => 'assignfeedback_file'
-        ];
-        $this->assertEquals($totalsubmissions*2, $DB->count_records('files', $filesfilter));
+            // For some reason, uploading a file always creates extra entries per file.
+            // And the extra entries' component and filearea are NOT related to mod assign!
+            $this->assertEquals($totalsubmissions*2, $DB->count_records('files', $filter));
+        }
 
         // Not only is mod assign directly coupled to the gradebook module, the
         // way the gradebook stores assignment grades is also very messy. The
@@ -179,20 +180,45 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
             // assignfeedback_editpdf_queue tables.
             $submission = $assignment->get_user_submission($user->id, true);
 
-            // This populates the mdl_assignsubmission_onlinetext table.
+
+            // This populates the mdl_assignsubmission_onlinetext table. It has
+            // to be done before "uploading" a file for the online text plugin.
+            // Otherwise the "uploaded" file will mysteriously disappear from
+            // the mdl_files table.
             $text = [
                 'onlinetext_editor' => [
-                    'itemid' => file_get_unused_draft_itemid(),
+                    // This should have a reference to the uploaded file but is omitted here.
                     'text' => sprintf("%s's submission text", $user->username),
+                    'itemid' => $submission->id,
                     'format' => FORMAT_HTML
                 ]
             ];
             $onlinesubmission->save($submission, (object)$text);
 
-            // This populates the *global* mdl_file table with submission files.
-            $file = 'submission.pdf';
+            // This populates the *global* mdl_file table with assignsubmission_onlinetxt
+            // plugin files. Yes, the online text submission is supposed to be for *text*
+            // but you can also upload files into the textarea. Completely and totally
+            // separate from the assignsubmission_file plugin.
+            $file = 'submission.txt';
             $context = $assignment->get_context();
-            $submissionfile = [
+            $onlinesubmissionfile = [
+                'contextid' => $context->id,
+                'component' => 'assignsubmission_onlinetext',
+                'filearea' => ASSIGNSUBMISSION_ONLINETEXT_FILEAREA,
+                'itemid' => $submission->id,
+                'filepath' => '/',
+                'filename' => $file
+            ];
+
+            $fs = get_file_storage();
+            $sourcefile = $CFG->dirroot . "/mod/assign/feedback/file/tests/fixtures/$file";
+            $fs->create_file_from_pathname((object)$onlinesubmissionfile, $sourcefile);
+
+
+            // This populates the global mdl_file table with assignsubmission_file
+            // plugin files.
+            $file = 'submission.pdf';
+            $filesubmissionfile = [
                 'contextid' => $context->id,
                 'component' => 'assignsubmission_file',
                 'filearea' => ASSIGNSUBMISSION_FILE_FILEAREA,
@@ -201,13 +227,15 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
                 'filename' => $file
             ];
 
-            $fs = get_file_storage();
             $sourcefile = $CFG->dirroot . "/mod/assign/feedback/editpdf/tests/fixtures/$file";
-            $fs->create_file_from_pathname((object)$submissionfile, $sourcefile);
+            $fs->create_file_from_pathname((object)$filesubmissionfile, $sourcefile);
 
             // This populates the assignsubmission_file table. Notice it is
-            // totally decoupled from the details in the mdl_files table!
+            // decoupled from the details in the mdl_files table. Which
+            // makes it totally different from uploading files to the online text
+            // plugin.
             $filesubmission->save($submission, new stdClass());
+
 
             // This populates the *global* mdl_comment table with submission
             // comments
@@ -223,6 +251,7 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
 
             $comment = new comment((object)$submissioncomments);
             $comment->add(sprintf("%s's submission comment", $user->username));
+
 
             // This populates the assign_grades table.
             $this->setUser($teacher);
@@ -381,13 +410,13 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
         $this->assertSame($env->purgecount, $count, "wrong count before purge");
 
         $exported = singleassignments::execute_export($env->purgeduser, $env->context);
-        $this->assertCount($env->purgecount, $exported->files, "wrong exported data count");
+        $this->assertCount($env->purgecount*2, $exported->files, "wrong exported data count"); // 1 submission_file, 1 submission_onlinetxt
         $this->assertCount($env->purgecount, $exported->data, "wrong exported data count");
 
         foreach ($exported->data as $data) {
             $this->assertCount(1, $data['submission text'], "wrong exported online text before purge");
             $this->assertCount(1, $data['comments'], "wrong exported comments before purge");
-            $this->assertCount(1, $data['files'], "wrong exported files before purge");
+            $this->assertCount(2, $data['files'], "wrong exported files before purge"); // 1 submission_file, 1 submission_onlinetxt
             $this->assertCount(1, $data['grades'], "wrong exported grades before purge");
             $this->assertContains($data['assignment'], $assignmentnames, "unknown exported assignment name before purge");
         }

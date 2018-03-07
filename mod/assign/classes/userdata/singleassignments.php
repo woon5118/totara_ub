@@ -114,6 +114,7 @@ class singleassignments extends item {
             $modulecontext = \context_module::instance($submission->cmid);
 
             $files = [
+                ['assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA],
                 ['assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA],
                 ['assignfeedback_file', ASSIGNFEEDBACK_FILE_FILEAREA]
             ];
@@ -450,12 +451,17 @@ class singleassignments extends item {
             ];
 
             $modulecontext = \context_module::instance($assignment->cmid);
-            $stored = get_file_storage()->get_area_files(
-                $modulecontext->id, 'assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA, $assignment->submissionid, "itemid, filename", false
-            );
+            $fileareas = [
+                ['assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA],
+                ['assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA]
+            ];
+            foreach ($fileareas as $tuple) {
+                list($component, $area) = $tuple;
+                $stored = \get_file_storage()->get_area_files($modulecontext->id, $component, $area, $assignment->submissionid, "itemid, filename", false);
 
-            foreach ($stored as $file) {
-                $data['files'][] = $export->add_file($file);
+                foreach ($stored as $file) {
+                    $data['files'][] = $export->add_file($file);
+                }
             }
 
             $export->data[] = $data;
