@@ -265,5 +265,6 @@ $string['viewsurveyresponses'] = 'View {$a} survey responses';
 $string['notyetanswered'] = 'Not yet answered';
 $string['allquestionrequireanswer'] = 'All questions are required and must be answered.';
 $string['userdataitemanalysis'] = 'Analysis';
+$string['userdataitemanalysis_help'] = 'Analysis of the user\'s answers, conducted by someone else. This data is not ordinarily visible to the user.';
 $string['userdataitemanswers'] = 'Answers';
 $string['userdataitemanswers_analysis'] = 'Answers and analysis';

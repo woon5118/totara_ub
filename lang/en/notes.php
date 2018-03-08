@@ -66,9 +66,9 @@ $string['site'] = 'site';
 $string['sitenotes'] = 'Site notes';
 $string['unknown'] = 'unknown';
 $string['userdataitemnotes_purge'] = 'All notes about the user';
-$string['userdataitemnotes_export_hidden'] = 'Notes the user cannot see';
-$string['userdataitemnotes_export_hidden_help'] = 'These notes may contain sensitive information that the user exporting should not see';
-$string['userdataitemnotes_export_visible'] = 'Notes the user can see';
+$string['userdataitemnotes_export_hidden'] = 'Notes not visible to the user';
+$string['userdataitemnotes_export_hidden_help'] = 'This data is not ordinarily visible to the user.';
+$string['userdataitemnotes_export_visible'] = 'Notes visible to the user';
 
 // Deprecated since Moodle 3.0.
 $string['cannotdeletepost'] = 'Error occurred while deleting post';

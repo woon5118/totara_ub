@@ -59,6 +59,14 @@ class instant_messages_received extends item {
     }
 
     /**
+     * Returns sort order.
+     * @return int
+     */
+    public static function get_sortorder() {
+        return 737; // Order just after Sent.
+    }
+
+    /**
      * Can user data of this item data be purged from system?
      *
      * @param int $userstatus target_user::STATUS_ACTIVE, target_user::STATUS_DELETED or target_user::STATUS_SUSPENDED

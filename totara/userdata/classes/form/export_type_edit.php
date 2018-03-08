@@ -65,6 +65,18 @@ final class export_type_edit extends \totara_form\form {
         $exportitemselection->set_collapsible(false);
         $this->model->add($exportitemselection);
 
+        $externalhelpurl = new \moodle_url('https://help.totaralearning.com/');
+        $externalhelplinkandlabel = \html_writer::link(
+            $externalhelpurl,
+            get_string('exportitemselectionfilewarninglinklabel', 'totara_userdata'),
+            array('target' => '_blank')
+        );
+        $this->model->add(new \totara_form\form\element\static_html(
+            'filewarning',
+            '',
+            get_string('exportitemselectionfilewarning', 'totara_userdata', $externalhelplinkandlabel)
+        ));
+
         $itemdescription = new \totara_form\form\element\static_html('itemselection_desc', '', get_string('exportitemselection_desc', 'totara_userdata'));
         $this->model->add($itemdescription);
 

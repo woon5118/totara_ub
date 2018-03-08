@@ -45,7 +45,7 @@ class password_history extends \totara_userdata\userdata\item {
      * @return int
      */
     public static function get_sortorder() {
-        return 800;
+        return 873; // Order just after Password.
     }
 
     /**

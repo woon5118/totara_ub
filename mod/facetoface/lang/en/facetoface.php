@@ -2102,7 +2102,7 @@ The following students were removed from events:<br>{$a}';
 $string['upgradefixstatusapprovedlimbousersdetail'] = '{$a->user} was removed from seminar {$a->f2f}';
 $string['upgradeprocessinggrades'] = 'Processing seminar grades, this may take a while if there are many events...';
 $string['usercancelledon'] = 'User cancelled on {$a}';
-$string['userdataitemcustomfields'] = 'Sign up & cancellation custom fields';
+$string['userdataitemcustomfields'] = 'Sign-up and cancellation custom fields';
 $string['userdataiteminterest'] = 'Declared interest';
 $string['userdataitemsignups'] = 'Attendance records';
 $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not exist';

@@ -95,7 +95,10 @@ final class purge {
             $classes[$maincomponent][$class] = $class::get_sortorder();
         }
 
-        // Sort using sortorder defined in items.
+        // Move 'User' to the top of the list.
+        uksort($classes, function($a, $b) { return $b === 'core_user'; });
+
+        // Sort user data items within components using sortorder defined in items.
         foreach ($classes as $maincomponent => $items) {
             asort($items, SORT_NUMERIC);
             $classes[$maincomponent] = array_keys($items);
