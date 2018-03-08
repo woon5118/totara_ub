@@ -34,6 +34,7 @@
 * @return void
 */
 function totara_upgrade_mod_savepoint($result, $version, $modname) {
+    debugging('totara_upgrade_mod_savepoint() is deprecated, use upgrade_plugin_savepoint() instead', DEBUG_DEVELOPER);
     list($type, $plugin) = explode('_', $modname, 2);
     upgrade_plugin_savepoint($result, $version, $type, $plugin);
 }

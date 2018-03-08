@@ -81,7 +81,7 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
         totara_upgrade_default_schedule($task, $incorrectschedule, $newschedule);
 
         // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2017042800, 'totara_feedback360');
+        upgrade_plugin_savepoint(true, 2017042800, 'totara', 'feedback360');
     }
 
     if ($oldversion < 2017081000) {

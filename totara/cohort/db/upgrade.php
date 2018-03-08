@@ -38,7 +38,7 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         totara_cohort_migrate_rules('learning', 'programcompletionduration', 'learning', 'programcompletiondurationassigned');
 
         // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2017030300, 'totara_cohort');
+        upgrade_plugin_savepoint(true, 2017030300, 'totara', 'cohort');
     }
 
     // Set default scheduled tasks correctly.

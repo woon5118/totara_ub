@@ -237,41 +237,13 @@ function upgrade_main_savepoint($result, $version, $allowabort=true) {
  *
  * @category upgrade
  * @param bool $result false if upgrade step failed, true if completed
- * @param string or float $version main version
+ * @param string or float $version module version
  * @param string $modname name of module
  * @param bool $allowabort allow user to abort script execution here
  * @return void
  */
 function upgrade_mod_savepoint($result, $version, $modname, $allowabort=true) {
-    global $DB;
-
-    $component = 'mod_'.$modname;
-
-    if (!$result) {
-        throw new upgrade_exception($component, $version);
-    }
-
-    $dbversion = $DB->get_field('config_plugins', 'value', array('plugin'=>$component, 'name'=>'version'));
-
-    if (!$module = $DB->get_record('modules', array('name'=>$modname))) {
-        print_error('modulenotexist', 'debug', '', $modname);
-    }
-
-    if ($dbversion >= $version) {
-        // something really wrong is going on in upgrade script
-        throw new downgrade_exception($component, $dbversion, $version);
-    }
-    set_config('version', $version, $component);
-
-    upgrade_log(UPGRADE_LOG_NORMAL, $component, 'Upgrade savepoint reached');
-
-    // reset upgrade timeout to default
-    upgrade_set_timeout();
-
-    // this is a safe place to stop upgrades if user aborts page loading
-    if ($allowabort and connection_aborted()) {
-        die;
-    }
+    upgrade_plugin_savepoint($result, $version, 'mod', $modname, $allowabort);
 }
 
 /**
@@ -281,41 +253,13 @@ function upgrade_mod_savepoint($result, $version, $modname, $allowabort=true) {
  *
  * @category upgrade
  * @param bool $result false if upgrade step failed, true if completed
- * @param string or float $version main version
+ * @param string or float $version block version
  * @param string $blockname name of block
  * @param bool $allowabort allow user to abort script execution here
  * @return void
  */
 function upgrade_block_savepoint($result, $version, $blockname, $allowabort=true) {
-    global $DB;
-
-    $component = 'block_'.$blockname;
-
-    if (!$result) {
-        throw new upgrade_exception($component, $version);
-    }
-
-    $dbversion = $DB->get_field('config_plugins', 'value', array('plugin'=>$component, 'name'=>'version'));
-
-    if (!$block = $DB->get_record('block', array('name'=>$blockname))) {
-        print_error('blocknotexist', 'debug', '', $blockname);
-    }
-
-    if ($dbversion >= $version) {
-        // something really wrong is going on in upgrade script
-        throw new downgrade_exception($component, $dbversion, $version);
-    }
-    set_config('version', $version, $component);
-
-    upgrade_log(UPGRADE_LOG_NORMAL, $component, 'Upgrade savepoint reached');
-
-    // reset upgrade timeout to default
-    upgrade_set_timeout();
-
-    // this is a safe place to stop upgrades if user aborts page loading
-    if ($allowabort and connection_aborted()) {
-        die;
-    }
+    upgrade_plugin_savepoint($result, $version, 'block', $blockname, $allowabort);
 }
 
 /**
@@ -325,16 +269,64 @@ function upgrade_block_savepoint($result, $version, $blockname, $allowabort=true
  *
  * @category upgrade
  * @param bool $result false if upgrade step failed, true if completed
- * @param string or float $version main version
- * @param string $type name of plugin
- * @param string $dir location of plugin
+ * @param string|float $version plugin version
+ * @param string $type type of plugin
+ * @param string $plugin name of plugin
  * @param bool $allowabort allow user to abort script execution here
  * @return void
  */
 function upgrade_plugin_savepoint($result, $version, $type, $plugin, $allowabort=true) {
     global $DB;
 
+    if (!\core_component::is_valid_plugin_name($type, $plugin)) {
+        throw new coding_exception('Invalid plugin name format');
+    }
+    $plugins =\core_component::get_plugin_list($type);
+    if (!isset($plugins[$plugin])) {
+        throw new coding_exception('Invalid plugin name');
+    }
+
+    $plugindir = $plugins[$plugin];
     $component = $type.'_'.$plugin;
+
+    if ($type === 'mod') {
+        if (!$DB->record_exists('modules', array('name' => $plugin))) {
+            print_error('modulenotexist', 'debug', '', $plugin);
+        }
+    } else if ($type === 'block') {
+        if (!$DB->record_exists('block', array('name' => $plugin))) {
+            print_error('blocknotexist', 'debug', '', $plugin);
+        }
+    }
+
+    if (!PHPUNIT_TEST and debugging('', DEBUG_DEVELOPER)) {
+        // Unfortunately developers often copy/paste wrong parameters for this method,
+        // so make sure to give them a warning when this function is called from wrong upgrade script.
+        $upgradescript = $plugindir . '/db/upgrade.php';
+        $bt = debug_backtrace();
+        if (isset($bt[1]) and (
+                $bt[1]['function'] === 'upgrade_plugins' or
+                $bt[1]['function'] === 'upgrade_plugins_modules' or
+                $bt[1]['function'] === 'upgrade_plugins_blocks')) {
+            // All good, this is a version bump without upgrade stuff.
+
+        } else if (file_exists($upgradescript)) {
+            $upgradescript = realpath($upgradescript);
+            $found = false;
+            foreach ($bt as $i => $trace) {
+                if (realpath($trace['file']) === $upgradescript) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                debugging('savepoint was not called from appropriate upgrade.php file', DEBUG_DEVELOPER);
+            }
+
+        } else {
+            debugging("db/upgrade.php script for plugin $component does not exist!");
+        }
+    }
 
     if (!$result) {
         throw new upgrade_exception($component, $version);
@@ -346,6 +338,20 @@ function upgrade_plugin_savepoint($result, $version, $type, $plugin, $allowabort
         // Something really wrong is going on in the upgrade script
         throw new downgrade_exception($component, $dbversion, $version);
     }
+
+    // Totara: make sure we do not set future version.
+    $getconfigversion = function ($versionpath) {
+        $plugin = new stdClass();
+        $plugin->version = null;
+        $module = $plugin;
+        include($versionpath);
+        return $plugin->version;
+    };
+    $configversion = $getconfigversion($plugindir . '/version.php');
+    if ($version > $configversion) {
+        throw new upgrade_exception($component, $version, 'upgrade tried to set version higher than version.php');
+    }
+
     set_config('version', $version, $component);
     upgrade_log(UPGRADE_LOG_NORMAL, $component, 'Upgrade savepoint reached');
 
@@ -718,7 +724,7 @@ function upgrade_plugins_modules($startcallback, $endcallback, $verbose) {
 
         /// Add record into modules table - may be needed in install.php already
             $module->id = $DB->insert_record('modules', $module);
-            upgrade_mod_savepoint(true, $plugin->version, $module->name, false);
+            upgrade_plugin_savepoint(true, $plugin->version, 'mod', $module->name, false);
 
         /// Post installation hook - optional
             if (file_exists("$fullmod/db/install.php")) {
@@ -765,7 +771,7 @@ function upgrade_plugins_modules($startcallback, $endcallback, $verbose) {
             $currmodule = $DB->get_record('modules', array('name'=>$module->name));
             if ($installedversion < $plugin->version) {
                 // store version if not already there
-                upgrade_mod_savepoint($result, $plugin->version, $mod, false);
+                upgrade_plugin_savepoint($result, $plugin->version, 'mod', $mod, false);
             }
 
             // update cron flag if needed
@@ -923,7 +929,7 @@ function upgrade_plugins_blocks($startcallback, $endcallback, $verbose) {
                 $DB->get_manager()->install_from_xmldb_file($fullblock.'/db/install.xml');
             }
             $block->id = $DB->insert_record('block', $block);
-            upgrade_block_savepoint(true, $plugin->version, $block->name, false);
+            upgrade_plugin_savepoint(true, $plugin->version, 'block', $block->name, false);
 
             if (file_exists($fullblock.'/db/install.php')) {
                 require_once($fullblock.'/db/install.php');
@@ -970,7 +976,7 @@ function upgrade_plugins_blocks($startcallback, $endcallback, $verbose) {
             $currblock = $DB->get_record('block', array('name'=>$block->name));
             if ($installedversion < $plugin->version) {
                 // store version if not already there
-                upgrade_block_savepoint($result, $plugin->version, $block->name, false);
+                upgrade_plugin_savepoint($result, $plugin->version, 'block', $block->name, false);
             }
 
             if ($currblock->cron != $block->cron) {
