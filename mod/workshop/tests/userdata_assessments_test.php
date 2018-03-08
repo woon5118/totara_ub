@@ -26,6 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 use totara_userdata\userdata\target_user;
 use mod_workshop\userdata\assessments;
 
+/**
+ * Class mod_workshop_userdata_assessments_testcase
+ *
+ * @group totara_userdata
+ */
 class mod_workshop_userdata_assessments_testcase extends advanced_testcase {
 
     private function create_submission_with_assessment_and_grades($workshop, $submittinguser, $assessors) {
@@ -252,8 +257,8 @@ class mod_workshop_userdata_assessments_testcase extends advanced_testcase {
             $this->assertArrayHasKey($assessment->feedbackauthor, $expectedcontent);
             $this->assertCount(1, $assessment->grades);
             $this->assertEquals($expectedcontent[$assessment->feedbackauthor], reset($assessment->grades)->peercomment);
-            $this->assertCount(2, $assessment->files);
-            foreach ($assessment->files as $filedata) {
+            $this->assertCount(2, $assessment->files['/']);
+            foreach ($assessment->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
         }
@@ -339,8 +344,8 @@ class mod_workshop_userdata_assessments_testcase extends advanced_testcase {
             $this->assertArrayHasKey($assessment->feedbackauthor, $expectedcontent);
             $this->assertCount(1, $assessment->grades);
             $this->assertEquals($expectedcontent[$assessment->feedbackauthor], reset($assessment->grades)->peercomment);
-            $this->assertCount(2, $assessment->files);
-            foreach ($assessment->files as $filedata) {
+            $this->assertCount(2, $assessment->files['/']);
+            foreach ($assessment->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
         }
@@ -424,8 +429,8 @@ class mod_workshop_userdata_assessments_testcase extends advanced_testcase {
             $this->assertArrayHasKey($assessment->feedbackauthor, $expectedcontent);
             $this->assertCount(1, $assessment->grades);
             $this->assertEquals($expectedcontent[$assessment->feedbackauthor], reset($assessment->grades)->peercomment);
-            $this->assertCount(2, $assessment->files);
-            foreach ($assessment->files as $filedata) {
+            $this->assertCount(2, $assessment->files['/']);
+            foreach ($assessment->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
         }
@@ -509,8 +514,8 @@ class mod_workshop_userdata_assessments_testcase extends advanced_testcase {
             $this->assertArrayHasKey($assessment->feedbackauthor, $expectedcontent);
             $this->assertCount(1, $assessment->grades);
             $this->assertEquals($expectedcontent[$assessment->feedbackauthor], reset($assessment->grades)->peercomment);
-            $this->assertCount(2, $assessment->files);
-            foreach ($assessment->files as $filedata) {
+            $this->assertCount(2, $assessment->files['/']);
+            foreach ($assessment->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
         }

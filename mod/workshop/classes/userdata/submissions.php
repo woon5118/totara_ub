@@ -167,39 +167,42 @@ class submissions extends \totara_userdata\userdata\item {
         );
 
         foreach($submissions as $submission) {
-            $submissiondata = clone $submission;
-            unset($submissiondata->ctxid);
+            $submission->assessments = $DB->get_records(
+                'workshop_assessments',
+                ['submissionid' => $submission->id],
+                '',
+                // Excluding feedbackreviewer, that should relate only to the reviewer and not the user who made the submission.
+                'id, submissionid, grade, gradinggrade, gradinggradeover, gradinggradeoverby, feedbackauthor'
+                );
 
-            $submissiondata->assessments = $DB->get_records('workshop_assessments', ['submissionid' => $submission->id]);
-
-            foreach($submissiondata->assessments as $assessment) {
+            foreach($submission->assessments as $assessment) {
                 $assessment->grades = $DB->get_records('workshop_grades', ['assessmentid' => $assessment->id]);
                 $assessment->files = [];
 
                 $files = $fs->get_area_files($submission->ctxid, 'mod_workshop', 'overallfeedback_content', $assessment->id, null, false);
                 foreach($files as $file) {
-                    $assessment->files[] = $export->add_file($file);
+                    $assessment->files[$file->get_filepath()][] = $export->add_file($file);
                 }
 
                 $files = $fs->get_area_files($submission->ctxid, 'mod_workshop', 'overallfeedback_attachment', $assessment->id, null, false);
                 foreach($files as $file) {
-                    $assessment->files[] = $export->add_file($file);
+                    $assessment->files[$file->get_filepath()][] = $export->add_file($file);
                 }
             }
 
-            $submissiondata->files = [];
+            $submission->files = [];
 
             $files = $fs->get_area_files($submission->ctxid, 'mod_workshop', 'submission_content', $submission->id, null, false);
             foreach($files as $file) {
-                $submissiondata->files[] = $export->add_file($file);
+                $submission->files[$file->get_filepath()][] = $export->add_file($file);
             }
 
             $files = $fs->get_area_files($submission->ctxid, 'mod_workshop', 'submission_attachment', $submission->id, null, false);
             foreach($files as $file) {
-                $submissiondata->files[] = $export->add_file($file);
+                $submission->files[$file->get_filepath()][] = $export->add_file($file);
             }
 
-            $export->data[] = $submissiondata;
+            $export->data[] = $submission;
         }
 
         return $export;
@@ -210,7 +213,7 @@ class submissions extends \totara_userdata\userdata\item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;
@@ -231,10 +234,10 @@ class submissions extends \totara_userdata\userdata\item {
      * Not exporting. We were not initially looking to purge as this is old data that is not used within any recent version
      * of Totara.
      *
-     * @param $submissionid
-     * @param $assessmentids
+     * @param int $submissionid
+     * @param array $assessmentids
      */
-    private static function purge_data_from_old_tables($submissionid, $assessmentids) {
+    private static function purge_data_from_old_tables($submissionid, array $assessmentids) {
         global $DB;
 
         if (!empty($assessmentids)) {

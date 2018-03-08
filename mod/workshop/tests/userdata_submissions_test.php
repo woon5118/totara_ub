@@ -26,6 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 use totara_userdata\userdata\target_user;
 use mod_workshop\userdata\submissions;
 
+/**
+ * Class mod_workshop_userdata_submissions_testcase
+ *
+ * @group totara_userdata
+ */
 class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
 
     /**
@@ -74,7 +79,7 @@ class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
                 'component' => 'mod_workshop',
                 'filearea' => 'overallfeedback_content',
                 'itemid' => $assessmentid,
-                'filepath' => '/',
+                'filepath' => '/anotherpath/',
                 'filename' => $assessor->username . '_ascontent_' . $workshop->name
             ];
             $filestorage->create_file_from_string($ascontentfile, 'content file contents');
@@ -84,7 +89,7 @@ class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
                 'component' => 'mod_workshop',
                 'filearea' => 'overallfeedback_attachment',
                 'itemid' => $assessmentid,
-                'filepath' => '/',
+                'filepath' => '/anotherpath/',
                 'filename' => $assessor->username . '_asattachment_' . $workshop->name
             ];
             $filestorage->create_file_from_string($asattachmentfile, 'attachment file contents');
@@ -210,19 +215,20 @@ class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
             array_merge(['filearea' => 'overallfeedback_attachment'], $notinparams));
         $this->assertEquals(0, $attachmentfilecount);
 
-        // For assessments that do remain, there will be a file each area, plus a directory entry, this number should remain.
+        // For assessments that do remain, there will be a file each area, plus 2 directory entries
+        // (for the base '/' and '/anotherpath/'), this number should remain.
         list($isinsql, $isinparams) = $DB->get_in_or_equal($assessmentids, SQL_PARAMS_NAMED);
         $contentfilecount = $DB->count_records_select(
             'files',
             'filearea = :filearea AND itemid ' . $isinsql,
             array_merge(['filearea' => 'overallfeedback_content'], $isinparams));
-        $this->assertEquals(count($assessmentids) * 2, $contentfilecount);
+        $this->assertEquals(count($assessmentids) * 3, $contentfilecount);
 
         $attachmentfilecount = $DB->count_records_select(
             'files',
             'filearea = :filearea AND itemid ' . $isinsql,
             array_merge(['filearea' => 'overallfeedback_attachment'], $isinparams));
-        $this->assertEquals(count($assessmentids) * 2, $attachmentfilecount);
+        $this->assertEquals(count($assessmentids) * 3, $attachmentfilecount);
 
         // And now for the submission ids.
 
@@ -276,13 +282,13 @@ class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
         foreach ($export->data as $submission) {
             $this->assertTrue(in_array($submission->content, $expectedcontent));
             $this->assertCount(3, $submission->assessments);
-            $this->assertCount(2, $submission->files);
-            foreach ($submission->files as $filedata) {
+            $this->assertCount(2, $submission->files['/']);
+            foreach ($submission->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
             foreach ($submission->assessments as $assessment) {
                 $this->assertCount(1, $assessment->grades);
-                $this->assertCount(2, $assessment->files);
+                $this->assertCount(2, $assessment->files['/anotherpath/']);
                 // Assessments may be from other users as we are exporting any assessments of a user's submission.
             }
         }
@@ -364,13 +370,13 @@ class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
         foreach ($export->data as $submission) {
             $this->assertTrue(in_array($submission->content, $expectedcontent));
             $this->assertCount(3, $submission->assessments);
-            $this->assertCount(2, $submission->files);
-            foreach ($submission->files as $filedata) {
+            $this->assertCount(2, $submission->files['/']);
+            foreach ($submission->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
             foreach ($submission->assessments as $assessment) {
                 $this->assertCount(1, $assessment->grades);
-                $this->assertCount(2, $assessment->files);
+                $this->assertCount(2, $assessment->files['/anotherpath/']);
                 // Assessments may be from other users as we are exporting any assessments of a user's submission.
             }
         }
@@ -459,13 +465,13 @@ class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
         foreach ($export->data as $submission) {
             $this->assertTrue(in_array($submission->content, $expectedcontent));
             $this->assertCount(3, $submission->assessments);
-            $this->assertCount(2, $submission->files);
-            foreach ($submission->files as $filedata) {
+            $this->assertCount(2, $submission->files['/']);
+            foreach ($submission->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
             foreach ($submission->assessments as $assessment) {
                 $this->assertCount(1, $assessment->grades);
-                $this->assertCount(2, $assessment->files);
+                $this->assertCount(2, $assessment->files['/anotherpath/']);
                 // Assessments may be from other users as we are exporting any assessments of a user's submission.
             }
         }
@@ -554,13 +560,13 @@ class mod_workshop_userdata_submissions_testcase extends advanced_testcase {
         foreach ($export->data as $submission) {
             $this->assertTrue(in_array($submission->content, $expectedcontent));
             $this->assertCount(3, $submission->assessments);
-            $this->assertCount(2, $submission->files);
-            foreach ($submission->files as $filedata) {
+            $this->assertCount(2, $submission->files['/']);
+            foreach ($submission->files['/'] as $filedata) {
                 $this->assertStringStartsWith($data['user1']->username, $filedata['filename']);
             }
             foreach ($submission->assessments as $assessment) {
                 $this->assertCount(1, $assessment->grades);
-                $this->assertCount(2, $assessment->files);
+                $this->assertCount(2, $assessment->files['/anotherpath/']);
                 // Assessments may be from other users as we are exporting any assessments of a user's submission.
             }
         }

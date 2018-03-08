@@ -33,8 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  *
  * For deleting assessments created by the target user. These will be assessments of other user's submissions
  * and any assessments of the user's own submissions.
- *
- * @package mod_workshop
  */
 class assessments extends item {
 
@@ -90,24 +88,26 @@ class assessments extends item {
 
         $join = self::get_activities_join($context, 'workshop', 'wsub.workshopid');
         $assessments = $DB->get_records_sql(
-                "SELECT wa.*, ctx.id AS ctxid
-                   FROM {workshop_submissions} wsub
-                 {$join}
-                   JOIN {workshop_assessments} wa
-                     ON wsub.id = wa.submissionid
-                  WHERE wa.reviewerid = :reviewerid",
+            "SELECT wa.id, ctx.id AS ctxid
+               FROM {workshop_submissions} wsub
+             {$join}
+               JOIN {workshop_assessments} wa
+                 ON wsub.id = wa.submissionid
+              WHERE wa.reviewerid = :reviewerid",
                 ['reviewerid' => $user->id]
         );
 
-        self::purge_data_from_old_tables(array_keys($assessments));
+        $assessmentids = array_keys($assessments);
 
-        $DB->delete_records_list('workshop_grades', 'assessmentid', array_keys($assessments));
+        self::purge_data_from_old_tables($assessmentids);
+
+        $DB->delete_records_list('workshop_grades', 'assessmentid', $assessmentids);
         $fs = get_file_storage();
         foreach ($assessments as $assessment) {
             $fs->delete_area_files($assessment->ctxid, 'mod_workshop', 'overallfeedback_content', $assessment->id);
             $fs->delete_area_files($assessment->ctxid, 'mod_workshop', 'overallfeedback_attachment', $assessment->id);
         }
-        $DB->delete_records_list('workshop_assessments', 'id', array_keys($assessments));
+        $DB->delete_records_list('workshop_assessments', 'id', $assessmentids);
 
         $join = self::get_activities_join($context, 'workshop', 'wagg.workshopid');
         $aggregationids = $DB->get_fieldset_sql(
@@ -147,25 +147,21 @@ class assessments extends item {
             ['reviewerid' => $user->id]
         );
 
-        $allassessmentdata = [];
         foreach($assessments as $assessment) {
-            $assessmentdata = clone $assessment;
-            unset($assessmentdata->ctxid);
-
-            $assessmentdata->grades = $DB->get_records('workshop_grades', ['assessmentid' => $assessment->id]);
-            $assessmentdata->files = [];
+            $assessment->grades = $DB->get_records('workshop_grades', ['assessmentid' => $assessment->id]);
+            $assessment->files = [];
 
             $files = $fs->get_area_files($assessment->ctxid, 'mod_workshop', 'overallfeedback_content', $assessment->id, null, false);
             foreach($files as $file) {
-                $assessmentdata->files[] = $export->add_file($file);
+                $assessment->files[$file->get_filepath()][] = $export->add_file($file);
             }
 
             $files = $fs->get_area_files($assessment->ctxid, 'mod_workshop', 'overallfeedback_attachment', $assessment->id, null, false);
             foreach($files as $file) {
-                $assessmentdata->files[] = $export->add_file($file);
+                $assessment->files[$file->get_filepath()][] = $export->add_file($file);
             }
 
-            $allassessmentdata[] = $assessmentdata;
+            unset($assessment->ctxid);
         }
 
         $join = self::get_activities_join($context, 'workshop', 'wagg.workshopid');
@@ -177,7 +173,7 @@ class assessments extends item {
             ['userid' => $user->id]
         );
 
-        $export->data['assessments'] = $allassessmentdata;
+        $export->data['assessments'] = $assessments;
         $export->data['aggregations'] = $aggregations;
 
         return $export;
@@ -188,7 +184,7 @@ class assessments extends item {
      *
      * @param target_user $user
      * @param \context $context restriction for counting i.e., system context for everything and course context for course data
-     * @return int  integer is the count >= 0, negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;
@@ -211,10 +207,9 @@ class assessments extends item {
      * Not exporting. We were not initially looking to purge as this is old data that is not used within any recent version
      * of Totara.
      *
-     * @param $submissionid
-     * @param $assessmentids
+     * @param array $assessmentids
      */
-    private static function purge_data_from_old_tables($assessmentids) {
+    private static function purge_data_from_old_tables(array $assessmentids) {
         global $DB;
 
         if (!empty($assessmentids)) {
