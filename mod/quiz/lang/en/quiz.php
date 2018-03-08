@@ -928,6 +928,7 @@ $string['upgradingquizattempts'] = 'Upgrading quiz attempts: quiz {$a->done}/{$a
 $string['upgradingveryoldquizattempts'] = 'Upgrading very old quiz attempts: {$a->done}/{$a->outof}';
 $string['url'] = 'URL';
 $string['usedcategorymoved'] = 'This category has been preserved and moved to the site level because it is a published category still in use by other courses.';
+$string['userdataitemattempts'] = 'Quiz attempts';
 $string['useroverrides'] = 'User overrides';
 $string['useroverridesdeleted'] = 'User overrides deleted';
 $string['usersnone'] = 'No students have access to this quiz';
