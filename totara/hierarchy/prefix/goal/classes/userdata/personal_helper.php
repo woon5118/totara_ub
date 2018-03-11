@@ -130,7 +130,7 @@ class personal_helper {
                 // Include any files from the goal description.
                 $files = $fs->get_area_files($user->contextid, 'totara_hierarchy', 'goal', $goal->id, "timemodified", false);
                 foreach ($files as $file) {
-                     $goal['files']['desc'][] = $export->add_file($file);
+                     $itemdata['files']['desc'][] = $export->add_file($file);
                 }
             }
 
