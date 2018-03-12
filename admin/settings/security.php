@@ -12,11 +12,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $ADMIN->add('security', $temp);
 
     // "sitepolicies" settingpage
-    if (!empty($CFG->enablesitepolicies)) {
-        $temp = new admin_settingpage('sitepolicies', new lang_string('securitysettings', 'tool_sitepolicy'));
-    } else {
-        $temp = new admin_settingpage('sitepolicies', new lang_string('sitepolicies', 'admin'));
-    }
+    $temp = new admin_settingpage('sitepolicies', new lang_string('securitysettings', 'tool_sitepolicy'));
     $temp->add(new admin_setting_configcheckbox('protectusernames', new lang_string('protectusernames', 'admin'), new lang_string('configprotectusernames', 'admin'), 1));
     $temp->add(new admin_setting_configcheckbox('forcelogin', new lang_string('forcelogin', 'admin'), new lang_string('configforcelogintotara', 'totara_core'), 1));
     $temp->add(new admin_setting_configcheckbox('forceloginforprofiles', new lang_string('forceloginforprofiles', 'admin'), new lang_string('configforceloginforprofiles', 'admin'), 1));
