@@ -198,13 +198,13 @@ function xmldb_totara_program_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018010800, 'totara', 'program');
     }
 
-    if ($oldversion < 2018020500) {
+    if ($oldversion < 2018031501) {
 
         // We need to fix a regression from TL-15995. See TL-16826 for details.
         // The wrong plugin name was used, 'totara_totara_program'. We need to remove it.
-        set_config('version', null, 'totara_totara_facetoface');
+        set_config('version', null, 'totara_totara_program');
 
-        upgrade_plugin_savepoint(true, 2018020500, 'totara', 'program');
+        upgrade_plugin_savepoint(true, 2018031501, 'totara', 'program');
     }
 
     return true;
