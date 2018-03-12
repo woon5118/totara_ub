@@ -1,4 +1,4 @@
-@mod @mod_glossary
+@mod @mod_glossary @_file_upload
 Feature: Importing glossary entries
   In order to add glossary entries by bulk
   As a teacher
@@ -22,7 +22,6 @@ Feature: Importing glossary entries
   Scenario: Importing glossary entries and checking the Recent activity block
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I add the "Recent activity" block
     And I follow "Glossary 1"
     And I navigate to "Import entries" in current page administration
     And I upload "mod/glossary/tests/fixtures/texfilter_glossary_en.xml" file to "File to import" filemanager
