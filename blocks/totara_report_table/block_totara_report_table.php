@@ -201,8 +201,7 @@ class block_totara_report_table extends block_base {
         }
 
         // Ensure that the toolbar search is disabled, as this will not work from the report block.
-        // Only sorting and paging are supported.
-        $report->toolbarsearch = false;
+        $report->hidetoolbar = true;
 
         \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
@@ -244,6 +243,11 @@ class block_totara_report_table extends block_base {
             if ($report->get_filtered_count() == 0) {
                 return $this->content;
             }
+        }
+
+        if ($report->has_disabled_filters()) {
+            global $OUTPUT;
+            $reporthtml = $OUTPUT->notification(get_string('filterdisabledwarning', 'totara_reportbuilder'), 'warning') . $reporthtml;
         }
 
         // The table has already been rendered so just return the class.
