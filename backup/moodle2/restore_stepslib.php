@@ -3128,7 +3128,7 @@ class restore_course_completion_structure_step extends restore_structure_step {
     }
 
     /**
-     * Processes course compltion criteria complete records
+     * Processes course completion criteria complete records
      *
      * @global moodle_database $DB
      * @param stdClass $data
@@ -3149,7 +3149,7 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 'userid' => $data->userid,
                 'course' => $data->course,
                 'criteriaid' => $data->criteriaid,
-                'timecompleted' => $this->apply_date_offset($data->timecompleted),
+                'timecompleted' => $data->timecompleted,
                 'rpl' => isset($data->rpl) ? $data->rpl : null,
             );
             if (isset($data->gradefinal)) {
@@ -3180,9 +3180,9 @@ class restore_course_completion_structure_step extends restore_structure_step {
             $params = array(
                 'userid' => $data->userid,
                 'course' => $data->course,
-                'timeenrolled' => $this->apply_date_offset($data->timeenrolled),
-                'timestarted' => $this->apply_date_offset($data->timestarted),
-                'timecompleted' => $this->apply_date_offset($data->timecompleted),
+                'timeenrolled' => $data->timeenrolled,
+                'timestarted' => $data->timestarted,
+                'timecompleted' => $data->timecompleted,
                 'reaggregate' => $data->reaggregate,
                 'rpl' => isset($data->rpl) ? $data->rpl : null,
                 'rplgrade' => isset($data->rplgrade) ? $data->rplgrade : null,
@@ -3245,7 +3245,7 @@ class restore_course_completion_structure_step extends restore_structure_step {
             $params = array(
                 'userid' => $userid,
                 'courseid' => $courseid,
-                'timecompleted' => $this->apply_date_offset($data->timecompleted),
+                'timecompleted' => $data->timecompleted,
                 'grade' => $data->grade
             );
 
