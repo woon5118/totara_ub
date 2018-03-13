@@ -54,6 +54,8 @@ if ($component === 'backup') {
     if ($filearea !== 'backup') {
         throw new invalid_parameter_exception('invalid filearea parameter');
     }
+} else {
+    throw new invalid_parameter_exception('invalid component parameter');
 }
 
 navigation_node::override_active_url(new moodle_url('/backup/restorefile.php', array('contextid' => $contextid)));
