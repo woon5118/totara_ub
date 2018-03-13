@@ -21,12 +21,12 @@
  * @package availability_hierarchy_organisation
  */
 
-$string['assignedtoorgx'] = 'You are assigned to the Organisation: {$a}';
+$string['assignedtoorgx'] = 'You are assigned to the Organisation: <strong>{$a}</strong>';
 $string['chooseorganisation'] = 'Choose an organisation';
 $string['description'] = 'Require learners to be a assigned to an Organisation.';
 $string['error_selectfield'] = 'Error, please select an Organisation';
 $string['missing'] = '(missing activity)';
-$string['notassignedtoorgx'] = 'You are not assigned to Organisation: {$a}';
+$string['notassignedtoorgx'] = 'You are not assigned to Organisation: <strong>{$a}</strong>';
 $string['pluginname'] = 'Restriction by assignment to an Organisation';
 $string['searchorganisations'] = 'Search organisations';
 $string['title'] = 'Assigned to Organisation';

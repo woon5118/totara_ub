@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use availability_hierarchy_position\condition;
 
+/**
+ * @group availability
+ */
 class availability_hierarchy_position_condition_testcase extends advanced_testcase {
     /**
      * Tests constructing and using grade condition.
@@ -66,7 +69,7 @@ class availability_hierarchy_position_condition_testcase extends advanced_testca
 
         // Check if available when user is not assigned to a position.
         $this->assertFalse($condition->is_available(false, $info, true, $user->id));
-        $information = $condition->get_description(false, false, $info);
+        $information = strip_tags($condition->get_description(false, false, $info));
         $this->assertRegExp('~You are assigned to the Position: Test Position 1~', $information);
         $this->assertTrue($condition->is_available(true, $info, true, $user->id));
 
@@ -79,7 +82,7 @@ class availability_hierarchy_position_condition_testcase extends advanced_testca
 
         $this->assertTrue($condition->is_available(false, $info, true, $user->id));
         $this->assertFalse($condition->is_available(true, $info, true, $user->id));
-        $information = $condition->get_description(false, true, $info);
+        $information = strip_tags($condition->get_description(false, true, $info));
         $this->assertRegExp('~You are not assigned to Position: Test Position 1~', $information);
     }
 

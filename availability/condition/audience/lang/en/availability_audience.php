@@ -24,8 +24,8 @@
 $string['chooseaudience'] = 'Choose Audience';
 $string['description'] = 'Require learners to be a member of a selected Audience.';
 $string['error_selectfield'] = 'Error, please select an Audience';
-$string['memberofaudiencex'] = 'You are a member of the Audience: {$a}';
+$string['memberofaudiencex'] = 'You are a member of the Audience: <strong>{$a}</strong>';
 $string['missing'] = '(missing activity)';
-$string['notmemberofaudiencex'] = 'You are not a member of the Audience: {$a}';
+$string['notmemberofaudiencex'] = 'You are not a member of the Audience: <strong>{$a}</strong>';
 $string['pluginname'] = 'Restriction by member of Audience';
 $string['title'] = 'Member of Audience';

@@ -25,6 +25,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use availability_hierarchy_organisation\condition;
 
+/**
+ * @group availability
+ */
 class availability_hierarchy_organisation_condition_testcase extends advanced_testcase {
     /**
      * Tests constructing and using grade condition.
@@ -65,7 +68,7 @@ class availability_hierarchy_organisation_condition_testcase extends advanced_te
 
         // Check if available when user is not assigned to an organisation.
         $this->assertFalse($condition->is_available(false, $info, true, $user->id));
-        $information = $condition->get_description(false, false, $info);
+        $information = strip_tags($condition->get_description(false, false, $info));
         $this->assertRegExp('~You are assigned to the Organisation: Test Organisation 1~', $information);
         $this->assertTrue($condition->is_available(true, $info, true, $user->id));
 
@@ -78,7 +81,7 @@ class availability_hierarchy_organisation_condition_testcase extends advanced_te
 
         $this->assertTrue($condition->is_available(false, $info, true, $user->id));
         $this->assertFalse($condition->is_available(true, $info, true, $user->id));
-        $information = $condition->get_description(false, true, $info);
+        $information = strip_tags($condition->get_description(false, true, $info));
         $this->assertRegExp('~You are not assigned to Organisation: Test Organisation 1~', $information);
     }
 
