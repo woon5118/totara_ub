@@ -184,3 +184,4 @@ $string['taskpurgesuspended'] = 'Automatic user data purging of suspended users'
 $string['timefinished'] = 'Finished';
 $string['timechanged'] = 'Changed';
 $string['timestarted'] = 'Started';
+$string['userdataitemexport_request'] = 'User data export';
