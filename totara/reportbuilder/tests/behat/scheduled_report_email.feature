@@ -162,3 +162,34 @@ Feature: Test that report builder reports can be scheduled to be emailed
     And I click on "Edit" "link" in the "Schedulable Report" "table_row"
     Then I should not see "User One"
     And I should see "User Two"
+
+  Scenario: Delete single email entries but keep at least one recipient email address
+    Given the following "cohorts" exist:
+      | name | idnumber |
+      | CH1  | CH1      |
+      | CH2  | CH2      |
+    When I press "Add audiences"
+    And I click on "CH1" "link" in the "Add audiences" "totaradialogue"
+    And I click on "Save" "button" in the "Add audiences" "totaradialogue"
+    And I wait "1" seconds
+    Then I should see "CH1"
+    And I should not see "CH2"
+    And  I set the field "Send to self" to "0"
+
+    When I set the field "External email address to add" to "a@example.com"
+    And I press "Add email"
+    Then I should see "a@example.com"
+
+    When I click on "Delete" "link" in the ".list-externalemails div[data-id='a@example.com']" "css_element"
+    Then I should not see "a@example.com"
+
+    When I press "Save changes"
+    And I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    Then I should not see "a@example.com"
+
+  # This requires that the audience id to be correct
+    When I click on "Delete" "link" in the "#audiences_1" "css_element"
+    Then I should not see "CH1"
+
+    When I press "Save changes"
+    Then I should see "At least one recipient email address is required for export option you selected"

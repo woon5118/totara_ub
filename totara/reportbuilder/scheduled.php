@@ -285,20 +285,23 @@ if ($fromform = $mform->get_data()) {
     } else {
         $DB->update_record('report_builder_schedule', $todb);
         $newid = $todb->id;
+        $audiences = array();
+        $systemusers = array();
+        $externalusers = array();
 
         if ($allow_audiences && !empty($fromform->audiences)) {
             $audiences = explode(',', $fromform->audiences);
-        } else {
+        } else if (!$allow_audiences) {
             $audiences = array_keys($current_audiences);
         }
         if ($allow_systemusers && !empty($fromform->systemusers)) {
             $systemusers = explode(',', $fromform->systemusers);
-        } else {
+        } else if (!$allow_systemusers) {
             $systemusers = array_keys($current_systemusers);
         }
         if ($allow_emailexternalusers && !empty($fromform->externalemails)) {
             $externalusers = explode(',', $fromform->externalemails);
-        } else {
+        } else if (!$allow_emailexternalusers) {
             $externalusers = $current_externalusers;
         }
     }
