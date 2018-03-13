@@ -264,6 +264,7 @@ class rb_filter_date extends rb_filter_type {
         unset($_POST[$this->name.'daysafter']);
         unset($_POST[$this->name.'daysbeforechkbox']);
         unset($_POST[$this->name.'daysbefore']);
+        unset($_POST[$this->name.'notset']);
     }
 
     /**
