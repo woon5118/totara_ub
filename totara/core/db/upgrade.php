@@ -316,5 +316,23 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018030503, 'totara', 'core');
     }
 
+
+    if ($oldversion < 2018031501) {
+        $deletedauths = array('fc', 'imap', 'nntp', 'none', 'pam', 'pop3');
+        foreach ($deletedauths as $auth) {
+            if ($DB->record_exists('user', array('auth' => $auth, 'deleted' => 0))) {
+                // Keep the auth plugin settings,
+                // admins will have to uninstall this manually.
+                continue;
+            }
+            uninstall_plugin('auth', $auth);
+        }
+
+        uninstall_plugin('tool', 'innodb');
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018031501, 'totara', 'core');
+    }
+
     return true;
 }

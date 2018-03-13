@@ -1,6 +1,13 @@
 This files describes API changes in /auth/* - plugins,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* auth_none plugin was removed for potential security reasons,
+  this plugin was never intended for production servers
+* deprecated plugins auth_fc, auth_imap, auth_nntp, auth_pam and auth_pop3 were removed
+
+
 === 10 ===
 
 * New auth hook - pre_user_login_hook() - available, triggered right after the user object is created.

@@ -1152,6 +1152,10 @@ class core_plugin_manager {
     public static function is_deleted_standard_plugin($type, $name) {
         // TOTARA: Do not include plugins that were removed during upgrades to Totara 9 or Moodle 3.0 and earlier.
         $plugins = array(
+            // Totara 12.0 removals.
+            'auth_fc', 'auth_imap', 'auth_nntp', 'auth_none', 'auth_pam', 'auth_pop3',
+            'tool_innodb',
+
             // Totara 10.0 removals.
             'theme_kiwifruitresponsive',
             'theme_customtotararesponsive',
@@ -1223,8 +1227,8 @@ class core_plugin_manager {
             ),
 
             'auth' => array(
-                'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'lti', 'manual', 'mnet',
-                'nntp', 'nologin', 'none', 'pam', 'pop3', 'shibboleth', 'webservice'
+                'cas', 'db', 'email', 'ldap', 'lti', 'manual', 'mnet',
+                'nologin', 'shibboleth', 'webservice'
                 // Totara
                 , 'connect', 'approved'
             ),
