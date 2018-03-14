@@ -129,7 +129,8 @@ class rb_source_course_completion extends rb_base_source {
                 'user_enrolments',
                 'LEFT',
                 '{user_enrolments}',
-                'user_enrolments.userid = base.userid',
+                '(user_enrolments.userid = base.userid AND ' .
+                    'user_enrolments.enrolid IN (SELECT id FROM {enrol} WHERE courseid = base.course))',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
