@@ -408,9 +408,9 @@ class rb_filter_date extends rb_filter_type {
 
             // Add the SQL to check that the timestamp is zero.
             if (isset($res)) {
-                $res = "({$res}) OR {$query} = :{$uniqueparam}";
+                $res = "(({$res}) OR {$query} = :{$uniqueparam} OR {$query} IS NULL)";
             } else {
-                $res = "{$query} = :{$uniqueparam}";
+                $res = "({$query} = :{$uniqueparam} OR {$query} IS NULL)";
             }
         }
 
