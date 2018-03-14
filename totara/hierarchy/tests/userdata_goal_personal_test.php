@@ -39,7 +39,6 @@ class userdata_goal_personal_test extends advanced_testcase {
 
     /**
      * Setup the test data for personal goals userdata.
-     * TODO - pending TL-16909 add scale information to these tests
      *
      * @return \stdClass - An object containing data created by this function.
      */
@@ -56,6 +55,15 @@ class userdata_goal_personal_test extends advanced_testcase {
         $user3 = $this->getDataGenerator()->create_user(); // Deleted user.
         delete_user($user3);
         $retdata->user3 = $DB->get_record('user', ['id' => $user3->id]);
+
+        $valuedata = [
+            1 => ['name' => 'created', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
+            2 => ['name' => 'Started', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+            3 => ['name' => 'Middled', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+            4 => ['name' => 'Almosts', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
+            5 => ['name' => 'Finishd', 'proficient' => 1, 'sortorder' => 5, 'default' => 0]
+        ];
+        $scale1 = $hierarchygen->create_scale('goal', ['name' => 'goalscale1'], $valuedata);
 
         $frame1 = $hierarchygen->create_goal_frame('frame1'); // This returns the whole object.
         $ctype1 = $hierarchygen->create_goal_type(['idnumber' => 'ctype1']); // This returns the id, consistency!

@@ -164,5 +164,45 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017112705, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2018031600) {
+        // change the type of defaultid in competency scales from a smallint to a bigint since it contains an id record.
+        $field = new xmldb_field('defaultid', XMLDB_TYPE_INTEGER, 10, null, null, null, null, 'usermodified');
+        $table = new xmldb_table('comp_scale');
+
+        // First remove any index on the field.
+        $index = new xmldb_index('compscal_def_ix', XMLDB_INDEX_NOTUNIQUE, ['defaultid']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Change the field type to a larger int.
+        $dbman->change_field_precision($table, $field);
+
+        // Recreate or add the index.
+        $dbman->add_index($table, $index);
+
+        upgrade_plugin_savepoint(true, 2018031600, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2018031700) {
+        // change the type of defaultid in goal scales from a smallint to a bigint since it contains an id record.
+        $field = new xmldb_field('defaultid', XMLDB_TYPE_INTEGER, 10, null, null, null, null, 'usermodified');
+        $table = new xmldb_table('goal_scale');
+
+        // First remove any index on the field.
+        $index = new xmldb_index('goalscal_def_ix', XMLDB_INDEX_NOTUNIQUE, ['defaultid']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Change the field type to a larger int.
+        $dbman->change_field_precision($table, $field);
+
+        // Recreate or add the index.
+        $dbman->add_index($table, $index);
+
+        upgrade_plugin_savepoint(true, 2018031700, 'totara', 'hierarchy');
+    }
+
     return true;
 }

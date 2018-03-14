@@ -242,6 +242,67 @@ class totara_hierarchy_generator extends component_generator_base {
     }
 
     /**
+     * Create a scale for the given prefix.
+     *
+     * We need to create the scale with a dummy default value, so we can create the values
+     * with the correct scaleid, then we update the default value when we know the correct valueid.
+     *
+     * @param string $prefix Prefix that identifies the type of hierarchy (competency, goal)
+     * @param array $scaledata - The scale item record
+     * @param array $valuedata - An array of scale value items, note one value should have a default value set to 1.
+     * @return stdClass scale database object
+     */
+    public function create_scale($prefix, $scaledata = array(), $valuedata = array()) {
+        global $USER, $DB;
+
+        // Create the scale item, filling in any missing information.
+        $sdefaults = ['name' => $prefix . '_scale',
+                      'description' => $prefix . '_scale',
+                      'timemodified' => time(),
+                      'usermodified' => $USER->id,
+                      'defaultid' => 1];
+        $scaledata = array_merge($scaledata, $sdefaults);
+        $scaleid = $DB->insert_record("{$prefix}_scale", $scaledata);
+
+        // Create the scale values, filling in any missing information.
+        $vdefaults = ['name' => $prefix . '_scale_value',
+                      'proficient' => 0,
+                      'scaleid' => $scaleid,
+                      'timemodified' => time(),
+                      'usermodified' => $USER->id];
+
+        // You can't have a scale without values, so if values is empty chuck in these.
+        if (empty($valuedata)) {
+            $valuedata = [
+                1 => ['name' => 'Assigned', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
+                2 => ['name' => 'Progress', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                3 => ['name' => 'Complete', 'proficient' => 1, 'sortorder' => 3, 'default' => 0]
+            ];
+        }
+
+        $value = null;
+        $defaultid = null;
+        foreach ($valuedata as $vdata) {
+            $vdata = array_merge($vdefaults, $vdata);
+
+            $valueid = $DB->insert_record("{$prefix}_scale_values", $vdata);
+
+            if (!empty($vdata->default)) {
+                $defaultid = $valueid;
+            }
+        }
+
+        // If a default value hasn't been specified, just use the last one.
+        if (empty($defaultid)) {
+            $defaultid = $valueid;
+        }
+
+        // Finally update the default value and return the scale.
+        $DB->set_field("{$prefix}_scale", 'defaultid', $defaultid, ['id' => $scaleid]);
+        return $DB->get_record("{$prefix}_scale", array('id' => $scaleid));
+    }
+
+    /**
      * Create a personal goal for a user
      *
      * @param int $userid       The id of the user to create the goal for

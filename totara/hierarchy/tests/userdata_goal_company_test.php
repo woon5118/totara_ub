@@ -56,7 +56,17 @@ class userdata_goal_company_test extends advanced_testcase {
         delete_user($user3);
         $retdata->user3 = $DB->get_record('user', ['id' => $user3->id]);
 
-        $frame1 = $hierarchygen->create_goal_frame('frame1'); // This returns the whole object.
+        $valuedata = [
+            1 => ['name' => 'Assigned', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
+            2 => ['name' => 'Begining', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+            3 => ['name' => 'Middling', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+            4 => ['name' => 'Resolvin', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
+            5 => ['name' => 'Complete', 'proficient' => 1, 'sortorder' => 5, 'default' => 0]
+        ];
+        $retdata->custscale = $hierarchygen->create_scale('goal', ['name' => 'goalscale1'], $valuedata);
+        $retdata->custvals = $DB->get_records('goal_scale_values', ['scaleid' => $retdata->custscale->id], 'sortorder'); // Get their real ids.
+
+        $frame1 = $hierarchygen->create_goal_frame(['name' => 'frame1', 'scaleid' => $retdata->custscale->id]); // This returns the whole object.
         $scaleid = $DB->get_field('goal_scale_assignments', 'scaleid', ['frameworkid' => $frame1->id]);
 
         // Create goal one and assign both users.
@@ -64,16 +74,23 @@ class userdata_goal_company_test extends advanced_testcase {
         $retdata->cgoal1 = $cgoal1;
         $hierarchygen->goal_assign_individuals($cgoal1->id, [$user1->id, $user2->id]);
 
-        // Update the scale value for user one to create some history records.
-        $value = $DB->get_record('goal_scale_values', ['scaleid' => $scaleid, 'sortorder' => 2]); // In progress.
-        $hierarchygen->update_company_goal_user_scale_value($user1->id, $cgoal1->id, $value->id);
+        // Update the scale value for user1 a few times to create history records.
+        $record = $DB->get_record('goal_record', ['goalid' => $cgoal1->id, 'userid' => $user1->id]);
+        foreach ($retdata->custvals as $scalevalue) {
+            // Skip the default, they are already assigned to that.
+            if ($scalevalue->sortorder == 1) {
+                continue;
+            }
+
+            $hierarchygen->update_company_goal_user_scale_value($user1->id, $cgoal1->id, $scalevalue->id);
+        }
 
         //Create goal two and assign no one.
         $cgoal2 = $hierarchygen->create_goal(['fullname' => 'cgoal2', 'frameworkid' => $frame1->id]);
         $retdata->cgoal2 = $cgoal2;
 
         // Create goal three in a different framework and assign user 1.
-        $frame2 = $hierarchygen->create_goal_frame('frame2');
+        $frame2 = $hierarchygen->create_goal_frame(['name' => 'frame2']);
         $cgoal3 = $hierarchygen->create_goal(['fullname' => 'cgoal3', 'frameworkid' => $frame2->id]);
         $hierarchygen->goal_assign_individuals($cgoal3->id, [$user1->id, $user3->id]);
         $retdata->cgoal3 = $cgoal3;
@@ -154,7 +171,7 @@ class userdata_goal_company_test extends advanced_testcase {
         $records = $DB->get_records('goal_record', ['userid' => $data->user1->id]);
         $count = company_purge::execute_count($targetuser1, $syscontext);
         $this->assertEquals(2, $count);
-        $this->assertEquals(5, $DB->count_records('goal_item_history'));
+        $this->assertEquals(8, $DB->count_records('goal_item_history'));
         $result = company_purge::execute_purge($targetuser1, $syscontext);
         $count = company_purge::execute_count($targetuser1, $syscontext);
         $this->assertEquals(0, $count);
@@ -265,7 +282,7 @@ class userdata_goal_company_test extends advanced_testcase {
 
             // Check the historical data is included.
             if ($scaledata->goalid == $data->cgoal1->id) {
-                $this->assertEquals(2, count($scaledata->scalehistory));
+                $this->assertEquals(5, count($scaledata->scalehistory));
             } else {
                 $this->assertEquals(1, count($scaledata->scalehistory));
             }
@@ -312,7 +329,7 @@ class userdata_goal_company_test extends advanced_testcase {
 
             // Check the historical data is included.
             if ($scaledata->goalid == $data->cgoal1->id) {
-                $this->assertEquals(2, count($scaledata->scalehistory));
+                $this->assertEquals(5, count($scaledata->scalehistory));
             } else {
                 $this->assertEquals(1, count($scaledata->scalehistory));
             }
@@ -333,7 +350,7 @@ class userdata_goal_company_test extends advanced_testcase {
         foreach ($result->data['deleted'] as $item) {
             // Check the historical data is included.
             if ($item->goalid == $data->cgoal1->id) {
-                $this->assertEquals(2, count($item->scalehistory));
+                $this->assertEquals(5, count($item->scalehistory));
             } else {
                 $this->assertEquals(1, count($item->scalehistory));
             }
