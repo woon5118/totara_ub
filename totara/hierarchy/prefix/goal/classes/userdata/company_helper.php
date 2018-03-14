@@ -28,6 +28,9 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+
 /**
  * Core functions for company goal userdata items.
  */

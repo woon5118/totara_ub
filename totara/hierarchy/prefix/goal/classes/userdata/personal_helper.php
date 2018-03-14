@@ -28,6 +28,9 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+
 /**
  * Core functions for personal goal userdata items.
  */
@@ -44,9 +47,8 @@ class personal_helper {
      * @return int result self::RESULT_STATUS_SUCCESS, self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     public static function purge(target_user $user, \context $context) {
-        global $CFG, $DB;
+        global $DB;
 
-        require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
         $systemcontext = \context_system::instance();
 
@@ -107,9 +109,7 @@ class personal_helper {
      * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     public static function export(target_user $user, \context $context) {
-        global $DB, $CFG;
-
-        require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+        global $DB;
 
         $fs = get_file_storage();
         $systemcontext = \context_system::instance();
