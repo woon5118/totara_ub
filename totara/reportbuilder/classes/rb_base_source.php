@@ -59,7 +59,7 @@ abstract class rb_base_source {
      * TODO - it would be nice to make this definable in the config or something.
      * @var string $uniqueseperator - A string unique enough to use as a seperator for textareas
      */
-    protected $uniquedelimiter = '\.|./';
+    protected $uniquedelimiter = '^|:';
 
     /** @var array $addeduserjoins internal tracking of user columns */
     private $addeduserjoins = array();
