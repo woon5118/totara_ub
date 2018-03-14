@@ -124,6 +124,11 @@ module.exports = function(grunt) {
     // Globbing pattern for matching all AMD JS source files.
     var amdSrc = [inAMD ? cwd + '/src/*.js' : '**/amd/src/*.js'];
 
+    // Non AMD JS which still needs to uglify through grunt
+    var independentSrc = [
+        cwd + '/totara/core/js/lib/src/*.js'
+    ];
+
     /**
      * Totara: Test if given path is for a RTL stylesheet.
      *
@@ -380,6 +385,14 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     src: amdSrc,
+                    rename: uglifyRename
+                }],
+                options: {report: 'none'}
+            },
+            independent: {
+                files: [{
+                    expand: true,
+                    src: independentSrc,
                     rename: uglifyRename
                 }],
                 options: {report: 'none'}
