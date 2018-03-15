@@ -29,6 +29,7 @@ Feature: In a report, admin can see loglive data
     And I set the field "reader" to "Legacy log"
     And I wait to be redirected
     And I should see "course_add mod"
+    And I press "Pause live updates"
     And I log out
 
   @javascript @_switch_window
@@ -54,6 +55,8 @@ Feature: In a report, admin can see loglive data
     Then I should see "Pause live updates"
     And I wait "8" seconds
     And I should see "Test name2"
+    # So the refresh ajax script doesn't run during the log out process (causing an error in PHP logs)
+    And I press "Pause live updates"
     And I log out
 
   @javascript @_switch_window
@@ -77,5 +80,7 @@ Feature: In a report, admin can see loglive data
     And I press "Resume live updates"
     And I wait "8" seconds
     And I should see "Test name2"
+    # So the refresh ajax script doesn't run during the log out process (causing an error in PHP logs)
+    And I press "Pause live updates"
     And I log out
 
