@@ -116,10 +116,11 @@ Feature: auth_approved: email confirmation
 
     # Successful registration outcome #4: approver gets notification
     When I log in as "itmgr"
-    Then I should see "Signup applicant email confirmed"
+    And I open the notification popover
+    Then I should see "New account request requires approval"
 
-    When I follow "Click for more information"
-    Then I should see "Signup applicant email confirmed"
+    When I follow "View full notification"
+    Then I should see "has just confirmed their email address"
     Then I should see "jb007"
     Then I should see "bond@example.gov"
 
@@ -149,7 +150,8 @@ Feature: auth_approved: email confirmation
 
     When I log out
     And I log in as "itmgr"
-    Then I should not see "Signup applicant email confirmed"
+    And I open the notification popover
+    Then I should not see "New account request requires approval"
 
 
   # -------------------------------
@@ -178,7 +180,8 @@ Feature: auth_approved: email confirmation
 
     When I log out
     And I log in as "vp"
-    Then I should not see "Signup applicant email confirmed"
+    And I open the notification popover
+    Then I should not see "New account request requires approval"
 
 
 

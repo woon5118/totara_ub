@@ -208,9 +208,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $messages = $messagesink->get_messages();
         $message = reset($messages);
         $this->assertEquals($approver->id, $message->useridto);
-        $this->assertSame('New signup request', $message->subject);
-        $this->assertContains('New signup to be approved: username "test1", email "test_1@example.com"', $message->fullmessage);
-        $this->assertContains('New signup to be approved: username "test1", email "test_1@example.com"', $message->smallmessage);
+        $this->assertSame('Account request awaits email confirmation', $message->subject);
+        $this->assertContains('Applicant "test1 test1" requested an account with username "test1"; they were asked to confirm their email address "test_1@example.com"', $message->fullmessage);
+        $this->assertContains('Applicant "test1 test1" requested an account with username "test1"; they were asked to confirm their email address "test_1@example.com"', $message->smallmessage);
         $this->assertSame($noreplyuser->email, $message->fromemail);
 
         $events = $eventsink->get_events();
@@ -367,9 +367,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $messages = $messagesink->get_messages();
         $message = reset($messages);
         $this->assertEquals($approver->id, $message->useridto);
-        $this->assertSame('Signup applicant email confirmed', $message->subject);
-        $this->assertContains('Signup applicant email confirmed: signup applicant with username "test1" has confirmed their email address "test_1@example.com"', $message->fullmessage);
-        $this->assertContains('Signup applicant email confirmed: signup applicant with username "test1" has confirmed their email address "test_1@example.com"', $message->smallmessage);
+        $this->assertSame('New account request requires approval', $message->subject);
+        $this->assertContains('Applicant "test1 test1", who requested an account with username "test1", has just confirmed their email address "test_1@example.com"', $message->fullmessage);
+        $this->assertContains('Applicant "test1 test1", who requested an account with username "test1", has just confirmed their email address "test_1@example.com"', $message->smallmessage);
         $this->assertSame($noreplyuser->email, $message->fromemail);
 
 
@@ -440,6 +440,8 @@ class auth_approved_request_testcase extends advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        $approver = $this->create_approver();
+
         $emailsink = $this->redirectEmails();
         $eventsink = $this->redirectEvents();
         $messagesink = $this->redirectMessages();
@@ -465,7 +467,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertInstanceOf('single_button', $result[2]);
         $this->assertSame(get_login_url(), $result[2]->url->out(false));
         $this->assertSame(3, $eventsink->count());
-        $this->assertSame(0, $messagesink->count());
+        $this->assertSame(1, $messagesink->count());
         $this->assertSame(1, $emailsink->count());
 
         $emails = $emailsink->get_messages();
@@ -516,6 +518,13 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame(get_string('eventrequestapproved', 'auth_approved'), $event::get_name());
         $this->assertContains('/auth/approved/index.php', (string)$event->get_url());
 
+        // Verify approver notification.
+        $messages = $messagesink->get_messages();
+        $message = reset($messages);
+        $this->assertEquals($approver->id, $message->useridto);
+        $this->assertSame('New account request was approved automatically', $message->subject);
+        $this->assertSame($noreplyuser->email, $message->fromemail);
+
         $emailsink->close();
         $eventsink->close();
         $messagesink->close();
@@ -525,6 +534,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+
+        $approver = $this->create_approver();
+
         $emailsink = $this->redirectEmails();
         $eventsink = $this->redirectEvents();
         $messagesink = $this->redirectMessages();
@@ -553,7 +565,7 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $this->assertSame(1, $emailsink->count());
         $this->assertSame(3, $eventsink->count());
-        $this->assertSame(0, $messagesink->count());
+        $this->assertSame(1, $messagesink->count());
 
         $emails = $emailsink->get_messages();
 
@@ -602,6 +614,13 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
         $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+
+        // Verify approver notification.
+        $messages = $messagesink->get_messages();
+        $message = reset($messages);
+        $this->assertEquals($approver->id, $message->useridto);
+        $this->assertSame('New account request was approved automatically', $message->subject);
+        $this->assertSame($noreplyuser->email, $message->fromemail);
 
         $emailsink->close();
         $eventsink->close();

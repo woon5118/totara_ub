@@ -203,13 +203,14 @@ final class request {
             $errors = self::validate_signup_form_data($data, self::STAGE_APPROVAL);
             if (!$errors) {
                 self::approve_request($request->id, '', true);
+                $request = $DB->get_record('auth_approved_request', array('id' => $request->id), '*', MUST_EXIST);
                 $approved = true;
             }
         }
 
         if ($approved) {
-            // Do not send any confirmation about approved email,
-            // also there is no need to notify approvers any more.
+            // Do not send any confirmation about approved email.
+            comms::notify_auto_approved_request($request);
             $loginbutton = new \single_button(new \moodle_url(get_login_url()), get_string('login'), 'get');
             return array(true, get_string('confirmtokenacceptedapproved', 'auth_approved', s($request->username)), $loginbutton);
         } else {
