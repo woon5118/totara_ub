@@ -126,22 +126,18 @@ echo $OUTPUT->header();
         <div class="span5">
           <label for="removeselect"><?php print_string('existingadmins', 'core_role'); ?></label>
           <?php $admisselector->display(); ?>
-          </td>
-      <td id="buttonscell">
-        <p class="arrow_button">
+        </div>
+        <div class="span2 controls">
             <input name="add" id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>"
-                   title="<?php print_string('add'); ?>" class="btn btn-secondary"/><br />
+                   title="<?php print_string('add'); ?>" class="btn btn-default"/>
             <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>"
-                   title="<?php print_string('remove'); ?>" class="btn btn-secondary"/><br />
+                   title="<?php print_string('remove'); ?>" class="btn btn-default"/>
             <input name="main" id="main" type="submit" value="<?php echo get_string('mainadminset', 'core_role'); ?>"
-                   title="<?php print_string('mainadminset', 'core_role'); ?>" class="btn btn-secondary"/>
-        </p>
-      </td>
-      <td id="potentialcell">
-          <p>
+                   title="<?php print_string('mainadminset', 'core_role'); ?>" class="btn btn-default"/>
+        </div>
+        <div class="span5">
             <label for="addselect"><?php print_string('users'); ?></label>
-          </p>
-          <?php $potentialadmisselector->display(); ?>
+            <?php $potentialadmisselector->display(); ?>
         </div>
       </div>
     </form>
