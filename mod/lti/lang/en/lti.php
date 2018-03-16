@@ -70,7 +70,6 @@ $string['addnewapp'] = 'Enable external application';
 $string['addserver'] = 'Add new trusted server';
 $string['addtype'] = 'Add preconfigured tool';
 $string['allow'] = 'Allow';
-$string['allowinstructorcustom'] = 'Allow trainers to add custom parameters';
 $string['allowsetting'] = 'Allow tool to store 8K of settings in Totara';
 $string['always'] = 'Always';
 $string['automatic'] = 'Automatic, based on tool URL';
