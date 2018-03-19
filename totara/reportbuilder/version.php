@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2018031500;       // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2018041100;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120505;       // Requires this Moodle version.
 $plugin->component = 'totara_reportbuilder';  // To check on upgrade, that module sits in correct place

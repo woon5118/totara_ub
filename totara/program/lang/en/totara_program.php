@@ -231,8 +231,6 @@ $string['confirmdeletecompletion'] = 'Are you sure that you want to delete this 
 $string['confirmmessagechanges'] = 'Confirm message changes';
 $string['confirmresolution'] = 'Confirm issue resolution';
 $string['content'] = 'Content';
-$string['contentavailability'] = 'Hide currently unavailable content';
-$string['contentavailability_help'] = 'Sets whether the report will include programs before/after the available from/until settings';
 $string['contenttypenotfound'] = 'Content type not found';
 $string['contentupdatednotsaved'] = 'Program content updated (not yet saved)';
 $string['continue'] = 'Continue';
@@ -1095,3 +1093,8 @@ If a learner belongs to an organisation that is assigned to the program and also
 $string['error:cannotrequestextnotuser'] = 'You cannot request an extension for another user';
 $string['extensionrequestfailed:nomanager'] = 'Extension request was not sent. Manager could not be found';
 $string['error:noprogramcompletionfound'] = 'No program completion record was found';
+
+// Deprecated since Totara 12
+
+$string['contentavailability'] = 'Hide currently unavailable content';
+$string['contentavailability_help'] = 'Sets whether the report will include programs before/after the available from/until settings';

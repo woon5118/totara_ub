@@ -1347,17 +1347,22 @@ class rb_tag_content extends rb_base_content {
  * Restrict content by availability
  *
  * Pass in a column that contains a pipe '|' separated list of official tag ids
+ *
+ * @deprecated Since Totara 12.0
  */
 class rb_prog_availability_content extends rb_base_content {
     /**
      * Generate the SQL to apply this content restriction
      *
+     * @deprecated Since Totara 12.0
      * @param string $field SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
     public function sql_restriction($field, $reportid) {
+        debugging('rb_prog_availability_content::sql_restriction has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
+
         // The restriction snippet based on the available fields was moved to totara_visibility_where.
         // So no restriction for programs or certifications.
         $restriction = " 1=1 ";
@@ -1368,12 +1373,14 @@ class rb_prog_availability_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since Totara 12.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
      * @return string Human readable description of the restriction
      */
     public function text_restriction($title, $reportid) {
+        debugging('rb_prog_availability_content::text_restriction has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         return get_string('contentavailability', 'totara_program');
     }
 
@@ -1381,11 +1388,14 @@ class rb_prog_availability_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since Totara 12.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
+        debugging('rb_prog_availability_content::form_template has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
+
         global $DB;
 
         // Get current settings and
@@ -1408,12 +1418,15 @@ class rb_prog_availability_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since Totara 12.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+        debugging('rb_prog_availability_content::form_process has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
+
         global $DB;
 
         $status = true;

@@ -275,5 +275,45 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017120800, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2018041100) {
+
+        // Deprecated content option "hide currently unavailable content" has been removed in the UI via TL-16893.
+        // This upgrade deals with removing redundant database entries.
+        $sql = "DELETE FROM {report_builder_settings}
+                      WHERE type = 'prog_availability_content'
+                        AND name = 'enable'";
+        $DB->execute($sql, array());
+
+        // Get reports that use the program or certification source that still have content options.
+        // This should only be custom content options that have been added.
+        $sql = "SELECT DISTINCT rb.id
+                  FROM {report_builder_settings} rbs
+                  JOIN {report_builder} rb
+                    ON rb.id = rbs.reportid
+                 WHERE (rb.source = 'program' OR rb.source = 'certification')
+                   AND rbs.name = 'enable'
+                   AND rbs.value = '1'";
+        $reportstoexclude = $DB->get_fieldset_sql($sql);
+
+        if ($reportstoexclude) {
+            list($sql, $reportstoexclude_params) = $DB->get_in_or_equal($reportstoexclude, SQL_PARAMS_QM, 'param', false);
+            $reportstoexclude_sql = 'AND id ' . $sql;
+        } else {
+            $reportstoexclude_sql = '';
+            $reportstoexclude_params = array();
+        }
+
+        // Update all reports using the program or certification source to not use any content options as there should
+        // be none. (other than reports with custom content options detected via $reportstoexclude, so let's exclude those).
+        $sql = "UPDATE {report_builder}
+                   SET contentmode = 0
+                 WHERE (source = 'program' OR source = 'certification')
+                 $reportstoexclude_sql";
+        $DB->execute($sql, $reportstoexclude_params);
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2018041100, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

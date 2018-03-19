@@ -55,3 +55,4 @@ information provided here is intended especially for developers.
 * Added 'selectionlimit' option to manager field filters. "{$CFG->totara_reportbuilder_filter_selected_managers_limit}"
   introduced to limit the number of selected managers in the report builder job assignment filter dialog.
   Default value is 25, to make it unlimited, set it to 0.
+* rb_prog_availability_content class has been deprecated.

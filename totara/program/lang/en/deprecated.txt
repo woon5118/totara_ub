@@ -21,3 +21,5 @@ totalassignments_help,totara_program
 error:cannotrequestextnotuser,totara_program
 extensionrequestfailed:nomanager,totara_program
 error:noprogramcompletionfound,totara_program
+contentavailability,totara_program
+contentavailability_help,totara_program

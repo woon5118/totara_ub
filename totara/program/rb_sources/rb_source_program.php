@@ -115,21 +115,6 @@ class rb_source_program extends rb_base_source {
         return $filteroptions;
     }
 
-    protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'prog_availability',
-                get_string('availablecontent', 'rb_source_program'),
-                array(
-                    'available' => 'base.available',
-                    'availfrom' => 'base.availablefrom',
-                    'availuntil' => 'base.availableuntil',
-                )
-            ),
-        );
-        return $contentoptions;
-    }
-
     protected function define_paramoptions() {
         $paramoptions = array(
             new rb_param_option(
