@@ -3176,8 +3176,6 @@ class restore_course_completion_structure_step extends restore_structure_step {
         $data->course = $this->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        // If course is set to start completion on enrol, then users may be already enrolled and completion records may exist already at this point.
-        $startonenrol = $DB->get_field('course', 'completionstartonenrol', array('id' => $data->course));
         if (!empty($data->userid)) {
             $params = array(
                 'userid' => $data->userid,
@@ -3223,6 +3221,10 @@ class restore_course_completion_structure_step extends restore_structure_step {
                     "Created completion in restore_course_completion_structure_step->process_course_completions");
             }
             $transaction->allow_commit();
+            // Remove any existing cache.
+            $cache = cache::make('core', 'coursecompletion');
+            $key = $data->userid . '_' . $data->course;
+            $cache->delete($key);
         }
     }
 
