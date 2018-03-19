@@ -47,7 +47,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy singlelang',
-                    'policystatement' => 'Policy statement singlelang',
+                    'statement' => 'Policy statement singlelang',
                     'consentstatement' => 'Consent statement singlelang',
                     'providetext' => 'yes',
                     'withheldtext' => 'no',
@@ -61,7 +61,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy singlelang_multiconsent',
-                    'policystatement' => 'Policy statement singlelang_multiconsent',
+                    'statement' => 'Policy statement singlelang_multiconsent',
                     'numoptions' => 2,
                     'consentstatement' => 'Consent statement singlelang_multiconsent',
                     'providetext' => 'yes',
@@ -77,7 +77,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'languages' => 'en, nl',
                     'langprefix' => ',nl ',
                     'title' => 'Test policy multilang_multiconsent',
-                    'policystatement' => 'Policy statement multilang_multiconsent',
+                    'statement' => 'Policy statement multilang_multiconsent',
                     'numoptions' => 2,
                     'consentstatement' => 'Consent statement multilang_multiconsent',
                     'providetext' => 'Yes',
@@ -93,7 +93,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'languages' => 'en, nl',
                     'langprefix' => ',nl ',
                     'title' => 'Test policy published',
-                    'policystatement' => 'Policy statement published',
+                    'statement' => 'Policy statement published',
                     'numoptions' => 2,
                     'consentstatement' => 'Consent statement published',
                     'providetext' => 'yes',
@@ -143,13 +143,39 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
         }
 
         $languages = isset($options['languages']) ? explode(',', $options['languages']) : ['en'];
+        $languages = array_map(function($l) { return trim($l);}, $languages);
+        $prefixes = isset($options['langprefix']) ? explode(',', $options['langprefix']) : [''];
+        $prefixes = array_map(
+            function($l) {
+                if ($l != '') {
+                    return trim($l) . ' ';
+                } else {
+                    return $l;
+                }
+            }, $prefixes);
         $numoptions = $options['numoptions'] ?? 1;
 
         // # lang localised policies
         $rows = $DB->get_records('tool_sitepolicy_localised_policy');
         $this->assertEquals(count($languages), count($rows));
         foreach ($rows as $row) {
-            $this->assertEquals(($row->language == $languages[0]), (bool)$row->isprimary);
+            $idx = array_search($row->language, $languages);
+            $isprimary = $idx !== false && $idx == 0;
+            $this->assertEquals($isprimary, (bool)$row->isprimary);
+
+            $prefix = $idx < count($prefixes) ? $prefixes[$idx] : '';
+            if (isset($options['title'])) {
+                $this->assertEquals($prefix . $options['title'], $row->title);
+            }
+            if (isset($options['statement'])) {
+                $this->assertEquals($prefix . $options['statement'], $row->policytext);
+            }
+            if (isset($options['authorid'])) {
+                $this->assertEquals($options['authorid'], $row->authorid);
+            }
+            if (isset($options['time'])) {
+                $this->assertEquals($options['time'], $row->timecreated);
+            }
         }
 
         // # consent options
@@ -180,7 +206,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy onedraft',
-                    'policystatement' => 'Policy statement onedraft',
+                    'statement' => 'Policy statement onedraft',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement onedraft',
                     'providetext' => 'yes',
@@ -197,7 +223,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy onepublished',
-                    'policystatement' => 'Policy statement onepublished',
+                    'statement' => 'Policy statement onepublished',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement onepublished',
                     'providetext' => 'yes',
@@ -214,7 +240,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy threearchived',
-                    'policystatement' => 'Policy statement threearchived',
+                    'statement' => 'Policy statement threearchived',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement threearchived',
                     'providetext' => 'yes',
@@ -231,7 +257,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy all',
-                    'policystatement' => 'Policy statement all',
+                    'statement' => 'Policy statement all',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement all',
                     'providetext' => 'yes',
@@ -248,7 +274,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy draftandarvhiced',
-                    'policystatement' => 'Policy statement draftandarvhiced',
+                    'statement' => 'Policy statement draftandarvhiced',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement draftandarchived',
                     'providetext' => 'yes',
@@ -266,7 +292,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'languages' => 'en, nl',
                     'langprefix' => ',nl ',
                     'title' => 'Test policy userconsented',
-                    'policystatement' => 'Policy statement userconsented',
+                    'statement' => 'Policy statement userconsented',
                     'numoptions' => 2,
                     'consentstatement' => 'Consent statement userconsented',
                     'providetext' => 'yes',

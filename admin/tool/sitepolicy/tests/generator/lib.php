@@ -47,7 +47,7 @@ class tool_sitepolicy_generator extends component_generator_base {
      *      'languages' => 'en', // Languages. First language is primary
      *      'langprefix' => [''], // Prefix to add each language's values to distinguish between languages
      *      'title' => 'Policy title',
-     *      'policystatement' => 'Policy statement',
+     *      'statement' => 'Policy statement',
      *      'numoptions' => 1, // Number of consent options per version
      *      'consentstatement' => 'Consent statement',
      *      'providetext' => 'yes',
@@ -82,7 +82,7 @@ class tool_sitepolicy_generator extends component_generator_base {
      *      'languages' => 'en', // Languages. First language is primary
      *      'langprefix' => [''], // Prefix to add each language's values to distinguish between languages
      *      'title' => 'Policy title',
-     *      'policystatement' => 'Policy statement',
+     *      'statement' => 'Policy statement',
      *      'numoptions' => 1, // Number of consent options per version
      *      'consentstatement' => 'Consent statement',
      *      'providetext' => 'yes',
@@ -131,7 +131,7 @@ class tool_sitepolicy_generator extends component_generator_base {
      *      'languages' => 'en', // Translation languages. First language is primary
      *      'langprefix' => [''], // Prefix to add each language's values to distinguish between languages
      *      'title' => 'Policy title',
-     *      'policystatement' => 'Policy statement',
+     *      'statement' => 'Policy statement',
      *      'consentstatement' => 'Consent statement',
      *      'providetext' => 'Yes',
      *      'withheldtext' => 'No',
@@ -293,7 +293,7 @@ class tool_sitepolicy_generator extends component_generator_base {
         $consentids = [];
         for ($i = 0; $i < count($definition['languages']); $i++) {
             $lang = trim($definition['languages'][$i]);
-            $langprefix = !empty($definition['langprefix'][$i]) ? $definition['langprefix'][$i] . ' ' : '';
+            $langprefix = !empty($definition['langprefix'][$i]) ? trim($definition['langprefix'][$i]) . ' ' : '';
             $policy = localisedpolicy::from_data($version, $lang, $i == 0);
             $policy->set_authorid($definition['authorid']);
             $policy->set_timecreated($definition['time']);

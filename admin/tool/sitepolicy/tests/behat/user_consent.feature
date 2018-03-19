@@ -28,13 +28,13 @@ Feature: Give or withhold user consent
     And I should see "P1 - Consent statement 1"
     And I should not see "Consent is required to access the site"
 
-    And I set the "P1 - Consent statement 1" Totara form field to "0"
+    And I set the "P1 - Consent statement 1" Totara formF field to "0"
     And I press "Submit"
-    Then I should see "Dashboard"
+    Then I should see "Current Learning"
 
     When I log out
     And I log in as "learner1"
-    Then I should see "Dashboard"
+    Then I should see "Current Learning"
 
   Scenario: User must view all optional sitepolicies before being allowed to log in
     Given the following "multiversionpolicies" exist in "tool_sitepolicy" plugin:
@@ -59,7 +59,7 @@ Feature: Give or withhold user consent
 
     When I set the "P2 - Consent statement 1" Totara form field to "1"
     And I press "Submit"
-    Then I should see "Dashboard"
+    Then I should see "Current Learning"
 
   Scenario: User is only required to view an optional policy once
     Given the following "multiversionpolicies" exist in "tool_sitepolicy" plugin:
@@ -133,11 +133,11 @@ Feature: Give or withhold user consent
 
     When I set the "P4 - Consent statement 1 (Consent is required to access the site)" Totara form field to "1"
     And I press "Submit"
-    Then I should see "Dashboard"
+    Then I should see "Current Learning"
 
     When I log out
     And I log in as "learner1"
-    Then I should see "Dashboard"
+    Then I should see "Current Learning"
 
 
   Scenario: Guest user must view all policies and consent to all mandatory policies on every login
@@ -168,7 +168,8 @@ Feature: Give or withhold user consent
     # guest user's consent is still valid for the session
     When I follow "Log in"
     And I log in as "learner1"
-    Then I should see "Dashboard"
+    Then I should see "1 of 2 policies"
+    And I should see "Policy 1"
 
     # new session after logout
     When I log out

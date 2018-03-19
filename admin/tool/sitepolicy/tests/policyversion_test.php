@@ -31,21 +31,31 @@ defined('MOODLE_INTERNAL') || die();
 class tool_sitepolicy_policyversion_test extends \advanced_testcase {
 
     /**
-     * Test new_policy_draft with exceptions
+     * Test new_policy_draft with exception when sitepolicy not saved
      */
-    public function test_new_policy_draft_exceptions() {
+    public function test_new_policy_draft_exception_sitepolicy_not_saved() {
 
         $this->resetAfterTest();
         $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Site policy must be saved before adding policy versions');
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
-        // Unsaved sitepolicy
         $sitepolicy = new sitepolicy();
         $version = policyversion::new_policy_draft($sitepolicy);
+    }
+
+    /**
+     * Test new_policy_draft with exception when another draft already exists
+     */
+    public function test_new_policy_draft_exception_draft_exists() {
+
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Cannot create draft as it already exists');
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_draft_policy([]);
         $version = policyversion::new_policy_draft($sitepolicy);
-
     }
 
     /**
@@ -127,6 +137,160 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
     }
 
     /**
+     * Test delete.
+     * Ensure related rows are also deleted
+     */
+    public function test_delete() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $options = [
+            'hasdraft' => true,
+            'numpublished' => 0,
+            'allarchived' => false,
+            'authorid' => 2,
+            'languages' => 'en',
+            'title' => 'Test policy all',
+            'statement' => 'Policy statement all',
+            'numoptions' => 1,
+            'consentstatement' => 'Consent statement all',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+        ];
+
+        $sitepolicy = $generator->create_multiversion_policy($options);
+
+        // Ensure the rows were created
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_policy_version');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_consent_options');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_consent');
+        $this->assertEquals(1, count($rows));
+
+        // Now delete the policy_version and ensure that related entries are also deleted
+        $version = policyversion::from_policy_latest($sitepolicy);
+        $version->delete();
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_policy_version');
+        $this->assertEquals(0, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_consent_options');
+        $this->assertEquals(0, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_policy');
+        $this->assertEquals(0, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_consent');
+        $this->assertEquals(0, count($rows));
+    }
+
+    /**
+     * Test delete error conditions.
+     * Only test error conditions handled in policyversion here.
+     * Other classes test their own error conditions.
+     */
+    public function test_delete_exceptions() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('This version was published, so it cannot be deleted');
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $options = [
+            'hasdraft' => false,
+            'numpublished' => 1,
+            'allarchived' => false,
+            'authorid' => 2,
+            'languages' => 'en',
+            'title' => 'Test policy all',
+            'statement' => 'Policy statement all',
+            'numoptions' => 1,
+            'consentstatement' => 'Consent statement all',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+        ];
+
+        $sitepolicy = $generator->create_multiversion_policy($options);
+
+        // Ensure the rows were created
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_policy_version');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_consent_options');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_consent');
+        $this->assertEquals(1, count($rows));
+
+        // Now try to delete - error should be thrown and rows left intacked
+        $version = policyversion::from_policy_latest($sitepolicy);
+        $version->delete();
+    }
+
+    /**
+     * Test force delete
+     */
+    public function test_delete_force() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $options = [
+            'hasdraft' => false,
+            'numpublished' => 1,
+            'allarchived' => false,
+            'authorid' => 2,
+            'languages' => 'en',
+            'title' => 'Test policy all',
+            'statement' => 'Policy statement all',
+            'numoptions' => 1,
+            'consentstatement' => 'Consent statement all',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+        ];
+
+        $sitepolicy = $generator->create_multiversion_policy($options);
+
+        // Ensure the rows were created
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_policy_version');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_consent_options');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_consent');
+        $this->assertEquals(1, count($rows));
+
+        // force delete
+        $version = policyversion::from_policy_latest($sitepolicy);
+        $version->delete(true);
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(1, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_policy_version');
+        $this->assertEquals(0, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_consent_options');
+        $this->assertEquals(0, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_policy');
+        $this->assertEquals(0, count($rows));
+        $rows = $DB->get_records('tool_sitepolicy_localised_consent');
+        $this->assertEquals(0, count($rows));
+    }
+
+    /**
      * Test from_policy_latest
      */
     public function test_from_policy_latest() {
@@ -142,7 +306,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             'authorid' => 2,
             'languages' => 'en',
             'title' => 'Test policy all',
-            'policystatement' => 'Policy statement all',
+            'statement' => 'Policy statement all',
             'numoptions' => 1,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -230,7 +394,6 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->assertEquals(policyversion::STATUS_ARCHIVED, $version->get_status());
     }
 
-
     /**
      * Data provider for test_get_versionlist.
      */
@@ -245,7 +408,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy onedraft',
-                    'policystatement' => 'Policy statement onedraft',
+                    'statement' => 'Policy statement onedraft',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement onedraft',
                     'providetext' => 'yes',
@@ -262,7 +425,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy onepublished',
-                    'policystatement' => 'Policy statement onepublished',
+                    'statement' => 'Policy statement onepublished',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement onepublished',
                     'providetext' => 'yes',
@@ -279,7 +442,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy threearchived',
-                    'policystatement' => 'Policy statement threearchived',
+                    'statement' => 'Policy statement threearchived',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement threearchived',
                     'providetext' => 'yes',
@@ -297,7 +460,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
                     'languages' => 'en, nl, he',
                     'langprefix' =>',nl ,he ',
                     'title' => 'Test policy all',
-                    'policystatement' => 'Policy statement all',
+                    'statement' => 'Policy statement all',
                     'numoptions' => 3,
                     'consentstatement' => 'Consent statement all',
                     'providetext' => 'yes',
@@ -315,7 +478,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
                     'languages' => 'en, nl',
                     'langprefix' => ',nl ',
                     'title' => 'Test policy draftandarvhiced',
-                    'policystatement' => 'Policy statement draftandarvhiced',
+                    'statement' => 'Policy statement draftandarvhiced',
                     'numoptions' => 3,
                     'consentstatement' => 'Consent statement draftandarchived',
                     'providetext' => 'yes',
@@ -390,7 +553,6 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         }
     }
 
-
     /**
      * Test get_versionlist after manipulating options
      **/
@@ -408,7 +570,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             'languages' => 'en, nl',
             'langprefix' => ',nl',
             'title' => 'Test policy optionchanges',
-            'policystatement' => 'Policy statement optionchanges',
+            'statement' => 'Policy statement optionchanges',
             'numoptions' => 3,
             'consentstatement' => 'Consent statement optionchanges',
             'providetext' => 'yes',
@@ -467,7 +629,6 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->assertEquals(policyversion::STATUS_DRAFT, $row->status);
     }
 
-
     /**
      * Test get_summary
      **/
@@ -482,7 +643,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             'languages' => 'en, nl, he',
             'langprefix' =>',nl ,he ',
             'title' => 'Test policy all',
-            'policystatement' => 'Policy statement all',
+            'statement' => 'Policy statement all',
             'numoptions' => 3,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -586,7 +747,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             'languages' => 'en, nl, he',
             'langprefix' =>',nl ,he ',
             'title' => 'Test policy all',
-            'policystatement' => 'Policy statement all',
+            'statement' => 'Policy statement all',
             'numoptions' => 3,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -668,7 +829,6 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->assertEquals($version2->get_timearchived(), $version2->get_timearchived());
     }
 
-
     /**
      * Test publish
      */
@@ -695,6 +855,8 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->assertEquals($version2->get_timearchived(), $version2->get_timearchived());
     }
 
+    // Not testing clone_content explicitly here as it is uses only localisedcpolicy methods and is also
+    // used extensively in the data generators
 
     /**
      * Test has_active
@@ -720,7 +882,6 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
      * Test get_languages
      **/
     public function test_get_languages() {
-        global $DB;
 
         $this->resetAfterTest();
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
@@ -730,7 +891,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             'languages' => 'en, nl, he',
             'langprefix' =>',nl ,he ',
             'title' => 'Test policy all',
-            'policystatement' => 'Policy statement all',
+            'statement' => 'Policy statement all',
             'numoptions' => 3,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -752,5 +913,4 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             $this->assertEquals((int)($language->language == $expected[0]), $language->isprimary);
         }
     }
-
 }

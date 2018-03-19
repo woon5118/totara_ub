@@ -270,6 +270,10 @@ class localisedconsent {
             throw new \coding_exception("Localised policy must be saved before saving localised consent option");
         }
 
+        if (empty($entry->consentoptionid)) {
+            throw new \coding_exception("Consent option must be saved before saving localised consent option");
+        }
+
         if (empty($this->id)) {
             // Create.
             $this->id = $DB->insert_record('tool_sitepolicy_localised_consent', $entry);

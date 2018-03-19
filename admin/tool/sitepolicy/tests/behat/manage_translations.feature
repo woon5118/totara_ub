@@ -1,4 +1,4 @@
-@javascript @tool @tool_sitepolicy @totara
+@javascript @tool @tool_sitepolicy @totara @language_packs
 Feature: Manage sitepolicy version translations
   As an admin
   I want to manage multiple translations of a site policy

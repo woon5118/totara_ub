@@ -43,7 +43,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy onedraft',
-                    'policystatement' => 'Policy statement onedraft',
+                    'statement' => 'Policy statement onedraft',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement onedraft',
                     'providetext' => 'yes',
@@ -60,7 +60,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy onepublished',
-                    'policystatement' => 'Policy statement onepublished',
+                    'statement' => 'Policy statement onepublished',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement onepublished',
                     'providetext' => 'yes',
@@ -77,7 +77,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy threearchived',
-                    'policystatement' => 'Policy statement threearchived',
+                    'statement' => 'Policy statement threearchived',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement threearchived',
                     'providetext' => 'yes',
@@ -95,7 +95,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
                     'languages' => 'en, nl, es',
                     'langprefix' => ',nl,es',
                     'title' => 'Test policy all',
-                    'policystatement' => 'Policy statement all',
+                    'statement' => 'Policy statement all',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement all',
                     'providetext' => 'yes',
@@ -112,7 +112,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
                     'authorid' => 2,
                     'languages' => 'en',
                     'title' => 'Test policy draftandarvhiced',
-                    'policystatement' => 'Policy statement draftandarvhiced',
+                    'statement' => 'Policy statement draftandarvhiced',
                     'numoptions' => 1,
                     'consentstatement' => 'Consent statement draftandarchived',
                     'providetext' => 'yes',
@@ -157,6 +157,9 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
         $this->assertEquals($expected['status'], $row->status);
     }
 
+    /**
+     * Test switchversion method
+     */
     public function test_get_switchversion() {
         global $DB;
 
@@ -171,7 +174,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
             'languages' => 'en, nl, es',
             'langprefix' => ',nl,es',
             'title' => 'Test policy all',
-            'policystatement' => 'Policy statement all',
+            'statement' => 'Policy statement all',
             'numoptions' => 1,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -226,6 +229,40 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
             return (!is_null($policy->timepublished) && !is_null($policy->timearchived));
         });
         $this->assertTrue(array_key_exists($oldpublishedid, $archived));
+    }
+
+    /**
+     * Test save and delete methods
+     */
+    public function test_save_and_delete() {
+         global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        // Verify no existing site_policies
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(0, count($rows));
+
+        $sitepolicy = new sitepolicy();
+        $sitepolicy->save();
+
+        // Verify new site_policy saved
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(1, count($rows));
+        $id = reset($rows)->id;
+
+        // Now update timecreated and save again
+        $sitepolicy->set_timecreated(12345);
+        $sitepolicy->save();
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(1, count($rows));
+        $this->assertEquals($id, reset($rows)->id);
+
+        // Now delete the policy
+        $sitepolicy->delete();
+        $rows = $DB->get_records('tool_sitepolicy_site_policy');
+        $this->assertEquals(0, count($rows));
     }
 
 }

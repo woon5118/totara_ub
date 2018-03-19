@@ -31,8 +31,36 @@ defined('MOODLE_INTERNAL') || die();
 class tool_sitepolicy_userconsent_test extends \advanced_testcase {
 
     /**
-     * Test save with and without consentoption and/or language
-     * @expectedException coding_exception
+     * Test save with and without consentoption
+     */
+    public function test_save_with_exception_no_consentoptionid() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Expected consentoptionid and language not set');
+
+        $userconsent = new userconsent();
+        $userconsent->save();
+    }
+
+    /**
+     * Test save
+     */
+    public function test_save_exception_no_language() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Expected consentoptionid and language not set');
+
+        $userconsent = new userconsent();
+        $userconsent->set_consentoptionid(1);
+        $userconsent->save();
+    }
+
+    /**
+     * Test save
      */
     public function test_save() {
         global $DB;
@@ -40,22 +68,16 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $userconsent = new userconsent();
-        $userconsent->save();
-        $this->assertEquals(0, $userconsent->get_id());
-        $rows = $DB->get_records('tool_sitepolicy_localised_consent');
-        $this->assertFalse($rows);
-
         $userconsent->set_consentoptionid(1);
-        $userconsent->save();
-        $this->assertEquals(0, $userconsent->get_id());
-        $this->assertFalse($rows);
-
         $userconsent->set_language('en');
         $userconsent->save();
-        $rows = $DB->get_records('tool_sitepolicy_localised_consent');
+        $rows = $DB->get_records('tool_sitepolicy_user_consent');
         $this->assertEquals(1, count($rows));
         $row = array_shift($rows);
         $this->assertEquals($row->id, $userconsent->get_id());
+        $this->assertEquals(0, $row->hasconsented);
+        $this->assertEquals(1, $row->consentoptionid);
+        $this->assertEquals('en', $row->language);
     }
 
     /**
@@ -75,7 +97,7 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
             'languages' => 'sp,en,nl',
             'langprefix' => ',en,nl',
             'title' => 'Test policy',
-            'policystatement' => 'Policy statement',
+            'statement' => 'Policy statement',
             'numoptions' => 2,
             'consentstatement' => 'Consent statement',
             'providetext' => 'yes',
@@ -106,7 +128,7 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
             'languages' => 'sp,en,nl',
             'langprefix' => ',en,nl',
             'title' => 'Test policy',
-            'policystatement' => 'Policy statement',
+            'statement' => 'Policy statement',
             'numoptions' => 2,
             'consentstatement' => 'Consent statement',
             'providetext' => 'yes',
@@ -137,7 +159,7 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
             'languages' => 'sp,en,nl',
             'langprefix' => ',en,nl',
             'title' => 'Test policy',
-            'policystatement' => 'Policy statement',
+            'statement' => 'Policy statement',
             'numoptions' => 2,
             'consentstatement' => 'Consent statement',
             'providetext' => 'yes',
@@ -188,6 +210,15 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
         $consentpolicies = userconsent::get_unansweredpolicies(2);
         $this->assertEquals(1, count($consentpolicies));
 
+        // User consents to mandatory option
+        $userconsent->set_consentoptionid($mandatoryoption->id);
+        $userconsent->set_hasconsented(1);
+        $userconsent->set_timeconsented(time()-7);
+        $userconsent->save();
+
+        $consentpolicies = userconsent::get_unansweredpolicies(2);
+        $this->assertEquals(1, count($consentpolicies)); // Hasn't answered optional
+
         // User doesn't agree with optional option
         $userconsent->set_consentoptionid($optionaloption->id);
         $userconsent->set_language('nl');
@@ -196,18 +227,9 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
         $userconsent->save();
 
         $consentpolicies = userconsent::get_unansweredpolicies(2);
-        $this->assertEquals(1, count($consentpolicies));
-
-        // User consents to mandatory option
-        $userconsent->set_consentoptionid($mandatoryoption->id);
-        $userconsent->set_hasconsented(1);
-        $userconsent->set_timeconsented(time()-7);
-        $userconsent->save();
-
-        $consentpolicies = userconsent::get_unansweredpolicies(2);
         $this->assertEquals(0, count($consentpolicies));
 
-        // And then revokes his consent
+        // Now user revokes his consent to mandatory option
         $userconsent->set_consentoptionid($mandatoryoption->id);
         $userconsent->set_hasconsented(0);
         $userconsent->set_timeconsented(time()-6);
@@ -238,7 +260,7 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
             'languages' => 'sp,en,nl',
             'langprefix' => ',en,nl',
             'title' => 'Test policy',
-            'policystatement' => 'Policy statement',
+            'statement' => 'Policy statement',
             'numoptions' => 2,
             'consentstatement' => 'Consent statement',
             'providetext' => 'yes',
@@ -284,6 +306,114 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
     }
 
     /**
+     * Data provider for test_user_consent_language.
+     */
+    public function data_user_consent_language() {
+        return [
+            [
+                'syslang_is_primary',
+                [
+                    'authorid' => 2,
+                    'languages' => 'en',
+                    'title' => 'EN only Test policy',
+                    'statement' => 'EN only Policy statement',
+                    'numoptions' => 1,
+                    'consentstatement' => 'EN only Consent statement',
+                    'providetext' => 'yes',
+                    'withheldtext' => 'no',
+                    'mandatory' => 'all',
+                ],
+                ['en','en']
+            ],
+            [
+                'syslang_is_avail',
+                [
+                    'authorid' => 2,
+                    'languages' => 'fr,en',
+                    'langprefix' => 'fr,en',
+                    'title' => 'EN only Test policy',
+                    'statement' => 'EN only Policy statement',
+                    'numoptions' => 1,
+                    'consentstatement' => 'EN only Consent statement',
+                    'providetext' => 'yes',
+                    'withheldtext' => 'no',
+                    'mandatory' => 'all',
+                ],
+                ['en','en']
+            ],
+            [
+                'user_preference_and_non_syslang_primary',
+                [
+                    'authorid' => 2,
+                    'languages' => 'sp',
+                    'title' => 'SP only Test policy',
+                    'statement' => 'SP only Policy statement',
+                    'numoptions' => 1,
+                    'consentstatement' => 'SP only Consent statement',
+                    'providetext' => 'si',
+                    'withheldtext' => 'no',
+                    'mandatory' => 'all',
+                ],
+                ['sp','sp']
+            ],
+            [
+                'user_preferences_avail',
+                [
+                    'authorid' => 2,
+                    'languages' => 'nl,sp',
+                    'langprefix' => 'nl,sp',
+                    'title' => 'Test policy',
+                    'statement' => 'Policy statement',
+                    'numoptions' => 1,
+                    'consentstatement' => 'Consent statement',
+                    'providetext' => 'Yes',
+                    'withheldtext' => 'No',
+                    'mandatory' => 'First',
+                ],
+                ['sp','nl']
+            ],
+            [
+                'primary_for_all',
+                [
+                    'authorid' => 2,
+                    'languages' => 'fr,he',
+                    'langprefix' => 'fr,he',
+                    'title' => 'Test policy',
+                    'statement' => 'Policy statement',
+                    'numoptions' => 1,
+                    'consentstatement' => 'Consent statement',
+                    'providetext' => 'Yes',
+                    'withheldtext' => 'No',
+                    'mandatory' => 'First',
+                ],
+                ['fr','fr']
+            ],
+        ];
+    }
+
+    /**
+     * Test get_user_consent_language
+     * @dataProvider data_user_consent_language
+     */
+    public function get_user_consent_language($name, $options, $expectedlang) {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $user1 = $this->getDataGenerator()->create_user(['username' => 'user1', 'lang' => 'sp']);
+        $user2 = $this->getDataGenerator()->create_user(['username' => 'user2', 'lang' => 'nl']);
+
+        $sitepolicy = $generator->create_published_policy($options);
+        $versionid = policyversion::from_policy_latest($sitepolicy)->get_id();
+
+        $lang1 = userconsent::get_user_consent_language($versionid, $user1->id);
+        $this->assertEquals($exectedlang[0], $lang1);
+        $lang2 = userconsent::get_user_consent_language($versionid, $user2->id);
+        $this->assertEquals($exectedlang[1], $lang2);
+    }
+
+    /**
      * Test get_userconsenttable
      */
     public function test_get_userconsenttable() {
@@ -298,7 +428,7 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
             'languages' => 'sp,en,nl',
             'langprefix' => ',en,nl',
             'title' => 'Test policy',
-            'policystatement' => 'Policy statement',
+            'statement' => 'Policy statement',
             'numoptions' => 2,
             'consentstatement' => 'Consent statement',
             'providetext' => 'yes',
@@ -315,5 +445,55 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
 
         $consents = userconsent::get_userconsenttable(3);
         $this->assertEquals(2, count($consents));
+    }
+
+    /**
+     * Test has_consented_previous_version
+     */
+    public function test_has_consented_previous_version() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $options = [
+            'hasdraft' => true,
+            'numpublished' => 1,
+            'allarchived' => false,
+            'authorid' => 2,
+            'languages' => 'sp,en,nl',
+            'langprefix' => ',en,nl',
+            'title' => 'Test policy',
+            'statement' => 'Policy statement',
+            'numoptions' => 1,
+            'consentstatement' => 'Consent statement',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+            ];
+
+        $sitepolicy = $generator->create_multiversion_policy($options);
+        $activeversion = policyversion::from_policy_latest($sitepolicy, policyversion::STATUS_PUBLISHED);
+        $draftversion = policyversion::from_policy_latest($sitepolicy, policyversion::STATUS_DRAFT);
+        $row = $DB->get_record('tool_sitepolicy_consent_options', ['policyversionid' => $activeversion->get_id()]);
+        $consentoptionid = $row->id;
+
+        // No consent given yet
+        $this->assertFalse(userconsent::has_consented_previous_version($activeversion, 3));
+        $this->assertFalse(userconsent::has_consented_previous_version($activeversion, 4));
+
+        // User 3 give consent
+        $userconsent = new userconsent();
+        $userconsent->set_userid(3);
+        $userconsent->set_consentoptionid($consentoptionid);
+        $userconsent->set_language('nl');
+        $userconsent->set_hasconsented(1);
+        $userconsent->set_timeconsented(time()-10);
+        $userconsent->save();
+
+        // Now publish the draft version
+        $draftversion->publish();
+        $this->assertTrue(userconsent::has_consented_previous_version($draftversion, 3));
+        $this->assertFalse(userconsent::has_consented_previous_version($draftversion, 4));
     }
 }

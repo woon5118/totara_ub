@@ -1,4 +1,4 @@
-@javascript @tool @tool_sitepolicy @totara
+@javascript @tool @tool_sitepolicy @totara @language_packs
 Feature: Sitepolicy version navigation
   As an admin
   I must be able to view available sitepolicies
