@@ -36,11 +36,9 @@ function xmldb_auth_manual_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
+    // Totara 11 branching line.
 
-    // Automatically generated Moodle v3.2.0 release upgrade line.
-    // Put any upgrade step following this.
+    // Totara 12 branching line.
 
     if ($oldversion < 2017020700) {
         // Convert info in config plugins from auth/manual to auth_manual.
