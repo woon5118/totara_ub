@@ -66,7 +66,9 @@
         {{#adder}} <!-- adder tile -->
             {{#editing}}
                 <div class="block-totara-featured-links-tile-adder block-totara-featured-links-tile block-totara-featured-links-tile-{{size}}">
-                    <a href="{{& url}}" target="_self" type="add" class="btn btn-primary" blockid="{{instanceid}}"><span>Add Tile</span></a>
+                    <a href="{{& url}}" target="_self" type="add" class="btn btn-primary" blockid="{{instanceid}}">
+                        <span>{{#str}}addtile, block_totara_featured_links{{/str}}</span>
+                    </a>
                 </div>
             {{/editing}}
         {{/adder}}

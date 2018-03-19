@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['addtile'] = 'Add Tile';
 $string['aggregation_all'] = 'Users matching all of the criteria above can view this feature link';
 $string['aggregation_any'] = 'Users matching any of the criteria above can view this feature link';
 $string['aggregation_label'] = 'Ruleset aggregation';
