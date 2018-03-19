@@ -33,9 +33,8 @@ if ($ADMIN->fulltree) {
         require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_lowercase_configtext.php');
         require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_contexts_configtext.php');
 
-        // Include needed files.
-        require_once($CFG->dirroot.'/auth/cas/auth.php');
-        require_once($CFG->dirroot.'/auth/cas/languages.php');
+        // Totara: DO NOT dare to load the bloated CAS library here!!!
+        //         Forget constants and use their values directly.
 
         // Introductory explanation.
         $settings->add(new admin_setting_heading('auth_cas/pluginname', '',
@@ -62,23 +61,25 @@ if ($ADMIN->fulltree) {
 
         // CAS Version.
         $casversions = array();
-        $casversions[CAS_VERSION_1_0] = 'CAS 1.0';
-        $casversions[CAS_VERSION_2_0] = 'CAS 2.0';
+        $casversions['1.0'] = 'CAS 1.0';
+        $casversions['2.0'] = 'CAS 2.0';
         $settings->add(new admin_setting_configselect('auth_cas/casversion',
                 new lang_string('auth_cas_casversion', 'auth_cas'),
-                new lang_string('auth_cas_version', 'auth_cas'), CAS_VERSION_2_0, $casversions));
+                new lang_string('auth_cas_version', 'auth_cas'), '2.0', $casversions));
 
         // Language.
-        if (!isset($CASLANGUAGES) || empty($CASLANGUAGES)) {
-            // Prevent warnings on other admin pages.
-            // $CASLANGUAGES is defined in /auth/cas/languages.php.
-            $CASLANGUAGES = array();
-            $CASLANGUAGES[PHPCAS_LANG_ENGLISH] = 'English';
-            $CASLANGUAGES[PHPCAS_LANG_FRENCH] = 'French';
-        }
+        $options = array();
+        $options['CAS_Languages_English'] = 'English';
+        $options['CAS_Languages_French'] = 'French';
+        $options['CAS_Languages_Greek'] = 'Greek';
+        $options['CAS_Languages_German'] = 'German';
+        $options['CAS_Languages_Japanese'] = 'Japanese';
+        $options['CAS_Languages_Spanish'] = 'Spanish';
+        $options['CAS_Languages_Catalan'] = 'Catalan';
+        $options['CAS_Languages_ChineseSimplified'] = 'Simplified Chinese';
         $settings->add(new admin_setting_configselect('auth_cas/language',
                 new lang_string('auth_cas_language_key', 'auth_cas'),
-                new lang_string('auth_cas_language', 'auth_cas'), PHPCAS_LANG_ENGLISH, $CASLANGUAGES));
+                new lang_string('auth_cas_language', 'auth_cas'), 'CAS_Languages_English', $options));
 
         // Proxy.
         $yesno = array(
