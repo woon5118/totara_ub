@@ -126,6 +126,9 @@ class totara_quicklinks_userdata_test extends advanced_testcase {
      * Test count of items
      */
     public function test_count_quicklinks() {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/user/lib.php');
 
         $this->resetAfterTest();
 
@@ -135,5 +138,10 @@ class totara_quicklinks_userdata_test extends advanced_testcase {
         $count = quicklinks::execute_count($targetuser, context_system::instance());
 
         $this->assertEquals(2, $count);
+
+        // Delete user and check count function still works.
+        user_delete_user($data->user1);
+        $count = quicklinks::execute_count($targetuser, context_system::instance());
+        $this->assertEquals(0, $count);
     }
 }

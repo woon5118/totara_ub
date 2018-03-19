@@ -115,7 +115,11 @@ class quicklinks extends item {
                     {block_instances} bi ON bq.block_instance_id = bi.id
                 WHERE bi.parentcontextid = :contextid AND bq.userid = :userid";
 
-        $usercontext = \context_user::instance($user->id);
+        $usercontext = \context_user::instance($user->id, IGNORE_MISSING);
+        if (!$usercontext) {
+            // Context not found return zero.
+            return 0;
+        }
 
         $params = ['contextid' => $usercontext->id, 'userid' => $user->id];
 
