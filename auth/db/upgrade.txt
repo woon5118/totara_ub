@@ -6,6 +6,7 @@ information provided here is intended especially for developers.
 * The CLI sync users script has been deprecated, use the scheduled task instead.
 * The config.html file was migrated to use the admin settings API.
   The identifier for configuration data stored in config_plugins table was converted from 'auth/db' to 'auth_db'.
+* Added support for PDO drivers.
 
 
 === 10 ===

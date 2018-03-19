@@ -45,7 +45,7 @@ if ($ADMIN->fulltree) {
     $dbtypes = array("access", "ado_access", "ado", "ado_mssql", "borland_ibase", "csv", "db2",
         "fbsql", "firebird", "ibase", "informix72", "informix", "mssql", "mssql_n", "mssqlnative",
         "mysql", "mysqli", "mysqlt", "oci805", "oci8", "oci8po", "odbc", "odbc_mssql", "odbc_oracle",
-        "oracle", "postgres64", "postgres7", "postgres", "proxy", "sqlanywhere", "sybase", "vfp");
+        "oracle", "pdo", "postgres64", "postgres7", "postgres", "proxy", "sqlanywhere", "sybase", "vfp");
     foreach ($dbtypes as $dbtype) {
         $dboptions[$dbtype] = $dbtype;
     }
@@ -135,7 +135,7 @@ if ($ADMIN->fulltree) {
         new lang_string('auth_dbupdateusers_description', 'auth_db'), 0, $yesno));
 
     // Display locking / mapping of profile fields.
-    $authplugin = get_auth_plugin($this->name);
+    $authplugin = get_auth_plugin('db');
     display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields,
             get_string('auth_dbextrafields', 'auth_db'),
             true, true, $authplugin->get_custom_user_profile_fields());
