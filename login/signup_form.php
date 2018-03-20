@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -152,20 +151,24 @@ class login_signup_form extends moodleform implements renderable, templatable {
         }
     }
 
-    function validation($data, $files) {
-        global $CFG, $DB;
+    /**
+     * Validate user supplied data on the signup form.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
+    public function validation($data, $files) {
+    global $CFG, $DB;
         $errors = parent::validation($data, $files);
 
         if ($this->signup_captcha_enabled()) {
-            $recaptcha_element = $this->_form->getElement('recaptcha_element');
-            if (!empty($this->_form->_submitValues['recaptcha_challenge_field'])) {
-                $challenge_field = $this->_form->_submitValues['recaptcha_challenge_field'];
-                $response_field = $this->_form->_submitValues['recaptcha_response_field'];
-                if (true !== ($result = $recaptcha_element->verify($challenge_field, $response_field))) {
-                    $errors['recaptcha_element']
-                        = $result == 'incorrect-captcha-sol'
-                        ? get_string('incorrectpleasetryagain', 'auth')
-                        : $result;
+            $recaptchaelement = $this->_form->getElement('recaptcha_element');
+            if (!empty($this->_form->_submitValues['g-recaptcha-response'])) {
+                $response = $this->_form->_submitValues['g-recaptcha-response'];
+                if (!$recaptchaelement->verify($response)) {
+                    $errors['recaptcha_element'] = get_string('incorrectpleasetryagain', 'auth');
                 }
             } else {
                 $errors['recaptcha_element'] = get_string('missingrecaptchachallengefield');
@@ -250,14 +253,13 @@ class login_signup_form extends moodleform implements renderable, templatable {
         $errors += profile_validation($dataobject, $files);
 
         return $errors;
-
     }
 
     /**
      * Returns whether or not the captcha element is enabled, and the admin settings fulfil its requirements.
      * @return bool
      */
-    function signup_captcha_enabled() {
+    public function signup_captcha_enabled() {
         global $CFG;
         $authplugin = get_auth_plugin($CFG->registerauth);
         return !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey) && $authplugin->is_captcha_enabled();
