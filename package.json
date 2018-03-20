@@ -23,6 +23,6 @@
         "promise": "~6.1.0"
     },
     "engines": {
-        "node": ">=4"
+        "node": "8"
     }
 }
