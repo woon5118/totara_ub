@@ -24,7 +24,7 @@
  */
 
 
-namespace ltiservice_memberships\local\resource;
+namespace ltiservice_memberships\local\resources;
 
 use mod_lti\local\ltiservice\resource_base;
 use ltiservice_memberships\local\service\memberships;

@@ -24,7 +24,7 @@
  */
 
 
-namespace ltiservice_profile\local\resource;
+namespace ltiservice_profile\local\resources;
 
 use \mod_lti\local\ltiservice\service_base;
 
