@@ -1986,6 +1986,7 @@ $string['userdataitem-user-preferences'] = 'Preferences';
 $string['userdataitem-user-preferences_help'] = 'User preferences include language, timezone, calendar and theme.';
 $string['userdataitem-user-private_keys'] = 'Private keys';
 $string['userdataitem-user-private_keys_help'] = 'Private keys used to grant access to published grade exports.';
+$string['userdataitem-user-role_assignments'] = 'Role assignments';
 $string['userdataitem-user-systemaccess'] = 'System access logs';
 $string['userdataitem-user-systemaccess_help'] = 'System access includes first access timestamp, last access timestamp, last login timestamp, current login timestamp, last course access and last IP address.';
 $string['userdataitem-user-username'] = 'Username';
