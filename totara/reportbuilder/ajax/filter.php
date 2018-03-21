@@ -32,6 +32,8 @@ require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_sesskey();
 require_login();
 
+$PAGE->set_context(context_user::instance($USER->id));
+
 /// Get params
 $action = required_param('action', PARAM_ALPHA);
 $reportid = required_param('id', PARAM_INT);
@@ -100,6 +102,12 @@ switch ($action) {
         if ($filter = $DB->get_record('report_builder_filters', array('id' => $fid))) {
             $DB->delete_records('report_builder_filters', array('id' => $fid));
             reportbuilder_set_status($reportid);
+
+            // To be able to sort the filter back into the correct group of the select box
+            // we need the translated label
+            $reportbuilder = new reportbuilder($reportid);
+            $filter->typelabel = $reportbuilder->get_type_heading($filter->type);
+
             echo json_encode((array)$filter);
         } else {
             echo false;

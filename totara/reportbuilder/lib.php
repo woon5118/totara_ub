@@ -1293,15 +1293,6 @@ class reportbuilder {
             return array();
         }
 
-        // Are we handling a 'group' source?
-        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
-            // Use original source name (minus any suffix).
-            $sourcename = $matches[1];
-        } else {
-            // Standard source.
-            $sourcename = $this->source;
-        }
-
         $out = array();
         $filters = $DB->get_records('report_builder_filters', array('reportid' => $this->_id), 'sortorder');
         foreach ($filters as $filter) {
@@ -1326,17 +1317,7 @@ class reportbuilder {
                     // Use value from database.
                     $filterobj->label = $filter->filtername;
                 } else if (!empty($option->filteroptions['addtypetoheading'])) {
-                    $langstr = 'type_' . $option->type;
-                    if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
-                        // Is there a type string in the source file?
-                        $type = get_string($langstr, 'rb_source_' . $sourcename);
-                    } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
-                        // How about in report builder?
-                        $type = get_string($langstr, 'totara_reportbuilder');
-                    } else {
-                        // Display in missing string format to make it obvious.
-                        $type = get_string($langstr, 'rb_source_' . $sourcename);
-                    }
+                    $type = $this->get_type_heading($option->type);
                     $text = (object) array ('column' => $option->label, 'type' => $type);
                     $filterobj->label = get_string ('headingformat', 'totara_reportbuilder', $text);
                 }
@@ -1799,15 +1780,6 @@ class reportbuilder {
             return false;
         }
 
-        // Are we handling a 'group' source?
-        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
-            // Use original source name (minus any suffix).
-            $sourcename = $matches[1];
-        } else {
-            // Standard source.
-            $sourcename = $this->source;
-        }
-
         $out = array();
         foreach ($this->columnoptions as $option) {
             $key = $option->type . '-' . $option->value;
@@ -1829,17 +1801,7 @@ class reportbuilder {
             // There may be more than one type of data (for exmaple, users), for example columns,
             // so add the type to the heading to differentiate the types - if required.
             if (isset($option->addtypetoheading) && $option->addtypetoheading) {
-                $langstr = 'type_' . $option->type;
-                if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
-                    // Is there a type string in the source file?
-                    $type = get_string($langstr, 'rb_source_' . $sourcename);
-                } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
-                    // How about in report builder?
-                    $type = get_string($langstr, 'totara_reportbuilder');
-                } else {
-                    // Display in missing string format to make it obvious.
-                    $type = get_string($langstr, 'rb_source_' . $sourcename);
-                }
+                $type = $this->get_type_heading($option->type);
                 $text = (object) array ('column' => $defaultheading, 'type' => $type);
                 $defaultheading = get_string ('headingformat', 'totara_reportbuilder', $text);
             }
@@ -1847,6 +1809,36 @@ class reportbuilder {
             $out[$key] = format_string($defaultheading);
         }
         return $out;
+    }
+
+    /**
+     * Returns the translated heading name for given type
+     *
+     * @param string $type
+     * @return string
+     */
+    public function get_type_heading($type) {
+        // Are we handling a 'group' source?
+        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
+            // Use original source name (minus any suffix).
+            $sourcename = $matches[1];
+        } else {
+            // Standard source.
+            $sourcename = $this->source;
+        }
+
+        $langstr = 'type_' . $type;
+        if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
+            // Is there a type string in the source file?
+            $heading = get_string($langstr, 'rb_source_' . $sourcename);
+        } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
+            // How about in report builder?
+            $heading = get_string($langstr, 'totara_reportbuilder');
+        } else {
+            // Display in missing string format to make it obvious.
+            $heading = get_string($langstr, 'rb_source_' . $sourcename);
+        }
+        return $heading;
     }
 
     /**
@@ -4649,29 +4641,9 @@ class reportbuilder {
 
         $filters = $this->filteroptions;
 
-        // Are we handling a 'group' source?
-        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
-            // Use original source name (minus any suffix).
-            $sourcename = $matches[1];
-        } else {
-            // Standard source.
-            $sourcename = $this->source;
-        }
-
         foreach ($filters as $filter) {
             if (!$onlyinstant || in_array($filter->filtertype, array('date', 'select', 'menuofchoices', 'multicheck'))) {
-                $langstr = 'type_' . $filter->type;
-                if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
-                    // Is there a type string in the source file?
-                    $section = get_string($langstr, 'rb_source_' . $sourcename);
-                } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
-                    // How about in report builder?
-                    $section = get_string($langstr, 'totara_reportbuilder');
-                } else {
-                    // Display in missing string format to make it obvious.
-                    $section = get_string_manager()->get_string($langstr, 'rb_source_' . $sourcename);
-                }
-
+                $section = $this->get_type_heading($filter->type);
                 $key = $filter->type . '-' . $filter->value;
                 $ret[$section][$key] = format_string($filter->label);
             }
@@ -4693,29 +4665,9 @@ class reportbuilder {
 
         $columnoptions = $this->columnoptions;
 
-        // Are we handling a 'group' source?
-        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
-            // Use original source name (minus any suffix).
-            $sourcename = $matches[1];
-        } else {
-            // Standard source.
-            $sourcename = $this->source;
-        }
-
         foreach ($columnoptions as $columnoption) {
             if ($columnoption->is_searchable()) {
-                $langstr = 'type_' . $columnoption->type;
-                if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
-                    // Is there a type string in the source file?
-                    $section = get_string($langstr, 'rb_source_' . $sourcename);
-                } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
-                    // How about in report builder?
-                    $section = get_string($langstr, 'totara_reportbuilder');
-                } else {
-                    // Display in missing string format to make it obvious.
-                    $section = get_string_manager()->get_string($langstr, 'rb_source_' . $sourcename);
-                }
-
+                $section = $this->get_type_heading($columnoption->type);
                 $key = $columnoption->type . '-' . $columnoption->value;
                 $ret[$section][$key] = format_string($columnoption->name);
             }
@@ -4795,32 +4747,12 @@ class reportbuilder {
             return $ret;
         }
 
-        // are we handling a 'group' source?
-        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
-            // use original source name (minus any suffix)
-            $sourcename = $matches[1];
-        } else {
-            // standard source
-            $sourcename = $this->source;
-        }
-
         foreach ($columns as $column) {
             // don't include unselectable columns
             if (!$column->selectable) {
                 continue;
             }
-            $langstr = 'type_' . $column->type;
-            // is there a type string in the source file?
-            if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
-                $section = get_string($langstr, 'rb_source_' . $sourcename);
-            // how about in report builder?
-            } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
-                $section = get_string($langstr, 'totara_reportbuilder');
-            } else {
-                // Display in missing string format to make it obvious.
-                $section = get_string_manager()->get_string($langstr, 'rb_source_' . $sourcename);
-            }
-
+            $section = $this->get_type_heading($column->type);
             $key = $column->type . '-' . $column->value;
             $ret[$section][$key] = format_string($column->name);
         }

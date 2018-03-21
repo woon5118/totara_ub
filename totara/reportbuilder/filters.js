@@ -329,6 +329,9 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         searchcolumnbox.find('select optgroup[label=New]').remove();
                         searchcolumnbox.find('select.search_column_selector').attr('id', 'id_searchcolumn'+searchcolumnid);
 
+                        // Set the id of the new searchcolumn tr
+                        selector.closest('tr').attr('searchcolumnid', searchcolumnid);
+
                         // Append a new filter select box
                         searchcolumnbox.closest('table').append(newsearchcolumninput);
 
@@ -403,8 +406,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                             module.rb_reload_filter_option_btns(lowersibling);
                         }
 
-                        var nlabel = o.type.replace(/[-_]/g, ' ');  // Determine the optgroup label.
-                        nlabel = rb_ucwords(nlabel);
+                        var nlabel = o.typelabel;
                         var issidebarfilter = $('#id_all_sidebar_filters').find('option[value=' + o.type + '-' + o.value+']').length > 0;
 
                         // Add deleted filter to new standard filter selector.
@@ -494,8 +496,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         searchcolumnrow.remove();
 
                         // Add deleted search column to new search column selector.
-                        var nlabel = o.type.replace(/[-_]/g, ' ');  // Determine the optgroup label.
-                        nlabel = rb_ucwords(nlabel);
+                        var nlabel = o.typelabel;  // Determine the optgroup label.
                         var optgroup = $(".new_search_column_selector optgroup[label='" + nlabel + "']");
                         if (optgroup.length == 0) {
                             // Create optgroup and append to select.
