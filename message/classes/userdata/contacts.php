@@ -35,20 +35,6 @@ use totara_userdata\userdata\target_user;
 class contacts extends item {
 
     /**
-     * Get main Frankenstyle component name (core subsystem or plugin).
-     * This is used for UI purposes to group items into components.
-     *
-     * NOTE: this can be overridden to move item to a different form group in UI,
-     *       for example local plugins and items to standard activities
-     *       or blocks may move items to their related plugins.
-     */
-    public static function get_main_component() {
-        // Currently grouping it under 'messages' is not possible so we put it under the user component for now.
-        // TODO: Change to core_message as soon as this is possible.
-        return 'core_user';
-    }
-
-    /**
      * String used for human readable name of this item.
      *
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.

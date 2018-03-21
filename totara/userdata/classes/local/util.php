@@ -57,6 +57,9 @@ final class util {
         switch ($component) {
             case 'core_user': return get_string('user');
             case 'core_badges': return get_string('badges', 'core_badges');
+            case 'core_question': return get_string('questionbank', 'core_question');
+            case 'core_course': return get_string('courses', 'core');
+            case 'core_message': return get_string('messaging', 'core_message');
         }
 
         if ($component === 'core_completion') {

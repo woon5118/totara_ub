@@ -70,6 +70,7 @@ $string['messagepreferences'] = 'Message preferences';
 $string['message'] = 'Message';
 $string['messagepreferences'] = 'Message preferences';
 $string['messages'] = 'Messages';
+$string['messaging'] = 'Messaging';
 $string['messagingdisabled'] = 'Messaging is disabled on this site, emails will be sent instead';
 $string['newonlymsg'] = 'Show only new';
 $string['newmessage'] = 'New message';
