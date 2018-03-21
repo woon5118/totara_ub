@@ -19,10 +19,20 @@
 // @copyright 2018 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
-// @package   theme_basis
+// @package   theme_roots
 
-// Include colour palette
-@import "tui/tui_colours.less";
+// IMPORTANT all other sizes are calculated from this base
+@totara_style-size_base: 10px;
 
-// Include font styles
-@import "tui/tui_typography.less";
+// Calculate available Rem sizes from px
+@totara_style-size_1: unit(1 / @totara_style-size_base, rem); // 1px
+@totara_style-size_4: unit(4 / @totara_style-size_base, rem); // 4px
+@totara_style-size_8: unit(8 / @totara_style-size_base, rem); // 8px
+@totara_style-size_13: unit(13 / @totara_style-size_base, rem); // 13px
+@totara_style-size_16: unit(16 / @totara_style-size_base, rem); // 16px
+@totara_style-size_18: unit(18 / @totara_style-size_base, rem); // 18px
+@totara_style-size_24: unit(24 / @totara_style-size_base, rem); // 24px
+@totara_style-size_30: unit(30 / @totara_style-size_base, rem); // 30px
+@totara_style-size_32: unit(32 / @totara_style-size_base, rem); // 32px
+@totara_style-size_40: unit(40 / @totara_style-size_base, rem); // 40px
+@totara_style-size_48: unit(48 / @totara_style-size_base, rem); // 48px
