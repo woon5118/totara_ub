@@ -119,7 +119,7 @@ Feature: Seminar event cancellation notifications
     And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
 
     When I click on "Cancel event" "link" in the "10 February 2025" "table_row"
-    Then I should see "Canceling event in Test Seminar"
+    Then I should see "Cancelling event in Test Seminar"
     And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
     And I press "Yes"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
@@ -310,7 +310,7 @@ Feature: Seminar event cancellation notifications
     And I should see "Booking full" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
-    And I should see "Canceling event in Test Seminar"
+    And I should see "Cancelling event in Test Seminar"
     And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
     And I press "Yes"
 

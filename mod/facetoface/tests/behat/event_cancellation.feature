@@ -77,7 +77,7 @@ Feature: Seminar event cancellation basic
     And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
 
     When I click on "Cancel event" "link" in the "10 February 2025" "table_row"
-    Then I should see "Canceling event in Test Seminar"
+    Then I should see "Cancelling event in Test Seminar"
     And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
 
     When I press "No"
@@ -508,7 +508,7 @@ Feature: Seminar event cancellation basic
     And I press "Save changes"
 
     When I click on "Cancel event" "link" in the "0 / 30" "table_row"
-    And I should see "Canceling event in"
+    And I should see "Cancelling event in"
     And I should see "Are you completely sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
@@ -559,7 +559,7 @@ Feature: Seminar event cancellation basic
     And I press "Save changes"
 
     When I click on "Cancel event" "link" in the "0 / 30" "table_row"
-    And I should see "Canceling event in"
+    And I should see "Cancelling event in"
     And I should see "Are you completely sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
