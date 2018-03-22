@@ -1,6 +1,10 @@
 This files describes API changes in the assign code.
 information provided here is intended especially for developers.
 
+=== 10.8 ===
+* assign::add_attempt requires that set_most_recent_team_submission() be called if attempting to use this function with a team
+  submission.
+
 === 10 ===
 * External function mod_assign_external::get_assignments now returns additional optional fields:
    - preventsubmissionnotingroup: Prevent submission not in group.
