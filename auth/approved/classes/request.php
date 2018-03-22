@@ -460,12 +460,9 @@ final class request {
         } else {
             if ($DB->record_exists_select('user', "LOWER(email) = LOWER(:email)", array('email'=>$data['email']))) {
                 if ($stage == request::STAGE_SIGNUP) {
-                    $errors['email'] = sprintf(
-                        '%s <a href="%s/login/forgot_password.php">%s?</a>',
-                        get_string('emailexists'),
-                        $CFG->wwwroot,
-                        get_string('passwordforgotten')
-                    );
+                    $errors['email'] = get_string('emailexists') . ' ' .
+                        get_string('emailexistssignuphint', 'moodle',
+                            \html_writer::link(new \moodle_url('/login/forgot_password.php'), get_string('emailexistshintlink')));
                 } else {
                     $errors['email'] = get_string('emailexists');
                 }
