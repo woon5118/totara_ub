@@ -29,20 +29,7 @@ Feature: security overview
     And I should see "OK" in the "Guest role" "table_row"
     And I should see "OK" in the "Frontpage role" "table_row"
 
-  @javascript
-  Scenario: Check that Critical status is displayed when required in the security overview for issue, No authentication
-
-    # First, check the status is OK
-    Given I navigate to "Security overview" node in "Site administration > Reports"
-    And I should see "OK" in the "No authentication" "table_row"
-
-    # Now change to create a Critical status
-    Given I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
-    And I click on "Enable" "link" in the "No authentication" "table_row"
-
-    # Check the status is shown as Critical
-    Given I navigate to "Security overview" node in "Site administration > Reports"
-    And I should see "Critical" in the "No authentication" "table_row"
+  # NOTE auth_none was removed in Totara 12, there is no way to test it, but we want to keep the error in case somebody copied it from older branch.
 
   @javascript
   Scenario: Check that Critical status is displayed when required in the security overview for issue, Allow EMBED and OBJECT
