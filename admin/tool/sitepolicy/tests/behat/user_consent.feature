@@ -28,7 +28,7 @@ Feature: Give or withhold user consent
     And I should see "P1 - Consent statement 1"
     And I should not see "Consent is required to access the site"
 
-    And I set the "P1 - Consent statement 1" Totara formF field to "0"
+    And I set the "P1 - Consent statement 1" Totara form field to "0"
     And I press "Submit"
     Then I should see "Current Learning"
 
