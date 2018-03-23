@@ -33,6 +33,9 @@ if ($ADMIN->fulltree) {
         require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_lowercase_configtext.php');
         require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_contexts_configtext.php');
 
+        // We need to use some of the Moodle LDAP constants / functions to create the list of options.
+        require_once($CFG->dirroot.'/auth/ldap/auth.php');
+
         // Totara: DO NOT dare to load the bloated CAS library here!!!
         //         Forget constants and use their values directly.
 

@@ -43,7 +43,7 @@ $string['auth_shib_instructions'] = 'Use the <a href="{$a}">Shibboleth login</a>
 $string['auth_shib_instructions_help'] = 'Here you should provide custom instructions for your users to explain Shibboleth.  It will be shown on the login page in the instructions section. The instructions must include a link to "<b>{$a}</b>" that users click when they want to log in.';
 $string['auth_shib_instructions_key'] = 'Login instructions';
 $string['auth_shib_integrated_wayf'] = 'Totara WAYF service';
-$string['auth_shib_integrated_wayf_description'] = 'If you enable this, Totara will use its own WAYF service instead of the one configured for Shibboleth. Moodle will display a drop-down list on this alternative login page where the user has to select his Identity Provider.';
+$string['auth_shib_integrated_wayf_description'] = 'If you enable this, Totara will use its own WAYF service instead of the one configured for Shibboleth. Totara will display a drop-down list on this alternative login page where the user has to select his Identity Provider.';
 $string['auth_shib_logout_return_url'] = 'Alternative logout return URL';
 $string['auth_shib_logout_return_url_description'] = 'Provide the URL that Shibboleth users shall be redirected to after logging out.<br />If left empty, users will be redirected to the location that Totara will redirect users to';
 $string['auth_shib_logout_url'] = 'Shibboleth Service Provider logout handler URL';
