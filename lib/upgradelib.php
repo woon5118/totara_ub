@@ -377,6 +377,8 @@ function upgrade_stale_php_files_present() {
     global $CFG;
 
     $someexamplesofremovedfiles = array(
+        // Removed in Totara 12.0
+        '/admin/auth_config.php',
         // Removed in 3.2.
         '/calendar/preferences.php',
         '/lib/alfresco/',
