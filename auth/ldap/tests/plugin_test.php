@@ -297,6 +297,76 @@ class auth_ldap_plugin_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('role_assignments'));
         $this->assertEquals(2, $DB->count_records('role_assignments', array('roleid'=>$creatorrole->id)));
 
+        // Test custom fields.
+        /** @var totara_core_generator $totaragenerator */
+        $totaragenerator = $this->getDataGenerator()->get_plugin_generator('totara_core');
+        $field = $totaragenerator->create_custom_profile_field(array('datatype' => 'text', 'name' => 'Pokus', 'shortname' => 'pokus'));
+        set_config('field_map_profile_field_pokus', 'uidnumber', 'auth_ldap');
+        set_config('field_updatelocal_profile_field_pokus', 'oncreate', 'auth_ldap');
+        set_config('field_updateremote_profile_field_pokus', '0', 'auth_ldap');
+        set_config('field_lock_profile_field_pokus', 'unlocked', 'auth_ldap');
+        /** @var auth_plugin_ldap $auth */
+        $auth = get_auth_plugin('ldap'); // Must reload config here!!!
+
+        $this->create_ldap_user($connection, $topdn, 6);
+        ob_start();
+        $sink = $this->redirectEvents();
+        $auth->sync_users(true);
+        $sink->close();
+        ob_end_clean();
+        $this->assertEquals(7, $DB->count_records('user', array('auth' => 'ldap')));
+        $user1 = $DB->get_record('user', array('username' => 'username1'), '*', MUST_EXIST);
+        $user6 = $DB->get_record('user', array('username' => 'username6'), '*', MUST_EXIST);
+        $this->assertSame(false, $DB->get_field('user_info_data', 'data', array('userid' => $user1->id, 'fieldid' => $field->id)));
+        $this->assertSame('2006', $DB->get_field('user_info_data', 'data', array('userid' => $user6->id, 'fieldid' => $field->id)));
+
+        set_config('field_map_profile_field_pokus', 'gidNumber', 'auth_ldap');
+        set_config('field_updatelocal_profile_field_pokus', 'onlogin', 'auth_ldap');
+        /** @var auth_plugin_ldap $auth */
+        $auth = get_auth_plugin('ldap'); // Must reload config here!!!
+        ob_start();
+        $sink = $this->redirectEvents();
+        $auth->sync_users(true);
+        $sink->close();
+        ob_end_clean();
+        $this->assertEquals(7, $DB->count_records('user', array('auth' => 'ldap')));
+        $user1 = $DB->get_record('user', array('username' => 'username1'), '*', MUST_EXIST);
+        $user6 = $DB->get_record('user', array('username' => 'username6'), '*', MUST_EXIST);
+        $this->assertSame('1001', $DB->get_field('user_info_data', 'data', array('userid' => $user1->id, 'fieldid' => $field->id)));
+        $this->assertSame('1006', $DB->get_field('user_info_data', 'data', array('userid' => $user6->id, 'fieldid' => $field->id)));
+
+        $this->create_ldap_user($connection, $topdn, 7);
+
+        $errorcode = null;
+        $user7 = authenticate_user_login('username7', 'pass7', false, $errorcode);
+        $this->assertSame('username7', $user7->username);
+        $this->assertSame('ldap', $user7->auth);
+        $this->assertSame('0', $user7->deleted);
+        $this->assertSame('0', $user7->suspended);
+        $this->assertSame('1007', $DB->get_field('user_info_data', 'data', array('userid' => $user7->id, 'fieldid' => $field->id)));
+
+        set_config('field_map_profile_field_pokus', 'uidnumber', 'auth_ldap');
+        /** @var auth_plugin_ldap $auth */
+        $auth = get_auth_plugin('ldap'); // Must reload config here!!!
+        ob_start();
+        $sink = $this->redirectEvents();
+        $auth->sync_users(false);
+        $sink->close();
+        ob_end_clean();
+        $this->assertEquals(8, $DB->count_records('user', array('auth' => 'ldap')));
+        $user1 = $DB->get_record('user', array('username' => 'username1'), '*', MUST_EXIST);
+        $user6 = $DB->get_record('user', array('username' => 'username6'), '*', MUST_EXIST);
+        $user7 = $DB->get_record('user', array('username' => 'username7'), '*', MUST_EXIST);
+        $this->assertSame('1001', $DB->get_field('user_info_data', 'data', array('userid' => $user1->id, 'fieldid' => $field->id)));
+        $this->assertSame('1006', $DB->get_field('user_info_data', 'data', array('userid' => $user6->id, 'fieldid' => $field->id)));
+        $this->assertSame('1007', $DB->get_field('user_info_data', 'data', array('userid' => $user7->id, 'fieldid' => $field->id)));
+
+        $user7 = authenticate_user_login('username7', 'pass7', false, $errorcode);
+        $this->assertSame('username7', $user7->username);
+        $this->assertSame('ldap', $user7->auth);
+        $this->assertSame('0', $user7->deleted);
+        $this->assertSame('0', $user7->suspended);
+        $this->assertSame('2007', $DB->get_field('user_info_data', 'data', array('userid' => $user7->id, 'fieldid' => $field->id)));
 
         $this->recursive_delete($connection, TEST_AUTH_LDAP_DOMAIN, 'dc=moodletest');
         ldap_close($connection);
