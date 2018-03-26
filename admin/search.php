@@ -6,6 +6,8 @@ require_once('../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/admin/admin_settings_search_form.php');
 
+redirect_if_major_upgrade_required();
+
 $query = trim(optional_param('query', '', PARAM_NOTAGS));  // Search string
 
 $context = context_system::instance();
@@ -13,6 +15,10 @@ $PAGE->set_context($context);
 
 admin_externalpage_setup('search', '', array('query' => $query)); // now hidden page
 require_capability('moodle/site:config', $context); //Totara: this page is really for admins only!
+
+if (moodle_needs_upgrading()) {
+    redirect(new moodle_url('/admin/index.php'));
+}
 
 $adminroot = admin_get_root(); // need all settings here
 $adminroot->search = $query; // So we can reference it in search boxes later in this invocation

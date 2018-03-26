@@ -3,6 +3,8 @@
 require_once('../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 
+redirect_if_major_upgrade_required();
+
 $section = required_param('section', PARAM_SAFEDIR);
 $return = optional_param('return','', PARAM_ALPHA);
 $adminediting = optional_param('adminedit', -1, PARAM_BOOL);

@@ -6,6 +6,8 @@
 require_once('../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 
+redirect_if_major_upgrade_required();
+
 $return = optional_param('return', '', PARAM_ALPHA);
 
 /// no guest autologin
@@ -20,6 +22,10 @@ admin_externalpage_setup('upgradesettings'); // now hidden page
 $PAGE->set_pagelayout('maintenance'); // do not print any blocks or other rubbish, we want to force saving
 $PAGE->blocks->show_only_fake_blocks();
 $adminroot = admin_get_root(); // need all settings
+
+if (moodle_needs_upgrading()) {
+    redirect(new moodle_url('/admin/index.php'));
+}
 
 // now we'll deal with the case that the admin has submitted the form with new settings
 if ($data = data_submitted() and confirm_sesskey()) {
