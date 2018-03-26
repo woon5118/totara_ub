@@ -39,8 +39,3 @@ $field = new xmldb_field('invalidatecache', XMLDB_TYPE_INTEGER, '1', null, null,
 if (!$dbman->field_exists($table, $field)) {
     $dbman->add_field($table, $field);
 }
-
-// Increase course longname field to 1333 characters.
-$table = new xmldb_table('course');
-$field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null);
-$dbman->change_field_precision($table, $field);

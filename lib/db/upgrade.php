@@ -1493,17 +1493,5 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2016120504.04);
     }
 
-    if ($oldversion < 2016120505.01) {
-
-        // Increase course fullname field to 1333 characters.
-        $table = new xmldb_table('course');
-        $field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null);
-
-        $dbman->change_field_precision($table, $field);
-
-        // Main savepoint reached.
-        upgrade_main_savepoint(true, 2016120505.01);
-    }
-
     return true;
 }

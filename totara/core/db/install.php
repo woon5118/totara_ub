@@ -273,5 +273,10 @@ function xmldb_totara_core_install() {
     set_config('backup_auto_shortname', get_config('backup', 'backup_shortname'), 'backup');
     set_config('backup_shortname', null, 'backup');
 
+    // Increase course fullname field to 1333 characters.
+    $table = new xmldb_table('course');
+    $field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null);
+    $dbman->change_field_precision($table, $field);
+
     return true;
 }

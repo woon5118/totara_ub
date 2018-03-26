@@ -334,5 +334,16 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018031501, 'totara', 'core');
     }
 
+    if ($oldversion < 2018032600) {
+        // Increase course fullname field to 1333 characters.
+        $table = new xmldb_table('course');
+        $field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null);
+
+        $dbman->change_field_precision($table, $field);
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018032600, 'totara', 'core');
+    }
+
     return true;
 }
