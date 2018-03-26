@@ -1387,7 +1387,7 @@ class core_plugin_manager {
             ),
 
             'ltiservice' => array(
-                'memberships', 'profile', 'toolproxy', 'toolsettings'
+                'gradebookservices', 'memberships', 'profile', 'toolproxy', 'toolsettings'
             ),
 
             'media' => array(
