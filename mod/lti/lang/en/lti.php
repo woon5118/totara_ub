@@ -515,6 +515,7 @@ $string['unabletofindtooltype'] = 'Unable to find tool for {$a->id}';
 $string['unknownstate'] = 'Unknown state';
 $string['update'] = 'Update';
 $string['useraccountinformation'] = 'User account information';
+$string['userdataitemtool'] = 'LTI submissions';
 $string['userpersonalinformation'] = 'User personal information';
 $string['using_tool_cartridge'] = 'Using tool cartridge';
 $string['using_tool_configuration'] = 'Using tool configuration: ';
