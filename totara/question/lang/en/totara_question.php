@@ -119,6 +119,7 @@ will be provided for the users to put their answers.
 
 When multiple fields is enabled, you can create several text boxes for each review item, each with its own
 title. Enter a title (such as a question relating to the review items) for each text box that you want to provide.';
+$string['noanswer'] = '-';
 $string['nolearnercompfromplan'] = '{$a}\'s learning plan(s) don\'t contain any competencies to review';
 $string['nolearnercoursefromplan'] = '{$a}\'s learning plan(s) don\'t contain any courses to review';
 $string['nolearnerevidencefromplan'] = '{$a}\'s learning plan(s) don\'t contain any evidence to review';

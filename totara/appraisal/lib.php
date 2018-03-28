@@ -1740,14 +1740,21 @@ class appraisal {
      * Unassign all role_assignments for a given user, but retain associated data.
      *
      * @param int $userid   - The id of the user to run this for.
+     * @param bool $includeownappraisals true if learner role assignments should also be removed.
      */
-    public static function unassign_user_roles($userid) {
+    public static function unassign_user_roles($userid, bool $includeownappraisals = true) {
         global $DB;
 
         $transaction = $DB->start_delegated_transaction();
 
         // Flag all data associated with other users assignments as deleted but keep the data.
-        $roles = $DB->get_records('appraisal_role_assignment', array('userid' => $userid));
+        if ($includeownappraisals) {
+            $roles = $DB->get_records('appraisal_role_assignment', array('userid' => $userid));
+        } else {
+            $select = "userid = :userid AND appraisalrole <> :rolelearner";
+            $params = array('userid' => $userid, 'rolelearner' => self::ROLE_LEARNER);
+            $roles = $DB->get_records_select('appraisal_role_assignment', $select, $params);
+        }
 
         // Create role changed records for all the roles.
         $todb = new stdClass();
@@ -1763,8 +1770,14 @@ class appraisal {
         }
 
         // Unassign all the users role assignments.
-        $sql = "UPDATE {appraisal_role_assignment} SET userid = 0 WHERE userid = ?";
-        $DB->execute($sql, array($userid));
+        if ($includeownappraisals) {
+            $sql = "UPDATE {appraisal_role_assignment} SET userid = 0 WHERE userid = ?";
+            $DB->execute($sql, array($userid));
+        } else {
+            $sql = "UPDATE {appraisal_role_assignment} SET userid = 0 WHERE userid = :userid AND appraisalrole <> :rolelearner";
+            $params = array('userid' => $userid, 'rolelearner' => self::ROLE_LEARNER);
+            $DB->execute($sql, $params);
+        }
 
         $transaction->allow_commit();
     }
