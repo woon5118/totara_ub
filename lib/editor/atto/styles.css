@@ -211,34 +211,18 @@ div.editor_atto_content:hover .atto_control {
 .editor_atto_notification .atto_info,
 .editor_atto_notification .atto_warning {
     display: inline-block;
-    padding: 0.5em;
-    padding-left: 1em;
-    padding-right: 1em;
     border-top: none;
     border-radius: 0 0 8px 8px;
 }
+
 .editor_atto_alert {
     position: fixed;
     z-index: 200; /* must sit atop main menu > sub menu positoned elements in case of :hover action */
     top: 80px;
-    left: 50%;
-    opacity: 0; /* manipulated by Y.Anim */
     box-shadow: 2px 2px 5px 1px #ccc;
-
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
     transform: translateX(-50%);
-
-    cursor: pointer;
-}
-.editor_atto_alert .icon {
-    position: absolute;
-    top: 0;
-    right: 3px;
-}
-.dir-rtl .editor_atto_alert .icon {
-    right: auto;
-    left: 3px;
+    /*rtl:ignore*/
+    left: 50%;
 }
 
 .editor_atto_toolbar,

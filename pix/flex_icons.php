@@ -1136,6 +1136,13 @@ $icons = array(
                     'classes' => 'fa-indent',
                 ),
         ),
+    'info' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-info-circle ft-state-info',
+                ),
+        ),
     'info-circle' =>
         array(
             'data' =>
