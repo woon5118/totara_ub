@@ -25,10 +25,13 @@ define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/clilib.php');
 
+define('MOODLE_COMMIT', '2a591e36a9783c364d1c55d8988b5630d073bc93'); // 3.2.8 - Totara 10 and 11
+
 list($options, $unrecognized) = cli_get_params(
     array(
         'run'    => false,
         'list'   => false,
+        'diffupstream' => false,
         'help'    => false
     ),
     array(
@@ -44,13 +47,14 @@ if ($unrecognized) {
     cli_error(get_string('cliunknowoption', 'admin', $unrecognized), 2);
 }
 
-if (!$options['run'] and !$options['list']) {
+if (!$options['run'] and !$options['list'] and !$options['diffupstream']) {
     $help =
         "Bump up all Totara plugin versions to today's date
 
 Options:
 -h, --help            Print out this help
 --list                List all Totara plugins
+--diffupstream        List differences from upstream
 --run                 Bump up all Totara plugin versions and requires
 
 NOTE: you need to have git and 'releasemoodle' remote to use this script
@@ -58,10 +62,6 @@ NOTE: you need to have git and 'releasemoodle' remote to use this script
 
     echo $help;
     exit(0);
-}
-
-if (dev_get_maturity() == MATURITY_STABLE) {
-    cli_error('This tool is intended for Totara developers only!!!');
 }
 
 $output = null;
@@ -82,6 +82,34 @@ if (!in_array('releasemoodle', $output)) {
 }
 
 list($moodleplugins, $totaraplugins) = dev_get_totara_and_moodle_plugins();
+
+if ($options['diffupstream']) {
+    cli_heading('List of changed upstream plugin versions');
+
+    foreach ($moodleplugins as $component => $fulldir) {
+
+        $upstreamversion = (string)dev_get_plugin_version_upstream($fulldir);
+        $ourversion = (string)dev_get_plugin_version($fulldir);
+
+        if ($upstreamversion === $ourversion) {
+            continue;
+        }
+
+        $error = 'error';
+        if ($ourversion > $upstreamversion and $ourversion < floor($upstreamversion) + 1) {
+            $error = 'looks ok';
+        }
+        if ($component === 'tool_uploadcourse' and $upstreamversion === '2016120500' and $ourversion === '2016120501') {
+            $error = '   warning (potential problem from TL-15012)';
+        }
+        if (file_exists("$fulldir/db/totara_postupgrade.php")) {
+            $error .= ' (postupgrade present)';
+        }
+
+        cli_writeln(str_pad($component, 40, ' ', STR_PAD_RIGHT) . ' ' . $upstreamversion . ' ==> ' . $ourversion . ' ' . $error);
+    }
+    die;
+}
 
 cli_heading('List of ' . count($totaraplugins) . ' Totara plugins');
 $today = date('Ymd') . '00';
@@ -105,6 +133,10 @@ if ($error) {
 
 if (!$options['run']) {
     die;
+}
+
+if (dev_get_maturity() == MATURITY_STABLE) {
+    cli_error('Bumping up all Totara plugin versions cannot be done in stable branches!!!');
 }
 
 $updated = array();
@@ -141,6 +173,27 @@ function dev_get_plugin_version($fulldir) {
     $plugin->version = null;
     $module = $plugin;
     include($fulldir.'/version.php');
+
+    return $plugin->version;
+}
+
+function dev_get_plugin_version_upstream($fulldir) {
+    $plugin = new stdClass();
+    $plugin->version = null;
+    $module = $plugin;
+
+    $versioncontent = dev_get_upstream_file_content("$fulldir/version.php");
+    if ($versioncontent === false) {
+        return null;
+    }
+    $versioncontent = str_replace('<?php', '', $versioncontent);
+    try {
+        eval($versioncontent);
+    } catch (Throwable $t) {
+        cli_writeln('Error parsing file at ' . $fulldir . '/version.php');
+        var_dump($versioncontent);
+        throw $t;
+    }
 
     return $plugin->version;
 }
@@ -221,7 +274,7 @@ function dev_get_maturity() {
  */
 function dev_is_upstream_file($file) {
     global $CFG;
-    $tag = '70fa678586c32a4710c62a59f71d63e02bd9e500'; // 3.2.2 - Totara 10
+    $tag = MOODLE_COMMIT;
     $cwd = getcwd();
     chdir($CFG->dirroot);
     $file = substr($file, strlen($CFG->dirroot) +1);
@@ -230,3 +283,22 @@ function dev_is_upstream_file($file) {
     return ($status === 0);
 }
 
+/**
+ * Get content of upstream file
+ *
+ * @param string $file
+ * @return string|false
+ */
+function dev_get_upstream_file_content($file) {
+    global $CFG;
+    $tag = MOODLE_COMMIT;
+    $cwd = getcwd();
+    chdir($CFG->dirroot);
+    $file = substr($file, strlen($CFG->dirroot) +1);
+    exec("git cat-file -p {$tag}:{$file}", $output, $status);
+    chdir($cwd);
+    if ($status !== 0) {
+        return false;
+    }
+    return implode("\n", $output);
+}
