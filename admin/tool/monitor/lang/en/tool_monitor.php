@@ -101,3 +101,4 @@ $string['subscribeto'] = 'Subscribe to rule "{$a}"';
 $string['taskcleanevents'] = 'Cleanup event monitor events';
 $string['taskchecksubscriptions'] = 'Activate/deactivate invalid rule subscriptions';
 $string['unsubscribe'] = 'Unsubscribe';
+$string['userdataitemsubscriptions'] = 'User subscriptions to monitored events';
