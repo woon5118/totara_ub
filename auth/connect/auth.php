@@ -35,7 +35,7 @@ class auth_plugin_connect extends auth_plugin_base {
      */
     public function __construct() {
         $this->authtype = 'connect';
-        $this->config = get_config('auth/connect'); // Old style config mess - not used.
+        $this->config = get_config('auth_connect');
     }
 
     /**

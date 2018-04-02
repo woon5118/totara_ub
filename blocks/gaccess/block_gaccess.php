@@ -64,7 +64,7 @@ class block_gaccess extends block_list {
         }
 
         // Quick and simple way to prevent block from showing up on users My Moodle if their email does not match the Google registered domain.
-        $domain = (get_config('blocks/gaccess','domainname') ? get_config('blocks/gaccess','domainname') : get_config('auth/gsaml','domainname'));
+        $domain = (get_config('blocks/gaccess','domainname') ? get_config('blocks/gaccess','domainname') : false);
 
         if ($this->content !== NULL) {
             return $this->content;
