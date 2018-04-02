@@ -50,7 +50,7 @@ function xmldb_auth_ldap_upgrade($oldversion) {
     // Automatically generated Moodle v3.3.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2017051501) {
+    if ($oldversion < 2017080100) {
         // The "auth_ldap/coursecreators" setting was replaced with "auth_ldap/coursecreatorcontext" (created
         // dynamically from system-assignable roles) - so migrate any existing value to the first new slot.
         if ($ldapcontext = get_config('auth_ldap', 'creators')) {
@@ -64,7 +64,7 @@ function xmldb_auth_ldap_upgrade($oldversion) {
             // Delete old setting.
             set_config('creators', null, 'auth_ldap');
 
-            upgrade_plugin_savepoint(true, 2017051501, 'auth', 'ldap');
+            upgrade_plugin_savepoint(true, 2017080100, 'auth', 'ldap');
         }
     }
 
