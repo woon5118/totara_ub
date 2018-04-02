@@ -87,7 +87,7 @@ class auth extends base {
                 'moodle/site:config', $this->is_enabled() === false);
             include($this->full_path('settings.php')); // This may also set $settings to null.
         } else if (file_exists($this->full_path('config.html'))) {
-            debugging("config.html files in authentication plugins are not supported any more, developer needs to migrate settings to settings.php", DEBUG_DEVELOPER);
+            debugging("config.html files in authentication plugins are not supported any more, developer needs to migrate config.html to settings.php", DEBUG_DEVELOPER);
         }
 
         if ($settings) {

@@ -384,46 +384,6 @@ class auth_plugin_base {
     }
 
     /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param object $config
-     * @param object $err
-     * @param array $user_fields
-     * @deprecated since Moodle 3.3
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('Use of config.html files have been deprecated, please update your code to use the admin settings API.');
-        //override if needed
-    }
-
-    /**
-     * A chance to validate form data, and last chance to
-     * do stuff before it is inserted in config_plugin
-     * @param object object with submitted configuration settings (without system magic quotes)
-     * @param array $err array of error messages
-     * @deprecated since Moodle 3.3
-     */
-     function validate_form($form, &$err) {
-        debugging('Use of config.html files have been deprecated, please update your code to use the admin settings API.');
-        //override if needed
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     *
-     * @param object object with submitted configuration settings (without system magic quotes)
-     * @deprecated since Moodle 3.3
-     */
-    function process_config($config) {
-        debugging('Use of config.html files have been deprecated, please update your code to use the admin settings API.');
-        //override if needed
-        return true;
-    }
-
-    /**
      * Hook for overriding behaviour of login page.
      * This method is called from login/index.php page for all enabled auth plugins.
      *
