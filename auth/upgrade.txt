@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 12 ===
 
+* all upstream plugins received full backports from v3.4.2
 * auth_none plugin was removed for potential security reasons,
   this plugin was never intended for production servers
 * deprecated plugins auth_fc, auth_imap, auth_nntp, auth_pam and auth_pop3 were removed
