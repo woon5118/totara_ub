@@ -32,8 +32,13 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_auth_db_upgrade($oldversion) {
     global $CFG, $DB;
 
-    // Automatically generated Moodle v3.2.0 release upgrade line.
-    // Put any upgrade step following this.
+    $dbman = $DB->get_manager();
+
+    // Totara 10 branching line.
+
+    // Totara 11 branching line.
+
+    // Totara 12 branching line.
 
     if ($oldversion < 2017032800) {
         // Convert info in config plugins from auth/db to auth_db
