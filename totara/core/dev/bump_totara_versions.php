@@ -25,7 +25,7 @@ define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/clilib.php');
 
-define('MOODLE_COMMIT', '2a591e36a9783c364d1c55d8988b5630d073bc93'); // 3.2.8 - Totara 10 and 11
+define('MOODLE_DEFAULT_TAG', 'v3.2.8'); // The upstream release that Totara 10 and 11 are based on.
 
 list($options, $unrecognized) = cli_get_params(
     array(
@@ -88,7 +88,12 @@ if ($options['diffupstream']) {
 
     foreach ($moodleplugins as $component => $fulldir) {
 
-        $upstreamversion = (string)dev_get_plugin_version_upstream($fulldir);
+        $tag = dev_get_plugin_backported($fulldir);
+        if (!$tag) {
+            $tag = MOODLE_DEFAULT_TAG;
+        }
+
+        $upstreamversion = (string)dev_get_plugin_version_upstream($fulldir, $tag);
         $ourversion = (string)dev_get_plugin_version($fulldir);
 
         if ($upstreamversion === $ourversion) {
@@ -177,12 +182,21 @@ function dev_get_plugin_version($fulldir) {
     return $plugin->version;
 }
 
-function dev_get_plugin_version_upstream($fulldir) {
+function dev_get_plugin_backported($fulldir) {
+    $plugin = new stdClass();
+    $plugin->backported = null;
+    $module = $plugin;
+    include($fulldir.'/version.php');
+
+    return $plugin->backported;
+}
+
+function dev_get_plugin_version_upstream($fulldir, $tag = MOODLE_DEFAULT_TAG) {
     $plugin = new stdClass();
     $plugin->version = null;
     $module = $plugin;
 
-    $versioncontent = dev_get_upstream_file_content("$fulldir/version.php");
+    $versioncontent = dev_get_upstream_file_content("$fulldir/version.php", $tag);
     if ($versioncontent === false) {
         return null;
     }
@@ -270,11 +284,12 @@ function dev_get_maturity() {
  * Is the given file part of upstream Moodle?
  *
  * @param string $file
+ * @param string $tag optional upstream release tag
  * @return bool
  */
-function dev_is_upstream_file($file) {
+function dev_is_upstream_file($file, $tag = MOODLE_DEFAULT_TAG) {
     global $CFG;
-    $tag = MOODLE_COMMIT;
+
     $cwd = getcwd();
     chdir($CFG->dirroot);
     $file = substr($file, strlen($CFG->dirroot) +1);
@@ -287,11 +302,12 @@ function dev_is_upstream_file($file) {
  * Get content of upstream file
  *
  * @param string $file
+ * @param string $tag optional upstream release tag
  * @return string|false
  */
-function dev_get_upstream_file_content($file) {
+function dev_get_upstream_file_content($file, $tag = MOODLE_DEFAULT_TAG) {
     global $CFG;
-    $tag = MOODLE_COMMIT;
+
     $cwd = getcwd();
     chdir($CFG->dirroot);
     $file = substr($file, strlen($CFG->dirroot) +1);
