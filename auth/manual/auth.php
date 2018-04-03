@@ -41,16 +41,13 @@ class auth_plugin_manual extends auth_plugin_base {
      * The name of the component. Used by the configuration.
      */
     const COMPONENT_NAME = 'auth_manual';
-    const LEGACY_COMPONENT_NAME = 'auth/manual';
 
     /**
      * Constructor.
      */
     public function __construct() {
         $this->authtype = 'manual';
-        $config = get_config(self::COMPONENT_NAME);
-        $legacyconfig = get_config(self::LEGACY_COMPONENT_NAME);
-        $this->config = (object)array_merge((array)$legacyconfig, (array)$config);
+        $this->config = get_config(self::COMPONENT_NAME);
     }
 
     /**
