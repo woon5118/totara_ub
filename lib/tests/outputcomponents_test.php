@@ -153,7 +153,7 @@ class core_outputcomponents_testcase extends advanced_testcase {
         $this->assertEquals(1, $CFG->slasharguments);
         $this->assertEquals(1, $CFG->themerev);
         $this->assertEquals(0, $CFG->themedesignermode);
-        $this->assertSame('https://www.example.com/moodle', $CFG->wwwroot);
+        $this->assertSame('http://www.example.com/moodle', $CFG->wwwroot);
         $this->assertEquals(0, $CFG->enablegravatar);
         $this->assertSame('mm', $CFG->gravatardefaulturl);
 

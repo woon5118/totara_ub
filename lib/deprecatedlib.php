@@ -527,13 +527,6 @@ function filter_text($text, $courseid = NULL) {
 }
 
 /**
- * @deprecated Loginhttps is no longer supported
- */
-function httpsrequired() {
-    throw new coding_exception('httpsrequired() can not be used any more. Loginhttps is no longer supported.');
-}
-
-/**
  * Given a physical path to a file, returns the URL through which it can be reached in Moodle.
  *
  * @deprecated since 3.1 - replacement legacy file API methods can be found on the moodle_url class, for example:
@@ -4444,7 +4437,7 @@ function course_get_cm_rename_action(cm_info $mod, $sr = null) {
  */
 function course_scale_used($courseid, $scaleid) {
     global $CFG, $DB;
-    
+
     debugging('course_scale_used() is deprecated and never used, plugins can implement <modname>_scale_used_anywhere, '.
         'all implementations of <modname>_scale_used are now ignored', DEBUG_DEVELOPER);
 

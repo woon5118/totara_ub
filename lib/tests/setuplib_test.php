@@ -356,9 +356,9 @@ class core_setuplib_testcase extends advanced_testcase {
      */
     public function test_get_exception_info_link() {
         global $CFG, $SESSION;
+        $this->resetAfterTest();
 
         $httpswwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
-        $CFG->loginhttps = false;
 
         // Simple local URL.
         $url = $CFG->wwwroot . '/something/here?really=yes';
@@ -415,13 +415,6 @@ class core_setuplib_testcase extends advanced_testcase {
         $exception = new moodle_exception('none');
         $infos = $this->get_exception_info($exception);
         $this->assertSame($url, $infos->link);
-
-        // Internal HTTPS link from fromurl without login HTTPS.
-        $CFG->loginhttps = false;
-        $SESSION->fromurl = $httpswwwroot . '/something/here?really=yes';
-        $exception = new moodle_exception('none');
-        $infos = $this->get_exception_info($exception);
-        $this->assertSame($CFG->wwwroot . '/', $infos->link);
 
         // External link from fromurl.
         $SESSION->fromurl = 'http://moodle.org/something/here?really=yes';

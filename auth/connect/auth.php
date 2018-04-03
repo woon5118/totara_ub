@@ -134,8 +134,7 @@ class auth_plugin_connect extends auth_plugin_base {
         }
 
         $testsession = optional_param('testsession', 0, PARAM_INT);  // Tests session works properly/
-        $cancel      = optional_param('cancel', 0, PARAM_BOOL);      // Redirect to frontpage, needed for loginhttps.
-        if ($testsession or $cancel) {
+        if ($testsession) {
             return;
         }
 
