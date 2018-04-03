@@ -347,12 +347,9 @@ if (($action == 'edit') || ($action == 'new')) {
                 $settings .= '<a href="' . $sesskeyurl . '&amp;action=edit&amp;repos=' . $typename . '">' . $settingsstr .'</a>';
 
                 $settings .= $OUTPUT->container_start('mdl-left');
-                $settings .= '<br/>';
-                $settings .= $admininstancenumbertext;
-                $settings .= '<br/>';
-                $settings .= $courseinstancenumbertext;
-                $settings .= '<br/>';
-                $settings .= $userinstancenumbertext;
+                $settings .= empty($admininstancenumbertext) ? '' : '<br />' . $admininstancenumbertext;
+                $settings .= empty($courseinstancenumbertext) ? '' : '<br />' . $courseinstancenumbertext;
+                $settings .= empty($userinstancenumbertext) ? '' : '<br />' . $userinstancenumbertext;
                 $settings .= $OUTPUT->container_end();
             }
             // Get the current visibility
