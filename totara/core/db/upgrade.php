@@ -31,7 +31,7 @@
  */
 function xmldb_totara_core_upgrade($oldversion) {
     global $CFG, $DB;
-    require(__DIR__ . '/upgradelib.php');
+    require_once(__DIR__ . '/upgradelib.php');
 
     $dbman = $DB->get_manager();
 
