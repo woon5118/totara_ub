@@ -37,7 +37,7 @@ $string['descriptiontype_help'] = 'There are three possible ways to specify a de
 
 * Default behaviour uses the MIME type. If there is a language string in mimetypes.php corresponding to that MIME type, it will be used; otherwise the MIME type itself will be displayed to users.
 * You can specify a custom description on this form.
-* You can specify the name of a languge string in mimetypes.php to use instead of the MIME type.';
+* You can specify the name of a language string in mimetypes.php to use instead of the MIME type.';
 $string['descriptiontype_default'] = 'Default (MIME type or corresponding language string if available)';
 $string['descriptiontype_custom'] = 'Custom description specified in this form';
 $string['descriptiontype_lang'] = 'Alternative language string (from mimetypes.php)';

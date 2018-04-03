@@ -32,10 +32,9 @@ $string['recursivecontext'] = 'Include child contexts';
 $string['recursivecontext_help'] = 'If unticked, tags of items in the context specified above will be displayed, but not tags of items in lower contexts. For example, course tags may be displayed, but not course activity tags.';
 $string['standardonly'] = 'Only standard';
 $string['tagcollection'] = 'Tag collection';
-$string['tagcollection_help'] = 'Select tag collection to display tags from. If you choose "Any" '
-        . 'the tags from all collections except for those marked with * will be displayed';
+$string['tagcollection_help'] = 'Select tag collection to display tags from. If you choose **Any** the tags from all collections except for those marked with * will be displayed.';
 $string['taggeditemscontext'] = 'Tagged items context';
-$string['taggeditemscontext_help'] = 'You can limit the tag cloud to the tags that are present in the current course category, course or module';
+$string['taggeditemscontext_help'] = 'You can limit the tag cloud to the tags that are present in the current course category, course, or module.';
 $string['tags:addinstance'] = 'Add a new tags block';
 $string['tags:myaddinstance'] = 'Add a new tags block to My learning';
 

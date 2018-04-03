@@ -57,7 +57,7 @@ $string['filter_help'] = 'Select the conditions under which the tour will be sho
 $string['filter_theme'] = 'Theme';
 $string['filter_theme_help'] = 'Show the tour when the user is using one of the selected themes.';
 $string['filter_role'] = 'Role';
-$string['filter_role_help'] = 'A tour may be restricted to users with selected roles in the context where the tour is shown. For example, restricting a Dashboard tour to users with the role of student won\'t work if users have the role of student in a course (as is generally the case). A Dashboard tour can only be restricted to users with a system role.';
+$string['filter_role_help'] = 'A tour may be restricted to users with selected roles in the context where the tour is shown. For example, restricting a Dashboard tour to users with the role of learner won\'t work if users have the role of learner in a course (as is generally the case). A Dashboard tour can only be restricted to users with a system role.';
 $string['importtour'] = 'Import tour';
 $string['left'] = 'Left';
 $string['modifyshippedtourwarning'] = 'This is a user tour that has shipped with Totara. Any modifications you make may be overridden during your next site upgrade.';
@@ -82,8 +82,7 @@ Some example values include:
 * /mod/forum/view.php% - to match the forum discussion list
 * /user/profile.php% - to match the user profile page
 
-If you wish to display a tour on the Site Home page, you can use the value: "FRONTPAGE".
-';
+If you wish to display a tour on the Site Home page, you can use the value: **FRONTPAGE**.';
 $string['placement'] = 'Placement';
 $string['pluginname'] = 'User tours';
 $string['resettouronpage'] = 'Reset user tour on this page';
@@ -91,9 +90,9 @@ $string['right'] = 'Right';
 $string['select_block'] = 'Select a block';
 $string['targettype_help'] = 'Each step is associated with a part of the page - the target. Target types are:
 
-* Block - for displaying a step next to a specified block
-* CSS selector - for accurately defining the target area using CSS
-* Display in middle of page - for a step which does not need to be associated with a specific part of the page';
+* **Block**: For displaying a step next to a specified block.
+* **CSS selector**: For accurately defining the target area using CSS.
+* **Display in middle of page**: For a step which does not need to be associated with a specific part of the page.';
 $string['selector_defaulttitle'] = 'Enter a descriptive title';
 $string['selectordisplayname'] = 'A CSS selector matching \'{$a}\'';
 $string['skip'] = 'Skip';
@@ -118,8 +117,7 @@ $string['orphan_help'] = 'Show the step if the target could not be found on the 
 $string['backdrop'] = 'Show with backdrop';
 $string['backdrop_help'] = 'You can use a backdrop to highlight the part of the page that you are pointing to.
 
-Note: Backdrops are not compatible with some parts of the page such as the navigation bar.
-';
+Note that backdrops are not compatible with some parts of the page such as the navigation bar.';
 $string['reflex'] = 'Proceed on click';
 $string['reflex_help'] = 'Proceed to the next step when the target is clicked on.';
 $string['placement_help'] = 'A step may be placed above, below, left or right of the target. Above or below is recommended, as these adjust better for mobile display.

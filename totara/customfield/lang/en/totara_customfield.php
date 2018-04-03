@@ -36,13 +36,13 @@ $string['customfield'] = 'Custom field';
 $string['customfieldcolumnstextarea'] = 'Columns (text area)';
 $string['customfieldcolumnstextarea_help'] = '**Columns** sets the width of text area custom field.
 
-If a text editor plug-in is applied to the text area, the width will be determined by the plug-in and changing this value may have no effect.';
+If a text editor plug-in is applied to the text area, the width will be determined by the plugin and changing this value may have no effect.';
 $string['customfielddefaultdatacheckbox'] = 'Checked by default (Checkbox)';
-$string['customfielddefaultdatacheckbox_help'] = 'When set to Yes the Custom field checkbox will be checked by default.
+$string['customfielddefaultdatacheckbox_help'] = 'When set to **Yes** the **Custom field** checkbox will be checked by default.
 
-When set to No the Custom field checkbox will not be checked by default.';
+When set to **No** the **Custom field** checkbox will not be checked by default.';
 $string['customfielddefaultdatamenu'] = 'Default value (menu of choices)';
-$string['customfielddefaultdatamenu_help'] = 'Set the default value that will appear in the drop down box. The default value must appear in the menu options above.
+$string['customfielddefaultdatamenu_help'] = 'Set the default value that will appear in the dropdown box. The default value must appear in the menu options above.
 
 Leave blank if there is no default entry required.';
 $string['customfielddefaultdatatext'] = 'Default value (Text input)';
@@ -56,31 +56,31 @@ Leave this field blank if no default text is required.';
 $string['customfieldfieldsizetext'] = 'Display size (Text input)';
 $string['customfieldfieldsizetext_help'] = 'Display size sets the number of characters that will be displayed in the text field.';
 $string['customfieldforceunique'] = 'Custom Field unique';
-$string['customfieldforceunique_help'] = 'When set to Yes the custom field will only accept a unique value. If a duplicate value is used in this field the system will not allow the item to be saved.
+$string['customfieldforceunique_help'] = 'When set to **Yes** the custom field will only accept a unique value. If a duplicate value is used in this field the system will not allow the item to be saved.
 
-When set to No the custom field will accept any value in the field.';
+When set to **No** the custom field will accept any value in the field.';
 $string['customfieldfullname'] = 'Custom Field full name';
 $string['customfieldfullname_help'] = 'Custom field full name is the complete title of the custom field.';
 $string['customfieldhidden'] = 'Custom Field hidden';
-$string['customfieldhidden_help'] = 'When set to Yes the custom field will not be visible on the settings page or elsewhere where it would have been shown. When No the custom field will be visible.';
+$string['customfieldhidden_help'] = 'When set to **Yes** the custom field will not be visible on the settings page or elsewhere where it would have been shown. When **No** the custom field will be visible.';
 $string['customfieldlocked'] = 'Custom Field locked';
-$string['customfieldlocked_help'] = 'When set to Yes the custom field will only display the information given when the field was set up. The field cannot be edited for existing records and it is not locked when creating a record.';
+$string['customfieldlocked_help'] = 'When set to **Yes** the custom field will only display the information given when the field was set up. The field cannot be edited for existing records and it is not locked when creating a record.';
 $string['customfieldmaxlengthtext'] = 'Maximum length (Text Input)';
 $string['customfieldmaxlengthtext_help'] = 'Maximum length sets the maximum number of characters the text field will accept.';
 $string['customfieldmenuoptions'] = 'Menu options (Menu of choices)';
-$string['customfieldmenuoptions_help'] = 'Enter the menu options that will appear in the drop down box.
+$string['customfieldmenuoptions_help'] = 'Enter the menu options that will appear in the dropdown box.
 
 Only enter one option per line.';
 $string['customfieldmultiselectoptions'] = 'Menu options (and icons)';
-$string['customfieldmultiselectoptions_help'] = 'Enter the multi-select options (and icons) that will appear in the drop down box.';
+$string['customfieldmultiselectoptions_help'] = 'Enter the multi-select options (and icons) that will appear in the dropdown box.';
 $string['customfieldrequired'] = 'This field is required';
-$string['customfieldrequired_help'] = 'If set to Yes, it will be a compulsory field when creating new items
+$string['customfieldrequired_help'] = 'If set to **Yes**, it will be a compulsory field when creating new items
 
-If set to No, it will be an optional field when creating new items.';
+If set to **No**, it will be an optional field when creating new items.';
 $string['customfieldrowstextarea'] = 'Rows (text area)';
 $string['customfieldrowstextarea_help'] = '**Rows** sets the height of the text area custom field (the number of lines).
 
-If a text editor plug-in is applied to the text area, the height will be determined by the plug-in and changing this value may have no effect.';
+If a text editor plugin is applied to the text area, the height will be determined by the plugin and changing this value may have no effect.';
 $string['customfields'] = 'Custom fields';
 $string['customfieldshortname'] = 'Custom Field short name';
 $string['customfieldshortname_help'] = 'Custom field short name is the abbreviated name of the custom field and can be used for display purposes.
@@ -138,13 +138,11 @@ $string['customfielddefaultdataurltext'] = 'Default text';
 $string['customfielddefaultdataurltext_help'] = 'Default link text to be displayed. If empty the URL will be used.';
 $string['customfielddefaultdataurltarget'] = 'Open in a new window';
 $string['customfieldurl'] = 'URL';
-$string['customfieldurl_help'] = '
-The URL is split into three inputs.
+$string['customfieldurl_help'] = 'The URL is split into three inputs.
 
-* URL - Must start with http://, https:// or /
-* Text - Optional link text. If left empty, the URL will be displayed
-* Open in new window or tab
-';
+* **URL**: Must start with **http://**, **https://**, or **/**.
+* **Text**: Optional link text. If left empty, the URL will be displayed.
+* **Open in new window or tab**.';
 $string['customfieldurlformaterror'] = 'The URL needs to start with http://, https:// or /';
 $string['defaultchecked'] = 'Checked by default';
 $string['defaultdata'] = 'Default value';
@@ -152,7 +150,7 @@ $string['defaultmake'] = 'Make selected by default';
 $string['defaultselected'] = 'Selected by default';
 $string['deletefield'] = 'Deleting a field';
 $string['description'] = 'Description of the field';
-$string['description_help'] = 'A text description of this custom field';
+$string['description_help'] = 'A text description of this custom field.';
 $string['editfield'] = 'Editing custom field: {$a}';
 $string['endyear'] = 'End year';
 $string['error:abstractmethod'] = 'This abstract method must be overriden';
@@ -193,7 +191,7 @@ $string['pluginname'] = 'Customfields';
 $string['programcertcustomfields'] = 'Program and Certification custom fields';
 $string['readonlyemptyfield'] = '-';
 $string['regexpattern'] = 'Regular expression validation';
-$string['regexpattern_help'] = 'A regular expression that will be used to ensure entered text is in the expected format. For example "/^[0-9]{3}$/" will ensure the text consists of exactly 3 numbers.
+$string['regexpattern_help'] = 'A regular expression that will be used to ensure entered text is in the expected format. For example **/^[0-9]{3}$/** will ensure the text consists of exactly three numbers.
 
 This validation is performed only when submitting forms with custom fields, current data is not affected after validation is changed.
 

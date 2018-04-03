@@ -95,7 +95,7 @@ $string['assignincludechildren'] = 'Include Child Groups?';
 $string['assignments'] = 'Assignments';
 $string['assigned'] = 'Assigned';
 $string['assignnumusers'] = 'Learners';
-$string['assignnumusers_help'] = 'Shows the current number of users in the specific user group(s). This may differ from the number that were in the group when the group was originally assigned';
+$string['assignnumusers_help'] = 'Shows the current number of users in the specific user group(s). This may differ from the number that were in the group when the group was originally assigned.';
 $string['assignsourcename'] = 'Assigned Group';
 $string['assignnumcompleted'] = '{$a->total} ({$a->completed} completed)';
 $string['backtoappraisal'] = 'Back to appraisal';
@@ -120,7 +120,7 @@ $string['closedon'] = 'This appraisal was cancelled on {$a}';
 $string['complete'] = 'Complete';
 $string['completeby'] = 'Complete by';
 $string['completebydate'] = 'Complete by <br>{$a}';
-$string['completebystage_help'] = 'Leave the dates empty if you don\'t know them yet, but note that the appraisal can\'t be activate without them';
+$string['completebystage_help'] = 'Leave the dates empty if you don\'t know them yet, but note that the appraisal can\'t be activate without them.';
 $string['completed'] = 'Completed';
 $string['completedon'] = 'This appraisal was completed on {$a}';
 $string['completestage'] = 'Complete stage';
@@ -157,9 +157,9 @@ $string['deletedappraisal'] = 'Appraisal deleted';
 $string['deletedpage'] = 'Page deleted';
 $string['deletedstage'] = 'Stage deleted';
 $string['description'] = 'Description';
-$string['description_help'] = 'When a appraisal description is created the information displays after appraisal name';
+$string['description_help'] = 'When a appraisal description is created the information displays after appraisal name.';
 $string['descriptionstage'] = 'Description';
-$string['descriptionstage_help'] = 'When a description is created the information displays after appraisal stage name';
+$string['descriptionstage_help'] = 'When a description is created the information displays after appraisal stage name.';
 $string['detailreport'] = 'Detail report';
 $string['detailreportforx'] = '{$a} detail report: ';
 $string['downloadnow'] = 'Download now';
@@ -297,7 +297,7 @@ $string['learners'] = 'Learners';
 $string['leavespace'] = 'Leave space on print-out to write comments';
 $string['locked'] = 'Locked';
 $string['locks'] = 'Lock stage after completion';
-$string['locks_help'] = 'Locking a stage after completion means the user\'s own answers are no longer editable';
+$string['locks_help'] = 'Locking a stage after completion means the user\'s own answers are no longer editable.';
 $string['lockwhencompleted'] = 'Lock stage when completed';
 $string['manageappraisals'] = 'Manage appraisals';
 $string['managestage'] = 'Manage {$a}\'s content';
@@ -369,9 +369,7 @@ $string['messageplaceholders_help'] = 'The following placeholders are available:
 * [appraiserlastname]
   <br />The appraiser\'s last name.
 * [appraiserfullname]
-  <br />The appraiser\'s full name (defaults to \'Appraiser not known\').
-
-';
+  <br />The appraiser\'s full name (defaults to \'Appraiser not known\').';
 $string['missingroles'] = 'Some assigned users are missing important role assignments or have not yet selected a job assignment for this appraisal.';
 $string['missingrolesbelow'] = ' Users may not be able to complete the appraisal without these roles, they are listed below:';
 $string['missingrolesinfo'] = 'Some assigned users are missing important role assignments or have not yet selected a job assignment for this appraisal. {$a}';
@@ -381,9 +379,9 @@ $string['missingrolestitle'] = 'Appraisals Missing Roles - {$a}';
 $string['myappraisals'] = 'My Appraisals';
 $string['teamappraisals'] = 'Team\'s Appraisals';
 $string['name'] = 'Name';
-$string['name_help'] = 'This is the name that will appear at the top of your appraisal forms and reports';
+$string['name_help'] = 'This is the name that will appear at the top of your appraisal forms and reports.';
 $string['namestage'] = 'Name';
-$string['namestage_help'] = 'This is the name that will appear at the top of your appraisal stages';
+$string['namestage_help'] = 'This is the name that will appear at the top of your appraisal stages.';
 $string['next'] = 'Next';
 $string['noappraisals'] = 'No appraisals have been created.';
 $string['noappraisalsactive'] = 'No appraisals are active.';
@@ -398,7 +396,7 @@ $string['ontarget'] = 'On target';
 $string['options'] = 'Options';
 $string['overdue'] = 'Overdue';
 $string['overrideviewother'] = 'Override view other role\'s answers';
-$string['overrideviewother_help'] = 'If "Override view other role\'s answers" is set then the role will see all other roles\'
+$string['overrideviewother_help'] = 'If **Override view other role\'s answers** is set then the role will see all other roles\'
 answers, otherwise viewing answers of other roles is determined by the original question.';
 $string['pagename'] = 'Page: {$a}';
 $string['pagedefaultname'] = 'New Page';
@@ -427,7 +425,7 @@ $string['printyourappraisal'] = 'Print your appraisal';
 $string['progresssaved'] = 'Progress saved';
 $string['pluginname'] = 'Totara Appraisals';
 $string['redisplay'] = 'Redisplay';
-$string['redisplay_help'] = 'If "Redisplay" is set then visibility and editing of the redisplayed question is controlled by the
+$string['redisplay_help'] = 'If **Redisplay** is set then visibility and editing of the redisplayed question is controlled by the
 original question and (where applicable) stage locking settings, otherwise the question will not be redisplayed.';
 $string['reportappraisals'] = 'Reports';
 $string['required'] = 'Required';

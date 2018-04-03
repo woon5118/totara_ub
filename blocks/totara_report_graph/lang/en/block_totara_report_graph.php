@@ -41,7 +41,7 @@ By default the graph image will consume the available space, while maintaining i
 Please be aware that the aspect ratio of the image is always maintained, setting a max width and a max height will not change the aspect ratio.';
 $string['pluginname'] = 'Report graph';
 $string['reportfor'] = 'Show report data for user';
-$string['reportfor_help'] = 'The report may use specific user account so that all users see the same graph or the graph may include data depending on current logged in user';
+$string['reportfor_help'] = 'The report may use specific user account so that all users see the same graph or the graph may include data depending on current logged in user.';
 $string['reportforcurrent'] = 'Current user viewing block';
 $string['reportforguest'] = 'The guest account';
 $string['reportforme'] = 'Me ({$a})';

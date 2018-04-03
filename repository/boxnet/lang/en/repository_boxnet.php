@@ -34,7 +34,7 @@ $string['information'] = 'Get a client ID and secret from the <a href="https://a
 $string['invalidpassword'] = 'Invalid password';
 $string['nullfilelist'] = 'There are no files in this repository';
 $string['password'] = 'Password';
-$string['pluginname_help'] = 'Repository on Box';
+$string['pluginname_help'] = 'Repository on Box.';
 $string['pluginname'] = 'Box';
 $string['saved'] = 'Box data saved';
 $string['shareurl'] = 'Share URL';

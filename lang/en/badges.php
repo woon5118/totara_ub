@@ -67,7 +67,7 @@ $string['archiveconfirm'] = 'Delete and keep existing issued badges';
 $string['archivehelp'] = '<p>This option means that the badge will be marked as "retired" and will no longer appear in the list of badges. Users will no longer be able to earn this badge, however existing badge recipients will still be able to display this badge on their profile page and push it to their external backpacks.</p>
 <p>If you would like your users to retain access to the earned badges it is important to select this option instead of fully deleting badges.</p>';
 $string['attachment'] = 'Attach badge to message';
-$string['attachment_help'] = 'If enabled, an issued badge file will be attached to the recipient\'s email for download. (Attachments must be enabled in Site administration > Plugins > Message outputs > Email to use this option.)';
+$string['attachment_help'] = 'If enabled, an issued badge file will be attached to the recipient\'s email for download. (Attachments must be enabled in *Site administration > Plugins > Message outputs > Email* to use this option.)';
 $string['award'] = 'Award badge';
 $string['awardedtoyou'] = 'Issued to me';
 $string['awardoncron'] = 'Access to the badges was successfully enabled. Too many users can instantly earn this badge. To ensure site performance, this action will take some time to process.';
@@ -131,8 +131,7 @@ $string['badgedetails'] = 'Badge details';
 $string['badgeimage'] = 'Image';
 $string['badgeimage_help'] = 'This is an image that will be used when this badge is issued.
 
-To add a new image, browse and select an image (in JPG or PNG format) then click "Save changes". The image will be cropped to a square and resized to match badge image requirements. ';
-
+To add a new image, browse and select an image (in JPG or PNG format) then click **Save changes**. The image will be cropped to a square and resized to match badge image requirements.';
 $string['badgeprivacysetting'] = 'Badge privacy settings';
 $string['badgeprivacysetting_help'] = 'Badges you earn can be displayed on your account profile page. This setting allows you to automatically set the visibility of the newly earned badges.
 
@@ -228,15 +227,15 @@ $string['criteria_3_help'] = 'Social';
 $string['criteria_4'] = 'Course completion';
 $string['criteria_4_help'] = 'Allows a badge to be awarded to users who have completed the course. This criterion can have additional parameters such as minimum grade and date of course completion.';
 $string['criteria_5'] = 'Completing a set of courses';
-$string['criteria_5_help'] = 'Allows a badge to be awarded to users who have completed a set of courses. Each course can have additional parameters such as minimum grade and date of course completion. ';
+$string['criteria_5_help'] = 'Allows a badge to be awarded to users who have completed a set of courses. Each course can have additional parameters such as minimum grade and date of course completion.';
 $string['criteria_6'] = 'Profile completion';
-$string['criteria_6_help'] = 'Allows a badge to be awarded to users for completing certain fields in their profile. You can select from default and custom profile fields that are available to users. ';
+$string['criteria_6_help'] = 'Allows a badge to be awarded to users for completing certain fields in their profile. You can select from default and custom profile fields that are available to users.';
 $string['criteria_7'] = 'Audience membership';
 $string['criteria_7_help'] = 'Allows a badge to be awarded to users for becoming a member of certian audiences.';
 $string['criteria_8'] = 'Program completion';
 $string['criteria_8_help'] = 'Allows a badge to be awarded to users for completing certain programs.';
 $string['criterror'] = 'Current parameters issues';
-$string['criterror_help'] = 'This fieldset shows all parameters that were initially added to this badge requirement but are no longer available. It is recommended that you un-check such parameters to make sure that users can earn this badge in the future.';
+$string['criterror_help'] = 'This field set shows all parameters that were initially added to this badge requirement but are no longer available. It is recommended that you uncheck such parameters to make sure that users can earn this badge in the future.';
 $string['currentimage'] = 'Current image';
 $string['currentstatus'] = 'Current status: ';
 $string['dateawarded'] = 'Date issued';
@@ -255,7 +254,7 @@ $string['deletehelp'] = '<p>Fully deleting a badge means that all its informatio
 $string['delcritconfirm'] = 'Are you sure that you want to delete this criterion?';
 $string['delparamconfirm'] = 'Are you sure that you want to delete this parameter?';
 $string['description'] = 'Description';
-$string['description_help'] = 'A short description of the badge. This can only be plain text without any formatting. (This is a requirement of the Mozilla OpenBadges standard.)';
+$string['description_help'] = 'A short description of the badge. This can only be plain text without any formatting. (This is a requirement of the Mozilla Open Badges standard.)';
 $string['disconnect'] = 'Disconnect';
 $string['donotaward'] = 'Currently, this badge is not active, so it cannot be awarded to users. If you would like to award this badge, please set its status to active.';
 $string['editsettings'] = 'Edit settings';
@@ -340,7 +339,7 @@ $string['expireperiodh'] = 'This badge expires {$a} hour(s) after being issued.'
 $string['expireperiodm'] = 'This badge expires {$a} minute(s) after being issued.';
 $string['expireperiods'] = 'This badge expires {$a} second(s) after being issued.';
 $string['expirydate'] = 'Expiry date';
-$string['expirydate_help'] = 'Optionally, badges can expire on a specific date, or the date can be calculated based on the date when the badge was issued to a user. ';
+$string['expirydate_help'] = 'Optionally, badges can expire on a specific date, or the date can be calculated based on the date when the badge was issued to a user.';
 $string['externalconnectto'] = 'To display external badges you need to <a href="{$a}">connect to a backpack</a>.';
 $string['externalbadges'] = 'My badges from other web sites';
 $string['externalbadgesp'] = 'Badges from other web sites:';
@@ -357,7 +356,7 @@ $string['issuerurl'] = 'Issuer URL';
 $string['localconnectto'] = 'To share these badges outside this web site you need to <a href="{$a}">connect to a backpack</a>.';
 $string['localbadges'] = 'My badges from {$a} web site';
 $string['localbadgesh'] = 'My badges from this web site';
-$string['localbadgesh_help'] = 'All badges earned within this web site by completing courses, course activities, and other requirements.
+$string['localbadgesh_help'] = 'All badges earned within this website by completing courses, course activities, and other requirements.
 
 You can manage your badges here by making them public or private for your profile page.
 
@@ -396,15 +395,11 @@ $string['notification_help'] = 'This setting manages notifications sent to a bad
 
 The following options are available:
 
-* **NEVER** – Do not send notifications.
-
-* **EVERY TIME** – Send a notification every time this badge is awarded.
-
-* **DAILY** – Send notifications once a day.
-
-* **WEEKLY** – Send notifications once a week.
-
-* **MONTHLY** – Send notifications once a month.';
+* **Never**: Do not send notifications.
+* **Every time**: Send a notification every time this badge is awarded.
+* **Daily**: Send notifications once a day.
+* **Weekly**: Send notifications once a week.
+* **Monthly**: Send notifications once a month.';
 $string['notifydaily'] = 'Daily';
 $string['notifyevery'] = 'Every time';
 $string['notifymonthly'] = 'Monthly';
@@ -443,7 +438,7 @@ $string['signinwithyouremail'] = 'Sign in with your email';
 $string['sitebadges'] = 'Site badges';
 $string['sitebadges_help'] = 'Site badges can only be awarded to users for site-related activities. These include completing a set of courses or parts of user profiles. Site badges can also be issued manually by one user to another.
 
-Badges for course-related activities must be created at the course level. Course badges can be found under Course Administration > Badges.';
+Badges for course-related activities must be created at the course level. Course badges can be found under *Course Administration > Badges*.';
 $string['statusmessage_0'] = 'This badge is currently not available to users. Enable access if you want users to earn this badge. ';
 $string['statusmessage_1'] = 'This badge is currently available to users. Disable access to make any changes. ';
 $string['statusmessage_2'] = 'This badge is currently not available to users, and its criteria are locked. Enable access if you want users to earn this badge. ';
@@ -452,15 +447,12 @@ $string['statusmessage_4'] = 'This badge is currently archived.';
 $string['status'] = 'Badge status';
 $string['status_help'] = 'Status of a badge determines its behaviour in the system:
 
-* **AVAILABLE** – Means that this badge can be earned by users. While a badge is available to users, its criteria cannot be modified.
+* **Available**: Means that this badge can be earned by users. While a badge is available to users, its criteria cannot be modified.
+* **Not avilable**: Means that this badge is not available to users and cannot be earned or manually issued. If such badge has never been issued before, its criteria can be changed.
 
-* **NOT AVAILABLE** – Means that this badge is not available to users and cannot be earned or manually issued. If such badge has never been issued before, its criteria can be changed.
+Once a badge has been issued to at least one user, it automatically becomes **Locked**. Locked badges can still be earned by users, but their criteria can no longer be changed. If you need to modify details or criteria of a locked badge, you can duplicate this badge and make all the required changes.
 
-Once a badge has been issued to at least one user, it automatically becomes **LOCKED**. Locked badges can still be earned by users, but their criteria can no longer be changed. If you need to modify details or criteria of a locked badge, you can duplicate this badge and make all the required changes.
-
-*Why do we lock badges?*
-
-We want to make sure that all users complete the same requirements to earn a badge. Currently, it is not possible to revoke badges. If we allowed badges requirements to be modified all the time, we would most likely end up with users having the same badge for meeting completely different requirements.';
+Badges are locked because we want to make sure that all users complete the same requirements to earn a badge. Currently, it is not possible to revoke badges. If we allowed badges requirements to be modified all the time, we would most likely end up with users having the same badge for meeting completely different requirements.';
 $string['subject'] = 'Message subject';
 $string['type'] = 'Type';
 $string['userdataitemconnectedbackpacks'] = 'Connected backpacks';

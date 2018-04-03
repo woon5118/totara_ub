@@ -66,7 +66,7 @@ $string['groupkey'] = 'Use group enrolment keys';
 $string['groupkey_desc'] = 'Use group enrolment keys by default.';
 $string['groupkey_help'] = 'In addition to restricting access to the course to only those who know the key, use of group enrolment keys means users are automatically added to groups when they enrol in the course.
 
-Note: An enrolment key for the course must be specified in the self enrolment settings as well as group enrolment keys in the group settings.';
+Note, an enrolment key for the course must be specified in the self enrolment settings as well as group enrolment keys in the group settings.';
 $string['keyholder'] = 'You should have received this enrolment key from:';
 $string['longtimenosee'] = 'Unenrol inactive after';
 $string['longtimenosee_help'] = 'If users haven\'t accessed a course for a long time, then they are automatically unenrolled. This parameter specifies that time limit.';
@@ -98,12 +98,12 @@ $string['self:manage'] = 'Manage enrolled users';
 $string['self:unenrol'] = 'Unenrol users from course';
 $string['self:unenrolself'] = 'Unenrol self from the course';
 $string['sendcoursewelcomemessage'] = 'Send course welcome message';
-$string['sendcoursewelcomemessage_help'] = 'When a user self enrols in the course, they may be sent a welcome message email. If sent from the course contact (by default the teacher), and more than one user has this role, the email is sent from the first user to be assigned the role.';
+$string['sendcoursewelcomemessage_help'] = 'When a user self enrols in the course, they may be sent a welcome message email. If sent from the course contact (by default the trainer), and more than one user has this role, the email is sent from the first user to be assigned the role.';
 $string['showhint'] = 'Show hint';
 $string['showhint_desc'] = 'Show first letter of the guest access key.';
 $string['status'] = 'Allow existing enrolments';
 $string['status_desc'] = 'Enable self enrolment method in new courses.';
-$string['status_help'] = 'If enabled together with \'Allow new enrolments\' disabled, only users who self enrolled previously can access the course. If disabled, this self enrolment method is effectively disabled, since all existing self enrolments are suspended and new users cannot self enrol.';
+$string['status_help'] = 'If enabled together with **Allow new enrolments** disabled, only users who self enrolled previously can access the course. If disabled, this self enrolment method is effectively disabled, since all existing self enrolments are suspended and new users cannot self enrol.';
 $string['unenrol'] = 'Unenrol user';
 $string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"?';
 $string['unenroluser'] = 'Do you really want to unenrol "{$a->user}" from course "{$a->course}"?';

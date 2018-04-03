@@ -305,15 +305,13 @@ $string['menuitem:accessbypreset'] = 'Restrict access by preset rule';
 $string['menuitem:accessbyrole'] = 'Restrict access by role';
 $string['menuitem:accesscontrols'] = 'Access Controls';
 $string['menuitem:accessmode'] = 'Access Mode';
-$string['menuitem:accessmode_help'] = '
-Access controls are used to restrict which users can view the menu item.
+$string['menuitem:accessmode_help'] = 'Access controls are used to restrict which users can view the menu item.
 
 **Restrict access** determines how the following criteria are applied.
 
 When set to **any**, users will be able to see this menu item if they meet **any one** of the enabled criteria below.
 
-When set to **all**, users will only be able to see this menu item if they meet **all** the enabled criteria below.
-';
+When set to **all**, users will only be able to see this menu item if they meet **all** the enabled criteria below.';
 $string['menuitem:accessnotenabled'] = 'The settings below are not currently active because this item\'s visibility is not set to "Use custom access settings".';
 $string['menuitem:addcohorts'] = 'Add audiences';
 $string['menuitem:addnew'] = 'Add new menu item';
@@ -321,8 +319,7 @@ $string['menuitem:anycontext'] = 'Users may have role in any context';
 $string['menuitem:audienceaggregation'] = 'Audience aggregation';
 $string['menuitem:audienceaggregation_help'] = 'Determines whether the user must be a member of all of the selected audiences, or any of the selected audiences.';
 $string['menuitem:context'] = 'Context';
-$string['menuitem:context_help'] = '
-**Context** allows you to specify where a user must have a role assigned in order to view the menu item.
+$string['menuitem:context_help'] = '**Context** allows you to specify where a user must have a role assigned in order to view the menu item.
 
 A user can be assigned a role at the system level giving them site wide access or just within a particular context. For instance a trainer may only be assigned the role at the course level.
 
@@ -341,15 +338,14 @@ $string['menuitem:formitemtargetattr_help'] = 'If selected, clicking this menu i
 $string['menuitem:formitemtitle'] = 'Menu title';
 $string['menuitem:formitemtitle_help'] = 'The name of this menu item. This field supports the multi-language content filter.';
 $string['menuitem:formitemurl'] = 'Menu default url address';
-$string['menuitem:formitemurl_help'] = 'Start the URL with a "/" to make the link relative to your site URL. Otherwise start the URL with http:// or https://, i.e. http://extdomain.com
+$string['menuitem:formitemurl_help'] = 'Start the URL with a **/** to make the link relative to your site URL. Otherwise start the URL with http:// or https://, i.e. http://extdomain.com
 
 You can also use following placeholders:
 
-* ##userid## - current user id
-* ##username## - current username
-* ##useremail## - current user email
-* ##courseid## - current course id
-';
+* ##userid## : Current user ID.
+* ##username## : Current username.
+* ##useremail## : Current user email.
+* ##courseid## : Current course ID.';
 $string['menuitem:formitemvisibility'] = 'Visibility';
 $string['menuitem:hide'] = 'Hide';
 $string['menuitem:movesuccess'] = 'The item was moved successfully';
@@ -357,9 +353,9 @@ $string['menuitem:norolesfound'] = 'No roles found';
 $string['menuitem:presetwithaccess'] = 'Condition required to view';
 $string['menuitem:presetwithaccess_help'] = 'This criteria allows you to restrict access to the menu item using one or more predefined rules.
 
-How these rules are required is determined by the **Preset rule aggregation** setting. If it is set to "all" then the user must meet all of the selected criteria. If it is set to "any" the user must meet only one of the selected criteria.';
+How these rules are required is determined by the **Preset rule aggregation** setting. If it is set to **all** then the user must meet all of the selected criteria. If it is set to **any** the user must meet only one of the selected criteria.';
 $string['menuitem:presetaggregation'] = 'Preset rule aggregation';
-$string['menuitem:presetaggregation_help'] = 'Determines whether the user must be a meet all of the selected preset rules, or any of the selected preset rules.';
+$string['menuitem:presetaggregation_help'] = 'Determines whether the user must meet all of the selected preset rules, or any of the selected preset rules.';
 $string['menuitem:resettodefault'] = 'Reset menu to default configuration';
 $string['menuitem:resettodefaultconfirm'] = 'Are you absolutely sure that you want to reset the main menu to its default configuration? This will permanently erase all customisations.';
 $string['menuitem:resettodefaultcomplete'] = 'Main menu reset to default configuration.';
@@ -454,7 +450,7 @@ $string['permittedcrossdomainpolicies_desc'] = 'If set to "none" browsers are in
 $string['pluginname'] = 'Totara core';
 $string['pluginnamewithkey'] = 'Self enrolment with key';
 $string['pos_description'] = 'Description';
-$string['pos_description_help'] = 'Description of the position';
+$string['pos_description_help'] = 'Description of the position.';
 $string['position_typeicon'] = 'Position type icon';
 $string['positiona'] = 'Position {$a}';
 $string['positionatcompletion'] = 'Position at completion';
@@ -635,7 +631,6 @@ $string['choosetempmanager_help'] = 'A temporary manager can be assigned. The as
 Click **Choose temporary manager** to select a temporary manager.
 
 If the name you are looking for does not appear in the list, it might be that the user does not have the necessary rights to act as a temporary manager.';
-
 $string['recordoflearningfor'] = 'Record of Learning for ';
 $string['developmentplan'] = 'Development Planner';
 $string['enablemyteam'] = 'Enable My Team';

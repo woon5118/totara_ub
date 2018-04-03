@@ -106,7 +106,7 @@ $string['configtypes'] = 'Enable LTI applications';
 $string['configured'] = 'Configured';
 $string['confirmtoolactivation'] = 'Are you sure you would like to activate this tool?';
 $string['contentitem'] = 'Content-Item Message';
-$string['contentitem_help'] = 'If ticked, the option \'Select content\' will be available when adding an external tool.';
+$string['contentitem_help'] = 'If ticked, the option **Select content** will be available when adding an external tool.';
 $string['course_tool_types'] = 'Course tools';
 $string['courseactivitiesorresources'] = 'Course activities or resources';
 $string['courseid'] = 'Course ID number';
@@ -118,7 +118,7 @@ $string['curllibrarymissing'] = 'PHP Curl library must be installed to use LTI';
 $string['custom'] = 'Custom parameters';
 $string['custom_config'] = 'Using custom tool configuration.';
 $string['custom_help'] = 'Custom parameters are settings used by the tool provider. For example, a custom parameter may be used to display
-a specific resource from the provider.  Each parameter should be entered on a separate line using a format of "name=value"; for example, "chapter=3".
+a specific resource from the provider.  Each parameter should be entered on a separate line using a format of **name=value**; for example, **chapter=3**.
 
 It is safe to leave this field unchanged unless directed by the tool provider.';
 $string['custominstr'] = 'Custom parameters';
@@ -130,13 +130,10 @@ $string['default_launch_container'] = 'Default launch container';
 $string['default_launch_container_help'] = 'The launch container affects the display of the tool when launched from the course. Some launch containers provide more screen
 real estate to the tool, and others provide a more integrated feel with the Totara environment.
 
-* **Default** - Use the launch container specified by the tool configuration.
-* **Embed** - The tool is displayed within the existing Totara window, in a manner similar to most other Activity types.
-* **Embed, without blocks** - The tool is displayed within the existing Totara window, with just the navigation controls
-        at the top of the page.
-* **New window** - The tool opens in a new window, occupying all the available space.
-        Depending on the browser, it will open in a new tab or a popup window.
-        It is possible that browsers will prevent the new window from opening.';
+* **Default**: Use the launch container specified by the tool configuration.
+* **Embed**: The tool is displayed within the existing Totara window, in a manner similar to most other activity types.
+* **Embed, without blocks**: The tool is displayed within the existing Totara window, with just the navigation controls at the top of the page.
+* **New window**: The tool opens in a new window, occupying all the available space. Depending on the browser, it will open in a new tab or a popup window. It is possible that browsers will prevent the new window from opening.';
 $string['delegate'] = 'Delegate to teacher';
 $string['delete'] = 'Delete';
 $string['delete_confirmation'] = 'Are you sure you want to delete this preconfigured tool?';
@@ -164,7 +161,7 @@ $string['edittype'] = 'Edit preconfigured tool';
 $string['embed'] = 'Embed';
 $string['embed_no_blocks'] = 'Embed, without blocks';
 $string['enableemailnotification'] = 'Send notification emails';
-$string['enableemailnotification_help'] = 'If enabled, students will receive email notification when their tool submissions are graded.';
+$string['enableemailnotification_help'] = 'If enabled, learners will receive email notification when their tool submissions are graded.';
 $string['enterkeyandsecret'] = 'Enter your consumer key and shared secret';
 $string['enterkeyandsecret_help'] = 'If you were given a consumer key and/or shared secret, input them here';
 $string['errorbadurl'] = 'URL is not a valid tool URL or cartridge.';
@@ -177,17 +174,19 @@ $string['errortooltypenotfound'] = 'LTI tool type not found.';
 $string['existing_window'] = 'Existing window';
 $string['extensions'] = 'LTI extension services';
 $string['external_tool_type'] = 'Preconfigured tool';
-$string['external_tool_type_help'] = '* **Automatic, based on tool URL** - The best tool configuration is selected automatically. If the tool URL is not recognised, the tool configuration details may need to be entered manually.
-* **A specific preconfigured tool** - The tool configuration for the specified tool will be used when communicating with the external tool provider. If the tool URL does not appear to belong to the tool provider, a warning will be shown. It is not always necessary to enter a tool URL.
-* **Custom configuration** - A consumer key and shared secret may need to be entered manually. The consumer key and shared secret may be obtained from the tool provider. However, not all tools require a consumer key and shared secret, in which case the fields may be left blank.
+$string['external_tool_type_help'] = 'Options are:
+
+* **Automatic, based on tool URL**: The best tool configuration is selected automatically. If the tool URL is not recognised, the tool configuration details may need to be entered manually.
+* **A specific preconfigured tool**: The tool configuration for the specified tool will be used when communicating with the external tool provider. If the tool URL does not appear to belong to the tool provider, a warning will be shown. It is not always necessary to enter a tool URL.
+* **Custom configuration**: A consumer key and shared secret may need to be entered manually. The consumer key and shared secret may be obtained from the tool provider. However, not all tools require a consumer key and shared secret, in which case the fields may be left blank.
 
 ### Preconfigured tool editing
 
 Three icons are available after the preconfigured tool dropdown list:
 
-* **Add** - Create a course level tool configuration. All External tool instances in this course may use the tool configuration.
-* **Edit** - Select a course level tool from the dropdown, then click this icon. The details of the tool configuration may be edited.
-* **Delete** - Remove the selected course level tool.';
+* **Add**: Create a course level tool configuration. All External tool instances in this course may use the tool configuration.
+* **Edit**: Select a course level tool from the dropdown, then click this icon. The details of the tool configuration may be edited.
+* **Delete**: Remove the selected course level tool.';
 $string['external_tool_types'] = 'Preconfigured tools';
 $string['failedtoconnect'] = 'Totara was unable to communicate with the "{$a}" system';
 $string['failedtocreatetooltype'] = 'Failed to create new tool. Please check the URL and try again.';
@@ -218,7 +217,7 @@ $string['invalidid'] = 'LTI ID was incorrect';
 $string['launch_in_moodle'] = 'Launch tool in Totara';
 $string['launch_in_popup'] = 'Launch tool in a pop-up';
 $string['launch_url'] = 'Tool URL';
-$string['launch_url_help'] = 'The tool URL indicates the web address of the External Tool, and may contain additional information, such as the resource to show.
+$string['launch_url_help'] = 'The tool URL indicates the web address of the **External tool**, and may contain additional information, such as the resource to show.
 If you are unsure what to enter for the tool URL, please check with the tool provider for more information.
 
 You can enter a cartridge URL if you have one, and the rest of the form details will fill automatically.
@@ -229,13 +228,10 @@ $string['launchinpopup'] = 'Launch container';
 $string['launchinpopup_help'] = 'The launch container affects the display of the tool when launched from the course. Some launch containers provide more screen
 real estate to the tool, and others provide a more integrated feel with the Totara environment.
 
-* **Default** - Use the launch container specified by the tool configuration.
-* **Embed** - The tool is displayed within the existing Totara window, in a manner similar to most other Activity types.
-* **Embed, without blocks** - The tool is displayed within the existing Totara window, with just the navigation controls
-        at the top of the page.
-* **New window** - The tool opens in a new window, occupying all the available space.
-        Depending on the browser, it will open in a new tab or a popup window.
-        It is possible that browsers will prevent the new window from opening.';
+* **Default**: Use the launch container specified by the tool configuration.
+* **Embed**: The tool is displayed within the existing Totara window, in a manner similar to most other Activity types.
+* **Embed, without blocks**: The tool is displayed within the existing Totara window, with just the navigation controls at the top of the page.
+* **New window**: The tool opens in a new window, occupying all the available space. Depending on the browser, it will open in a new tab or a popup window. It is possible that browsers will prevent the new window from opening.';
 $string['launchoptions'] = 'Launch options';
 $string['leaveblank'] = 'Leave blank if you do not need them';
 $string['lti'] = 'LTI';
@@ -252,26 +248,20 @@ $string['lti_launch_error'] = 'An error occurred when launching the external too
 $string['lti_launch_error_tool_request'] = '<p>
 To submit a request for an administrator to complete the tool configuration, click <a href="{$a->admin_request_url}" target="_top">here</a>.
 </p>';
-$string['lti_launch_error_unsigned_help'] = '<p>This error may be a result of a missing consumer key and shared secret for the tool provider.</p>
-<p>If you have a consumer key and shared secret, you may enter it when editing the external tool instance (make sure advanced options are visible).</p>
-<p>Alternatively, you may <a href="{$a->course_tool_editor}">create a course level tool provider configuration</a>.</p>';
+$string['lti_launch_error_unsigned_help'] = 'This error may be a result of a missing consumer key and shared secret for the tool provider.If you have a consumer key and shared secret, you may enter it when editing the external tool instance (make sure advanced options are visible).Alternatively, you may <a href="{$a->course_tool_editor}">create a course level tool provider configuration</a>.';
 $string['lti_tool_request_added'] = 'Tool configuration request successfully submitted. You may need to contact an administrator to complete the tool configuration.';
 $string['lti_tool_request_existing'] = 'A tool configuration for the tool domain has already been submitted.';
 $string['ltiunknownserviceapicall'] = 'LTI unknown service API call.';
 $string['main_admin'] = 'General help';
 $string['main_admin_help'] = 'External tools allow Totara users to seamlessly interact with learning resources hosted remotely. Through a special
 launch protocol, the remote tool will have access to some general information about the launching user. For example,
-the institution name, course id, user id, and other information such as the user\'s name or e-mail address.
+the institution name, course ID, user ID, and other information such as the user\'s name or email address.
 
 Tools listed on this page are separated into three categories:
 
-* **Active** - These tool providers have been approved and configured by an administrator. They can be used from within any
-        course on this Totara instance. If a consumer key and shared secret are entered, a trust relationship is established
-        between this Totara instance and the remote tool, providing a secure communication channel.
-* **Pending** - These tool providers came in through a package import, but have not been configured by an administrator.
-        Teachers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.
-* **Rejected** - These tools providers are flagged as ones which an administrator has no intention of making available to the entire
-        Totara instance. Teachers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.';
+* **Active**: These tool providers have been approved and configured by an administrator. They can be used from within any course on this Totara instance. If a consumer key and shared secret are entered, a trust relationship is established between this Totara instance and the remote tool, providing a secure communication channel.
+* **Pending**: These tool providers came in through a package import, but have not been configured by an administrator. Trainers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.
+* **Rejected**: These tools providers are flagged as ones which an administrator has no intention of making available to the entire Totara instance. Trainers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.';
 $string['manage_external_tools'] = 'Manage tools';
 $string['manage_tools'] = 'Manage preconfigured tools';
 $string['manage_tool_proxies'] = 'Manage external tool registrations';
@@ -281,15 +271,15 @@ $string['misconfiguredtools'] = 'Misconfigured tool instances were detected';
 $string['missingparameterserror'] = 'The page is misconfigured: "{$a}"';
 $string['module_class_type'] = 'Totara module type';
 $string['modulename'] = 'External tool';
-$string['modulename_help'] = 'The external tool activity module enables students to interact with learning resources and activities on other web sites. For example, an external tool could provide access to a new activity type or learning materials from a publisher.
+$string['modulename_help'] = 'The external tool activity module enables learners to interact with learning resources and activities on other web sites. For example, an external tool could provide access to a new activity type or learning materials from a publisher.
 
-To create an external tool activity, a tool provider which supports LTI (Learning Tools Interoperability) is required. A teacher can create an external tool activity or make use of a tool configured by the site administrator.
+To create an external tool activity, a tool provider which supports LTI (Learning Tools Interoperability) is required. A trainer can create an external tool activity or make use of a tool configured by the site administrator.
 
 External tool activities differ from URL resources in a few ways:
 
-* External tools are context aware i.e. they have access to information about the user who launched the tool, such as institution, course and name
-* External tools support reading, updating, and deleting grades associated with the activity instance
-* External tool configurations create a trust relationship between your site and the tool provider, allowing secure communication between them';
+* External tools are context aware i.e. they have access to information about the user who launched the tool, such as institution, course and name.
+* External tools support reading, updating, and deleting grades associated with the activity instance.
+* External tool configurations create a trust relationship between your site and the tool provider, allowing secure communication between them.';
 $string['modulename_link'] = 'mod/lti/view';
 $string['modulename_shortcut_link'] = 'mod/lti/view/custom';
 $string['modulenameplural'] = 'External tools';
@@ -353,7 +343,7 @@ $string['preferwidth'] = 'Preferred width';
 $string['press_to_submit'] = 'Press to launch this activity';
 $string['privacy'] = 'Privacy';
 $string['quickgrade'] = 'Allow quick grading';
-$string['quickgrade_help'] = 'If enabled, multiple tools can be graded on one page. Add grades and comments then click the "Save all my feedback" button to save all changes for that page.';
+$string['quickgrade_help'] = 'If enabled, multiple tools can be graded on one page. Add grades and comments then click the **Save all my feedback** button to save all changes for that page.';
 $string['redirect'] = 'You will be redirected in few seconds. If you are not, press the button.';
 $string['register'] = 'Register';
 $string['register_warning'] = 'The registration page seems to be taking a while to open. If it does not appear, check that you entered the correct URL in the configuration settings. If Totara is using https, ensure the tool you are configuring supports https and you are using https in the URL.';
@@ -400,7 +390,7 @@ the browser from warning the user if the underlying page was accessed over SSL, 
 $string['secure_launch_url'] = 'Secure tool URL';
 $string['secure_launch_url_help'] = 'Similar to the tool URL, but used instead of the tool URL if high security is required. Totara will use the secure tool URL instead of the tool URL if the Totara site is accessed through SSL, or if the tool configuration is set to always launch through SSL.
 
-The tool URL may also be set to an https address to force launching through SSL, and this field may be left blank.';
+The tool URL may also be set to an HTTPS address to force launching through SSL, and this field may be left blank.';
 $string['selectcontent'] = 'Select content';
 $string['send'] = 'Send';
 $string['services'] = 'Services';
@@ -408,10 +398,10 @@ $string['services_help'] = 'Select those services which you wish to offer to the
 $string['setupoptions'] = 'Set-up options';
 $string['share_email'] = 'Share launcher\'s email with the tool';
 $string['share_email_admin'] = 'Share launcher\'s email with tool';
-$string['share_email_admin_help'] = 'Specify whether the e-mail address of the user launching the tool will be shared with the tool provider.
-The tool provider may need launcher\'s e-mail addresses to distinguish users with the same name in the UI, or send e-mails
+$string['share_email_admin_help'] = 'Specify whether the email address of the user launching the tool will be shared with the tool provider.
+The tool provider may need launcher\'s email addresses to distinguish users with the same name in the UI, or send emails
 to users based on actions within the tool.';
-$string['share_email_help'] = 'Specify whether the e-mail address of the user launching the tool will be shared with the tool provider.
+$string['share_email_help'] = 'Specify whether the email address of the user launching the tool will be shared with the tool provider.
 
 The tool provider may need launcher\'s email addresses to distinguish users with the same name, or send emails to users based on actions within the tool.
 
@@ -433,9 +423,9 @@ $string['share_roster_help'] = 'Specify whether the tool can access the list of 
 Note that this setting may be overridden in the tool configuration.';
 $string['show_in_course_activity_chooser'] = 'Show in activity chooser and as a preconfigured tool';
 $string['show_in_course_lti1'] = 'Tool configuration usage';
-$string['show_in_course_lti1_help'] = 'This tool may be shown in the activity chooser for a teacher to select to add to a course. Alternatively, it may be shown in the preconfigured tool dropdown menu when adding an external tool to a course. A further option is for the tool configuration to only be used if the exact tool URL is entered when adding an external tool to a course.';
+$string['show_in_course_lti1_help'] = 'This tool may be shown in the activity chooser for a trainer to select to add to a course. Alternatively, it may be shown in the preconfigured tool dropdown menu when adding an external tool to a course. A further option is for the tool configuration to only be used if the exact tool URL is entered when adding an external tool to a course.';
 $string['show_in_course_lti2'] = 'Tool configuration usage';
-$string['show_in_course_lti2_help'] = 'This tool can be shown in the activity chooser for a teacher to select to add to a course or in the preconfigured tool dropdown menu when adding an external tool to a course.';
+$string['show_in_course_lti2_help'] = 'This tool can be shown in the activity chooser for a trainer to select to add to a course or in the preconfigured tool dropdown menu when adding an external tool to a course.';
 $string['show_in_course_no'] = 'Do not show; use only when a matching tool URL is entered';
 $string['show_in_course_preconfigured'] = 'Show as preconfigured tool when adding an external tool';
 $string['size'] = 'Size parameters';
@@ -454,9 +444,9 @@ $string['toggle_debug_data'] = 'Toggle debug data';
 $string['tool_config_not_found'] = 'Tool configuration not found for this URL.';
 $string['tool_settings'] = 'Tool settings';
 $string['tooldescription'] = 'Tool description';
-$string['tooldescription_help'] = 'The description of the tool that will be displayed to teachers in the activity list.
+$string['tooldescription_help'] = 'The description of the tool that will be displayed to trainers in the activity list.
 
-This should describe what the tool is for and what it does and any additional information the teacher may need to know.';
+This should describe what the tool is for and what it does and any additional information the trainer may need to know.';
 $string['toolisbeingused'] = 'This tool is being used {$a} times';
 $string['toolisnotbeingused'] = 'This tool has not yet been used';
 $string['toolproxy'] = 'External tool registrations';
@@ -464,13 +454,10 @@ $string['toolproxy_help'] = 'External tool registrations allow Totara site admin
 
 Tool registrations listed on this page are separated into four categories:
 
-* **Configured** - These tool registrations have been set up but the registration process has not yet been started.
-* **Pending** - The registration process for these tool registrations has been started but has not completed. Open and save the settings to move it
-back to the \'Configured\' category.
-* **Accepted** - These tool registrations have been approved; the resources specified in the tool proxy will appear on the preconfigured tools page
-with an initial status of \'Pending\'.
-* **Rejected** - These tool registrations are ones which were rejected during the registration process. Open and save the settings to move it
-back to the \'Configured\' category so the registration process can be restarted.';
+* **Configured**: These tool registrations have been set up but the registration process has not yet been started.
+* **Pending**: The registration process for these tool registrations has been started but has not completed. Open and save the settings to move it back to the **Configured** category.
+* **Accepted**: These tool registrations have been approved; the resources specified in the tool proxy will appear on the preconfigured tools page with an initial status of **Pending**.
+* **Rejected**: These tool registrations are ones which were rejected during the registration process. Open and save the settings to move it back to the **Configured** category so the registration process can be restarted.';
 $string['toolproxyregistration'] = 'External tool registration';
 $string['toolregistration'] = 'External tool registration';
 $string['toolsetup'] = 'External tool configuration';
@@ -481,24 +468,24 @@ $string['tooltypenotdeleted'] = 'Could not delete preconfigured tool';
 $string['tooltypeupdated'] = 'Preconfigured tool updated';
 $string['toolurl'] = 'Tool URL';
 $string['toolurlplaceholder'] = 'Tool URL...';
-$string['toolurl_help'] = 'The tool URL is used to match tool URLs to the correct tool configuration. Prefixing the URL with http(s) is optional.
+$string['toolurl_help'] = 'The tool URL is used to match tool URLs to the correct tool configuration. Prefixing the URL with HTTP(S) is optional.
 
 Additionally, the base URL is used as the tool URL if a tool URL is not specified in the external tool instance.
 
-For example, a base URL of *tool.com* would match the following:
+For example, a base URL of **tool.com** would match the following:
 
 * tool.com
 * tool.com/quizzes
 * tool.com/quizzes/quiz.php?id=10
 * www.tool.com/quizzes
 
-A base URL of *www.tool.com/quizzes* would match the following:
+A base URL of **www.tool.com/quizzes** would match the following:
 
 * www.tool.com/quizzes
 * tool.com/quizzes
 * tool.com/quizzes/take.php?id=10
 
-A base URL of *quiz.tool.com* would match the following:
+A base URL of **quiz.tool.com** would match the following:
 
 * quiz.tool.com
 * quiz.tool.com/take.php?id=10
@@ -508,7 +495,7 @@ If two different tool configurations are for the same domain, the most specific 
 You can also insert a cartridge URL if you have one and the details for the tool will be automatically filled.';
 $string['typename'] = 'Tool name';
 $string['typename_help'] = 'The tool name is used to identify the tool provider within Totara. The name entered will be visible
-to teachers when adding external tools within courses.';
+to trainers when adding external tools within courses.';
 $string['types'] = 'Types';
 $string['unabletocreatetooltype'] = 'Unable to create tool';
 $string['unabletofindtooltype'] = 'Unable to find tool for {$a->id}';
