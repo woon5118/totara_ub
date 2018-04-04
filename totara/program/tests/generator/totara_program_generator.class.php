@@ -429,22 +429,6 @@ class totara_program_generator extends component_generator_base {
         totara_program\progress\program_progress_cache::mark_program_cache_stale($program->id);
     }
 
-    private function complete_course($courseid, $userid) {
-        $comp_man = new stdClass();
-        $comp_man->id = $DB->get_field('course_completions', 'id',
-            array('userid' => $this->user_man->id, 'course' => $this->course->id));
-        $comp_man->userid = $this->user_man->id;
-        $comp_man->course = $this->course->id;
-        $comp_man->timeenrolled = $this->now;
-        $comp_man->timestarted = $this->now;
-        $comp_man->timecompleted = $this->now;
-        $comp_man->status = COMPLETION_STATUS_COMPLETE;
-
-        // Purge the course and program completion caches
-        completion_info::purge_progress_caches();
-        totara_program\progress\mark_user_cache_stale::mark_program_cache_stale($userid);
-    }
-
     /**
      * Get empty program assignment
      *
