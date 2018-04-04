@@ -123,6 +123,7 @@ $string['completionusegradewithoutgradeenabled'] = 'To enable this setting, you 
 $string['conversionexception'] = 'Could not convert assignment. Exception was: {$a}.';
 $string['configshowrecentsubmissions'] = 'Everyone can see notifications of submissions in recent activity reports.';
 $string['confirmsubmission'] = 'Are you sure you want to submit your work for grading? You will not be able to make any more changes.';
+$string['confirmsubmissionheading'] = 'Confirm submission';
 $string['confirmbatchgradingoperation'] = 'Are you sure you want to {$a->operation} for {$a->count} learners?';
 $string['couldnotconvertgrade'] = 'Could not convert assignment grade for user {$a}.';
 $string['couldnotconvertsubmission'] = 'Could not convert assignment submission for user {$a}.';
