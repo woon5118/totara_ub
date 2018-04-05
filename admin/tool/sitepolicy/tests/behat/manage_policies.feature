@@ -12,7 +12,7 @@ Feature: Manage sitepolicies
 
   Scenario: Create, update and delete a draft sitepolicy
     Given I log in as "admin"
-    And I navigate to "Site policies" node in "Site administration > Security"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
     Then I should see "No policies created"
     And "Create new policy" "button" should exist
 
@@ -57,7 +57,7 @@ Feature: Manage sitepolicies
 
   Scenario: Create, publish and archive a sitepolicy
     Given I log in as "admin"
-    And I navigate to "Site policies" node in "Site administration > Security"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
     Then I should see "No policies created"
     And "Create new policy" "button" should exist
 
@@ -106,7 +106,7 @@ Feature: Manage sitepolicies
       | title    | languages | statement          | numoptions | consentstatement       | providetext | withholdtext | mandatory |
       | Policy 1 | en        | Policy 1 statement | 1          | P1 - Consent statement | Yes         | No           | first     |
     And I log in as "admin"
-    And I navigate to "Site policies" node in "Site administration > Security"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
     Then I should see "0" in the "Policy 1" "table_row"
     And I should see "1 new version (draft)" in the "Policy 1" "table_row"
 

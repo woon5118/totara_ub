@@ -25,7 +25,7 @@
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-admin_externalpage_setup('tool_sitepolicy');
+admin_externalpage_setup('tool_sitepolicy-managerpolicies');
 
 $localisedpolicyid = required_param('localisedpolicy', PARAM_INT);
 $localisedpolicy = new \tool_sitepolicy\localisedpolicy($localisedpolicyid);

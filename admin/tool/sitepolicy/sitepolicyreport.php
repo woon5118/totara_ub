@@ -20,14 +20,15 @@
  * @author Courteney Brownie <courteney.brownie@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package tool_sitepolicy
+ *
+ * @global moodle_database $DB
+ * @global moodle_page $PAGE
  */
 
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
-admin_externalpage_setup('tool_sitepolicy');
-
-global $USER, $DB;
+admin_externalpage_setup('tool_sitepolicy-userconsentreport');
 
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); //export format
@@ -35,11 +36,6 @@ $debug = optional_param('debug', 0, PARAM_INT);
 
 // Default to current user.
 $userid = $USER->id;
-
-$context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_url("/{$CFG->admin}/tool/sitepolicy/sitepolicyreport.php");
-$PAGE->set_pagelayout('admin');
 
 $strheading = get_string('alerts', 'totara_message');
 
@@ -64,6 +60,7 @@ if ($format != '') {
 
 \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
+/** @var totara_reportbuilder_renderer $output */
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
 $PAGE->set_button($report->edit_button());

@@ -19,7 +19,7 @@ Feature: Sitepolicy version navigation
       | 0        | 1            | 0           | Published 1 | en        |            | Poblished 1 statement | 2          | p1-Consent statement | Yes         | No           | first     |
 
     And I log in as "admin"
-    And I navigate to "Site policies" node in "Site administration > Security"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
 
     Then I should see "Site policies" in the "//div[@id='region-main']//h2" "xpath_element"
     And the "generaltable" table should contain the following:
@@ -91,8 +91,8 @@ Feature: Sitepolicy version navigation
     And I should not see "Archive" in the "1" "table_row"
 
     # - navigating back to index.php
-    And I should see "Site policies" in the ".breadcrumb-nav" "css_element"
-    When I click on "Site policies" "link" in the ".breadcrumb-nav" "css_element"
+    And I should see "Manage policies" in the ".breadcrumb-nav" "css_element"
+    When I click on "Manage policies" "link" in the ".breadcrumb-nav" "css_element"
     Then I should see "Site policies" in the "//div[@id='region-main']//h2" "xpath_element"
 
     ## Test following the policy name link -> Non-draft
@@ -117,7 +117,7 @@ Feature: Sitepolicy version navigation
     And I press "Install selected language pack(s)"
     And I wait until "Language pack 'nl' was successfully installed" "text" exists
 
-    And I navigate to "Site policies" node in "Site administration > Security"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
     Then I should see "Site policies" in the "//div[@id='region-main']//h2" "xpath_element"
     And the "generaltable" table should contain the following:
       | Name          | Status    |
@@ -209,7 +209,7 @@ Feature: Sitepolicy version navigation
     And I should see "Manage \"nl All multi\" policy"
 
     ## Publish - Cancel
-    When I click on "Site policies" "link" in the ".breadcrumb-nav" "css_element"
+    When I click on "Manage policies" "link" in the ".breadcrumb-nav" "css_element"
     Then I should see "Site policies" in the "//div[@id='region-main']//h2" "xpath_element"
     When I follow "Draft 1"
     Then I should see "Manage \"Draft 1\" policy"

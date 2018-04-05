@@ -27,7 +27,7 @@ require_once($CFG->libdir . '/adminlib.php');
 
 use \tool_sitepolicy\localisedpolicy;
 
-admin_externalpage_setup('tool_sitepolicy');
+admin_externalpage_setup('tool_sitepolicy-managerpolicies');
 
 $PAGE->set_context(context_system::instance());
 

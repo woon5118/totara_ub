@@ -29,7 +29,7 @@ use \tool_sitepolicy\policyversion,
     \tool_sitepolicy\sitepolicy,
     \tool_sitepolicy\localisedpolicy;
 
-admin_externalpage_setup('tool_sitepolicy');
+admin_externalpage_setup('tool_sitepolicy-managerpolicies');
 
 $sitepolicyid = required_param('sitepolicyid', PARAM_INT);
 $sitepolicy = new sitepolicy($sitepolicyid);

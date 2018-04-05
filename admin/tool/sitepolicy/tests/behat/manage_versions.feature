@@ -16,7 +16,7 @@ Feature: Manage sitepolicy versions
       | 0        | 1            | 0           | Policy 1 | en        |            | Policy 1 statement | 1          | P1 - Consent statement | Yes         | No           | first     |
 
     And I log in as "admin"
-    And I navigate to "Site policies" node in "Site administration > Security"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
     Then the "generaltable" table should contain the following:
       | Name     | Revisions | Status    |
       | Policy 1 | 1         | Published |
@@ -69,7 +69,7 @@ Feature: Manage sitepolicy versions
       | hasdraft | numpublished | allarchived | title    | languages | langprefix | statement          | numoptions | consentstatement       | providetext | withholdtext | mandatory |
       | 0        | 1            | 0           | Policy 2 | en,nl,fr  | ,nl ,fr    | Policy 2 statement | 2          | P2 - Consent statement | Yes         | No           | first     |
     And I log in as "admin"
-    And I navigate to "Site policies" node in "Site administration > Security"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
     Then the "generaltable" table should contain the following:
       | Name     | Revisions | Status    |
       | Policy 2 | 1         | Published |

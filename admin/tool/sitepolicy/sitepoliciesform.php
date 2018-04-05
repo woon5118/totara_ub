@@ -25,7 +25,7 @@
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-admin_externalpage_setup('tool_sitepolicy');
+admin_externalpage_setup('tool_sitepolicy-managerpolicies');
 
 $context = context_system::instance();
 $PAGE->set_context($context);
