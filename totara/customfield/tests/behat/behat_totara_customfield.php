@@ -47,7 +47,7 @@ class behat_totara_customfield extends behat_base {
         $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
         $move_literal = behat_context_helper::escape(get_string($string));
-        $xpath = "//td[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
+        $xpath = "//td/span[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
         try {
             $this->find('xpath', $xpath, new coding_exception(__METHOD__));
         } catch (coding_exception $ex) {
@@ -76,7 +76,7 @@ class behat_totara_customfield extends behat_base {
         $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
         $move_literal = behat_context_helper::escape(get_string($string));
-        $xpath = "//td[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
+        $xpath = "//td/span[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
         $this->find('xpath', $xpath, new \Behat\Mink\Exception\ExpectationException("Could not find the {$move_literal} action for the {$fn_literal} Totara custom field", $this->getSession()));
     }
 
@@ -95,7 +95,7 @@ class behat_totara_customfield extends behat_base {
         $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
         $move_literal = behat_context_helper::escape(get_string($string));
-        $xpath = "//td[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
+        $xpath = "//td/span[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
         $node = $this->find('xpath', $xpath, new \Behat\Mink\Exception\ExpectationException("Could not find the {$move_literal} action for the {$fn_literal} Totara custom field", $this->getSession()));
         $node->click();
     }
