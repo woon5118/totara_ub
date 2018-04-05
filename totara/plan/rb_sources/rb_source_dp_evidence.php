@@ -366,8 +366,18 @@ class rb_source_dp_evidence extends rb_base_source {
         }
     }
 
+    /**
+     * Displays evidence name as html link
+     *
+     * @param string $evidencelink
+     * @param object Report row $row
+     * @return string html link
+     */
     public function rb_display_evidencelink($evidencelink, $row) {
         global $OUTPUT;
+        if (empty($evidencelink)) {
+            return '';
+        }
         return $OUTPUT->action_link(new moodle_url($evidencelink), $evidencelink);
     }
 

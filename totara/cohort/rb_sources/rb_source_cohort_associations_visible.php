@@ -370,13 +370,16 @@ class rb_source_cohort_associations_visible extends rb_base_source {
     }
 
     /**
-     * Helper function to display the learning item's name, with its icon and a link to it
+     * Helper function to display the learning item's name, with its icon and a link to it.
+     *
      * @param str $instancename
      * @param object $row
-     * @return str
+     * @return str html link
      */
     public function rb_display_associationnameiconlink($instancename, $row) {
-
+        if (empty($instancename)) {
+            return '';
+        }
         if ($row->type == COHORT_ASSN_ITEMTYPE_COURSE) {
             $url = new moodle_url('/course/view.php', array('id' => $row->insid));
         } else {
@@ -417,25 +420,6 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             return $this->cohort_association_delete_link($associationid, $row);
         }
         return '';
-    }
-
-    /**
-     * Helper function to display the "Set completion date" link for a program (should only be used with enrolled items)
-     * @param $instanceid
-     * @param $row
-     * @deprecated Since 11; no replacement; program completion is for enrolled audience, NOT visible audiences.
-     */
-    public function rb_display_programcompletionlink($instanceid, $row) {
-        debugging('rb_display_programcompletionlink() has been deprecated with no replacement', DEBUG_DEVELOPER);
-        static $canedit = null;
-        if ($canedit === null) {
-            $canedit = has_capability('moodle/cohort:manage', context_system::instance());
-        }
-
-        if ($canedit && $row->type == COHORT_ASSN_ITEMTYPE_PROGRAM) {
-            return totara_cohort_program_completion_link($row->cohortid, $instanceid);
-        }
-        return get_string('na', 'totara_cohort');
     }
 
     public function get_required_jss() {

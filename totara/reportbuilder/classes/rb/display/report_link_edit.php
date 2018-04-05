@@ -34,7 +34,9 @@ namespace totara_reportbuilder\rb\display;
 class report_link_edit extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT;
-
+        if (empty($value)) {
+            return '';
+        }
         // Retrieve the extra row data.
         $extra = self::get_extrafields_row($row, $column);
 

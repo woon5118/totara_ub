@@ -460,14 +460,18 @@ class rb_source_org extends rb_base_source {
     }
 
 
-    //
-    //
-    // Source specific column display methods
-    //
-    //
-    function rb_display_orgnamelink($orgname, $row) {
+    /**
+     * Displays organisation name as html link
+     *
+     * @param string $orgname
+     * @param object Report row $row
+     * @return string html link
+     */
+    public function rb_display_orgnamelink($orgname, $row) {
+        if (empty($orgname)) {
+            return '';
+        }
         $url = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'organisation', 'id' => $row->orgid));
-
         return html_writer::link($url, $orgname);
     }
 

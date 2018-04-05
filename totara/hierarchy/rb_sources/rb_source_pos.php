@@ -469,14 +469,18 @@ class rb_source_pos extends rb_base_source {
     }
 
 
-    //
-    //
-    // Source specific column display methods
-    //
-    //
-    function rb_display_posnamelink($posname, $row) {
+    /**
+     * Displays position name as html link
+     *
+     * @param string $posname
+     * @param object Report row $row
+     * @return string html link
+     */
+    public function rb_display_posnamelink($posname, $row) {
+        if (empty($posname)) {
+            return '';
+        }
         $url = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'position', 'id' => $row->posid));
-
         return html_writer::link($url, $posname);
     }
 

@@ -362,7 +362,18 @@ class rb_source_cohort extends rb_base_source {
         return $paramoptions;
     }
 
-    function rb_display_link_cohort_category($categoryname, $row, $isexport = false) {
+    /**
+     * Displays category name as link to event
+     *
+     * @param string $categoryname
+     * @param object Report row $row
+     * @param bool $isexport optional false
+     * @return string html link
+     */
+    public function rb_display_link_cohort_category($categoryname, $row, $isexport = false) {
+        if (empty($categoryname)) {
+            return '';
+        }
         $categoryname = format_string($categoryname);
 
         $contextid = $row->context_id;
@@ -389,11 +400,16 @@ class rb_source_cohort extends rb_base_source {
     }
 
     /**
-     * RB helper function to show the name of the cohort with a link to the cohort's details page
+     * RB helper function to show the name of the cohort with a link to the cohort's details page.
+     *
      * @param int $cohortid
      * @param object $row
+     * @return string html link
      */
-    public function rb_display_cohort_name_link($cohortname, $row ) {
+    public function rb_display_cohort_name_link($cohortname, $row) {
+        if (empty($cohortname)) {
+            return '';
+        }
         return html_writer::link(new moodle_url('/cohort/view.php', array('id' => $row->cohort_id)), format_string($cohortname));
     }
 

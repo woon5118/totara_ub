@@ -767,9 +767,18 @@ class rb_source_program_overview extends rb_base_source {
         }
     }
 
-    function rb_display_course_status_list($data, $row) {
+    /**
+     * Displays course statuses as html links.
+     *
+     * @param array $data
+     * @param object Report row $row
+     * @return string html link
+     */
+    public function rb_display_course_status_list($data, $row) {
         global $COMPLETION_STATUS;
-
+        if (empty($data)) {
+            return '';
+        }
         $output = array();
         $items = explode($this->uniquedelimiter, $data);
         foreach ($items as $status) {
@@ -782,8 +791,18 @@ class rb_source_program_overview extends rb_base_source {
         return implode($output, "\n");
     }
 
-    function rb_display_category_link_list($data, $row) {
+    /**
+     * Displays categories as html links.
+     *
+     * @param array $data
+     * @param object Report row $row
+     * @return string html link
+     */
+    public function rb_display_category_link_list($data, $row) {
         $output = array();
+        if (empty($data)) {
+            return '';
+        }
         $items = explode($this->uniquedelimiter, $data);
         foreach ($items as $item) {
             list($catid, $visible, $catname) = explode('|', $item);
@@ -798,8 +817,17 @@ class rb_source_program_overview extends rb_base_source {
         return implode($output, "\n");
     }
 
-    function rb_display_coursename_list($data, $row) {
-
+    /**
+     * Displays course names as html links.
+     *
+     * @param array $data
+     * @param object Report row $row
+     * @return string html link
+     */
+    public function rb_display_coursename_list($data, $row) {
+        if (empty($data)) {
+            return '';
+        }
          $items = explode($this->uniquedelimiter, $data);
          foreach ($items as $key => $item) {
              list($id, $coursename) = explode('|', $item);
@@ -808,58 +836,6 @@ class rb_source_program_overview extends rb_base_source {
          }
 
         return implode($items, "\n");
-    }
-
-    /**
-     * @deprecated since Totara 11
-     */
-    function rb_display_program_completion_progress($status, $row, $isexport = false) {
-        debugging('rb_source_program_overview::rb_display_program_completion_progress has been deprecated. Replaced by class totara_program\rb\display\program_completion_progress', DEBUG_DEVELOPER);
-
-        global $CFG, $PAGE;
-
-        if (!empty($row->programid) && !empty($row->userid)) {
-            // If the extra fields are provided then use the same behaviour as the RoL:Programs report.
-            require_once($CFG->dirroot . '/totara/program/lib.php');
-            $progress = prog_display_progress($row->programid, $row->userid, CERTIFPATH_STD, $isexport);
-            if ($isexport && is_numeric($progress)) {
-                return get_string('xpercentcomplete', 'totara_core', $progress);
-            } else {
-                return $progress;
-            }
-        }
-
-        debugging('rb_source_program_overview->rb_display_program_completion_progress() requires programid and userid extrafield to produce accurate results', DEBUG_DEVELOPER);
-
-        $completions = array();
-        $tempcompletions = explode(', ', $status);
-
-        foreach ($tempcompletions as $completion) {
-            $coursesetstatus = explode("|", $completion);
-            if (isset($coursesetstatus[1])) {
-                $completions[$coursesetstatus[0]] = $coursesetstatus[1];
-            } else {
-                $completions[$coursesetstatus[0]] =  STATUS_COURSESET_INCOMPLETE;
-            }
-        }
-
-        $cnt = count($completions);
-        if ($cnt == 0) {
-            return '-';
-        }
-        $complete = 0;
-
-        foreach ($completions as $comp) {
-            if ($comp == STATUS_COURSESET_COMPLETE) {
-                $complete++;
-            }
-        }
-
-        $percentage = round(($complete / $cnt) * 100, 2);
-        $totara_renderer = $PAGE->get_renderer('totara_core');
-
-        // Get relevant progress bar and return for display.
-        return $totara_renderer->progressbar($percentage, 'medium', $isexport, $percentage . '%');
     }
 
     // Source specific filter display methods.

@@ -287,11 +287,16 @@ class rb_source_cohort_members extends rb_base_source {
     }
 
     /**
-     * RB helper function to show the name of the cohort with a link to the cohort's details page
-     * @param int $cohortid
-     * @param object $row
+     * RB helper function to show the name of the cohort with a link to the cohort's details page.
+     *
+     * @param string $cohortname
+     * @param object Report row $row
+     * @return string html link
      */
     public function rb_display_cohort_name_link($cohortname, $row) {
+        if (empty($cohortname)) {
+            return '';
+        }
         return html_writer::link(new moodle_url('/cohort/view.php',
             array('id' => $row->cohort_id)), format_string($cohortname));
     }
