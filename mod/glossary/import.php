@@ -164,7 +164,7 @@ if ($xml = glossary_read_imported_file($result)) {
     }
 
     $xmlentries = $xml['GLOSSARY']['#']['INFO'][0]['#']['ENTRIES'][0]['#']['ENTRY'];
-    $sizeofxmlentries = sizeof($xmlentries);
+    $sizeofxmlentries = is_array($xmlentries) ? count($xmlentries) : 0;
     for($i = 0; $i < $sizeofxmlentries; $i++) {
         // Inserting the entries
         $xmlentry = $xmlentries[$i];
@@ -229,7 +229,7 @@ if ($xml = glossary_read_imported_file($result)) {
             $importedentries++;
 
             $xmlaliases = @$xmlentry['#']['ALIASES'][0]['#']['ALIAS']; // ignore missing ALIASES
-            $sizeofxmlaliases = is_array($xmlaliases) ? sizeof($xmlaliases) : 0;
+            $sizeofxmlaliases = is_array($xmlaliases) ? count($xmlaliases) : 0;
             for($k = 0; $k < $sizeofxmlaliases; $k++) {
             /// Importing aliases
                 $xmlalias = $xmlaliases[$k];
@@ -246,7 +246,7 @@ if ($xml = glossary_read_imported_file($result)) {
             if (!empty($data->catsincl)) {
                 // If the categories must be imported...
                 $xmlcats = @$xmlentry['#']['CATEGORIES'][0]['#']['CATEGORY']; // ignore missing CATEGORIES
-                $sizeofxmlcats = sizeof($xmlcats);
+                $sizeofxmlcats = is_array($xmlcats) ? count($xmlcats) : 0;
                 for($k = 0; $k < $sizeofxmlcats; $k++) {
                     $xmlcat = $xmlcats[$k];
 
@@ -282,7 +282,7 @@ if ($xml = glossary_read_imported_file($result)) {
             // Import tags associated with the entry.
             if (core_tag_tag::is_enabled('mod_glossary', 'glossary_entries')) {
                 $xmltags = @$xmlentry['#']['TAGS'][0]['#']['TAG']; // Ignore missing TAGS.
-                $sizeofxmltags = count($xmltags);
+                $sizeofxmltags = is_array($xmltags) ? count($xmltags) : 0;
                 for ($k = 0; $k < $sizeofxmltags; $k++) {
                     // Importing tags.
                     $tag = $xmltags[$k]['#'];
