@@ -106,6 +106,9 @@ foreach (count::get_countable_items_grouped_list() as $maincomponent => $classes
         $stats['itemscount']++;
 
         if ($prevcomponent !== $maincomponent) {
+            if ($prevcomponent !== null) {
+                echo '</dl>';
+            }
             $prevcomponent = $maincomponent;
             $maincomponentname = util::get_component_name($maincomponent);
             echo $OUTPUT->heading($maincomponentname, 3);
