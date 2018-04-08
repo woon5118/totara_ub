@@ -43,7 +43,19 @@ function xmldb_auth_mnet_upgrade($oldversion) {
     if ($oldversion < 2017020700) {
         // Convert info in config plugins from auth/mnet to auth_mnet.
         upgrade_fix_config_auth_plugin_names('mnet');
-        upgrade_fix_config_auth_plugin_defaults('mnet');
+
+        // Totara: add default settings to make the upgrade settings page shorter.
+        if (!is_enabled_auth('mnet')) {
+            $defaults = array (
+                'rpc_negotiation_timeout' => '30',
+            );
+            foreach ($defaults as $name => $value) {
+                if (get_config('auth_mnet', $name) === false) {
+                    set_config($name, $value, 'auth_mnet');
+                }
+            }
+        }
+
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'mnet');
     }
 

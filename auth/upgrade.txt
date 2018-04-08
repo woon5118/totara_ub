@@ -9,9 +9,7 @@ information provided here is intended especially for developers.
 * deprecated plugins auth_fc, auth_imap, auth_nntp, auth_pam and auth_pop3 were removed
 * Authentication plugins have been migrated to use the admin settings API.
   Old deprecated config.html files are not supported any more. See how the helper function
-  upgrade_fix_config_auth_plugin_names() can be used to convert the legacy settings to the new ones. Another helper
-  function upgrade_fix_config_auth_plugin_defaults() can be used to populate the settings with default values so that
-  they are not falsely reported as newly added ones.
+  upgrade_fix_config_auth_plugin_names() can be used to convert the legacy settings to the new ones.
 
 
 === 10 ===

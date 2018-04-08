@@ -39,11 +39,41 @@ function xmldb_auth_email_upgrade($oldversion) {
     // Totara 11 branching line.
 
     // Totara 12 branching line.
-    
+
     if ($oldversion < 2017020700) {
         // Convert info in config plugins from auth/email to auth_email.
         upgrade_fix_config_auth_plugin_names('email');
-        upgrade_fix_config_auth_plugin_defaults('email');
+
+        // Totara: add default settings to make the upgrade settings page shorter.
+        if (!is_enabled_auth('email')) {
+            $defaults = array (
+                'recaptcha' => '0',
+                'field_lock_firstname' => 'unlocked',
+                'field_lock_lastname' => 'unlocked',
+                'field_lock_email' => 'unlocked',
+                'field_lock_city' => 'unlocked',
+                'field_lock_country' => 'unlocked',
+                'field_lock_lang' => 'unlocked',
+                'field_lock_description' => 'unlocked',
+                'field_lock_url' => 'unlocked',
+                'field_lock_idnumber' => 'unlocked',
+                'field_lock_institution' => 'unlocked',
+                'field_lock_department' => 'unlocked',
+                'field_lock_phone1' => 'unlocked',
+                'field_lock_phone2' => 'unlocked',
+                'field_lock_address' => 'unlocked',
+                'field_lock_firstnamephonetic' => 'unlocked',
+                'field_lock_lastnamephonetic' => 'unlocked',
+                'field_lock_middlename' => 'unlocked',
+                'field_lock_alternatename' => 'unlocked',
+            );
+            foreach ($defaults as $name => $value) {
+                if (get_config('auth_email', $name) === false) {
+                    set_config($name, $value, 'auth_email');
+                }
+            }
+        }
+
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'email');
     }
 

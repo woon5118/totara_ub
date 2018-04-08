@@ -2552,44 +2552,14 @@ function upgrade_fix_config_auth_plugin_names($plugin) {
  * disabled auth methods. The enabled methods have their settings already
  * stored, so reporting actual new settings for them is valid.
  *
+ * @deprecated since Totara 12.0
+ *
  * @param string $plugin the auth plugin name such as 'cas', 'manual' or 'mnet'
  */
 function upgrade_fix_config_auth_plugin_defaults($plugin) {
-    global $CFG;
-
-    $pluginman = core_plugin_manager::instance();
-    $enabled = $pluginman->get_enabled_plugins('auth');
-
-    if (isset($enabled[$plugin])) {
-        // Do not touch settings of enabled auth methods.
-        return;
-    }
-
-    // We can't directly use {@link core\plugininfo\auth::load_settings()} here
-    // because the plugins are not fully upgraded yet. Instead, we emulate what
-    // that method does. We fetch a temporary instance of the plugin's settings
-    // page to get access to the settings and their defaults. Note we are not
-    // adding that temporary instance into the admin tree. Yes, this is a hack.
-
-    $plugininfo = $pluginman->get_plugin_info('auth_'.$plugin);
-    $adminroot = admin_get_root();
-    $ADMIN = $adminroot;
-    $auth = $plugininfo;
-
-    $section = $plugininfo->get_settings_section_name();
-    $settingspath = $plugininfo->full_path('settings.php');
-
-    if (file_exists($settingspath)) {
-        $settings = new admin_settingpage($section, 'Emulated settings page for auth_'.$plugin, 'moodle/site:config');
-        include($settingspath);
-
-        if ($settings) {
-            // Consistently with what admin/cli/upgrade.php does, apply the default settings twice.
-            // I assume this is done for theoretical cases when a default value depends on an other.
-            admin_apply_default_settings($settings, false);
-            admin_apply_default_settings($settings, false);
-        }
-    }
+    // Totara: it would be very naive to abuse settings.php files here, it would NOT work!
+    //         Instead set any missing auth plugin default settings in upgrade.php directly.
+    debugging('Missing auth plugin defaults cannot be added automatically');
 }
 
 /**
