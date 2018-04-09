@@ -23,6 +23,8 @@
 
 namespace tool_sitepolicy\rb\display;
 
+defined('MOODLE_INTERNAL') || die();
+
 use \tool_sitepolicy\policyversion;
 /**
  * Display policy version's status

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of Totara Learn
  *
@@ -25,12 +24,15 @@
 
 namespace tool_sitepolicy\form;
 
-use totara_form\form,
-    totara_form\form\element\text,
-    totara_form\form\element\textarea,
-    totara_form\form\group\section,
-    totara_form\form\element\select,
-    totara_form\form\element\hidden;
+defined('MOODLE_INTERNAL') || die();
+
+use tool_sitepolicy\localisedpolicy;
+use totara_form\form;
+use totara_form\form\element\text;
+use totara_form\form\element\textarea;
+use totara_form\form\group\section;
+use totara_form\form\element\select;
+use totara_form\form\element\hidden;
 
 /**
  * Class versionform
@@ -43,6 +45,7 @@ class versionform extends form {
         $model->add(new hidden('localisedpolicy', PARAM_INT));
         $model->add(new hidden('versionnumber', PARAM_INT));
         $model->add(new hidden('sitepolicyid', PARAM_INT));
+        $model->add(new hidden('newpolicy', PARAM_BOOL));
         $model->add(new hidden('buttonlabel', PARAM_ALPHANUMEXT));
         $model->add(new hidden('ret', PARAM_TEXT));
 
@@ -77,5 +80,31 @@ class versionform extends form {
      */
     public static function get_form_controller() {
         return new versionform_controller();
+    }
+
+    /**
+     * Prepares current data for this form given the localised policy.
+     *
+     * @param localisedpolicy $localisedpolicy
+     * @param bool $newpolicy
+     * @param string $returnpage
+     * @return array
+     */
+    public static function prepare_current_data(localisedpolicy $localisedpolicy, bool $newpolicy, string $returnpage) {
+        $version = $localisedpolicy->get_policyversion();
+        $currentdata = [
+            'localisedpolicy' => $localisedpolicy->get_id(),
+            'versionnumber' => $version->get_versionnumber(),
+            'language' => $localisedpolicy->get_language(false),
+            'policyversionid' => $version->get_id(),
+            'title' => $localisedpolicy->get_title(false),
+            'policytext' => $localisedpolicy->get_policytext(false),
+            'whatsnew' => $localisedpolicy->get_whatsnew(),
+            'statements' => $localisedpolicy->get_statements(false),
+            'sitepolicyid' => $version->get_sitepolicy()->get_id(),
+            'newpolicy' => $newpolicy,
+            'ret' => $returnpage,
+        ];
+        return $currentdata;
     }
 }

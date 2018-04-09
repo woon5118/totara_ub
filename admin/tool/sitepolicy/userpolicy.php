@@ -25,33 +25,34 @@
 require(__DIR__ . '/../../../config.php');
 
 use \tool_sitepolicy\userconsent;
-
-$PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php"));
-$PAGE->set_popup_notification_allowed(false);
+use \tool_sitepolicy\url_helper;
 
 if (\core\session\manager::is_loggedinas()) {
     print_error('nopermissions', 'error', '', 'Site policy');
 }
 
-$language = optional_param('language', '', PARAM_LANG);
+$language = optional_param('language', '', PARAM_SAFEDIR); // We can't use PARAM_LANG here the language pack may have been uninstalled.
 $currentcount = optional_param('currentcount', 1, PARAM_INT);
 $totalcount = optional_param('totalcount', 0, PARAM_INT);
 $policyversionid = optional_param('policyversionid', 0, PARAM_INT);
 $versionnumber = optional_param('versionnumber', 0, PARAM_INT);
-
 $consentdata = optional_param('consentdata', '', PARAM_TEXT);
 
+// Check if the user is logged in rather than calling require_login.
+// If they are not logged in then they must, and require_login will redirect them back here if required.
+// If they are logged in then calling require_login would lead to a recursive redirect.
 if (!isloggedin()) {
-    require_login();
+    require_login(null, false);
 }
 
-$reload = new moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php");
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url(new moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php"));
+$PAGE->set_popup_notification_allowed(false);
+
 $home = $CFG->wwwroot . '/';
-$logout = new moodle_url("/{$CFG->admin}/tool/sitepolicy/userexit.php");
 $userid = $USER->id;
-$userlisturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/userlist.php", ['userid' => $userid]);
-$translationurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationlist.php", ['policyversionid' => $policyversionid]);
+$userlisturl = url_helper::user_sitepolicy_list($userid);
+$translationurl = url_helper::localisedpolicy_list($policyversionid);
 
 if (empty($policyversionid)) {
     $unanswered = \tool_sitepolicy\userconsent::get_unansweredpolicies($userid);
@@ -95,7 +96,7 @@ if ($version->is_draft() && !has_capability('tool/sitepolicy:manage', context_sy
 $versionnumber = $version->get_versionnumber();
 $availlanguages = get_string_manager()->get_list_of_translations();
 
-if (empty($language) || !isset($availlanguages[$language])) {
+if (empty($language)) {
     $language = \tool_sitepolicy\userconsent::get_user_consent_language($policyversionid, $userid, true);
 }
 
@@ -140,8 +141,11 @@ $params = [
 $form = new \tool_sitepolicy\form\userconsentform($currentdata, $params);
 
 if ($form->is_cancelled()) {
+
     redirect($userlisturl);
+
 } elseif ($formdata = $form->get_data()) {
+
     $userconsent = new userconsent();
     $userconsent->set_userid($userid);
 
@@ -165,7 +169,7 @@ if ($form->is_cancelled()) {
 
         $answers = implode(',', $answers);
 
-        redirect(new moodle_url($logout, ['policyversionid' => $policyversionid, 'language' => $language, 'currentcount' => $currentcount, 'totalcount' => $totalcount, 'consentdata' => $answers]));
+        redirect(url_helper::user_sitepolicy_reject_confirmation($policyversionid, $language, $currentcount, $totalcount, $answers));
     }
 
     foreach ($options as $option) {
@@ -189,29 +193,41 @@ if ($form->is_cancelled()) {
     } else if ($totalcount == 0) {
         redirect($userlisturl);
     } else {
-        redirect(new moodle_url($reload, ['currentcount' => $currentcount + 1, 'totalcount' => $totalcount]));
+        redirect(url_helper::user_sitepolicy_consent($currentcount + 1, $totalcount));
     }
+
 }
 
-$PAGE->set_title($currentpolicy->get_title());
+$PAGE->set_title($currentpolicy->get_title(false));
 
-//Navigation Bar
+// Navigation Bar
+// Start the navigation off at the users branch.
+if ($node = $PAGE->navigation->find('user' . $USER->id, navigation_node::TYPE_USER)) {
+    $node->make_active();
+}
 $PAGE->navbar->add(get_string('userconsentnavbar', 'tool_sitepolicy'), $userlisturl);
-$PAGE->navbar->add($currentpolicy->get_title());
+$PAGE->navbar->add($currentpolicy->get_title(true));
 
+/** @var tool_sitepolicy_renderer $renderer */
+$renderer = $PAGE->get_renderer('tool_sitepolicy');
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('userconsentxofy', 'tool_sitepolicy', ['currentpolicy' => $currentcount, 'totalpolicies' => $totalcount]), 4);
-echo $OUTPUT->heading($currentpolicy->get_title());
+echo $renderer->header();
+echo $renderer->heading(get_string('userconsentxofy', 'tool_sitepolicy', ['currentpolicy' => $currentcount, 'totalpolicies' => $totalcount]), 4);
+echo $renderer->heading($currentpolicy->get_title(true));
 
 //Langugae Selection Dropdown
 $verlanguages = $version->get_languages();
+$langarray = [];
+$availlanguages = get_string_manager()->get_list_of_translations(true);
 if (!array_key_exists($language, $availlanguages)) {
     // Handling case where language pack has been removed
-    $language = 'en';
+    $languages = get_string_manager()->get_list_of_languages();
+    if (isset($languages[$language])) {
+        $langarray[$language] = $languages[$language];
+    } else {
+        $langarray[$language] = $language;
+    }
 }
-$langarray = [];
-$availlanguages = get_string_manager()->get_list_of_translations($language);
 
 foreach ($verlanguages as $lang => $row) {
     if (array_key_exists($lang, $availlanguages)) {
@@ -219,15 +235,14 @@ foreach ($verlanguages as $lang => $row) {
     }
 }
 
-$renderer = $PAGE->get_renderer('tool_sitepolicy');
-$langurl = new moodle_url($reload, ['policyversionid' => $policyversionid, 'versionnumber' => $versionnumber, 'currentcount' => $currentcount, 'totalcount' => $totalcount]);
+$langurl = url_helper::user_sitepolicy_version_view($userid, $policyversionid, $versionnumber, null, $currentcount, $totalcount);
 if (!empty($langarray)) {
     $select = new \single_select($langurl, 'language', $langarray, $language, [], 'userpolicy');
     $select->class = 'singleselect pull-right';
-    echo $OUTPUT->render($select);
+    echo $renderer->render($select);
 }
 
-//Whats Changed area
+// Whats Changed area.
 if ($versionnumber > 1 and !empty($currentpolicy->get_whatsnew())) {
     if (userconsent::has_consented_previous_version($version, $userid) == true) {
         echo html_writer::tag('h4', html_writer::tag('strong', get_string('userconsentwhatschanged', 'tool_sitepolicy')) . html_writer::tag('/strong', ''));
@@ -235,8 +250,8 @@ if ($versionnumber > 1 and !empty($currentpolicy->get_whatsnew())) {
     }
 }
 
-echo html_writer::div(text_to_html($currentpolicy->get_policytext()), 'policybox');
-echo html_writer::tag('h2', get_string('userconsentprovideconsent', 'tool_sitepolicy'));
-echo $form->render();
-echo $OUTPUT->footer();
+echo html_writer::div($currentpolicy->get_policytext(true), 'policybox');
+echo $renderer->heading(get_string('userconsentprovideconsent', 'tool_sitepolicy'));
+echo $renderer->form($form);
+echo $renderer->footer();
 

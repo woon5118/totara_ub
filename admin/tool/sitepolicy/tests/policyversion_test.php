@@ -38,7 +38,6 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Site policy must be saved before adding policy versions');
-        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = new sitepolicy();
         $version = policyversion::new_policy_draft($sitepolicy);
@@ -52,6 +51,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Cannot create draft as it already exists');
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_draft_policy([]);
@@ -65,6 +65,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_published_policy([]);
@@ -98,6 +99,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_published_policy([]);
@@ -144,6 +146,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -201,6 +204,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('This version was published, so it cannot be deleted');
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -244,6 +248,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -297,6 +302,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -392,6 +398,49 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $this->assertEquals($sitepolicy, $version->get_sitepolicy());
         $this->assertEquals($expectedrow->publisherid, $version->get_publisherid());
         $this->assertEquals(policyversion::STATUS_ARCHIVED, $version->get_status());
+    }
+
+    /**
+     * Test we cannot get the latest version for an unsaved site policy.
+     * @throws \coding_exception
+     */
+    public function test_from_policy_latest_unsaved_sitepolicy() {
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Site policy must be saved before retrieving a version');
+
+        $sitepolicy = new sitepolicy();
+        policyversion::from_policy_latest($sitepolicy);
+    }
+
+    /**
+     * Test we cannot get the latest version for an unsaved site policy.
+     * @throws \coding_exception
+     */
+    public function test_from_policy_latest_invalid_status() {
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Invalid status passed');
+
+        $sitepolicy = sitepolicy::create_new_policy('test', 'test', [], 'en');
+        policyversion::from_policy_latest($sitepolicy, 'monkeys');
+    }
+
+    /**
+     * Test we cannot get the latest version for an unsaved site policy.
+     * @throws \coding_exception
+     */
+    public function test_from_policy_latest_missing_versions() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Policy don\'t have any versions, remove policy and create new');
+
+        $sitepolicy = sitepolicy::create_new_policy('test', 'test', [], 'en');
+
+        $DB->delete_records('tool_sitepolicy_policy_version');
+
+        policyversion::from_policy_latest($sitepolicy);
     }
 
     /**
@@ -497,6 +546,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
     public function test_get_versionlist($debugkey, $options) {
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_multiversion_policy($options);
@@ -560,6 +610,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -636,6 +687,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -691,7 +743,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             $DB->insert_record('tool_sitepolicy_localised_consent', $entry);
         }
 
-        $summary = $version->get_summary();
+        $summary = $version->get_summary(true);
 
         $this->assertEquals(count($languages), count($summary));
         foreach ($summary as $row) {
@@ -718,7 +770,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             }
         }
 
-        $summary = $version->get_summary();
+        $summary = $version->get_summary(true);
 
         $this->assertEquals(count($languages), count($summary));
         foreach ($summary as $row) {
@@ -740,6 +792,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -810,6 +863,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_published_policy([]);
@@ -827,6 +881,31 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $version2 = new policyversion($version->get_id());
         $this->assertEquals($version->get_timepublished(), $version2->get_timepublished());
         $this->assertEquals($version2->get_timearchived(), $version2->get_timearchived());
+
+        // Ensure we can archive it again with no change.
+        $version2->archive();
+
+        $version3 = new policyversion($version->get_id());
+        $this->assertEquals($version->get_timepublished(), $version2->get_timepublished());
+        $this->assertEquals($version2->get_timearchived(), $version2->get_timearchived());
+        $this->assertEquals($version3->get_timepublished(), $version2->get_timepublished());
+        $this->assertEquals($version2->get_timearchived(), $version3->get_timearchived());
+    }
+
+    /**
+ * Test archive cannot be executed if the version is not published.
+ */
+    public function test_archive_exception_if_not_published() {
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Cannot archive unpublished version');
+
+        /** @var \tool_sitepolicy_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $sitepolicy = $generator->create_published_policy([]);
+        $version = policyversion::new_policy_draft($sitepolicy);
+        $version->archive();
     }
 
     /**
@@ -836,6 +915,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_draft_policy([]);
@@ -845,14 +925,29 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
         $version = new policyversion($row->id);
         $this->assertNull($version->get_timepublished());
         $this->assertNull($version->get_timearchived());
+        $this->assertTrue($version->is_draft());
+        $this->assertFalse($version->is_archived());
 
         $version->publish();
         $this->assertNotNull($version->get_timepublished());
         $this->assertNull($version->get_timearchived());
+        $this->assertFalse($version->is_draft());
+        $this->assertFalse($version->is_archived());
 
         $version2 = new policyversion($version->get_id());
         $this->assertEquals($version->get_timepublished(), $version2->get_timepublished());
         $this->assertEquals($version2->get_timearchived(), $version2->get_timearchived());
+
+        $version2->set_timepublished(12345);
+        $version2->save();
+        $this->assertEquals(12345, $version2->get_timepublished());
+        $version2 = new policyversion($version->get_id());
+        $this->assertEquals(12345, $version2->get_timepublished());
+
+        // Finally confirm  that we can't publish it again.
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Cannot publish version that is already published');
+        $version2->publish();
     }
 
     // Not testing clone_content explicitly here as it is uses only localisedcpolicy methods and is also
@@ -866,6 +961,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
     public function test_has_active($debugkey, $options) {
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $sitepolicy = $generator->create_multiversion_policy($options);
@@ -884,6 +980,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
     public function test_get_languages() {
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -899,18 +996,128 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             'mandatory' => 'first'
         ];
 
-        $expected = explode(',', $options['languages']);
-        $expected = array_map(function ($v) {return trim($v);}, $expected);
-
         $sitepolicy = $generator->create_published_policy($options);
         $version = policyversion::from_policy_latest($sitepolicy);
 
         $languages = $version->get_languages();
 
-        $this->assertEquals(count($expected), count($languages));
+        $this->assertEquals(3, count($languages));
+        $expected = ['en', 'he', 'nl'];
         foreach ($languages as $language) {
             $this->assertContains($language->language, $expected);
-            $this->assertEquals((int)($language->language == $expected[0]), $language->isprimary);
+            $this->assertEquals((int)($language->language == 'en'), $language->isprimary);
         }
+
+        // Now test getting them formatted.
+        $languages = $version->get_languages(true);
+        $expected = ['English', 'Hebrew', 'Dutch; Flemish'];
+        $this->assertEquals(3, count($languages));
+        foreach ($languages as $language) {
+            $shortlang = preg_replace('#^([a-zA-Z0-9]+) .*?$#', '$1', $language->language);
+            $this->assertContains($shortlang, $expected);
+            $this->assertEquals((int)($shortlang == 'English'), $language->isprimary);
+        }
+    }
+
+    public function test_incomplete_language_translations() {
+        $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+        $options = [
+            'authorid' => 2,
+            'languages' => 'en, nl, he',
+            'langprefix' =>',nl ,he ',
+            'title' => 'Test policy all',
+            'statement' => 'Policy statement all',
+            'numoptions' => 3,
+            'consentstatement' => 'Consent statement all',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+        ];
+
+        $sitepolicy = $generator->create_published_policy($options);
+        $version = policyversion::from_policy_latest($sitepolicy);
+
+        $generator->create_draft_policy([
+            'sitepolicy' => $sitepolicy,
+            'authorid' => 2,
+            'languages' => 'en, nl',
+            'langprefix' =>',nl ',
+            'title' => 'Next policy all',
+            'statement' => 'Next policy statement all',
+            'numoptions' => 3,
+            'consentstatement' => 'Next consent statement all',
+            'providetext' => 'next yes',
+            'withheldtext' => 'next no',
+            'mandatory' => 'first'
+        ]);
+
+        $draft = policyversion::from_policy_latest($sitepolicy);
+        $this->assertNotEquals($version->get_id(), $draft->get_id());
+
+        // Add a new option to the english localisation.
+        $localisation = $draft->get_primary_localisedpolicy();
+        $statements = $localisation->get_statements();
+        $statementids = array_map(function($item){
+            return $item->dataid;
+        }, $statements);
+        $consent = new \stdClass();
+        $consent->dataid = 0;
+        $consent->mandatory = false;
+        $consent->statement = 'My new statement';
+        $consent->provided = 'Too right';
+        $consent->withheld = 'Nah';
+        $statements[] = $consent;
+        $localisation->set_statements($statements);
+        $localisation->save();
+        $statements = $localisation->get_statements();
+        $newstatementids = array_map(function($item){
+            return $item->dataid;
+        }, $statements);
+        $missingids = array_diff($newstatementids, $statementids);
+        self::assertCount(1, $missingids);
+        $missingid = reset($missingids);
+
+        // Reload the draft.
+        $draft = policyversion::from_policy_latest($sitepolicy);
+
+        // Confirm that it is incomplete.
+        // Expected because English now has four options, but Dutch still has only three.
+        $this->assertTrue($draft->has_incomplete_language_translations());
+        $incomplete = $draft->get_incomplete_language_translations();
+        self::assertCount(1, $incomplete);
+        self::assertEquals(['Dutch; Flemish'], $incomplete);
+
+        // Quickly confirm we cannot publish this draft as it is no complete.
+        self::assertFalse($draft->is_complete());
+        try {
+            $draft->publish();
+            $this->fail('It should not be possible to publish a draft version that is not complete.');
+        } catch (\Exception $e) {
+            self::assertInstanceOf(\coding_exception::class, $e);
+            self::assertContains('Cannot publish incomplete version', $e->getMessage());
+        }
+
+        // Add the forth option to Dutch.
+        $localisation = localisedpolicy::from_version($draft, ['language' => 'nl']);
+        $statements = $localisation->get_statements();
+        $consent = new \stdClass();
+        $consent->dataid = $missingid;
+        $consent->mandatory = false;
+        $consent->statement = 'My new statement';
+        $consent->provided = 'Too right';
+        $consent->withheld = 'Nah';
+        $statements[] = $consent;
+        $localisation->set_statements($statements);
+        $localisation->save();
+
+        // Reload the draft.
+        $draft = policyversion::from_policy_latest($sitepolicy);
+
+        // Confirm that the world is once again balanced.
+        $this->assertFalse($draft->has_incomplete_language_translations());
+        $incomplete = $draft->get_incomplete_language_translations();
+        self::assertCount(0, $incomplete);
     }
 }

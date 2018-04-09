@@ -32,7 +32,7 @@ class tool_sitepolicy_consentoption_test extends \advanced_testcase {
     /**
      * Test from_data error condition
      */
-    public function test_from_data_exception() {
+    public function test_from_data_unsaved_sitepolicy_exception() {
 
         $this->resetAfterTest();
         $this->expectException('coding_exception');
@@ -40,7 +40,22 @@ class tool_sitepolicy_consentoption_test extends \advanced_testcase {
 
         $sitepolicy = new sitepolicy();
         $version = policyversion::new_policy_draft($sitepolicy);
-        $consentoption = consentoption::from_data($version, true);
+        consentoption::from_data($version, true);
+    }
+
+    /**
+     * Test from_data error condition
+     */
+    public function test_from_data_unsaved_version_exception() {
+
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Version must be saved before adding consent options');
+
+        $sitepolicy = new sitepolicy();
+        $sitepolicy->save();
+        $version = policyversion::new_policy_draft($sitepolicy);
+        consentoption::from_data($version, true);
     }
 
     /**
@@ -66,9 +81,7 @@ class tool_sitepolicy_consentoption_test extends \advanced_testcase {
     /**
      * Test save error condition
      */
-    public function test_save_exception() {
-        global $DB;
-
+    public function test_save_exception_on_unsaved_sitepolicy() {
         $this->resetAfterTest();
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Site policy must be saved before adding policy versions');
@@ -77,6 +90,18 @@ class tool_sitepolicy_consentoption_test extends \advanced_testcase {
         $version = policyversion::new_policy_draft($sitepolicy);
 
         $consentoption = consentoption::from_data($version, true, 123);
+        $consentoption->save();
+    }
+
+    /**
+     * Test save error condition
+     */
+    public function test_save_exception_on_unset_policyversion() {
+        $this->resetAfterTest();
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Version must be saved before saving the consent option');
+
+        $consentoption = new consentoption(0);
         $consentoption->save();
     }
 

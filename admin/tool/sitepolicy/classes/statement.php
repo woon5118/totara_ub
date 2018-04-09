@@ -24,6 +24,8 @@
 
 namespace tool_sitepolicy;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Consent statement class used to transport data between the statement element and the working code.
  *

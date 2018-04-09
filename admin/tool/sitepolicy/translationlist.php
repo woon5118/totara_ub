@@ -25,40 +25,19 @@
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-admin_externalpage_setup('tool_sitepolicy-managerpolicies');
-
 $policyversionid = required_param('policyversionid', PARAM_INT);
-$translationlisturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationlist.php", ['policyversionid' => $policyversionid]);
+
+admin_externalpage_setup('tool_sitepolicy-managerpolicies', '', null, \tool_sitepolicy\url_helper::localisedpolicy_list($policyversionid));
 
 $version = new \tool_sitepolicy\policyversion($policyversionid);
 $sitepolicy = $version->get_sitepolicy();
-$primarypolicy = \tool_sitepolicy\localisedpolicy::from_version($version,
-    ['isprimary' => \tool_sitepolicy\localisedpolicy::STATUS_PRIMARY]);
-$title = $primarypolicy->get_title();
+$primarypolicy = $version->get_primary_localisedpolicy();
 
-$heading = get_string('translationsheading', 'tool_sitepolicy', $title);
-$context = context_system::instance();
-$PAGE->set_url($translationlisturl);
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title($heading);
-$PAGE->set_heading($heading);
-$PAGE->set_context($context);
+$PAGE->set_title(get_string('translationsheading', 'tool_sitepolicy', $version->get_primary_title(true)));
+$PAGE->set_heading($PAGE->title);
+$PAGE->navbar->add($version->get_primary_title(true), \tool_sitepolicy\url_helper::version_list($sitepolicy->get_id()));
+$PAGE->navbar->add(get_string('translationheader', 'tool_sitepolicy'));
 
-/**
- * @var tool_sitepolicy_renderer $renderer
- */
-$renderer = $PAGE->get_renderer('tool_sitepolicy');
-echo $renderer->header();
-echo $OUTPUT->heading($heading);
-
-// Actions.
-$versionlisturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionlist.php", ['sitepolicyid' => $sitepolicy->get_id()]);
-echo html_writer::link($versionlisturl, get_string('translationsbacktoversions', 'tool_sitepolicy'));
-
-if ($version->is_draft()) {
-    echo $renderer->add_translation_single_select($version);
-}
-
-// Table.
-echo $renderer->manage_translation_table($version);
-echo $renderer->footer();
+/** @var \tool_sitepolicy\output\page_renderer $renderer */
+$renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
+echo $renderer->policyversion_translation_list($version);

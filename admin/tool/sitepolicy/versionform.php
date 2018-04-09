@@ -25,17 +25,16 @@
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-use \tool_sitepolicy\localisedpolicy;
+use \tool_sitepolicy\localisedpolicy,
+    \tool_sitepolicy\url_helper;
 
-admin_externalpage_setup('tool_sitepolicy-managerpolicies');
-
-$PAGE->set_context(context_system::instance());
-
-$newpolicy = optional_param('newpolicy', "", PARAM_INT);
+$newpolicy = (bool)optional_param('newpolicy', false, PARAM_BOOL);
 $localisedpolicyid = required_param('localisedpolicy', PARAM_INT);
 $sitepolicyid = optional_param('sitepolicyid', 0, PARAM_INT);
 $returnpage = optional_param('ret', 'policies', PARAM_ALPHANUMEXT);
-$PAGE->set_url(new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionform.php", ['localisedpolicyid' => $localisedpolicyid]));
+
+$url = url_helper::version_edit($localisedpolicyid);
+admin_externalpage_setup('tool_sitepolicy-managerpolicies', '', null, $url);
 
 $primarypolicy = new localisedpolicy($localisedpolicyid);
 
@@ -44,57 +43,48 @@ if (!$primarypolicy->is_primary()) {
 }
 
 $version = $primarypolicy->get_policyversion();
-$title = $primarypolicy->get_title();
+
+$sitepolicyurl = url_helper::version_list($version->get_sitepolicy()->get_id());
+$translationurl = url_helper::localisedpolicy_list($version->get_id());
 
 switch ($returnpage) {
     case 'versions':
-        $redirect = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionlist.php", ['sitepolicyid' => $version->get_sitepolicy()->get_id()]);
+        $redirect = $sitepolicyurl;
         break;
 
     case 'translations':
-        $redirect = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationlist.php", ['policyversionid' => $version->get_id()]);
+        $redirect = $translationurl;
         break;
 
     default:
-        $redirect = new moodle_url("/{$CFG->admin}/tool/sitepolicy/index.php");
+        $redirect = url_helper::sitepolicy_list();
         break;
 }
 
 // Prepare current data
 $languages = get_string_manager()->get_list_of_translations();
-if (!array_key_exists($primarypolicy->get_language(), $languages)) {
+if (!array_key_exists($primarypolicy->get_language(false), $languages)) {
     $primarypolicy->set_language('en');
 }
 
-$statements = $primarypolicy->get_statements(false);
-
-$currentdata = [
-    'localisedpolicy' => $primarypolicy->get_id(),
-    'versionnumber' => $version->get_versionnumber(),
-    'language' => $primarypolicy->get_language(),
-    'policyversionid' => $version->get_id(),
-    'title' => $primarypolicy->get_title(),
-    'policytext' => $primarypolicy->get_policytext(),
-    'whatsnew' => $primarypolicy->get_whatsnew(),
-    'statements' => $statements,
-    'sitepolicyid' => $version->get_sitepolicy()->get_id(),
-    'newpolicy' => $newpolicy,
-    'ret' => $returnpage,
-];
+$currentdata = \tool_sitepolicy\form\versionform::prepare_current_data($primarypolicy, $newpolicy, $returnpage);
 $form = new \tool_sitepolicy\form\versionform($currentdata);
 
 if ($form->is_cancelled()) {
-    if ($newpolicy) {
+
+    if ($newpolicy && confirm_sesskey()) {
+        // It's important to note that sesskey is actually checked by the cancelled form.
+        // However to be extra safe confirm that the user is intentionally doing this.
+        // Only draft versions can be deleted like this.
         $version->delete();
     }
     redirect($redirect);
 
 } elseif ($formdata = $form->get_data()) {
+
     if (!empty($version->get_timepublished())) {
         throw new coding_exception('Cannot edit published version.');
     }
-
-    $time = time();
 
     $primarypolicy->set_authorid($USER->id);
     $primarypolicy->set_title($formdata->title);
@@ -108,9 +98,6 @@ if ($form->is_cancelled()) {
     $returnpage = !empty($returnpage) ? $returnpage : $formdata->ret;
     switch ($returnpage) {
         case 'versions':
-            $successmsg = get_string('versionupdated', 'tool_sitepolicy', $version->get_versionnumber());
-            break;
-
         case 'translations':
             $successmsg = get_string('versionupdated', 'tool_sitepolicy', $version->get_versionnumber());
             break;
@@ -120,24 +107,18 @@ if ($form->is_cancelled()) {
             break;
     }
 
-    redirect($redirect, $successmsg,
-        null,
-        \core\output\notification::NOTIFY_SUCCESS);
+    redirect($redirect, $successmsg, null, \core\output\notification::NOTIFY_SUCCESS);
+
 }
 
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title($title);
-echo $OUTPUT->header($title);
-
-$params = ['title' => $title];
-if ($newpolicy) {
-    $heading = get_string('versionformheadernew', 'tool_sitepolicy', $params);
-} else {
-    $params['versionnumber'] = $version->get_versionnumber();
-    $heading = get_string('versionformheader', 'tool_sitepolicy', $params);
+$PAGE->set_title($primarypolicy->get_title(false));
+$PAGE->navbar->add($primarypolicy->get_title(true), $sitepolicyurl);
+if ($returnpage === 'translations') {
+    $PAGE->navbar->add(get_string('translations', 'tool_sitepolicy'), $translationurl);
+    $PAGE->navbar->add($primarypolicy->get_language(true));
 }
+$PAGE->navbar->add(get_string('versionedit', 'tool_sitepolicy'));
 
-echo $OUTPUT->heading($heading);
-echo $form->render();
-echo $OUTPUT->footer();
-
+/** @var \tool_sitepolicy\output\page_renderer $renderer */
+$renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
+echo $renderer->localisedversion_edit($version, $form, (bool)$newpolicy);

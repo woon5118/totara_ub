@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of Totara Learn
  *
@@ -25,9 +24,11 @@
 
 namespace tool_sitepolicy\form;
 
-use totara_form\form,
-    totara_form\form\element\radios,
-    totara_form\form\element\hidden;
+defined('MOODLE_INTERNAL') || die();
+
+use totara_form\form;
+use totara_form\form\element\radios;
+use totara_form\form\element\hidden;
 
 class userconsentform extends form {
     protected function definition() {

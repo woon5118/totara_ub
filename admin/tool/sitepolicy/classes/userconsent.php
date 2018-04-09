@@ -24,6 +24,8 @@
 
 namespace tool_sitepolicy;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class for managing and querying user consent data
  **/
@@ -305,7 +307,9 @@ class userconsent {
         if ($userid != 0) {
             $userchoosen = $DB->get_record_sql($userchoosensql,
                 ['userid' => $userid, 'policyversionid' => $policyversionid]);
-            if (!empty($userchoosen) && isset($languages[$userchoosen->language])) {
+            if (!empty($userchoosen)) {
+                // Ignore whether this is an available translation or not!
+                // It is what the user has viewed and consented to.
                 return $userchoosen->language;
             }
         }

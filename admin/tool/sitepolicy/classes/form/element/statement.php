@@ -24,6 +24,8 @@
 
 namespace tool_sitepolicy\form\element;
 
+defined('MOODLE_INTERNAL') || die();
+
 use  tool_sitepolicy\form\validator\statement_required;
 
 /**
@@ -46,6 +48,8 @@ class statement extends \totara_form\element {
      * Statement element constructor.
      *
      * @param string $name
+     * @param bool $nocontrols
+     * @param bool Remove add/remove controls from form
      */
     public function __construct(string $name, bool $nocontrols = false) {
         parent::__construct($name, '');
@@ -108,7 +112,7 @@ class statement extends \totara_form\element {
                 $statement->instance = $count;
                 $statement->index = $count - 1;
                 $count++;
-                $result['consent_statements'][] = $statement->export_for_template($this->get_name());
+                $result['consent_statements'][] = $statement->export_for_template();
             }
         }
 
@@ -118,7 +122,7 @@ class statement extends \totara_form\element {
             $statement->index = $count - 1;
             // Not strictly needed, but kept in order to reduce the chance of regressions in the future.
             $count++;
-            $result['consent_statements'][] = $statement->export_for_template($this->get_name());
+            $result['consent_statements'][] = $statement->export_for_template();
         }
 
         $result['consent_statement_count'] = count($result['consent_statements']);

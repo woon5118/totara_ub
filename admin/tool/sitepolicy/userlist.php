@@ -24,29 +24,37 @@
 
 require(__DIR__ . '/../../../config.php');
 
-require_login();
-
 $userid = optional_param('userid', $USER->id, PARAM_INT);
+
+require_login(null, false);
+
 if ($userid != $USER->id) {
     require_capability('tool/sitepolicy:manage', context_system::instance());
+    $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+    $currentuser = false;
+} else {
+    $user = $USER;
+    $currentuser = true;
 }
-$userlisturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/userlist.php",['userid'=>$userid]);
+
+$userlisturl = \tool_sitepolicy\url_helper::user_sitepolicy_list($user->id);
 
 $PAGE->set_context(context_system::instance());
 $heading = get_string('userlistuserconsent', 'tool_sitepolicy');
-$context = context_system::instance();
 $PAGE->set_url($userlisturl);
-$PAGE->navbar->add($heading);
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 
-/**
- * @var tool_sitepolicy_renderer $renderer
- */
+// Start the navigation off at the users branch.
+$PAGE->navigation->extend_for_user($user);
+if ($node = $PAGE->navigation->find('user' . $user->id, navigation_node::TYPE_USER)) {
+    $node->make_active();
+}
+$PAGE->navbar->add($heading);
+
+/** @var tool_sitepolicy_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy');
 echo $renderer->header();
-echo $OUTPUT->heading ($heading);
-
-// Table
-echo $renderer->manage_userconsents_table($userid);
+echo $renderer->heading($heading);
+echo $renderer->manage_userconsents_table($user->id);
 echo $renderer->footer();

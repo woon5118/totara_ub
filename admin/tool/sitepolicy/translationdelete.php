@@ -25,63 +25,49 @@
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-admin_externalpage_setup('tool_sitepolicy-managerpolicies');
-
 $localisedpolicyid = required_param('localisedpolicy', PARAM_INT);
+$confirm = optional_param('confirm', 0, PARAM_INT);
+
+$url = \tool_sitepolicy\url_helper::localisedpolicy_delete($localisedpolicyid);
+admin_externalpage_setup('tool_sitepolicy-managerpolicies', '', null, $url);
+
 $localisedpolicy = new \tool_sitepolicy\localisedpolicy($localisedpolicyid);
-$version = $localisedpolicy->get_policyversion();
-
-$redirecturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationlist.php", ['policyversionid' => $version->get_id()]);
-$pageurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationdelete.php", ['localisedpolicy' => $localisedpolicyid]);
-
-$PAGE->set_url($pageurl);
-$PAGE->set_context(context_system::instance());
-
-// Validate.
 if ($localisedpolicy->is_primary()) {
     throw new coding_exception('Cannot delete primary policy version translation.');
 }
 
+$version = $localisedpolicy->get_policyversion();
 if ($version->get_timepublished()) {
     throw new coding_exception('Cannot delete translation of published version.');
 }
 
-$languagestr = get_string_manager()->get_list_of_languages()[$localisedpolicy->get_language()];
+$sitepolicy = $version->get_sitepolicy();
 
 // Perform action.
-$confirm = optional_param('confirm', 0, PARAM_INT);
 if ($confirm) {
+    // Must have a valid sesskey!
+    require_sesskey();
+
     $localisedpolicy->delete();
 
     redirect(
-        $redirecturl,
-        get_string('translationdeleted', 'tool_sitepolicy', $languagestr),
+        \tool_sitepolicy\url_helper::localisedpolicy_list($version->get_id()),
+        get_string('translationdeleted', 'tool_sitepolicy', $localisedpolicy->get_language(true)),
         null,
         \core\output\notification::NOTIFY_SUCCESS
     );
 }
 
 // Output
-$PAGE->set_pagelayout('admin');
-$heading = get_string('deletetranslationheading', 'tool_sitepolicy');
-$PAGE->set_title($heading);
-$PAGE->set_heading($heading);
+$PAGE->set_title(get_string('deletetranslationheading', 'tool_sitepolicy'));
+$PAGE->set_heading($PAGE->title);
+$PAGE->navbar->add($localisedpolicy->get_primary_title(true), \tool_sitepolicy\url_helper::version_list($sitepolicy->get_id()));
+$PAGE->navbar->add(get_string('translationheader', 'tool_sitepolicy'), \tool_sitepolicy\url_helper::localisedpolicy_list($version->get_id()));
+$PAGE->navbar->add($localisedpolicy->get_language(true));
+$PAGE->navbar->add($PAGE->title);
 
-/**
- * @var tool_sitepolicy_renderer $renderer
- */
+/** @var tool_sitepolicy_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy');
 echo $renderer->header();
-
-$policytitle = $localisedpolicy->get_primary_title();
-
-// Show confirmation.
-$strparams = ['title' => $policytitle, 'language' => $languagestr];
-$message = $renderer->heading(get_string('deletetranslationtitle', 'tool_sitepolicy', $strparams));
-$message .= get_string('deletetranslationmessage', 'tool_sitepolicy');
-$deleteurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationdelete.php", ['confirm' => 1, 'localisedpolicy' => $localisedpolicyid]);
-$delete = new single_button($deleteurl, get_string('deletetranslationdelete', 'tool_sitepolicy'));
-$cancel = new single_button($redirecturl, get_string('deletetranslationcancel', 'tool_sitepolicy'));
-
-echo $renderer->action_confirm($heading, $message, $delete, $cancel);
+echo $renderer->delete_translation_confirmation($localisedpolicy);
 echo $renderer->footer();

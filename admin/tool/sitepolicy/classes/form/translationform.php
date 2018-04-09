@@ -24,12 +24,15 @@
 
 namespace tool_sitepolicy\form;
 
-use totara_form\form,
-    totara_form\form\element\text,
-    totara_form\form\element\static_html,
-    totara_form\form\element\textarea,
-    totara_form\form\element\hidden,
-    totara_form\form\group\section;
+defined('MOODLE_INTERNAL') || die();
+
+use tool_sitepolicy\localisedpolicy;
+use totara_form\form;
+use totara_form\form\element\text;
+use totara_form\form\element\static_html;
+use totara_form\form\element\textarea;
+use totara_form\form\element\hidden;
+use totara_form\form\group\section;
 
 /**
  * Class translationform
@@ -40,7 +43,7 @@ class translationform extends form {
 
         $model = $this->model;
         $model->add(new hidden('localisedpolicy', PARAM_INT));
-        $model->add(new hidden('language', PARAM_LANG));
+        $model->add(new hidden('language', PARAM_SAFEDIR)); // We can't use PARAM_LANG here as the language pack may have been uninstalled.
         $model->add(new hidden('policyversionid', PARAM_INT));
 
         $model->add(new static_html('primarytitle', '&nbsp;', $this->parameters['primarytitle']));
@@ -79,4 +82,75 @@ class translationform extends form {
         return new translationform_controller();
     }
 
+    /**
+     * Prepares current data for this form, given the localised policy, and the primary localised policy.
+     *
+     * @param localisedpolicy $primarypolicy
+     * @param localisedpolicy $localisedpolicy
+     * @return array
+     */
+    public static function prepare_current_data(localisedpolicy $primarypolicy, localisedpolicy $localisedpolicy) {
+        $primaryoptions = $primarypolicy->get_statements(false);
+        $options = $localisedpolicy->get_statements(false);
+        if (empty($options)) {
+            $options = [];
+            foreach ($primaryoptions as $option) {
+                $option->primarystatement = $option->statement;
+                $option->statement = '';
+                $option->primaryprovided = $option->provided;
+                $option->provided = '';
+                $option->primarywithheld = $option->withheld;
+                $option->withheld = '';
+
+                $options[] = $option;
+            }
+
+        } else {
+            // We need to merge the primary and localised options
+            // Find all options that are only in one list
+            $newprimary = array_diff_key($primaryoptions, $options);
+
+            foreach ($options as $idx => $option) {
+                if (isset($primaryoptions[$idx])) {
+                    $primaryoption = $primaryoptions[$idx];
+                    $option->primarystatement = $primaryoption->statement;
+                    $option->primaryprovided = $primaryoption->provided;
+                    $option->primarywithheld = $primaryoption->withheld;
+                } else {
+                    if ($idx < 0) {
+                        $option[$idx]->removedstatement = true;
+                    } else {
+                        unset($option[$idx]);
+                    }
+                }
+            }
+
+            foreach ($newprimary as $idx) {
+                $primaryoption = $primaryoptions[$idx];
+                $option->primarystatement = $primaryoption->statement;
+                $option->statement = '';
+                $option->primaryprovided = $primaryoption->provided;
+                $option->provided = '';
+                $option->primarywithheld = $primaryoption->withheld;
+                $option->withheld = '';
+
+                $options[] = $option;
+            }
+        }
+
+        $currentdata = [
+            'localisedpolicy' => $localisedpolicy->get_id(),
+            'language' => $localisedpolicy->get_language(false),
+            'policyversionid' => $localisedpolicy->get_policyversion()->get_id(),
+            'title' => $localisedpolicy->get_title(false),
+            'policytext' => $localisedpolicy->get_policytext(false),
+            'statements' => $options,
+            'whatsnew' => $localisedpolicy->get_whatsnew(),
+
+            // Set primary fields required to display in textareas.
+            'primarypolicytext' => $primarypolicy->get_policytext(false),
+            'primarywhatsnew' => $primarypolicy->get_whatsnew(),
+        ];
+        return $currentdata;
+    }
 }

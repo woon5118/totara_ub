@@ -38,10 +38,12 @@ use \tool_sitepolicy\sitepolicy,
  */
 class tool_sitepolicy_generator extends component_generator_base {
     /**
-     * Create new site policy with one draft version, with specfied translations and number of consent options
+     * Create a new draft version, with specfied translations and number of consent options.
+     * If no site policy is provided one is created.
      *
      * Options
      *  [
+     *      'sitepolicy' => $sitepolicy // An instance of a site policy, if not provided one is created.
      *      'time' => time(), // Time of creation
      *      'authorid' => 2, // User who created
      *      'languages' => 'en', // Languages. First language is primary
@@ -147,13 +149,10 @@ class tool_sitepolicy_generator extends component_generator_base {
      * @return sitepolicy
      */
     public function create_multiversion_policy($options) : sitepolicy {
-        global $DB;
-
         // Wait one second to prevent duplicates
         if (!isset($options['time'])) {
             sleep(1);
         }
-
 
         $hasdraft = $options['hasdraft'] ?? true;
         $numpublished = $options['numpublished'] ?? 0;
@@ -213,6 +212,7 @@ class tool_sitepolicy_generator extends component_generator_base {
      */
     private function parse_options($options): array {
         $definition = [];
+        $definition['sitepolicy'] = $options['sitepolicy'] ?? null;
         $definition['time'] = $options['time'] ?? time();
         $definition['authorid'] = $options['authorid'] ?? 2;
         $definition['languages'] = isset($options['languages']) ? explode(',', $options['languages']) : ['en'];
@@ -268,8 +268,6 @@ class tool_sitepolicy_generator extends component_generator_base {
      * @return sitepolicy
      */
     private function create_policy(array $definition = []) : sitepolicy {
-        global $DB;
-
         $definition = array_merge([
             'time' => time(),
             'authorid' => 2,
@@ -282,9 +280,15 @@ class tool_sitepolicy_generator extends component_generator_base {
 
         $consentoptions = [];
 
-        $sitepolicy = new sitepolicy();
-        $sitepolicy->set_timecreated($definition['time']);
-        $sitepolicy->save();
+        if ($definition['sitepolicy'] instanceof sitepolicy) {
+            $sitepolicy = $definition['sitepolicy'];
+
+        } else {
+
+            $sitepolicy = new sitepolicy();
+            $sitepolicy->set_timecreated($definition['time']);
+            $sitepolicy->save();
+        }
 
         $version = policyversion::new_policy_draft($sitepolicy);
         $version->set_timecreated($definition['time']);

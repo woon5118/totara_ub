@@ -28,62 +28,31 @@
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
+$sid = optional_param('sid', 0, PARAM_INT); // Report: saved search.
+$format = optional_param('format', false, PARAM_TEXT); // Report: export.
+$debug = optional_param('debug', 0, PARAM_INT); // Report: debug turned on/off.
+
 admin_externalpage_setup('tool_sitepolicy-userconsentreport');
 
-$sid = optional_param('sid', '0', PARAM_INT);
-$format = optional_param('format', '', PARAM_TEXT); //export format
-$debug = optional_param('debug', 0, PARAM_INT);
-
-// Default to current user.
-$userid = $USER->id;
-
-$strheading = get_string('alerts', 'totara_message');
-
-$shortname = 'tool_sitepolicy';
-$data = array(
-    'userid' => $userid,
-);
-
 // Verify global restrictions.
-$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
+$reportrecord = $DB->get_record('report_builder', array('shortname' => 'tool_sitepolicy'));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
-
-if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid, $globalrestrictionset)) {
+// Get the embedded report.
+$data = array(
+    'userid' => $USER->id, // Default to current user.
+);
+$report = reportbuilder_get_embedded_report('tool_sitepolicy', $data, false, $sid, $globalrestrictionset);
+if (!$report) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
-
-$logurl = $PAGE->url->out_as_local_url();
-if ($format != '') {
+// Export the data, if required.
+if ($format) {
     $report->export_data($format);
     die;
 }
 
 \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
-/** @var totara_reportbuilder_renderer $output */
-$output = $PAGE->get_renderer('totara_reportbuilder');
-
-$PAGE->set_button($report->edit_button());
-
-echo $output->header();
-
-$countfiltered = $report->get_filtered_count();
-$strheading = get_string('embeddedtitle', 'rb_source_tool_sitepolicy');
-$heading = $strheading . ': ' . $output->result_count_info($report);
-echo $output->heading($heading);
-
-if ($debug) {
-    $report->debug($debug);
-}
-
-$report->display_search();
-$report->display_sidebar_search();
-
-echo $report->display_saved_search_options();
-
-$report->display_table();
-
-// Export button.
-$output->export_select($report, $sid);
-
-echo $output->footer();
+/** @var \tool_sitepolicy\output\page_renderer $renderer */
+$renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
+echo $renderer->consent_report($report, $debug, $sid);

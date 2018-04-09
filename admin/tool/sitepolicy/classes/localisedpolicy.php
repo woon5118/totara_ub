@@ -24,6 +24,8 @@
 
 namespace tool_sitepolicy;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class for changing the tool_sitepolicy_localised_policy table
  **/
@@ -107,25 +109,49 @@ class localisedpolicy {
 
     /**
      * Gets language for localised policy
+     * @param bool $formatted If true the language is translated and formatted for output.
      * @return string language
      */
-    public function get_language(): string {
+    public function get_language($formatted = false): string {
+        if ($formatted) {
+            $translations = get_string_manager()->get_list_of_translations(true);
+            if (isset($translations[$this->language])) {
+                return $translations[$this->language];
+            }
+            // This is just a guess, it may or may not match up, if it does then great!
+            $languages = get_string_manager()->get_list_of_languages();
+            if (isset($languages[$this->language])) {
+                return $languages[$this->language];
+            }
+            // No luck.
+            return $this->language;
+        }
         return $this->language;
     }
 
     /**
      * Gets title for localised policy
+     *
+     * @param bool $formatted If true the title will be formatted for output before being returned.
      * @return string title
      */
-    public function get_title(): string {
+    public function get_title($formatted = false): string {
+        if ($formatted) {
+            return format_string($this->title, true, ['context' => \context_system::instance()]);
+        }
         return $this->title;
     }
 
     /**
      * Gets policytext for localised policy
+     *
+     * @param bool $formatted If set to true the text will be formatted for output before being returned.
      * @return string policytext
      */
-    public function get_policytext(): string {
+    public function get_policytext($formatted = false): string {
+        if ($formatted) {
+            return text_to_html($this->policytext);
+        }
         return $this->policytext;
     }
 
@@ -171,7 +197,7 @@ class localisedpolicy {
 
     /**
      * Get consentoptions
-     * @return array of localisedconsentoptions
+     * @return localisedconsent[]
      */
     public function get_consentoptions(): array {
         return $this->consentoptions;
@@ -352,10 +378,15 @@ class localisedpolicy {
         $entry->title = $this->title;
         $entry->policytext = $this->policytext;
         $entry->whatsnew = $this->whatsnew;
-        $entry->timecreated = time();
+        $entry->timecreated = $this->timecreated;
         $entry->isprimary = $this->isprimary;
         $entry->authorid = $this->authorid;
         $entry->policyversionid = $this->policyversion->get_id();
+
+        if (empty($entry->timecreated)) {
+            // Hmm, its empty default to now.
+            $entry->timecreated = time();
+        }
 
         // Save localised policy and its options together
         $trans = $DB->start_delegated_transaction();
@@ -380,8 +411,6 @@ class localisedpolicy {
      */
     private function save_consentoptions() {
         foreach ($this->consentoptions as $key => $localisedconsent) {
-            $localisedpolicyid = $localisedconsent->get_localisedpolicy()->get_id();
-
             $option = $localisedconsent->get_option();
             if (!$localisedconsent->is_removed()) {
                 if ($this->isprimary) {
@@ -397,7 +426,7 @@ class localisedpolicy {
                     $localisedconsent->delete();
                 }
 
-                unset($this->consentoption[$key]);
+                unset($this->consentoptions[$key]);
             }
         }
     }
@@ -513,8 +542,8 @@ class localisedpolicy {
             throw new \coding_exception("Cannot clone non primary localised policy");
         }
 
-        $this->title = $from->get_title();
-        $this->policytext = $from->get_policytext();
+        $this->title = $from->get_title(false);
+        $this->policytext = $from->get_policytext(false);
 
         // Can't just copy consentoptions - we need to ensure that new objects are created
         $statements = $from->get_statements(true);
@@ -524,18 +553,24 @@ class localisedpolicy {
 
     /**
      * Get title of the primary version of this policyversion
+     *
+     * @param bool $formatted If true the title will be formatted for output.
      * @return string
      */
-    public function get_primary_title(): string {
+    public function get_primary_title($formatted = false): string {
         global $DB;
 
         if ($this->is_primary()) {
-            return $this->title;
+            return $this->get_title($formatted);
         }
 
         $params = ['policyversionid' => $this->policyversion->get_id(),
                    'isprimary' => self::STATUS_PRIMARY];
-        return $DB->get_field('tool_sitepolicy_localised_policy', 'title', $params);
+        $title = $DB->get_field('tool_sitepolicy_localised_policy', 'title', $params);
+        if ($formatted) {
+            return format_string($title, true, ['context' => \context_system::instance()]);
+        }
+        return $title;
     }
 
     /**

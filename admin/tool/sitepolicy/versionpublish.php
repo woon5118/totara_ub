@@ -26,83 +26,49 @@ require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 use \tool_sitepolicy\policyversion,
-    \tool_sitepolicy\sitepolicy,
-    \tool_sitepolicy\localisedpolicy;
-
-admin_externalpage_setup('tool_sitepolicy-managerpolicies');
+    \tool_sitepolicy\url_helper;
 
 $policyversionid = required_param('policyversionid', PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
+admin_externalpage_setup('tool_sitepolicy-managerpolicies', '', null, url_helper::version_publish($policyversionid));
+
 $version = new policyversion($policyversionid);
 $sitepolicy = $version->get_sitepolicy();
 
-$currenturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionpublish.php", ['policyversionid' => $policyversionid]);
-$versionlisturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionlist.php", ['sitepolicyid' => $sitepolicy->get_id()]);
+$versionlisturl = url_helper::version_list($sitepolicy->get_id());
+$primarypolicy = $version->get_primary_localisedpolicy();
 
-$PAGE->set_context(context_system::instance());
-$PAGE->set_url($currenturl);
-
-$primarypolicy = localisedpolicy::from_version($version, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
-$policytitle = $primarypolicy->get_title();
+if ($version->has_incomplete_language_translations()) {
+    debugging('Policy versions with incomplete translations cannot be published.', DEBUG_DEVELOPER);
+    redirect($versionlisturl);
+}
 
 // Perform action.
 if ($confirm) {
+
+    // You must have the correct sesskey.
+    require_sesskey();
+
     $sitepolicy->switchversion($version);
 
-    $strparams = [
-        'title' => $policytitle,
+    $message = get_string('publishsuccess', 'tool_sitepolicy', [
+        'title' => $primarypolicy->get_title(true),
         'version' => $version->get_versionnumber()
-    ];
-    redirect(
-        $versionlisturl,
-        get_string('publishsuccess', 'tool_sitepolicy', $strparams),
-        null,
-        \core\output\notification::NOTIFY_SUCCESS
-    );
+    ]);
+    redirect($versionlisturl, $message, null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
 // Output.
-$heading = get_string('publishheading', 'tool_sitepolicy', $policytitle);
+$heading = get_string('publishheading', 'tool_sitepolicy', $primarypolicy->get_title(true));
 
-$PAGE->set_pagelayout('admin');
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
+$PAGE->navbar->add($primarypolicy->get_title(false), $versionlisturl);
+$PAGE->navbar->add(get_string('versionpublish', 'tool_sitepolicy'));
 
-/**
- * @var tool_sitepolicy_renderer $renderer
- */
+/** @var tool_sitepolicy_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy');
 echo $renderer->header();
-
-// Show confirmations.
-if ($version->is_complete()) {
-    // Version is complete - good to go.
-    $message = $renderer->heading(get_string('publishpolicytitle', 'tool_sitepolicy', $policytitle));
-    $message .= get_string('publishlistheading', 'tool_sitepolicy');
-
-    $message .= html_writer::alist([
-        get_string('publishlist1', 'tool_sitepolicy'),
-        get_string('publishlist2', 'tool_sitepolicy'),
-        get_string('publishlist3', 'tool_sitepolicy'),
-        get_string('publishlist4', 'tool_sitepolicy'),
-    ]);
-    $message .= get_string('publishlangheading', 'tool_sitepolicy');
-
-    $langarray = [];
-    $versionlang = $version->get_languages();
-    // First entry is primary
-    $primarylang = reset($versionlang)->language;
-
-    foreach ($versionlang as $translation) {
-        $langarray[] = get_string_manager()->get_list_of_languages($primarylang)[$translation->language];
-    }
-    $message .= html_writer::alist($langarray);
-
-    $confirmurl = new moodle_url($currenturl, ['confirm' => "1"]);
-    $continue = new single_button($confirmurl, get_string('publishpublish', 'tool_sitepolicy'));
-}
-
-$cancel = new single_button($versionlisturl, get_string('publishcancel', 'tool_sitepolicy'));
-echo $renderer->action_confirm($heading, $message, $continue, $cancel);
+echo $renderer->publish_version_confirmation($version);
 echo $renderer->footer();

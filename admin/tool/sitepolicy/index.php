@@ -20,6 +20,14 @@
  * @author Courteney Brownie <courteney.brownie@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package tool_sitepolicy
+ *
+ * @global moodle_page $PAGE
+ */
+
+/**
+ * Displays a list of site policies configured on the site.
+ *
+ * This is a management page.
  */
 
 require(__DIR__ . '/../../../config.php');
@@ -27,25 +35,10 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('tool_sitepolicy-managerpolicies');
 
-global $PAGE;
-
-$context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_url("/{$CFG->admin}/tool/sitepolicy/index.php");
-$PAGE->set_pagelayout('admin');
-
 $title = get_string('policiestitle', 'tool_sitepolicy');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
-/**
- * @var tool_sitepolicy_renderer $renderer
- */
-$renderer = $PAGE->get_renderer('tool_sitepolicy');
-
-echo $OUTPUT->header();
-echo $OUTPUT->heading($title);
-
-//Table
-echo $renderer->manage_site_policy_table();
-echo $OUTPUT->footer();
+/** @var \tool_sitepolicy\output\page_renderer $renderer */
+$renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
+echo $renderer->sitepolicy_list();

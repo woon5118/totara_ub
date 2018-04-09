@@ -61,9 +61,8 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
      * Test from_version
      */
     public function test_from_version() {
-        global $DB;
-
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -74,7 +73,7 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
             'languages' => 'fr,nl,en',
             'langprefix' => 'fr,nl,en',
             'title' => 'Test policy all',
-            'statement' => 'Policy statement all',
+            'statement' => "Policy statement\nall",
             'numoptions' => 1,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -87,15 +86,65 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
 
         $localisedpolicy = localisedpolicy::from_version($version, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
         $this->assertEquals('fr', $localisedpolicy->get_language());
-        $this->assertEquals('fr Test policy all', $localisedpolicy->get_title());
-        $this->assertEquals('fr Policy statement all', $localisedpolicy->get_policytext());
+        $this->assertEquals('fr Test policy all', $localisedpolicy->get_title(false));
+        $this->assertEquals('fr Test policy all', $localisedpolicy->get_title(true));
+        $this->assertEquals("fr Policy statement\nall", $localisedpolicy->get_policytext(false));
+        $this->assertEquals('<div class="text_to_html">fr Policy statement<br />'."\n".'all</div>', $localisedpolicy->get_policytext(true));
         $this->assertEquals(1, $localisedpolicy->is_primary());
 
         $localisedpolicy = localisedpolicy::from_version($version, ['language' => 'en']);
         $this->assertEquals('en', $localisedpolicy->get_language());
-        $this->assertEquals('en Test policy all', $localisedpolicy->get_title());
-        $this->assertEquals('en Policy statement all', $localisedpolicy->get_policytext());
+        $this->assertEquals('en Test policy all', $localisedpolicy->get_title(false));
+        $this->assertEquals('en Test policy all', $localisedpolicy->get_title(true));
+        $this->assertEquals("en Policy statement\nall", $localisedpolicy->get_policytext(false));
+        $this->assertEquals('<div class="text_to_html">en Policy statement<br />'."\n".'all</div>', $localisedpolicy->get_policytext(true));
         $this->assertEquals(0, $localisedpolicy->is_primary());
+    }
+
+    /**
+     * Test from_version
+     */
+    public function test_formatted_content() {
+        $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $options = [
+            'hasdraft' => true,
+            'numpublished' => 0,
+            'allarchived' => false,
+            'authorid' => 2,
+            'languages' => 'en',
+            'langprefix' => 'en',
+            'title' => 'Test policy <a href="test">all</a>',
+            'statement' => "Policy <a href='test'>statement</a> all\nnow",
+            'numoptions' => 1,
+            'consentstatement' => 'Consent statement all',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+        ];
+
+        $sitepolicy = $generator->create_multiversion_policy($options);
+        $version = policyversion::from_policy_latest($sitepolicy);
+
+        $localisedpolicy = localisedpolicy::from_version($version, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
+        $this->assertEquals('en', $localisedpolicy->get_language());
+        $this->assertEquals('en Test policy <a href="test">all</a>', $localisedpolicy->get_title(false));
+        $this->assertEquals('en Test policy all', $localisedpolicy->get_title(true));
+        $this->assertEquals("en Policy <a href='test'>statement</a> all\nnow", $localisedpolicy->get_policytext(false));
+        $this->assertEquals('<div class="text_to_html">en Policy <a href=\'test\'>statement</a> all<br />'."\n".'now</div>', $localisedpolicy->get_policytext(true));
+        $this->assertEquals(1, $localisedpolicy->is_primary());
+        $this->assertEquals('', $localisedpolicy->get_whatsnew());
+        // Ensure that it was created within the last 2 seconds.
+        $time = time();
+        $created = $localisedpolicy->get_timecreated();
+        $diff = abs($time - $created);
+        $this->assertTrue($diff >= 0 && $diff < 2);
+
+        // Finally check that the primary formatting works just as well.
+        $this->assertEquals('en Test policy <a href="test">all</a>', $localisedpolicy->get_primary_title(false));
+        $this->assertEquals('en Test policy all', $localisedpolicy->get_primary_title(true));
     }
 
     /**
@@ -165,7 +214,7 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         $this->assertEquals(localisedpolicy::STATUS_PRIMARY, $row->isprimary);
         $this->assertEquals($version->get_id(), $row->policyversionid);
 
-        $time = time();
+        $time = time() - 2;
         $localisedpolicy->set_title('The title');
         $localisedpolicy->set_policytext('The policy text');
         $localisedpolicy->set_whatsnew('The whatsnew text');
@@ -200,7 +249,6 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         $version->save();
 
         $localisedpolicy = localisedpolicy::from_data($version, 'en');
-        $time = time();
 
         // 3 new statements
         $statements = [];
@@ -375,9 +423,8 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
      * Test get_statements
      */
     public function test_get_statements() {
-        global $DB;
-
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -419,6 +466,7 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -465,6 +513,7 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -512,12 +561,55 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
     }
 
     /**
+     * Test delete after a user has consented is not possible
+     */
+    public function test_delete_with_consent_not_possible() {
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Localised policy can\'t be deleted while user_consent entries exist');
+
+        $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $options = [
+            'hasdraft' => false,
+            'numpublished' => 1,
+            'allarchived' => false,
+            'authorid' => 2,
+            'languages' => 'en',
+            'langprefix' => '',
+            'title' => 'Test policy delete',
+            'statement' => 'Policy statement delete',
+            'numoptions' => 1,
+            'consentstatement' => 'Consent statement delete',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+        ];
+
+        $sitepolicy = $generator->create_multiversion_policy($options);
+        $version = policyversion::from_policy_latest($sitepolicy);
+
+        $localisedpolicy = localisedpolicy::from_version($version, ['language' => 'en']);
+
+        $userconsent = new userconsent();
+        $userconsent->set_timeconsented(1523249171);
+        $userconsent->set_consentoptionid(abs(key($localisedpolicy->get_statements())));
+        $userconsent->set_language('en');
+        $userconsent->save();
+
+        // Now delete the localised_policy. Localised_consent should also be deleted
+        $localisedpolicy->delete();
+    }
+
+    /**
      * Test clone content
      */
     public function test_clone_content() {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -594,9 +686,9 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
      * Test get primary and localised titles
      */
     public function test_get_titles() {
-        global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [

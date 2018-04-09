@@ -20,9 +20,12 @@
  * @author Courteney Brownie <courteney.brownie@totaralearning.com>
  * @package tool_sitepolicy
  */
-/*
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
  * Site Policy Version
  */
 $plugin->component = 'tool_sitepolicy';
-$plugin->version = 2018031500;  //Date: YYYYMMDDHH
-$plugin->requires = 2016120505; //Date: YYYYMMDDHH
+$plugin->version = 2018031500;
+$plugin->requires = 2016120505;

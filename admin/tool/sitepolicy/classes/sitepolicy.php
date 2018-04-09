@@ -24,6 +24,8 @@
 
 namespace tool_sitepolicy;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class for changing the tool_sitepolicy_site_policy table
  **/
@@ -70,7 +72,6 @@ class sitepolicy {
      * @param int $id
      */
     public function __construct(int $id = 0) {
-        global $DB;
         if ($id > 0) {
             $this->id = $id;
             $this->load();
@@ -84,7 +85,7 @@ class sitepolicy {
         global $DB;
 
         $entry = new \stdClass();
-        if (is_null($this->timecreated)) {
+        if (empty($this->timecreated)) {
             $this->timecreated = time();
         }
 
@@ -128,8 +129,6 @@ class sitepolicy {
 
      */
     public function switchversion(policyversion $newpolicyversion, int $time = 0, int $publisherid = 0) {
-        global $DB;
-
         if ($newpolicyversion->get_sitepolicy()->get_id() != $this->id) {
             throw new \coding_exception("Cannot change to new policy version as it does not belong to this site policy");
         }
@@ -191,5 +190,65 @@ class sitepolicy {
                    'statusarchived' => policyversion::STATUS_ARCHIVED
                   ];
         return $DB->get_records_sql($policylistsql, $params);
+    }
+
+    /**
+     * Creates a new site policy
+     *
+     * @param string $title
+     * @param string $policytext
+     * @param statement[] $statements
+     * @param string $language
+     * @param int|null $authorid
+     * @return sitepolicy
+     * @throws \coding_exception
+     * @throws \dml_transaction_exception
+     */
+    public static function create_new_policy(string $title, string $policytext, array $statements, string $language, int $authorid = null): sitepolicy {
+        global $DB, $USER;
+
+        if ($authorid === null) {
+            $authorid = $USER->id;
+        }
+        $time = time();
+
+        $trans = $DB->start_delegated_transaction();
+
+        $sitepolicy = new sitepolicy();
+        $sitepolicy->set_timecreated($time);
+        $sitepolicy->save();
+
+        $version = policyversion::new_policy_draft($sitepolicy, $time);
+        $version->save();
+
+        $primarypolicy = localisedpolicy::from_data($version, $language, true);
+        $primarypolicy->set_authorid($authorid);
+        $primarypolicy->set_timecreated($time);
+        $primarypolicy->set_title($title);
+        $primarypolicy->set_policytext($policytext);
+        $primarypolicy->set_statements($statements);
+
+        $primarypolicy->save();
+        $trans->allow_commit();
+
+        return $sitepolicy;
+    }
+
+    /**
+     * Creates a new draft version of this site policy.
+     *
+     * @return policyversion
+     */
+    public function create_new_draft_version() {
+        global $DB;
+        $latestversion = policyversion::from_policy_latest($this);
+
+        $trans = $DB->start_delegated_transaction();
+        $draft = policyversion::new_policy_draft($this);
+        $draft->save();
+        $draft->clone_content($latestversion);
+        $trans->allow_commit();
+
+        return $draft;
     }
 }

@@ -24,6 +24,8 @@
 
 namespace tool_sitepolicy;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class for changing the tool_sitepolicy_policy_version table
  **/
@@ -69,6 +71,18 @@ class policyversion {
      * @var int publisherid
      */
     private $publisherid = null;
+
+    /**
+     * An array of summary information about localised versions for this policy version.
+     * @var \stdClass[]
+     */
+    private $summaryinformation = null;
+
+    /**
+     * The primary localised version.
+     * @var localisedpolicy
+     */
+    private $primarylocalisedpolicy = null;
 
     /**
      * policyversion constructor.
@@ -156,16 +170,14 @@ class policyversion {
     }
 
     /**
-     * Sets timecreated for policy version
-     * @return int timecreated
+     * Sets time created for policy version
      */
     public function set_timecreated(int $time) {
         $this->timecreated = $time;
     }
 
     /**
-     * Sets timepublished for policy version
-     * @return int timepublished
+     * Sets time published for policy version
      */
     public function set_timepublished(int $time) {
         $this->timepublished = $time;
@@ -343,8 +355,8 @@ class policyversion {
     /**
      * Get latest policy version
      *
-     * @param $sitepolicy $sitepolicy
-     * @param array $status Search for latest policy version in this state
+     * @param sitepolicy $sitepolicy
+     * @param string $status Search for latest policy version in this state
      * @return policyversion
      * @throws \coding_exception
      */
@@ -371,7 +383,7 @@ class policyversion {
                     break;
 
                 default:
-                    throw new \coding_exception("Invalid status passed: $status");
+                    throw new \coding_exception("Invalid status passed", $status);
                     break;
             }
         }
@@ -397,7 +409,6 @@ class policyversion {
      * Get current active version for policy
      *
      * @return policyversion
-     * @throws \dml_exception
      */
     public static function from_policy_active(sitepolicy $sitepolicy): policyversion {
         return self::from_policy_latest($sitepolicy, policyversion::STATUS_PUBLISHED);
@@ -461,10 +472,26 @@ class policyversion {
 
     /**
      * Get summary data
-     * @return array
+     *
+     * @param bool $reset If set to true summary information will be reloaded.
+     * @return \stdClass[]
      */
-    public function get_summary(): array {
+    public function get_summary($reset = false): array {
+        if ($reset) {
+            $this->summaryinformation = null;
+        }
+        $this->ensure_summary_loaded();
+        return $this->summaryinformation;
+    }
+
+    /**
+     * Ensure that summary information has been loaded.
+     */
+    public function ensure_summary_loaded(): void {
         global $DB;
+        if ($this->summaryinformation !== null) {
+            return;
+        }
 
         $localisedpolicysql = "
                SELECT tslp.id,
@@ -491,10 +518,13 @@ class policyversion {
 
                 WHERE tspv.id = :policyversionid
              GROUP BY tslp.id, tspv.timepublished, tslp.language, tslp.isprimary, tslp2.id, tslp2.language
-             ORDER BY tslp.id
-        ";
+             ORDER BY tslp.id";
+        $params = [
+            'policyversionid' => $this->id,
+            'policyversionid2' => $this->id
+        ];
 
-        return $DB->get_records_sql($localisedpolicysql, ['policyversionid' => $this->id, 'policyversionid2' => $this->id]);
+        $this->summaryinformation = $DB->get_records_sql($localisedpolicysql, $params);
     }
 
     /**
@@ -544,8 +574,6 @@ class policyversion {
      * @throws \coding_exception
      */
     public function archive(int $time = 0) {
-        global $DB;
-
         if (empty($time)) {
             $time = time();
         }
@@ -570,7 +598,7 @@ class policyversion {
      * @param int $time
      */
     public function publish(int $publisherid = 0, int $time = 0) {
-        global $DB, $USER;
+        global $USER;
 
         if (empty($time)) {
             $time = time();
@@ -596,13 +624,12 @@ class policyversion {
     /**
      * Clones policy primary version and constent options
      * @param policyversion $from Policy version to take content from
-     * @return policyversion
      */
     public function clone_content(policyversion $from) {
 
         $fromprimarypolicy = localisedpolicy::from_version($from, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
 
-        $tolocalisedpolicy = localisedpolicy::from_data($this, $fromprimarypolicy->get_language(), 1);
+        $tolocalisedpolicy = localisedpolicy::from_data($this, $fromprimarypolicy->get_language(false), 1);
         $tolocalisedpolicy->clone_content($fromprimarypolicy);
     }
 
@@ -626,13 +653,120 @@ class policyversion {
 
     /**
      * Get all localisations languages for current version
+     *
+     * @param bool $formatted If true the language list will be translated and formatted for output.
      * @return array of languages. First element is the primary language
      */
-    public function get_languages(): array {
+    public function get_languages($formatted = false): array {
         global $DB;
 
         // Sorting by id as the primary is always created first
-        return $DB->get_records('tool_sitepolicy_localised_policy', ['policyversionid' => $this->id], 'id', 'language, isprimary');
+        $languages = $DB->get_records('tool_sitepolicy_localised_policy', ['policyversionid' => $this->id], 'id', 'id, language, isprimary');
+        $returnlanguages = [];
+
+        if ($formatted) {
+            $primarylang = reset($languages)->language;
+            $installedlanguagepacks = get_string_manager()->get_list_of_translations(false);
+            $alllanguagepacks = get_string_manager()->get_list_of_translations(false);
+            $alllanguages = get_string_manager()->get_list_of_languages($primarylang);
+            foreach ($languages as $language) {
+                if (isset($installedlanguagepacks[$language->language])) {
+                    // Expected.
+                    $language->language = $installedlanguagepacks[$language->language];
+                } else if (isset($alllanguagepacks[$language->language])) {
+                    // Its a translation for a language pack that is no longer installed.
+                    $language->language = $alllanguagepacks[$language->language];
+                } else if (isset($alllanguages[$language->language])) {
+                    // No dice, its not a known language pack, maybe its a language.
+                    $language->language = $alllanguages[$language->language];
+                } else {
+                    // Woah, what is this?!
+                    debugging('Unknown localised site policy language "'.$language->language.'"', DEBUG_DEVELOPER);
+                }
+            }
+        }
+
+        foreach ($languages as $language) {
+            if (isset($returnlanguages[$language->language])) {
+                debugging('Policy version found with two translations in the same language "'.$language->language.'".', DEBUG_DEVELOPER);
+            }
+            $returnlanguages[$language->language] = $language;
+        }
+
+        return $returnlanguages;
+    }
+
+    /**
+     * Returns true if there are any incomplete language translations.
+     *
+     * @return bool
+     */
+    public function has_incomplete_language_translations(): bool {
+        if ($this->get_status() != policyversion::STATUS_DRAFT) {
+            return false;
+        }
+        $versionsummary = $this->get_summary();
+        foreach ($versionsummary as $entries => $entry) {
+            if ($entry->incomplete) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns an array of incomplete language translations.
+     *
+     * @return string[]
+     */
+    public function get_incomplete_language_translations(): array {
+        if ($this->get_status() != policyversion::STATUS_DRAFT) {
+            return array();
+        }
+        $versionsummary = $this->get_summary();
+        $incompletelanguages = [];
+        $translations = get_string_manager()->get_list_of_translations(true);
+        $languages = get_string_manager()->get_list_of_languages();
+        foreach ($versionsummary as $entries => $entry) {
+            if ($entry->incomplete) {
+                if (isset($translations[$entry->language])) {
+                    $incompletelanguages[] = $translations[$entry->language];
+                } else if (isset($languages[$entry->language])) {
+                    $incompletelanguages[] = $languages[$entry->language];
+                } else {
+                    $incompletelanguages[] = $entry->language;
+                }
+            }
+        }
+        return $incompletelanguages;
+    }
+
+    /**
+     * Ensure the primary localised version has been loaded.
+     */
+    private function ensure_primary_localisedversion_loaded() {
+        if (!$this->primarylocalisedpolicy) {
+            $this->primarylocalisedpolicy = localisedpolicy::from_version($this, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
+        }
+    }
+
+    /**
+     * Returns the primary localised version.
+     * @return localisedpolicy
+     */
+    public function get_primary_localisedpolicy(): localisedpolicy {
+        $this->ensure_primary_localisedversion_loaded();
+        return $this->primarylocalisedpolicy;
+    }
+
+    /**
+     * Return the title of the primary localised version.
+     *
+     * @param bool $formatted
+     * @return string
+     */
+    public function get_primary_title(bool $formatted = false): string {
+        return $this->get_primary_localisedpolicy()->get_title($formatted);
     }
 }
 

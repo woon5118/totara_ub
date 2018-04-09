@@ -403,7 +403,7 @@ class rb_source_tool_sitepolicy extends rb_base_source {
         $sql = "SELECT distinct language FROM {tool_sitepolicy_localised_policy}";
         $languages = $DB->get_records_sql($sql);
         foreach ($languages as $language) {
-            $userlanguage[$language->language] = get_string_manager()->get_list_of_languages()[$language->language];
+            $userlanguage[$language->language] = get_string_manager()->get_list_of_translations()[$language->language];
         }
         return $userlanguage;
     }

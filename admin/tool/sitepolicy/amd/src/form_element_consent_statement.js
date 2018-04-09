@@ -80,15 +80,22 @@ define(['jquery', 'totara_form/form', 'core/templates'], function($, Form) {
             form.reload();
         });
         removebutton.on('click', function(e) {
+            // JS pending as we're executing the display of a dialog.
+            M.util.js_pending('tool_sitepolicy-consent_statement_removal');
             e.preventDefault();
             var me = $(this),
                 statement = $(me.closest('div[data-rel="statement-block"]')),
-                input = $(statement.find('input[name="' + name + '__removedstatement[' + me.data('index') + ']"]'));
+                input = $(statement.find('input[name="' + name + '__removedstatement[' + me.data('index') + ']"]')),
+                readypromise;
 
-            self.delete_confirm(e, function() {
+            readypromise = self.delete_confirm(e, function() {
                 input.val(1);
                 statement.addClass('hidden');
                 statement.find('input[required]').removeAttr('required');
+            });
+            readypromise.done(function() {
+                // The dialog has been successfully displayed.
+                M.util.js_complete('tool_sitepolicy-consent_statement_removal');
             });
         });
         done();
@@ -96,10 +103,12 @@ define(['jquery', 'totara_form/form', 'core/templates'], function($, Form) {
 
     /**
      * Confirm deletion of consent statement
-     * @param e - Event
-     * @param yescallback - Callback if user agreed
+     * @param {Event} e The triggering event.
+     * @param {Function} yescallback Callback to execute if user agrees.
+     * @return {Promise} A promise that will be resolved then the dialog has been successfully displayed to the user.
      */
     ConsentStatement.prototype.delete_confirm = function(e, yescallback) {
+        var readypromise = $.Deferred();
         require(['core/modal_factory', 'core/modal_events', 'core/str'], function(modals, modalEvents, str) {
             var requiredstrings = [
                 {key: 'deleteconsentconfirmtitle', component: 'tool_sitepolicy'},
@@ -116,10 +125,12 @@ define(['jquery', 'totara_form/form', 'core/templates'], function($, Form) {
                 confirm.done(function(modal) {
                     var root = modal.getRoot();
                     root.on(modalEvents.yes, yescallback);
+                    root.on(modalEvents.shown, readypromise.resolve);
                     modal.show();
                 });
             });
         });
+        return readypromise.promise();
     };
 
     return ConsentStatement;

@@ -127,6 +127,21 @@ class tool_sitepolicy_userdata_fields_testcase extends advanced_testcase {
     }
 
     /**
+     * Ensure that author is not exportable.
+     */
+    public function test_author_not_exportable() {
+        self::assertFalse(\tool_sitepolicy\userdata\author::is_exportable());
+    }
+
+    /**
+     * Ensure that author is not countable.
+     */
+    public function test_author_not_countable() {
+        self::assertFalse(\tool_sitepolicy\userdata\author::is_countable());
+    }
+
+
+    /**
      * Test that only published of the version is purged
      */
     public function test_purge_publisher() {
@@ -151,5 +166,20 @@ class tool_sitepolicy_userdata_fields_testcase extends advanced_testcase {
 
         // But user is no publisher
         $this->assertEquals(0, $DB->count_records('tool_sitepolicy_policy_version', ['publisherid' => $that->user->id]));
+    }
+
+
+    /**
+     * Ensure that publisher is not exportable.
+     */
+    public function test_publisher_not_exportable() {
+        self::assertFalse(\tool_sitepolicy\userdata\publisher::is_exportable());
+    }
+
+    /**
+     * Ensure that publisher is not countable.
+     */
+    public function test_publisher_not_countable() {
+        self::assertFalse(\tool_sitepolicy\userdata\publisher::is_countable());
     }
 }

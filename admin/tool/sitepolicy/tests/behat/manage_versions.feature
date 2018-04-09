@@ -28,7 +28,7 @@ Feature: Manage sitepolicy versions
     And "Create new version" "button" should exist
 
     When I follow "View"
-    Then I should see "English (primary)"
+    Then I should see "English"
 
     When I follow "Back to all versions"
     And I press "Create new version"
@@ -81,7 +81,7 @@ Feature: Manage sitepolicy versions
     And "Create new version" "button" should exist
 
     When I follow "View"
-    Then I should see "English (primary)"
+    Then I should see "English"
     And I should see "Dutch; Flemish"
     And I should see "French"
 

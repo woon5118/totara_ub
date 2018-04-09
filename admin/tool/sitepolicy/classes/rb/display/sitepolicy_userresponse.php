@@ -23,6 +23,8 @@
 
 namespace tool_sitepolicy\rb\display;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Display user's sitepolicy response
  *

@@ -24,6 +24,8 @@
 
 namespace tool_sitepolicy\form;
 
+defined('MOODLE_INTERNAL') || die();
+
 use totara_form\form_controller;
 
 /**
@@ -31,7 +33,7 @@ use totara_form\form_controller;
  **/
 class versionform_controller extends form_controller {
 
-    /** @var element_compilation_js $form */
+    /** @var \tool_sitepolicy\form\versionform $form */
     protected $form;
 
     /**
@@ -43,7 +45,7 @@ class versionform_controller extends form_controller {
      * and returning of the form instance.
      *
      * @param string $idsuffix string extra for identifier to allow repeated forms on one page
-     * @return form
+     * @return \tool_sitepolicy\form\versionform
      */
     public function get_ajax_form_instance($idsuffix) {
         // Access control first.

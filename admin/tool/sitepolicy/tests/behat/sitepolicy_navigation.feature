@@ -142,8 +142,8 @@ Feature: Sitepolicy version navigation
     Then I should see "Manage \"nl All multi\" translations"
     And the "generaltable" table should contain the following:
       | Language             | Status   | Options |
-      | Nederlands (primary) | Complete | -       |
-      | Engels               | Complete | -       |
+      | Nederlands           | Complete | -       |
+      | English              | Complete | -       |
     And "Back to all versions" "link" should exist
     # navigate back to versionlist
     And I follow "Back to all versions"

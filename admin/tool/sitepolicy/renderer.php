@@ -22,23 +22,37 @@
  * @package tool_sitepolicy
  */
 
-require_once(__DIR__ . '/../../../config.php');
-
+use \tool_sitepolicy\sitepolicy;
 use \tool_sitepolicy\policyversion;
+use \tool_sitepolicy\localisedpolicy;
+use \tool_sitepolicy\url_helper;
+use \tool_sitepolicy\userconsent;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class tool_sitepolicy_renderer
+ *
+ * The following methods pass through to the core renderer:
+ * @method header()
+ * @method heading($text)
+ * @method footer()
+ * @method single_button($url, $label, $method = 'post', array $options = null)
+ * @method notification($message, $type = null)
+ * @method help_icon($identifier, $component = 'moodle', $linktext = '')
+ * @method box_start($classes, $id)
+ * @method box_end()
+ */
 class tool_sitepolicy_renderer extends plugin_renderer_base {
+
     /**
      * Generates Site Policies table
      * @return string
      */
     public function manage_site_policy_table() {
-        global $CFG;
-        $out = $this->single_button(new moodle_url("/{$CFG->admin}/tool/sitepolicy/sitepoliciesform.php"),
-            get_string('policycreatenew', 'tool_sitepolicy'));
+        $out = $this->single_button(url_helper::sitepolicy_create(), get_string('policycreatenew', 'tool_sitepolicy'));
 
-        $sitepolicylist = \tool_sitepolicy\sitepolicy::get_sitepolicylist();
+        $sitepolicylist = sitepolicy::get_sitepolicylist();
 
         $table = new html_table();
         $row = [];
@@ -53,12 +67,13 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
                 get_string('policieslabelstatus', 'tool_sitepolicy'),
             ];
             foreach ($sitepolicylist as $entry) {
-                $versionlisturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionlist.php", ['sitepolicyid' => $entry->id]);
-                $versionformurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionform.php", ['localisedpolicy' => $entry->localisedpolicyid, 'ret' => 'policies']);
+                $versionlisturl = url_helper::version_list($entry->id);
+                $versionformurl = url_helper::version_edit($entry->localisedpolicyid, 'policies');
                 $rowitems = [];
 
                 // Title
-                $rowitems[] = new html_table_cell(html_writer::link($versionlisturl, $title = $entry->title));
+                $title = format_string($entry->title, true, ['context' => context_system::instance()]);
+                $rowitems[] = new html_table_cell(html_writer::link($versionlisturl, $title));
 
                 // Status
                 $status = get_string('policystatus'.$entry->status, 'tool_sitepolicy');
@@ -66,12 +81,12 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
                 $draftlink = '';
                 if ($draft) {
                     $draftlink = $this->help_icon('policystatusdraft', 'tool_sitepolicy') . ' ' .
-                        html_writer::link($versionformurl, get_string('policiesrevisionnewdraft', 'tool_sitepolicy'));
+                        html_writer::link($versionformurl, s(get_string('policiesrevisionnewdraft', 'tool_sitepolicy')));
                 }
 
                 // Revisions
                 $rowitems[] = new html_table_cell($entry->numpublished . ' ' . $draftlink);
-                $rowitems[] = new html_table_cell($status);
+                $rowitems[] = new html_table_cell(s($status));
                 $row[] = new html_table_row($rowitems);
             }
         }
@@ -86,7 +101,6 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
      * @return string
      */
     public function manage_version_policy_table(int $sitepolicyid) {
-        global $CFG;
         $table = new html_table();
         $table->head = [
             get_string('versionslabelversion', 'tool_sitepolicy'),
@@ -101,7 +115,7 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
         $out = '';
 
         foreach ($versionlist as $entry) {
-            $versionformurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionform.php", ['localisedpolicy' => $entry->primarylocalisedid, 'ret' => 'versions']);
+            $versionformurl = url_helper::version_edit($entry->primarylocalisedid, 'versions');
             $rowitems = [];
 
             // Version number.
@@ -113,7 +127,7 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
             $rowitems[] = new html_table_cell($statusstr);
 
             // Number of translations.
-            $translationlisturl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationlist.php", ['policyversionid' => $entry->id]);
+            $translationlisturl = url_helper::localisedpolicy_list($entry->id);
             $incomplete = "";
             if ($status == policyversion::STATUS_DRAFT && $entry->cnt_translatedoptions != $entry->cnt_options) {
                 $incomplete = $this->output->flex_icon('warning',
@@ -138,8 +152,8 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
                     $rowitems[] = new html_table_cell('-');
                     $rowitems[] = new html_table_cell('-');
 
-                    $publishurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionpublish.php", ['policyversionid' => $entry->id]);
-                    $deleteurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versiondelete.php", ['policyversionid' => $entry->id]);
+                    $publishurl = url_helper::version_publish($entry->id);
+                    $deleteurl = url_helper::version_delete($entry->id);
 
                     if (!empty($incomplete)) {
                         $options[] = $this->output->action_icon('#',
@@ -159,7 +173,7 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
                     $rowitems[] = new html_table_cell(userdate($entry->timepublished));
                     $rowitems[] = new html_table_cell('-');
 
-                    $archiveurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionarchive.php", ['policyversionid' => $entry->id]);
+                    $archiveurl = url_helper::version_archive($entry->id);
                     $options[] = $this->output->action_icon($archiveurl,
                         new pix_icon('archive', get_string('versionarchive', 'tool_sitepolicy'),
                             'tool_sitepolicy'));
@@ -183,18 +197,23 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
     /**
      * Generates Add translation single select
      *
-     * @param policyversion $version
+     * @param policyversion $policyversion
      * @return string
      */
-    public function add_translation_single_select(policyversion $version) {
-        global $CFG;
+    public function add_translation_single_select(policyversion $policyversion) {
+        /** @var core_string_manager_standard $sm */
         $syslanguages = get_string_manager()->get_list_of_translations();
-        $verlanguages = $version->get_languages();
+        $verlanguages = $policyversion->get_languages();
         $options = array_diff_key($syslanguages, $verlanguages);
 
-        $translationformurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationform.php", ['policyversionid' => $version->get_id()]);
-
-        $select = new \single_select($translationformurl, 'language', $options, '', ['' => get_string('translationsadd', 'tool_sitepolicy')], 'addtranslationform');
+        $select = new \single_select(
+            url_helper::version_create($policyversion->get_id(), null),
+            'language',
+            $options,
+            '',
+            ['' => get_string('translationsadd', 'tool_sitepolicy')],
+            'addtranslationform'
+        );
         $select->class = 'singleselect pull-right';
 
         return $this->output->render($select);
@@ -203,11 +222,10 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
     /**
      * Generates Translations table
      *
-     * @param policyversion $version
+     * @param policyversion $policyversion
      * @return string
      */
-    public function manage_translation_table(policyversion $version) {
-        global $CFG;
+    public function manage_translation_table(policyversion $policyversion) {
         $table = new html_table();
 
         $table->head = [
@@ -218,15 +236,20 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
 
         $row = [];
 
-        $versionsummary = $version->get_summary();
+        $policyversionsummary = $policyversion->get_summary();
         $out = '';
 
-        foreach ($versionsummary as $entries => $entry) {
-            $versionformurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionform.php", ['localisedpolicy' => $entry->id, 'ret' => 'translations']);
-            $translationformurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationform.php", ['localisedpolicy' => $entry->id]);
-            $deleteurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/translationdelete.php", ['localisedpolicy' => $entry->id]);
-            $viewpolicyurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/viewpolicy.php");
-            $language = get_string_manager()->get_list_of_languages($entry->primarylanguage)[$entry->language];
+        foreach ($policyversionsummary as $entries => $entry) {
+            $versionformurl = url_helper::version_edit($entry->id, 'translations');
+            $translationformurl = url_helper::localisedpolicy_edit($entry->id);
+            $deleteurl = url_helper::localisedpolicy_delete($entry->id);
+            $translations = get_string_manager()->get_list_of_translations(true);
+            if (isset($translations[$entry->language])) {
+                $language = $translations[$entry->language];
+            } else {
+                // Hmmm not a known translation, I bet it is
+                $language = get_string_manager()->get_list_of_languages($entry->primarylanguage)[$entry->language];
+            }
             $rowitems = [];
 
             // Language.
@@ -235,7 +258,8 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
                 $languagestr = get_string('translationprimary', 'tool_sitepolicy', $language);
 
             }
-            $rowitems[] = new html_table_cell(html_writer::link(new moodle_url($viewpolicyurl, ['language' => $entry->language, 'policyversionid' => $version->get_id(), 'versionnumber' => $version->get_versionnumber()]), $languagestr));
+            $viewpolicyurl = url_helper::sitepolicy_view($policyversion->get_id(), $entry->language, $policyversion->get_versionnumber());
+            $rowitems[] = new html_table_cell(html_writer::link($viewpolicyurl, $languagestr));
 
             // Status.
             if (!empty($entry->timepublished)) {
@@ -300,9 +324,8 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
      * @return string
      */
     public function manage_userconsents_table(int $userid) {
-        global $CFG;
-        $consentresponse = \tool_sitepolicy\userconsent::get_userconsenttable($userid);
-        $viewpolicyurl = new moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php");
+
+        $consentresponse = userconsent::get_userconsenttable($userid);
 
         $table = new html_table();
         if (empty($consentresponse)) {
@@ -320,6 +343,8 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
             $row = [];
 
             $previousid = 0;
+            $translations = get_string_manager()->get_list_of_translations(true);
+            $languages = get_string_manager()->get_list_of_languages();
             foreach ($consentresponse as $response) {
                 $rowitems = [];
 
@@ -327,24 +352,28 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
                 $rowitems[] = new html_table_cell('');
                 $rowitems[] = new html_table_cell('');
                 if ($response->policyversionid != $previousid) {
-                    $rowitems[0] = new html_table_cell(html_writer::link(new moodle_url($viewpolicyurl,
-                        ['policyversionid' => $response->policyversionid,
-                         'versionnumber' => $response->versionnumber,
-                         'language' => $response->language]),
-                        $response->title));
+                    $myviewpolicyurl = url_helper::user_sitepolicy_version_view($userid, $response->policyversionid, $response->versionnumber, $response->language, 1, 1);
+                    $rowitems[0] = new html_table_cell(html_writer::link($myviewpolicyurl, $response->title));
                     $rowitems[1] = new html_table_cell($response->versionnumber);
                 }
 
-                //Language
-                $rowitems[] = new html_table_cell(get_string_manager()->get_list_of_languages($response->language)[$response->language]);
+                // Language.
+                $language = $response->language;
+                if (isset($translations[$language])) {
+                    $language = $translations[$language];
+                } else if (isset($languages[$language])) {
+                    // Just a guess really, the translation has been uninstalled.
+                    $language = $languages[$language];
+                }
+                $rowitems[] = new html_table_cell($language);
 
-                //Consent Statement
+                // Consent Statement
                 $rowitems[] = new html_table_cell($response->statement);
 
-                //Consent Response
+                // Consent Response
                 $rowitems[] = new html_table_cell($response->response);
 
-                //Date Consented
+                // Date Consented
                 $rowitems[] = new html_table_cell(userdate($response->timeconsented));
                 $row[] = new html_table_row($rowitems);
                 $previousid = $response->policyversionid;
@@ -355,5 +384,148 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
         $out = '';
         $out .= $this->output->render($table);
         return $out;
+    }
+
+    /**
+     * Renders a totara form.
+     *
+     * @param \totara_form\form $form
+     * @return string
+     */
+    public function form(\totara_form\form $form) {
+        return $form->render();
+    }
+
+    /**
+     * Displays a notification to warn about incomplete translations.
+     *
+     * @param policyversion $policyversion
+     * @return string
+     */
+    public function incomplete_language_translation_notification(policyversion $policyversion): string {
+        $incompletelanguages = $policyversion->get_incomplete_language_translations();
+        if (empty($incompletelanguages)) {
+            return '';
+        }
+
+        $message = get_string('publishincompletedesc', 'tool_sitepolicy');
+        $message .= html_writer::alist($incompletelanguages);
+        $message .= get_string('publishincompleteaction', 'tool_sitepolicy');
+        return $this->notification($message, \core\output\notification::NOTIFY_WARNING);
+    }
+
+    /**
+     * Displays a publish version confirmation dialog.
+     *
+     * @param policyversion $policyversion
+     * @return string
+     */
+    public function publish_version_confirmation(policyversion $policyversion): string {
+        if (!$policyversion->is_complete()) {
+            throw new \coding_exception('Policy versions cannot be published if there are incomplete localised versions.');
+        }
+
+        $message = $this->heading(get_string('publishpolicytitle', 'tool_sitepolicy', $policyversion->get_primary_title(true)));
+        $message .= get_string('publishlistheading', 'tool_sitepolicy');
+
+        $message .= html_writer::alist([
+            get_string('publishlist1', 'tool_sitepolicy'),
+            get_string('publishlist2', 'tool_sitepolicy'),
+            get_string('publishlist3', 'tool_sitepolicy'),
+            get_string('publishlist4', 'tool_sitepolicy'),
+        ]);
+        $message .= get_string('publishlangheading', 'tool_sitepolicy');
+        $message .= html_writer::alist(array_keys($policyversion->get_languages(true)));
+
+        $confirmurl = url_helper::version_publish($policyversion->get_id());
+        $confirmurl->param('confirm', 1);
+        $continue = new single_button($confirmurl, get_string('publishpublish', 'tool_sitepolicy'));
+
+        $cancelurl = url_helper::version_list($policyversion->get_sitepolicy()->get_id());
+        $cancel = new single_button($cancelurl, get_string('publishcancel', 'tool_sitepolicy'));
+        return $this->action_confirm($this->page->heading, $message, $continue, $cancel);
+    }
+
+    /**
+     * Displays a delete translation confirmation dialog.
+     *
+     * @param localisedpolicy $localisedpolicy
+     * @return string
+     */
+    public function delete_translation_confirmation(localisedpolicy $localisedpolicy): string {
+        $strparams = [
+            'title' => $localisedpolicy->get_primary_title(true),
+            'language' => $localisedpolicy->get_language(true)
+        ];
+        $message = $this->heading(get_string('deletetranslationtitle', 'tool_sitepolicy', $strparams));
+        $message .= get_string('deletetranslationmessage', 'tool_sitepolicy');
+        $deleteurl = url_helper::localisedpolicy_delete($localisedpolicy->get_id());
+        $deleteurl->param('confirm', 1);
+        $delete = new single_button($deleteurl, get_string('deletetranslationdelete', 'tool_sitepolicy'));
+
+        $cancelurl = url_helper::localisedpolicy_list($localisedpolicy->get_policyversion()->get_id());
+        $cancel = new single_button($cancelurl, get_string('deletetranslationcancel', 'tool_sitepolicy'));
+
+        return $this->action_confirm($this->page->title, $message, $delete, $cancel);
+    }
+
+    /**
+     * Displays a delete version confirmation
+     *
+     * @param policyversion $policyversion
+     * @return string
+     */
+    public function delete_version_confirmation(policyversion $policyversion) {
+        $primarypolicy = localisedpolicy::from_version($policyversion, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
+
+        // Show confirmation.
+        if ($policyversion->get_versionnumber() == 1) {
+            $message = $this->heading(get_string('deletepolicytitle', 'tool_sitepolicy', $primarypolicy->get_primary_title(true)));
+        } else {
+            $strparams = [
+                'title' => $primarypolicy->get_primary_title(true),
+                'version' => $policyversion->get_versionnumber()
+            ];
+            $message = $this->heading(get_string('deleteversiontitle', 'tool_sitepolicy', $strparams));
+        }
+        $message .= get_string('deletelistheading', 'tool_sitepolicy');
+
+        $policyversionlang = $policyversion->get_languages(true);
+        $message .= html_writer::alist(array_keys($policyversionlang));
+
+        $deleteurl = url_helper::version_delete($policyversion->get_id());
+        $deleteurl->param('confirm', 1);
+        $delete = new single_button($deleteurl, get_string('deleteversiondelete', 'tool_sitepolicy'));
+
+        $cancelurl = url_helper::version_list($policyversion->get_sitepolicy()->get_id());
+        $cancel = new single_button($cancelurl, get_string('deleteversioncancel', 'tool_sitepolicy'));
+
+        return $this->action_confirm($this->page->heading, $message, $delete, $cancel);
+    }
+
+    /**
+     * Displays an archive version confirmation.
+     *
+     * @param policyversion $policyversion
+     * @return string
+     */
+    public function archive_version_confirmation(policyversion $policyversion) {
+        // Show confirmation.
+        $primarypolicy = localisedpolicy::from_version($policyversion, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
+        $strparams = [
+            'title' => $primarypolicy->get_title(true),
+            'version' => $policyversion->get_versionnumber()
+        ];
+        $message = $this->heading(get_string('archivetitle', 'tool_sitepolicy', $strparams));
+        $message .= get_string('archivemessage', 'tool_sitepolicy');
+
+        $archiveurl = url_helper::version_archive($policyversion->get_id());
+        $archiveurl->param('confirm', 1);
+        $continue = new single_button($archiveurl, get_string('archivearchive', 'tool_sitepolicy'));
+
+        $cancelurl = url_helper::version_list($policyversion->get_sitepolicy()->get_id());
+        $cancel = new single_button($cancelurl, get_string('archivecancel', 'tool_sitepolicy'));
+
+        return $this->action_confirm($this->page->heading, $message, $continue, $cancel);
     }
 }

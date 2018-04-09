@@ -130,9 +130,11 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
      */
     public function test_get_sitepolicylist($debugkey, $options) {
         $this->resetAfterTest();
+
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
-        $sitepolicy = $generator->create_multiversion_policy($options);
+        $generator->create_multiversion_policy($options);
         $list = sitepolicy::get_sitepolicylist();
 
         $hasdraft = $options['hasdraft'];
@@ -164,6 +166,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        /** @var \tool_sitepolicy_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         $options = [
@@ -229,16 +232,35 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
             return (!is_null($policy->timepublished) && !is_null($policy->timearchived));
         });
         $this->assertTrue(array_key_exists($oldpublishedid, $archived));
+
+        $newpolicy = sitepolicy::create_new_policy('test', 'test', [], 'en');
+        $newversion = policyversion::from_policy_latest($newpolicy);
+
+        try {
+            // Test a version from a different policy (sanity checking!)
+            $sitepolicy->switchversion($newversion);
+            $this->fail('Able to switch a sitepolicy to a version that does not belong to it.');
+        } catch (\coding_exception $e) {
+            $this->assertSame('Coding error detected, it must be fixed by a programmer: Cannot change to new policy version as it does not belong to this site policy', $e->getMessage());
+        }
+
+        $newversion->publish();
+        try {
+            // Test we can't switch to a published version.
+            $newpolicy->switchversion($newversion);
+            $this->fail('Able to switch a sitepolicy to an already published version.');
+        } catch (\coding_exception $e) {
+            $this->assertSame('Coding error detected, it must be fixed by a programmer: Cannot publish a non-draft policy version', $e->getMessage());
+        }
     }
 
     /**
      * Test save and delete methods
      */
     public function test_save_and_delete() {
-         global $DB;
+        global $DB;
 
         $this->resetAfterTest();
-        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
 
         // Verify no existing site_policies
         $rows = $DB->get_records('tool_sitepolicy_site_policy');
@@ -246,6 +268,7 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
 
         $sitepolicy = new sitepolicy();
         $sitepolicy->save();
+        $this->assertNotEmpty($sitepolicy->get_timecreated());
 
         // Verify new site_policy saved
         $rows = $DB->get_records('tool_sitepolicy_site_policy');
@@ -263,6 +286,56 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
         $sitepolicy->delete();
         $rows = $DB->get_records('tool_sitepolicy_site_policy');
         $this->assertEquals(0, count($rows));
+    }
+
+    /**
+     * Tests the creation of a new site policy.
+     */
+    public function test_create_new_policy_and_draft_version() {
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        self::assertCount(0, $list = sitepolicy::get_sitepolicylist());
+
+        $sitepolicy = \tool_sitepolicy\sitepolicy::create_new_policy(
+            'Test title',
+            'I am the policy text',
+            [],
+            'en'
+        );
+
+        self::assertInstanceOf(sitepolicy::class, $sitepolicy);
+
+        $list = sitepolicy::get_sitepolicylist();
+        self::assertCount(1, $list);
+        /** @var sitepolicy $expectedpolicy */
+        $expectedpolicyobj = reset($list);
+        $expectedpolicy = new sitepolicy($expectedpolicyobj->id);
+
+        self::assertInstanceOf(sitepolicy::class, $expectedpolicy);
+        self::assertSame($expectedpolicy->get_id(), $sitepolicy->get_id());
+        self::assertSame($expectedpolicy->get_timecreated(), $sitepolicy->get_timecreated());
+
+        $expectedversion = policyversion::from_policy_latest($expectedpolicy, policyversion::STATUS_DRAFT);
+        $actualversion = policyversion::from_policy_latest($sitepolicy, policyversion::STATUS_DRAFT);
+
+        self::assertInstanceOf(policyversion::class, $expectedversion);
+        self::assertInstanceOf(policyversion::class, $actualversion);
+
+        self::assertSame($expectedversion->get_id(), $actualversion->get_id());
+        self::assertSame($expectedversion->get_timecreated(), $actualversion->get_timecreated());
+        self::assertSame($expectedversion->get_versionnumber(), $actualversion->get_versionnumber());
+        self::assertSame($expectedversion->get_primary_title(), $actualversion->get_primary_title());
+
+        $expectedversion->publish();
+
+        $actualdraft = $sitepolicy->create_new_draft_version();
+        $expecteddraft = policyversion::from_policy_latest($sitepolicy, policyversion::STATUS_DRAFT);
+        self::assertInstanceOf(policyversion::class, $actualdraft);
+        self::assertInstanceOf(policyversion::class, $expecteddraft);
+        self::assertSame($expecteddraft->get_id(), $actualdraft->get_id());
     }
 
 }

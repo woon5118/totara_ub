@@ -8,15 +8,8 @@ Feature: Manage sitepolicy version translations
     And  I log in as "admin"
     And I set the following administration settings values:
       | Enable site policies | 1 |
-
-    And I navigate to "Language packs" node in "Site administration > Language"
-    And I set the field "Available language packs" to "fr"
-    And I press "Install selected language pack(s)"
-    And I wait until "Language pack 'fr' was successfully installed" "text" exists
-    And I set the field "Available language packs" to "nl"
-    And I press "Install selected language pack(s)"
-    And I wait until "Language pack 'nl' was successfully installed" "text" exists
-
+    And I fake the French language pack is installed for site policies
+    And I fake the Dutch language pack is installed for site policies
     And I log out
 
   Scenario: Add a new translation to a sitepolicy version
@@ -43,15 +36,16 @@ Feature: Manage sitepolicy version translations
     Then I should see "Manage \"Policy 1\" translations"
     And the "generaltable" table should contain the following:
       | Language          | Status   | Options |
-      | English (primary) | Complete | -       |
+      | English | Complete | -       |
     And I should not see "Add translation"
 
-    When I follow "English (primary)"
+    #When I follow "English"
+    When I click on "English ‎(en)‎ (primary)" "link"
     Then I should see "Policy 1 statement"
     And I should see "P1 - Consent statement 1"
-    And I should see "Manage translations" in the ".breadcrumb-nav" "css_element"
+    And I should see "Translations" in the ".breadcrumb-nav" "css_element"
 
-    When I click on "Manage translations" "link" in the ".breadcrumb-nav" "css_element"
+    When I click on "Translations" "link" in the ".breadcrumb-nav" "css_element"
     Then I should see "Manage \"Policy 1\" translations"
     And I should see "Back to all versions"
 
@@ -62,7 +56,7 @@ Feature: Manage sitepolicy version translations
     Then I should see "Manage \"Policy 1\" translations"
     And the "generaltable" table should contain the following:
       | Language          | Status   | Options |
-      | English (primary) | Complete | Edit    |
+      | English | Complete | Edit    |
     And I should see "Add translation"
 
     When I select "nl" from the "language" singleselect
@@ -74,16 +68,15 @@ Feature: Manage sitepolicy version translations
       | statements__withheld[0]   | Nee                 |
       | whatsnew                  | Iets het verander   |
     And I press "Save"
-    Then I should see "Dutch; Flemish translation of \"Policy 1\" has been saved"
+    Then I should see "Nederlands ‎(nl)‎ translation of \"Policy 1\" has been saved"
     And I should see "Manage \"Policy 1\" translations"
     And the "generaltable" table should contain the following:
       | Language          | Status   |
-      | English (primary) | Complete |
-      | Dutch; Flemish    | Complete |
-    And I should see "Edit" in the "English (primary)" "table_row"
-    And I should see "Edit" in the "Dutch; Flemish" "table_row"
-    And I should see "Delete" in the "Dutch; Flemish" "table_row"
-
+      | English | Complete |
+      | Nederlands    | Complete |
+    And I should see "Edit" in the "English" "table_row"
+    And I should see "Edit" in the "Nederlands" "table_row"
+    And I should see "Delete" in the "Nederlands" "table_row"
 
   Scenario: Add a new option to a multilingual sitepolicy
     Given the following "multiversionpolicies" exist in "tool_sitepolicy" plugin:
@@ -111,16 +104,16 @@ Feature: Manage sitepolicy version translations
     When I click on "View" "link" in the "Draft" "table_row"
     Then the "generaltable" table should contain the following:
       | Language          | Status   |
-      | English (primary) | Complete |
-      | Dutch; Flemish    | Complete |
-      | French            | Complete |
-    And I should see "Edit" in the "English (primary)" "table_row"
-    And I should see "Edit" in the "Dutch; Flemish" "table_row"
-    And I should see "Delete" in the "Dutch; Flemish" "table_row"
-    And I should see "Edit" in the "French" "table_row"
-    And I should see "Delete" in the "French" "table_row"
+      | English           | Complete |
+      | Nederlands        | Complete |
+      | Français          | Complete |
+    And I should see "Edit" in the "English" "table_row"
+    And I should see "Edit" in the "Nederlands" "table_row"
+    And I should see "Delete" in the "Nederlands" "table_row"
+    And I should see "Edit" in the "Français" "table_row"
+    And I should see "Delete" in the "Français" "table_row"
 
-    When I click on "Edit" "link" in the "English (primary)" "table_row"
+    When I click on "Edit" "link" in the "English" "table_row"
     Then I should see "Edit version 1 of \"Policy 2\""
     And "Remove" "button" should exist
     And "Add statement" "button" should exist
@@ -135,9 +128,9 @@ Feature: Manage sitepolicy version translations
     And I should see "Manage \"Policy 2\" translations"
     And the "generaltable" table should contain the following:
       | Language          | Status   |
-      | English (primary) | Complete |
-      | Dutch; Flemish    | Incomplete |
-      | French            | Incomplete |
+      | English           | Complete |
+      | Nederlands        | Incomplete |
+      | Français          | Incomplete |
 
     When I follow "Back to all versions"
     Then I should see "Manage \"Policy 2\" policy"
@@ -149,8 +142,8 @@ Feature: Manage sitepolicy version translations
     And "Publish" "link" should not exist
 
     When I click on "View" "link" in the "Draft" "table_row"
-    And I click on "Edit" "link" in the "French" "table_row"
-    Then I should see "Translate \"Policy 2\" to French"
+    And I click on "Edit" "link" in the "Français" "table_row"
+    Then I should see "Translate \"Policy 2\" to Français"
     And "Remove" "button" should not exist
     And "Add statement" "button" should not exist
 
@@ -160,14 +153,14 @@ Feature: Manage sitepolicy version translations
       | statements__withheld[1]   | Pas d'accord                           |
     And I press "Save"
     Then I should see "Manage \"Policy 2\" translations"
-    And I should see "French translation of \"Policy 2\" has been saved"
+    And I should see "Français ‎(fr)‎ translation of \"Policy 2\" has been saved"
     And the "generaltable" table should contain the following:
       | Language          | Status     |
-      | English (primary) | Complete   |
-      | Dutch; Flemish    | Incomplete |
-      | French            | Complete   |
+      | English           | Complete   |
+      | Nederlands        | Incomplete |
+      | Français          | Complete   |
 
-    When I click on "Edit" "link" in the "English (primary)" "table_row"
+    When I click on "Edit" "link" in the "English" "table_row"
     And I press "statements_remove[1]"
     And I press "Yes"
     And I press "Save"
@@ -175,9 +168,9 @@ Feature: Manage sitepolicy version translations
     And I should see "Version (1) has been saved"
     And the "generaltable" table should contain the following:
       | Language          | Status     |
-      | English (primary) | Complete   |
-      | Dutch; Flemish    | Complete   |
-      | French            | Complete   |
+      | English           | Complete   |
+      | Nederlands        | Complete   |
+      | Français          | Complete   |
 
     When I follow "Back to all versions"
     Then the "generaltable" table should contain the following:

@@ -22,59 +22,34 @@
  * @package tool_sitepolicy
  */
 
+/**
+ * Page to facilitate the creation of a new site policy.
+ *
+ * This is a management page.
+ */
+
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-admin_externalpage_setup('tool_sitepolicy-managerpolicies');
+use \tool_sitepolicy\url_helper;
 
-$context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_url(new moodle_url("/{$CFG->admin}/tool/sitepolicy/versionform.php"));
+admin_externalpage_setup('tool_sitepolicy-managerpolicies', '', null, url_helper::sitepolicy_create());
 
-$redirect = new moodle_url("/{$CFG->admin}/tool/sitepolicy/index.php");
-$pagetitle = get_string('policyformheader', 'tool_sitepolicy');
-
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title($pagetitle);
-
-$currentdata = [
-    'versionnumber' => 1,
-];
-
-$form = new tool_sitepolicy\form\versionform($currentdata);
+$form = new tool_sitepolicy\form\versionform(['versionnumber' => 1]);
 
 if ($form->is_cancelled()) {
-    redirect($redirect);
+    redirect(url_helper::sitepolicy_list());
 }
-
 if ($formdata = $form->get_data()) {
-    $trans = $DB->start_delegated_transaction();
-
-    $time = time();
-    $sitepolicy = new tool_sitepolicy\sitepolicy();
-    $sitepolicy->set_timecreated($time);
-    $sitepolicy->save();
-
-    $version = tool_sitepolicy\policyversion::new_policy_draft($sitepolicy, $time);
-    $version->save();
-
-    $primarypolicy = tool_sitepolicy\localisedpolicy::from_data($version, $formdata->language, true);
-    $primarypolicy->set_authorid($USER->id);
-    $primarypolicy->set_timecreated($time);
-    $primarypolicy->set_title($formdata->title);
-    $primarypolicy->set_policytext($formdata->policytext);
-    $primarypolicy->set_statements($formdata->statements);
-
-    $primarypolicy->save();
-    $trans->allow_commit();
-
-    redirect($redirect, get_string('policynewsaved', 'tool_sitepolicy', $formdata->title),
-        null,
-        \core\output\notification::NOTIFY_SUCCESS);
+    \tool_sitepolicy\sitepolicy::create_new_policy($formdata->title, $formdata->policytext, $formdata->statements, $formdata->language);
+    $message = get_string('policynewsaved', 'tool_sitepolicy', $formdata->title);
+    redirect(url_helper::sitepolicy_list(), $message, null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('policycreatenew', 'tool_sitepolicy'));
-echo $form->render();
-echo $OUTPUT->footer();
+$PAGE->set_pagelayout('admin');
+$PAGE->set_title(get_string('policyformheader', 'tool_sitepolicy'));
+$PAGE->navbar->add($PAGE->title);
 
+/** @var \tool_sitepolicy\output\page_renderer $renderer */
+$renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
+echo $renderer->sitepolicy_create_new_policy($form);

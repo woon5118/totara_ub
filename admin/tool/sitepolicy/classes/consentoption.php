@@ -23,6 +23,9 @@
  */
 
 namespace tool_sitepolicy;
+
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class for changing the tool_sitepolicy_consent_options table
  **/

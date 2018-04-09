@@ -123,7 +123,7 @@ final class current extends item {
               CASE 
                 WHEN tsuc.hasconsented = 1 THEN tslc.consentoption
                 WHEN tsuc.hasconsented = 0 THEN tslc.nonconsentoption
-		      ELSE NULL END AS response
+              ELSE NULL END AS response
             FROM $from
               JOIN {tool_sitepolicy_localised_policy} tslp ON (tslp.policyversionid = tspv.id AND tslp.language = tsuc.language)
               JOIN {tool_sitepolicy_localised_consent} tslc ON (tslc.consentoptionid = tsco.id AND tslc.localisedpolicyid = tslp.id) 

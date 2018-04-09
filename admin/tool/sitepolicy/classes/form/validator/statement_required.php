@@ -21,12 +21,13 @@
  * @package tool_sitepolicy
  */
 
-
 namespace tool_sitepolicy\form\validator;
 
-use totara_form\element_validator,
-    totara_form\model,
-    tool_sitepolicy\form\element\statement;
+defined('MOODLE_INTERNAL') || die();
+
+use totara_form\element_validator;
+use totara_form\model;
+use tool_sitepolicy\form\element\statement;
 
 /**
  * Totara site policy statement 'required' attribute validator.
