@@ -4249,7 +4249,8 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
                 // to $CFG->forcelogin and $CFG->forceloginforprofileimage.
                 $options['cacheability'] = 'public';
             }
-            send_stored_file($file, 60*60*24*365, 0, false, $options); // enable long caching, there are many images on each page
+            // Totara: 7 days only to minimise privacy issues when users remove/change image.
+            send_stored_file($file, 60*60*24*7, 0, false, $options); // enable long caching, there are many images on each page
 
         } else if ($filearea === 'private' and $context->contextlevel == CONTEXT_USER) {
             require_login();

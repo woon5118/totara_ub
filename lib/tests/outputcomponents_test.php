@@ -143,6 +143,10 @@ class core_outputcomponents_testcase extends advanced_testcase {
 
         // Force SVG on so that we have predictable URL's.
         $CFG->svgicons = true;
+        // Totara: Login as real user to see all profile images.
+        $this->setAdminUser();
+        $CFG->forcelogin = '1';
+        $CFG->forceloginforprofileimage = '1';
 
         // Verify new install contains expected defaults.
         $this->assertSame(theme_config::DEFAULT_THEME, $CFG->theme);
@@ -219,6 +223,18 @@ class core_outputcomponents_testcase extends advanced_testcase {
         $this->assertEquals($reads, $DB->perf_get_reads());
         $this->assertEquals($CFG->wwwroot.'/theme/image.php/' . $CFG->theme . '/core/1/u/f2', $up3->get_url($page, $renderer)->out(false));
         $this->assertGreaterThan($reads, $DB->perf_get_reads());
+
+        // Totara: test privacy.
+        $this->setUser(null);
+        $up1 = new user_picture($user1);
+        $this->assertSame($CFG->wwwroot.'/theme/image.php/' . $CFG->theme . '/core/1/u/f2', $up1->get_url($page, $renderer)->out(false));
+        $CFG->forcelogin = '0';
+        $CFG->forceloginforprofileimage = '0';
+        $up1 = new user_picture($user1);
+        $this->assertSame($CFG->wwwroot.'/pluginfile.php/'.$context1->id.'/user/icon/' . $CFG->theme . '/f2?rev=11', $up1->get_url($page, $renderer)->out(false));
+        $CFG->forcelogin = '1';
+        $CFG->forceloginforprofileimage = '1';
+        $this->setAdminUser();
 
         // Test gravatar.
         set_config('enablegravatar', 1);
