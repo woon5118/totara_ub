@@ -153,9 +153,10 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
     And I click on "Enable" "link" in the "Email-based self-registration" "table_row"
     And I navigate to "Email-based self-registration" node in "Site administration > Plugins > Authentication"
-    And I click on "Yes" "option" in the "#menuallowsignupposition" "css_element"
-    And I click on "Yes" "option" in the "#menuallowsignuporganisation" "css_element"
-    And I click on "Yes" "option" in the "#menuallowsignupmanager" "css_element"
+    And I set the following fields to these values:
+    | Position     | Yes |
+    | Organisation | Yes |
+    | Manager      | Yes |
     And I press "Save changes"
     And the following config values are set as admin:
       | registerauth    | email |
