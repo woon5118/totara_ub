@@ -768,6 +768,11 @@ class auth_plugin_db extends auth_plugin_base {
 
         raise_memory_limit(MEMORY_HUGE);
 
+        if (empty($this->config->type)) {
+            echo $OUTPUT->notification('Database type not specified.', 'notifyproblem');
+            return;
+        }
+
         if (empty($this->config->table)) {
             echo $OUTPUT->notification('External table not specified.', 'notifyproblem');
             return;

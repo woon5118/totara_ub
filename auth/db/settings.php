@@ -41,7 +41,7 @@ if ($ADMIN->fulltree) {
             '127.0.0.1', PARAM_RAW));
 
     // Type.
-    $dboptions = array();
+    $dboptions = array('' => get_string('none')); // Totara: we must have 'None' option to 'unconfigure' the plugin.
     $dbtypes = array("access", "ado_access", "ado", "ado_mssql", "borland_ibase", "csv", "db2",
         "fbsql", "firebird", "ibase", "informix72", "informix", "mssql", "mssql_n", "mssqlnative",
         "mysql", "mysqli", "mysqlt", "oci805", "oci8", "oci8po", "odbc", "odbc_mssql", "odbc_oracle",
@@ -52,7 +52,7 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configselect('auth_db/type',
         new lang_string('auth_dbtype_key', 'auth_db'),
-        new lang_string('auth_dbtype', 'auth_db'), 'mysqli', $dboptions));
+        new lang_string('auth_dbtype', 'auth_db'), '', $dboptions)); // Totara: 'None' is the correct default!
 
     // Sybase quotes.
     $yesno = array(

@@ -46,9 +46,9 @@ function xmldb_auth_db_upgrade($oldversion) {
 
         // Totara: add default settings to make the upgrade settings page shorter.
         if (!is_enabled_auth('db')) {
-            $defaults = array (
+            $defaults = array(
                 'host' => '127.0.0.1',
-                'type' => 'mysqli',
+                'type' => '',
                 'sybasequoting' => '0',
                 'name' => '',
                 'user' => '',
