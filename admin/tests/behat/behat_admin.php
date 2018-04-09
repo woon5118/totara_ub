@@ -142,4 +142,29 @@ class behat_admin extends behat_base {
             set_config($config, $value, $plugin);
         }
     }
+
+    /**
+     * Make sure there are no new admin settings waiting to be confirmed.
+     *
+     * NOTE: this is a workaround for suddenly popping up settings such as when adding custom fields,
+     *       this is not intended for real upgrades.
+     *
+     * @Given /^I confirm new default admin settings$/
+     */
+    public function i_confirm_new_default_admin_settings() {
+        \behat_hooks::set_step_readonly(false);
+
+        $this->getSession()->visit($this->locate_path('admin/upgradesettings.php'));
+        $this->wait_for_pending_js();
+
+        $url = $this->getSession()->getCurrentUrl();
+        if (strpos($url, 'upgradesettings.php') !== false) {
+            $this->execute('behat_forms::press_button', 'Save changes');
+            $this->wait_for_pending_js();
+        }
+
+        $this->getSession()->visit($this->locate_path('index.php'));
+        $this->wait_for_pending_js();
+    }
+
 }

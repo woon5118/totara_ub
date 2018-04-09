@@ -41,6 +41,8 @@ Feature: Test dynamic audience with user profile choice based custom text fields
       | TestAudience | D1       | 2          |
 
     Given I log in as "admin"
+    # Unfortunately new custom fields are popping up in auth plugin settings.
+    And I confirm new default admin settings
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     And I follow "TestAudience"
     And I switch to "Rule sets" tab

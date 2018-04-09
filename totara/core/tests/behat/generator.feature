@@ -14,6 +14,8 @@ Feature: Test Totara core generators
     | textarea | pok5      | Pokus 5 |             |
     | date     | pok6      | Pokus 6 |             |
     And I log in as "admin"
+    # Unfortunately new custom fields are popping up in auth plugin settings.
+    And I confirm new default admin settings
     And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
     Then I should see "Pokus 1"
     And I should see "Pokus 2"
@@ -32,6 +34,8 @@ Feature: Test Totara core generators
       | text     | pok4      | Pokus 4  |             |
       | textarea | pok5      | Pokus 5  |             |
     And I log in as "admin"
+    # Unfortunately new custom fields are popping up in auth plugin settings.
+    And I confirm new default admin settings
     And I navigate to "Custom fields" node in "Site administration > Courses"
     Then I should see "Pokus 1"
     And I should see "Pokus 2"
@@ -49,6 +53,8 @@ Feature: Test Totara core generators
       | text     | pok4      | Pokus 4  |             |
       | textarea | pok5      | Pokus 5  |             |
     And I log in as "admin"
+    # Unfortunately new custom fields are popping up in auth plugin settings.
+    And I confirm new default admin settings
     And I navigate to "Custom fields" node in "Site administration > Courses"
     And I click on "Programs / Certifications" "link"
     Then I should see "Pokus 1"
