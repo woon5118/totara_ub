@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
+ * @author Yuliya Bozhko <yuliya.bozhko@totaralearning.com>
  *
  * @package auth_approved
  */
@@ -28,37 +29,77 @@ use \totara_reportbuilder\rb\display\base;
 
 final class request_profilefields extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        // TODO - display all sign up profile fields values the same way as on user profile page
-        return 'TODO';
+        global $DB;
 
-        /*
-        global $OUTPUT;
-
-        // Retrieve the extra row data.
-        $extra = self::get_extrafields_row($row, $column);
-
-        if ($format == 'html') {
-            return $OUTPUT->action_link(new moodle_url('/mod/facetoface/view.php', array('f' => $extra->activity_id)), $value);
-        } else {
-            return $value;
+        if (!$value) {
+            return '';
         }
-
 
         $customfields = json_decode($value);
 
-            foreach ($customfields as $name => $value) {
-                if ($value === null) {
-                    continue; // Null means "don't update the existing data", so skip this field.
-                }
+        // Get all the fields that appear on sign-up page keyed by their shortname.
+        $signupfields = $DB->get_records_select('user_info_field', 'signup = 1 AND visible <> 0', [], '', 'shortname, *');
 
-                if ($value === "" && !$saveemptyfields) {
-                    continue; // CSV import and empty fields are not saved, so skip this field.
-                }
+        $display = '';
+        foreach ($customfields as $name => $fieldvalue) {
+            $key = str_replace('profile_field_', '', $name);
 
-                $profile = str_replace('customfield_', 'profile_field_', $name);
-                // If the custom field is a menu, the option index will be set by function totara_sync_data_preprocess.
-                $user->{$profile} = $value;
+            // Check if we still have this custom field available.
+            // It could have been removed since a user signed up, but we still store data in the requests table.
+            // This check would also skip extra data from datetime fields, like 'raw' and 'timezone' settings.
+            // Make sure to include '0' as menu and text custom fields can store this value.
+            if (!isset($signupfields[$key]) || $fieldvalue === "") {
+                continue;
             }
-         */
+
+            $displayclass = '\totara_reportbuilder\rb\display\userfield_' . $signupfields[$key]->datatype;
+            switch ($signupfields[$key]->datatype) {
+                case 'textarea':
+                    // Skip textarea fields without any text value.
+                    if (empty($fieldvalue->text)) {
+                        continue 2;
+                    }
+                    $format = $fieldvalue->format;
+                    $fieldvalue = $fieldvalue->text;
+                    break;
+
+                case 'datetime':
+                    // Check if we need to display time as well.
+                    if (!empty($signupfields[$key]->param3)) {
+                        $displayclass = '\totara_reportbuilder\rb\display\nice_datetime';
+                    } else {
+                        $displayclass = '\totara_reportbuilder\rb\display\nice_date';
+                    }
+                    break;
+
+                case 'menu':
+                    // Check if there are any options in the menu field.
+                    if (empty($signupfields[$key]->param1)) {
+                        continue 2;
+                    }
+                    // Get the value of the option because approval requests store keys only.
+                    $options = explode("\n", $signupfields[$key]->param1);
+                    if (isset($options[(int)$fieldvalue])) {
+                        $fieldvalue = $options[(int)$fieldvalue];
+                    } else {
+                        continue 2;
+                    }
+                    break;
+
+                case 'date':
+                case 'checkbox':
+                case 'text':
+                    break;
+
+                default:
+                    // Unsupported profile fields.
+                    continue 2;
+            }
+
+            $display .= \html_writer::tag('dt', format_string($signupfields[$key]->name)) .
+                        \html_writer::tag('dd', $displayclass::display($fieldvalue, $format, $row, $column, $report));
+        }
+
+        return \html_writer::tag('dl', $display, array('class' => 'dl-horizontal'));
     }
 }
