@@ -46,7 +46,7 @@ function xmldb_auth_email_upgrade($oldversion) {
 
         // Totara: add default settings to make the upgrade settings page shorter.
         if (!is_enabled_auth('email')) {
-            $defaults = array (
+            $defaults = array(
                 'recaptcha' => '0',
                 'field_lock_firstname' => 'unlocked',
                 'field_lock_lastname' => 'unlocked',

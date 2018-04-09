@@ -48,7 +48,7 @@ function xmldb_auth_cas_upgrade($oldversion) {
 
         // Totara: add default settings to make the upgrade settings page shorter.
         if (!is_enabled_auth('cas')) {
-            $defaults = array (
+            $defaults = array(
                 'hostname' => '',
                 'baseuri' => '',
                 'port' => '',

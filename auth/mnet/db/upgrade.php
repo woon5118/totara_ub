@@ -46,7 +46,7 @@ function xmldb_auth_mnet_upgrade($oldversion) {
 
         // Totara: add default settings to make the upgrade settings page shorter.
         if (!is_enabled_auth('mnet')) {
-            $defaults = array (
+            $defaults = array(
                 'rpc_negotiation_timeout' => '30',
             );
             foreach ($defaults as $name => $value) {

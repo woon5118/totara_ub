@@ -46,7 +46,7 @@ function xmldb_auth_ldap_upgrade($oldversion) {
 
         // Totara: add default settings to make the upgrade settings page shorter.
         if (!is_enabled_auth('ldap')) {
-            $defaults = array (
+            $defaults = array(
                 'host_url' => '',
                 'ldap_version' => '3',
                 'start_tls' => '0',
