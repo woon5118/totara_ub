@@ -38,8 +38,8 @@ class auth_shibboleth_admin_setting_special_idp_configtextarea extends admin_set
      */
     public function __construct() {
         $default = $orgdefault = "urn:mace:organization1:providerID, Example Organization 1
-        https://another.idp-id.com/shibboleth, Other Example Organization, /Shibboleth.sso/DS/SWITCHaai
-        urn:mace:organization2:providerID, Example Organization 2, /Shibboleth.sso/WAYF/SWITCHaai";
+https://another.idp-id.com/shibboleth, Other Example Organization, /Shibboleth.sso/DS/SWITCHaai
+urn:mace:organization2:providerID, Example Organization 2, /Shibboleth.sso/WAYF/SWITCHaai";
 
         parent::__construct('auth_shibboleth/organization_selection',
                 get_string('auth_shib_idp_list', 'auth_shibboleth'),

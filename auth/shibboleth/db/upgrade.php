@@ -46,13 +46,13 @@ function xmldb_auth_shibboleth_upgrade($oldversion) {
 
         // Totara: add default settings to make the upgrade settings page shorter.
         if (!is_enabled_auth('shibboleth')) {
-            $defaults = array (
+            $defaults = array(
                 'user_attribute' => '',
                 'convert_data' => '',
                 'alt_login' => 'off',
                 'organization_selection' => 'urn:mace:organization1:providerID, Example Organization 1
-        https://another.idp-id.com/shibboleth, Other Example Organization, /Shibboleth.sso/DS/SWITCHaai
-        urn:mace:organization2:providerID, Example Organization 2, /Shibboleth.sso/WAYF/SWITCHaai',
+https://another.idp-id.com/shibboleth, Other Example Organization, /Shibboleth.sso/DS/SWITCHaai
+urn:mace:organization2:providerID, Example Organization 2, /Shibboleth.sso/WAYF/SWITCHaai',
                 'logout_handler' => '',
                 'logout_return_url' => '',
                 'login_name' => 'Shibboleth Login',
