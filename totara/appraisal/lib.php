@@ -257,6 +257,7 @@ class appraisal {
 
         $assign = new totara_assign_appraisal('appraisal', $this);
         $assign->store_user_assignments();
+        $assign->store_job_assignments();
         $assign->store_role_assignments();
 
         $this->create_answers_table();
@@ -473,6 +474,16 @@ class appraisal {
         $assignment->store_role_assignment_for_appraisee($appraiseeid);
     }
 
+    /**
+     * Check if automatic job assignment should be done for this appraisal.
+     *
+     * @return bool
+     */
+    public function can_auto_link_job_assignments(): bool {
+        global $CFG;
+        // If multiple job assignments are allowed, auto-linking should not happen.
+        return empty($CFG->totara_job_allowmultiplejobs);
+    }
 
     /**
      * Update user and role assignments for a live appraisal.
@@ -487,6 +498,19 @@ class appraisal {
         }
 
         $assign = new totara_assign_appraisal('appraisal', $this);
+
+        // Remember new appraisee ids for potential job assignment linking below.
+        $linkjobappraiseeids = [];
+        if ($this->can_auto_link_job_assignments()) {
+            /** @var moodle_recordset $added */
+            $added = $assign->get_unstored_users();
+            if ($added->valid()) {
+                foreach ($added as $newappraisee) {
+                    $linkjobappraiseeids[] = $newappraisee->id;
+                }
+            }
+            $added->close();
+        }
 
         // Create user assignments and role assignments for new users.
         $added = $assign->get_unstored_users();
@@ -612,6 +636,9 @@ class appraisal {
                 }
             }
         }
+
+        // Link job assignments if required.
+        $assign->store_job_assignments($linkjobappraiseeids);
     }
 
     /**

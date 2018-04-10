@@ -328,6 +328,7 @@ class appraisal_test extends appraisal_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
+        /** @var appraisal $appraisal */
         list($appraisal) = $this->prepare_appraisal_with_users();
         list($errors, $warnings) = $appraisal->validate();
         $this->assertEmpty($errors);
@@ -370,6 +371,166 @@ class appraisal_test extends appraisal_testcase {
         $this->assertEquals(appraisal::STATUS_ACTIVE, $appraisal->status);
         $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
         $this->assertEquals(4, $count);
+
+        // Check there were no job assignments auto-linked for the added users, because with default configuration this shouldn't happen.
+        $this->assertCount(1, $DB->get_records('appraisal_user_assignment', ['userid' => $user1->id]));
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user1->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+        $this->assertCount(1, $DB->get_records('appraisal_user_assignment', ['userid' => $user2->id]));
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user2->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+    }
+
+    /**
+     * Test auto-linking of job assignments works as expected when activating appraisal.
+     */
+    public function test_auto_link_job_assignment_on_activate() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        // Create one job assignment for user1.
+        $user1ja = \totara_job\job_assignment::create_default($user1->id);
+
+        // Create two job assignments for user2.
+        \totara_job\job_assignment::create_default($user2->id);
+        \totara_job\job_assignment::create_default($user2->id);
+
+        // Switch allowmultiplejobs off.
+        set_config('totara_job_allowmultiplejobs', 0);
+
+        // Set up appraisal for all 3 users and activate.
+        /** @var appraisal $appraisal */
+        list($appraisal) = $this->prepare_appraisal_with_users([], [$user1, $user2, $user3]);
+        list($errors, $warnings) = $appraisal->validate();
+        $this->assertEmpty($errors);
+        $this->assertEmpty($warnings);
+        $this->assertEquals(appraisal::STATUS_DRAFT, $appraisal->status);
+        $count = $DB->count_records('appraisal_user_assignment', ['appraisalid' => $appraisal->id]);
+        $this->assertEquals(0, $count);
+        $appraisal->activate();
+
+        // For user1 the existing job assignment should have been linked.
+        $jobassignments = $DB->get_records('job_assignment', ['userid' => $user1->id]);
+        $this->assertCount(1, $jobassignments);
+        $jobassignment = reset($jobassignments);
+        $this->assertEquals($user1ja->id, $jobassignment->id);
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user1->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => $user1ja->id,
+        ]));
+
+        // For user2 nothing should have been linked because he had more than 1 job assignment.
+        $this->assertCount(1, $DB->get_records('appraisal_user_assignment', ['userid' => $user2->id]));
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user2->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+
+        // For user3 an empty job assignment should have been created and linked.
+        $jobassignments = $DB->get_records('job_assignment', ['userid' => $user3->id]);
+        $this->assertCount(1, $jobassignments);
+        $user3ja = reset($jobassignments);
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user3->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => $user3ja->id,
+        ]));
+    }
+
+    /**
+     * Test auto-linking of job assignments works as expected when users are added to an active appraisal.
+     */
+    public function test_auto_link_job_assignment_on_dynamic_assignment() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        // Create one job assignment for user1.
+        $user1ja = \totara_job\job_assignment::create_default($user1->id);
+
+        // Create two job assignments for user2.
+        \totara_job\job_assignment::create_default($user2->id);
+        \totara_job\job_assignment::create_default($user2->id);
+
+        // Switch allowmultiplejobs off.
+        set_config('totara_job_allowmultiplejobs', 0);
+
+        // Set up appraisal and activate.
+        /** @var appraisal $appraisal */
+        list($appraisal) = $this->prepare_appraisal_with_users();
+        list($errors, $warnings) = $appraisal->validate();
+        $this->assertEmpty($errors);
+        $this->assertEmpty($warnings);
+        $this->assertEquals(appraisal::STATUS_DRAFT, $appraisal->status);
+        $count = $DB->count_records('appraisal_user_assignment', ['appraisalid' => $appraisal->id]);
+        $this->assertEquals(0, $count);
+        $appraisal->activate();
+
+        // Create audience and add to appraisal.
+        $cohort = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort->id, $user1->id);
+        cohort_add_member($cohort->id, $user2->id);
+        cohort_add_member($cohort->id, $user3->id);
+        $urlparams = array('includechildren' => false, 'listofvalues' => array($cohort->id));
+        $assign = new totara_assign_appraisal('appraisal', $appraisal);
+        $grouptypeobj = $assign->load_grouptype('cohort');
+        $grouptypeobj->handle_item_selector($urlparams);
+
+        // Our 3 users should not be assigned to the appraisal yet.
+        $this->assertFalse($DB->record_exists('appraisal_user_assignment', ['userid' => $user1->id]));
+        $this->assertFalse($DB->record_exists('appraisal_user_assignment', ['userid' => $user2->id]));
+        $this->assertFalse($DB->record_exists('appraisal_user_assignment', ['userid' => $user3->id]));
+
+        // Force user assignments update.
+        $appraisal->check_assignment_changes();
+
+        // For user1 the existing job assignment should have been linked.
+        $jobassignments = $DB->get_records('job_assignment', ['userid' => $user1->id]);
+        $this->assertCount(1, $jobassignments);
+        $jobassignment = reset($jobassignments);
+        $this->assertEquals($user1ja->id, $jobassignment->id);
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user1->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => $user1ja->id,
+        ]));
+
+        // For user2 nothing should have been linked because he had more than 1 job assignment.
+        $this->assertCount(1, $DB->get_records('appraisal_user_assignment', ['userid' => $user2->id]));
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user2->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+
+        // For user3 an empty job assignment should have been created and linked.
+        $jobassignments = $DB->get_records('job_assignment', ['userid' => $user3->id]);
+        $this->assertCount(1, $jobassignments);
+        $user3ja = reset($jobassignments);
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user3->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => $user3ja->id,
+        ]));
     }
 
     public function test_active_appraisal_remove_group () {
