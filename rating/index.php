@@ -131,12 +131,19 @@ if (!$ratings) {
 
         $row = new html_table_row();
         $row->attributes['class'] = 'ratingitemheader';
-        if ($course && $course->id) {
-            $row->cells[] = $OUTPUT->user_picture($rating, array('courseid' => $course->id));
+
+        if ($rating->userdeleted) {
+            $row->cells[] = '';
+            $row->cells[] = get_string('deleteduser', 'rating');
         } else {
-            $row->cells[] = $OUTPUT->user_picture($rating);
+            if ($course && $course->id) {
+                $row->cells[] = $OUTPUT->user_picture($rating, array('courseid' => $course->id));
+            } else {
+                $row->cells[] = $OUTPUT->user_picture($rating);
+            }
+            $row->cells[] = fullname($rating);
         }
-        $row->cells[] = fullname($rating);
+
         if ($rating->rating > $maxrating) {
             $rating->rating = $maxrating;
         }

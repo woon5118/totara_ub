@@ -456,6 +456,8 @@ class rating_manager {
             'ratingarea' => $options->ratingarea,
         );
         $userfields = user_picture::fields('u', null, 'userid');
+        $userfields .= ', u.deleted AS userdeleted';
+
         $sql = "SELECT r.id, r.rating, r.itemid, r.userid, r.timemodified, r.component, r.ratingarea, $userfields
                   FROM {rating} r
              LEFT JOIN {user} u ON r.userid = u.id
