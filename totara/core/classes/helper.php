@@ -73,6 +73,11 @@ final class helper {
         $incorrectperms = [];
         foreach ($iterator as $info) {
             /** @var \SplFileInfo $info */
+            if ($info->isLink()) {
+                // This must be some unsupported custom hack,
+                // standard distribution is not supposed to have any symlinks.
+                continue;
+            }
             $name = $info->getFilename();
             $fullpath = $info->getPathname();
             $relpath = substr($fullpath, strlen($CFG->dirroot) + 1);

@@ -67,6 +67,19 @@ class totara_core_totara_testcase extends advanced_testcase {
     }
 
     /**
+     * Make sure top level plugin directories are not symlinks.
+     */
+    public function test_no_plugin_sumlinks() {
+        $types = core_component::get_plugin_types();
+        foreach ($types as $type => $typedir) {
+            $plugins = core_component::get_plugin_list($type);
+            foreach ($plugins as $name => $plugindir) {
+                $this->assertFalse(is_link($plugindir), "Totara plugins must not be installed via symlinks, you need to fix $plugindir");
+            }
+        }
+    }
+
+    /**
      * Data provider to check visibility of an item.
      *
      * @return array $data Data to be used by test_totara_is_item_visibility_hidden.
