@@ -81,7 +81,7 @@ if (isguestuser()) {
 
     echo $OUTPUT->header();
     $out = html_writer::tag('p', get_string('guestsno', 'facetoface')) . '<br/><br/>' . html_writer::tag('p', get_string('liketologin'));
-    echo $OUTPUT->confirm($out, $loginurl, get_local_referer(false));
+    echo $OUTPUT->confirm($out, $loginurl, get_local_referer(false, $CFG->wwwroot . '/'));
     echo $OUTPUT->footer();
     exit();
 }

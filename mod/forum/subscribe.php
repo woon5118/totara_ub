@@ -213,7 +213,7 @@ if ($issubscribed) {
                     \core\output\notification::NOTIFY_SUCCESS
                 );
         } else {
-            print_error('cannotunsubscribe', 'forum', get_local_referer(false));
+            print_error('cannotunsubscribe', 'forum', get_local_referer(false, $CFG->wwwroot . '/'));
         }
     } else {
         if (\mod_forum\subscriptions::unsubscribe_user_from_discussion($user->id, $discussion, $context)) {
@@ -225,16 +225,16 @@ if ($issubscribed) {
                     \core\output\notification::NOTIFY_SUCCESS
                 );
         } else {
-            print_error('cannotunsubscribe', 'forum', get_local_referer(false));
+            print_error('cannotunsubscribe', 'forum', get_local_referer(false, $CFG->wwwroot . '/'));
         }
     }
 
 } else {  // subscribe
     if (\mod_forum\subscriptions::subscription_disabled($forum) && !has_capability('mod/forum:managesubscriptions', $context)) {
-        print_error('disallowsubscribe', 'forum', get_local_referer(false));
+        print_error('disallowsubscribe', 'forum', get_local_referer(false, $CFG->wwwroot . '/'));
     }
     if (!has_capability('mod/forum:viewdiscussion', $context)) {
-        print_error('noviewdiscussionspermission', 'forum', get_local_referer(false));
+        print_error('noviewdiscussionspermission', 'forum', get_local_referer(false, $CFG->wwwroot . '/'));
     }
     if (is_null($sesskey)) {
         // We came here via link in email.
