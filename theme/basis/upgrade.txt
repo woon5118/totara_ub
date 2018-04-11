@@ -1,5 +1,13 @@
 This file describes API changes for 'theme_basis'.
 
+=== 12.0 ===
+
+* Altered theme/basis/layout/partials/footer.php, removing reference to page_footer_nav
+* Deprecated page_footer_nav.mustage template
+* Deprecated theme_basis_renderer::page_footer_nav()
+* Deprecated theme_basis_renderer::render_page_footer_nav()
+* Deprecated theme_basis\output\page_footer_nav
+
 === 10.0 ===
 
 * Ensured block action icons conform to WCAG AA contrast for text and background
