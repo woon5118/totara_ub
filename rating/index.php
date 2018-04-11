@@ -105,8 +105,6 @@ if (!$ratings) {
     $sorturl->remove_params('sort');
 
     $table = new html_table;
-    $table->cellpadding = 3;
-    $table->cellspacing = 3;
     $table->attributes['class'] = 'generalbox ratingtable';
     $table->head = array(
         '',
@@ -146,7 +144,7 @@ if (!$ratings) {
         $row->cells[] = userdate($rating->timemodified);
         $table->data[] = $row;
     }
-    echo html_writer::table($table);
+    echo $OUTPUT->render($table);
 }
 if ($popup) {
     echo $OUTPUT->close_window_button();
