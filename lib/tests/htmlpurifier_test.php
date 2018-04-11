@@ -40,11 +40,14 @@ class core_htmlpurifier_testcase extends basic_testcase {
      * Verify _blank target is allowed.
      */
     public function test_allow_blank_target() {
-        // See MDL-52651 for an explanation as to why the rel="noreferrer" attribute is expected here.
-        // Also note we do not need to test links with an existing rel attribute as the HTML Purifier is configured to remove
-        // the rel attribute.
+        // Totara: HTMLPurifier adds extra rel attributes automatically.
         $text = '<a href="http://moodle.org" target="_blank">Some link</a>';
         $expected = '<a href="http://moodle.org" target="_blank" rel="noreferrer noopener">Some link</a>';
+        $result = format_text($text, FORMAT_HTML);
+        $this->assertSame($expected, $result);
+
+        $text = '<a href="http://moodle.org">Some link</a>';
+        $expected = '<a href="http://moodle.org">Some link</a>';
         $result = format_text($text, FORMAT_HTML);
         $this->assertSame($expected, $result);
 

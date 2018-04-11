@@ -1917,8 +1917,7 @@ function purify_html($text, $options = array()) {
             // Use the built-in Ruby module to add annotation support.
             $def->manager->addModule(new HTMLPurifier_HTMLModule_Ruby());
 
-            // Use the custom Noreferrer module.
-            $def->manager->addModule(new HTMLPurifier_HTMLModule_Noreferrer());
+            // Totara: HTMLPurifier adds noreferrer and noopener rel automatically.
         }
 
         $purifier = new HTMLPurifier($config);
