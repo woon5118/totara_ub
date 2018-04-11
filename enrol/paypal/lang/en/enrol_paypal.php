@@ -60,3 +60,4 @@ $string['sendpaymentbutton'] = 'Send payment via PayPal';
 $string['status'] = 'Allow PayPal enrolments';
 $string['status_desc'] = 'Allow users to use PayPal to enrol into a course by default.';
 $string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"?';
+$string['userdataitemtransaction_information'] = 'PayPal transaction information';
