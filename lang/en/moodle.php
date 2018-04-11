@@ -1961,6 +1961,7 @@ $string['useraccount'] = 'User account';
 $string['userconfirmed'] = 'Confirmed {$a}';
 $string['useractivity'] = 'Activity';
 $string['userdata'] = 'User data';
+$string['userdataitem-course-request'] = 'Requests for new courses';
 $string['userdataitem-user-customfields_notvisible'] = 'Custom profile fields marked not visible';
 $string['userdataitem-user-customfields_notvisible_help'] = 'This data is not ordinarily visible to the user.';
 $string['userdataitem-user-customfields_uservisible'] = 'Custom profile fields marked visible';
