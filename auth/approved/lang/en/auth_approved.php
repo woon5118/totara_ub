@@ -258,3 +258,6 @@ $string['successpositionbulk'] = 'Bulk set positions for {$a} requests';
 $string['successreject'] = 'Account request "{$a}" was rejected';
 $string['successrejectbulk'] = 'Bulk rejected {$a} requests';
 $string['searchformanager'] = 'Search';
+$string['userdataitemapproval_request'] = 'Approval requests';
+$string['userdataitemapproval_request_snapshot'] = 'Approval request snapshots';
+
