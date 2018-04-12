@@ -182,3 +182,16 @@ Feature: Give or withhold user consent
     And I click on "#guestlogin input[type=submit]" "css_element"
     Then I should see "1 of 2 policies"
     And I should see "Policy 1"
+
+  Scenario: Admin should not view site policy if log in as leaner
+    Given I log in as "admin"
+    And the following "multiversionpolicies" exist in "tool_sitepolicy" plugin:
+      | hasdraft | numpublished | allarchived | title    | languages |statement          | numoptions | consentstatement       | providetext | withholdtext | mandatory |
+      | 0        | 1            | 0           | Policy 1 | en        |Policy 1 statement | 1          | P1 - Consent statement | Yes         | No           | none      |
+    And I navigate to "Users > Accounts > Browse list of users" in site administration
+    And I follow "Learner One"
+    And I follow "Log in as"
+    And I should see "You are logged in as Learner One"
+    When I press "Continue"
+    Then I should see "Current Learning"
+    And I log out

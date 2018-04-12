@@ -30,6 +30,10 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php"));
 $PAGE->set_popup_notification_allowed(false);
 
+if (\core\session\manager::is_loggedinas()) {
+    print_error('nopermissions', 'error', '', 'Site policy');
+}
+
 $language = optional_param('language', '', PARAM_LANG);
 $currentcount = optional_param('currentcount', 1, PARAM_INT);
 $totalcount = optional_param('totalcount', 0, PARAM_INT);

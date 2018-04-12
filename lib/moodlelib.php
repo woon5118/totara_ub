@@ -2829,7 +2829,7 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
     }
 
     // Site policies.
-    if (\tool_sitepolicy\userconsent::is_consent_needed($USER->id)) {
+    if (\tool_sitepolicy\userconsent::is_consent_needed($USER->id) && !\core\session\manager::is_loggedinas()) {
         if ($preventredirect) {
             throw new moodle_exception('sitepolicyconsentpending', 'tool_sitepolicy');
         }
