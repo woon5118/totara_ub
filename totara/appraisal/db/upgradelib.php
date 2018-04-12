@@ -110,3 +110,39 @@ function totara_appraisal_upgrade_fix_inconsistent_multichoice_param1() {
 
     $DB->execute($sql, $params);
 }
+
+/**
+ * TL-17131 Appraisal snapshots not deleted when user is deleted.
+ *
+ * Clears any appraisal snapshots from the files table; these were previously
+ * not removed when a learner's appraisal itself was deleted.
+ */
+function totara_appraisal_remove_orphaned_snapshots() {
+    global $DB;
+
+    // When an appraisal is deleted, records in the appraisal_role_assignment
+    // table are removed but snapshot entries in the files table still link to
+    // these records via the files.itemid column. So this code removes all the
+    // dangling snapshot entries.
+
+    $sql = "
+      SELECT f.component, f.filearea, f.itemid
+        FROM {files} f
+       WHERE f.component = 'totara_appraisal'
+         AND f.filearea like 'snapshot%'
+         AND NOT EXISTS (
+             SELECT 1
+               FROM {appraisal_role_assignment} a
+              WHERE a.id = f.itemid
+       )
+    ";
+
+    $context = context_system::instance()->id;
+    $fs = get_file_storage();
+    $results = $DB->get_recordset_sql($sql);
+
+    foreach($results as $rs) {
+        $fs->delete_area_files($context, $rs->component, $rs->filearea, $rs->itemid);
+    }
+    $results->close();
+}

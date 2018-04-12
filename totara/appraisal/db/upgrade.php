@@ -77,5 +77,14 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017110700, 'totara', 'appraisal');
     }
 
+    // TL-17131 Appraisal snapshots not deleted when user is deleted.
+    if ($oldversion < 2018041600) {
+
+        totara_appraisal_remove_orphaned_snapshots();
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2018041600, 'totara', 'appraisal');
+    }
+
     return true;
 }

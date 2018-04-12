@@ -1052,7 +1052,7 @@ class appraisal {
     public function delete_all_snapshots() {
         $context = context_system::instance();
         $fs = get_file_storage();
-        $fs->delete_area_files($context->id, 'totara_appraisal', 'snapshot_', $this->id);
+        $fs->delete_area_files($context->id, 'totara_appraisal', 'snapshot_'.$this->id);
     }
 
     /**
@@ -1725,7 +1725,7 @@ class appraisal {
                 $DB->delete_records('appraisal_scale_data', array('appraisalroleassignmentid' => $roleassignmentid));
                 $DB->delete_records('appraisal_quest_data_' . $appraisalid, array('appraisalroleassignmentid' => $roleassignmentid));
                 $DB->delete_records('appraisal_stage_data', array('appraisalroleassignmentid' => $roleassignmentid));
-                $fs->delete_area_files($context->id, 'totara_appraisal', 'snapshot_', $appraisalid, $roleassignmentid);
+                $fs->delete_area_files($context->id, 'totara_appraisal', "snapshot_$appraisalid", $roleassignmentid);
             }
 
             $DB->delete_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassignmentid));
