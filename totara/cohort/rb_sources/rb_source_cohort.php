@@ -371,9 +371,7 @@ class rb_source_cohort extends rb_base_source {
      * @return string html link
      */
     public function rb_display_link_cohort_category($categoryname, $row, $isexport = false) {
-        if (empty($categoryname)) {
-            return '';
-        }
+
         $categoryname = format_string($categoryname);
 
         $contextid = $row->context_id;
