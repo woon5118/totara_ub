@@ -50,9 +50,10 @@ class totara_reportbuilder_userdata_scheduled_reports_test extends advanced_test
         /** @var \totara_reportbuilder_generator $rbgen */
         $rbgen = $gen->get_plugin_generator('totara_reportbuilder');
 
-        // 2 users
+        // 3 users
         $user = $gen->create_user();
         $otheruser = $gen->create_user();
+        $thirduser = $gen->create_user();
 
         // Audience
         $cohort = $gen->create_cohort();
@@ -75,6 +76,7 @@ class totara_reportbuilder_userdata_scheduled_reports_test extends advanced_test
             $rbgen->add_scheduled_user($schedule, $user);
             $rbgen->add_scheduled_user($schedule, $otheruser);
         }
+        $rbgen->add_scheduled_user($otherusersched, $thirduser);
 
         $this->assertTrue($DB->record_exists('report_builder_schedule', ['userid' => $user->id]));
 
@@ -164,9 +166,9 @@ class totara_reportbuilder_userdata_scheduled_reports_test extends advanced_test
     }
 
     /**
-     * Test that data are purged correctly
+     * Test that data are exported correctly
      */
-    public function test_purge_count() {
+    public function test_export_count() {
         $seed = (object)$this->seed();
 
         // Run export.
@@ -176,14 +178,16 @@ class totara_reportbuilder_userdata_scheduled_reports_test extends advanced_test
         $this->assertEquals(1, $count);
         $this->assertCount(1, $export->data);
         $data = current($export->data);
+
         $this->assertEquals('Users', $data['reportname']);
         $this->assertEquals($seed->usersearch->name, $data['searchname']);
 
         $this->assertCount(1, $data['audiences']);
         $this->assertEquals($seed->cohort->name, current($data['audiences']));
 
-        $this->assertCount(1, $data['users']);
-        $this->assertEquals(fullname($seed->user), current($data['users']));
+        $this->assertCount(2, $data['users']);
+        $this->assertContains(fullname($seed->user), $data['users']);
+        $this->assertContains(fullname($seed->otheruser), $data['users']);
 
         $this->assertCount(1, $data['external']);
         $this->assertContains('@example.com', current($data['external']));

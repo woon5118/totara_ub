@@ -146,16 +146,17 @@ final class scheduled_reports extends item {
                     'users' => [],
                     'external' => []
                 ];
-                if (!empty($record->cohortname)) {
-                    $result[$record->id]['audiences'][] = $record->cohortname;
-                }
-                if (!empty($record->systemuserid)) {
-                    $result[$record->id]['users'][] = fullname($record);
-                }
-                if (!empty($record->email)) {
-                    $result[$record->id]['external'][] = $record->email;
-                }
             }
+            if (!empty($record->cohortname) && !in_array($record->cohortname, $result[$record->id]['audiences'])) {
+                $result[$record->id]['audiences'][] = $record->cohortname;
+            }
+            if (!empty($record->systemuserid) && !in_array(fullname($record), $result[$record->id]['users'])) {
+                $result[$record->id]['users'][] = fullname($record);
+            }
+            if (!empty($record->email) && !in_array($record->email, $result[$record->id]['external'])) {
+                $result[$record->id]['external'][] = $record->email;
+            }
+
         }
         $export = new \totara_userdata\userdata\export();
         $export->data = $result;
