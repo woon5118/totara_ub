@@ -1805,6 +1805,7 @@ class renderer_base {
             $loader = new \core\output\mustache_filesystem_loader();
             $stringhelper = new \core\output\mustache_string_helper();
             $quotehelper = new \core\output\mustache_quote_helper();
+            $escapehelper = new \core\output\mustache_escape_helper();
             $jshelper = new \core\output\mustache_javascript_helper($this->page);
             $pixhelper = new \core\output\mustache_pix_helper($this);
             $flexhelper = new \core\output\mustache_flex_icon_helper($this);
@@ -1817,7 +1818,9 @@ class renderer_base {
                 'quote' => array($quotehelper, 'quote'),
                 'js' => array($jshelper, 'help'),
                 'pix' => array($pixhelper, 'pix'),
-                'flex_icon' => array($flexhelper, 'flex_icon'));
+                'flex_icon' => array($flexhelper, 'flex_icon'),
+                'esc' => array($escapehelper, 'esc')
+            );
 
             $this->mustache = new Mustache_Engine(array(
                 'cache' => $cachedir,

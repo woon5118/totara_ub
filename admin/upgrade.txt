@@ -1,5 +1,11 @@
 This files describes API changes in /admin/*.
 
+=== 12 ===
+
+* Icon helpers are no longer used in the following templates, icon data is passed via context data:
+** admin/templates/setting_configcolourpicker.mustache
+** admin/templates/setting_emoticons.mustache
+
 === 11 ===
 
 * Hub functionality has been deprecated and will be removed entirely in the next major version.

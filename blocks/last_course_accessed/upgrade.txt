@@ -1,6 +1,11 @@
 This files describes API changes in /blocks/last_course_accessed,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* String helpers are no longer used in the following templates, string data is passed via context data:
+** blocks/last_course_accessed/templates/block.mustache
+
 === 10.1 ===
 
 * updated block.mustache, deprecating 'last_accessed'

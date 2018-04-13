@@ -26,8 +26,9 @@ define([
     'block_totara_featured_links/visibility_form',
     'core/str',
     'core/config',
-    'core/templates'
-], function($, ajax, VisForm, mdlstr, config, templates) {
+    'core/templates',
+    'core/flex_icon'
+], function($, ajax, VisForm, mdlstr, config, templates, flex) {
 
     /* global totaraDialog
               totaraDialog_handler_treeview_multiselect */
@@ -96,7 +97,8 @@ define([
             var elements = $('.selected [id^=item]', this._container);
             elements.each(function() {
 
-                var itemid = $(this).attr('id').split('_');
+                var itemid = $(this).attr('id').split('_'),
+                    name = $(this).find('a').text();
                 itemid = itemid[itemid.length - 1];  // The last item is the actual id.
                 itemid = parseInt(itemid);
 
@@ -105,15 +107,17 @@ define([
                     return;
                 }
 
-                // This will call the function to load and render our template.
-                var context = {cohortid: itemid, name: $(this).find('a').text()};
-                var promise = templates.render('block_totara_featured_links/element_audience_list_item', context);
-                promise.done(function(html) {
+                mdlstr.get_string('delete_audience_rule', 'block_totara_featured_links', name).then(function(str) {
+                    return flex.getIconData('delete', 'core', {alt: str});
+                }).then(function(icon) {
+                    // This will call the function to load and render our template.
+                    var context = {cohortid: itemid, name: name, deleteicon: icon};
+                    return templates.render('block_totara_featured_links/element_audience_list_item', context);
+                }).then(function(html) {
                     VisForm.add_to_audience_list(html);
                     VisForm.add_to_audience_id(itemid);
                     VisForm.add_audience_table_listeners();
                 });
-
             });
             ehandler._dialog.hide();
         };

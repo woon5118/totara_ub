@@ -8,6 +8,27 @@ information provided here is intended especially for developers.
 * $CFG->loginhttps setting was removed, do not use it.
 * $PAGE->https_required() and $PAGE->verify_https_required() are now deprecated, do not use them.
 * $CFG->httpswwwroot is now deprecated and will always contain in the same value as wwwroot.
+* String helpers are no longer used in the following templates, string data is passed via context data:
+** lib/templates/block.mustache
+** lib/templates/loading.mustache
+** lib/templates/modal.mustache
+** lib/templates/progress_bar.mustache
+* Icon helpers are no longer used in the following templates, icon data is passed via context data:
+** lib/form/templates/form_notification.mustache
+** lib/templates/action_menu.mustache
+** lib/templates/action_menu_item.mustache
+** lib/templates/action_menu_link.mustache
+** lib/templates/action_menu_trigger.mustache
+** lib/templates/chooser_item.mustache
+** lib/templates/help_icon.mustache
+** lib/templates/inplace_editable.mustache
+** lib/templates/login.mustache
+** lib/templates/permissionmanager_role.mustache
+* The following templates have been updated:
+** lib/templates/notification_error.mustache
+** lib/templates/notification_info.mustache
+** lib/templates/notification_success.mustache
+** lib/templates/notification_warning.mustache
 
 === 11.0 ===
 

@@ -221,6 +221,8 @@ class inplace_editable implements templatable, renderable {
                 'displayvalue' => (string)$this->displayvalue
             );
         }
+        $icondata = array('alt' => (string)$this->edithint);
+        $icon = flex_icon::get_icon('t/editstring', 'core', $icondata);
 
         return array(
             'component' => $this->component,
@@ -233,6 +235,10 @@ class inplace_editable implements templatable, renderable {
             'type' => $this->type,
             'options' => $this->options,
             'linkeverything' => $this->get_linkeverything() ? 1 : 0,
+            'icon' => array(
+                'template' => $icon->get_template(),
+                'context' => $icon->export_for_template($output)
+            )
         );
     }
 

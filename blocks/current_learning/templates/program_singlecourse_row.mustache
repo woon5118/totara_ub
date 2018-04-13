@@ -65,7 +65,7 @@
 }}
 <li id="block_current_learning-program-{{id}}" class="block_current_learning-item block_current_learning-program">
 <div class="block_current_learning-row-item">
-    <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">{{#flex_icon}}{{icon}}{{/flex_icon}}</span>
+    <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">{{#icondata}}{{#context}}{{> &&template}}{{/context}}{{/icondata}}</span>
     <a href="{{{url_view}}}"><h3>{{{fullname}}}</h3></a>
     <div class="block_current_learning-row-item__status">
         {{#dueinfo}}

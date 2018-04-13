@@ -101,7 +101,7 @@
             <span class="expanded-icon">{{#flex_icon}}expanded{{/flex_icon}}</span>
         </span>
         <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">
-            {{#flex_icon}}{{icon}}{{/flex_icon}}
+            {{#icondata}}{{#context}}{{> &&template}}{{/context}}{{/icondata}}
         </span>
         <a href="{{url_view}}">
             <h3>{{{fullname}}}</h3>
@@ -159,7 +159,7 @@
                 {{#nextsetoperator}}
                     <p class="current_learning-operator">
                         {{#nextseticon}}
-                            {{#flex_icon}}{{nextseticon}}{{/flex_icon}}
+                            {{#flex_icon}}plus{{/flex_icon}}
                         {{/nextseticon}}
                         {{^nextseticon}}
                             <span>{{nextsetoperator}}</span>

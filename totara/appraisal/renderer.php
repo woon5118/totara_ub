@@ -1518,6 +1518,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
 
         if (!empty($stage->timedue)) {
             $context['completeby'] = userdate($stage->timedue, get_string('strftimedate', 'langconfig'));
+            $context['completeby_string'] = get_string('completebydate', 'totara_appraisal', s($context['completeby']));
         }
 
         // Info block (in middle).
@@ -1541,6 +1542,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $context['textstatus'] = get_string('overdue', 'totara_appraisal');
         } else if ($stageinprogress) {
             $stagestatus = 'appraisal-stage-inprogress';
+            $context['status'] = 'spacer';
             $context['textstatus'] = get_string('incomplete', 'totara_appraisal');
         } else if ($stage->is_completed($userassignment)) {
             $stagestatus = 'appraisal-stage-completed';
@@ -1646,9 +1648,16 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             // Better ux element grouping will be better
             $lines[] = $icon . $rolecomplete;
         }
+        $statusflexicon = \core\output\flex_icon::get_icon($context['status']);
+        $this->statusicon = [
+            'template' => $statusflexicon->get_template(),
+            'context' => $statusflexicon->export_for_template($this->output)
+        ];
+
         $context['lines'] = $lines;
         $context['actions'] = $actions;
         $context['cssclass'] = $stagestatus;
+        $context['statusicon'] = $this->statusicon;
 
         return $this->render_from_template('totara_appraisal/stage_brief', $context);
     }

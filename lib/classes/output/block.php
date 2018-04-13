@@ -81,7 +81,11 @@ class block implements renderable {
         }
 
         if ($skiptitle) {
-            $block->accessible_skip = array('id' => $bc->skipid, 'title' => $skiptitle);
+            $block->accessible_skip = array(
+                'id' => $bc->skipid,
+                'title' => $skiptitle,
+                'skiptext' => get_string('skipa', 'access', $skiptitle)
+            );
 
             // @deprecated since Totara 10
             $block->accessible_skip_from = array('href' => '#sb-' . $bc->skipid, 'title' => $skiptitle);

@@ -47,7 +47,17 @@
         "editlabel" : "New name for this",
         "type" : "text",
         "options" : "",
-        "linkeverything": 0
+        "linkeverything": 0,
+        "icon": {
+            "template": "core/flex_icon",
+            "context":     {
+                "identifier" : "edit",
+                "customdata": {
+                    "alt": "Inline edit"
+                },
+                "classes": "fa-edit"
+            }
+        }
     }
 }}
 {{#component}}
@@ -56,7 +66,7 @@
         {{^ linkeverything }}{{{displayvalue}}}{{/ linkeverything }}
         <a href="#" class="quickeditlink" data-inplaceeditablelink="1" title="{{edithint}}">
             {{# linkeverything }}{{{displayvalue}}}{{/ linkeverything }}
-            <span class="quickediticon visibleifjs">{{#pix}}t/editstring,core,{{edithint}}{{/pix}}</span>
+            <span class="quickediticon visibleifjs">{{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}</span>
         </a>
 </span>
 {{#js}}

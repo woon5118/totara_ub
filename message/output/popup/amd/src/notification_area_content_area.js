@@ -24,8 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery', 'core/templates', 'core/notification', 'core/custom_interaction_events',
-        'message_popup/notification_repository', 'message_popup/notification_area_events'],
-    function($, Templates, DebugNotification, CustomEvents, NotificationRepo, NotificationAreaEvents) {
+        'message_popup/notification_repository', 'message_popup/notification_area_events', 'core/str'],
+    function($, Templates, DebugNotification, CustomEvents, NotificationRepo, NotificationAreaEvents, Str) {
 
     var SELECTORS = {
         CONTAINER: '[data-region="notification-area"]',
@@ -176,21 +176,34 @@ define(['jquery', 'core/templates', 'core/notification', 'core/custom_interactio
      * @return {object} jQuery promise
      */
     ContentArea.prototype.showNotification = function(notification) {
-        var headerPromise = Templates.render(TEMPLATES.HEADER, notification).done(function(html) {
-            this.setHeaderHTML(html);
-        }.bind(this));
+        var string_promise = $.Deferred();
 
-        var contentPromise = Templates.render(TEMPLATES.CONTENT, notification).done(function(html) {
-            this.setContentHTML(html);
-        }.bind(this));
+        if (notification.contexturlname) {
+            string_promise = Str.get_string('viewnotificationresource', 'message', notification.contexturlname);
+        } else {
+            string_promise.resolve('');
+        }
 
-        var footerPromise = Templates.render(TEMPLATES.FOOTER, notification).done(function(html) {
-            this.setFooterHTML(html);
-        }.bind(this));
+        return string_promise.then(function (string) {
+            if (string !== '') {
+                notification.str_viewnotificationresource = string;
+            }
+            var headerPromise = Templates.render(TEMPLATES.HEADER, notification).done(function(html) {
+                this.setHeaderHTML(html);
+            }.bind(this));
 
-        return $.when(headerPromise, contentPromise, footerPromise).done(function() {
-            this.show();
-            this.getContainer().trigger(NotificationAreaEvents.notificationShown, [notification]);
+            var contentPromise = Templates.render(TEMPLATES.CONTENT, notification).done(function(html) {
+                this.setContentHTML(html);
+            }.bind(this));
+
+            var footerPromise = Templates.render(TEMPLATES.FOOTER, notification).done(function(html) {
+                this.setFooterHTML(html);
+            }.bind(this));
+
+            return $.when(headerPromise, contentPromise, footerPromise).done(function() {
+                this.show();
+                this.getContainer().trigger(NotificationAreaEvents.notificationShown, [notification]);
+            }.bind(this));
         }.bind(this));
     };
 

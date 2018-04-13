@@ -43,20 +43,25 @@
             }
         ],
         "icon": {
-            "attributes": [
-                {"name": "src", "value": "https://raw.githubusercontent.com/moodle/moodle/master/pix/t/check.png"},
-                {"name": "alt", "value": "Action link's icon"}
-            ]
+            "template": "core/flex_icon",
+            "context": {
+                "identifier" : "edit",
+                "customdata": {
+                    "classes": "custom-class another-custom-class",
+                    "alt": "Settings"
+                },
+                "classes": "fa-edit"
+            }
         },
         "text": "This is an action link"
     }
 }}
 {{^disabled}}
-    <a href="{{{url}}}" id="{{id}}" class="{{classes}}" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}>{{#icon}}{{#pix}}{{key}}, {{component}}, {{{title}}}{{/pix}}{{/icon}}{{{text}}}</a>
+    <a href="{{{url}}}" id="{{id}}" class="{{classes}}" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}>{{#icon}}{{#context}}{{> &&template}}{{/context}}{{/icon}}{{{text}}}</a>
     {{#hasactions}}
         {{> core/actions }}
     {{/hasactions}}
 {{/disabled}}
 {{#disabled}}
-    <span class="currentlink {{classes}}" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}>{{#icon}}{{#pix}}{{key}}, {{component}}, {{{title}}}{{/pix}}{{/icon}}{{{text}}}</span>
+    <span class="currentlink {{classes}}" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}>{{#icon}}{{#context}}{{> &&template}}{{/context}}{{/icon}}{{{text}}}</span>
 {{/disabled}}

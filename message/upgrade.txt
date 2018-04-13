@@ -1,6 +1,13 @@
 This files describes API changes in /message/ messaging system,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* String helpers are no longer used in the following templates, string data is passed via context data:
+** message/templates/message_area_context.mustache
+** message/templates/message_area_messages_area.mustache
+** message/templates/message_area_profile.mustache
+
 === 10 ===
 
 * get_message_processors accepts an addition parameter for testing, which will just reset processor and exit.

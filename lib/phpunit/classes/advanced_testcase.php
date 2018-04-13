@@ -236,38 +236,50 @@ abstract class advanced_testcase extends base_testcase {
      *
      * Discards the debugging message if successful.
      *
-     * @param null|string $debugmessage null means any
+     * @param null|string|array $debugmessages null means any
      * @param null|string $debuglevel null means any
      * @param string $message
      */
-    public function assertDebuggingCalled($debugmessage = null, $debuglevel = null, $message = '') {
+    public function assertDebuggingCalled($debugmessages = null, $debuglevel = null, $message = '') {
         $debugging = $this->getDebuggingMessages();
         $debugdisplaymessage = "\n".phpunit_util::display_debugging_messages(true);
         $this->resetDebugging();
 
+        $expectedmessages = $debugmessages;
+        if (!is_array($expectedmessages)) {
+            $expectedmessages = [$expectedmessages];
+        }
+        $expectedcount = count($expectedmessages);
         $count = count($debugging);
 
-        if ($count == 0) {
+        if ($count === 0) {
             if ($message === '') {
                 $message = 'Expectation failed, debugging() not triggered.';
             }
             $this->fail($message);
         }
-        if ($count > 1) {
+        if ($count !== $expectedcount) {
             if ($message === '') {
-                $message = 'Expectation failed, debugging() triggered '.$count.' times.'.$debugdisplaymessage;
+                $message = 'Expectation failed, debugging() triggered '.$count.' times, expected '.$expectedcount.' times.'.$debugdisplaymessage;
             }
             $this->fail($message);
         }
-        $this->assertEquals(1, $count);
+        $this->assertEquals($expectedcount, $count);
 
-        $message .= $debugdisplaymessage;
-        $debug = reset($debugging);
-        if ($debugmessage !== null) {
-            $this->assertSame($debugmessage, $debug->message, $message);
+        if ($debugmessages !== null) {
+            // Compare messages.
+            $actual = [];
+            foreach ($debugging as $debug) {
+                $actual[] = $debug->message;
+            }
+
+            $this->assertEquals($expectedmessages, $actual, $message . $debugdisplaymessage);
         }
+
         if ($debuglevel !== null) {
-            $this->assertSame($debuglevel, $debug->level, $message);
+            foreach ($debugging as $debug) {
+                $this->assertSame($debuglevel, $debug->level, $message);
+            }
         }
     }
 

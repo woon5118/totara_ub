@@ -1,6 +1,11 @@
 This files describes API changes in tagging, information provided
 here is intended especially for developers.
 
+=== 12 ===
+
+* String helpers are no longer used in the following templates, string data is passed via context data:
+** tag/templates/tagcloud.mustache
+
 === 11 ===
 
 * Updated delete and combine tags buttons to use standard bootstrap 3 markup

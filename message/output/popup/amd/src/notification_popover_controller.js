@@ -232,7 +232,8 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/str', 'core/url',
         if (notifications.length) {
             $.each(notifications, function(index, notification) {
                 // Determine what the offset was when loading this notification.
-                var offset = this.getOffset() - this.limit;
+                var offset = this.getOffset() - this.limit,
+                    string_promise = $.Deferred();
                 // Update the view more url to contain the offset to allow the notifications
                 // page to load to the correct position in the list of notifications.
                 notification.viewmoreurl = URL.relativeUrl('/message/output/popup/notifications.php', {
@@ -240,7 +241,16 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/str', 'core/url',
                     offset: offset,
                 });
 
-                var promise = Templates.render('message_popup/notification_content_item', notification);
+                if (notification.isread) {
+                    string_promise.resolve(notification.subject);
+                } else {
+                    string_promise = Str.get_string('unreadnotification', 'message', notification.subject);
+                }
+
+                var promise = string_promise.then(function (aria_notification) {
+                    notification.aria_viewnotification = aria_notification;
+                    return Templates.render('message_popup/notification_content_item', notification);
+                });
                 promises.push(promise);
 
                 promise.then(function(html, js) {

@@ -47,7 +47,7 @@
     <h2 id="{{id}}_status"></h2>
     <div class="progress progress-striped active">
         <div id="{{id}}_bar" class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{progress}}" style="width:{{progress}}%">
-            <span class="progressbar__text">{{#str}}xpercent, core, {{progress}}{{/str}}</span>
+            <span class="progressbar__text">{{progresstext}}</span>
         </div>
     </div>
     {{#popover}}{{> core/popover}}{{/popover}}

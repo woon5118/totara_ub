@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery', 'core/templates', 'core/notification', 'core/custom_interaction_events',
-        'message_popup/notification_repository', 'message_popup/notification_area_events'],
-    function($, Templates, DebugNotification, CustomEvents, NotificationRepo, NotificationAreaEvents) {
+        'message_popup/notification_repository', 'message_popup/notification_area_events', 'core/str'],
+    function($, Templates, DebugNotification, CustomEvents, NotificationRepo, NotificationAreaEvents, Str) {
 
     var SELECTORS = {
         CONTAINER: '[data-region="notification-area"]',
@@ -315,12 +315,22 @@ define(['jquery', 'core/templates', 'core/notification', 'core/custom_interactio
             $.each(notifications, function(index, notification) {
                 // Need to remove the contexturl so the item isn't rendered
                 // as a link.
-                var contextUrl = notification.contexturl;
+                var contextUrl = notification.contexturl,
+                    string_promise = $.Deferred();
                 delete notification.contexturl;
 
-                var promise = Templates.render(TEMPLATES.NOTIFICATION, notification);
+                if (notification.read) {
+                    string_promise.resolve(notification.subject);
+                } else {
+                    string_promise = Str.get_string('unreadnotification', 'message', notification.subject);
+                }
 
+                var promise = string_promise.then(function (aria_notification) {
+                    notification.aria_viewnotification = aria_notification;
+                    return Templates.render('message_popup/notification_content_item', notification);
+                });
                 promises.push(promise);
+
                 promise.then(function(html, js) {
                     allhtml[index] = html;
                     alljs[index] = js;

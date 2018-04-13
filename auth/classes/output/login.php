@@ -153,7 +153,12 @@ class login implements renderable, templatable {
         global $CFG;
 
         $identityproviders = array_map(function($idp) use ($output) {
-            $idp['icon'] = $idp['icon']->export_for_pix($output);
+            $icon = $idp['icon'];
+            $idp['icon'] = array(
+                'context' => $icon->export_for_template($output),
+                'template' => $icon->get_template($output)
+            );
+            $idp['icon'] = array_merge($idp['icon'], $icon->export_for_pix($output));
             return $idp;
         }, $this->identityproviders);
 

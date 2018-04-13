@@ -4655,10 +4655,15 @@ class admin_setting_emoticons extends admin_setting {
                         $alt = $fields[0]->value;
                     }
                     $icon = new pix_emoticon($fields[1]->value, $alt, $fields[2]->value);
+                    $iconattr = array(
+                        'template' => $icon->get_template(),
+                        'context' => $icon->export_for_template($OUTPUT)
+                    );
+                    $iconattr = array_merge($iconattr, $icon->export_for_pix($OUTPUT));
                 }
                 $context->emoticons[] = [
                     'fields' => $fields,
-                    'icon' => $icon ? $icon->export_for_pix($OUTPUT) : null
+                    'icon' => $icon ? $iconattr : null
                 ];
                 $fields = [];
                 $i = 0;
@@ -9561,12 +9566,17 @@ class admin_setting_configcolourpicker extends admin_setting {
     public function output_html($data, $query = '') {
         global $PAGE, $OUTPUT;
 
-        $icon = new pix_icon('i/loading', get_string('loading', 'admin'), 'moodle', ['class' => 'loadingicon']);
+        $icon = \core\output\flex_icon::get_icon('i/loading', 'moodle', ['class' => 'loadingicon', 'alt' => get_string('loading', 'admin')]);
+        $iconattr = array(
+            'template' => $icon->get_template(),
+            'context' => $icon->export_for_template($OUTPUT)
+        );
+        $iconattr = array_merge($iconattr, $icon->export_for_pix());
         $context = (object) [
             'id' => $this->get_id(),
             'name' => $this->get_full_name(),
             'value' => $data,
-            'icon' => $icon->export_for_pix($OUTPUT),
+            'icon' => $iconattr,
             'haspreviewconfig' => !empty($this->previewconfig),
             'forceltr' => $this->get_force_ltr()
         ];
@@ -9577,7 +9587,6 @@ class admin_setting_configcolourpicker extends admin_setting {
         return format_admin_setting($this, $this->visiblename, $element, $this->description, true, '',
             $this->get_defaultsetting(), $query);
     }
-
 }
 
 

@@ -26,7 +26,7 @@ namespace core_question\output;
 defined('MOODLE_INTERNAL') || die();
 
 use lang_string;
-use pix_icon;
+use \core\output\flex_icon;
 
 
 /**
@@ -45,9 +45,10 @@ class qbank_chooser_item extends \core\output\chooser_item {
      * @param context $context The relevant context.
      */
     public function __construct($qtype, $context) {
-        $icon = new pix_icon('icon', $qtype->local_name(), $qtype->plugin_name(), [
+        $icon = flex_icon::get_icon('icon', $qtype->plugin_name(), [
             'class' => 'icon',
-            'title' => $qtype->local_name()
+            'title' => $qtype->local_name(),
+            'alt' => $qtype->local_name()
         ]);
         $help = new lang_string('pluginnamesummary', $qtype->plugin_name());
         parent::__construct($qtype->plugin_name(), $qtype->menu_name(), $qtype->name(), $icon, $help, $context);

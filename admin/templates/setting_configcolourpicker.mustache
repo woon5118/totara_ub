@@ -32,13 +32,26 @@
         "name": "name0",
         "id": "id0",
         "value": "#555655",
-        "haspreviewconfig": false
+        "haspreviewconfig": false,
+        "icon": {
+            "template": "core/flex_icon",
+            "context": {
+                "identifier" : "edit",
+                "customdata": {
+                    "classes": "custom-class another-custom-class",
+                    "alt": "Settings"
+                },
+                "classes": "fa-edit"
+            }
+        }
     }
 }}
 <div class="form-colourpicker defaultsnext">
     <div class="admin_colourpicker clearfix">
         {{#icon}}
-            {{#pix}} {{key}}, {{component}}, {{{title}}} {{/pix}}
+            {{#context}}
+                {{> &&template}}
+            {{/context}}
         {{/icon}}
     </div>
     <input type="text" name="{{name}}" id="{{id}}" value="{{value}}" size="12" class="text-ltr">

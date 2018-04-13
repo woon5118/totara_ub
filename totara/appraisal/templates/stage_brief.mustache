@@ -32,6 +32,7 @@
 
     Context variables required for this template:
     * rule text the text of the rule to display
+    * statusicon flex icon context
 
     Example context (json):
     {
@@ -48,11 +49,7 @@
 <div class="appraisal-stage {{cssclass}}">
     <div class="appraisal-stagetitle">
         <h3>{{name}}</h3>
-        {{#completeby}}
-            <div>
-                {{#str}}completebydate, totara_appraisal, {{completeby}}{{/str}}
-            </div>
-        {{/completeby}}
+        {{#completeby}}<div>{{{completeby_string}}}</div>{{/completeby}}
     </div>
     <div class="appraisal-stageinfo">
         <h4>{{#str}}requirements, totara_appraisal{{/str}}</h4>
@@ -63,7 +60,7 @@
     </div>
     {{{actions}}}
     <div class="appraisal-stagestate">
-        {{#status}}{{#flex_icon}} {{status}}, {}{{/flex_icon}}{{/status}}
+        {{#statusicon}}{{#context}}{{> &&template }}{{/context}}{{/statusicon}}
         <span class="appraisal-statetext">{{textstatus}}</span>
     </div>
 </div>

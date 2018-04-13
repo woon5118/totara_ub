@@ -170,6 +170,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/str',
 
         if (messages.length) {
             $.each(messages, function(index, message) {
+                var strkey = '';
                 message.contexturl = URL.relativeUrl('/message/index.php', {
                     user: this.userId,
                     id: message.userid,
@@ -179,7 +180,16 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/str',
                     id: message.userid,
                 });
 
-                var promise = Templates.render('message_popup/message_content_item', message);
+                if (message.isread) {
+                    strkey = 'viewmessageswith';
+                } else {
+                    strkey = 'viewunreadmessageswith';
+                }
+
+                var promise = Str.get_string(strkey, 'message', message.fullname).then(function(viewmessageswith) {
+                    message.aria_viewmessageswith = viewmessageswith;
+                    return Templates.render('message_popup/message_content_item', message);
+                });
                 promises.push(promise);
 
                 promise.then(function(html, js) {

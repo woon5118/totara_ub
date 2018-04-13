@@ -124,10 +124,13 @@ class grading_app implements templatable, renderable {
 
         $time = time();
         $export->count = count($export->participants);
+        $strparam = array('x' => $export->index, 'y' => $export->count);
+        $export->xofy = get_string('xofy', 'mod_assign', $strparam);
         $export->coursename = $this->assignment->get_course_context()->get_context_name();
         $export->caneditsettings = has_capability('mod/assign:addinstance', $this->assignment->get_context());
         $export->duedate = $this->assignment->get_instance()->duedate;
         $export->duedatestr = userdate($this->assignment->get_instance()->duedate);
+        $export->duedatedisplay = get_string('duedatecolon', 'mod_assign', $export->duedatestr);
 
         // Time remaining.
         $due = '';

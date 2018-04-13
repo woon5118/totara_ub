@@ -122,7 +122,10 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
 
             // Show the profile.
             return promises[0].then(function(data) {
-                return Templates.render('core_message/message_area_profile', data);
+                return Str.get_string('pictureof', 'core', data.fullname).then(function(pictureof) {
+                    data.str_pictureof = pictureof;
+                    return Templates.render('core_message/message_area_profile', data);
+                });
             }).then(function(html, js) {
                 Templates.replaceNodeContents(this.messageArea.find(SELECTORS.MESSAGESAREA), html, js);
             }.bind(this)).fail(Notification.exception);

@@ -107,9 +107,16 @@ class MoodleQuickForm_form_notification extends HTML_QuickForm_static implements
     }
 
     public function export_for_template(renderer_base $output) {
+        $alertflexicon = \core\output\flex_icon::get_icon('notification-' . $this->icontype);
+        $this->alerticon = [
+            'template' => $alertflexicon->get_template(),
+            'context' => $alertflexicon->export_for_template($output)
+        ];
+
         $context = $this->export_for_template_base($output);
         $context['level'] = $this->messagetype;
         $context['iconlevel'] = $this->icontype;
+        $context['alerticon'] = $this->alerticon;
         $context['message'] = $this->messagetext;
         $context['notifyid'] = $context['id'] . '_notify';
 

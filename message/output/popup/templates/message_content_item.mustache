@@ -51,8 +51,7 @@
     data-region="message-content-item-container"
     role="listitem"
     href="{{{contexturl}}}"
-    {{^isread}}aria-label="{{#str}} viewunreadmessageswith, message, {{fullname}} {{/str}}"{{/isread}}
-    {{#isread}}aria-label="{{#str}} viewmessageswith, message, {{fullname}} {{/str}}"{{/isread}}
+    {{#aria_viewmessageswith}}aria-label="{{.}}"{{/aria_viewmessageswith}}
     tabindex="0">
 
     <div class="content-item">

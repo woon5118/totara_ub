@@ -89,6 +89,7 @@ class tagcloud implements templatable {
             if (!empty($tag->count)) {
                 $this->tagset[$idx]->count = $tag->count;
                 $this->tagset[$idx]->size = (int)($tag->count / $maxcount * 20);
+                $this->tagset[$idx]->tagcountstring = get_string('numberofentries', 'blog', $tag->count);
             }
         }
 
@@ -115,6 +116,7 @@ class tagcloud implements templatable {
             'tags' => $this->tagset,
             'tagscount' => $cnt,
             'totalcount' => $this->totalcount,
+            'overflowstring' => get_string('showingfirsttags', 'core_tag', $cnt),
             'overflow' => ($this->totalcount > $cnt) ? 1 : 0,
         );
     }

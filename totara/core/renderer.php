@@ -227,6 +227,7 @@ class totara_core_renderer extends plugin_renderer_base {
 
         $data = new stdClass();
         $data->numberinteam = $numteammembers;
+        $data->numberinteamstring = get_string('numberofstaff', 'totara_core', $numteammembers);
         $data->href = (string) new moodle_url('/my/teammembers.php');
 
         return $this->output->render_from_template('totara_core/my_team_nav', $data);
@@ -278,9 +279,17 @@ class totara_core_renderer extends plugin_renderer_base {
             // Check url property is set.
             if (isset($report->url)) {
                 // Escaping is done in the mustache template, so no need to do it in format string
-                $report_data = array ('name' => format_string($report->fullname, true, array('escape' => false)), 'href' => $report->url);
+                $report_data = array ('name' => format_string($report->fullname), 'href' => $report->url);
 
                 if ($canedit) {
+                    $icon_params = array(
+                        'alt' => get_string('editreport', 'totara_reportbuilder', $report->fullname)
+                    );
+                    $icon = \core\output\flex_icon::get_icon('t/edit', 'core', $icon_params);
+                    $report_data['icon'] = array(
+                        'template' => $icon->get_template(),
+                        'context' => $icon->export_for_template($this)
+                    );
                     $report_data['edit_href'] = (string) new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
                 }
 

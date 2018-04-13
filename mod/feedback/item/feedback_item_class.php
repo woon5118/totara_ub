@@ -215,7 +215,7 @@ abstract class feedback_item_base {
         $strupdate = get_string('edit_item', 'feedback');
         $actions['update'] = new action_menu_link_secondary(
             new moodle_url('/mod/feedback/edit_item.php', array('id' => $item->id)),
-            new pix_icon('t/edit', $strupdate, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            \core\output\flex_icon::get_icon('t/edit', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $strupdate)),
             $strupdate,
             array('class' => 'editing_update', 'data-action' => 'update')
         );
@@ -231,7 +231,7 @@ abstract class feedback_item_base {
             $actions['required'] = new action_menu_link_secondary(
                 new moodle_url('/mod/feedback/edit.php', array('id' => $cm->id,
                     'switchitemrequired' => $item->id, 'sesskey' => sesskey())),
-                new pix_icon($buttonimg, $buttontitle, 'feedback', array('class' => 'iconsmall', 'title' => '')),
+                \core\output\flex_icon::get_icon($buttonimg, 'feedback', array('class' => 'iconsmall', 'title' => '', 'alt' => $buttontitle)),
                 $buttontitle,
                 array('class' => 'editing_togglerequired', 'data-action' => 'togglerequired')
             );
@@ -240,7 +240,7 @@ abstract class feedback_item_base {
         $strdelete = get_string('delete_item', 'feedback');
         $actions['delete'] = new action_menu_link_secondary(
             new moodle_url('/mod/feedback/edit.php', array('id' => $cm->id, 'deleteitem' => $item->id, 'sesskey' => sesskey())),
-            new pix_icon('t/delete', $strdelete, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            \core\output\flex_icon::get_icon('t/delete', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $strdelete)),
             $strdelete,
             array('class' => 'editing_delete', 'data-action' => 'delete')
         );
@@ -314,7 +314,7 @@ class feedback_item_pagebreak extends feedback_item_base {
         $strdelete = get_string('delete_pagebreak', 'feedback');
         $actions['delete'] = new action_menu_link_secondary(
             new moodle_url('/mod/feedback/edit.php', array('id' => $cm->id, 'deleteitem' => $item->id, 'sesskey' => sesskey())),
-            new pix_icon('t/delete', $strdelete, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            \core\output\flex_icon::get_icon('t/delete', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $strdelete)),
             $strdelete,
             array('class' => 'editing_delete', 'data-action' => 'delete')
         );

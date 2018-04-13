@@ -60,8 +60,7 @@
     {{^contexturl}}
     <div tabindex="0"
     {{/contexturl}}
-        {{#read}}aria-label="{{subject}}"{{/read}}
-        {{^read}}aria-label="{{#str}} unreadnotification, message, {{subject}} {{/str}}"{{/read}}>
+        {{#aria_viewnotification}}aria-label="{{.}}"{{/aria_viewnotification}}>
 
         <div class="content-item-body">
             <div class="notification-image">

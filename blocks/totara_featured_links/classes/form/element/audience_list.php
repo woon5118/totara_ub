@@ -104,11 +104,19 @@ class audience_list extends static_html {
                 $results[] = (object)['cohortid' => $id];
             }
         }
+        $renderer = $PAGE->get_renderer('core');
         foreach ($results as $result) {
             $data = self::get_audience_data($result->cohortid);
-            $items[] = ['name' => $data['name'], 'cohortid' => $result->cohortid, 'num_learners' => $data['learners']];
+            $deleteflexicon = \core\output\flex_icon::get_icon('delete', 'core', [
+                'alt'=> get_string('delete_audience_rule', 'block_totara_featured_links', $data['name'])
+            ]);
+            $data['deleteicon'] = [
+                'template' => $deleteflexicon->get_template(),
+                'context' => $deleteflexicon->export_for_template($renderer)
+            ];
+
+            $items[] = ['name' => $data['name'], 'cohortid' => $result->cohortid, 'num_learners' => $data['learners'], 'deleteicon' => $data['deleteicon']];
         }
-        $renderer = $PAGE->get_renderer('core');
         return $renderer->render_from_template(
             'block_totara_featured_links/element_audience_list', [
                 'name' => $this->get_name(),

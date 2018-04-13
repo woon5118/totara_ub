@@ -571,6 +571,7 @@ class document implements \renderable, \templatable {
             'componentname' => $componentname,
             'areaname' => $areaname,
             'courseurl' => course_get_url($this->get('courseid')),
+            'incoursenane' => get_string('incourse', 'search', format_string($this->get('coursefullname'), true, array('context' => $this->get('contextid')))),
             'coursefullname' => format_string($this->get('coursefullname'), true, array('context' => $this->get('contextid'))),
             'modified' => userdate($this->get('modified')),
             'title' => ($title !== '') ? $title : get_string('notitle', 'search'),
@@ -594,12 +595,14 @@ class document implements \renderable, \templatable {
             } else {
                 $file = reset($files);
                 $data['filename'] = format_string($file->get_filename(), true, array('context' => $this->get('contextid')));
+                $data['matchingfilename'] = get_string('matchingfile', 'search', $data['filename']);
             }
         }
 
         if ($this->is_set('userid')) {
             $data['userurl'] = new \moodle_url('/user/view.php', array('id' => $this->get('userid'), 'course' => $this->get('courseid')));
             $data['userfullname'] = format_string($this->get('userfullname'), true, array('context' => $this->get('contextid')));
+            $data['bynameuser'] = get_string('byname', 'moodle', $data['userfullname']);
         }
 
         return $data;

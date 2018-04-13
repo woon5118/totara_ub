@@ -19,6 +19,9 @@
 
     Help icon.
 
+    Context variables required for this template:
+    * helpicon flex icon context
+
     Example context (json):
     {
         "title": "Help with something",
@@ -35,5 +38,5 @@
     }
 }}
 <span class="helptooltip">
-    <a href="{{url}}" title={{#quote}}{{title}}{{/quote}} aria-haspopup="true" target="_blank">{{#icon}}{{#flex_icon}}help, {"alt":"{{alt}}"} {{/flex_icon}}{{/icon}}{{#linktext}}{{.}}{{/linktext}}</a>
+    <a href="{{url}}" title={{#quote}}{{title}}{{/quote}} aria-haspopup="true" target="_blank">{{#helpicon}}{{#context}}{{> &&template }}{{/context}}{{/helpicon}}{{#linktext}}{{.}}{{/linktext}}</a>
 </span>

@@ -85,7 +85,12 @@ class chooser_item implements renderable, templatable {
         $data->id = $this->id;
         $data->label = $this->label;
         $data->value = $this->value;
-        $data->icon = $this->icon->export_for_pix($output); // Totara: we must use pix helper for all mod icons!
+        $icon = array(
+            'template' => $this->icon->get_template(),
+            'context' => $this->icon->export_for_template($output)
+        );
+        $icon = array_merge($icon, $this->icon->export_for_pix($output));
+        $data->icon = $icon;
 
         $options = new stdClass();
         $options->trusted = false;

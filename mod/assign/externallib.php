@@ -2747,6 +2747,8 @@ class mod_assign_external extends external_api {
             throw new moodle_exception('usernotincourse');
         }
 
+        $duedatestr = userdate($assign->get_instance()->duedate, get_string('strftimedatetime', 'langconfig'));
+
         $return = array(
             'id' => $participant->id,
             'fullname' => $participant->fullname,
@@ -2756,7 +2758,8 @@ class mod_assign_external extends external_api {
             'allowsubmissionsfromdate' => $assign->get_instance()->allowsubmissionsfromdate,
             'duedate' => $assign->get_instance()->duedate,
             'cutoffdate' => $assign->get_instance()->cutoffdate,
-            'duedatestr' => userdate($assign->get_instance()->duedate, get_string('strftimedatetime', 'langconfig')),
+            'duedatestr' => $duedatestr,
+            'duedatedisplay' => get_string('duedatecolon', 'mod_assign', $duedatestr)
         );
 
         if (!empty($participant->groupid)) {

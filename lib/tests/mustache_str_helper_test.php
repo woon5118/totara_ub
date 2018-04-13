@@ -23,82 +23,510 @@
  * @package   core_output
  */
 
-use core\output\mustache_string_helper;
-
 defined('MOODLE_INTERNAL') || die();
 
-class mustache_string_helper_testcase extends basic_testcase {
+class mustache_string_helper_testcase extends advanced_testcase {
 
     /**
-     * @var core_renderer
+     * Creates a new mustache instance, cloned from the real one, ready for testing.
+     *
+     * @return array
      */
-    protected static $renderer;
+    private static function get_mustache() {
+
+        $page = new \moodle_page();
+        $renderer = $page->get_renderer('core');
+        $reflection = new ReflectionMethod($renderer, 'get_mustache');
+        $reflection->setAccessible(true);
+        /** @var Mustache_Engine $mustache */
+        $mustache = $reflection->invoke($renderer);
+        // Clone it, we want the real mustache loader to still have access to the templates.
+        $mustache = clone($mustache);
+        // Set a new loader so that we can add templates for testing.
+        $loader = new Mustache_Loader_ArrayLoader([]);
+        $mustache->setLoader($loader);
+        return [$mustache, $loader, $renderer, $page];
+    }
 
     /**
-     * @var \Mustache_Engine
+     * Test the get_mustache method returns what we require.
+     *
+     * @return array
      */
-    protected static $engine;
+    public function test_get_mustache() {
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
+        self::assertInstanceOf(Mustache_Engine::class, $mustache);
+        self::assertInstanceOf(Mustache_Loader_ArrayLoader::class, $loader);
+        self::assertInstanceOf(core_renderer::class, $renderer);
+        self::assertInstanceOf(moodle_page::class, $page);
+        return [$mustache, $loader, $renderer, $page];
+    }
 
+    /**
+     * @depends test_get_mustache
+     * @param array $data
+     */
+    public function test_valid_usage($data) {
+        /**
+         * @var Mustache_Engine $mustache
+         * @var Mustache_Loader_ArrayLoader $loader
+         * @var core_renderer $renderer
+         * @var moodle_page $page
+         */
+        list($mustache, $loader, $renderer, $page) = $data;
 
-    public static function setUpBeforeClass() {
+        // Identifier only.
+        $loader->setTemplate('test', '{{#str}}viewallcourses{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses'),
+            $mustache->render('test')
+        );
 
+        // Identifier only: variable spacing
+        $loader->setTemplate('test', '{{# str }} viewallcourses {{/ str }}');
+        $this->assertEquals(
+            get_string('viewallcourses'),
+            $mustache->render('test')
+        );
+
+        // Identifier + component.
+        $loader->setTemplate('test', '{{#str}}viewallcourses,core{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses', 'core'),
+            $mustache->render('test')
+        );
+
+        // Identifier + component alt.
+        $loader->setTemplate('test', '{{#str}}viewallcourses,moodle{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses', 'moodle'),
+            $mustache->render('test')
+        );
+
+        // Identifier + component + $a identifier
+        $loader->setTemplate('test', '{{#str}}added,core,delete{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test')
+        );
+
+        // Identifier + component + $a identifier + $a component
+        $loader->setTemplate('test', '{{#str}}added,core,delete,core{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test')
+        );
+
+        // Identifier + component + $a identifier + $a component: Varied spacing 1
+        $loader->setTemplate('test', '{{#str}} added , core , delete , core {{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test')
+        );
+
+        // Identifier + component + $a identifier + $a component: Varied spacing 2
+        $loader->setTemplate('test', '{{# str }}  added  ,  core  ,  delete  ,  core  {{/ str }}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test')
+        );
+
+        // Identifier + component + $a identifier + $a component: Varied spacing 3
+        $loader->setTemplate('test', '{{#  str  }}  added  ,  core  ,  delete  ,  core  {{/  str  }}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test')
+        );
+
+        // Variable identifier escaped.
+        $loader->setTemplate('test', '{{#str}}{{identifier}}{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses'),
+            $mustache->render('test', ['identifier' => 'viewallcourses'])
+        );
+
+        // Variable identifier not escaped.
+        $loader->setTemplate('test', '{{#str}}{{{identifier}}}{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses'),
+            $mustache->render('test', ['identifier' => 'viewallcourses'])
+        );
+
+        // Variable identifier + variable component
+        $loader->setTemplate('test', '{{#str}}{{identifier}},{{component}}{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses'),
+            $mustache->render('test', ['identifier' => 'viewallcourses', 'component' => 'moodle'])
+        );
+
+        // Variable identifier + variable component escaped
+        $loader->setTemplate('test', '{{#str}}{{identifier}}, {{{component}}}{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses'),
+            $mustache->render('test', ['identifier' => 'viewallcourses', 'component' => 'moodle'])
+        );
+
+        // Variable identifier escaped + variable component escaped
+        $loader->setTemplate('test', '{{#str}}{{{identifier}}}, {{{component}}}{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses'),
+            $mustache->render('test', ['identifier' => 'viewallcourses', 'component' => 'moodle'])
+        );
+
+        // Variable identifier + variable component + variable alt
+        $loader->setTemplate('test', '{{#str}}{{identifier}}, {{component}}, viewallcourses{{/str}}');
+        $this->assertEquals(
+            get_string('added', '', get_string('viewallcourses')),
+            $mustache->render('test', ['identifier' => 'added', 'component' => 'moodle'])
+        );
+
+        // Variable identifier + variable component + variable alt: Variable spacing 1
+        $loader->setTemplate('test', '{{#str}} {{identifier}} , {{component}} , viewallcourses {{/str}}');
+        $this->assertEquals(
+            get_string('added', '', get_string('viewallcourses')),
+            $mustache->render('test', ['identifier' => 'added', 'component' => 'moodle'])
+        );
+
+        // Variable identifier + variable component + variable alt: Variable spacing 2
+        $loader->setTemplate('test', '{{#  str  }}  {{identifier}}  ,  {{component}}  ,  viewallcourses  {{/  str  }}');
+        $this->assertEquals(
+            get_string('added', '', get_string('viewallcourses')),
+            $mustache->render('test', ['identifier' => 'added', 'component' => 'moodle'])
+        );
+    }
+
+    /**
+     * @depends test_get_mustache
+     * @param array $data
+     */
+    public function test_legacy_usage($data) {
+        /**
+         * @var Mustache_Engine $mustache
+         * @var Mustache_Loader_ArrayLoader $loader
+         * @var core_renderer $renderer
+         * @var moodle_page $page
+         */
+        list($mustache, $loader, $renderer, $page) = $data;
+
+        // Identifier + component + variable $a
+        $loader->setTemplate('test', '{{#str}}added,core,{{var}}{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test', ['var' => get_string('delete')])
+        );
+        $this->assertDebuggingCalled('Legacy string helper API in use, this will not be supported in the future.');
+
+        // Variable identifier + variable component + variable alt escaped
+        $loader->setTemplate('test', '{{#str}}{{identifier}}, {{component}}, {{{alt}}}{{/str}}');
+        $this->assertEquals(
+            get_string('added', '', get_string('viewallcourses')),
+            $mustache->render('test', ['identifier' => 'added', 'component' => 'moodle', 'alt' => get_string('viewallcourses')])
+        );
+        $this->assertDebuggingCalled('Legacy string helper API in use, this will not be supported in the future.');
+
+        // Identifier + component + JSON encoded $a containing multiple properties.
+        $data = ['thing' => 'pennies', 'count' => 6];
+        $loader->setTemplate('test', '{{#str}}displayingfirst,core,'.json_encode($data).'{{/str}}');
+        $this->assertEquals(
+            get_string('displayingfirst', 'core', $data),
+            $mustache->render('test')
+        );
+        $this->assertDebuggingCalled('Legacy string helper API in use, this will not be supported in the future.');
+
+        // Recursive string helpers: str + str
+        $loader->setTemplate('test', '{{#str}}added,core,{{#str}}delete{{/str}}{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', ''),
+            $mustache->render('test')
+        );
+        $this->assertDebuggingCalled([
+            'Escaped content contains unexpected mustache processing queues. It will be lost.',
+            'Legacy string helper API in use, this will not be supported in the future.'
+        ]);
+
+        // Recursive helpers: str + flex + str
+        $loader->setTemplate('test', '{{#str}}added,core,{{#flex_icon}}permissions-check,delete{{/flex_icon}}{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', ''),
+            $mustache->render('test')
+        );
+        $this->assertDebuggingCalled([
+            'Escaped content contains unexpected mustache processing queues. It will be lost.',
+            'Legacy string helper API in use, this will not be supported in the future.'
+        ]);
+
+        // Invalid string identifier during variable substitution.
+        $loader->setTemplate('test', '{{#str}}{{test}}{{/str}}');
+        $this->assertEquals(
+            '',
+            $mustache->render('test', ['test' => 'fake string id'])
+        );
+        $this->assertDebuggingCalled([
+            'Invalid identifier for string helper must be a string identifier.'
+        ]);
+
+        // Invalid string identifier during variable substitution.
+        $loader->setTemplate('test', '{{#str}}viewallcourses,{{test}}{{/str}}');
+        $this->assertEquals(
+            get_string('viewallcourses', 'core'),
+            $mustache->render('test', ['test' => 'fake string component'])
+        );
+        $this->assertDebuggingCalled([
+            'Invalid component for string helper must be a string component.'
+        ]);
+
+        // Recursive helpers: str + js
+        $loader->setTemplate('test', '{{#str}}added,core,{{#js}}alert(window.location);{{/js}}{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', ''),
+            $mustache->render('test')
+        );
+        $this->assertDebuggingCalled([
+            'Escaped content contains unexpected mustache processing queues. It will be lost.',
+            'Legacy string helper API in use, this will not be supported in the future.'
+        ]);
+        $this->assertNotContains('alert(window.location);', $page->requires->get_end_code());
+
+        // Odd mix of content.
+        $loader->setTemplate('test', '{{#str}} {{identifier}} , {{component}} , {test}, core {{/str}}');
+        $this->assertEquals(
+            get_string('added', '', null),
+            $mustache->render('test', ['identifier' => 'added', 'component' => 'moodle'])
+        );
+        $this->assertDebuggingCalled('Invalid $a identifier for string helper must be a string identifier.');
+    }
+
+    /**
+     * @depends test_get_mustache
+     * @param array $data
+     */
+    public function test_excess_arguments($data) {
+        /**
+         * @var Mustache_Engine $mustache
+         * @var Mustache_Loader_ArrayLoader $loader
+         * @var core_renderer $renderer
+         * @var moodle_page $page
+         */
+        list($mustache, $loader, $renderer, $page) = $data;
+
+        // One additional argument.
+        $loader->setTemplate('test', '{{#str}}added,core,delete,core,mystery{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test', ['var' => get_string('delete')])
+        );
+        $this->assertDebuggingCalled('Unexpected number of arguments, 1 too many');
+
+        // Two additional arguments.
+        $loader->setTemplate('test', '{{#str}}added,core,delete,core,one,two{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test', ['var' => get_string('delete')])
+        );
+        $this->assertDebuggingCalled('Unexpected number of arguments, 2 too many');
+    }
+
+    /**
+     * @depends test_get_mustache
+     * @param array $data
+     */
+    public function test_non_conforming_a_string_identifier($data) {
+        /**
+         * @var Mustache_Engine $mustache
+         * @var Mustache_Loader_ArrayLoader $loader
+         * @var core_renderer $renderer
+         * @var moodle_page $page
+         */
+        list($mustache, $loader, $renderer, $page) = $data;
+
+        $loader->setTemplate('test', '{{#str}}added,core,test case{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', null),
+            $mustache->render('test')
+        );
+        $this->assertDebuggingCalled('Invalid $a identifier for string helper must be a string identifier.');
+    }
+
+    /**
+     * @depends test_get_mustache
+     * @param array $data
+     */
+    public function test_non_conforming_a_string_component($data) {
+        /**
+         * @var Mustache_Engine $mustache
+         * @var Mustache_Loader_ArrayLoader $loader
+         * @var core_renderer $renderer
+         * @var moodle_page $page
+         */
+        list($mustache, $loader, $renderer, $page) = $data;
+
+        $loader->setTemplate('test', '{{#str}}added,core,delete,test case{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test')
+        );
+        $this->assertDebuggingCalled('Invalid $a component for string helper must be a string component.');
+    }
+
+    public function test_no_exploitable_string_helper_uses() {
         global $CFG;
 
-        require_once("{$CFG->dirroot}/lib/mustache/src/Mustache/Autoloader.php");
-        Mustache_Autoloader::register();
+        $dir_iterator = new RecursiveDirectoryIterator($CFG->dirroot);
+        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
-        self::$renderer = new \core_renderer(new moodle_page(), '/');
-        // Get the engine from the renderer. We do this once cause its mad.
-        $class = new ReflectionClass(self::$renderer);
-        $method = $class->getMethod('get_mustache');
-        $method->setAccessible(true);
-        self::$engine = $method->invoke(self::$renderer);
+        // OK, so we are about to scan all mustache templates to look for abuses.
+        // There should be none, but if there are valid cases that are found to be false positive then we
+        // can list them here and know that they have been manually validated as safe.
+        // If you are adding to this list you need approval from the security experts.
+        $whitelist = [
+            $CFG->dirroot . '/lib/templates/test.mustache', // A mustache test file. Must not contain anything exploitable.
+            $CFG->dirroot . '/totara/core/templates/progressbar.mustache', // Deprecated since Totara 12.
+            $CFG->dirroot . '/totara/core/templates/errorlog_link.mustache', // Deprecated since Totara 12.
+        ];
+
+        $recursivehelpers = [];
+        foreach ($iterator as $file) {
+            /** @var SplFileInfo $file */
+            if ($file->isFile() && $file->getExtension() === 'mustache') {
+                $path = $file->getPathname();
+                $whitelistkey = array_search($path, $whitelist);
+                if (!is_readable($path)) {
+                    $this->fail('Mustache template is not readable by unit test suite "'.$path.'"');
+                }
+                $content = file_get_contents($path);
+                $content = str_replace("\n", '', $content);
+                $result = self::has_str_helper_containing_recursive_helpers($content);
+                if ($result) {
+                    if ($whitelistkey !== false) {
+                        // It's OK, its on the whitelist.
+                        unset($whitelist[$whitelistkey]);
+                        continue;
+                    }
+                    $recursivehelpers[] = str_replace($CFG->dirroot, '', $path).' :: '.$result;
+                }
+                $result = self::has_str_helper_containing_variables($content);
+                if ($result) {
+                    if ($whitelistkey !== false) {
+                        // It's OK, its on the whitelist.
+                        unset($whitelist[$whitelistkey]);
+                        continue;
+                    }
+                    $variablesinhelpers[] = str_replace($CFG->dirroot, '', $path).' :: '.$result;
+                }
+            }
+        }
+
+        if (!empty($recursivehelpers)) {
+            $this->fail('Templates containing string helper uses which contain recursive helper calls found'."\n * ".join("\n * ", $recursivehelpers));
+        }
+        if (!empty($variablesinhelpers)) {
+            $this->fail('Templates containing variables in string helpers.'."\n * ".join("\n * ", $variablesinhelpers));
+        }
+        if (!empty($whitelist)) {
+            $this->fail('Items on the whitelist were not found to contain vulnerabilities.'."\n".join("\n", $whitelist));
+        }
     }
 
-    /**
-     * Returns a LambdaHelper populated with the given contextdata.
-     *
-     * @param array|stdClass $contextdata
-     * @return Mustache_LambdaHelper
-     */
-    protected function get_lambda_helper($contextdata = []) {
-        return new \Mustache_LambdaHelper(self::$engine, new \Mustache_Context($contextdata));
+    public function test_has_str_helper_containing_variables() {
+        // None.
+        self::assertFalse(self::has_str_helper_containing_variables(''));
+        self::assertFalse(self::has_str_helper_containing_variables('test'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{test}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{{test}}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{#str}}test{{/str}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{#pix}}test{{/pix}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{#str}}  test  {{/str}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{#str}}{test}{{/str}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{#pix}}{test}{{/pix}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{#pix}}{{test}}{{/pix}}'));
+        self::assertFalse(self::has_str_helper_containing_variables('#str{{test}}str'));
+        self::assertFalse(self::has_str_helper_containing_variables('{{str}}{{test}}{{str}}'));
+
+        // One.
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#str}}{{test}}{{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{# str }} {{ test }} {{/ str }}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#  str  }} {{  test  }}  {{/  str  }}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#str}}{{{test}}}{{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#str}}{{{{test}}}}{{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#str}}  {{test}}  {{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#str}}  {{{test}}}  {{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#str}}  {{{{test}}}}  {{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_variables('{{#str}}{{test}}{{/str}}{{#pix}}test{{/pix}}'));
+
+        // Multiple.
+        self::assertSame(2, self::has_str_helper_containing_variables('{{#str}}{{test}}{{/str}}{{#str}}{{test}}{{/str}}'));
+        self::assertSame(3, self::has_str_helper_containing_variables('{{#str}} {{test}}, {{test}} {{/str}} {{#str}} {{test}} {{/str}}'));
+        self::assertSame(3, self::has_str_helper_containing_variables('{{# str }} {{ test }}, {{ test }} {{/ str }} {{# str }} {{ test }} {{/ str }}'));
     }
 
-    /**
-     * It should generate the same output as rendering the renderable without customdata.
-     *
-     * @covers \core\output\mustache_string_helper::__construct
-     * @covers \core\output\mustache_string_helper::string
-     */
-    public function test_string_helper() {
-        $mustachehelper = new mustache_string_helper(self::$renderer);
-        $string = 'viewallcourses'; // Some random string
-
-        $expected = get_string($string);
-        $actual = $mustachehelper->str($string, $this->get_lambda_helper());
-
-        $this->assertEquals($expected, $actual);
+    private static function has_str_helper_containing_variables(string $template) {
+        preg_match_all('@(\{{2}[#/][^\}]+\}{2}|\{{2,3}[^\}]+\}{2,3})@', $template, $matches);
+        $helper = 'str';
+        $helperlevel = 0;
+        $count = 0;
+        $regex_open = '@\{{2}# *'.preg_quote($helper, '@').' *\}{2}@';
+        $regex_close = '@\{{2}/ *'.preg_quote($helper, '@').' *\}{2}@';
+        foreach ($matches[0] as $match) {
+            $opening = preg_match($regex_open, $match);
+            $closing = preg_match($regex_close, $match);
+            if ($opening) {
+                $helperlevel ++;
+            } else if ($closing) {
+                $helperlevel --;
+            }
+            if ($helperlevel > 0 && !$opening && !$closing) {
+                // We're withing a helper.
+                $count++;
+            }
+        }
+        return ($count === 0) ? false : $count;
     }
 
-    /**
-     * It should generate the same output as rendering the renderable without customdata.
-     *
-     * @covers \core\output\mustache_string_helper::__construct
-     * @covers \core\output\mustache_string_helper::string
-     */
-    public function test_string_variable_helper() {
-        $mustachehelper = new mustache_string_helper(self::$renderer);
+    public function test_has_str_helper_containing_recursive_helpers() {
+        // None.
+        self::assertFalse(self::has_str_helper_containing_recursive_helpers(''));
+        self::assertFalse(self::has_str_helper_containing_recursive_helpers('test'));
+        self::assertFalse(self::has_str_helper_containing_recursive_helpers('{{test}}'));
+        self::assertFalse(self::has_str_helper_containing_recursive_helpers('{{{test}}}'));
+        self::assertFalse(self::has_str_helper_containing_recursive_helpers('{{#str}}{{test}}{{/str}}'));
+        self::assertFalse(self::has_str_helper_containing_recursive_helpers('{{# str }} {{ test }} {{/ str }}'));
+        self::assertFalse(self::has_str_helper_containing_recursive_helpers('{{#str}}{{test}}{{/str}}{{#str}}{{test}}{{/str}}'));
 
-        $actualidentifier = 'viewallcourses';
-        $variableidentifier = '{{test_string}}';
+        // One.
+        self::assertSame(1, self::has_str_helper_containing_recursive_helpers('{{#str}}{{#str}}{{test}}{{/str}}{{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_recursive_helpers('{{#str}}{{#pix}}test{{/pix}}{{/str}}'));
+        self::assertSame(1, self::has_str_helper_containing_recursive_helpers('{{# str }}{{# pix }} test {{/ pix }} {{/ str }}'));
+        self::assertSame(2, self::has_str_helper_containing_recursive_helpers('{{#str}}{{#pix}}{{#str}}test{{/str}}{{/pix}}{{/str}}'));
 
-        $expected = get_string($actualidentifier);
+        // Multiple.
+        self::assertSame(2, self::has_str_helper_containing_recursive_helpers('{{#str}}{{#str}}{{#str}}{{test}}{{/str}}{{/str}}{{/str}}'));
+    }
 
-        $lambdahelper = $this->get_lambda_helper(['test_string' => $actualidentifier]);
-        $mustachehelper = new mustache_string_helper(self::$renderer);
-        $actual = $mustachehelper->str($variableidentifier, $lambdahelper);
+    private static function has_str_helper_containing_recursive_helpers(string $template) {
+        preg_match_all('@\{{2}[#/][^\}]+\}{2}@', $template, $matches);
+        $helper = 'str';
+        $level = 0;
+        $count = 0;
+        $regex_open = '@\{{2}# *'.preg_quote($helper, '@').' *\}{2}@';
+        $regex_close = '@\{{2}/ *'.preg_quote($helper, '@').' *\}{2}@';
+        foreach ($matches[0] as $match) {
+            $opening_str = preg_match($regex_open, $match);
+            $closing_str = preg_match($regex_close, $match);
+            $opening = $opening_str || (strpos($match, '{{#') !== false);
 
-        $this->assertEquals($expected, $actual);
+            if ($opening_str) {
+                if ($level > 0) {
+                    $count++;
+                }
+                $level++;
+            } else if ($closing_str) {
+                $level--;
+            } else if ($opening) {
+                if ($level > 0) {
+                    $count++;
+                }
+            }
+        }
+        return ($count === 0) ? false : $count;
     }
 }

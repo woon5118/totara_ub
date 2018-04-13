@@ -46,6 +46,7 @@ require_once($CFG->libdir . '/outputcomponents.php');
             'id' => 'abc',
             'width' => 0,
             'progress' => 0,
+            'progresstext' => get_string('xpercent', 'core', 0),
         );
 
         $this->assertSame($expected, $progress_bar->export_for_template($OUTPUT));
@@ -55,6 +56,7 @@ require_once($CFG->libdir . '/outputcomponents.php');
             'id' => 'abc',
             'width' => 500,
             'progress' => 0,
+            'progresstext' => get_string('xpercent', 'core', 0),
         );
 
         $this->assertSame($expected, $progress_bar->export_for_template($OUTPUT));
@@ -106,6 +108,7 @@ require_once($CFG->libdir . '/outputcomponents.php');
             'id' => 'abc',
             'width' => 0,
             'progress' => 10,
+            'progresstext' => get_string('xpercent', 'core', 10),
             'popover' => array(
                 'contenttemplate' => false,
                 'contenttemplatecontext' => false,

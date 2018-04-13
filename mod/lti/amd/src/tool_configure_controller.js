@@ -268,15 +268,36 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/templates', 'mod_lti/e
                 toolProxy.query({'orphanedonly': true})
             )
             .done(function(types, proxies) {
-                    templates.render('mod_lti/tool_list', {tools: types, proxies: proxies})
-                        .done(function(html, js) {
-                                container.empty();
-                                container.append(html);
-                                templates.runTemplateJS(js);
-                                promise.resolve();
-                            }).fail(promise.reject);
-                })
-            .fail(promise.reject);
+                var requiredstrings = [];
+
+                types.map(function(el, i){
+                    var requiredstring = {key: 'toolisbeingused', component: 'mod_lti', param: el.instancecount};
+                    requiredstrings.push(requiredstring);
+                });
+                proxies.map(function(el, i){
+                    var requiredstring = {key: 'toolisbeingused', component: 'mod_lti', param: el.instancecount};
+                    requiredstrings.push(requiredstring);
+                });
+
+
+                str.get_strings(requiredstrings).then(function(strings) {
+                    var stringindex = 0;
+                    types.map(function(el, i) {
+                        types[i].toolusedcountstr = strings[stringindex];
+                        stringindex++;
+                    });
+                    proxies.map(function(el, i) {
+                        proxies[i].toolusedcountstr = strings[stringindex];
+                        stringindex++;
+                    });
+                    return templates.render('mod_lti/tool_list', {tools: types, proxies: proxies});
+                }).then(function(html, js) {
+                    container.empty();
+                    container.append(html);
+                    templates.runTemplateJS(js);
+                    promise.resolve();
+                }).fail(promise.reject);
+            }).fail(promise.reject);
 
         promise.fail(notification.exception)
             .always(function() {

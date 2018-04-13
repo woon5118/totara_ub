@@ -26,9 +26,20 @@
     Example context (json):
     {
         "emoticons": [
-            { "fields": [
-                { "name": "Smile", "field": "f1", "value": ":)" }
-            ]}
+            {
+                "fields": [
+                    { "name": "Smile", "field": "f1", "value": ":)" }
+                ]
+                "icon": {
+                    "template": "core/pix_icon",
+                    "context": {
+                        "class": "emoticon",
+                        "alt": "wink",
+                        "title": "wink",
+                        "url": "__WWWROOT__/theme/image.php?theme=basis&component=core&image=s%2Fwink"
+                    }
+                }
+            }
         ]
     }
 }}
@@ -53,7 +64,7 @@
                     {{/fields}}
                     <td>
                         {{#icon}}
-                            {{#pix}} {{key}}, {{component}}, {{{title}}} {{/pix}}
+                            {{#context}}{{> &&template}}{{/context}}
                         {{/icon}}
                     </td>
                 </tr>

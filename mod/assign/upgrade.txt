@@ -5,6 +5,14 @@ information provided here is intended especially for developers.
 
 * Modified mod_assign_renderer::render_assign_submission_status_compact removing incorrect use alert-error CSS class
 * Modified mod_assign_renderer::render_assign_submission_status removing incorrect use alert-error CSS class
+* String helpers are no longer used in the following templates, string data is passed via context data:
+** mod/assign/templates/popout_button.mustache
+** mod/assign/templates/loading.mustache
+** mod/assign/templates/grading_navigation_user_summary.mustache
+** mod/assign/templates/grading_navigation_user_selector.mustache
+** mod/assign/templates/grading_navigation.mustache
+** mod/assign/templates/grading_app.mustache
+** mod/assign/templates/grading_actions.mustache
 
 === 11.2 ===
 

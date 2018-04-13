@@ -25,7 +25,18 @@
         "paramname": "param",
         "value": "1",
         "label": "item one",
-        "description": "description one"
+        "description": "description one",
+        "icon": {
+            "template": "core/flex_icon",
+            "context": {
+                "identifier" : "mod_book|icon",
+                "customdata": {
+                    "classes": "custom-class another-custom-class",
+                    "alt": "Book book"
+                },
+                "classes": "fa-book"
+            }
+        }
     }
 }}
 <div class="option">
@@ -33,7 +44,7 @@
         <input type="radio" name="{{paramname}}" id="item_{{id}}" value="{{value}}">
         <span class="modicon">
             {{#icon}}
-                {{#pix}}{{key}}, {{component}}, {{{title}}}{{/pix}}
+                {{#context}}{{> &&template}}{{/context}}
             {{/icon}}
         </span>
         <span class="typename">{{label}}</span>

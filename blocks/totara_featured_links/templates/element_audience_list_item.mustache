@@ -49,7 +49,7 @@
 <li>
     {{name}}
     <a title="Delete" class="coursecohortdeletelink" href="#" data-type="cohort_delete" cohortid="{{cohortid}}">
-        {{#flex_icon}}delete, {"alt":"{{#str}}delete_audience_rule, block_totara_featured_links, {{name}}{{/str}}"}{{/flex_icon}}
+        {{#deleteicon}}{{#context}}{{> &&template }}{{/context}}{{/deleteicon}}
     </a>
     (#{{num_learners}})
 </li>

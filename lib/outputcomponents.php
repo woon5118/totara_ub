@@ -510,10 +510,20 @@ class help_icon implements renderable, templatable {
 
         $data = get_formatted_help_string($this->identifier, $this->component, false);
 
+        $helpflex = \core\output\flex_icon::get_icon('help', [
+            'alt'=> $alt,
+            'classes'=> 'iconhelp'
+        ]);
+
         $data->alt = $alt;
         $data->icon = (new pix_icon('help', $alt, 'core', ['class' => 'iconhelp']))->export_for_template($output);
         $data->linktext = $this->linktext;
         $data->title = get_string('helpprefix2', '', trim($title, ". \t"));
+        $data->helpicon = [
+            'template' => $helpflex->get_template(),
+            'context' => $helpflex->export_for_template($output)
+        ];
+
         $data->url = (new moodle_url('/help.php', [
             'component' => $this->component,
             'identifier' => $this->identifier,
@@ -1433,7 +1443,16 @@ class action_link implements renderable {
 
         $data->text = $this->text instanceof renderable ? $output->render($this->text) : (string) $this->text;
         $data->url = $this->url ? $this->url->out(false) : '';
-        $data->icon = $this->icon ? $this->icon->export_for_pix() : null;
+        if ($this->icon) {
+            $iconattr = array(
+                'template' => $this->icon->get_template(),
+                'context' => $this->icon->export_for_template($output),
+            );
+            $iconattr = array_merge($iconattr, $this->icon->export_for_pix());
+            $data->icon = $iconattr;
+        } else {
+            $data->icon = null;
+        }
         $data->classes = isset($attributes['class']) ? $attributes['class'] : '';
         unset($attributes['class']);
 
@@ -4008,11 +4027,10 @@ class action_menu implements renderable, templatable {
             $linkclasses[] = 'textmenu';
         } else {
             $title = new lang_string('actions', 'moodle');
-            $this->actionicon = new pix_icon(
+            $this->actionicon = \core\output\flex_icon::get_icon(
                 't/edit_menu',
-                $title,
                 'moodle',
-                array('class' => 'iconsmall actionmenu', 'title' => '')
+                array('class' => 'iconsmall actionmenu', 'title' => '', 'alt' => $title)
             );
             $pixicon = $this->actionicon;
         }
@@ -4193,11 +4211,16 @@ class action_menu implements renderable, templatable {
             $primary->menutrigger = $this->menutrigger;
         } else {
             $primary->title = get_string('actions');
-            $actionicon = new pix_icon('t/edit_menu', $primary->title, 'moodle', ['class' => 'iconsmall actionmenu', 'title' => '']);
+            $actionicon = \core\output\flex_icon::get_icon('t/edit_menu', 'moodle', ['class' => 'iconsmall actionmenu', 'title' => '', 'alt' => $primary->title]);
         }
 
         if ($actionicon instanceof pix_icon) {
-            $primary->icon = $actionicon->export_for_pix();
+            $icon = array(
+                'template' => $actionicon->get_template(),
+                'context' => $actionicon->export_for_template($output)
+            );
+            $icon = array_merge($icon, $actionicon->export_for_pix());
+            $primary->icon = $icon;
         } else {
             $primary->iconraw = $actionicon ? $output->render($actionicon) : '';
         }
@@ -4352,7 +4375,12 @@ class action_menu_link extends action_link implements renderable {
                     unset($icon->attributes['title']);
                 }
             }
-            $data->icon = $icon ? $icon->export_for_pix() : null;
+
+            $data->icon = array(
+                'template' => $icon->get_template(),
+                'context' => $icon->export_for_template($output)
+            );
+            $data->icon = array_merge($data->icon, $icon->export_for_pix($output));
         }
 
         $data->disabled = !empty($attributes['disabled']);
@@ -4676,6 +4704,7 @@ class progress_bar implements renderable, templatable {
             'id' => $this->html_id,
             'width' => $this->width,
             'progress' => $this->percent,
+            'progresstext' => get_string('xpercent', 'core', $this->percent)
         ];
 
         if ($this->popover instanceof \core\output\popover) {

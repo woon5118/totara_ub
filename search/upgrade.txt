@@ -1,6 +1,11 @@
 This files describes API changes in /search/*,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* String helpers are no longer used in the following templates, string data is passed via context data:
+** search/templates/result.mustache
+
 === 10 ===
 
 * Base search area classes have been renamed, please update your search areas to use the classes below:

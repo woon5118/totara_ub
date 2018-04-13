@@ -886,7 +886,7 @@ abstract class base {
 
         $action_menu_items[] = new \action_menu_link_secondary(
             $editurl,
-            new flex_icon('edit'),
+            \core\output\flex_icon::get_icon('edit'),
             get_string('content_menu_title', 'block_totara_featured_links') . $editsr,
             ['type' => 'edit']
         );
@@ -905,7 +905,7 @@ abstract class base {
 
             $action_menu_items[] = new \action_menu_link_secondary(
                 $visibilityurl,
-                new flex_icon('hide'),
+                \core\output\flex_icon::get_icon('hide'),
                 get_string('visibility_menu_title', 'block_totara_featured_links') . $visibilitysr,
                 ['type' => 'edit_vis']
             );
@@ -916,7 +916,7 @@ abstract class base {
         );
         $action_menu_items[] = new \action_menu_link_secondary(
             new \moodle_url('/'),
-            new flex_icon('delete'),
+            \core\output\flex_icon::get_icon('delete'),
             get_string('delete_menu_title', 'block_totara_featured_links') . $deletesr,
             ['type' => 'remove', 'blockid' => $this->blockid, 'tileid' => $this->id]
         );
