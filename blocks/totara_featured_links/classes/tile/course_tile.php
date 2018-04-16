@@ -24,10 +24,12 @@
 namespace block_totara_featured_links\tile;
 
 class course_tile extends learning_item_tile {
-    protected $used_fields = ['courseid', // int The id of the course that the tile links to.
+    protected $used_fields = [
+        'courseid',         // int The id of the course that the tile links to.
         'background_color', // string The hex value of the background color.
         'heading_location', // string Where the heading is located 'top' or 'bottom'.
-        'progressbar'];
+        'progressbar'       // int 1 or 0 whether to show the progress bar.
+    ];
     /** @var string Class for the visibility form */
     protected $visibility_form = '\block_totara_featured_links\tile\course_form_visibility';
     /** @var string Class for the visibility form*/
@@ -47,7 +49,7 @@ class course_tile extends learning_item_tile {
      *
      * @return string
      */
-    public static function get_name() {
+    public static function get_name(): string {
         return get_string('course_name', 'block_totara_featured_links');
     }
 
@@ -58,7 +60,7 @@ class course_tile extends learning_item_tile {
      * {@inheritdoc}
      * @return \stdClass
      */
-    public function get_content_form_data() {
+    public function get_content_form_data(): \stdClass {
         $dataobj = parent::get_content_form_data();
         if (!empty($this->get_course())) {
             $dataobj->course_name = $this->get_course()->fullname;
@@ -78,10 +80,10 @@ class course_tile extends learning_item_tile {
      * {@inheritdoc}
      * @return array
      */
-    protected function get_content_template_data() {
+    protected function get_content_template_data(): array {
         global $USER, $DB;
         if (empty($this->get_course())) {
-            return null;
+            return [];
         }
         if (!$status = $DB->get_field('course_completions', 'status', array('userid' => $USER->id, 'course' => $this->data->courseid))) {
             $status = null;
@@ -104,11 +106,12 @@ class course_tile extends learning_item_tile {
      * and add the url to the course if the course can be retrieved.
      *
      * @param \renderer_base $renderer
+     * @param array $settings
      * @return array
      */
-    protected function get_content_wrapper_template_data(\renderer_base $renderer) {
+    protected function get_content_wrapper_template_data(\renderer_base $renderer, array $settings = []): array {
         global $CFG;
-        $data = parent::get_content_wrapper_template_data($renderer);
+        $data = parent::get_content_wrapper_template_data($renderer, $settings);
         if (!empty($this->get_course())) {
             $data['url'] = $CFG->wwwroot.'/course/view.php?id='.$this->get_course()->id;
         }
@@ -120,7 +123,7 @@ class course_tile extends learning_item_tile {
      *
      * @param \stdClass $data
      */
-    public function save_content_tile ($data) {
+    public function save_content_tile($data): void {
         if (isset($data->course_name_id)) {
             $this->data->courseid = $data->course_name_id;
         }
@@ -137,7 +140,7 @@ class course_tile extends learning_item_tile {
      *
      * @return bool
      */
-    protected function user_can_view_content() {
+    protected function user_can_view_content(): bool {
         return boolval($this->get_course());
     }
 
@@ -145,13 +148,14 @@ class course_tile extends learning_item_tile {
      * {@inheritdoc}
      * @return array
      */
-    public function get_accessibility_text() {
+    public function get_accessibility_text(): array {
         return ['sr-only' => get_string('course_sr-only', 'block_totara_featured_links', !empty($this->course->fullname) ? $this->course->fullname : '')];
     }
 
     /**
      * Returns the course this tile is associated with.
      *
+     * @param boolean $reload if the course is to be reloaded
      * @return \stdClass|bool The course record or false if there is no associated course.
      */
     public function get_course($reload = false) {
@@ -181,7 +185,7 @@ class course_tile extends learning_item_tile {
      *
      * @return string of text shown if a tile is hidden but being viewed in edit mode.
      */
-    protected function get_hidden_text() {
+    protected function get_hidden_text(): string {
         if (empty($this->get_course())) {
             return get_string('course_has_been_deleted', 'block_totara_featured_links');
         } else {

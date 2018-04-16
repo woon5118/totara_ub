@@ -21,27 +21,18 @@
  * @package block_totara_featured_links
  */
 
-namespace block_totara_featured_links\form\validator;
-
-defined('MOODLE_INTERNAL') || die();
-
-use totara_form\element_validator;
+namespace block_totara_featured_links\tile;
 
 /**
- * Class is_color
- * Makes sure the value passed by the color input is a 3 or 6 long hexadecimal string starting with a hash
- * @package block_totara_featured_links
+ * Interface MetaTile
+ * This is a interface for all tiles that can contain other tiles.
+ * @package block_totara_featured_links\tile
  */
-class is_color extends element_validator {
+interface meta_tile {
 
     /**
-     * this makes sure the color is a hash followed by 6 numbers
-     *
-     * @return void adds errors to element
+     * Gets all the tiles that are contained by this tile.
+     * @return array of {@link base} but none should be meta_tiles
      */
-    public function validate() {
-        if (preg_match('/^#([0-9a-fA-F]{3}){1,2}$/', $this->element->get_data()['background_color']) == 0) {
-            $this->element->add_error(get_string('color_error', 'block_totara_featured_links'));
-        }
-    }
+    public function get_subtiles(): array;
 }

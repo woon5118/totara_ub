@@ -44,6 +44,11 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
         $this->blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
     }
 
+    public function tearDown() {
+        parent::tearDown();
+        $this->blockgenerator = null;
+    }
+
     /**
      * Tests the delete instance method of the block cleans up all related data.
      */
@@ -84,6 +89,7 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
      */
     public function test_get_tiles() {
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $instance = $this->blockgenerator->create_instance();
         $this->blockgenerator->create_default_tile($instance->id);
@@ -94,7 +100,7 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
         $this->assertInstanceOf('block_totara_featured_links', $block);
 
         // Make the get_tiles method accessible so that we can call it.
-        $method = new \ReflectionMethod($block, 'get_tiles');
+        $method = new ReflectionMethod($block, 'get_tiles');
         $method->setAccessible(true);
         /* @var block_totara_featured_links\tile\base[] $tiles */
         $tiles = $method->invoke($block);
@@ -116,10 +122,11 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
      */
     public function test_get_tiles_empty_block() {
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $instance = $this->blockgenerator->create_instance();
         $block = block_instance('totara_featured_links', $instance);
-        $method = new \ReflectionMethod($block, 'get_tiles');
+        $method = new ReflectionMethod($block, 'get_tiles');
         $method->setAccessible(true);
 
         $tiles = $method->invoke($block);
@@ -127,7 +134,7 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
         $this->assertCount(0, $tiles);
     }
 
-    public function test_intance_copy() {
+    public function test_instance_copy() {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();

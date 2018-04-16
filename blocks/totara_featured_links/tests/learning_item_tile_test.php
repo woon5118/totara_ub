@@ -65,7 +65,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
     public function test_get_course_valid($tiledata) {
         $this->resetAfterTest(false);
 
-        /* @var \block_totara_featured_links\tile\course_tile $tile */
+        /* @var block_totara_featured_links\tile\course_tile $tile */
         $tile = $tiledata['tile'];
         $course = $tiledata['course'];
 
@@ -81,7 +81,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
         $this->resetAfterTest(false);
         global $DB;
 
-        /* @var \block_totara_featured_links\tile\course_tile $tile */
+        /* @var block_totara_featured_links\tile\course_tile $tile */
         $tile = $tiledata['tile'];
         $course = $tiledata['course'];
 
@@ -99,7 +99,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
         $this->assertEquals($course->id, $reloadedcourse->id);
         $this->assertEquals('newshortname', $reloadedcourse->shortname);
 
-        /* @var \block_totara_featured_links\tile\course_tile $tilenocourse */
+        /* @var block_totara_featured_links\tile\course_tile $tilenocourse */
         $tilenocourse = $tiledata['tilenocourse'];
         $this->assertFalse($tilenocourse->get_course());
     }
@@ -111,7 +111,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
     public function test_get_course_no_course($tiledata) {
         $this->resetAfterTest(false);
 
-        /* @var \block_totara_featured_links\tile\learning_item $tilenocourse */
+        /* @var block_totara_featured_links\tile\learning_item $tilenocourse */
         $tilenocourse = $tiledata['tilenocourse'];
         $this->assertFalse($tilenocourse->get_course());
     }
@@ -135,7 +135,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
     }
 
     /**
-     * @param array $tile
+     * @param array $tiledata
      * @depends test_save_content_tile
      */
     public function test_user_can_view_content($tiledata) {
@@ -144,7 +144,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
 
         $this->setUser();
 
-        /* @var \block_totara_featured_links\tile\learning_item $tile */
+        /* @var block_totara_featured_links\tile\learning_item $tile */
         $tile = $tiledata['tile'];
         $course = $tiledata['course'];
 

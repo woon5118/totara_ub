@@ -25,6 +25,7 @@ namespace block_totara_featured_links\tile;
 
 defined('MOODLE_INTERNAL') || die();
 
+use block_totara_featured_links\form\element\colorpicker;
 use block_totara_featured_links\form\validator\alt_text_required;
 use block_totara_featured_links\form\validator\is_color;
 use totara_form\form\element\checkbox;
@@ -32,7 +33,6 @@ use totara_form\form\element\filemanager;
 use totara_form\form\element\radios;
 use totara_form\form\element\text;
 use totara_form\form\element\textarea;
-use \block_totara_featured_links\form\element\colorpicker;
 use totara_form\form\group\section;
 use totara_form\form\validator\element_filemanager;
 use totara_form\group;
@@ -48,7 +48,7 @@ class default_form_content extends base_form_content{
     /**
      * The tile specific content options
      * @param group $group
-     * @return null
+     * @return void
      */
     public function specific_definition(group $group) {
         $url = $group->add(new text('url', get_string('url_title', 'block_totara_featured_links'), PARAM_URL));
@@ -66,10 +66,14 @@ class default_form_content extends base_form_content{
 
         $textgroup->add(new textarea('textbody', get_string('tile_description', 'block_totara_featured_links'), PARAM_TEXT));
 
-        $textgroup->add(new radios('heading_location', get_string('heading_location', 'block_totara_featured_links'), [
-            base::HEADING_TOP => get_string('top_heading', 'block_totara_featured_links'),
-            base::HEADING_BOTTOM => get_string('bottom_heading', 'block_totara_featured_links')
-        ]));
+        $textgroup->add(new radios(
+            'heading_location',
+            get_string('heading_location', 'block_totara_featured_links'),
+            [
+                base::HEADING_TOP => get_string('top_heading', 'block_totara_featured_links'),
+                base::HEADING_BOTTOM => get_string('bottom_heading', 'block_totara_featured_links')
+            ]
+        ));
 
         /** @var section $backgroundgroup */
         $backgroundgroup = $this->model->add(new section('backgroundgroup', get_string('background', 'block_totara_featured_links')));
@@ -80,19 +84,26 @@ class default_form_content extends base_form_content{
             new filemanager(
                 'background_img',
                 get_string('tile_background', 'block_totara_featured_links'),
-                ['subdirs' => 0,
+                [
+                    'subdirs' => 0,
                     'maxbytes' => 0,
                     'maxfiles' => 1,
                     'accept' => ['web_image'],
-                    'context' => \context_block::instance($this->get_parameters()['blockinstanceid'])]
+                    'context' => \context_block::instance($this->get_parameters()['blockinstanceid'])
+                ]
             )
         );
         $file->add_validator(new element_filemanager());
         $file->add_help_button('tile_background', 'block_totara_featured_links');
 
-        $group->add(new radios('background_appearance', get_string('backgroundappearance', 'block_totara_featured_links'),
-            ['cover' => get_string('backgroundcover', 'block_totara_featured_links'),
-                'contain' => get_string('backgroundcontain', 'block_totara_featured_links')]));
+        $group->add(new radios(
+            'background_appearance',
+            get_string('backgroundappearance', 'block_totara_featured_links'),
+            [
+                'cover' => get_string('backgroundcover', 'block_totara_featured_links'),
+                'contain' => get_string('backgroundcontain', 'block_totara_featured_links')
+            ]
+        ));
 
         $alt_text = $backgroundgroup->add(new text('alt_text', get_string('tile_alt_text', 'block_totara_featured_links'), PARAM_TEXT));
         $alt_text->add_validator(new alt_text_required(null, 'background_img'));

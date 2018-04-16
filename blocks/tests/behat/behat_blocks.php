@@ -136,7 +136,9 @@ class behat_blocks extends behat_base {
      * @param string $title
      */
     public function i_should_see_the_block($title) {
-        $this->execute('behat_general::assert_element_contains_text', array($this->escape($title), '.block', 'css_element'));
+        $xpathliteral = \behat_context_helper::escape($title);
+        $xpath = '//div[contains(concat(\' \', normalize-space(@class), \' \'), \' block \')]//h2[text()[contains(.,'.$xpathliteral.')]]';
+        $this->execute('behat_general::should_exist', array($xpath, 'xpath_element'));
     }
 
     /**

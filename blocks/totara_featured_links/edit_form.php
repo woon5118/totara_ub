@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
  * Class block_totara_featured_links_edit_form
  * This is the edit form for the block
  */
-class block_totara_featured_links_edit_form extends \block_edit_form{
+class block_totara_featured_links_edit_form extends block_edit_form{
 
     /**
      * defines the form for the custom block options

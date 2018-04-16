@@ -26,6 +26,7 @@
 define(['jquery'], function($) {
     return {
         init: function(interval, id) {
+            // Not that pretty but will get replaced in TL-16143
             var currentImg = 1;
             var maxImg = 0;
             maxImg = $('#' + id).children('div').length;
@@ -37,8 +38,9 @@ define(['jquery'], function($) {
             if (interval === 0) {
                 return;
             }
-            window.setInterval(function() {
-                $('#' + id + ' div:nth-of-type(' + currentImg + ')').css({'z-index': '2'}).fadeOut('slow');
+            window.setInterval(function () {
+                $('#' + id + ' > div:nth-of-type(' + currentImg + ')').css({'z-index': '3'}).fadeOut('slow');
+                $('#' + id + ' > div:nth-of-type(' + currentImg + ')').find('*').css({'z-index': '4'}).fadeOut('slow');
 
                 var newcurrentImg = -1;
                 do {
@@ -46,7 +48,8 @@ define(['jquery'], function($) {
                 } while (currentImg === newcurrentImg);
                 currentImg = newcurrentImg;
 
-                $('#' + id + ' div:nth-of-type(' + currentImg + ')').css({'z-index': '1'}).show();
+                $('#' + id + ' > div:nth-of-type(' + currentImg + ')').css({'z-index': '1'}).show();
+                $('#' + id + ' > div:nth-of-type(' + currentImg + ')').find('*').css({'z-index': '2'}).show();
             }, interval);
         }
     };
