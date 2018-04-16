@@ -743,7 +743,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
             new program($program->id);
             $this->fail("Exception expected");
         } catch (moodle_exception $e) {
-            $this->assertSame('Could not find role with shortname student', $e->getMessage());
+            $this->assertSame('Could not find role with shortname learner', $e->getMessage());
         }
 
         $CFG->learnerroleid = null;
@@ -751,7 +751,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
             new program($program->id);
             $this->fail("Exception expected");
         } catch (moodle_exception $e) {
-            $this->assertSame('Could not find role with shortname student', $e->getMessage());
+            $this->assertSame('Could not find role with shortname learner', $e->getMessage());
         }
 
         $CFG->learnerroleid = false;
@@ -759,7 +759,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
             new program($program->id);
             $this->fail("Exception expected");
         } catch (moodle_exception $e) {
-            $this->assertSame('Could not find role with shortname student', $e->getMessage());
+            $this->assertSame('Could not find role with shortname learner', $e->getMessage());
         }
     }
 

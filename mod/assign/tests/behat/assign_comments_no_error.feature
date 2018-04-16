@@ -17,7 +17,7 @@ Feature: Switch role does not cause an error message in assignsubmission_comment
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name           | Test assignment              |
       | Description               | This is the description text |
-      | Students submit in groups | Yes                          |
+      | Learners submit in groups | Yes                          |
 
   Scenario: I switch role to student and an error doesn't occur
     When I navigate to "Switch role to..." node in "Course administration"

@@ -31,7 +31,7 @@ Feature: Check that the assignment grade can be updated correctly
     Then I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"
-    And I set the field "Notify students" to "0"
+    And I set the field "Notify learners" to "0"
     And I press "Save changes"
     And I press "Ok"
     And I click on "Edit settings" "link"
@@ -62,13 +62,13 @@ Feature: Check that the assignment grade can be updated correctly
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
       | Use marking workflow | Yes |
-      | Students submit in groups | Yes |
+      | Learners submit in groups | Yes |
       | Group mode | No groups |
     When I follow "Test assignment name"
     Then I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"
-    And I set the field "Notify students" to "0"
+    And I set the field "Notify learners" to "0"
     And I press "Save changes"
     And I press "Ok"
     And I click on "Edit settings" "link"

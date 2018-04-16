@@ -32,7 +32,7 @@ Feature: In an assignment, teacher can submit feedback files during grading
       | Assignment name                  | Test assignment name |
       | Description                      | Submit your PDF file |
       | Maximum number of uploaded files | 2                    |
-      | Students submit in groups        | Yes                  |
+      | Learners submit in groups        | Yes                  |
     And I follow "Test assignment name"
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"

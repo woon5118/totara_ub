@@ -109,7 +109,7 @@ Feature: Teacher can modify choices of the students
     And I follow "Choice name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
-      | Publish results | Always show results to students |
+      | Publish results | Always show results to learners |
       | Privacy of results | Publish full results, showing names and their choices |
       | Show column for unanswered | Yes |
     And I press "Save and display"

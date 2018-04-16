@@ -105,7 +105,7 @@ Feature: Availability of programs affects assignments
     Then I should see "2" in the "Audience1" "table_row"
     When I press "Save changes"
     And I press "Save all changes"
-    Then I should see "Caution: Program is live - there are students who will see or be affected by changes you make"
+    Then I should see "Caution: Program is live - there are learners who will see or be affected by changes you make"
     And I should see "2 learner(s) assigned: 2 active, 0 exception(s)."
     When I click on "Delete" "link" in the "Audience1" "table_row"
     When I press "Save changes"
