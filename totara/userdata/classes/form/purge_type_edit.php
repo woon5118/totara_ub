@@ -91,7 +91,9 @@ final class purge_type_edit extends \totara_form\form {
         $this->model->add($itemdescription);
 
         $groupeditems = \totara_userdata\local\purge::get_purgeable_items_grouped_list((int)$purgetype->userstatus);
-        foreach ($groupeditems as $maincomponent => $items) {
+        $grouplabels = \totara_userdata\local\util::get_sorted_grouplabels(array_keys($groupeditems));
+        foreach ($grouplabels as $maincomponent => $grouplabel) {
+            $items = $groupeditems[$maincomponent];
             $options = array();
             $optionhelps = array();
             /** @var \totara_userdata\userdata\item $item this is not an instance, but it helps with autocomplete */
@@ -106,7 +108,6 @@ final class purge_type_edit extends \totara_form\form {
                     $optionhelps[] = array($value, $identifier, $component);
                 }
             }
-            $grouplabel = \totara_userdata\local\util::get_component_name($maincomponent);
             $group = new \totara_form\form\element\checkboxes('grp_' . $maincomponent, $grouplabel, $options);
             foreach ($optionhelps as $info) {
                 list($value, $identifier, $component) = $info;
@@ -169,4 +170,5 @@ final class purge_type_edit extends \totara_form\form {
 
         return $errors;
     }
+
 }

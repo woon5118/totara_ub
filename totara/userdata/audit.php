@@ -94,7 +94,11 @@ $stats = array(
 $resultstauses = \totara_userdata\userdata\manager::get_results();
 
 $prevcomponent = null;
-foreach (count::get_countable_items_grouped_list() as $maincomponent => $classes) {
+
+$groupeditems = count::get_countable_items_grouped_list();
+$grouplabels = \totara_userdata\local\util::get_sorted_grouplabels(array_keys($groupeditems));
+foreach ($grouplabels as $maincomponent => $grouplabel) {
+    $classes = $groupeditems[$maincomponent];
     foreach ($classes as $class) {
         /** @var item $class this is not an instance, but it helps with autocomplete */
 
@@ -110,8 +114,7 @@ foreach (count::get_countable_items_grouped_list() as $maincomponent => $classes
                 echo '</dl>';
             }
             $prevcomponent = $maincomponent;
-            $maincomponentname = util::get_component_name($maincomponent);
-            echo $OUTPUT->heading($maincomponentname, 3);
+            echo $OUTPUT->heading($grouplabel, 3);
             echo '<dl class="dl-horizontal">';
         }
 

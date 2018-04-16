@@ -270,4 +270,39 @@ class totara_userdata_local_util_testcase extends advanced_testcase {
         }
         $this->assertEquals(array_values($records), array_values($newrecords));
     }
+
+    /**
+     * test returning a sorted array of component labels
+     */
+    public function test_get_sorted_grouplabels() {
+        $groupeditems = [
+            'core_question',
+            'mod_forum',
+            'core_course',
+            'core_user',
+            'block_recent_activity',
+            'block_totara_featured_links'
+        ];
+        $sortedlabels = util::get_sorted_grouplabels($groupeditems);
+        $this->assertEquals(
+            [
+                'core_user' => 'User',
+                'mod_forum' => 'Activity: Forum',
+                'block_totara_featured_links' => 'Block: Featured Links',
+                'block_recent_activity' => 'Block: Recent activity',
+                'core_course' => 'Courses',
+                'core_question' => 'Question bank'
+            ],
+            $sortedlabels
+        );
+
+        $sortedlabels = util::get_sorted_grouplabels([]);
+        $this->assertEmpty($sortedlabels);
+        $this->assertInternalType('array', $sortedlabels);
+
+        $groupeditems = ['core_user'];
+        $sortedlabels = util::get_sorted_grouplabels($groupeditems);
+        $this->assertEquals(['core_user' => 'User'], $sortedlabels);
+    }
+
 }

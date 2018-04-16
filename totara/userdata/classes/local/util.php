@@ -23,6 +23,8 @@
 
 namespace totara_userdata\local;
 
+use core_collator;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -55,11 +57,16 @@ final class util {
         // All plugins should be handled within the get_component_string() function below.
         // Keep digging and you will find the answer to your question.
         switch ($component) {
-            case 'core_user': return get_string('user');
-            case 'core_badges': return get_string('badges', 'core_badges');
-            case 'core_question': return get_string('questionbank', 'core_question');
-            case 'core_course': return get_string('courses', 'core');
-            case 'core_message': return get_string('messaging', 'core_message');
+            case 'core_user':
+                return get_string('user');
+            case 'core_badges':
+                return get_string('badges', 'core_badges');
+            case 'core_question':
+                return get_string('questionbank', 'core_question');
+            case 'core_course':
+                return get_string('courses', 'core');
+            case 'core_message':
+                return get_string('messaging', 'core_message');
         }
 
         if ($component === 'core_completion') {
@@ -68,6 +75,28 @@ final class util {
         }
 
         return get_component_string($component, CONTEXT_SYSTEM);
+    }
+
+    /**
+     * Get sorted group labels for array of components
+     *
+     * @param array $groupeditems Array of components to get labels for
+     * @return array
+     */
+    public static function get_sorted_grouplabels(array $groupeditems): array {
+        $grouplabels = [];
+        foreach ($groupeditems as $maincomponent) {
+            if ($maincomponent !== 'core_user') {
+                $grouplabels[$maincomponent] = self::get_component_name($maincomponent);
+            }
+        }
+        core_collator::asort($grouplabels);
+        // We want core_user component always to be the first element.
+        if (in_array('core_user', $groupeditems)) {
+            $userlabel = ['core_user' => self::get_component_name('core_user')];
+            $grouplabels = array_merge($userlabel, $grouplabels);
+        }
+        return $grouplabels;
     }
 
 
