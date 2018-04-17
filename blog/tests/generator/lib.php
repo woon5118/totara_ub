@@ -39,7 +39,9 @@ class core_blog_generator extends component_generator_base {
         global $DB, $USER;
         $record = (object)(array)$record;
 
-        $record->module = 'blog';
+        if (empty($record->module)) {
+            $record->module = 'blog';
+        }
         if (empty($record->userid)) {
             throw new coding_exception('Module generator requires $record->userid.');
         }
@@ -61,7 +63,9 @@ class core_blog_generator extends component_generator_base {
         if (!isset($record->summay)) {
             $record->summary = 'This is test generated blog';
         }
-        $record->content = '';
+        if (!isset($record->content)) {
+            $record->content = '';
+        }
         if (!isset($record->uniquehash)) {
             $record->uniquehash = '';
         }
