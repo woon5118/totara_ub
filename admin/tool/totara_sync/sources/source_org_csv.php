@@ -43,8 +43,7 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
         $this->config->import_fullname = "1";
         $this->config->import_frameworkidnumber = "1";
         $this->config->import_timemodified = "1";
-        $this->config->import_deleted = (isset($this->element->config->sourceallrecords) &&
-            $this->element->config->sourceallrecords == 0) ? "1" : "0";
+        $this->config->import_deleted = empty($this->element->config->sourceallrecords) ? "1" : "0";
 
         if (empty($filepath) && get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY) {
             $mform->addElement('html', html_writer::tag('p', get_string('nofilesdir', 'tool_totara_sync')));

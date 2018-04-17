@@ -43,8 +43,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         if (empty($this->element->config->allowduplicatedemails)) {
             $this->config->import_email = "1";
         }
-        $this->config->import_deleted = (isset($this->element->config->sourceallrecords) &&
-            $this->element->config->sourceallrecords == 0) ? "1" : "0";
+        $this->config->import_deleted = empty($this->element->config->sourceallrecords) ? "1" : "0";
 
         $db_table = isset($this->config->{'database_dbtable'}) ? $this->config->{'database_dbtable'} : false;
 
