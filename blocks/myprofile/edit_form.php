@@ -25,8 +25,20 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_myprofile_edit_form extends block_edit_form {
+
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     protected function specific_definition($mform) {
         global $CFG;
+        parent::specific_definition($mform);
+
         $mform->addElement('header', 'configheader', get_string('myprofile_settings', 'block_myprofile'));
 
         $mform->addElement('selectyesno', 'config_display_picture', get_string('display_picture', 'block_myprofile'));

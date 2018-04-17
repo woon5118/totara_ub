@@ -18,6 +18,7 @@ Feature: Adding and configuring HTML blocks
 
   Scenario: Other users can see HTML block that has been configured even when it has no header
     And I configure the "(new HTML block)" block
+    And I set the field "Block title (no title if blank)" to ""
     And I set the field "Content" to "Static text without a header"
     And I press "Save changes"
     Then I should not see "(new HTML block)"

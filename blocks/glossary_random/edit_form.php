@@ -29,15 +29,23 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_glossary_random_edit_form extends block_edit_form {
+
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     protected function specific_definition($mform) {
         global $DB;
 
-        // Fields for editing HTML block title and contents.
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+        parent::specific_definition($mform);
 
-        $mform->addElement('text', 'config_title', get_string('title', 'block_glossary_random'));
-        $mform->setDefault('config_title', get_string('pluginname','block_glossary_random'));
-        $mform->setType('config_title', PARAM_TEXT);
+        // Fields for editing HTML block title and contents.
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         // Select glossaries to put in dropdown box ...
         $glossaries = $DB->get_records_select_menu('glossary', 'course = ? OR globalglossary = ?', array($this->block->course->id, 1), 'name', 'id,name');

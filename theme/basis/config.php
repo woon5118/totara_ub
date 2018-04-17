@@ -30,6 +30,7 @@ $THEME->name = 'basis';
 $THEME->parents = array('roots', 'base');
 $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
+$THEME->enable_hide = true;
 $THEME->sheets = array('totara', 'settings-noprocess');
 $THEME->enable_dock = true;
 

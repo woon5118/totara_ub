@@ -32,12 +32,22 @@
 class block_section_links_edit_form extends block_edit_form {
 
     /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
+    /**
      * The definition of the fields to use.
      *
      * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+        parent::specific_definition($mform);
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         $numberofsections = array();
         for ($i = 1; $i < 53; $i++){

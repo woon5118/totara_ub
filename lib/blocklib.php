@@ -1759,8 +1759,9 @@ class block_manager {
             redirect($this->page->url);
 
         } else {
-            $strheading = get_string('blockconfiga', 'moodle', $block->get_title());
-            $editpage->set_title($strheading);
+            $strheading = get_string('blockconfigtitle', 'moodle');
+            $title = get_string('blockconfiga', 'moodle', $block->get_title());
+            $editpage->set_title($title);
             $editpage->set_heading($strheading);
             $bits = explode('-', $this->page->pagetype);
             if ($bits[0] == 'tag' && !empty($this->page->subpage)) {

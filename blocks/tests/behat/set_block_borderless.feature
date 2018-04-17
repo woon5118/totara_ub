@@ -13,10 +13,9 @@
     Then ".chromeless" "css_element" should not exist
     When I configure the "(new HTML block)" block
     And I expand all fieldsets
-    Then I should see "Display block border"
-    When I set the following fields to these values:
-      | Content | some content |
-      | Display block border | 0     |
+    Then I should see "Border"
+    When I set the field "Content" to "some content"
+    And I set the field with xpath "//*[@id='display_with_border_hide']" to "0"
     And I click on "Save changes" "button"
     Then ".chromeless" "css_element" should exist
     When I press "Stop customising this page"
@@ -26,14 +25,16 @@
     Then ".chromeless" "css_element" should not exist
     When I configure the "(new HTML block)" block
     And I expand all fieldsets
-    Then I should see "Display block border"
+    Then I should see "Border"
     When I set the following fields to these values:
+      | Block title (no title if blank)   | HTML |
       | Content | some content |
-      | Display block border | 0     |
+    And I set the field with xpath "//*[@id='display_with_border_hide']" to "0"
     And I click on "Save changes" "button"
     Then ".chromeless" "css_element" should exist
     When I configure the "HTML" block
-    And I set the field "Display block border" to "1"
+    And I expand all fieldsets
+    And I set the field "Border" to "1"
     And I click on "Save changes" "button"
     Then ".chromeless" "css_element" should not exist
 

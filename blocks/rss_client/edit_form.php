@@ -29,11 +29,23 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_rss_client_edit_form extends block_edit_form {
+
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     protected function specific_definition($mform) {
         global $CFG, $DB, $USER;
 
+        parent::specific_definition($mform);
+
         // Fields for editing block contents.
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         $mform->addElement('selectyesno', 'config_display_description', get_string('displaydescriptionlabel', 'block_rss_client'));
         $mform->setDefault('config_display_description', 0);
@@ -80,10 +92,7 @@ class block_rss_client_edit_form extends block_edit_form {
                     '<a href="' . $CFG->wwwroot . '/blocks/rss_client/managefeeds.php?courseid=' . $this->page->course->id . '">' .
                     get_string('feedsaddedit', 'block_rss_client') . '</a>');
         }
-
-        $mform->addElement('text', 'config_title', get_string('uploadlabel'));
         $mform->setType('config_title', PARAM_NOTAGS);
-
         $mform->addElement('selectyesno', 'config_block_rss_client_show_channel_link', get_string('clientshowchannellinklabel', 'block_rss_client'));
         $mform->setDefault('config_block_rss_client_show_channel_link', 0);
 

@@ -237,6 +237,9 @@ class block_base {
 
         if (!$this->hide_header()) {
             $bc->title = $this->title;
+            if (isset($this->config->title)) {
+                $bc->title = $this->config->title;
+            }
         }
 
         if (empty($bc->title)) {
@@ -267,6 +270,14 @@ class block_base {
             $bc->dockable = true;
         }
 
+        if ($this->page->user_is_editing()) {
+            $bc->displayheader = true;
+        }
+        else {
+            $bc->displayheader = $this->display_with_header();
+        }
+
+        $bc->headercollapsable = $this->allow_block_hiding();
         $bc->annotation = ''; // TODO MDL-19398 need to work out what to say here.
 
         return $bc;
@@ -442,7 +453,6 @@ class block_base {
      * For instance: if your block will have different title's depending on location (site, course, blog, etc)
      */
     function specialization() {
-        // Just to make sure that this method exists.
     }
 
     /**
@@ -613,7 +623,10 @@ class block_base {
      */
     public function instance_can_be_docked() {
         global $CFG;
-        return (!empty($CFG->allowblockstodock) && $this->page->theme->enable_dock);
+        return (
+            (!empty($CFG->allowblockstodock) && $this->page->theme->enable_dock) &&
+            (empty($this->config->enabledock) || $this->config->enabledock=='yes')
+        );
     }
 
     /**
@@ -702,6 +715,33 @@ EOD;
             return (bool)$this->config->display_with_border;
         }
         return $this->display_with_border_by_default();
+    }
+
+    /**
+     * Returns true if setting not initialize
+     *
+     * @return bool
+     */
+    public function display_with_header() {
+        if (isset($this->config->display_with_header)) {
+            return (bool)$this->config->display_with_header;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns true if setting not initialize
+     *
+     * @return bool
+     */
+    public function allow_block_hiding() {
+
+        if ($this->page->theme->enable_hide && !empty($this->config->allow_hiding) && $this->config->allow_hiding == 'no') {
+            return false;
+        }
+
+        return true;
     }
 }
 

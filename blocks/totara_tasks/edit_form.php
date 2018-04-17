@@ -27,11 +27,19 @@ require_once($CFG->libdir . '/formslib.php');
 
 class block_totara_tasks_edit_form extends block_edit_form {
 
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     protected function specific_definition($mform) {
         global $CFG;
-
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
-
+        parent::specific_definition($mform);
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
         $options = array(0 => get_string('no'), 1 => get_string('yes'));
         $attributes = array();
         if (empty($CFG->block_totara_tasks_showempty)) {

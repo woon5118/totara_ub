@@ -85,10 +85,6 @@ class block_settings extends block_base {
         return true;
     }
 
-    function instance_can_be_docked() {
-        return (parent::instance_can_be_docked() && (empty($this->config->enabledock) || $this->config->enabledock=='yes'));
-    }
-
     function get_required_javascript() {
         global $PAGE;
         $adminnode = $PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN);

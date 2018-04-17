@@ -30,6 +30,7 @@ $THEME->name = 'roots';
 $THEME->parents = array('base');
 $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
+$THEME->enable_hide = true;
 $THEME->sheets = array('totara');
 
 // We need to include the Less files directly

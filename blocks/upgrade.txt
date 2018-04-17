@@ -1,5 +1,14 @@
 This files describes API changes in /blocks/* - activity modules,
 information provided here is intended especially for developers.
+=== 12 ===
+
+* Introduced block_edit_form::has_general_settings() method to keep backward compatibility.
+  All custom blocks which implement 'block_edit_form' need to be updated. Until they implement 'has_general_settings()' method they will continue to operate as before.
+  If they implement either of 'block title' or 'block docking' settings already (and use the same config keys) then simply remove the code.
+  All custom blocks need to implement 'has_general_settings()' function to indicate that they have been updated to use the new system.
+  The block_edit_form::has_general_settings() method will be removed entirely in the next major version.
+* The block_settings_edit_form::specific_definition() method has been deprecated, use block_edit_form::specific_definition() method instead.
+* The block_mentees_edit_form::specific_definition() method has been deprecated, use block_mentees_edit_form::specific_definition() method instead.
 
 === 10 ===
 

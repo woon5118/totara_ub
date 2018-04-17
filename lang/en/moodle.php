@@ -205,6 +205,7 @@ $string['backupversion'] = 'Backup version';
 $string['badges'] = 'Badges';
 $string['block'] = 'Block';
 $string['blockconfiga'] = 'Configuring a {$a} block';
+$string['blockconfigtitle'] = 'Block Configuration';
 $string['blockconfigbad'] = 'This block has not been implemented correctly and thus cannot provide a configuration interface.';
 $string['blocks'] = 'Blocks';
 $string['blocksaddedit'] = 'Add/Edit blocks';

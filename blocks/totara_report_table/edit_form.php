@@ -27,6 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/blocks/edit_form.php');
 
 class block_totara_report_table_edit_form extends block_edit_form {
+
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     /**
      * Form definition for this specific block.
      *
@@ -42,13 +52,9 @@ class block_totara_report_table_edit_form extends block_edit_form {
         $PAGE->requires->string_for_js('allavailabledata', 'block_totara_report_table');
         $PAGE->requires->js_call_amd('block_totara_report_table/module', 'populatelist', array());
 
+        parent::specific_definition($mform);
         // Output the form.
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
-
-        // Block title.
-        $mform->addElement('text', 'config_title', get_string('blocktitle', 'block_totara_report_table'));
-        $mform->addHelpButton('config_title', 'blocktitle', 'block_totara_report_table');
-        $mform->setType('config_title', PARAM_TEXT);
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         // Report selection.
         $reportoptions = array('' => get_string('choosedots', 'core'));

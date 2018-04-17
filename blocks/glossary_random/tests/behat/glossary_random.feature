@@ -39,7 +39,7 @@ Feature: Random glossary entry block is used in a course
     And I add the "Random glossary entry" block
     And I configure the "block_glossary_random" block
     And I set the following fields to these values:
-      | Title                           | AutoGlossaryblock   |
+      | Block title (no title if blank) | AutoGlossaryblock   |
       | Take entries from this glossary | GlossaryAuto        |
       | How a new entry is chosen       | Last modified entry |
     And I press "Save changes"
@@ -85,7 +85,7 @@ Feature: Random glossary entry block is used in a course
     And I add the "Random glossary entry" block
     And I configure the "block_glossary_random" block
     And I set the following fields to these values:
-      | Title                           | ManualGlossaryblock |
+      | Block title (no title if blank) | ManualGlossaryblock |
       | Take entries from this glossary | GlossaryManual      |
       | How a new entry is chosen       | Last modified entry |
     And I press "Save changes"

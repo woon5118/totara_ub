@@ -32,9 +32,21 @@
  */
 
 class block_blog_recent_edit_form extends block_edit_form {
+
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     protected function specific_definition($mform) {
+        parent::specific_definition($mform);
+
         // Fields for editing HTML block title and contents.
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         $numberofentries = array();
         for ($i = 1; $i <= 20; $i++) {

@@ -66,8 +66,16 @@ class block_edit_form extends moodleform {
         // TOTARA: This is a little hacky, we are going to force this as a config option for all blocks.
         // Because its prefixed with "config_" it will be collected from and stored in the block_instance.configdata field
         // automatically for us.
+
+        // block appearance heading
         $mform->addElement('header', 'displayconfig', get_string('displayconfig', 'block'));
-        $mform->addElement('selectyesno', 'config_display_with_border', get_string('config_display_with_border', 'block'));
+        // header element
+        $mform->addElement('radio', 'config_display_with_header', get_string('config_display_with_header', 'block'), get_string('show'), 1);
+        $mform->addElement('radio', 'config_display_with_header', '', get_string('hide'), 0, array('id' => 'display_with_header_hide'));
+        $mform->setDefault('config_display_with_header', $this->block->display_with_header());
+        // border element
+        $mform->addElement('radio', 'config_display_with_border', get_string('config_display_with_border', 'block'), get_string('show'), 1);
+        $mform->addElement('radio', 'config_display_with_border', '', get_string('hide'), 0, array('id' => 'display_with_border_hide'));
         $mform->setDefault('config_display_with_border', $this->block->display_with_border());
 
         // Then show the fields about where this block appears.
@@ -298,9 +306,48 @@ class block_edit_form extends moodleform {
 
     /**
      * Override this to create any form fields specific to this type of block.
+     *
      * @param object $mform the form being built.
      */
     protected function specific_definition($mform) {
-        // By default, do nothing.
+
+        if ($this->has_general_settings()) {
+            $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+            // add title element
+            $mform->addElement('text', 'config_title', get_string('config_settings_block_title', 'block'));
+            $mform->setDefault('config_title', $this->block->get_title());
+            $mform->setType('config_title', PARAM_TEXT);
+            // add hiding element
+            $mform->addElement('radio', 'config_allow_hiding', get_string('config_settings_block_hiding', 'block'), get_string('yes'), 'yes');
+            $mform->addElement('radio', 'config_allow_hiding', '', get_string('no'), 'no', array('id' => 'config_allow_hiding_hide'));
+            if (empty($this->block->config->allow_hiding) || $this->block->config->allow_hiding == 'yes') {
+                $mform->setDefault('config_allow_hiding', 'yes');
+            }
+            else {
+                $mform->setDefault('config_allow_hiding', 'no');
+            }
+            // add dock element
+            $mform->addElement('radio', 'config_enabledock', get_string('config_settings_block_docking', 'block'), get_string('yes'), 'yes');
+            $mform->addElement('radio', 'config_enabledock', '', get_string('no'), 'no');
+            if (empty($this->block->config->enabledock) || $this->block->config->enabledock == 'yes') {
+                $mform->setDefault('config_enabledock', 'yes');
+            }
+            else {
+                $mform->setDefault('config_enabledock', 'no');
+            }
+        }
+    }
+
+    /**
+     * Override this function when your block has been updated to allow the base class block_edit_form to manage the hiding and docking settings.
+     * In a future version of Totara, this function will be deprecated and all blocks will be assumed to have handed over management of hiding and docking to the base class.
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        if (class_exists('block_' . $this->block->name() . '_edit_form')) {
+            return false;
+        }
+        return true;
     }
 }

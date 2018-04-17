@@ -29,11 +29,20 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_tag_flickr_edit_form extends block_edit_form {
-    protected function specific_definition($mform) {
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
-        $mform->addElement('text', 'config_title', get_string('configtitle', 'block_tag_flickr'));
-        $mform->setType('config_title', PARAM_TEXT);
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
+    protected function specific_definition($mform) {
+        parent::specific_definition($mform);
+
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         $mform->addElement('text', 'config_numberofphotos', get_string('numberofphotos', 'block_tag_flickr'), array('size' => 5));
         $mform->setType('config_numberofphotos', PARAM_INT);

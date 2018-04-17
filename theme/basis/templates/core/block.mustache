@@ -60,7 +60,8 @@
             },
             "controls":{
                 "control_output":"<div id='action-menu-1'> ... </div>"
-            }
+            },
+            "collapsable":true
         },
         "content":"I am the content of the example block<br \/>Each block is responsible for styling their own content.",
         "footer":{
@@ -79,7 +80,7 @@
             {{{control_output}}}
         {{/controls}}
         <div class="title block-title">
-            <div class="block_action"></div>
+            <div class="block_action"  {{#collapsable}}data-collapsable="1"{{/collapsable}}></div>
             {{#title}}
                 <h2 id="{{id}}" data-movetext="true">{{{text}}}</h2>
             {{/title}}

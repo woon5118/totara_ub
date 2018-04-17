@@ -20,16 +20,16 @@ Feature: Test edit the block config for the featured links block
 
   Scenario: Check that the block can be configured
     When I configure the "Featured Links" block
-    Then I should see "Title for the block"
-    And I should see "Tile size"
+    Then I should see "Block title (no title if blank)"
+    And I click on "Custom block settings" "link"
     And I should see "Manual ID"
 
   Scenario: Check that editing the config options changes the content of the block
     When I configure the "Featured Links" block
     And I set the following fields to these values:
-      | Title for the block | Title |
-      | Tile size           | small |
-      | Manual ID           |  a_unique_id_totara_featured_links |
+      | Block title (no title if blank) | Title |
+      | Tile size                       | small |
+      | Manual ID                       |  a_unique_id_totara_featured_links |
     And I press "Save changes"
     Then I should see "Title"
     And ".block-totara-featured-links-tile-small" "css_element" should exist
@@ -38,9 +38,9 @@ Feature: Test edit the block config for the featured links block
   Scenario: Check that canceling doesn't change the contents of the block
     When I configure the "Featured Links" block
     And I set the following fields to these values:
-      | Title for the block | Title |
-      | Tile size           | small |
-      | Manual ID           |  a_unique_id_totara_featured_links |
+      | Block title (no title if blank) | Title |
+      | Tile size                       | small |
+      | Manual ID                       |  a_unique_id_totara_featured_links |
     And I press "Cancel"
     Then ".block-totara-featured-links-tile-medium" "css_element" should exist
     And I should not see "Title"

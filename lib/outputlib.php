@@ -399,6 +399,11 @@ class theme_config {
     public $enable_dock = false;
 
     /**
+     * @var bool If set to true and the theme enables then allow to hide the block
+     */
+    public $enable_hide = false;
+
+    /**
      * @var bool If set to true then this theme will not be shown in the theme selector unless
      * theme designer mode is turned on.
      */
@@ -567,7 +572,7 @@ class theme_config {
         $configurable = array(
             'parents', 'sheets', 'parents_exclude_sheets', 'plugins_exclude_sheets',
             'javascripts', 'javascripts_footer', 'parents_exclude_javascripts',
-            'layouts', 'enable_dock', 'enablecourseajax', 'requiredblocks',
+            'layouts', 'enable_dock','enable_hide', 'enablecourseajax', 'requiredblocks',
             'rendererfactory', 'csspostprocess', 'editor_sheets', 'rarrow', 'larrow', 'uarrow', 'darrow',
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
             'lessfile', 'extralesscallback', 'lessvariablescallback', 'blockrendermethod',

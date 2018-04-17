@@ -30,13 +30,22 @@ defined('MOODLE_INTERNAL') || die();
 class block_totara_featured_links_edit_form extends block_edit_form{
 
     /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
+    /**
      * defines the form for the custom block options
      * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
-        $mform->addElement('header', 'config_header', get_string('blocksettings', 'block'));
+        parent::specific_definition($mform);
 
-        $mform->addElement('text', 'config_title', get_string('block_header', 'block_totara_featured_links'), []);
+        $mform->addElement('header', 'config_header', get_string('customblocksettings', 'block'));
 
         $mform->addElement(
             'select',
@@ -74,7 +83,6 @@ class block_totara_featured_links_edit_form extends block_edit_form{
 
         $mform->addElement('text', 'config_manual_id', get_string('manual_id', 'block_totara_featured_links'));
 
-        $mform->setType('config_title', PARAM_TEXT);
         $mform->setType('config_size', PARAM_ALPHA);
         $mform->setType('config_manual_id', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('config_manual_id', 'manual_id', 'block_totara_featured_links');

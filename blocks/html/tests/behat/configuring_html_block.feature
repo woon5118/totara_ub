@@ -11,11 +11,12 @@ Feature: Adding and configuring HTML blocks
     When I turn editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
+    And I set the field "Block title (no title if blank)" to "The HTML block header"
     And I set the field "Content" to "Static text without a header"
     And I press "Save changes"
     Then I should not see "(new HTML block)"
     And I configure the "block_html" block
-    And I set the field "Block title" to "The HTML block header"
+    And I set the field "Block title (no title if blank)" to "The HTML block header"
     And I set the field "Content" to "Static text with a header"
     And I press "Save changes"
     And "block_html" "block" should exist
@@ -28,11 +29,12 @@ Feature: Adding and configuring HTML blocks
     When I turn editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
+    And I set the field "Block title (no title if blank)" to "The HTML block header"
     And I set the field "Content" to "Static text without a header"
     And I press "Save changes"
     Then I should not see "(new HTML block)"
     And I configure the "block_html" block
-    And I set the field "Block title" to "The HTML block header"
+    And I set the field "Block title (no title if blank)" to "The HTML block header"
     And I set the field "Content" to "Static text with a header"
     And I press "Save changes"
     And "block_html" "block" should exist

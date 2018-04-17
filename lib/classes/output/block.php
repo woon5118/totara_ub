@@ -113,8 +113,8 @@ class block implements renderable {
         }
 
         $block->header = array(
-            'title' => false,
-            'controls' => false
+            'title'    => false,
+            'controls' => false,
         );
         if ($title) {
             $block->header['title'] = $title;
@@ -123,6 +123,15 @@ class block implements renderable {
             $block->header['controls'] = $controls;
         }
 
+        $block->header['collapsable'] = true;
+        if (isset($bc->headercollapsable)) {
+            $block->header['collapsable'] = $bc->headercollapsable;
+        }
+
+        $block->header['display'] = true;
+        if (isset($bc->displayheader) && !$bc->displayheader) {
+            unset($block->header);
+        }
 
         $block->content = $bc->content;
 
@@ -137,7 +146,6 @@ class block implements renderable {
                 'annotation_content' => $bc->annotation
             );
         }
-
         return $block;
     }
 }

@@ -29,14 +29,20 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_tags_edit_form extends block_edit_form {
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     protected function specific_definition($mform) {
         global $CFG;
+        parent::specific_definition($mform);
         // Fields for editing HTML block title and contents.
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
-
-        $mform->addElement('text', 'config_title', get_string('configtitle', 'block_tags'));
-        $mform->setType('config_title', PARAM_TEXT);
-        $mform->setDefault('config_title', get_string('pluginname', 'block_tags'));
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         $this->add_collection_selector($mform);
 

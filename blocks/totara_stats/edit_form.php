@@ -27,10 +27,21 @@ require_once("$CFG->libdir/formslib.php");
 
 class block_totara_stats_edit_form extends block_edit_form {
 
+    /**
+     * Enable general settings
+     *
+     * @return bool
+     */
+    protected function has_general_settings() {
+        return true;
+    }
+
     protected function specific_definition($mform) {
         global $USER;
+        parent::specific_definition($mform);
         $mform = $this->_form;
         $stats = totara_stats_manager_stats($USER);
+        $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
         foreach ($stats as $stat) {
             $varname = 'config_'.$stat->string;
             $mform->addElement('header', $varname.'_header', get_string($stat->string.'_config', 'block_totara_stats'));

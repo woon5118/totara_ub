@@ -140,8 +140,8 @@ Feature: Report builder table block
     When I log in as "learner1"
     And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
-    Then I should not see "Admin" in the "Report table" "block"
-    And I configure the "Report table" block
+    Then I should not see "Admin" in the "Report access test" "block"
+    And I configure the "Report access test" block
     And I should see "Current report (inaccessible)"
 
   Scenario: Test block settings when report saved search became not public
@@ -178,9 +178,9 @@ Feature: Report builder table block
     And I press "Close"
     # Confirm that block report is not shown
     When I click on "Dashboard" in the totara menu
-    Then I should not see "learner2" in the "Report table" "block"
+    Then I should not see "learner2" in the "Report sid access test" "block"
     # Confirm that name of saved search is not shown
-    And I configure the "Report table" block
+    And I configure the "Report sid access test" block
     And I should see "Current saved search (inaccessible)"
     And I should not see "LearnerSearch"
 
