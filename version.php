@@ -47,7 +47,7 @@ $maturity = MATURITY_ALPHA;         // This version's maturity level.
 $TOTARA = new stdClass();
 
 $TOTARA->version    = '12dev';          // Please keep as string.
-$TOTARA->build      = '20180323.00';   // Please keep as string.
+$TOTARA->build      = '20180419.00';   // Please keep as string.
 
 if ($maturity == MATURITY_EVERGREEN) {
     $TOTARA->release = "Evergreen (Build: {$TOTARA->build})";
