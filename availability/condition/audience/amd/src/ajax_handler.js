@@ -53,12 +53,31 @@ define(['jquery', 'core/config'], function($, mdlcfg) {
                 return;
             }
 
+            function getCourse() {
+                var vars = {}, hash;
+                var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+
+                // Loop through all of the variables searching for course.
+                for(var i = 0; i < hashes.length; i++) {
+                    hash = hashes[i].split('=');
+                    if (hash[0] === 'course') {
+                        return hash[1];
+                    }
+                }
+
+                return null;
+            }
+
+            //Get the course param if it's available
+            var courseid = getCourse();
+
             if (_cache[query] === undefined) {
                 _cache[query] = $.ajax({
                     url: mdlcfg.wwwroot + '/availability/condition/audience/ajax.php',
                     type: 'POST',
                     data: {
-                        filter: query
+                        filter: query,
+                        course: courseid
                     }
                 });
             }

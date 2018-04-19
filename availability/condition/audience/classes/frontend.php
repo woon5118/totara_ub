@@ -40,7 +40,13 @@ class frontend extends \core_availability\frontend {
      * @return bool True if the user can add this restriction.
      */
     protected function allow_add($course, \cm_info $cm = null, \section_info $section = null) {
-        $context = \context_system::instance();
+        if (!empty($course->id)) {
+            $context = \context_course::instance($course->id);
+        } else if (!empty($course->category)) {
+            $context = \context_coursecat::instance($course->category);
+        } else {
+            $context = \context_system::instance();
+        }
 
         if (has_capability('moodle/cohort:view', $context)) {
             return true;

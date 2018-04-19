@@ -27,11 +27,15 @@ require_once(__DIR__ . '/../../../config.php');
 
 require_login(null, false);
 
+$courseid = optional_param('course', 0, PARAM_INT);
 $filter = optional_param('filter', '', PARAM_ALPHANUM);
 
-// Permissions checks on the system context to make sure we have access to
-// see audiences.
-$context = context_system::instance();
+// Permissions checks on the system context to make sure we have access to see audiences.
+if ($courseid) {
+    $context = context_course::instance($courseid);
+} else {
+    $context = context_system::instance();
+}
 require_capability('moodle/cohort:view', $context);
 
 $PAGE->set_context($context);
