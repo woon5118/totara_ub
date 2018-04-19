@@ -211,19 +211,6 @@ abstract class course_set {
     }
 
     /**
-     * Returns a html string with warnings or blank if none
-     *
-     * @deprecated since Totara 10.0.
-     * @global object $DB
-     * @param object $course
-     * @return string html content
-     */
-    protected function get_course_warnings($course) {
-        debugging('course_set::get_course_warnings is deprecated and no longer has any purpose', DEBUG_DEVELOPER);
-        return '';
-    }
-
-    /**
      * Returns true or false depending on whether or not this course set
      * contains the specified course
      *

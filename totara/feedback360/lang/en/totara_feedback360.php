@@ -349,13 +349,3 @@ $string['viewrequest'] = 'View Request';
 $string['viewresponse'] = 'View Response';
 $string['viewuserxresponses'] = 'View {$a}\'s responses';
 $string['you'] = 'You';
-
-
-// Deprecated since Totara 10
-$string['deletefeedback360questions'] = 'And all related questions';
-$string['deletefeedback360assignments'] = 'And all related assignments';
-$string['feedback360selectform'] = 'Select the type of feedback you want to receive:';
-$string['feedback360selectform_help'] = 'This is the form the users will have to fill in and submit as your feedback, click the preview link next to the name to see the form.';
-$string['newrequest'] = 'New Feedback Request';
-$string['noavailableforms'] = 'You have no unused forms available';
-$string['nofeedback360requested'] = 'There are no feedback requests yet';

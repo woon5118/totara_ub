@@ -1,6 +1,13 @@
 This file describes API changes in Totara Certification,
 information provided here is intended for developers.
 
+=== 12 ===
+
+Removed deprecated methods:
+  * certification_event_handler::unassigned()
+  * assign_certification_stage()
+  * delete_removed_users()
+
 === 10 ===
 
 * rb_display_certif_status has been moved in to a new style auto-loading class

@@ -1231,18 +1231,6 @@ $string['xrecord'] = '{$a} record shown';
 $string['xrecords'] = '{$a} records shown';
 
 /**
- * Deprecated strings.
- *
- * @deprecated since Totara 10.0.
- */
-
-$string['allreports'] = 'All Reports';
-$string['isrelativetotoday'] = ' (date of report generation)';
-$string['managereports'] = 'Manage reports';
-$string['pdf_landscapeformat'] = 'pdf format (landscape)';
-$string['pdf_portraitformat'] = 'pdf format (portrait)';
-
-/**
  * @deprecated since Totara 11.0.
  */
 

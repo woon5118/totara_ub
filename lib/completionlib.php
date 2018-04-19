@@ -1886,17 +1886,6 @@ class completion_info {
     }
 
     /**
-     * DEPRECATED: For testing only.
-     *
-     * @deprecated since Totara 10, this function should no longer be needed for testing.
-     */
-    public static function wipe_session_cache() {
-        debugging('The method \completion_info::wipe_session_cache has been deprecated and will be removed.', DEBUG_DEVELOPER);
-        $cache = cache::make('core', 'completion');
-        $cache->purge();
-    }
-
-    /**
      * Get all completions a user has across the site
      * @access  public
      * @param   $userid     int     User id

@@ -1,6 +1,14 @@
 This files describes API changes in Totara Completion Import,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* Removed deprecated methods:
+  * check_fields_exist()
+  * import_csv()
+  * import_completions()
+* Removed deprecated file csv_iterator.php
+
 === 11 ===
 
 * create_evidence_item() added eighth argument $evidencefields

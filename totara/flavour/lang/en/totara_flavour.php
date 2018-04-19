@@ -77,7 +77,3 @@ $string['setting_core_feature_facetoface'] = 'Seminar activities';
 $string['setting_core_feature_facetoface_desc'] = 'The seminar activity tracks instructor-led training events, allowing learners to choose a event and register, receive automated notifications, and view upcoming and past bookings on their calendar. Trainers can register learners, view/print a registration list, and track event attendance.  ';
 $string['unavailable'] = 'Unavailable';
 $string['unknown'] = 'Unknown';
-
-// depreacted
-$string['setting_core_enableteam'] = 'My Team';
-$string['setting_core_enableteam_desc'] = 'The My Team dashboard allows managers to view their direct reports to access user profiles, instructor led training, learning plans, records, and performance management options.';

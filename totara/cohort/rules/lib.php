@@ -215,30 +215,6 @@ function cohort_rule_create_rule($rulesetid, $type, $name) {
     return $todb->id;
 }
 
-
-/**
- * Take a rule's description and wrap it in the HTML it needs to fit into the rules form
- * @deprecated since Totara 9.0
- * @param int $ruleid
- * @param string $description
- * @param string $rulegroup
- * @param string $rulename
- * @param boolean $first
- * @param string $operator
- * @param boolean $brokenrule
- * @return string
- */
-function cohort_rule_form_html($ruleid, $description, $rulegroup = '', $rulename = '', $first = false, $operator = '',
-                               $brokenrule = false) {
-    // If you are here our appologise.
-    // As part of Totara 9.0 we rearranged how this was working cleaning up the output to use a list and cleaned up the JS handling
-    // of rule changes.
-    // For this reason the HTML returned by this method would likely have left to a breakage for you.
-    // As such it has been removed and you will need to update your code.
-    debugging('cohort_rule_form_html has been deprecated and no longer functions. Please see the code for details', DEBUG_DEVELOPER);
-    return '';
-}
-
 /**
  * Produces a ruleset data object for an audience ruleset.
  *

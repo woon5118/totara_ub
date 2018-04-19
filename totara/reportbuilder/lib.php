@@ -5523,23 +5523,6 @@ function sql_table_from_select($table, $select, array $params) {
 }
 
 /**
- * Returns the proper SQL to aggregate a field by joining with a specified delimiter
- *
- *
- */
-function sql_group_concat($field, $delimiter=', ', $unique=false) {
-    global $DB;
-
-    debugging('sql_group_concat() is deprecated. Use DB->sql_group_concat_unique() instead.', DEBUG_DEVELOPER);
-
-    if ($unique) {
-        return $DB->sql_group_concat_unique($field, $delimiter);
-    } else {
-        return $DB->sql_group_concat($field, $delimiter);
-    }
-}
-
-/**
  * Schedule reporting cache
  *
  * @global object $DB
@@ -5591,23 +5574,6 @@ function reportbuilder_fix_schedule($reportid) {
         $DB->update_record('report_builder_cache', $cache);
     }
     return true;
-}
-
-/**
- * Returns reports that the current user can view
- *
- * @param boolean showhidden If true include hidden reports
- *
- * @deprecated since Totara 2.9 - use reportbuilde::get_user_permitted_reports() instead
- *
- * @return array Array of report records
- */
-function reportbuilder_get_reports($showhidden=false) {
-    global $reportbuilder_permittedreports;
-    if (!isset($reportbuilder_permittedreports) || !is_array($reportbuilder_permittedreports)) {
-        $reportbuilder_permittedreports = reportbuilder::get_permitted_reports(null,$showhidden);
-    }
-    return $reportbuilder_permittedreports;
 }
 
 /**

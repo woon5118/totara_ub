@@ -1,2 +1,3 @@
-allreports,totara_reportbuilder
-isrelativetotoday,totara_reportbuilder
+activeonly,totara_reportbuilder
+deletedonly,totara_reportbuilder
+suspendedonly,totara_reportbuilder

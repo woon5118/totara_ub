@@ -1,9 +1,21 @@
 This files describes API changes in HR Import,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* Removed deprecated methods:
+  * totara_sync_element_user::sync_user_assignments()
+  * totara_sync_element_user::sync_user_job_assignments()
+  * totara_sync_element_user::sync_user_dependant_job_assignment_fields()
+  * totara_sync_element_user::get_invalid_org_pos()
+  * totara_sync_element_user::get_invalid_start_end_dates()
+  * totara_sync_element_user::get_invalid_roles()
+  * totara_sync_element_user::check_self_assignment()
+
+
 === 11.0 ===
 
-* Notifications and source field informaiion has been moved out Element forms, affecting mark-up in the following methods:
+* Notifications and source field information has been moved out Element forms, affecting mark-up in the following methods:
   * csv_trait::config_form_add_csv_details()
   * totara_sync_source_org_csv::config_form()
   * totara_sync_source_pos_csv::config_form()

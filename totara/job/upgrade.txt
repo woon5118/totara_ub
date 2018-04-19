@@ -4,6 +4,7 @@ information provided here is intended especially for developers.
 === 12 ===
 
 * totara/job/templates/job_management_listing.mustache Icon helpers are no longer used, icon data is passed via context data.
+* Removed deprecated file user/positions.php
 
 === 10 ===
 

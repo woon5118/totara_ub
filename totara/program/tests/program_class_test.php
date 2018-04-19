@@ -1474,17 +1474,13 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         ];
         $program = $this->program_generator->create_program($detail);
         $this->program_generator->add_courseset_to_program($program->id, 1, 1);
-        
-        $debugmessage = '$program->is_accessible() is deprecated, use the lib function prog_is_accessible() instead';
 
         // Check the program is accessible before the user is not assigned.
-        $this->assertTrue($program->is_accessible($user));
-        $this->assertDebuggingCalled($debugmessage);
+        $this->assertTrue(prog_is_accessible($program, $user));
 
         // Assign the user and check the program still accessible.
         $this->program_generator->assign_program($program->id, [$user->id]);
-        $this->assertTrue($program->is_accessible($user));
-        $this->assertDebuggingCalled($debugmessage);
+        $this->assertTrue(prog_is_accessible($program, $user));
 
         // Create a new program that is not visible.
         $now = time();
@@ -1500,12 +1496,11 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->program_generator->assign_program($program->id, [$user->id]);
         $this->assertEquals(0, $unavailableprogram->available);
         // Check the user cannot access it.
-        $this->assertFalse($unavailableprogram->is_accessible($user));
-        $this->assertDebuggingCalled($debugmessage);
+        $this->assertFalse(prog_is_accessible($unavailableprogram, $user));
+
         // Check the admin can still access it.
         $admin = get_admin();
-        $this->assertTrue($unavailableprogram->is_accessible($admin));
-        $this->assertDebuggingCalled($debugmessage);
+        $this->assertTrue(prog_is_accessible($unavailableprogram, $admin));
     }
 
     /**

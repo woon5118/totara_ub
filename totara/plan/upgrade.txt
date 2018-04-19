@@ -1,6 +1,13 @@
 This files describes API changes in Learning plans,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+Removed deprecated methods:
+  * development_plan::get_manager()
+  * development_plan::send_alert()
+  * dp_base_component::display_back_to_index_link()
+
 === 10 ===
 
 Added isexport param to rb_source_dp_certification::rb_display_link_program_icon.

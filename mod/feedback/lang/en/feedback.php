@@ -303,10 +303,6 @@ $string['radiobutton_rated'] = 'Radiobutton (rated)';
 $string['start'] = 'Start';
 $string['stop'] = 'End';
 
-// Deprecated since Totara 10.
-$string['generategrade'] = 'Generate Grade';
-$string['generategrade_help'] = 'If you want to use this feedback as a prerequisite for a conditional activity, requiring that the feedback must be completed before that conditional activity becomes available, then you must set **Generate Grade** to **Yes**.';
-
 // Archives
 $string['error:completedhistorynotfound'] = 'Completed history not found for id : {$a}';
 $string['viewarchive'] = 'Feedback archive';

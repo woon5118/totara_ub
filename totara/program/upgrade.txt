@@ -1,6 +1,25 @@
 This files describes API changes in Totara Program,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* Removed deprecated file assignment/remove_item.php
+* Removed deprecated methods:
+  * program::is_accessible()
+  * program::delete_completion_record()
+  * course_set::get_course_warnings()
+  * prog_assignments::__get()
+  * prog_assignments::__call()
+  * prog_store_position_assignment()
+* Removed deprecated class user_assignment
+* Removed deprecated functions and properties in JavaScript:
+  * program_assignment.total_count
+  * program_assignment.is_setup
+  * program_assignment.update_total_user_count()
+  * program_assignment.setup()
+  * category.user_count_label
+  * category.update_user_count()
+
 === 10 ===
 
 API Changes:

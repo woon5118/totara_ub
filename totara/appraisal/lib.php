@@ -642,26 +642,6 @@ class appraisal {
     }
 
     /**
-     * Check for user assignments with missing roles.
-     *
-     * @deprecated since 9.0
-     * @throws coding_exception
-     */
-    public function get_missingrole_users() {
-        throw new coding_exception('get_missingrole_users has been deprecated since 9.0. Use functions from totara_assign_appraisal instead.');
-    }
-
-    /**
-     * Get role changes for user assignments for the current appraisal
-     *
-     * @deprecated since 9.0
-     * @throws coding_exception
-     */
-    public function get_changedrole_users() {
-        throw new coding_exception('get_changedrole_users has been deprecated since 9.0. Use functions from totara_assign_appraisal instead.');
-    }
-
-    /**
      * Get the appraisal expected completed date, (the due date of the last stage).
      *
      * @return int timestamp
@@ -1186,36 +1166,6 @@ class appraisal {
             self::ROLE_TEAM_LEAD => 'roleteamlead',
             self::ROLE_APPRAISER => 'roleappraiser'
             );
-        return $roles;
-    }
-
-    /**
-     * Get the current position assignments for a users appraisal role assignments
-     *
-     * With the change to job assignments, this will only get values for the first job assignment.
-     * Use job assignment code to get these values for all or specific job assignments as needed.
-     *
-     * @deprecated since 9.0
-     * @param int userid The id of the user to get the current assignments for
-     * @return array(appraisal::ROLE_* => userid)
-     */
-    public static function get_live_role_assignments($userid) {
-
-        debugging('appraisal::get_live_role_assignments has been deprecated since 9.0. Use job assignment code to get values for these roles.',
-            DEBUG_DEVELOPER);
-
-        $jobassignment = \totara_job\job_assignment::get_first($userid);
-        $managerid = $jobassignment->managerid;
-        $teamleaderid = $jobassignment->teamleaderid;
-        $appraiserid = $jobassignment->appraiserid;
-
-        $roles = array(
-            self::ROLE_LEARNER => $userid,
-            self::ROLE_MANAGER => $managerid ? $managerid : 0,
-            self::ROLE_TEAM_LEAD => $teamleaderid ? $teamleaderid : 0,
-            self::ROLE_APPRAISER => $appraiserid ? $appraiserid : 0,
-        );
-
         return $roles;
     }
 

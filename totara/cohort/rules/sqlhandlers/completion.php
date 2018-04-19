@@ -274,25 +274,6 @@ class cohort_rule_sqlhandler_completion_duration_course extends cohort_rule_sqlh
 }
 
 /**
- * @deprecated Since 9.0
- * This class has been replaced by the cohort_rule_sqlhandler_completion_duration_started_program
- * and cohort_rule_sqlhandler_completion_duration_assigned_program classes.
- */
-class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sqlhandler_completion_duration_assigned_program {
-    protected function construct_sql_snippet($goalnum, $comparison, $lov) {
-
-        $message = 'The completion_duration_program has been deprecated and split into 2 new functions.
-    * Completion_duration_started_program now does what the deprecated function should have been doing
-    * Completion_duration_assigned_program now does what the deprecated function was actually doing
-    Please update your code to use one of the new functions.';
-
-        debugging($message, DEBUG_DEVELOPER);
-
-        return parent::construct_sql_snippet($goalnum, $comparison, $lov);
-    }
-}
-
-/**
  * Rule for checking whether user took longer than a specified duration to complete all
  * the programs in a list
  */

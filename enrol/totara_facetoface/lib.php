@@ -1213,50 +1213,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
     }
 }
 
-/*
- * DEPRECATED: Handles change in signup status if relevant for enrolment
- *
- * @deprecated since Totara 10
- * @param object $newstatus
- * @return bool
- */
-function enrol_totara_facetoface_statushandler($newstatus) {
-
-    debugging(__FUNCTION__.' has been deprecated, it is no longer required and will be removed after Totara 11.', DEBUG_DEVELOPER);
-
-    $status = enrol_totara_facetoface_enrol_on_approval($newstatus);
-    $status = enrol_totara_facetoface_unenrol_on_removal($newstatus) && $status;
-
-    return $status;
-}
-
-/**
- * DEPRECATED: Handles the deletion of a module by legacy event handler.
- *
- * @deprecated since Totara 10
- * @param stdClass $info
- * @return bool
- */
-function enrol_totara_facetoface_deletedhandler($info) {
-    global $DB;
-
-    debugging(__FUNCTION__.' has been deprecated, it is no longer required and will be removed after Totara 11.', DEBUG_DEVELOPER);
-
-    $status = true;
-    if ($info->modulename == 'facetoface') { // Facetoface activity deleted.
-        // Find all enrolment instances in this course of type totara_facetoface with 'unenrol when removed' enabled.
-        $enrols = $DB->get_records('enrol', array('enrol' => 'totara_facetoface', 'courseid' => $info->courseid,
-            enrol_totara_facetoface_plugin::SETTING_UNENROLWHENREMOVED => 1));
-        foreach ($enrols as $enrolinst) {
-            if (!$userids = $DB->get_fieldset_select('user_enrolments', 'userid', 'enrolid = ?', array($enrolinst->id))) {
-                continue;
-            }
-            $status = enrol_totara_facetoface_unenrol_if_no_signups($enrolinst, $userids) && $status;
-        }
-    }
-    return $status;
-}
-
 function enrol_totara_facetoface_enrol_on_approval($newstatus) {
     global $DB;
 

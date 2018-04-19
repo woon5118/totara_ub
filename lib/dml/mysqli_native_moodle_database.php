@@ -380,21 +380,6 @@ class mysqli_native_moodle_database extends moodle_database {
     }
 
     /**
-     * Is this database compatible with compressed row format?
-     * This feature is necessary for support of large number of text
-     * columns in InnoDB/XtraDB database.
-     *
-     * @deprecated since Totara 10.2
-     *
-     * @param bool $cached use cached result
-     * @return bool true if table can be created or changed to compressed row format.
-     */
-    public function is_compressed_row_format_supported($cached = true) {
-        // Totara: we require database that supports Compressed and Dynamic row formats, this is tested in environment.
-        return true;
-    }
-
-    /**
      * Check the database to see if innodb_file_per_table is on.
      *
      * @return bool True if on otherwise false.
@@ -439,23 +424,6 @@ class mysqli_native_moodle_database extends moodle_database {
             }
         }
         return false;
-    }
-
-    /**
-     * Determine if the row format should be set to compressed, dynamic, or default.
-     *
-     * Terrible kludge. If we're using utf8mb4 AND we're using InnoDB, we need to specify row format to
-     * be either dynamic or compressed (default is compact) in order to allow for bigger indexes (MySQL
-     * errors #1709 and #1071).
-     *
-     * @deprecated since Totara 10.2
-     *
-     * @param  string $engine The database engine being used. Will be looked up if not supplied.
-     * @param  string $collation The database collation to use. Will look up the current collation if not supplied.
-     * @return string An sql fragment to add to sql statements.
-     */
-    public function get_row_format_sql($engine = null, $collation = null) {
-        return "ROW_FORMAT=Compressed";
     }
 
     /**

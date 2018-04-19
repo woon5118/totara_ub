@@ -830,36 +830,6 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         return $out;
     }
 
-
-    /**
-     * Return the appropriate string describing the search matches
-     *
-     * @deprecated since Totara 9.9, 10 Please call $this->result_count_info() instead.
-     * @param integer $countfiltered Number of records that matched the search query
-     * @param integer $countall Number of records in total (with no search)
-     * @return string Text describing the number of results
-     */
-    public function print_result_count_string($countfiltered, $countall) {
-
-        debugging(__METHOD__ . ' has been deprecated please call totara_reportbuilder_renderer::result_count_info instead', DEBUG_DEVELOPER);
-
-        $displaycountall = get_config('totara_reportbuilder', 'allowtotalcount');
-
-        // Countall is 0.
-        if (empty($displaycountall) || ($countall == 0 && $countfiltered > 0)) {
-            // If we're here then countall is obviously wrong, so don't display it.
-            $resultstr = ((int)$countfiltered === 1) ? 'xrecord' : 'xrecords';
-            $a = $countfiltered;
-        } else {
-            $resultstr = ((int)$countall === 1) ? 'xofyrecord' : 'xofyrecords';
-            $a = new stdClass();
-            $a->filtered = $countfiltered;
-            $a->unfiltered = $countall;
-
-        }
-        return html_writer::span(get_string($resultstr, 'totara_reportbuilder', $a), 'rb-record-count');
-    }
-
     /**
      * Returns HTML containing a string detailing the result count for the given report.
      *

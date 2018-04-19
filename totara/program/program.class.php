@@ -354,31 +354,6 @@ class program {
         return true;
     }
 
-
-    /**
-     * @deprecated since Totara 10. Use prog_conditionally_delete_completion instead.
-     *
-     * Deletes the completion records for the program for the specified user.
-     *
-     * @param int $userid
-     * @param bool $deletecompleted Whether to force deletion of records for completed programs
-     * @return bool Deletion true|Exception
-     */
-    public function delete_completion_record($userid, $deletecompleted=false) {
-        debugging('certification_event_handler::unassigned() is deprecated, call certif_conditionally_delete_completion directly instead.', DEBUG_DEVELOPER);
-
-        global $DB;
-
-        if ($deletecompleted === true || !prog_is_complete($this->id, $userid)) {
-            $DB->delete_records('prog_completion', array('programid' => $this->id, 'userid' => $userid));
-            prog_log_completion($this->id, $userid, 'Deleted prog_completion in deprecated function program::delete_completion_record');
-        }
-
-        \totara_program\progress\program_progress_cache::mark_program_cache_stale($this->id);
-
-        return true;
-    }
-
     /**
      * Checks all the assignments for the program and assigns and unassigns
      * learners to the program if they meet or don't meet the current
@@ -2079,20 +2054,6 @@ class program {
         }
 
         return false;
-    }
-
-    /**
-     * Checks accessibility of the program for user if the user parameter is
-     * passed to the function otherwise checks if the program is generally
-     * accessible.
-     *
-     * @deprecated since Totara 10
-     * @param object $user If this parameter is included check availability to this user
-     * @return boolean
-     */
-    public function is_accessible($user = null) {
-        debugging('$program->is_accessible() is deprecated, use the lib function prog_is_accessible() instead', DEBUG_DEVELOPER);
-        return prog_is_accessible($this, $user);
     }
 
     /**

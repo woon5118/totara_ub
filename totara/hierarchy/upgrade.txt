@@ -1,10 +1,25 @@
 This files describes API changes in Totara Hierarchies,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* Removed deprecated methods:
+  * totara_hierarchy_renderer::print_competency_view_evidence()
+  * totara_hierarchy_renderer::print_goal_view_assignments()
+  * totara_hierarchy_renderer::print_assigned_goals()
+  * pos_can_edit_position_assignment()
+  * pos_get_current_position_data()
+  * pos_get_most_primary_position_assignment()
+  * get_position_assignments()
+* Removed deprecated class position_assignment
+* Removed deprecated files:
+  * prefix/position/assign/manager.php
+  * prefix/position/assign/tempmanager.php
+
 === 10 ===
 
 The following files have been deprecated and should no longer be linked to:
-* totara/hierarchy/prefix/competency/assign/save.phpy
+* totara/hierarchy/prefix/competency/assign/save.php
 * totara/hierarchy/prefix/competency/course/evidence.php
 * totara/hierarchy/prefix/competency/evidenceitem/course.php
 * totara/hierarchy/prefix/competency/item/view.php

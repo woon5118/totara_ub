@@ -764,18 +764,6 @@ function customfield_get_data_shortname_key($item, $tableprefix, $prefix) {
     return $out;
 }
 
-
-/**
- * Returns an object with the custom fields set for the given id
- * @param  integer  id
- * @return  object
- *
- * @deprecated since 10.0
- */
-function customfield_record($id, $tableprefix) {
-    throw new coding_exception('customfield_record has been deprecated since 10.');
-}
-
 /**
  * Get a single custom field instance.
  *

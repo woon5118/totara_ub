@@ -1062,32 +1062,6 @@ $string['youmustcompleteorviewing'] = 'A learner must complete {$a}';
 $string['z:incompleterecurringprogrammessage'] = 'A course in a recurring program that you are enrolled on has reached its end date but you have not completed the course. This course must be completed in order to meet the requirements of the program.';
 $string['z:incompleterecurringprogramsubject'] = 'Incomplete recurring course';
 
-// Deprecated since Totara 10
-
-$string['allcompletiontimeunknownissues'] = 'All "completion time unknown" issues';
-$string['allcurrentlyassignedissues'] = 'All "already assigned" issues';
-$string['allduplicatecourseissues'] = 'All "duplicate course in certifications" issues';
-$string['alltimeallowanceissues'] = 'All "time allowance" issues';
-$string['chosedismissexception'] = 'You have chosen to dismiss this exception';
-$string['completionrecordbecause'] = 'This user has a current completion record for the following reasons:';
-$string['completionrecordreasonnotfound'] = 'A current completion record exists for this user and this program, however no current assignment details could be found.';
-$string['completionrecordunapprovedplan'] = 'A current completion record exists for this user due to having added this program to their learning plan. However, please note that this has not been approved.';
-$string['completionrecorduserdeleted'] = 'A current completion record exists for this user. However, as the user has been deleted, they are not currently assigned.';
-$string['currentlyassigned'] = 'User already assigned to program via learning plan';
-$string['dismissandtakenoaction'] = 'Dismiss and take no action';
-$string['duplicatecourse'] = 'Already assigned to a different certification that contains one of the same courses used in this certification';
-$string['error:info_timedueunknown'] = 'This problem could cause program assignment exceptions, prevent the learner accessing the program or certification, or other problems related to the internal processing of this record. It should be fixed manually, by either disabling the \'Due date\' or setting a valid \'Due date\'.';
-$string['learnersassigned'] = '{$a->total} learner(s) assigned. {$a->assignments} learner(s) are active, {$a->exceptions} with exception(s)';
-$string['learnersassignedexceptions'] = '{$a->total} learner(s) assigned. {$a->assignments} learner(s) are active, <strong>{$a->exceptions} with exception(s)</strong>';
-$string['multiplefacetofacewarning'] = 'Warning : this course has seminar activity without multiple events set';
-$string['overrideandaddprogram'] = 'Override and add program';
-$string['setrealistictimeallowance'] = 'Set realistic time allowance';
-$string['total'] = 'Total';
-$string['totalassignments'] = 'Total potential assignments';
-$string['totalassignments_help'] = 'The total number of assignments that is displayed in the program assignments page and the overview page represents the total number of learners in all the assigned categories and not the number of learners currently assigned to the program.
-
-If a learner belongs to an organisation that is assigned to the program and also holds a position that is assigned to the program then the learner will be counted in each category (but will only be assigned to the program once).';
-
 // Deprecated since Totara 11
 
 $string['error:cannotrequestextnotuser'] = 'You cannot request an extension for another user';

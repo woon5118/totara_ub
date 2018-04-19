@@ -1,6 +1,24 @@
 This file describes API changes in reportbuilder,
 information provided here is intended especially for developers.
 
+=== 12.0 ===
+
+* Added 'selectionlimit' option to manager field filters. "{$CFG->totara_reportbuilder_filter_selected_managers_limit}"
+  introduced to limit the number of selected managers in the report builder job assignment filter dialog.
+  Default value is 25, to make it unlimited, set it to 0.
+* rb_prog_availability_content class has been deprecated.
+* Removed deprecated methods:
+  * reportbuilder_get_reports()
+  * sql_group_concat()
+  * totara_reportbuilder_renderer::print_result_count_string()
+
+=== 11.0 ===
+
+* Triggering of "\totara_reportbuilder\event\report_updated" event for deletion of scheduled reports has been
+  deprecated. Use "\totara_reportbuilder\event\scheduled_report_deleted" event instead.
+* Display method rb_display_deleted_status has been deprecated and replaced by
+  totara/reportbuilder/classes/rb/display/user_status.php
+
 === 10.0 ===
 
 * Added add_cohort_user_* calls to the add_user_* functions in the base source.
@@ -15,8 +33,6 @@ information provided here is intended especially for developers.
 
 * add_cohort_user_tables_to_joinlist has a new parameter $alias to allow multiple instances
   of cohort tables to be added to a single report source.
-
-* rb_display_orderedlist_to_newline() is now deprecated
 
 * Added rb_session_roles_content class in totara/reportbuilder/classes/rb_base_content.php
   to allow Seminar report content to be restricted by an event role in
@@ -42,17 +58,3 @@ information provided here is intended especially for developers.
 
 * rb_base_source::rb_display_user_email_unobscured() has been deprecated, use the
   totara/reportbuilder/classes/rb/display/user_email_unobscured class instead.
-
-=== 11.0 ===
-
-* Triggering of "\totara_reportbuilder\event\report_updated" event for deletion of scheduled reports has been
-  deprecated. Use "\totara_reportbuilder\event\scheduled_report_deleted" event instead.
-* Display method rb_display_deleted_status has been deprecated and replaced by
-  totara/reportbuilder/classes/rb/display/user_status.php
-
-=== 12.0 ===
-
-* Added 'selectionlimit' option to manager field filters. "{$CFG->totara_reportbuilder_filter_selected_managers_limit}"
-  introduced to limit the number of selected managers in the report builder job assignment filter dialog.
-  Default value is 25, to make it unlimited, set it to 0.
-* rb_prog_availability_content class has been deprecated.

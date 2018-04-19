@@ -8,6 +8,32 @@ information provided here is intended especially for developers.
 ** totara/core/templates/my_team_nav.mustache
 ** totara/core/templates/report_list.mustache
 * Removed deprecated placeholder polyfill
+* Removed deprecated methods:
+  * build_nojs_positionpicker()
+  * totara_update_temporary_managers()
+  * totara_display_course_progress_icon()
+  * totara_is_manager()
+  * totara_get_staff()
+  * totara_get_manager()
+  * totara_get_most_primary_manager()
+  * totara_update_temporary_manager()
+  * totara_unassign_temporary_manager()
+  * totara_get_teamleader()
+  * totara_get_appraiser()
+  * sql_cast2char()
+  * sql_cast2float()
+  * totara_core_renderer::totara_print_active_users()
+  * totara_core_renderer::display_course_progress_icon()
+  * totara_core_renderer::print_my_team_nav()
+  * totara_core_renderer::print_report_manager()
+  * totara_core_renderer::print_scheduled_reports()
+  * totara_core_renderer::print_toolbars()
+  * totara_core_renderer::print_totara_search()
+  * totara_core_renderer::print_totara_menu()
+  * totara_core_renderer::print_totara_notifications()
+  * totara_core_renderer::print_totara_progressbar()
+  * totara_core_renderer::print_icons_list()
+* Removed deprecated file dialogs/dialog_content_manager.class.php
 
 === 11 ===
 

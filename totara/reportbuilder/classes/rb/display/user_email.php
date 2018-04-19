@@ -26,9 +26,6 @@ namespace totara_reportbuilder\rb\display;
 /**
  * Displays email text on a reportbuilder generated report.
  *
- * Note: this replaces the global rb_display_user_email() function which has now
- * been deprecated.
- *
  * @author Murali Nair <murali.nair@totaralms.com>
  * @package totara_reportbuilder
  */

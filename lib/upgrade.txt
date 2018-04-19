@@ -29,6 +29,12 @@ information provided here is intended especially for developers.
 ** lib/templates/notification_info.mustache
 ** lib/templates/notification_success.mustache
 ** lib/templates/notification_warning.mustache
+* Removed deprecated completion_info::wipe_session_cache()
+* Removed deprecated function_or_method_exists()
+* Removed deprecated methods:
+  * mysqli_native_moodle_database::is_compressed_row_format_supported()
+  * mysqli_native_moodle_database::get_row_format_sql()
+* Removed deprecated behat_deprecated::i_select_to_approve()
 
 === 11.0 ===
 

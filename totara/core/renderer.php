@@ -32,18 +32,6 @@ if (!defined('MOODLE_INTERNAL')) {
 class totara_core_renderer extends plugin_renderer_base {
 
     /**
-     * Displays a count of the number of active users in the last year
-     *
-     * @param integer $activeusers Number of active users in the last year
-     * @return string HTML to output.
-     * @deprecated since 9.0.
-     */
-    public function totara_print_active_users($activeusers) {
-        debugging('totara_print_active_users has been deprecated please use active_users', DEBUG_DEVELOPER);
-        return $this->active_users($activeusers);
-    }
-
-    /**
     * Displays a count of the number of active users in the last year
     *
     * @param integer $activeusers Number of active users in the last year
@@ -103,23 +91,6 @@ class totara_core_renderer extends plugin_renderer_base {
         $output .= get_string('totaracopyright', 'totara_core', get_string('totaralearn', 'totara_core'));
         $output .= html_writer::end_div();
         return $output;
-    }
-
-    /**
-     * Returns markup for displaying a progress bar for a user's course progress
-     *
-     * Optionally with a link to the user's profile if they have the correct permissions
-     *
-     * @deprecated since 9.0
-     * @access  public
-     * @param   $userid     int
-     * @param   $courseid   int
-     * @param   $status     int     COMPLETION_STATUS_ constant
-     * @return  string html to display
-     */
-    public function display_course_progress_icon($userid, $courseid, $status) {
-        debugging("display_course_progress_icon has been deprecated. Use course_progress_bar instead", DEBUG_DEVELOPER);
-        return $this->course_progress_bar($userid, $courseid, $status);
     }
 
     /**
@@ -199,18 +170,6 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Print out the Totara My Team nav section.
-     *
-     * @deprecated since 9.0
-     * @param integer $numteammembers The number of members in the team.
-     * @return string HTML
-     */
-    public function print_my_team_nav($numteammembers) {
-        debugging("print_my_team_nav has been deprecated. Please use my_team_nav instead.", DEBUG_DEVELOPER);
-        return $this->my_team_nav($numteammembers);
-    }
-
-    /**
      * Use a template to generate the My Team nav markup.
      *
      * @param integer $numteammembers The number of members in the team.
@@ -231,19 +190,6 @@ class totara_core_renderer extends plugin_renderer_base {
         $data->href = (string) new moodle_url('/my/teammembers.php');
 
         return $this->output->render_from_template('totara_core/my_team_nav', $data);
-    }
-
-    /**
-     * Print out the table of visible reports.
-     *
-     * @deprecated since 9.0
-     * @param array $reports array of report objects visible to this user.
-     * @param bool $canedit if this user is an admin with editing turned on.
-     * @return string HTML
-     */
-    public function print_report_manager($reports, $canedit) {
-        debugging("print_report_manager has been deprecated. Use report_list instead.", DEBUG_DEVELOPER);
-        return $this->report_list($reports, $canedit);
     }
 
     /**
@@ -301,21 +247,6 @@ class totara_core_renderer extends plugin_renderer_base {
 
         return $report_list;
     }
-
-
-    /**
-     * Returns markup for displaying saved scheduled reports.
-     *
-     * @deprecated since 9.0.
-     * @param array $scheduledreports List of scheduled reports.
-     * @param boolean $showoptions boolean Show actions to edit or delete the scheduled report.
-     * @return string HTML
-     */
-    public function print_scheduled_reports($scheduledreports, $showoptions=true) {
-        debugging("print_scheduled_reports has been deprecated. Please use scheduled_reports_list instead.");
-        return $this->scheduled_reports($scheduledreports, $showoptions);
-    }
-
 
     /**
      * Uses a template to generate markup for displaying saved scheduled reports.
@@ -396,22 +327,6 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-    * Render a set of toolbars (either top or bottom)
-    *
-    * @deprecated since 9.0
-    * @param string $position 'top' or 'bottom'
-    * @param int $numcolumns
-    * @param array $toolbar array of left and right arrays
-    *              eg. $toolbar[0]['left'] = <first row left content>
-    *                  $toolbar[0]['right'] = <first row right content>
-    *                  $toolbar[1]['left'] = <second row left content>
-    */
-    public function print_toolbars($position='top', $numcolumns, $toolbar) {
-        debugging('print_toolbars has been deprecated please use table_toolbars', DEBUG_DEVELOPER);
-        echo $this->table_toolbars($toolbar, $position);
-    }
-
-    /**
      * Render a set of toolbars (either top or bottom)
      *
      * @param array $toolbar array of left and right arrays
@@ -463,23 +378,6 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Generate markup for search box
-     *
-     * @deprecated since 9.0
-     * @param string $action the form action
-     * @param array $hiddenfields array of hidden field names and values
-     * @param string $placeholder the form input placeholder text
-     * @param string $value the form input value text
-     * @param string $formid the form id
-     * @param string $inputid the form input id
-     * @return string the html form
-     */
-    public function print_totara_search($action, $hiddenfields = null, $placeholder = '', $value = '', $formid = null, $inputid = null) {
-        debugging('print_totara_search has been deprecated please use totara_search', DEBUG_DEVELOPER);
-        return $this->totara_search($action, $hiddenfields, $placeholder = '', $value = '', $formid, $inputid);
-    }
-
-    /**
      * Generate markup for search box.
      *
      * @param string $action the form action
@@ -513,16 +411,6 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Generate markup for totara menu
-     *
-     * @deprecated since 9.0
-     */
-    public function print_totara_menu($menudata, $parent=null, $selected_items=array()) {
-        debugging('print_totara_menu has been deprecated please use totara_menu', DEBUG_DEVELOPER);
-        return $this->totara_menu($menudata, $parent, $selected_items);
-    }
-
-    /**
      * Generate markup for totara menu. This function is called recursively.
      *
      * @param $menudata array the menu data
@@ -550,16 +438,6 @@ class totara_core_renderer extends plugin_renderer_base {
 
     /**
      * Displaying notices at top of page
-     *
-     * @deprecated since 9.0
-     */
-    public function print_totara_notifications() {
-        debugging('print_totara_notifications has been deprecated please use totara_notifications', DEBUG_DEVELOPER);
-        return $this->totara_notifications();
-    }
-
-    /**
-     * Displaying notices at top of page
      */
     public function totara_notifications() {
         $output = '';
@@ -576,21 +454,6 @@ class totara_core_renderer extends plugin_renderer_base {
         $data = new stdClass();
         $data->content = $output;
         return $this->render_from_template('totara_core/totara_notifications', $data);
-    }
-
-    /**
-     * Displays relevant progress bar
-     *
-     * @deprecated since 9.0
-     * @param $percent int a percentage value (0-100)
-     * @param $size string large, medium...
-     * @param $showlabel boolean show completion text label
-     * @param $tooltip string required tooltip text
-     * @return $out html string
-     */
-    public function print_totara_progressbar($percent, $size='medium', $showlabel=false, $tooltip='DEFAULTTOOLTIP') {
-        debugging('print_totara_progressbar has been deprecated please use progressbar', DEBUG_DEVELOPER);
-        return $this->progressbar($percent, $size, $showlabel, $tooltip);
     }
 
     /**
@@ -635,18 +498,6 @@ class totara_core_renderer extends plugin_renderer_base {
      */
     public function comment_template() {
         return $this->render_from_template('totara_core/comment_template', null);
-    }
-
-    /**
-     * Print list of icons.
-     *
-     * @deprecated since 9.0
-     * @param string $type Choose the group of Totara icons to return
-     * @return string HTML
-     */
-    public function print_icons_list($type = 'course') {
-        debugging("print_icons_list has been deprecated. Please use icon_list instead.",DEBUG_DEVELOPER);
-        return $this->icon_list($type);
     }
 
     /**

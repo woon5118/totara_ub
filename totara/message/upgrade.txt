@@ -1,0 +1,6 @@
+This files describes API changes in Totara Messages,
+information provided here is intended especially for developers.
+
+=== 12 ===
+
+Removed deprecated method totara_message_accept_reject_action()

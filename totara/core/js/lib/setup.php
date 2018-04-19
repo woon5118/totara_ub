@@ -32,17 +32,9 @@ require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content.class.php');
 define('TOTARA_JS_DIALOG',         1);
 define('TOTARA_JS_TREEVIEW',       2);
 define('TOTARA_JS_DATEPICKER',     3);
-/**
- * TOTARA_JS_PLACEHOLDER - loads the jQuery placeholder library
- * @deprecated since 10.0, removed in 12.0
- */
-define('TOTARA_JS_PLACEHOLDER',    4);
 define('TOTARA_JS_ICON_PREVIEW',   5);
 define('TOTARA_JS_UI',             6);
-/**
- * @deprecated deprecated since 9.0
- */
-define('TOTARA_JS_DATATABLES',     7);
+
 /**
  * Load appropriate JS and CSS files for lightbox
  *
@@ -130,11 +122,6 @@ function local_js($options = array()) {
 
         $PAGE->requires->js('/totara/core/js/icon.preview.js');
 
-    }
-
-    if (in_array(TOTARA_JS_DATATABLES, $options)) {
-        debugging('TOTARA_JS_DATATABLES has been deprecated and may cause unexpected results - please convert your JS to an AMD version', DEBUG_DEVELOPER);
-        $PAGE->requires->js('/totara/core/js/lib/jquery.dataTables' . $min . '.js');
     }
 }
 
@@ -513,22 +500,6 @@ function build_nojs_jobassignmentpicker($url, $urlparams) {
         print_error('nopositionsassigned', 'totara_hierarchy');
     }
     return $html;
-}
-
-/*
- * Create a non-javascript position picker page, allowing the user to select which
- * position to use to assign an item
- *
- * @deprecated since 9.0
- * @param string $url URL to take the user to when they click a position link
- * @params array $urlparams array of url parameters to pass along with URL
- * @return string HTML to print the position picker list
- */
-function build_nojs_positionpicker($url, $urlparams) {
-
-    debugging('build_nojs_positionpicker has been deprecated from 9.0. Use build_nojs_jobassignmentpicker instead.', DEBUG_DEVELOPER);
-
-    return build_nojs_jobassignmentpicker($url, $urlparams);
 }
 
 /**
