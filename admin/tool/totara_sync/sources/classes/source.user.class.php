@@ -132,7 +132,8 @@ abstract class totara_sync_source_user extends totara_sync_source {
             } else if ($f == 'deleted') {
                 $mform->addElement('hidden', $name, $this->config->$name);
                 $mform->setType($name, PARAM_INT);
-            } else if ($f == 'suspended' && $this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
+            } else if ($f == 'suspended' && isset($this->element->config->allow_delete)
+                && $this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
                 // Create a hidden suspended users setting to turn off import of suspended.
                 $mform->addElement('hidden', $name, '0');
                 $mform->setType($name, PARAM_INT);
@@ -156,7 +157,8 @@ abstract class totara_sync_source_user extends totara_sync_source {
         foreach ($this->fields as $f) {
             $name = 'fieldmapping_' . $f;
 
-            if ($f == 'suspended' && $this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
+            if ($f == 'suspended' && isset($this->element->config->allow_delete)
+                && $this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
                 $mform->addElement('hidden', $name, '');
                 $mform->setType($name, PARAM_TEXT);
                 continue;

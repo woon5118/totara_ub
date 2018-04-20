@@ -352,7 +352,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
 
         $notifications = $this->get_common_db_notifications();
         // Show a notification about delete suspending/unsuspending users
-        if ($this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
+        if (isset($this->element->config->allow_delete) && $this->element->config->allow_delete == totara_sync_element_user::SUSPEND_USERS) {
             $suspenddelete = get_string('suspendcolumndisabled', 'tool_totara_sync');
             $notifications .= $OUTPUT->notification($suspenddelete, \core\output\notification::NOTIFY_WARNING);
         }
