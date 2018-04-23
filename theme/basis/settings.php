@@ -40,8 +40,8 @@ if ($ADMIN->fulltree) {
 
     // Logo file setting.
     $name = "{$component}/logo";
-    $title = new lang_string('logo', $component);
-    $description = new lang_string('logodesc', $component);
+    $title = new lang_string('navlogo', $component);
+    $description = new lang_string('navlogo_desc', $component);
     $setting = new admin_setting_configstoredfile($name, $title, $description, 'logo',0 ,['accepted_types' => 'web_image']);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);
@@ -130,6 +130,15 @@ if ($ADMIN->fulltree) {
     $default = css_processor::$DEFAULT_HEADERBGC;
     $previewconfig = array('selector' => '#page-header', 'style' => 'backgroundColor');
     $setting = new admin_setting_configcolourpicker($name, $title, $description, $default, $previewconfig);
+    $setting->set_updatedcallback('theme_reset_all_caches');
+    $settings->add($setting);
+
+    // Navigation text color.
+    $name = "{$component}/navtextcolor";
+    $title = get_string('navtextcolor', $component);
+    $description = get_string('navtextcolor_desc', $component);
+    $default = css_processor::$DEFAULT_NAVTEXTCOLOR;
+    $setting = new admin_setting_configcolourpicker($name, $title, $description, $default, null, false);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);
 

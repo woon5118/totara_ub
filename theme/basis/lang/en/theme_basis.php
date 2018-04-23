@@ -46,8 +46,10 @@ $string['linkcolor'] = 'Link colour';
 $string['linkcolordesc'] = 'This sets the link colour for the theme.';
 $string['linkvisitedcolor'] = 'Visited link colour';
 $string['linkvisitedcolordesc'] = 'This sets the link colour for visited links.';
-$string['logo'] = 'Logo';
-$string['logodesc'] = 'Select or upload the image file to be used as the site\'s logo';
+$string['navlogo'] = 'Navigation logo';
+$string['navlogo_desc'] = 'Upload the image file to be used as the site\'s navigation logo.<br>File format: PNG<br>Max height: 40 pixel<br>Max width: 400 pixel';
+$string['navtextcolor'] = 'Navigation text colour';
+$string['navtextcolor_desc'] = 'Navigation text colour.';
 $string['pluginname'] = 'Basis';
 $string['region-bottom'] = 'Bottom';
 $string['region-main'] = 'Main';
@@ -56,3 +58,7 @@ $string['region-side-pre'] = 'Left';
 $string['region-top'] = 'Top';
 $string['textcolor'] = 'Text colour';
 $string['textcolor_desc'] = 'The colour of the text.';
+
+// Deprecated in 12.0
+$string['logo'] = 'Logo';
+$string['logodesc'] = 'Select or upload the image file to be used as the site\'s logo';

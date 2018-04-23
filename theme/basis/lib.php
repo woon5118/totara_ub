@@ -64,6 +64,7 @@ function theme_basis_process_css($css, $theme) {
         'contentbackground' => css_processor::$DEFAULT_CONTENTBACKGROUND,
         'bodybackground'    => css_processor::$DEFAULT_BODYBACKGROUND,
         'textcolor'         => css_processor::$DEFAULT_TEXTCOLOR,
+        'navtextcolor'      => css_processor::$DEFAULT_NAVTEXTCOLOR,
     );
 
     foreach (array_values($replacements) as $i => $replacement) {

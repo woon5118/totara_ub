@@ -97,6 +97,11 @@ input[type="reset"][disabled] {
     background-color: [[setting:headerbgc]];
 }
 
+#page-footer .performanceinfo li,
+#page-footer .performanceinfo p {
+    color: [[setting:navtextcolor]];
+}
+
 .ie8 .navbar-inner,
 .ie9 .navbar-inner {
     filter: none;
@@ -195,12 +200,67 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol, dl, input, textarea {
     background-color: [[setting:linkcolor]];
 }
 
+/** Navigation text colour **/
+.totaraNav_prim--toggleNav a,
+.totaraNav_prim--toggleNav a:active,
+.totaraNav_prim--toggleNav a:hover,
+.totaraNav_prim--toggleNav a:visited,
+.totaraNav_prim--side,
+.totaraNav_prim--side .usermenu a.toggle-display,
+.totaraNav_prim--side .usermenu a.toggle-display:focus,
+.totaraNav_prim--side .usermenu a.toggle-display:hover,
+.totaraNav_prim--list a,
+.totaraNav_prim--list a:active,
+.totaraNav_prim--list a:hover,
+.totaraNav_prim--list a:visited {
+    color: [[setting:navtextcolor]];
+}
+
+/** Navigation background colour **/
+.totaraNav_prim--list .navExpand--list,
+.totaraNav_prim {
+    background-color: [[setting:headerbgc]];
+}
+
+/** Navigation active/hover colour **/
+.totaraNav_prim--toggleNav a:focus,
+.totaraNav_prim--toggleNav a:hover,
+.totaraNav_prim--side .popover-region .nav-link:focus,
+.totaraNav_prim--side .popover-region .nav-link:hover,
+.totaraNav_prim--side .usermenu a.toggle-display:focus,
+.totaraNav_prim--side .usermenu a.toggle-display:hover,
+.totaraNav_prim--list a:focus,
+.totaraNav_prim--list a:hover {
+    background: [[setting:headerbgc-dark]];
+}
+
 @media (min-width: 768px) {
     .totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link {
         background-color: #F0F2F4;
     }
     .totara-menu-nav-item.selected .totara-menu-nav-item.selected .totara-menu-nav-item-link:hover, .totara-menu .totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link:hover {
         background-color: #DDE1E5;
+    }
+}
+
+@media (min-width: 992px) {
+    /** Navigation focus colour **/
+    .totaraNav--list_item_expanded > a.totaraNav_prim--list_item_link {
+        background: [[setting:headerbgc-dark-perc]];
+    }
+
+    /** Navigation selected colour **/
+    .totaraNav_prim--list_item_selected a.totaraNav_prim--list_item_link {
+        background-color: [[setting:buttoncolor]];
+        color: [[setting:buttoncolor-readable-text]];
+    }
+    .totaraNav_prim--list_item_selected .totaraNav_prim--list_item_link:active,
+    .totaraNav_prim--list_item_selected .totaraNav_prim--list_item_link:hover {
+        color: [[setting:buttoncolor-readable-text]];
+    }
+
+    a.totaraNav_sub--list_item_link {
+        color: #3d444b;
     }
 }
 

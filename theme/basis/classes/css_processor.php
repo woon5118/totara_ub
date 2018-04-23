@@ -75,6 +75,11 @@ class css_processor {
     /**
      * @var string
      */
+    public static $DEFAULT_NAVTEXTCOLOR = '#FFFFFF';
+
+    /**
+     * @var string
+     */
     public static $DEFAULT_CUSTOMCSS = '';
 
     /**
