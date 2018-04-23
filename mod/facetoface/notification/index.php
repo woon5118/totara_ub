@@ -98,10 +98,12 @@ foreach ($notifications as $note) {
     unset($defaultnotifications[$note->conditiontype]);
 }
 if (!empty($defaultnotifications)) {
-    $message = get_string('missingdefaultnotifications', 'facetoface', count($defaultnotifications));
-    $addmissingdefaulturl = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id, 'sesskey' => sesskey()));
-    $link = html_writer::link($addmissingdefaulturl, get_string('missingdefaultsfix', 'facetoface'));
-    echo $OUTPUT->notification($message . ' ' . $link, 'notifymessage');
+    $url = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id, 'sesskey' => sesskey()));
+    $a['url1'] = $url->out();
+    $url = new moodle_url('/mod/facetoface/notification/template/index.php');
+    $a['url2'] = $url->out();
+    $message = get_string('unavailablenotifications', 'facetoface', (object)$a);
+    echo $OUTPUT->notification($message, \core\output\notification::NOTIFY_WARNING);
 }
 
 $str_edit = get_string('edit', 'moodle');
@@ -121,8 +123,8 @@ $columns[] = 'type';
 $headers[] = get_string('type', 'facetoface');
 $columns[] = 'status';
 $headers[] = get_string('status', 'facetoface');
-$columns[] = 'options';
-$headers[] = get_string('options', 'facetoface');
+$columns[] = 'actions';
+$headers[] = get_string('actions', 'facetoface');
 
 $title = 'facetoface_notifications';
 $table = new flexible_table($title);
@@ -130,6 +132,8 @@ $table->define_baseurl($CFG->wwwroot . '/mod/facetoface/notification/index.php')
 $table->define_columns($columns);
 $table->define_headers($headers);
 $table->set_attribute('class', 'generalbox mod-facetoface-notification-list');
+$table->sortable(true, 'title');
+$table->no_sorting('actions');
 $table->setup();
 
 foreach ($notifications as $note) {
