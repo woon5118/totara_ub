@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 $knownregionpre = $PAGE->blocks->is_known_region('side-pre');
 $knownregionpost = $PAGE->blocks->is_known_region('side-post');
 $knownregionmain = $PAGE->blocks->is_known_region('main');
+$knownregiontop = $PAGE->blocks->is_known_region('top');
+$knownregionbottom = $PAGE->blocks->is_known_region('bottom');
 
 $grid = new theme_roots\output\bootstrap_grid();
 
@@ -38,6 +40,14 @@ if ($PAGE->blocks->region_has_content('side-pre', $OUTPUT)) {
 
 if ($PAGE->blocks->region_has_content('side-post', $OUTPUT)) {
     $grid->has_side_post();
+}
+
+if ($PAGE->blocks->region_has_content('top', $OUTPUT)) {
+    $grid->has_top();
+}
+
+if ($PAGE->blocks->region_has_content('bottom', $OUTPUT)) {
+    $grid->has_bottom();
 }
 
 $regions = $grid->get_regions_classes();
@@ -78,6 +88,13 @@ echo $OUTPUT->doctype() ?>
 
 <!-- Content -->
 <div id="page" class="container-fluid">
+    <div id="region-top" class="row">
+        <?php
+        if ($knownregiontop) {
+            echo $OUTPUT->blocks('top', $regions['top']);
+        }?>
+    </div>
+
     <div id="page-content" class="row">
         <div id="region-main" class="<?php echo $regions['content']; ?>">
             <?php
@@ -88,7 +105,6 @@ echo $OUTPUT->doctype() ?>
             <?php echo $OUTPUT->main_content(); ?>
             <?php echo $OUTPUT->course_content_footer(); ?>
         </div>
-
         <?php
         if ($knownregionpre) {
             echo $OUTPUT->blocks('side-pre', $regions['pre']);
@@ -96,6 +112,13 @@ echo $OUTPUT->doctype() ?>
         <?php
         if ($knownregionpost) {
             echo $OUTPUT->blocks('side-post', $regions['post']);
+        }?>
+    </div>
+
+    <div id="region-bottom" class="row">
+        <?php
+        if ($knownregionbottom) {
+            echo $OUTPUT->blocks('bottom', $regions['bottom']);
         }?>
     </div>
 </div>

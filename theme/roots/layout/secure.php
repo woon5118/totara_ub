@@ -26,9 +26,13 @@
 
 $hassidepre = $PAGE->blocks->region_has_content('side-pre', $OUTPUT);
 $hassidepost = $PAGE->blocks->region_has_content('side-post', $OUTPUT);
+$hastop = $PAGE->blocks->region_has_content('top', $OUTPUT);
+$hasbottom = $PAGE->blocks->region_has_content('bottom', $OUTPUT);
 
 $knownregionpre = $PAGE->blocks->is_known_region('side-pre');
 $knownregionpost = $PAGE->blocks->is_known_region('side-post');
+$knownregiontop = $PAGE->blocks->is_known_region('top');
+$knownregionbottom = $PAGE->blocks->is_known_region('bottom');
 
 $grid = new theme_roots\output\bootstrap_grid();
 
@@ -38,6 +42,14 @@ if ($hassidepre) {
 
 if ($hassidepost) {
     $grid->has_side_post();
+}
+
+if ($hastop) {
+    $grid->has_top();
+}
+
+if ($hasbottom) {
+    $grid->has_bottom();
 }
 
 $regions = $grid->get_regions_classes();
@@ -96,6 +108,13 @@ echo $OUTPUT->doctype() ?>
         </div>
     </header>
 
+    <div id="region-top" class="row">
+        <?php
+        if ($knownregiontop) {
+            echo $OUTPUT->blocks('top', $regions['top']);
+        }?>
+    </div>
+
     <div id="page-content" class="row">
         <div id="region-main" class="<?php echo $regions['content']; ?>">
             <?php
@@ -105,7 +124,6 @@ echo $OUTPUT->doctype() ?>
             echo $OUTPUT->course_content_footer();
             ?>
         </div>
-
         <?php
         if ($knownregionpre) {
             echo $OUTPUT->blocks('side-pre', $regions['pre']);
@@ -113,6 +131,13 @@ echo $OUTPUT->doctype() ?>
         <?php
         if ($knownregionpost) {
             echo $OUTPUT->blocks('side-post', $regions['post']);
+        }?>
+    </div>
+
+    <div id="region-bottom" class="row">
+        <?php
+        if ($knownregionbottom) {
+            echo $OUTPUT->blocks('bottom', $regions['bottom']);
         }?>
     </div>
 

@@ -47,3 +47,18 @@ Feature: Block region moving
       | Region  | Right |
     And I press "Save changes"
     And I should see "Comments" in the "//*[@id='region-post' or @id='block-region-side-post']" "xpath_element"
+
+  Scenario: Move blocks to top and bottom regions
+    When I follow "Test book name"
+    And I configure the "Comments" block
+    And I set the following fields to these values:
+      | Region  | Top |
+    And I press "Save changes"
+    And I should see "Comments" in the "//*[@id='region-top' or @id='block-region-top']" "xpath_element"
+
+    When I follow "Test book name"
+    And I configure the "Comments" block
+    And I set the following fields to these values:
+      | Region  | Bottom |
+    And I press "Save changes"
+    And I should see "Comments" in the "//*[@id='region-bottom' or @id='block-region-bottom']" "xpath_element"

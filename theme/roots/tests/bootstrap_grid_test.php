@@ -44,11 +44,15 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         // Side-pre and side-post.
         //
         $expected =  array(
+            'top' => 'col-md-12',
+            'bottom' => 'col-md-12',
             'content' => 'col-sm-12 col-md-6 col-md-push-3',
             'pre' => 'col-sm-6 col-md-3 col-md-pull-6',
             'post' => 'col-sm-6 col-md-3',
         );
         $actual = (new bootstrap_grid())
+            ->has_top()
+            ->has_bottom()
             ->has_side_pre()
             ->has_side_post()
             ->get_regions_classes();
@@ -59,11 +63,14 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         // Side-pre only.
         //
         $expected = array(
+            'top' => 'col-md-12',
+            'bottom' => 'empty',
             'content' => 'col-sm-12 col-md-9 col-md-push-3',
             'pre' => 'col-sm-6 col-md-3 col-md-pull-9',
             'post' => 'empty',
         );
         $actual = (new bootstrap_grid())
+            ->has_top()
             ->has_side_pre()
             ->get_regions_classes();
 
@@ -73,11 +80,14 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         // Side-post only.
         //
         $expected = array(
+            'top' => 'empty',
+            'bottom' => 'col-md-12',
             'content' => 'col-sm-12 col-md-9',
             'pre' => 'empty',
             'post' => 'col-sm-6 col-sm-offset-6 col-md-3 col-md-offset-0',
         );
         $actual = (new bootstrap_grid())
+            ->has_bottom()
             ->has_side_post()
             ->get_regions_classes();
 
@@ -87,6 +97,8 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         // No side regions.
         //
         $expected = array(
+            'top' => 'empty',
+            'bottom' => 'empty',
             'content' => 'col-md-12',
             'pre' => 'empty',
             'post' => 'empty',

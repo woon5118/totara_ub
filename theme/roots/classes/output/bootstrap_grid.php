@@ -20,6 +20,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright 2016 onwards Totara Learning Solutions LTD
  * @author    Joby Harding <joby.harding@totaralearning.com>
+ * @author    Murali Nair <murali.nair@totaralearning.com>
  * @package   theme_roots
  */
 
@@ -48,6 +49,16 @@ class bootstrap_grid {
     protected $side_post = false;
 
     /**
+     * @var bool
+     */
+    protected $top = false;
+
+    /**
+     * @var bool
+     */
+    protected $bottom = false;
+
+    /**
      * Set gridf
      */
     public function has_side_pre() {
@@ -62,44 +73,54 @@ class bootstrap_grid {
         return $this;
     }
 
+    public function has_top() {
+        $this->top = true;
+
+        return $this;
+    }
+
+    public function has_bottom() {
+        $this->bottom = true;
+
+        return $this;
+    }
+
     /**
      * Return classes which should be applied to configured regions.
      */
     public function get_regions_classes() {
-
         // NOTE: when making changes here make sure you apply them also to theme/roots/less/totara/core.less
 
+        $classes = [];
+        $classes['top'] = $this->top ? 'col-md-12' : 'empty';
+        $classes['bottom'] = $this->bottom ? 'col-md-12' : 'empty';
+        $classes['content'] = 'col-md-12';
+        $classes['pre'] = 'empty';
+        $classes['post'] = 'empty';
+
         if ($this->side_pre && $this->side_post) {
-            return array(
-                'content' => 'col-sm-12 col-md-6 col-md-push-3',
-                'pre' => 'col-sm-6 col-md-3 col-md-pull-6',
-                'post' => 'col-sm-6 col-md-3',
-            );
+            $classes['content'] = 'col-sm-12 col-md-6 col-md-push-3';
+            $classes['pre'] = 'col-sm-6 col-md-3 col-md-pull-6';
+            $classes['post'] = 'col-sm-6 col-md-3';
+            return $classes;
         }
 
         if ($this->side_pre && !$this->side_post) {
-            return array(
-                'content' => 'col-sm-12 col-md-9 col-md-push-3',
-                'pre' => 'col-sm-6 col-md-3 col-md-pull-9',
-                'post' => 'empty',
-            );
+            $classes['content'] = 'col-sm-12 col-md-9 col-md-push-3';
+            $classes['pre'] = 'col-sm-6 col-md-3 col-md-pull-9';
+            $classes['post'] = 'empty';
+            return $classes;
         }
 
         if (!$this->side_pre && $this->side_post) {
-            return array(
-                'content' => 'col-sm-12 col-md-9',
-                'pre' => 'empty',
-                'post' => 'col-sm-6 col-sm-offset-6 col-md-3 col-md-offset-0',
-            );
+            $classes['content'] = 'col-sm-12 col-md-9';
+            $classes['pre'] = 'empty';
+            $classes['post'] = 'col-sm-6 col-sm-offset-6 col-md-3 col-md-offset-0';
+            return $classes;
         }
 
         // No side-pre or side-post.
-        return array(
-            'content' => 'col-md-12',
-            'pre' => 'empty',
-            'post' => 'empty',
-        );
-
+        return $classes;
     }
 
 }

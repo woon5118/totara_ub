@@ -15,8 +15,12 @@ Scenario: Ensure editing a block on the home page lists the home page layout opt
   Then the "Default region" select box should contain "Left"
   And the "Default region" select box should contain "Right"
   And the "Default region" select box should contain "Main"
+  And the "Default region" select box should contain "Top"
+  And the "Default region" select box should contain "Bottom"
   And the "Region" select box should contain "Left"
   And the "Region" select box should contain "Right"
+  And the "Region" select box should contain "Top"
+  And the "Region" select box should contain "Bottom"
   And the "Region" select box should not contain "Main"
 
 Scenario: Ensure editing a block on the dashboard lists the dashboard layout options
@@ -27,8 +31,12 @@ Scenario: Ensure editing a block on the dashboard lists the dashboard layout opt
   Then the "Default region" select box should contain "Left"
   And the "Default region" select box should contain "Right"
   And the "Default region" select box should contain "Main"
+  And the "Default region" select box should contain "Top"
+  And the "Default region" select box should contain "Bottom"
   And the "Region" select box should contain "Left"
   And the "Region" select box should contain "Right"
+  And the "Region" select box should contain "Top"
+  And the "Region" select box should contain "Bottom"
   And the "Region" select box should contain "Main"
 
 Scenario: Ensure editing a block in a course lists the course layout options
@@ -43,8 +51,12 @@ Scenario: Ensure editing a block in a course lists the course layout options
   Then the "Default region" select box should contain "Left"
   And the "Default region" select box should contain "Right"
   And the "Default region" select box should contain "Main"
+  And the "Default region" select box should contain "Top"
+  And the "Default region" select box should contain "Bottom"
   And the "Region" select box should contain "Left"
   And the "Region" select box should contain "Right"
+  And the "Region" select box should contain "Top"
+  And the "Region" select box should contain "Bottom"
   And the "Region" select box should not contain "Main"
 
 Scenario: Ensure editing a block in an activity lists the activity layout options
@@ -62,8 +74,12 @@ Scenario: Ensure editing a block in an activity lists the activity layout option
   Then the "Default region" select box should contain "Left"
   And the "Default region" select box should contain "Right"
   And the "Default region" select box should contain "Main"
+  And the "Default region" select box should contain "Top"
+  And the "Default region" select box should contain "Bottom"
   And the "Region" select box should contain "Left"
   And the "Region" select box should contain "Right"
+  And the "Region" select box should contain "Top"
+  And the "Region" select box should contain "Bottom"
   And the "Region" select box should not contain "Main"
 
 Scenario: Ensure editing a block on an admin page lists the admin layout options
@@ -74,6 +90,10 @@ Scenario: Ensure editing a block on an admin page lists the admin layout options
   Then the "Default region" select box should contain "Left"
   And the "Default region" select box should contain "Right"
   And the "Default region" select box should contain "Main"
+  And the "Default region" select box should contain "Top"
+  And the "Default region" select box should contain "Bottom"
   And the "Region" select box should contain "Left"
   And the "Region" select box should not contain "Right"
+  And the "Region" select box should not contain "Top"
+  And the "Region" select box should not contain "Bottom"
   And the "Region" select box should not contain "Main"
