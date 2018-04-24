@@ -174,7 +174,7 @@ preferences,moodle|/user/preferences.php|preferences',
     $ADMIN->add('appearance', $temp);
 
      // Totara navigation.
-    $ADMIN->add('appearance', new admin_externalpage('totaranavigation', new lang_string('totaranavigation', 'totara_core'),
+    $ADMIN->add('appearance', new admin_externalpage('totaranavigation', new lang_string('menuitem:topnavigation', 'totara_core'),
             new moodle_url('/totara/core/menu/index.php'), array('totara/core:editmainmenu')));
 
     // "htmlsettings" settingpage

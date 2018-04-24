@@ -7,7 +7,7 @@ Feature: Test Appraisals menu item
   Scenario: Make sure Appraisals is available in totara menu
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Main menu" node in "Site administration > Appearance"
+    When I navigate to "Top navigation" node in "Site administration > Appearance"
     Then I should see "Performance" in the "#totaramenutable" "css_element"
     And I should see "Performance" in the totara menu
 
@@ -20,6 +20,6 @@ Feature: Test Appraisals menu item
     And I set the field "Enable 360 Feedbacks" to "Disable"
     And I set the field "Enable Goals" to "Disable"
     And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
-    Then I should not see "Performance" in the "#totaramenutable" "css_element"
-    And I should not see "Performance" in the totara menu
+    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    Then I should see "Performance" in the "#totaramenutable" "css_element"
+    And I should see "Feature disabled" in the "Performance" "table_row"

@@ -63,6 +63,12 @@ class menu implements \renderable, \IteratorAggregate {
     const SHOW_WHEN_REQUIRED = 2;
     const SHOW_CUSTOM = 3;
 
+    // Maximum number of levels of menu items.
+    // If increasing this number, additional .totara_item_depthX css styles need to be implemented to ensure
+    // that the top navigation menu editor table is formatted correctly. Also, the "path" db column has max
+    // length of 50, so keep an eye on that. Make sure to extend test_update_descendant_paths.
+    const MAX_DEPTH = 3;
+
     /**
      * Any access rule operator.
      * @const AGGREGATION_ANY One or more are required.
@@ -334,6 +340,12 @@ class menu implements \renderable, \IteratorAggregate {
         $data->parentid  = $parent->id;
         $data->classname = (!isset($data->classname) ? self::DEFAULT_CLASSNAME : $data->classname);
         $data->depth  = $parent->depth + 1;
+
+        if (!$this->can_set_depth($data->depth)) {
+            // You cannot move this item to the selected parent because it has children. Please move this item's children first.
+            throw new \coding_exception('Tried to create a menu item that was deeper than the maximum depth');
+        }
+
         $data->custom = (!isset($data->custom) ? self::DB_ITEM : (int)$data->custom);
         $data->url    = ($data->custom == self::DB_ITEM) ? $data->url : null;
         $data->customtitle = (!isset($data->customtitle) ? 1 : (int)$data->customtitle);
@@ -352,11 +364,57 @@ class menu implements \renderable, \IteratorAggregate {
     }
 
     /**
+     * Returns the maximum depth of all of this node's children, relative to this node's depth. E.g.
+     * - actual depth 2, with no children: 0
+     * - actual depth 2, just one child who is themselves childless: 1
+     * - a tree of descendants, where this node is depth 3 and the deepest descendant is depth 7: 4
+     *
+     * @return int
+     */
+    public function max_relative_descendant_depth() {
+        global $DB;
+
+        // If it doesn't exist in the database then it can't have descendants.
+        if (empty($this->id)) {
+            return 0;
+        }
+
+        $where = "path LIKE '{$DB->sql_like_escape($this->path . '/')}%'";
+
+        $depth = $DB->get_field_select('totara_navigation',  'MAX(depth)', $where, [], IGNORE_MISSING);
+
+        if ($depth === false || is_null($depth)) {
+            return 0;
+        } else {
+            return $depth - $this->depth;
+        }
+    }
+
+    /**
+     * Determines if the specified depth is valid, given the desired depth, the depth of descendants and the
+     * absolute maximum depth supported by the tree.
+     *
+     * @param int $depth
+     * @return bool
+     */
+    public function can_set_depth(int $depth) {
+        if (empty($this->id)) {
+            // If it doesn't exist in the database then it can't have descendants.
+            $maxrelativedescendantdepth = 0;
+        } else {
+            $maxrelativedescendantdepth = $this->max_relative_descendant_depth();
+        }
+
+        return 1 <= $depth && $depth + $maxrelativedescendantdepth <= self::MAX_DEPTH;
+    }
+
+    /**
      * Updates the record with either form data or raw data
      *
      * @global \moodle_database $DB
      * @param array|\stdClass $data
      * @return true
+     * @throws \coding_exception
      * @throws \moodle_exception
      */
     public function update($data) {
@@ -365,13 +423,6 @@ class menu implements \renderable, \IteratorAggregate {
         if (!$this->id) {
             // There is no actual DB record associated with root category.
             throw new \moodle_exception('error:findingmenuitem', 'totara_core');
-        }
-
-        if ((int)$data->parentid > 0) {
-            // Check if the children exists.
-            if ($this->get_children()) {
-                throw new \moodle_exception('error:itemhaschildren', 'totara_core');
-            }
         }
 
         $data = (object)$data;
@@ -385,16 +436,46 @@ class menu implements \renderable, \IteratorAggregate {
                 $data->title = $this->title;
             }
         }
+        $data->timemodified = time();
+
+        // Sort out depth and path.
         if ((int)$data->parentid > 0) {
-            $data->depth = 2;
-            $data->path = '/' . $data->parentid . '/' . $data->id;
+            $parent = self::get($data->parentid);
+
+            $data->depth = $parent->depth + 1;
+            $data->path = $parent->path . '/' . $data->id;
+
+            // If there is a parent then make sure that the item's children won't end up too deep.
+            if (!$this->can_set_depth($data->depth)) {
+                if ($data->depth > self::MAX_DEPTH) {
+                    throw new \coding_exception('Tried to create a menu item that was deeper than the maximum depth');
+                } else {
+                    throw new \moodle_exception('error:itemhasdescendants', 'totara_core');
+                }
+            }
         } else {
+            // Top level item. Can't have child depth problems because it can only have moved up (if at all).
             $data->depth = 1;
             $data->path = '/' . $data->id;
         }
-        $data->timemodified = time();
+
+        $transaction = $DB->start_delegated_transaction();
+
+        // Update the depth and path of all children.
+        $depthchange = $data->depth - $this->depth;
+        list($replacesql, $params) = $DB->sql_text_replace('path', $this->path, $data->path, SQL_PARAMS_NAMED);
+        $sql = "UPDATE {totara_navigation}
+                   SET depth = depth + :depthchange,
+                       timemodified = :timemodified,
+                       {$replacesql}
+                 WHERE path LIKE '{$DB->sql_like_escape($this->path . '/')}%'";
+        $params['depthchange'] = $depthchange;
+        $params['timemodified'] = $data->timemodified;
+        $DB->execute($sql, $params);
 
         $DB->update_record('totara_navigation', $data);
+
+        $transaction->allow_commit();
 
         \totara_core\event\menuitem_updated::create_from_item($data->id)->trigger();
 
@@ -420,9 +501,6 @@ class menu implements \renderable, \IteratorAggregate {
         }
 
         if ($data->custom == self::DB_ITEM) {
-            if (isset($data->url) && empty($data->url)) {
-                $errors['url'] = get_string('error:menuitemurlrequired', 'totara_core');
-            }
             if (\core_text::strlen($data->url) > 255) {
                 $errors['url'] = get_string('error:menuitemurltoolong', 'totara_core');
             }
@@ -512,10 +590,10 @@ class menu implements \renderable, \IteratorAggregate {
                 FROM
                     {totara_navigation} tn
                 WHERE
-                    tn.visibility > :visibility
+                    tn.visibility > :hidealways
                 ORDER BY
                     tn.parentid, tn.sortorder";
-        return $DB->get_records_sql($sql, array('visibility' => '0'));
+        return $DB->get_records_sql($sql, array('hidealways' => self::HIDE_ALWAYS));
     }
 
     /**
@@ -626,20 +704,39 @@ class menu implements \renderable, \IteratorAggregate {
      *
      * @global \moodle_database $DB
      * @param integer $excludeid Exclude this category and its children from the lists built.
+     * @param integer $parentid The node to add to the result, and all children to be called recursively.
      * @return array of strings
      */
-    public static function make_menu_list($excludeid = 0) {
+    public static function make_menu_list($excludeid = 0, int $parentid = 0) {
         global $DB;
 
-        $sql = 'SELECT tn.id, tn.title FROM {totara_navigation} tn WHERE tn.id <> ? AND tn.parentid = 0 ORDER BY tn.sortorder';
-        $rs = $DB->get_recordset_sql($sql, array('id' => $excludeid));
-        $baselist[0] = get_string('top');
-        foreach ($rs as $record) {
-            $baselist[$record->id] = format_string($record->title, true);
-        }
-        $rs->close();
+        $nodes = [];
 
-        return $baselist;
+        if ($parentid == 0) {
+            $nodes[0] = get_string('top');
+            $depth = 0;
+        } else {
+            $node = $DB->get_record('totara_navigation', ['id' => $parentid]);
+            $indent = '';
+            $depth = $node->depth;
+            for ($i = 1; $i < $node->depth; $i++) {
+                $indent .= '&nbsp;&nbsp;';
+            }
+            $nodes[$parentid] = $indent . '-&nbsp;' . format_string($node->title, true);
+        }
+
+        if ($depth < self::MAX_DEPTH - 1) {
+            $select = "id <> :excludedid AND parentid = :parentid";
+            $params = ['excludedid' => $excludeid, 'parentid' => $parentid];
+            $children = $DB->get_records_select('totara_navigation', $select, $params, 'sortorder');
+
+            foreach ($children as $child) {
+                $descendants = self::make_menu_list($excludeid, $child->id);
+                $nodes = $nodes + $descendants;
+            }
+        }
+
+        return $nodes;
     }
 
     /**

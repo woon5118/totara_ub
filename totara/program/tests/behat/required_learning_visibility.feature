@@ -23,7 +23,7 @@ Feature: See that program visibility affects Required Learning content correctly
       | firstjob     | firstjob    | user001   | user003   |
     # Get back the removed dashboard item for now.
     And I log in as "admin"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
+    And I navigate to "Top navigation" node in "Site administration > Appearance"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"

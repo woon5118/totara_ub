@@ -1426,73 +1426,8 @@ function totara_build_menu() {
     }
     unset($SESSION->mymenu);
 
-    $rs = \totara_core\totara\menu\menu::get_nodes();
-    $tree = array();
-    $parentree = array();
-    foreach ($rs as $id => $item) {
-
-        if (!isset($parentree[$item->parentid])) {
-            $node = \totara_core\totara\menu\menu::get($item->parentid);
-            // Silently ignore bad nodes - they might have been removed
-            // from the code but not purged from the DB yet.
-            if ($node === false) {
-                continue;
-            }
-            $parentree[$item->parentid] = $node;
-        }
-        $node = $parentree[$item->parentid];
-
-        switch ((int)$item->parentvisibility) {
-            case \totara_core\totara\menu\menu::HIDE_ALWAYS:
-                if (!is_null($item->parentvisibility)) {
-                    continue 2;
-                }
-                break;
-            case \totara_core\totara\menu\menu::SHOW_WHEN_REQUIRED:
-                $classname = $item->parent;
-                if (!is_null($classname) && class_exists($classname)) {
-                    $parentnode = new $classname($node);
-                    if ($parentnode->get_visibility() != \totara_core\totara\menu\menu::SHOW_ALWAYS) {
-                        continue 2;
-                    }
-                }
-                break;
-            case \totara_core\totara\menu\menu::SHOW_ALWAYS:
-                break;
-            case \totara_core\totara\menu\menu::SHOW_CUSTOM:
-                $classname = $item->parent;
-                if (!is_null($classname) && class_exists($classname)) {
-                    $parentnode = new $classname($node);
-                    if (!$parentnode->get_visibility()) {
-                        continue 2;
-                    }
-                }
-                break;
-            default:
-                // Silently ignore bad nodes - they might have been removed
-                // from the code but not purged from the DB yet.
-                continue 2;
-        }
-
-        $node = \totara_core\totara\menu\menu::node_instance($item);
-        // Silently ignore bad nodes - they might have been removed
-        // from the code but not purged from the DB yet.
-        if ($node === false) {
-            continue;
-        }
-        // Check each node's visibility.
-        if ($node->get_visibility() != \totara_core\totara\menu\menu::SHOW_ALWAYS) {
-            continue;
-        }
-
-        $tree[] = (object)array(
-            'name'     => $node->get_name(),
-            'linktext' => $node->get_title(),
-            'parent'   => $node->get_parent(),
-            'url'      => $node->get_url(false),
-            'target'   => $node->get_targetattr()
-        );
-    }
+    $allnodes = \totara_core\totara\menu\menu::get_nodes();
+    $tree = totara_build_menu_descendants(0, $allnodes);
 
     if (!empty($CFG->menulifetime)) {
         $SESSION->mymenu = array(
@@ -1511,6 +1446,54 @@ function totara_build_menu() {
 
     return $tree;
 }
+
+function totara_build_menu_descendants($parentid, $allrecords) {
+    $tree = [];
+
+    foreach ($allrecords as $id => $record) {
+        // Search all records for nodes whose parent was the one specified.
+        if ($record->parentid != $parentid) {
+            continue;
+        }
+
+        $node = \totara_core\totara\menu\menu::node_instance($record);
+
+        // Silently ignore bad nodes - they might have been removed
+        // from the code but not purged from the DB yet.
+        if ($node === false) {
+            continue;
+        }
+
+        // If this node isn't visible, the descendants will be skipped as well.
+        // Note that get_visibility will return either HIDE_ALWAYS (0) or SHOW_ALWAYS (1) or true or false when
+        // the $calculated parameter is true (default), so just treat this as boolean.
+        if (!$node->get_visibility()) {
+            continue;
+        }
+
+        $descendants = totara_build_menu_descendants($record->id, $allrecords);
+
+        $url = $node->get_url(false);
+
+        // We exclude leaf nodes (or empty group nodes) which don't have urls.
+        if (empty($url) && empty($descendants)) {
+            continue;
+        }
+
+        $tree[] = (object)array(
+            'name'     => $node->get_name(),
+            'linktext' => $node->get_title(),
+            'parent'   => $node->get_parent(),
+            'url'      => $url,
+            'target'   => $node->get_targetattr()
+        );
+
+        $tree = array_merge($tree, $descendants);
+    }
+
+    return $tree;
+}
+
 
 function totara_upgrade_menu() {
     totara_menu_reset_cache();

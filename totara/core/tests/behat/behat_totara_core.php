@@ -186,7 +186,7 @@ class behat_totara_core extends behat_base {
             $menutable = new TableNode($menurows);
             $ruletable = new TableNode($rulerows);
 
-            $this->execute("behat_navigation::i_navigate_to_node_in", array("Main menu", "Site administration > Appearance"));
+            $this->execute("behat_navigation::i_navigate_to_node_in", array("Top navigation", "Site administration > Appearance"));
             $this->execute("behat_forms::press_button", "Add new menu item");
             $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $menutable);
             $this->execute("behat_forms::press_button", "Add new menu item");

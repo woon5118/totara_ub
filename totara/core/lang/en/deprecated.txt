@@ -7,7 +7,9 @@ enabletempmanagers,totara_core
 enabletempmanagersdesc,totara_core
 error:appraisernotselected,totara_core
 error:datenotinfuture,totara_core
+error:itemhaschildren,totara_core
 error:managernotselected,totara_core
+error:menuitemurlrequired,totara_core
 error:organisationnotselected,totara_core
 error:positionnotselected,totara_core
 error:positionvalidationfailed,totara_core
@@ -42,5 +44,6 @@ tempmanagerselectionallusers,totara_core
 tempmanagerselectiononlymanagers,totara_core
 tempmanagersupporttext,totara_core
 timecompleted,totara_core
+totaranavigation,totara_core
 totararegistrationinfo,totara_core
 updatetemporarymanagerstask,totara_core

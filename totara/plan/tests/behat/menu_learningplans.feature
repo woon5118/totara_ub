@@ -7,7 +7,7 @@ Feature: Test Learning Plans menu item
   Scenario: Make sure Learning Plans is available in My Learning block
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Main menu" node in "Site administration > Appearance"
+    When I navigate to "Top navigation" node in "Site administration > Appearance"
     Then I should see "Learning Plans" in the "#totaramenutable" "css_element"
     When I click on "Dashboard" in the totara menu
     And I should see "Learning Plans" in the "My Learning" "block"
@@ -18,7 +18,6 @@ Feature: Test Learning Plans menu item
     When I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable Learning Plans" to "Disable"
     And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
-    Then I should not see "Learning Plans" in the "#totaramenutable" "css_element"
-    And I should not see "My Learning"
-    And I should not see "Learning Plans"
+    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    Then I should see "Learning Plans" in the "#totaramenutable" "css_element"
+    And I should see "Feature disabled" in the "Learning Plans" "table_row"

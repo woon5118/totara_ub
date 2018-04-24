@@ -41,7 +41,7 @@ Feature: Set due date for program assignments
     # Unfortunately new custom fields are popping up in auth plugin settings.
     And I confirm new default admin settings
     # Get back the removed dashboard item for now.
-    And I navigate to "Main menu" node in "Site administration > Appearance"
+    And I navigate to "Top navigation" node in "Site administration > Appearance"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"

@@ -86,7 +86,7 @@ $event->trigger();
 
 // Display page header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('totaranavigation', 'totara_core'));
+echo $OUTPUT->heading(get_string('menuitem:topnavigation', 'totara_core'));
 $editurl = new moodle_url('/totara/core/menu/edit.php', array('id' => '0'));
 echo $OUTPUT->single_button($editurl, get_string('menuitem:addnew', 'totara_core'), 'get');
 
@@ -97,6 +97,7 @@ $table->attributes['class'] = 'admintable generaltable editcourse';
 
 $table->head = array(
                 get_string('menuitem:title', 'totara_core'),
+                get_string('menuitem:type', 'totara_core'),
                 get_string('menuitem:url', 'totara_core'),
                 get_string('menuitem:visibility', 'totara_core'),
                 get_string('edit'),

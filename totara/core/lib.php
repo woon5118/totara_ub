@@ -392,8 +392,9 @@ function totara_resize_images_filearea($contextid, $component, $filearea, $itemi
  * @param int $depth of the category.
  * @param bool $up true if this category can be moved up.
  * @param bool $down true if this category can be moved down.
+ * @param bool $dimmed true if this item and descendants should be shown as dimmed (due to dimmed ascendant).
  */
-function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\menu $item, $depth = 0, $up = false, $down = false) {
+function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\menu $item, $depth = 0, $up = false, $down = false, $dimmed = false) {
     global $OUTPUT;
 
     static $str = null;
@@ -409,24 +410,36 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
         $str->spacer = $OUTPUT->spacer(array('width' => 11, 'height' => 11));
     }
 
+    $children = $item->get_children();
+
     if ($item->id) {
         $node = \totara_core\totara\menu\menu::node_instance($item->get_property());
         if ($node === false) {
             // Bad node, don't display.
             return;
         }
-        if ($node->is_disabled()) {
-            // Feature is disabled, do not show this in admin UI.
-            return;
-        }
-        $dimmed = ($item->visibility && $node->get_visibility() ? '' : ' dimmed');
+
+        $dimmed = $dimmed || !$item->visibility || $node->is_disabled();
+        $dimmedclass = $dimmed ? ' dimmed' : '';
+
         $url = '/totara/core/menu/index.php';
+
         $itemurl = new moodle_url($node->get_url());
-        $itemurl = html_writer::link($itemurl, $node->get_url(false), array('class' => $dimmed));
+        $itemurl = html_writer::link($itemurl, $node->get_url(false), array('class' => $dimmedclass));
+
         $itemtitle = $node->get_title();
+
+        if ($node->is_disabled()) {
+            $itemtype = get_string('menuitem:typedisabled', 'totara_core');
+        } else if (empty($children)) {
+            $itemtype = get_string('menuitem:typeurl', 'totara_core');
+        } else {
+            $itemtype = get_string('menuitem:typeparent', 'totara_core');
+        }
+
         $attributes = array();
         $attributes['title'] = $str->edit;
-        $attributes['class'] = 'totara_item_depth'.$depth.$dimmed;
+        $attributes['class'] = 'totara_item_depth'.$depth.$dimmedclass;
         $itemtitle = html_writer::link(new moodle_url('/totara/core/menu/edit.php',
                 array('id' => $item->id)), $itemtitle, $attributes);
 
@@ -479,32 +492,35 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
             );
         }
 
+        $itemvisibility = \totara_core\totara\menu\menu::get_visibility($item->visibility);
+
         $table->data[] = new html_table_row(array(
                          new html_table_cell($itemtitle),
+                         new html_table_cell($itemtype),
                          new html_table_cell($itemurl),
-                         new html_table_cell(\totara_core\totara\menu\menu::get_visibility($item->visibility)),
+                         new html_table_cell($itemvisibility),
                          new html_table_cell(join(' ', $icons)),
         ));
     }
 
-    if ($items = $item->get_children()) {
+    if (!empty($children)) {
 
         // Print all the children recursively.
-        $countitems = count($items);
+        $countchildren = count($children);
         $count = 0;
         $first = true;
         $last  = false;
-        foreach ($items as $node) {
+        foreach ($children as $node) {
 
             $count++;
-            if ($count == $countitems) {
+            if ($count == $countchildren) {
                 $last = true;
             }
             $up    = $first ? false : true;
             $down  = $last  ? false : true;
             $first = false;
 
-            totara_menu_table_load($table, $node, $depth+1, $up, $down);
+            totara_menu_table_load($table, $node, $depth+1, $up, $down, $dimmed);
         }
     }
 }

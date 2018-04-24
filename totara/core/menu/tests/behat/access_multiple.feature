@@ -14,7 +14,7 @@ Feature: Test restricting Totara custom menu access with rule aggregation
       | name | idnumber |
       | aud1 | aud1     |
     And I log in as "admin"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
+    And I navigate to "Top navigation" node in "Site administration > Appearance"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top                     |

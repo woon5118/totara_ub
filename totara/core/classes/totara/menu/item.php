@@ -180,7 +180,7 @@ class item {
 
     /**
      * Is this menu item completely disabled?
-     * If yes it will not be visible in admin UI and also for end users.
+     * If yes it will not be visible for end users.
      *
      * @return bool
      */
