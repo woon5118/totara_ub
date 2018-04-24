@@ -44,6 +44,7 @@ $COHORT_ASSN_ITEMTYPES = array(
     COHORT_ASSN_ITEMTYPE_PROGRAM => 'program',
     COHORT_ASSN_ITEMTYPE_CERTIF => 'certification',
     COHORT_ASSN_ITEMTYPE_MENU => 'menu',
+    COHORT_ASSN_ITEMTYPE_FEATURED_LINKS => 'block_totara_featured_links',
 );
 
 global $COHORT_ASSN_VALUES;

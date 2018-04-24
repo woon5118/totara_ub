@@ -258,4 +258,14 @@ class block_totara_featured_links extends block_base {
     public function display_with_border_by_default () {
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * The data for the tile is in the block_totara_featured_links table so that changes the content of the block.
+     * @return bool
+     */
+    public function has_configdata_in_other_table(): bool {
+        return true;
+    }
 }

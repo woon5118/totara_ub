@@ -743,6 +743,15 @@ EOD;
 
         return true;
     }
+
+    /**
+     * Returns if the block stores configuration data in other tables.
+     * This helps with comparing blocks to see if they are the same.
+     * @return bool
+     */
+    public function has_configdata_in_other_table(): bool {
+        return false;
+    }
 }
 
 /**

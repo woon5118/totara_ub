@@ -132,6 +132,10 @@ class block_totara_quicklinks extends block_base {
         $DB->delete_records('block_quicklinks', array('block_instance_id' => $this->instance->id));
         return true;
     }
+
+    public function has_configdata_in_other_table(): bool {
+        return true;
+    }
 }
 
 ?>

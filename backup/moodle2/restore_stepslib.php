@@ -3938,14 +3938,16 @@ class restore_block_instance_structure_step extends restore_structure_step {
         // If there is already one block of that type in the parent context
         // with the same showincontexts, pagetypepattern, subpagepattern, defaultregion and configdata
         // stop processing
-        $params = array(
-            'blockname' => $data->blockname, 'parentcontextid' => $data->parentcontextid,
-            'showinsubcontexts' => $data->showinsubcontexts, 'pagetypepattern' => $data->pagetypepattern,
-            'subpagepattern' => $data->subpagepattern, 'defaultregion' => $data->defaultregion);
-        if ($birecs = $DB->get_records('block_instances', $params)) {
-            foreach($birecs as $birec) {
-                if ($birec->configdata == $data->configdata) {
-                    return false;
+        if (!$bi->has_configdata_in_other_table()) {
+            $params = array(
+                'blockname' => $data->blockname, 'parentcontextid' => $data->parentcontextid,
+                'showinsubcontexts' => $data->showinsubcontexts, 'pagetypepattern' => $data->pagetypepattern,
+                'subpagepattern' => $data->subpagepattern, 'defaultregion' => $data->defaultregion);
+            if ($birecs = $DB->get_records('block_instances', $params)) {
+                foreach ($birecs as $birec) {
+                    if ($birec->configdata == $data->configdata) {
+                        return false;
+                    }
                 }
             }
         }
