@@ -475,11 +475,11 @@ class appraisal {
     }
 
     /**
-     * Check if automatic job assignment should be done for this appraisal.
+     * Check if automatic job assignment can be done.
      *
      * @return bool
      */
-    public function can_auto_link_job_assignments(): bool {
+    public static function can_auto_link_job_assignments(): bool {
         global $CFG;
         // If multiple job assignments are allowed, auto-linking should not happen.
         return empty($CFG->totara_job_allowmultiplejobs);
@@ -501,7 +501,7 @@ class appraisal {
 
         // Remember new appraisee ids for potential job assignment linking below.
         $linkjobappraiseeids = [];
-        if ($this->can_auto_link_job_assignments()) {
+        if (self::can_auto_link_job_assignments()) {
             /** @var moodle_recordset $added */
             $added = $assign->get_unstored_users();
             if ($added->valid()) {
@@ -521,6 +521,9 @@ class appraisal {
             $stages = appraisal_stage::get_stages($this->id);
             $DB->set_field('appraisal_user_assignment', 'activestageid', reset($stages)->id, array('appraisalid' => $this->id, 'activestageid' => null));
         }
+
+        // Link job assignments if required.
+        $assign->store_job_assignments($linkjobappraiseeids);
 
         // Find old user assignments that need to be reactivated.
         list($groupjoinsql, $groupparams, $groupalias) = $assign->get_users_from_groups_sql('u', 'id');
@@ -636,9 +639,6 @@ class appraisal {
                 }
             }
         }
-
-        // Link job assignments if required.
-        $assign->store_job_assignments($linkjobappraiseeids);
     }
 
     /**

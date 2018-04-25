@@ -533,6 +533,125 @@ class appraisal_test extends appraisal_testcase {
         ]));
     }
 
+    public function test_store_job_assignments() {
+        global $DB;
+
+        // Make sure allowmultiplejobs is ON, so no auto-linking of job assignments should happen to begin with.
+        set_config('totara_job_allowmultiplejobs', 1);
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        // Set up appraisal.
+        /** @var appraisal $appraisal */
+        list($appraisal) = $this->prepare_appraisal_with_users();
+        list($errors, $warnings) = $appraisal->validate();
+        $this->assertEmpty($errors);
+        $this->assertEmpty($warnings);
+        $this->assertEquals(appraisal::STATUS_DRAFT, $appraisal->status);
+        $count = $DB->count_records('appraisal_user_assignment', ['appraisalid' => $appraisal->id]);
+        $this->assertEquals(0, $count);
+
+        // Create audience and add to appraisal - only for user1 & user2.
+        $cohort = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort->id, $user1->id);
+        cohort_add_member($cohort->id, $user2->id);
+        $urlparams = array('includechildren' => false, 'listofvalues' => array($cohort->id));
+        $assign = new totara_assign_appraisal('appraisal', $appraisal);
+        $grouptypeobj = $assign->load_grouptype('cohort');
+        $grouptypeobj->handle_item_selector($urlparams);
+
+        $appraisal->activate();
+
+        // Only user1 & user2 should be assigned to the appraisal.
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user1->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user2->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+        $this->assertFalse($DB->record_exists('appraisal_user_assignment', ['userid' => $user3->id]));
+
+        // No job assignments should exist for our users.
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user1->id]));
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user2->id]));
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user3->id]));
+
+        // Nothing should happen when calling store_job_assignments() because setting totara_job_allowmultiplejobs is ON.
+        $assign = new totara_assign_appraisal('appraisal', $appraisal);
+        $assign->store_job_assignments([$user1->id, $user2->id, $user3->id]);
+
+        // No changes to data expected.
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user1->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user2->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+        $this->assertFalse($DB->record_exists('appraisal_user_assignment', ['userid' => $user3->id]));
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user1->id]));
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user2->id]));
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user3->id]));
+
+        // Switch allowmultiplejobs to OFF, so auto-linking of job assignments should happen now.
+        set_config('totara_job_allowmultiplejobs', 0);
+
+        // User3 is not assigned to the appraisal and should be ignored without error.
+        $assign->store_job_assignments([$user1->id, $user3->id]);
+
+        // User1 should have an appraisal assignment with job assignment linked.
+        $jobassignments = $DB->get_records('job_assignment', ['userid' => $user1->id]);
+        $this->assertCount(1, $jobassignments);
+        $user1ja = reset($jobassignments);
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user1->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => $user1ja->id,
+        ]));
+
+        // User2's & User3's data is unchanged.
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user2->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => null,
+        ]));
+        $this->assertFalse($DB->record_exists('appraisal_user_assignment', ['userid' => $user3->id]));
+
+        // User2 should not have a job assignment added (was left out in parameter array) and neither user3 (is not assigned to the appraisal).
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user2->id]));
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user3->id]));
+
+        // Call without parameter should also take care of user2 that we left out so far.
+        $assign->store_job_assignments();
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user1->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => $user1ja->id,
+        ]));
+        $jobassignments = $DB->get_records('job_assignment', ['userid' => $user2->id]);
+        $this->assertCount(1, $jobassignments);
+        $user2ja = reset($jobassignments);
+        $this->assertTrue($DB->record_exists('appraisal_user_assignment', [
+            'userid' => $user2->id,
+            'appraisalid' => $appraisal->id,
+            'jobassignmentid' => $user2ja->id,
+        ]));
+        $this->assertFalse($DB->record_exists('appraisal_user_assignment', ['userid' => $user3->id]));
+        $this->assertFalse($DB->record_exists('job_assignment', ['userid' => $user3->id]));
+    }
+
     public function test_active_appraisal_remove_group () {
         global $DB;
 

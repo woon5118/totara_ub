@@ -50,23 +50,27 @@ class totara_assign_appraisal extends totara_assign_core {
     }
 
     /**
-     * Automatically link job assignments.
+     * Automatically link job assignments for all assigned appraisees.
      *
-     * @param array|null $appraisee_ids
+     * @param array|null $appraisee_ids  If passed in, only appraisees for these ids
+     * are handled. If any id does not belong to a current appraisee, it is ignored.
      */
     public function store_job_assignments(array $appraisee_ids = null) {
         /** @var appraisal $appraisal */
         $appraisal = $this->moduleinstance;
 
-        if (!$appraisal->can_auto_link_job_assignments()) {
+        if (!appraisal::can_auto_link_job_assignments()) {
             return;
         }
 
         $appraisee_ids = $appraisee_ids ?? $this->get_current_appraisee_ids();
         foreach ($appraisee_ids as $appraisee_id) {
             $assignment = appraisal_user_assignment::get_user($appraisal->id, $appraisee_id);
-            // Call with param=false, so no job will be linked if user has multiple jobs.
-            $assignment->with_auto_job_assignment(false);
+            // Ignore if user is not assigned to the appraisal.
+            if (!empty($assignment->userid)) {
+                // Call with param=false, so no job will be linked if user has multiple jobs.
+                $assignment->with_auto_job_assignment(false);
+            }
         }
     }
 
