@@ -95,6 +95,11 @@ function xmldb_totara_core_install() {
 
     $systemcontext->mark_dirty();
 
+    // Make sure the context_map is up to date.
+    upgrade_set_timeout(3600);
+    \totara_core\access::build_context_map();
+    upgrade_set_timeout();
+
     // Set up frontpage.
     set_config('frontpage', '');
     set_config('frontpageloggedin', '');

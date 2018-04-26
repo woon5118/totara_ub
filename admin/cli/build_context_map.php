@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aaron Barnes <aaron.barnes@totaralms.com>
- * @package totara_core
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package core
  */
 
-defined('MOODLE_INTERNAL') || die();
+define('CLI_SCRIPT', true);
 
-/* NOTE: the following version number must be bumped during each major or minor Totara release. */
+require(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once($CFG->libdir.'/clilib.php');
+require_once($CFG->libdir.'/accesslib.php');
 
-$plugin->version  = 2018100100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_core';   // To check on upgrade, that module sits in correct place
+cli_heading('Building context map...');
+
+\totara_core\access::build_context_map();
+
+cli_heading('Done!');
+
+exit(0);

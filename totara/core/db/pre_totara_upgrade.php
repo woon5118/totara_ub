@@ -35,3 +35,14 @@ $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
 // Always update all language packs if we can, because they are used in Totara upgrade/install scripts.
 totara_upgrade_installed_languages();
+
+// Add context_map table to be used for flattening context tree.
+$table = new xmldb_table('context_map');
+$table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+$table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+$table->add_field('childid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+$table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+$table->add_index('parentid_childid_ix', XMLDB_INDEX_UNIQUE, array('parentid', 'childid'));
+if (!$dbman->table_exists($table)) {
+    $dbman->create_table($table);
+}

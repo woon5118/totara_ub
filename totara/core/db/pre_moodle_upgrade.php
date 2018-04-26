@@ -49,3 +49,14 @@ $index = new xmldb_index('moduleinstance', XMLDB_INDEX_NOTUNIQUE, array('modulei
 if (!$dbman->index_exists($table, $index)) {
     $dbman->add_index($table, $index);
 }
+
+// Add context_map table to be used for flattening context tree.
+$table = new xmldb_table('context_map');
+$table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+$table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+$table->add_field('childid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+$table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+$table->add_index('parentid_childid_ix', XMLDB_INDEX_UNIQUE, array('parentid', 'childid'));
+if (!$dbman->table_exists($table)) {
+    $dbman->create_table($table);
+}

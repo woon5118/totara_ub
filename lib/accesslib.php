@@ -5215,6 +5215,10 @@ abstract class context extends stdClass implements IteratorAggregate {
 
         context::reset_caches();
 
+        // Totara: update our context_map table once contexts have been updated.
+        $newrecord = (object)array('id' => $this->id, 'path' => $newpath);
+        \totara_core\access::context_moved($newrecord);
+
         $trans->allow_commit();
     }
 
@@ -5241,9 +5245,15 @@ abstract class context extends stdClass implements IteratorAggregate {
 
         if ($rebuild) {
             context_helper::build_all_paths(false);
-        }
 
-        context::reset_caches();
+            context::reset_caches();
+
+            // Totara: update our context_map table once contexts have been updated.
+            \totara_core\access::build_context_map();
+
+        } else {
+            context::reset_caches();
+        }
     }
 
     /**
@@ -5315,6 +5325,9 @@ abstract class context extends stdClass implements IteratorAggregate {
         if (!is_null($this->_path) and $this->_depth > 0) {
             $this->mark_dirty();
         }
+
+        // Totara: remove context map entries for this context.
+        \totara_core\access::context_deleted($this->_id);
     }
 
     // ====== context level related methods ======
@@ -5345,6 +5358,9 @@ abstract class context extends stdClass implements IteratorAggregate {
             $record->depth = substr_count($record->path, '/');
             $DB->update_record('context', $record);
         }
+
+        // Totara: add context map entries for all parents of this context.
+        \totara_core\access::context_created($record);
 
         return $record;
     }
@@ -5737,6 +5753,11 @@ class context_helper extends context {
                 $classname::build_paths(false);
             }
         }
+
+        // Totara: rebuild the map if we have paths.
+        if ($buildpaths) {
+            \totara_core\access::build_context_map();
+        }
     }
 
     /**
@@ -5754,6 +5775,9 @@ class context_helper extends context {
 
         // reset static course cache - it might have incorrect cached data
         accesslib_clear_all_caches(true);
+
+        // Totara: rebuild the map.
+        \totara_core\access::build_context_map();
     }
 
     /**
@@ -6024,6 +6048,9 @@ class context_system extends context {
             $record->depth = 1;
             $record->path  = '/'.$record->id;
             $DB->update_record('context', $record);
+
+            // Totara: add context map entry.
+            \totara_core\access::context_created($record);
         }
 
         if (!defined('SYSCONTEXTID')) {
@@ -7735,4 +7762,25 @@ function get_with_capability_join(context $context, $capability, $useridcolumn) 
     $wheres = "(" . implode(" AND ", $wheres) . ")";
 
     return new \core\dml\sql_join($joins, $wheres, $params);
+}
+
+/**
+ * This function allows you to restrict rows in an existing SQL statement by including the return value as
+ * a WHERE clause. You must provide the capability and user you want to check, and a sql field referencing
+ * context id. This allows you to check multiple contexts in one SQL query
+ * instead of having to call {@link has_capability()} inside a loop.
+ *
+ * NOTE: role switching is not implemented here
+ *
+ * @since Totara 12
+ *
+ * @param string        $capability     The name of the capability to check. For example mod/forum:view
+ * @param string        $contextidfield An SQL snippet which represents the link to context id in the parent SQL statement.
+ * @param int|\stdClass $user           A user id or user object, null means current user
+ * @param boolean       $doanything     If false, only real roles of administrators are considered
+ *
+ * @return array Array of the form array($sql, $params) which can be included in the WHERE clause of an SQL statement.
+ */
+function get_has_capability_sql($capability, $contextidfield, $user = null, $doanything = true) {
+    return \totara_core\access::get_has_capability_sql($capability, $contextidfield, $user, $doanything);
 }
