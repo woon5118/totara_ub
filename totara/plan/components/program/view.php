@@ -144,7 +144,7 @@ $PAGE->navbar->add(get_string("{$component->component}plural", 'totara_plan'), $
 $PAGE->navbar->add(get_string('viewitem', 'totara_plan'));
 
 
-$plan->print_header($componentname);
+$plan->print_header($componentname, array(), false);
 
 print $component->display_program_detail($progassid);
 
