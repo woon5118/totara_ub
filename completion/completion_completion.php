@@ -763,33 +763,34 @@ class completion_completion extends data_object {
 
                 // Not fetching row from the database - use values from $completions
                 $crc = new completion_criteria_completion($params, false);
+                $progress = $cc->get_progress($crc);
+            } else {
+                $progress = 0;
+            }
 
-                $key = $completion->criteriatype;
-                if ($this->progressinfo->criteria_exist($key)) {
-                    $curnode = $this->progressinfo->get_criteria($key);
+            $key = $completion->criteriatype;
+            if ($this->progressinfo->criteria_exist($key)) {
+                $curnode = $this->progressinfo->get_criteria($key);
+            } else {
+                // Should have been initialized for the completion_info - but just in case.
+                $curnode = $this->progressinfo->add_criteria($key, $completion->agg_method, $cc->get_weight());
+            }
+
+            if ($curnode && array_key_exists($completion->criteriatype, $multi_activity_criteria)) {
+                // Must set score on lowest level
+
+                // Again, this should have been initialized for the completion_info, but just making sure
+                $key = $completion->{$multi_activity_criteria[$completion->criteriatype]};
+                if ($curnode->criteria_exist($key)) {
+                    $curnode = $curnode->get_criteria($key);
                 } else {
-                    // Should have been initialized for the completion_info - but just in case.
-                    $curnode = $this->progressinfo->add_criteria($key, $completion->agg_method, $cc->get_weight());
-                }
-
-                if ($curnode && array_key_exists($completion->criteriatype, $multi_activity_criteria)) {
-                    // Must set score on lowest level
-
-                    // Again, this should have been initialized for the completion_info, but just making sure
-                    $key = $completion->{$multi_activity_criteria[$completion->criteriatype]};
-                    if ($curnode->criteria_exist($key)) {
-                        $curnode = $curnode->get_criteria($key);
-                    } else {
-                        $curnode = $curnode->add_criteria($key, $completion->agg_method, $cc->get_weight());
-                    }
-                }
-
-                if ($curnode) {
-                    $curnode->set_score($cc->get_progress($crc));
+                    $curnode = $curnode->add_criteria($key, $completion->agg_method, $cc->get_weight());
                 }
             }
 
-            // Else - do nothing, default to 0 progress
+            if ($curnode) {
+                $curnode->set_score($progress);
+            }
         }
 
         // Now do the actual aggregation
