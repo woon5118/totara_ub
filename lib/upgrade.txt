@@ -46,6 +46,10 @@ information provided here is intended especially for developers.
   see https://help.totaralearning.com/display/DEV/ES+6+functionality for more details.
 * JavaScript autoinitialisation using data-core-autoinitialise and data-core-autoinitialise-amd HTML data attributes has been
   added.
+* Added support for AMD modules in subdirectories (eg. core/sub/amdmodule is a valid AMD module)
+* Added support for using sub directories in templates folder.
+* $mform->init_javascript_enhancement() is deprecated and no longer does anything. Existing uses of smartselect enhancement
+  should be switched to the searchableselector form element or other solutions.
 
 === 11.0 ===
 
