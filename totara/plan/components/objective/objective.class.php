@@ -1192,7 +1192,8 @@ class dp_objective_component extends dp_base_component {
         }
 
         $button = $OUTPUT->single_button(new moodle_url("/totara/plan/components/objective/edit.php",
-                                            array('id' => $this->plan->id)), get_string('addnewobjective', 'totara_plan'), 'get');
+            array('id' => $this->plan->id)), get_string('addnewobjective', 'totara_plan'), 'get',
+            array('class' => 'singlebutton dp-plan-assign-button'));
 
         return $OUTPUT->container($button, "buttons plan-add-item-button-wrapper");
     }
