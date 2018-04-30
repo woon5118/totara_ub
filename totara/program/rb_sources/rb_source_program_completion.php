@@ -160,8 +160,15 @@ class rb_source_program_completion extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'progcompletion',
             'starteddate',
-            get_string('dateassigned', 'rb_source_program_completion'),
+            get_string('datestarted', 'rb_source_program_completion'),
             'base.timestarted',
+            array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
+        );
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
+            'assigneddate',
+            get_string('dateassigned', 'rb_source_program_completion'),
+            'base.timecreated',
             array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
         );
         $columnoptions[] = new rb_column_option(

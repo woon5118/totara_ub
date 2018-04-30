@@ -23,6 +23,7 @@
 
 // lang strings for report builder 'program completion' source
 $string['dateassigned'] = 'Date assigned';
+$string['datestarted'] = 'Date started';
 $string['sourcetitle'] = 'Program Completion';
 $string['program_completion'] = 'Program Completion';
 $string['programcompletionstatus'] = 'Status';
