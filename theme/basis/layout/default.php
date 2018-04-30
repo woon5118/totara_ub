@@ -50,8 +50,6 @@ if ($PAGE->blocks->region_has_content('bottom', $OUTPUT)) {
     $grid->has_bottom();
 }
 
-$regions = $grid->get_regions_classes();
-
 $PAGE->set_popup_notification_allowed(false);
 
 $themerenderer = $PAGE->get_renderer('theme_basis');
@@ -69,6 +67,8 @@ if (empty($PAGE->layout_options['nocustommenu'])) {
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <?php require("{$CFG->dirroot}/theme/basis/layout/partials/head.php"); ?>
+
+<?php $regions = $grid->get_regions_classes($PAGE->blocks->get_add_block_regions()); ?>
 
 <body <?php echo $OUTPUT->body_attributes(); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html() ?>

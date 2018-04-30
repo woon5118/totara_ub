@@ -111,6 +111,14 @@ class block_manager {
     protected $addableblocks = null;
 
     /**
+     * When figuring out what regions get the "Add block" UI we cache that information
+     * here for later re-use.
+     *
+     * @var array
+     */
+    protected $addblockregions = [];
+
+    /**
      * Will be an array region-name => array(db rows loaded in load_blocks);
      * @var array
      */
@@ -360,6 +368,17 @@ class block_manager {
             return true;
         }
         return !empty($this->visibleblockcontent[$region]) || !empty($this->extracontent[$region]);
+    }
+
+    /**
+     * Get the regions that had the "Add Block" UI added to them.
+     *
+     * This will only be accurate after all the regions content has been created.
+     *
+     * @return array
+     */
+    public function get_add_block_regions(): array {
+        return $this->addblockregions;
     }
 
     /**
@@ -1258,6 +1277,8 @@ class block_manager {
                 $addblockui = block_add_block_ui($this->page, $output, $region);
                 if ($addblockui) {
                     $contents[] = $addblockui;
+                    // Remember the regions we can add blocks to.
+                    $this->addblockregions[] = $region;
                 }
             }
             $this->visibleblockcontent[$region] = $contents;

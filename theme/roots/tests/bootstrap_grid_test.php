@@ -108,4 +108,53 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    public function test_get_regions_classes_editing_mode() {
+        $map_regions = [
+            'top' => 'top',
+            'bottom' => 'bottom',
+            'main' => 'content',
+            'side-pre' => 'pre',
+            'side-post' => 'post',
+        ];
+
+        // Test that all regions should have editing class.
+        $all_regions = array_keys($map_regions);
+        $editing_class = ' editing-region-border';
+        $expected = [
+            'top' => 'col-sm-12' . $editing_class,
+            'bottom' => 'col-sm-12' . $editing_class,
+            'content' => 'col-sm-12 col-md-6 col-md-push-3' . $editing_class,
+            'pre' => 'col-sm-6 col-md-3 col-md-pull-6' . $editing_class,
+            'post' => 'col-sm-6 col-md-3' . $editing_class,
+        ];
+        $actual = (new bootstrap_grid())
+            ->has_top()
+            ->has_bottom()
+            ->has_side_pre()
+            ->has_side_post()
+            ->get_regions_classes($all_regions);
+        $this->assertEquals($expected, $actual);
+
+        // Test for each single region.
+        foreach ($map_regions as $region => $grid_key) {
+            $expected = [
+                'top' => 'col-sm-12',
+                'bottom' => 'col-sm-12',
+                'content' => 'col-sm-12 col-md-6 col-md-push-3',
+                'pre' => 'col-sm-6 col-md-3 col-md-pull-6',
+                'post' => 'col-sm-6 col-md-3',
+            ];
+
+            $actual = (new bootstrap_grid())
+                ->has_top()
+                ->has_bottom()
+                ->has_side_pre()
+                ->has_side_post()
+                ->get_regions_classes([$region]);
+
+            $expected[$grid_key] .= $editing_class;
+
+            $this->assertEquals($expected, $actual);
+        }
+    }
 }

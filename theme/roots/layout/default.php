@@ -49,8 +49,6 @@ if ($PAGE->blocks->region_has_content('bottom', $OUTPUT)) {
     $grid->has_bottom();
 }
 
-$regions = $grid->get_regions_classes();
-
 $PAGE->set_popup_notification_allowed(false);
 
 $themerenderer = $PAGE->get_renderer('theme_roots');
@@ -74,6 +72,8 @@ echo $OUTPUT->doctype() ?>
     <?php echo $OUTPUT->standard_head_html(); ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
 </head>
+
+<?php $regions = $grid->get_regions_classes($PAGE->blocks->get_add_block_regions()); ?>
 
 <body <?php echo $OUTPUT->body_attributes(); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html() ?>

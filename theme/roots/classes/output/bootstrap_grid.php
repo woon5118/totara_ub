@@ -87,8 +87,11 @@ class bootstrap_grid {
 
     /**
      * Return classes which should be applied to configured regions.
+     *
+     * @param array $add_block_regions  List of regions where blocks can be added.
+     * @return array
      */
-    public function get_regions_classes() {
+    public function get_regions_classes(array $add_block_regions = []): array {
         // NOTE: when making changes here make sure you apply them also to theme/roots/less/totara/core.less
 
         $classes = [];
@@ -102,24 +105,50 @@ class bootstrap_grid {
             $classes['content'] = 'col-sm-12 col-md-6 col-md-push-3';
             $classes['pre'] = 'col-sm-6 col-md-3 col-md-pull-6';
             $classes['post'] = 'col-sm-6 col-md-3';
-            return $classes;
+            return $this->add_editing_class($classes, $add_block_regions);
         }
 
         if ($this->side_pre && !$this->side_post) {
             $classes['content'] = 'col-sm-12 col-md-9 col-md-push-3';
             $classes['pre'] = 'col-sm-6 col-md-3 col-md-pull-9';
             $classes['post'] = 'empty';
-            return $classes;
+            return $this->add_editing_class($classes, $add_block_regions);
         }
 
         if (!$this->side_pre && $this->side_post) {
             $classes['content'] = 'col-sm-12 col-md-9';
             $classes['pre'] = 'empty';
             $classes['post'] = 'col-sm-6 col-sm-offset-6 col-md-3 col-md-offset-0';
-            return $classes;
+            return $this->add_editing_class($classes, $add_block_regions);
         }
 
         // No side-pre or side-post.
+        return $this->add_editing_class($classes, $add_block_regions);
+    }
+
+    /**
+     * @param array $classes
+     * @param array $add_block_regions
+     * @return array
+     */
+    private function add_editing_class(array $classes, array $add_block_regions): array {
+        $editing_class = ' editing-region-border';
+        if ($this->side_pre && in_array('side-pre', $add_block_regions)) {
+            $classes['pre'] .= $editing_class;
+        }
+        if ($this->side_post && in_array('side-post', $add_block_regions)) {
+            $classes['post'] .= $editing_class;
+        }
+        if ($this->top && in_array('top', $add_block_regions)) {
+            $classes['top'] .= $editing_class;
+        }
+        if ($this->bottom && in_array('bottom', $add_block_regions)) {
+            $classes['bottom'] .= $editing_class;
+        }
+        if (in_array('main', $add_block_regions)) {
+            $classes['content'] .= $editing_class;
+        }
+
         return $classes;
     }
 

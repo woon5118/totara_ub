@@ -52,6 +52,28 @@
     }
 }
 
+#block-region-side-pre,
+#block-region-side-post,
+#block-region-top,
+#block-region-bottom,
+#region-main {
+    &.editing-region-border {
+        border: 8px solid transparent;
+        padding: (@grid-gutter-width / 2 - 8);
+        position: relative;
+        &::after {
+            border: 2px dotted @totara_style-color_neutral_5;
+            content: "";
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: -1;
+        }
+    }
+}
+
 .editing.empty-region-side-post.used-region-side-pre,
 .editing.side-pre-only.used-region-side-pre {
     #region-main {
