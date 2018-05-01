@@ -133,7 +133,7 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         $this->assertEquals('en Test policy <a href="test">all</a>', $localisedpolicy->get_title(false));
         $this->assertEquals('en Test policy all', $localisedpolicy->get_title(true));
         $this->assertEquals("en Policy <a href='test'>statement</a> all\nnow", $localisedpolicy->get_policytext(false));
-        $this->assertEquals('<div class="text_to_html">en Policy <a href=\'test\'>statement</a> all<br />'."\n".'now</div>', $localisedpolicy->get_policytext(true));
+        $this->assertEquals('<div class="text_to_html">en Policy <a href="test">statement</a> all<br />'."\n".'now</div>', $localisedpolicy->get_policytext(true));
         $this->assertEquals(1, $localisedpolicy->is_primary());
         $this->assertEquals('', $localisedpolicy->get_whatsnew());
         // Ensure that it was created within the last 2 seconds.

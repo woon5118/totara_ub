@@ -223,7 +223,7 @@ class policyversion {
      *
      * @return policyversion
      */
-    private static function from_data (sitepolicy $sitepolicy, $dbrow = null): policyversion {
+    public static function from_data (sitepolicy $sitepolicy, $dbrow = null): policyversion {
 
         $policyversion = new self();
         $policyversion->sitepolicy = $sitepolicy;

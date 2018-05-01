@@ -31,6 +31,8 @@ use \tool_sitepolicy\policyversion;
 use \tool_sitepolicy\localisedpolicy;
 use \tool_sitepolicy\userconsent;
 use \tool_sitepolicy_renderer;
+use \tool_sitepolicy\form\versionform;
+use \tool_sitepolicy\form\translationform;
 use \html_writer;
 
 /**
@@ -70,7 +72,7 @@ class page_renderer extends \plugin_renderer_base {
      * @param \tool_sitepolicy\form\versionform $form
      * @return string
      */
-    public function sitepolicy_create_new_policy(\tool_sitepolicy\form\versionform $form) {
+    public function sitepolicy_create_new_policy(versionform $form) {
         $renderer = $this->get_sitepolicy_renderer();
 
         $html = $renderer->header();
@@ -138,7 +140,7 @@ class page_renderer extends \plugin_renderer_base {
      * @param bool $newpolicy
      * @return string
      */
-    public function localisedversion_edit(policyversion $version, \tool_sitepolicy\form\versionform $form, bool $newpolicy) {
+    public function localisedversion_edit(policyversion $version, versionform $form, bool $newpolicy) {
 
         $renderer = $this->get_sitepolicy_renderer();
 
@@ -167,7 +169,7 @@ class page_renderer extends \plugin_renderer_base {
      * @param \tool_sitepolicy\form\translationform $form
      * @return string
      */
-    public function localisedversion_translation_edit(localisedpolicy $localisedpolicy, \tool_sitepolicy\form\translationform $form) {
+    public function localisedversion_translation_edit(localisedpolicy $localisedpolicy, translationform $form) {
 
         $heading = get_string('translationtolang', 'tool_sitepolicy', [
             'title' => $localisedpolicy->get_primary_title(true),
@@ -186,32 +188,18 @@ class page_renderer extends \plugin_renderer_base {
     /**
      * Previews a site policy.
      *
-     * @param localisedpolicy $localisedpolicy
-     * @param \tool_sitepolicy\form\userconsentform $form
+     * @param \tool_sitepolicy\form\versionform $form
      * @return string
      */
-    public function sitepolicy_preview(localisedpolicy $localisedpolicy, \tool_sitepolicy\form\userconsentform $form) {
+    public function sitepolicy_preview(versionform $form) {
         global $USER;
 
         $renderer = $this->get_sitepolicy_renderer();
 
-        $version = $localisedpolicy->get_policyversion();
-
         $html = $renderer->header();
-        $html .= $renderer->heading($localisedpolicy->get_title(true));
-
-        // Whats Changed area.
-        if ($version->get_versionnumber() > 1 and !empty($localisedpolicy->get_whatsnew())) {
-            if (is_siteadmin() or userconsent::has_consented_previous_version($version, $USER->id)) {
-                $html .= html_writer::tag('h4', '<strong>' . get_string('userconsentwhatschanged', 'tool_sitepolicy') . '</strong>');
-                $html .= $localisedpolicy->get_whatsnew();
-            }
-        }
-
-        $html .= html_writer::div($localisedpolicy->get_policytext(true), 'policybox');
-        $html .= $renderer->heading(get_string('userconsentprovideconsent', 'tool_sitepolicy'));
         $html .= $renderer->form($form);
         $html .= $renderer->footer();
+
         return $html;
     }
 

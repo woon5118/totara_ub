@@ -243,6 +243,10 @@ class sitepolicy {
         global $DB;
         $latestversion = policyversion::from_policy_latest($this);
 
+        if ($latestversion->get_status() == policyversion::STATUS_DRAFT) {
+            return $latestversion;
+        }
+
         $trans = $DB->start_delegated_transaction();
         $draft = policyversion::new_policy_draft($this);
         $draft->save();

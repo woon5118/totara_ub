@@ -27,12 +27,17 @@ namespace tool_sitepolicy\form;
 defined('MOODLE_INTERNAL') || die();
 
 use tool_sitepolicy\localisedpolicy;
+use tool_sitepolicy\element\sitepolicy;
 use totara_form\form;
 use totara_form\form\element\text;
 use totara_form\form\element\static_html;
 use totara_form\form\element\textarea;
 use totara_form\form\element\hidden;
 use totara_form\form\group\section;
+use totara_form\form\group\buttons;
+use totara_form\form\element\action_button;
+use totara_form\form\element\editor;
+use totara_form\form\clientaction\hidden_if;
 
 /**
  * Class translationform
@@ -42,34 +47,98 @@ class translationform extends form {
     protected function definition() {
 
         $model = $this->model;
+
+        $previewfield = $model->add(new hidden('preview', PARAM_INT));
+        ['preview' => $preview] = $this->model->get_current_data('preview');
+        $ispreview = !empty($preview);
+
         $model->add(new hidden('localisedpolicy', PARAM_INT));
         $model->add(new hidden('language', PARAM_SAFEDIR)); // We can't use PARAM_LANG here as the language pack may have been uninstalled.
         $model->add(new hidden('policyversionid', PARAM_INT));
 
-        $model->add(new static_html('primarytitle', '&nbsp;', $this->parameters['primarytitle']));
+        // Edit section
+        $editsection = $this->model->add(new section('edit_translation', ''));
+        $editsection->set_collapsible(false);
+        $editsection->set_expanded(true);
 
-        $policytitle = $model->add(new text('title', get_string('policytitle', 'tool_sitepolicy'), PARAM_TEXT));
+        $editsection->add(new static_html('primarytitle', '&nbsp;', $this->parameters['primarytitle']));
+
+        $policytitle = $editsection->add(new text('title', get_string('policytitle', 'tool_sitepolicy'), PARAM_TEXT));
         $policytitle->set_attribute('size', 1335);
         $policytitle->set_attribute('required', true);
 
-        $primarypolicy = $model->add(new textarea('primarypolicytext', '', PARAM_TEXT));
-        $primarypolicy->set_attributes(['rows' => 10]);
-        $primarypolicy->set_frozen(true);
-        $policyeditor = $model->add(new textarea('policytext', get_string('policystatement', 'tool_sitepolicy'), PARAM_TEXT));
+        $primarypolicy = $editsection->add(new static_html('primarypolicytext', '&nbsp;', '<div class="primarypolicybox">'.$this->parameters['primarypolicytext'].'</div>'));
+        $policyeditor = $editsection->add(new editor('policytext', get_string('policystatement', 'tool_sitepolicy')));
         $policyeditor->set_attributes(['rows' => 20, 'required' => true]);
 
-        $statement = new element\statement('statements', true);
-        $model->add($statement);
-        $statement->set_attribute('required', true);
+        $statements = new element\statement('statements', true);
+        $model->add($statements);
+        $statements->set_attribute('required', true);
+
+        $model->add_clientaction(new hidden_if($editsection))->not_empty($previewfield);
 
         if ($this->parameters['versionnumber'] > 1) {
-            $consent = $model->add(new section('whatschanged', get_string('policyversionwhatschanged', 'tool_sitepolicy')));
-            $primarywhatsnew = $consent->add(new textarea('primarywhatsnew', '', PARAM_TEXT));
-            $primarywhatsnew->set_frozen(true);
-            $policywhatsnew = $consent->add(new textarea('whatsnew', get_string('policyversionchanges', 'tool_sitepolicy'), PARAM_TEXT));
+            $whatschangedsection = $model->add(new section('whatschanged', get_string('policyversionwhatschanged', 'tool_sitepolicy')));
+            $whatschangedsection->set_collapsible(true);
+            $whatschangedsection->set_expanded(true);
+
+            $primarywhatsnew = $whatschangedsection->add(new static_html('primarywhatsnew', '&nbsp;',
+                '<div class="primarypolicybox">'.$this->parameters['primarywhatsnew'].'</div>'));
+            $policywhatsnew = $whatschangedsection->add(new editor('whatsnew', get_string('policyversionchanges', 'tool_sitepolicy')));
             $policywhatsnew->set_attributes(['rows' => 5]);
+
+            $model->add_clientaction(new hidden_if($whatschangedsection))->not_empty($previewfield);
         }
+
+        // Preview section
+        $previewsection = $this->model->add(new section('preview_translation', ''));
+        $previewsection->set_collapsible(false);
+        $previewsection->set_expanded(true);
+
+        if (!empty($this->parameters['previewnotification'])) {
+            $previewnotification = $previewsection->add(new static_html('previewnotification', '', $this->parameters['previewnotification']));
+        }
+
+        // Use the current field values
+        // We can't use get_raw_post_data here as all field creation and population steps may not have completed yet
+        $data = [];
+        $data = array_merge($data, $policytitle->get_data());
+        $data = array_merge($data, $policyeditor->get_data());
+        $data = array_merge($data, $statements ->get_data());
+        if ($this->parameters['versionnumber'] > 1) {
+            $data = array_merge($data, $policywhatsnew->get_data());
+        }
+
+        $options = [];
+        $options['title'] = $data['title'];
+        $options['policytext'] = $data['policytext'];
+        $options['viewonly']  = true;
+        if (isset($data['whatsnew'])) {
+            $options['whatsnew'] = $data['whatsnew'];
+        }
+
+        $options['statements'] = [];
+        foreach ($data['statements'] as $idx => $statement) {
+            if (empty($statement->removedstatement)) {
+                $options['statements'][] = [
+                    'mandatory' => $statement->mandatory,
+                    'statement' => $statement->statement,
+                    'provided' => $statement->provided,
+                    'withheld' => $statement->withheld
+                ];
+            }
+        }
+
+        $previewsection->add(new element\sitepolicy('policypreview', $options));
+        $model->add_clientaction(new hidden_if($previewsection))->is_empty($previewfield);
+
+        $buttongroup = $model->add(new buttons('actionbuttonsgroup'), -1);
+        $previewbutton = $buttongroup->add(new action_button('previewbutton', get_string('policypreview', 'tool_sitepolicy'), action_button::TYPE_SUBMIT));
+        $continuebutton = $buttongroup->add(new action_button('continuebutton', get_string('policycontinueedit', 'tool_sitepolicy'), action_button::TYPE_SUBMIT));
         $model->add_action_buttons(true, get_string('translationsave', 'tool_sitepolicy'));
+
+        $model->add_clientaction(new hidden_if($previewbutton))->not_empty($previewfield);
+        $model->add_clientaction(new hidden_if($continuebutton))->is_empty($previewfield);
     }
 
     /**
@@ -87,9 +156,10 @@ class translationform extends form {
      *
      * @param localisedpolicy $primarypolicy
      * @param localisedpolicy $localisedpolicy
-     * @return array
+     * @return array[] currentdata and parameters
      */
     public static function prepare_current_data(localisedpolicy $primarypolicy, localisedpolicy $localisedpolicy) {
+
         $primaryoptions = $primarypolicy->get_statements(false);
         $options = $localisedpolicy->get_statements(false);
         if (empty($options)) {
@@ -144,13 +214,21 @@ class translationform extends form {
             'policyversionid' => $localisedpolicy->get_policyversion()->get_id(),
             'title' => $localisedpolicy->get_title(false),
             'policytext' => $localisedpolicy->get_policytext(false),
+            'policytextformat' => FORMAT_HTML,
             'statements' => $options,
             'whatsnew' => $localisedpolicy->get_whatsnew(),
+            'whatsnewformat' => FORMAT_HTML,
+            'preview' => '',
+        ];
 
-            // Set primary fields required to display in textareas.
+        $params = [
+            // Pass primary values as parameters
+            'versionnumber' => $primarypolicy->get_policyversion()->get_versionnumber(),
+            'primarylanguage' => $primarypolicy->get_language(false),
+            'primarytitle' => $primarypolicy->get_title(false),
             'primarypolicytext' => $primarypolicy->get_policytext(false),
             'primarywhatsnew' => $primarypolicy->get_whatsnew(),
         ];
-        return $currentdata;
+        return [$currentdata, $params];
     }
 }

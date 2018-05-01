@@ -61,12 +61,12 @@ Feature: Manage sitepolicy version translations
 
     When I select "nl" from the "language" singleselect
     And I set the following fields to these values:
-      | Title                     | Beleid 1            |
-      | Policy statement          | Beleidsverklaring   |
-      | statements__statement[0]  | P1 - Stem jy saam?  |
-      | statements__provided[0]   | Ja                  |
-      | statements__withheld[0]   | Nee                 |
-      | whatsnew                  | Iets het verander   |
+      | Title                                    | Beleid 1            |
+      | Policy statement                         | Beleidsverklaring   |
+      | statements__statement[0]                 | P1 - Stem jy saam?  |
+      | statements__provided[0]                  | Ja                  |
+      | statements__withheld[0]                  | Nee                 |
+      | Changes since previous published version | Iets het verander   |
     And I press "Save"
     Then I should see "Nederlands ‎(nl)‎ translation of \"Policy 1\" has been saved"
     And I should see "Manage \"Policy 1\" translations"

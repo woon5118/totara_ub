@@ -51,12 +51,10 @@ $PAGE->set_popup_notification_allowed(false);
 
 $home = $CFG->wwwroot . '/';
 $userid = $USER->id;
-$userlisturl = url_helper::user_sitepolicy_list($userid);
-$translationurl = url_helper::localisedpolicy_list($policyversionid);
 
 if (empty($policyversionid)) {
     $unanswered = \tool_sitepolicy\userconsent::get_unansweredpolicies($userid);
-    if (count($unanswered) == 0 && $policyversionid == 0) {
+    if (count($unanswered) == 0) {
         $SESSION->tool_sitepolicy_consented = true;
         redirect($home);
     }
@@ -69,28 +67,29 @@ if (empty($policyversionid)) {
         $totalcount = count(array_unique($totalpolicyversion));
     }
 
-    if ($totalcount != 0) {
-        if (isguestuser()) {
-            // For guest users all policies are always returned
-            for ($i = 0; $i < $currentcount; $i++) {
-                $current = array_shift($unanswered);
-            }
-        } else {
-            $current = current($unanswered);
-        }
-
-        $policyversionid = $current->policyversionid;
-        $version = new \tool_sitepolicy\policyversion($policyversionid);
-    } else {
-        throw new coding_exception('Parameter policyversionid is expected in all non-consent uses');
+    // This shouldn't happen, but just in case
+    if ($totalcount == 0) {
+        $SESSION->tool_sitepolicy_consented = true;
+        redirect($home);
     }
-} else {
-    // User reviewing his answers. Can change
-    $version = new \tool_sitepolicy\policyversion($policyversionid);
-}
 
-if ($version->is_draft() && !has_capability('tool/sitepolicy:manage', context_system::instance())) {
-    throw new coding_exception("Policy not found");
+    if (isguestuser()) {
+        // For guest users all policies are always returned
+        for ($i = 0; $i < $currentcount; $i++) {
+            $current = array_shift($unanswered);
+        }
+    } else {
+        $current = current($unanswered);
+    }
+
+    $policyversionid = $current->policyversionid;
+    $version = new \tool_sitepolicy\policyversion($policyversionid);
+} else {
+    if ($totalcount == 0) {
+        throw new coding_exception('Parameter totalcount is expected if policyversionid is given');
+    }
+
+    $version = new \tool_sitepolicy\policyversion($policyversionid);
 }
 
 $versionnumber = $version->get_versionnumber();
@@ -101,58 +100,72 @@ if (empty($language)) {
 }
 
 $currentpolicy = \tool_sitepolicy\localisedpolicy::from_version($version, ['language' => $language]);
-$options = $currentpolicy->get_statements(false);
 
-// Add required string to mandatory options' statements here to properly allow for RTL languages
-$currentdata = [];
-foreach ($options as $option) {
-    if ($option->mandatory) {
-        $option->statement = get_string('userconsenttoaccess', 'tool_sitepolicy', $option->statement);
-    }
-
-    if (!empty($consentdata)) {
-        $answers = explode(',', $consentdata);
-        foreach ($answers as $answer) {
-            $data = explode('-', $answer);
-            $currentdata = array_merge($currentdata, ['option' . $data[0] => (int)$data[1]]);
-        }
-    } else if ($totalcount == 0) {
-        // User reviewing his answers
-        $hasconsent = userconsent::has_user_consented($option->dataid, $userid);
-        $currentdata = array_merge($currentdata, ['option' . $option->dataid => (int)$hasconsent]);
-    }
-}
-
-$currentdata = array_merge($currentdata, [
+$currentdata = [
     'policyversionid' => $policyversionid,
     'versionnumber' => $versionnumber,
     'localisedpolicyid' => $currentpolicy->get_id(),
     'language' => $language,
     'currentcount' => $currentcount,
-    'totalcount' => $totalcount
-]);
-
-$params = [
-    'consent' => $options,
-    'allowsubmit' => !$version->is_archived(),
-    'allowcancel' => ($totalcount == 0)
+    'totalcount' => $totalcount,
+    'title' => $currentpolicy->get_title(true),
+    'policytext' => $currentpolicy->get_policytext(true),
+    'whatsnew' => $currentpolicy->get_whatsnew(true),
 ];
+
+$statements = $currentpolicy->get_statements(false);
+$currentdata['statements'] = [];
+foreach ($statements as $idx => $statement) {
+    $dataid = abs($statement->dataid);        // get_statements return negative dataids for persisted statements
+    $currentdata['statements'][] = [
+        'dataid' => $dataid,
+        'mandatory' => $statement->mandatory,
+        'statement' => $statement->statement,
+        'provided' => $statement->provided,
+        'withheld' => $statement->withheld,
+    ];
+}
+
+if (!empty($consentdata)) {
+    $answers = explode(',', $consentdata);
+    foreach ($answers as $answer) {
+        $data = explode('-', $answer);
+        $currentdata = array_merge($currentdata, ['option' . $data[0] => (int)$data[1]]);
+    }
+} else {
+    // If user has consented before, show his previous answers
+    $options = $currentdata['statements'];
+    foreach ($options as $option) {
+        $hasconsent = userconsent::has_user_consented($option['dataid'], $userid);
+        $currentdata = array_merge($currentdata, ['option' . $option['dataid'] => (int)$hasconsent]);
+    }
+}
+
+$params = ['hidden' => [
+    'policyversionid' => PARAM_INT,
+    'versionnumber' => PARAM_INT,
+    'localisedpolicyid' => PARAM_INT,
+    'language' => PARAM_ALPHANUMEXT,
+    'currentcount' => PARAM_INT,
+    'totalcount' => PARAM_INT,
+]];
 
 $form = new \tool_sitepolicy\form\userconsentform($currentdata, $params);
 
 if ($form->is_cancelled()) {
-
-    redirect($userlisturl);
+    // Not allowing cancel here - this code is just a safety net
+    redirect(url_helper::user_sitepolicy_consent($currentcount, $totalcount));
 
 } elseif ($formdata = $form->get_data()) {
 
     $userconsent = new userconsent();
     $userconsent->set_userid($userid);
 
+    $options = $currentdata['statements'];
     $mandatorywithhelds = array_filter($options, function($option) use ($formdata) {
-        $optionfieldname = 'option' . $option->dataid;
-        $consent = $formdata->$optionfieldname;
-        $mandatory = $option->mandatory;
+        $optionkey = 'option' . $option['dataid'];
+        $consent = $formdata->userconsent[$optionkey];
+        $mandatory = $option['mandatory'];
         return (empty($consent) and $mandatory == true);
     });
 
@@ -161,10 +174,10 @@ if ($form->is_cancelled()) {
 
         $answers = [];
         foreach ($options as $option) {
-            $optionfieldname = 'option' . $option->dataid;
-            $consent = $formdata->$optionfieldname;
+            $optionkey = 'option' . $option['dataid'];
+            $consent = $formdata->userconsent[$optionkey];
 
-            $answers[] = implode('-', [$option->dataid, (int)$consent]);
+            $answers[] = implode('-', [$option['dataid'], (int)$consent]);
         }
 
         $answers = implode(',', $answers);
@@ -173,29 +186,25 @@ if ($form->is_cancelled()) {
     }
 
     foreach ($options as $option) {
-        $optionfieldname = 'option' . $option->dataid;
-        $consent = $formdata->$optionfieldname;
-        $mandatory = $option->mandatory;
+        $optionkey = 'option' . $option['dataid'];
+        $consent = $formdata->userconsent[$optionkey];
+        $mandatory = $option['mandatory'];
 
         $userconsent->set_hasconsented((int)$consent);
-        $userconsent->set_consentoptionid($option->dataid);
+        $userconsent->set_consentoptionid($option['dataid']);
         $userconsent->set_language($language);
         $userconsent->save();
-
     }
 
     // Will only get here is $SESSION->tool_sitepolicy_consented not previously set
     // We set it here if user has consented to all to handle guests correctly and also
     // avoid uneccessary db queries
-    if ($totalcount > 0 && $currentcount == $totalcount) {
+    if ($currentcount == $totalcount) {
         $SESSION->tool_sitepolicy_consented = true;
         redirect($home);
-    } else if ($totalcount == 0) {
-        redirect($userlisturl);
     } else {
         redirect(url_helper::user_sitepolicy_consent($currentcount + 1, $totalcount));
     }
-
 }
 
 $PAGE->set_title($currentpolicy->get_title(false));
@@ -205,15 +214,12 @@ $PAGE->set_title($currentpolicy->get_title(false));
 if ($node = $PAGE->navigation->find('user' . $USER->id, navigation_node::TYPE_USER)) {
     $node->make_active();
 }
-$PAGE->navbar->add(get_string('userconsentnavbar', 'tool_sitepolicy'), $userlisturl);
-$PAGE->navbar->add($currentpolicy->get_title(true));
 
 /** @var tool_sitepolicy_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy');
 
 echo $renderer->header();
 echo $renderer->heading(get_string('userconsentxofy', 'tool_sitepolicy', ['currentpolicy' => $currentcount, 'totalpolicies' => $totalcount]), 4);
-echo $renderer->heading($currentpolicy->get_title(true));
 
 //Langugae Selection Dropdown
 $verlanguages = $version->get_languages();
@@ -235,23 +241,13 @@ foreach ($verlanguages as $lang => $row) {
     }
 }
 
-$langurl = url_helper::user_sitepolicy_version_view($userid, $policyversionid, $versionnumber, null, $currentcount, $totalcount);
 if (!empty($langarray)) {
+    $langurl = url_helper::user_sitepolicy_version_view($userid, $policyversionid, $versionnumber, null, $currentcount, $totalcount);
     $select = new \single_select($langurl, 'language', $langarray, $language, [], 'userpolicy');
     $select->class = 'singleselect pull-right';
     echo $renderer->render($select);
 }
 
-// Whats Changed area.
-if ($versionnumber > 1 and !empty($currentpolicy->get_whatsnew())) {
-    if (userconsent::has_consented_previous_version($version, $userid) == true) {
-        echo html_writer::tag('h4', html_writer::tag('strong', get_string('userconsentwhatschanged', 'tool_sitepolicy')) . html_writer::tag('/strong', ''));
-        echo $currentpolicy->get_whatsnew();
-    }
-}
-
-echo html_writer::div($currentpolicy->get_policytext(true), 'policybox');
-echo $renderer->heading(get_string('userconsentprovideconsent', 'tool_sitepolicy'));
 echo $renderer->form($form);
 echo $renderer->footer();
 

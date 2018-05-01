@@ -27,6 +27,7 @@ namespace tool_sitepolicy\form;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_form\form_controller;
+use tool_sitepolicy\localisedpolicy;
 
 /**
  * Controller for version form
@@ -54,12 +55,28 @@ class versionform_controller extends form_controller {
         $syscontext = \context_system::instance();
         require_capability('moodle/site:config', $syscontext);
 
-        $localisedpolicy = optional_param('localisedpolicy', 0, PARAM_INT);
+        $localisedpolicyid = optional_param('localisedpolicy', 0, PARAM_INT);
         $versionnumber = optional_param('versionnumber', 0, PARAM_INT);
         $ret = optional_param('ret', '', PARAM_TEXT);
-        $currentdata = ['localisedpolicy' => $localisedpolicy, 'versionnumber' => $versionnumber, 'ret' => $ret];
+
+        if (empty($localisedpolicyid)) {
+            // Adding statements to new policy that haven't yet been persisted
+            $currentdata = ['localisedpolicy' => $localisedpolicy, 'versionnumber' => $versionnumber, 'ret' => $ret];
+            $params = [
+                'hidden' => [
+                    'localisedpolicy' => PARAM_INT,
+                    'policyversionid' => PARAM_INT,
+                    'ret' => PARAM_TEXT],
+            ];
+        } else {
+            // When persisted previously, we need the full set of hidden data
+            $localisedpolicy = new localisedpolicy($localisedpolicyid);
+            [$currentdata, $params] = versionform::prepare_current_data($localisedpolicy, false, $ret);
+            $currentdata['versionnumber'] = $versionnumber;
+        }
+
         // Create the form instance.
-        $this->form = new versionform($currentdata, null, $idsuffix);
+        $this->form = new versionform($currentdata, $params, $idsuffix);
         return $this->form;
     }
 

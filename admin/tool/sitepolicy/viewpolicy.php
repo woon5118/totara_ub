@@ -43,34 +43,9 @@ if (empty($language)) {
     $language = \tool_sitepolicy\userconsent::get_user_consent_language($policyversionid, $USER->id, false);
 }
 $currentpolicy = \tool_sitepolicy\localisedpolicy::from_version($version, ['language' => $language]);
-$options = $currentpolicy->get_statements(false);
-
-$currentdata = [];
-foreach ($options as $option) {
-    if ($option->mandatory) {
-        // Add required string to mandatory options' statements here to properly allow for RTL languages
-        $option->statement = get_string('userconsenttoaccess', 'tool_sitepolicy', $option->statement);
-    }
-    if (!is_siteadmin()) {
-        $hasconsent = \tool_sitepolicy\userconsent::has_user_consented($option->dataid, $USER->id);
-        $currentdata = array_merge($currentdata, ['option' . $option->dataid => (int)$hasconsent]);
-    }
-}
-
-$currentdata = array_merge($currentdata, [
-    'policyversionid' => $policyversionid,
-    'versionnumber' => $versionnumber,
-    'localisedpolicyid' => $currentpolicy->get_id(),
-    'language' => $language,
-]);
-
-$params = [
-    'consent' => $options,
-    'allowsubmit' => false,
-    'allowcancel' => false,
-];
-
-$form = new \tool_sitepolicy\form\userconsentform($currentdata, $params);
+[$currentdata, $params] = \tool_sitepolicy\form\versionform::prepare_current_data($currentpolicy, false, '');
+$params['previewonly'] = true;
+$form = new \tool_sitepolicy\form\versionform($currentdata, $params);
 
 $PAGE->set_title($currentpolicy->get_title(false));
 
@@ -85,7 +60,6 @@ if ($returntouser) {
     $PAGE->navbar->add(get_string('userconsentnavbar', 'tool_sitepolicy'), $userlisturl);
     $PAGE->navbar->add($currentpolicy->get_title(true));
 } else {
-    // Make this page look like the admin page so that the navigation knows where we are.
     $translationlisturl = \tool_sitepolicy\url_helper::localisedpolicy_list($currentpolicy->get_policyversion()->get_id());
     $versionlisturl = \tool_sitepolicy\url_helper::version_list($currentpolicy->get_policyversion()->get_sitepolicy()->get_id());
     global_navigation::override_active_url(\tool_sitepolicy\url_helper::sitepolicy_list());
@@ -96,4 +70,4 @@ if ($returntouser) {
 
 /** @var \tool_sitepolicy\output\page_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
-echo $renderer->sitepolicy_preview($currentpolicy, $form);
+echo $renderer->sitepolicy_preview($form);

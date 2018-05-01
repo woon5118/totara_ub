@@ -27,12 +27,18 @@ namespace tool_sitepolicy\form;
 defined('MOODLE_INTERNAL') || die();
 
 use tool_sitepolicy\localisedpolicy;
+use tool_sitepolicy\element\sitepolicy;
 use totara_form\form;
 use totara_form\form\element\text;
 use totara_form\form\element\textarea;
 use totara_form\form\group\section;
+use totara_form\form\group\buttons;
 use totara_form\form\element\select;
 use totara_form\form\element\hidden;
+use totara_form\form\element\action_button;
+use totara_form\form\element\editor;
+use totara_form\form\element\static_html;
+use totara_form\form\clientaction\hidden_if;
 
 /**
  * Class versionform
@@ -42,34 +48,115 @@ class versionform extends form {
     protected function definition() {
         $model = $this->model;
 
-        $model->add(new hidden('localisedpolicy', PARAM_INT));
-        $model->add(new hidden('versionnumber', PARAM_INT));
-        $model->add(new hidden('sitepolicyid', PARAM_INT));
-        $model->add(new hidden('newpolicy', PARAM_BOOL));
-        $model->add(new hidden('buttonlabel', PARAM_ALPHANUMEXT));
-        $model->add(new hidden('ret', PARAM_TEXT));
+        $params = $this->get_parameters();
+        $previewonly = !empty($params['previewonly']);
+        if (!$previewonly) {
+            $previewfield = $model->add(new hidden('preview', PARAM_INT));
+            ['preview' => $preview] = $this->model->get_current_data('preview');
+            $ispreview = !empty($preview);
 
-        $options = get_string_manager()->get_list_of_translations();
-        $model->add(new select('language', get_string('policyprimarylanguage', 'tool_sitepolicy'), $options));
+            $model->add(new hidden('versionnumber', PARAM_INT));
 
-        $policytitle = $model->add(new text('title', get_string('policytitle', 'tool_sitepolicy'), PARAM_TEXT));
-        $policytitle->set_attributes(['size' => 1335, 'required' => true]);
+            if (isset($params['hidden'])) {
+                foreach ($params['hidden'] as $name => $type) {
+                    $model->add(new hidden($name, $type));
+                }
+            }
 
-        $policyeditor = $model->add(new textarea('policytext', get_string('policystatement', 'tool_sitepolicy'), PARAM_TEXT));
-        $policyeditor->set_attributes(['rows' => 20, 'required' => true]);
+            ['versionnumber' => $versionnumber] = $this->model->get_current_data('versionnumber');
 
-        $statements = new element\statement('statements');
-        $model->add($statements);
-        $statements->set_attribute('required', true);
+            // Edit section
+            $editsection = $this->model->add(new section('edit_policyversion', ''));
+            $editsection->set_collapsible(false);
+            $editsection->set_expanded(true);
 
-        ['versionnumber' => $versionnumber] = $this->model->get_current_data('versionnumber');
-        if ($versionnumber > 1) {
-            $consent = $model->add(new section('whatschanged', get_string('policyversionwhatschanged', 'tool_sitepolicy')));
-            $whatsnew = $consent->add(new textarea('whatsnew', get_string('policyversionchanges', 'tool_sitepolicy'), PARAM_TEXT));
-            $whatsnew->set_attributes(['rows' => 5]);
+            $options = get_string_manager()->get_list_of_translations();
+            $languageselect = $editsection->add(new select('language', get_string('policyprimarylanguage', 'tool_sitepolicy'), $options));
+
+            $policytitle = $editsection->add(new text('title', get_string('policytitle', 'tool_sitepolicy'), PARAM_TEXT));
+            $policytitle->set_attributes(['size' => 1335, 'required' => !$previewonly]);
+
+            $policyeditor = $editsection->add(new editor('policytext', get_string('policystatement', 'tool_sitepolicy')));
+            $policyeditor->set_attributes(['rows' => 20, 'required' => !$previewonly]);
+
+            $statements = new element\statement('statements');
+            $editsection->add($statements);
+            $statements->set_attribute('required', !$previewonly);
+
+            $model->add_clientaction(new hidden_if($editsection))->not_empty($previewfield);
+
+            if ($versionnumber > 1) {
+                $whatschangedsection = $this->model->add(new section('whatschanged', get_string('policyversionwhatschanged', 'tool_sitepolicy')));
+                $whatschangedsection->set_collapsible(true);
+                $whatschangedsection->set_expanded(true);
+
+                $whatsnew = $whatschangedsection->add(new editor('whatsnew', get_string('policyversionchanges', 'tool_sitepolicy')));
+                $whatsnew->set_attributes(['rows' => 5]);
+
+                $model->add_clientaction(new hidden_if($whatschangedsection))->not_empty($previewfield);
+            }
         }
 
-        $model->add_action_buttons(true, get_string('policysave', 'tool_sitepolicy'));
+        // Preview section
+        $previewsection = $this->model->add(new section('preview_policyversion', ''));
+        $previewsection->set_collapsible(false);
+        $previewsection->set_expanded(true);
+
+        if (!empty($params['previewnotification'])) {
+            $previewnotification = $previewsection->add(new static_html('previewnotification', '', $params['previewnotification']));
+        }
+
+        // When in previewonly mode - use currentdata as the fields are not created
+        if ($previewonly) {
+            $data = $this->model->get_current_data(null);
+            $versionnumber = $data['versionnumber'];
+        } else {
+            // Use the current field values
+            // We can't use get_raw_post_data here as all field creation and population steps may not have completed yet
+            $data = [];
+            $data = array_merge($data, $policytitle->get_data());
+            $data = array_merge($data, $policyeditor->get_data());
+            $data = array_merge($data, $statements ->get_data());
+            if ($versionnumber > 1) {
+                $data = array_merge($data, $whatsnew ->get_data());
+            }
+        }
+
+        $options = [];
+        $options['title'] = $data['title'];
+        $options['policytext'] = $data['policytext'];
+        $options['viewonly']  = true;
+        if ($versionnumber > 1) {
+            $options['whatsnew'] = $data['whatsnew'];
+        }
+
+        $options['statements'] = [];
+        foreach ($data['statements'] as $idx => $statement) {
+            if (empty($statement->removedstatement)) {
+                $options['statements'][] = [
+                    'mandatory' => $statement->mandatory,
+                    'statement' => $statement->statement,
+                    'provided' => $statement->provided,
+                    'withheld' => $statement->withheld
+                ];
+            }
+        }
+
+        $previewsection->add(new element\sitepolicy('policypreview', $options));
+
+        if (!$previewonly) {
+            $model->add_clientaction(new hidden_if($previewsection))->is_empty($previewfield);
+
+            // No action buttons on preview only
+            $buttongroup = $model->add(new buttons('actionbuttonsgroup'), -1);
+
+            $previewbutton = $buttongroup->add(new action_button('previewbutton', get_string('policypreview', 'tool_sitepolicy'), action_button::TYPE_SUBMIT));
+            $continuebutton = $buttongroup->add(new action_button('continuebutton', get_string('policycontinueedit', 'tool_sitepolicy'), action_button::TYPE_SUBMIT));
+            $model->add_action_buttons(true, get_string('policysave', 'tool_sitepolicy'));
+
+            $model->add_clientaction(new hidden_if($previewbutton))->not_empty($previewfield);
+            $model->add_clientaction(new hidden_if($continuebutton))->is_empty($previewfield);
+        }
     }
 
     /**
@@ -88,23 +175,37 @@ class versionform extends form {
      * @param localisedpolicy $localisedpolicy
      * @param bool $newpolicy
      * @param string $returnpage
-     * @return array
+     * @return array[] currentdata and parameters
      */
     public static function prepare_current_data(localisedpolicy $localisedpolicy, bool $newpolicy, string $returnpage) {
+
         $version = $localisedpolicy->get_policyversion();
         $currentdata = [
-            'localisedpolicy' => $localisedpolicy->get_id(),
             'versionnumber' => $version->get_versionnumber(),
+            'preview' => '',
             'language' => $localisedpolicy->get_language(false),
-            'policyversionid' => $version->get_id(),
             'title' => $localisedpolicy->get_title(false),
             'policytext' => $localisedpolicy->get_policytext(false),
+            'policytextformat' => FORMAT_HTML,
             'whatsnew' => $localisedpolicy->get_whatsnew(),
+            'whatsnewformat' => FORMAT_HTML,
             'statements' => $localisedpolicy->get_statements(false),
+            'localisedpolicy' => $localisedpolicy->get_id(),
+            'policyversionid' => $version->get_id(),
             'sitepolicyid' => $version->get_sitepolicy()->get_id(),
             'newpolicy' => $newpolicy,
             'ret' => $returnpage,
         ];
-        return $currentdata;
+
+        $params = [
+            'hidden' => [
+                'localisedpolicy' => PARAM_INT,
+                'policyversionid' => PARAM_INT,
+                'sitepolicyid' => PARAM_INT,
+                'newpolicy' => PARAM_BOOL,
+                'ret' => PARAM_TEXT],
+        ];
+
+        return [$currentdata, $params];
     }
 }

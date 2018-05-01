@@ -298,7 +298,22 @@ class statement extends \totara_form\element {
             // need to know exactly which of them sent (e.g. if only first and last was sent they should not become
             // first and second.
             if ($propertyname === 'statements__mandatory') {
-                $mandatories = $data[$propertyname] ?? [];
+                // If nocontrols, the mandatory checkboxes are disabled and therefore not availble in the post data
+                // In this case we need to get it from the currentdata
+                if (!empty($data[$propertyname])) {
+                    $mandatories = $data[$propertyname];
+                } else {
+                    $curdata = $this->get_model()->get_current_data(null);
+                    $mandatories = [];
+
+                    // We first need the dataid to match up with the correct statement in currentdata
+                    // We only get here for non-primary translations. In this case all consent_options would
+                    // have been persisted and statements will therefore have a negative dataid index in the currentdata structure
+                    $dataids = $data[$name . '__dataid'] ?? [];
+                    foreach ($dataids as $dataid) {
+                        $mandatories[] = $curdata['statements'][-1 * $dataid]->mandatory ?? 0;
+                    }
+                }
 
                 for ($i = 0; $i < $expectedcount; $i++) {
                     $mandatories[$i] = $mandatories[$i] ?? 0;

@@ -27,30 +27,23 @@ namespace tool_sitepolicy\form;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_form\form;
-use totara_form\form\element\radios;
 use totara_form\form\element\hidden;
+use tool_sitepolicy\element\sitepolicy;
 
 class userconsentform extends form {
     protected function definition() {
         $model = $this->model;
 
-        $model->add(new hidden('policyversionid', PARAM_INT));
-        $model->add(new hidden('versionnumber', PARAM_INT));
-        $model->add(new hidden('localisedpolicyid', PARAM_INT));
-        $model->add(new hidden('language', PARAM_ALPHANUMEXT));
-        $model->add(new hidden('currentcount', PARAM_INT));
-        $model->add(new hidden('totalcount', PARAM_INT));
-
-        foreach ($this->parameters['consent'] as $options) {
-            $radiobutton = $model->add(new radios('option' . $options->dataid, $options->statement,
-                ['1' => $options->provided, '0' => $options->withheld]));
-
-            $radiobutton->set_attribute('required', true);
+        if (!empty($this->parameters['hidden'])) {
+            foreach ($this->parameters['hidden'] as $name => $type) {
+                $model->add(new hidden($name, $type));
+            }
         }
 
-        if ($this->parameters['allowsubmit']) {
-            $model->add_action_buttons($this->parameters['allowcancel'], get_string('userconsentsubmit', 'tool_sitepolicy'));
-        }
+        $data = $this->model->get_current_data(null);
+        $model->add(new element\sitepolicy('userconsent', $data));
+
+        $model->add_action_buttons(false, get_string('userconsentsubmit', 'tool_sitepolicy'));
     }
 }
 

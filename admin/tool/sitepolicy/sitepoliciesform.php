@@ -31,25 +31,42 @@
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+use \tool_sitepolicy\sitepolicy;
+use \tool_sitepolicy\policyversion;
+use \tool_sitepolicy\localisedpolicy;
 use \tool_sitepolicy\url_helper;
 
 admin_externalpage_setup('tool_sitepolicy-managerpolicies', '', null, url_helper::sitepolicy_create());
 
-$form = new tool_sitepolicy\form\versionform(['versionnumber' => 1]);
+/** @var \tool_sitepolicy\output\page_renderer $renderer */
+$renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
 
+$params = [
+    'previewnotification' => $OUTPUT->notification(get_string('policyispreview', 'tool_sitepolicy'), \core\output\notification::NOTIFY_INFO),
+];
+$form = new tool_sitepolicy\form\versionform(['versionnumber' => 1, 'policytextformat' => FORMAT_HTML, 'preview' => ''], $params);
+
+// We need to submit on preview button to ensure that the preview section contains the correct data
+// No need to submit on 'continue editing'
 if ($form->is_cancelled()) {
     redirect(url_helper::sitepolicy_list());
 }
 if ($formdata = $form->get_data()) {
-    \tool_sitepolicy\sitepolicy::create_new_policy($formdata->title, $formdata->policytext, $formdata->statements, $formdata->language);
-    $message = get_string('policynewsaved', 'tool_sitepolicy', $formdata->title);
-    redirect(url_helper::sitepolicy_list(), $message, null, \core\output\notification::NOTIFY_SUCCESS);
+    if ($formdata->submitbutton) {
+        \tool_sitepolicy\sitepolicy::create_new_policy($formdata->title, $formdata->policytext, $formdata->statements, $formdata->language);
+        $message = get_string('policynewsaved', 'tool_sitepolicy', $formdata->title);
+        redirect(url_helper::sitepolicy_list(), $message, null, \core\output\notification::NOTIFY_SUCCESS);
+    }
+
+    if ($formdata->previewbutton) {
+        $form = new tool_sitepolicy\form\versionform(['versionnumber' => 1, 'policytextformat' => FORMAT_HTML, 'preview' => '1'], $params);
+    }
 }
 
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('policyformheader', 'tool_sitepolicy'));
 $PAGE->navbar->add($PAGE->title);
 
-/** @var \tool_sitepolicy\output\page_renderer $renderer */
-$renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
+$PAGE->requires->js_call_amd('tool_sitepolicy/versionform', 'init');
+
 echo $renderer->sitepolicy_create_new_policy($form);

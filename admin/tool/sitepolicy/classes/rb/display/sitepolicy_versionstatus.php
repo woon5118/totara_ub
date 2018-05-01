@@ -25,13 +25,15 @@ namespace tool_sitepolicy\rb\display;
 
 defined('MOODLE_INTERNAL') || die();
 
+use \totara_reportbuilder\rb\display\base;
 use \tool_sitepolicy\policyversion;
+
 /**
  * Display policy version's status
  *
  * @package tool_sitepolicy
  */
-class sitepolicy_versionstatus extends \totara_reportbuilder\rb\display\base {
+class sitepolicy_versionstatus extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         switch ($value) {
             case policyversion::STATUS_PUBLISHED:

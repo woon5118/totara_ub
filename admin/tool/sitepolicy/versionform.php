@@ -67,8 +67,8 @@ if (!array_key_exists($primarypolicy->get_language(false), $languages)) {
     $primarypolicy->set_language('en');
 }
 
-$currentdata = \tool_sitepolicy\form\versionform::prepare_current_data($primarypolicy, $newpolicy, $returnpage);
-$form = new \tool_sitepolicy\form\versionform($currentdata);
+[$currentdata, $params] = \tool_sitepolicy\form\versionform::prepare_current_data($primarypolicy, $newpolicy, $returnpage);
+$form = new \tool_sitepolicy\form\versionform($currentdata, $params);
 
 if ($form->is_cancelled()) {
 
@@ -82,33 +82,42 @@ if ($form->is_cancelled()) {
 
 } elseif ($formdata = $form->get_data()) {
 
-    if (!empty($version->get_timepublished())) {
-        throw new coding_exception('Cannot edit published version.');
+    if ($formdata->submitbutton) {
+        if (!empty($version->get_timepublished())) {
+            throw new coding_exception('Cannot edit published version.');
+        }
+
+        $primarypolicy->set_authorid($USER->id);
+        $primarypolicy->set_title($formdata->title);
+        $primarypolicy->set_policytext($formdata->policytext);
+        if (isset($formdata->whatsnew)) {
+            $primarypolicy->set_whatsnew($formdata->whatsnew);
+        }
+        $primarypolicy->set_statements($formdata->statements);
+        $primarypolicy->save();
+
+        $returnpage = !empty($returnpage) ? $returnpage : $formdata->ret;
+        switch ($returnpage) {
+            case 'versions':
+            case 'translations':
+                $successmsg = get_string('versionupdated', 'tool_sitepolicy', $version->get_versionnumber());
+                break;
+
+            default:
+                $successmsg = get_string('policyupdated', 'tool_sitepolicy', $formdata->title);
+                break;
+        }
+
+        redirect($redirect, $successmsg, null, \core\output\notification::NOTIFY_SUCCESS);
     }
 
-    $primarypolicy->set_authorid($USER->id);
-    $primarypolicy->set_title($formdata->title);
-    $primarypolicy->set_policytext($formdata->policytext);
-    if (isset($formdata->whatsnew)) {
-        $primarypolicy->set_whatsnew($formdata->whatsnew);
+    if ($formdata->previewbutton) {
+        // currentdata contains the 'defaults' for the form which at this point should be the persisted values although the user
+        // have changed it already
+        $currentdata['preview'] = '1';
+        $params['previewnotification'] = $OUTPUT->notification(get_string('policyispreview', 'tool_sitepolicy'), \core\output\notification::NOTIFY_INFO);
+        $form = new \tool_sitepolicy\form\versionform($currentdata, $params);
     }
-    $primarypolicy->set_statements($formdata->statements);
-    $primarypolicy->save();
-
-    $returnpage = !empty($returnpage) ? $returnpage : $formdata->ret;
-    switch ($returnpage) {
-        case 'versions':
-        case 'translations':
-            $successmsg = get_string('versionupdated', 'tool_sitepolicy', $version->get_versionnumber());
-            break;
-
-        default:
-            $successmsg = get_string('policyupdated', 'tool_sitepolicy', $formdata->title);
-            break;
-    }
-
-    redirect($redirect, $successmsg, null, \core\output\notification::NOTIFY_SUCCESS);
-
 }
 
 $PAGE->set_title($primarypolicy->get_title(false));
@@ -118,6 +127,7 @@ if ($returnpage === 'translations') {
     $PAGE->navbar->add($primarypolicy->get_language(true));
 }
 $PAGE->navbar->add(get_string('versionedit', 'tool_sitepolicy'));
+$PAGE->requires->js_call_amd('tool_sitepolicy/versionform', 'init');
 
 /** @var \tool_sitepolicy\output\page_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');

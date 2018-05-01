@@ -25,12 +25,13 @@ namespace tool_sitepolicy\rb\display;
 
 defined('MOODLE_INTERNAL') || die();
 
+use \totara_reportbuilder\rb\display\base;
 /**
  * Display user's sitepolicy response
  *
  * @package tool_sitepolicy
  */
-class sitepolicy_userresponse extends \totara_reportbuilder\rb\display\base {
+class sitepolicy_userresponse extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
 
         // Get the necessary fields out of the row.

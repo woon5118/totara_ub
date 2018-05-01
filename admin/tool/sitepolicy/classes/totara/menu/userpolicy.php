@@ -25,9 +25,10 @@ namespace tool_sitepolicy\totara\menu;
 
 defined('MOODLE_INTERNAL') || die();
 
+use \totara_core\totara\menu\item as item;
 use \totara_core\totara\menu\menu as menu;
 
-class userpolicy extends \totara_core\totara\menu\item {
+class userpolicy extends item {
 
     protected function get_default_title() {
         return get_string('previewconsents', 'tool_sitepolicy');

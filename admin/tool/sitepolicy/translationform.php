@@ -64,12 +64,7 @@ if ($policyversionid) {
 $version = $localisedpolicy->get_policyversion();
 $primarypolicy = localisedpolicy::from_version($version, ['isprimary' => localisedpolicy::STATUS_PRIMARY]);
 
-$currentdata = tool_sitepolicy\form\translationform::prepare_current_data($primarypolicy, $localisedpolicy);
-$params = [
-    'primarylanguage' => $primarypolicy->get_language(false),
-    'primarytitle' => $primarypolicy->get_title(false),
-    'versionnumber' => $version->get_versionnumber()
-];
+[$currentdata, $params] = tool_sitepolicy\form\translationform::prepare_current_data($primarypolicy, $localisedpolicy);
 
 $form = new \tool_sitepolicy\form\translationform($currentdata, $params);
 
@@ -82,26 +77,35 @@ if ($form->is_cancelled()) {
 
 } else if ($formdata = $form->get_data()) {
 
-    $time = time();
+    if ($formdata->submitbutton) {
+        $time = time();
 
-    if ($version->get_timepublished()) {
-        throw new coding_exception('Cannot edit translation of published version.');
+        if ($version->get_timepublished()) {
+            throw new coding_exception('Cannot edit translation of published version.');
+        }
+
+        $localisedpolicy->set_authorid($USER->id);
+        $localisedpolicy->set_title($formdata->title);
+        $localisedpolicy->set_policytext($formdata->policytext);
+
+        if (!empty($formdata->whatsnew)) {
+            $localisedpolicy->set_whatsnew($formdata->whatsnew);
+        }
+
+        $localisedpolicy->set_statements($formdata->statements);
+        $localisedpolicy->save();
+
+        $successmsg = get_string('translationsaved', 'tool_sitepolicy', ['title' => $primarypolicy->get_title(true), 'language' => $languagestr]);
+        redirect($translationlisturl, $successmsg, null, \core\output\notification::NOTIFY_SUCCESS);
     }
 
-    $localisedpolicy->set_authorid($USER->id);
-    $localisedpolicy->set_title($formdata->title);
-    $localisedpolicy->set_policytext($formdata->policytext);
-
-    if (!empty($formdata->whatsnew)) {
-        $localisedpolicy->set_whatsnew($formdata->whatsnew);
+    if ($formdata->previewbutton) {
+        // currentdata contains the 'defaults' for the form which at this point should be the persisted values although the user
+        // may have changed it already
+        $currentdata['preview'] = '1';
+        $params['previewnotification'] = $OUTPUT->notification(get_string('policyispreview', 'tool_sitepolicy'), \core\output\notification::NOTIFY_INFO);
+        $form = new \tool_sitepolicy\form\translationform($currentdata, $params);
     }
-
-    $localisedpolicy->set_statements($formdata->statements);
-    $localisedpolicy->save();
-
-    $successmsg = get_string('translationsaved', 'tool_sitepolicy', ['title' => $primarypolicy->get_title(true), 'language' => $languagestr]);
-    redirect($translationlisturl, $successmsg, null, \core\output\notification::NOTIFY_SUCCESS);
-
 }
 
 $PAGE->set_title(get_string('translationheader', 'tool_sitepolicy'));
@@ -109,6 +113,8 @@ $PAGE->set_heading($PAGE->title);
 $PAGE->navbar->add($localisedpolicy->get_primary_title(true), \tool_sitepolicy\url_helper::version_list($version->get_sitepolicy()->get_id()));
 $PAGE->navbar->add(get_string('translationheader', 'tool_sitepolicy'), $translationlisturl);
 $PAGE->navbar->add($languagestr);
+
+$PAGE->requires->js_call_amd('tool_sitepolicy/translationform', 'init');
 
 /** @var \tool_sitepolicy\output\page_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');

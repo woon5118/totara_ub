@@ -58,9 +58,19 @@ class localisedpolicy {
     private $policytext = '';
 
     /**
+     * @var int policytextformat
+     */
+    private $policytextformat = FORMAT_HTML;
+
+    /**
      * @var string whatsnew
      */
     private $whatsnew = '';
+
+    /**
+     * @var int whatsnewformat
+     */
+    private $whatsnewformat = FORMAT_HTML;
 
     /**
      * @var int timecreated
@@ -148,18 +158,22 @@ class localisedpolicy {
      * @param bool $formatted If set to true the text will be formatted for output before being returned.
      * @return string policytext
      */
-    public function get_policytext($formatted = false): string {
+    public function get_policytext($formatted = true): string {
         if ($formatted) {
-            return text_to_html($this->policytext);
+            return format_text($this->policytext, $this->policytextformat);
         }
         return $this->policytext;
     }
 
     /**
      * Gets whatsnew for localised polic
+     * @param bool $formatted If set to true the text will be formatted for output before being returned.
      * @return string whatsnew
      */
-    public function get_whatsnew(): string {
+    public function get_whatsnew($formatted = true): string {
+        if ($formatted) {
+            return format_text($this->whatsnew, $this->whatsnewformat);
+        }
         return $this->whatsnew;
     }
 
