@@ -88,38 +88,44 @@ echo $OUTPUT->doctype() ?>
 
 <!-- Content -->
 <div id="page" class="container-fluid">
-    <div id="region-top" class="row">
-        <?php
-        if ($knownregiontop) {
-            echo $OUTPUT->blocks('top', $regions['top']);
-        }?>
-    </div>
+    <div id="page-content">
 
-    <div id="page-content" class="row">
-        <div id="region-main" class="<?php echo $regions['content']; ?>">
+        <?php
+        if ($knownregiontop) {?>
+            <div id="region-top" class="row">
+                <?php echo $OUTPUT->blocks('top', $regions['top']); ?>
+            </div>
             <?php
-            if ($knownregionmain) {
-                echo $OUTPUT->blocks('main');
-            }?>
-            <?php echo $OUTPUT->course_content_header(); ?>
-            <?php echo $OUTPUT->main_content(); ?>
-            <?php echo $OUTPUT->course_content_footer(); ?>
-        </div>
-        <?php
-        if ($knownregionpre) {
-            echo $OUTPUT->blocks('side-pre', $regions['pre']);
         }?>
-        <?php
-        if ($knownregionpost) {
-            echo $OUTPUT->blocks('side-post', $regions['post']);
-        }?>
-    </div>
 
-    <div id="region-bottom" class="row">
+        <div class="row">
+            <div id="region-main" class="<?php echo $regions['content']; ?>">
+                <?php
+                if ($knownregionmain) {
+                    echo $OUTPUT->blocks('main');
+                }?>
+                <?php echo $OUTPUT->course_content_header(); ?>
+                <?php echo $OUTPUT->main_content(); ?>
+                <?php echo $OUTPUT->course_content_footer(); ?>
+            </div>
+            <?php
+            if ($knownregionpre) {
+                echo $OUTPUT->blocks('side-pre', $regions['pre']);
+            }?>
+            <?php
+            if ($knownregionpost) {
+                echo $OUTPUT->blocks('side-post', $regions['post']);
+            }?>
+        </div>
+
         <?php
-        if ($knownregionbottom) {
-            echo $OUTPUT->blocks('bottom', $regions['bottom']);
+        if ($knownregionbottom) {?>
+            <div id="region-bottom" class="row">
+                <?php echo $OUTPUT->blocks('bottom', $regions['bottom']); ?>
+            </div>
+        <?php
         }?>
+
     </div>
 </div>
 

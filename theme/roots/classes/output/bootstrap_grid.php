@@ -92,8 +92,8 @@ class bootstrap_grid {
         // NOTE: when making changes here make sure you apply them also to theme/roots/less/totara/core.less
 
         $classes = [];
-        $classes['top'] = $this->top ? 'col-md-12' : 'empty';
-        $classes['bottom'] = $this->bottom ? 'col-md-12' : 'empty';
+        $classes['top'] = 'col-sm-12';
+        $classes['bottom'] = 'col-sm-12';
         $classes['content'] = 'col-md-12';
         $classes['pre'] = 'empty';
         $classes['post'] = 'empty';
