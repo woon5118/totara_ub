@@ -101,6 +101,7 @@ information provided here is intended especially for developers.
   mustache templates, the pix helper is available (although we don't recommend using context variables inside it).
 * Added renderPix method to templates JavaScript library
 * Update pix_icon template, adding an "icon" class
+* The cron runner now sets up a fresh PAGE and OUTPUT between each task.
 
 === 11.0 ===
 
