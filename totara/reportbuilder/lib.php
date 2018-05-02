@@ -1245,7 +1245,7 @@ class reportbuilder {
             if ($saved->ispublic != 0 || $saved->userid == $this->reportfor) {
                 $SESSION->reportbuilder[$this->get_uniqueid()] = unserialize($saved->search);
             } else {
-                if (defined('FULLME') and FULLME === 'cron') {
+                if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
                     mtrace('Saved search not found or search is not public');
                 } else {
                     print_error('savedsearchnotfoundornotpublic', 'totara_reportbuilder');
@@ -1253,7 +1253,7 @@ class reportbuilder {
                 return false;
             }
         } else {
-            if (defined('FULLME') and FULLME === 'cron') {
+            if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
                 mtrace('Saved search not found or search is not public');
             } else {
                 print_error('savedsearchnotfoundornotpublic', 'totara_reportbuilder');
