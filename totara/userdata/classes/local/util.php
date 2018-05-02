@@ -67,11 +67,10 @@ final class util {
                 return get_string('courses', 'core');
             case 'core_message':
                 return get_string('messaging', 'core_message');
-        }
-
-        if ($component === 'core_completion') {
-            // Ideally, this sort of thing can be done without hacks. But for now, we're just defining it here.
-            return get_string('userdatacomponentname', 'completion');
+            case 'core_grades':
+                return get_string('gradebook', 'core_grades');
+            case 'core_completion':
+                return get_string('userdatacomponentname', 'completion');
         }
 
         return get_component_string($component, CONTEXT_SYSTEM);

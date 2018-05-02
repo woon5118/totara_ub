@@ -23,11 +23,20 @@
 
 namespace mod_assign\userdata;
 
+
+use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
-
 defined('MOODLE_INTERNAL') || die();
+
+// This is needed to suppress warnings given by the use of undefined submission constants.
+/** @var $CFG \stdClass */
+require_once($CFG->dirroot .'/mod/assign/submissionplugin.php');
+require_once($CFG->dirroot .'/mod/assign/feedbackplugin.php');
+require_once($CFG->dirroot .'/mod/assign/submission/onlinetext/locallib.php');
+require_once($CFG->dirroot .'/mod/assign/submission/file/locallib.php');
+require_once($CFG->dirroot .'/mod/assign/feedback/file/locallib.php');
 
 /**
  * Handler for individual assignments.
@@ -67,6 +76,8 @@ class singleassignments extends item {
     protected static function purge(target_user $user, \context $context) {
         $userid = $user->get_user_record()->id;
 
+        $advgradingids = static::get_advanced_grading_instance_ids($user, $context);
+
         // At this time, the order of deletions is immaterial since the
         // database does not enforce referential integrity. But logically,
         // it should follow the sequence specified below.
@@ -77,6 +88,13 @@ class singleassignments extends item {
         self::purge_user_overrides($context, $userid);
         self::purge_user_assignments($context, $userid);
         self::purge_user_gradebook($context, $userid);
+
+        // No ids here - no data to purge.
+        if (!empty($advgradingids)) {
+            self::purge_advanced_grading_fillings('gradingform_guide_fillings', $advgradingids);
+            self::purge_advanced_grading_fillings('gradingform_rubric_fillings', $advgradingids);
+            self::purge_advanced_grading_instances($advgradingids);
+        }
 
         return self::RESULT_STATUS_SUCCESS;
     }
@@ -118,8 +136,7 @@ class singleassignments extends item {
                 ['assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA],
                 ['assignfeedback_file', ASSIGNFEEDBACK_FILE_FILEAREA]
             ];
-            foreach ($files as $tuple) {
-                list($component, $area) = $tuple;
+            foreach ($files as [$component, $area]) {
                 $fs->delete_area_files($modulecontext->id, $component, $area, $submission->id);
             }
         }
@@ -224,8 +241,7 @@ class singleassignments extends item {
             ['assignfeedback_editpdf_cmnt', 'gradeid'],
             ['assignfeedback_comments', 'grade']
         ];
-        foreach ($tables as $tuple) {
-            list($table, $column) = $tuple;
+        foreach ($tables as [$table, $column]) {
             $DB->delete_records_select($table, "$column $filter", $params);
         }
 
@@ -398,19 +414,34 @@ class singleassignments extends item {
                AND $module.teamsubmission = 0
         ";
 
-        $export = new \totara_userdata\userdata\export();
+        $export = new export();
+
+        $advgradeinstanceids = static::get_advanced_grading_instance_ids($user, $context);
+        $advgraderubricfillings = static::get_advanced_grading_fillings('gradingform_rubric_fillings', $advgradeinstanceids);
+        $advgradeguidefillings = static::get_advanced_grading_fillings('gradingform_guide_fillings', $advgradeinstanceids);
+
         foreach ($DB->get_recordset_sql($sql, $params) as $assignment) {
             $params = ['userid' => $userid, 'assignmentid' => $assignment->moduleid];
 
             $gradesql = "
-                SELECT grade, attemptnumber
+                SELECT id, grade, attemptnumber
                   FROM {assign_grades} grade
                  WHERE userid = :userid
                    AND assignment = :assignmentid
             ";
-            $grades = [];
+            $attempts = [];
             foreach ($DB->get_recordset_sql($gradesql, $params) as $grade) {
-                $grades[] = ["attempt " . $grade->attemptnumber => $grade->grade];
+                $attempts[$grade->attemptnumber] = [
+                    "grade" => $grade->grade,
+                ];
+
+                if (!empty($guidefillings = static::get_guide_fillings_for_grading_instance($advgradeguidefillings, $grade->id))) {
+                    $attempts[$grade->attemptnumber]['advanced_guide_fillings'] = $guidefillings;
+                }
+
+                if (!empty($rubricfillings = static::get_rubric_fillings_for_grading_instance($advgraderubricfillings, $grade->id))) {
+                    $attempts[$grade->attemptnumber]['advanced_rubric_fillings'] = $rubricfillings;
+                }
             }
 
             $commentssql = "
@@ -445,7 +476,7 @@ class singleassignments extends item {
                 'assignment' => $assignment->name,
                 'submission time' => $assignment->timemodified,
                 'submission text' => $onlinetext,
-                'grades' => $grades,
+                'attempts' => $attempts,
                 'comments' => $comments,
                 'files' => []
             ];
@@ -455,8 +486,7 @@ class singleassignments extends item {
                 ['assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA],
                 ['assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA]
             ];
-            foreach ($fileareas as $tuple) {
-                list($component, $area) = $tuple;
+            foreach ($fileareas as [$component, $area]) {
                 $stored = \get_file_storage()->get_area_files($modulecontext->id, $component, $area, $assignment->submissionid, "itemid, filename", false);
 
                 foreach ($stored as $file) {
@@ -501,5 +531,151 @@ class singleassignments extends item {
         ";
 
         return $DB->count_records_sql($filtersubmissionssql, $params);
+    }
+
+
+    /**
+     * Get the comma-separated string of IDs for grading instances for the given user & context.
+     *
+     * @param target_user $user User
+     * @param \context $context Context
+     * @return string Comma-separated list of advanced grading instances for the given user or -1 if there isn't any.
+     */
+    protected static function get_advanced_grading_instance_ids(target_user $user, \context $context): string {
+        global $DB;
+
+        $user = intval($user->id);
+        $joins = item::get_activities_join($context, 'assign', 'ass_gr.assignment', 'assign');
+        $aggsql = $DB->sql_group_concat("grid", ', ');
+
+        return ($agg = $DB->get_field_sql(
+            "SELECT ({$aggsql}) 
+                  FROM 
+                    (SELECT id as grid
+                     FROM {grading_instances} gr_inst
+                     WHERE itemid IN
+                      (SELECT ass_gr.id
+                       FROM {assign_grades} ass_gr $joins
+                       WHERE ass_gr.userid = {$user}
+                      )
+                    ) g")) ? $agg : '-1';
+    }
+
+
+    /**
+     * Get the advanced grading fillings for the specified table
+     *
+     * @param string $table Table name, currently: gradingform_guide_fillings or gradingform_rubric_fillings
+     * @param string $ids List of comma-separated instance IDs returned by static::get_advanced_grading_instance_ids()
+     * @return array of records.
+     */
+    public static function get_advanced_grading_fillings($table, $ids): array {
+        global $DB;
+
+        switch ($table) {
+            case 'gradingform_guide_fillings':
+                $select = implode(', ', [
+                        'src.*',
+                        'criteria.shortname as criterion_name',
+                        'criteria.description',
+                        'criteria.descriptionmarkers as markers',
+                        'criteria.maxscore as max_score',
+                ]);
+                $join = "JOIN {gradingform_guide_criteria} as criteria ON src.criterionid = criteria.id";
+                break;
+
+            case 'gradingform_rubric_fillings':
+                $select = implode(', ', [
+                    'src.*',
+                    'criteria.description',
+                    'levels_.score as score',
+                    '(SELECT MAX(score) FROM {gradingform_rubric_levels} l WHERE l.criterionid = src.criterionid) as max_score',
+                ]);
+                $join = "JOIN {gradingform_rubric_criteria} as criteria ON src.criterionid = criteria.id " .
+                        "JOIN {gradingform_rubric_levels} as levels_ ON src.levelid = levels_.id";
+                break;
+
+            default:
+                $select = '*';
+                $join = '';
+                break;
+        }
+
+        return $DB->get_records_sql("
+                  SELECT {$select}, instances.itemid as item_id
+                  FROM {{$table}} src
+                    JOIN {grading_instances} instances ON instances.id = src.instanceid
+                    {$join}
+                  WHERE src.instanceid IN ($ids)");
+    }
+
+
+    /**
+     * Takes care of the records in {grading_instances} table
+     *
+     * @param string $ids List of comma-separated instance IDs returned by static::get_advanced_grading_instance_ids()
+     */
+    protected static function purge_advanced_grading_instances($ids): void {
+        global $DB;
+
+        $DB->delete_records_select('grading_instances', "id IN ($ids)");
+    }
+
+
+    /**
+     * Takes care of the records in the given fillings table
+     *
+     * @param string $table Name of the table to be taken care of
+     * @param string $ids List of comma-separated instance IDs returned by static::get_advanced_grading_instance_ids()
+     */
+    protected static function purge_advanced_grading_fillings($table, $ids): void {
+        global $DB;
+
+        $DB->delete_records_select($table, "instanceid IN ($ids)");
+    }
+
+    /**
+     * Filters and remaps rubric fillings for a given assign_grade id (Assignment submission grading attempt)
+     *
+     * @param array $fillings fillings returned by static::get_advanced_grading_fillings('gradingform_rubric_fillings', ...)
+     * @param int $id assign_grade id
+     * @return array
+     */
+    protected static function get_rubric_fillings_for_grading_instance($fillings, $id) {
+        return array_map(function ($row) {
+            return [
+                'id' => $row->id,
+                'level_id' => $row->levelid,
+                'remark' => $row->remark,
+                'criterion' => $row->description,
+                'score' => $row->score,
+                'max_score' => $row->max_score,
+            ];
+        }, array_filter($fillings, function($row) use ($id) {
+            return $row->item_id == $id;
+        }));
+    }
+
+    /**
+     * Filters and remaps guide fillings for a given assign_grade id (Assignment submission grading attempt)
+     *
+     * @param array $fillings fillings returned by static::get_advanced_grading_fillings('gradingform_guide_fillings', ...)
+     * @param int $id assign_grade id
+     * @return array
+     */
+    protected static function get_guide_fillings_for_grading_instance($fillings, $id) {
+        return array_map(function ($row) {
+            return [
+                'id' => $row->id,
+                'remark' => $row->remark,
+                'score' => $row->score,
+                'criterion' => $row->criterion_name,
+                'criterion_description' => $row->description,
+                'markers' => $row->markers,
+                'max_score' => $row->max_score,
+            ];
+        }, array_filter($fillings, function($row) use ($id) {
+            return $row->item_id == $id;
+        }));
     }
 }

@@ -26,9 +26,7 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
 use assignfeedback_editpdf\page_editor;
-
 use mod_assign\userdata\singleassignments;
-
 use totara_userdata\userdata\target_user;
 
 
@@ -100,6 +98,13 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
         // records linking the user, assignment and the course in which the
         // assignment lives! Horribly convoluted and overly complex.
         $this->assertEquals($totalsubmissions+$totallearners, $DB->count_records('grade_grades'));
+
+        // Two fillings are created per submission.
+        $this->assertCount($totalsubmissions * 2, $DB->get_records('gradingform_guide_fillings'));
+        $this->assertCount($totalsubmissions * 2, $DB->get_records('gradingform_rubric_fillings'));
+
+        // Instance is created per submission per definition and must be gone!
+        $this->assertCount($totalsubmissions * 2, $DB->get_records('grading_instances'));
     }
 
 
@@ -277,6 +282,9 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
             $grade = $assignment->get_user_grade($user->id, false);
             $commentfeedback->save($grade, (object)$feedbackcomments);
 
+            // Let's create advanced grading madness here.
+            $this->generate_advanced_grading_data($grade->id);
+
             // This populates the *global* mdl_file table with feedback files.
             $file = 'feedback.txt';
             $feedbackfile = [
@@ -419,8 +427,13 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
             $this->assertCount(1, $data['submission text'], "wrong exported online text before purge");
             $this->assertCount(1, $data['comments'], "wrong exported comments before purge");
             $this->assertCount(2, $data['files'], "wrong exported files before purge"); // 1 submission_file, 1 submission_onlinetxt
-            $this->assertCount(1, $data['grades'], "wrong exported grades before purge");
+            $this->assertCount(1, $data['attempts'], "wrong exported grades before purge");
             $this->assertContains($data['assignment'], $assignmentnames, "unknown exported assignment name before purge");
+
+            foreach ($data['attempts'] as $attempt) {
+                $this->assertCount(2, $attempt['advanced_guide_fillings'], "wrong exported grades before purge");
+                $this->assertCount(2, $attempt['advanced_rubric_fillings'], "wrong exported grades before purge");
+            }
         }
 
         singleassignments::execute_purge($env->purgeduser, $env->context);
@@ -555,5 +568,348 @@ class mod_assign_userdata_singleassignments_testcase extends advanced_testcase {
             "learnerspercourse" => $learnerspercourse
         ];
         $this->purge_count_export_test((object)$env);
+    }
+
+    /**
+     * Generate data for advanced grading (when in use)
+     *
+     * @param int $id Assignment submission grade id (who knows what is that?)
+     * @return array of created objects
+     */
+    protected function generate_advanced_grading_data($id) {
+        // It's right to use grading API for all these, but it's kind of sloppy and inconsistent,
+        // So it's easier to create the required entries manually.
+        $rubric = $this->create_rubric_definition();
+        $guide = $this->create_guide_definition();
+
+        // Create guide criteria
+        $guidecriteria = [
+            $this->create_guide_criterion($guide),
+            $this->create_guide_criterion($guide),
+        ];
+
+        // Create rubric criteria
+        $rubriccriteria = [
+            $this->create_rubric_criterion($rubric),
+            $this->create_rubric_criterion($rubric),
+        ];
+
+        // Create advanced grading instance
+        $rubricinstance = $this->create_grading_instance($rubric, $id);
+        $guideinstance = $this->create_grading_instance($guide, $id);
+
+        // Create fillings
+        return [
+            'guide' => [
+                $this->create_guide_filling($guidecriteria[0], $guideinstance),
+                $this->create_guide_filling($guidecriteria[1], $guideinstance),
+            ],
+            'rubric' => [
+                $this->create_rubric_filling($rubriccriteria[0]->levels[0], $rubricinstance, ['criterionid' => $rubriccriteria[0]->id]),
+                $this->create_rubric_filling($rubriccriteria[1]->levels[1], $rubricinstance, ['criterionid' => $rubriccriteria[1]->id]),
+            ],
+        ];
+    }
+
+    /**
+     * Create advanced grading guide definition
+     *
+     * @param array $attributes data attributes
+     * @return stdClass Created definition
+     */
+    protected function create_guide_definition(array $attributes = []): \stdClass {
+        global $DB;
+
+        $default = [
+            'name' => 'Guide',
+            'description' => 'Advanced grading guide definition',
+        ];
+
+        $attributes = array_merge($default, $attributes);
+        $attributes['method'] = 'guide';
+
+        return (object) array_merge($attributes, [
+            'id' => $DB->insert_record('grading_definitions', $this->default_definition_attributes($attributes))
+        ]);
+    }
+
+    /**
+     * Create advanced grading rubric definition
+     *
+     * @param array $attributes
+     * @return stdClass Created definition
+     */
+    protected function create_rubric_definition(array $attributes = []): \stdClass {
+        global $DB;
+
+        $default = [
+            'name' => 'Rubric',
+            'description' => 'Advanced grading rubric definition',
+        ];
+
+        $attributes = array_merge($default, $attributes);
+        $attributes['method'] = 'rubric';
+
+        return (object) array_merge($attributes, [
+            'id' => $DB->insert_record('grading_definitions', $this->default_definition_attributes($attributes))
+        ]);
+    }
+
+    /**
+     * Create advanced grading guide criterion
+     *
+     * @param \stdClass|int $definition Advanced grading guide definition instance or id
+     * @param array $attributes data attributes
+     * @return \stdClass
+     */
+    protected function create_guide_criterion($definition, array $attributes = []): \stdClass {
+        global $DB;
+
+        if ($definition instanceof \stdClass) {
+            $definition = $definition->id;
+        }
+
+        $attributes = array_merge([
+            'definitionid' => $definition,
+            'shortname' => 'New guide criterion',
+            'description' => 'Description',
+            'descriptionformat' => 0,
+            'descriptionmarkers' => 'Description markers',
+            'descriptionmarkersformat' => 0,
+            'maxscore' => rand(25, 75),
+        ], $attributes);
+
+        if (!isset($attributes['sortorder'])) {
+            $attributes['sortorder'] = $DB->count_records('gradingform_guide_criteria', ['definitionid' => $attributes['definitionid']]) + 1;
+        }
+
+        return (object) array_merge($attributes, [
+            'id' => $DB->insert_record('gradingform_guide_criteria', $attributes)
+        ]);
+    }
+
+    /**
+     * Create advanced grading rubric criterion
+     *
+     * @param \stdClass|int $definition Advanced grading guide definition instance or id
+     * @param array $attributes data attributes
+     * @param int $levels Number of advanced grading rubric criterion levels to create
+     * @return \stdClass
+     */
+    protected function create_rubric_criterion($definition, array $attributes = [], int $levels = 2): \stdClass {
+        global $DB;
+
+        if ($definition instanceof \stdClass) {
+            $definition = $definition->id;
+        }
+
+        $attributes = array_merge([
+            'definitionid' => $definition,
+            'description' => 'Rubric description',
+            'descriptionformat' => 0,
+        ], $attributes);
+
+        if (!isset($attributes['sortorder'])) {
+            $attributes['sortorder'] = $DB->count_records('gradingform_rubric_criteria', ['definitionid' => $attributes['definitionid']]) + 1;
+        }
+
+        $id = $DB->insert_record('gradingform_rubric_criteria', $attributes);
+
+        if ($levels) {
+            $attributes['levels'] = [];
+
+            for ($i = 0; $i < $levels; $i++) {
+                $attributes['levels'][] = $this->create_rubric_level($id);
+            }
+        }
+
+        return (object) array_merge($attributes, [
+            'id' => $id,
+        ]);
+    }
+
+    /**
+     * Create advanced grading rubric criterion level
+     *
+     * @param \stdClass|int $criterion Advanced grading rubric criterion instance or ID
+     * @param array $attributes Attributes to override defaults
+     * @return stdClass created rubric level object
+     */
+    protected function create_rubric_level($criterion, array $attributes = []): \stdClass {
+        global $DB;
+        if ($criterion instanceof \stdClass) {
+            $criterion = $criterion->id;
+        }
+
+        $attributes = array_merge([
+            'criterionid' => $criterion,
+            'score' => rand(5,25),
+            'definition' => 'Rubric level definition',
+            'definitionformat' => 0
+        ], $attributes);
+
+        return (object) array_merge($attributes, [
+            'id' => $DB->insert_record('gradingform_rubric_levels', $attributes)
+        ]);
+    }
+
+    /**
+     * Create advanced grading guide criterion filling
+     *
+     * @param \stdClass|int $criterion Advanced grading criterion instance id
+     * @param \stdClass|int $instance Advanced grading instance or id
+     * @param array $attributes Attributes to override defaults
+     * @return stdClass created filling
+     */
+    protected function create_guide_filling($criterion, $instance, array $attributes = []): \stdClass {
+        global $DB;
+
+        if ($criterion instanceof \stdClass) {
+            $criterion = $criterion->id;
+        }
+        if ($instance instanceof \stdClass) {
+            $instance = $instance->id;
+        }
+
+        $attributes = array_merge([
+            'criterionid' => $criterion,
+            'instanceid' => $instance,
+            'remark' => 'Remark',
+            'remarkformat' => 0,
+            'score' => 10
+        ], $attributes);
+
+        return (object) array_merge($attributes, [
+            'id' => $DB->insert_record('gradingform_guide_fillings', $attributes)
+        ]);
+    }
+
+    /**
+     * Create advanced grading guide criterion filling applying a certain level
+     *
+     * @param \stdClass|int $level Advanced grading criterion instance id
+     * @param \stdClass|int $instance Advanced grading instance or id
+     * @param array $attributes Attributes to override defaults
+     * @return stdClass created filling
+     */
+    protected function create_rubric_filling($level, $instance, array $attributes = []): \stdClass {
+        global $DB;
+
+        if ($level instanceof \stdClass) {
+            $level = $level->id;
+        }
+        if ($instance instanceof \stdClass) {
+            $instance = $instance->id;
+        }
+
+        $attributes = array_merge([
+            'instanceid' => $instance,
+            'levelid' => $level,
+            'remark' => 'Remark',
+            'remarkformat' => 0,
+        ], $attributes);
+
+        if (!isset($attributes['criterionid'])) {
+            $attributes['criterionid'] = $DB->get_field('gradingform_rubric_levels',
+                'criterionid', ['id' => $attributes['levelid']], MUST_EXIST);
+        }
+
+        return (object) array_merge($attributes, [
+            'id' => $DB->insert_record('gradingform_rubric_fillings', $attributes)
+        ]);
+    }
+
+    /**
+     * Create advanced grading instance
+     *
+     * @param \stdClass|int $definition Advanced grading definition instance or ID
+     * @param \stdClass|int $item Assignment grade record (that what links user id with the feedback
+     * @param array $attributes Custom attributes to override
+     * @return stdClass Created instance
+     */
+    protected function create_grading_instance($definition, $item, array $attributes = []): \stdClass {
+        global $DB;
+
+        if ($definition instanceof \stdClass) {
+            $definition = $definition->id;
+        }
+
+        if ($item instanceof \stdClass) {
+            $item = $item->id;
+        }
+
+        if (!isset($attributes['definitionid'])) {
+            $attributes['definitionid'] = $definition;
+        }
+
+        if (!isset($attributes['itemid'])) {
+            $attributes['itemid'] = $item;
+        }
+
+        return (object) array_merge($attributes, [
+            'id' => $DB->insert_record('grading_instances', $this->default_instance_attributes($attributes))
+        ]);
+    }
+
+    /**
+     * Return default advanced grading definition attributes
+     *
+     * @param array $attributes Custom attributes to be merged with (will override default)
+     * @return array
+     */
+    protected function default_definition_attributes(array $attributes): array {
+        global $DB,$USER;
+
+        // Hijack user
+        $currentuser = $USER;
+        $this->setAdminUser();
+        $user = $USER;
+
+        // Return user
+        $this->setUser($currentuser);
+
+        return array_merge([
+            'areaid' => $DB->count_records('grading_definitions') + 1,
+            'name' => 'Advanced grading definition',
+            'description' => 'Advanced grading definition description',
+            'descriptionformat' => 1,
+            'status' => 20,
+            'copiedfrom' => null,
+            'timecreated' => time(),
+            'usercreated' => $user->id,
+            'timemodified' => time(),
+            'usermodified' => $user->id,
+            'timecopied' => 0,
+            'options' => json_encode(["alwaysshowdefinition" => 1,"showmarkspercriterionstudents" => 1])
+        ], $attributes);
+    }
+
+    /**
+     * Return default advanced grading instance attributes
+     *
+     * @param array $attributes Custom attributes to be merged with (will override default)
+     * @return array
+     */
+    protected function default_instance_attributes(array $attributes = []): array {
+        global $USER;
+
+        // Hijack user
+        $currentuser = $USER;
+        $this->setAdminUser();
+        $user = $USER;
+
+        // Return user
+        $this->setUser($currentuser);
+
+        return array_merge([
+            //'definitionid' => Must be set,
+            'raterid' => $user->id,
+            //'itemid' => Must be set
+            'rawgrade' => null,
+            'status' => 2,
+            'feedback' => 'Feedback, don\t think it is used though',
+            'feedbackformat' => 0,
+            'timemodified' => time(),
+        ], $attributes);
     }
 }
