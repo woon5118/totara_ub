@@ -335,6 +335,15 @@ class rb_column_option {
     public $deprecated;
 
     /**
+     * Does this column produce results that combine multiple data records?
+     * Compound results are generally not compatible with aggregations
+     * and as such should not allow them.
+     *
+     * @var bool
+     */
+    public $iscompound;
+
+    /**
      * Generate a new column option instance
      *
      * Options provided by an associative array, e.g.:
@@ -376,6 +385,7 @@ class rb_column_option {
             'extracontext' => null,
             'issubquery' => false,
             'deprecated' => false,
+            'iscompound' => false,
         );
         $options = array_merge($defaults, $options);
 

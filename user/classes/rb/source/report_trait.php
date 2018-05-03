@@ -406,6 +406,7 @@ trait report_trait {
                 'extrafields' => array('userid' => "$join.id", 'deleted' => "$join.deleted"),
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -422,6 +423,7 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -438,6 +440,7 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -454,6 +457,7 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -470,6 +474,7 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -487,6 +492,7 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -503,6 +509,7 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -520,6 +527,7 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
 

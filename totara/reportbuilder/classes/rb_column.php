@@ -308,6 +308,15 @@ class rb_column {
     public $deprecated;
 
     /**
+     * Does this column produce results that combine multiple data records?
+     * Compound results are generally not compatible with aggregations
+     * and as such should not allow them.
+     *
+     * @var bool
+     */
+    public $iscompound;
+
+    /**
      * Generate a new column instance
      *
      * Options provided by an associative array, e.g.:

@@ -45,7 +45,7 @@ trait report_trait {
 
         // All job fields listed by sortorder.
         $jobfieldlistsubsql = "
-            (SELECT u.id AS jfid,
+            (SELECT u.id AS jfid, COUNT(uja.id) AS jobcount,
             " . $DB->sql_group_concat('COALESCE(uja.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS titlenamelist,
             " . $DB->sql_group_concat('COALESCE(uja.startdate, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS jobstartdatelist,
             " . $DB->sql_group_concat('COALESCE(uja.enddate, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS jobenddatelist
@@ -209,6 +209,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -224,6 +225,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -239,7 +241,20 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
+            )
+        );
+        $columnoptions[] = new \rb_column_option(
+            'job_assignment',
+            'numjobassignments',
+            get_string('usersnumjobassignments', 'totara_reportbuilder'),
+            "alljobfields.jobcount",
+            array(
+                'joins'       => 'alljobfields',
+                'displayfunc' => 'plaintext', // We know we will have an integer here, so minimum cleaning needed.
+                'iscompound'  => true,
+                'dbdatatype'  => 'integer',
             )
         );
 
@@ -255,6 +270,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -269,6 +285,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -283,6 +300,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -297,6 +315,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -311,6 +330,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -325,6 +345,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -339,6 +360,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -355,6 +377,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -369,6 +392,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -383,6 +407,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -397,6 +422,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -411,6 +437,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -425,6 +452,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -439,6 +467,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -455,6 +484,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -469,6 +499,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -483,6 +514,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -497,6 +529,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -511,6 +544,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -533,6 +567,7 @@ trait report_trait {
                     'style' => array('white-space' => 'pre'),
                     // Users must have viewuseridentity.
                     'capability' => 'moodle/site:viewuseridentity',
+                    'iscompound' => true,
                 )
             );
         }
@@ -548,6 +583,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -564,6 +600,7 @@ trait report_trait {
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
+                'iscompound' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -952,10 +989,13 @@ trait report_trait {
     /**
      * Adds the joins for pos/org custom fields to the $joinlist.
      *
-     * @param string $prefix        Whether this is a pos/org
-     * @param string $join          The table to take the userid from
-     * @param string $joinfield     The field to take the userid from
+     * @param string $prefix    Whether this is a pos/org
+     * @param string $fields    The fields that need to be joined
+     * @param string $join      The table to take the userid from
+     * @param string $joinfield The field to take the userid from
      * @param array  $joinlist
+     *
+     * @return bool
      */
     private function add_totara_job_custom_field_tables($prefix, $fields, $join, $joinfield, &$joinlist) {
         global $DB;
@@ -1054,6 +1094,7 @@ trait report_trait {
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
                     'nosort' => true,
+                    'iscompound' => true,
                     'style' => array('white-space' => 'pre')
                 )
             );

@@ -2648,6 +2648,7 @@ abstract class rb_base_source {
                 'extrafields' => array('userid' => "$join.id", 'deleted' => "$join.deleted"),
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         /** Deprecated since Totara 12 */
@@ -2665,6 +2666,7 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         /** Deprecated since Totara 12 */
@@ -2682,6 +2684,7 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         /** Deprecated since Totara 12 */
@@ -2699,6 +2702,7 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         /** Deprecated since Totara 12 */
@@ -2716,6 +2720,7 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         /** Deprecated since Totara 12 */
@@ -2734,6 +2739,7 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         /** Deprecated since Totara 12 */
@@ -2751,6 +2757,7 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
         /** Deprecated since Totara 12 */
@@ -2769,6 +2776,7 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
                 'deprecated' => true,
+                'iscompound' => true,
             )
         );
 

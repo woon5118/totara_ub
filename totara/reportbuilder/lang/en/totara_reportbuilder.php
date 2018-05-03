@@ -1142,6 +1142,7 @@ $string['usersmanagername'] = 'User\'s Manager Name';
 $string['usersmanagernameall'] = 'User\'s Manager Name(s)';
 $string['usersmanagerobsemailall'] = 'User\'s Manager Email(s)';
 $string['usersmanagerunobsemailall'] = 'User\'s Manager Email(s) (ignoring user display setting)';
+$string['usersnumjobassignments'] = 'Number of Job Assignments';
 $string['usersorg'] = 'User\'s Organisation';
 $string['usersorgall'] = 'User\'s Organisation(s)';
 $string['usersorgbasic'] = 'User\'s Organisation (basic)';

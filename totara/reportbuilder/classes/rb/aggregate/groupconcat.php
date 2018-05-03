@@ -34,7 +34,7 @@ class groupconcat extends base {
     }
 
     public static function is_column_option_compatible(\rb_column_option $option) {
-        return ($option->dbdatatype !== 'timestamp');
+        return ($option->dbdatatype !== 'timestamp' && $option->iscompound !== true);
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
