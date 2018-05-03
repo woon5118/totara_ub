@@ -399,6 +399,11 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
 
     static $str = null;
 
+    if ($depth > \totara_core\totara\menu\menu::MAX_DEPTH) {
+        debugging('Tried to construct a menu tree which is deeper than the maximum allowed or contains a cycle: ' . format_string($item->title));
+        return;
+    }
+
     if (is_null($str)) {
         $str = new stdClass;
         $str->edit = new lang_string('edit');

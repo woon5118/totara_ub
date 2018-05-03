@@ -1447,12 +1447,30 @@ function totara_build_menu() {
     return $tree;
 }
 
-function totara_build_menu_descendants($parentid, $allrecords) {
+/**
+ * Get an array of all descendants of the given parent, recursively getting their descendants.
+ * The array will be ordered as a depth-first traversal of the tree.
+ *
+ * @param int $parentid
+ * @param array $allrecords containing all records from totara_navigation, so they don't need to be loaded from the db
+ * @param int $parentdepth used to prevent infinite loops, does not depend on the depth that nodes report, should
+ *                         usually not be provided
+ * @return array
+ */
+function totara_build_menu_descendants($parentid, $allrecords, $parentdepth = 0) {
     $tree = [];
+
+    $currentdepth = $parentdepth + 1;
 
     foreach ($allrecords as $id => $record) {
         // Search all records for nodes whose parent was the one specified.
         if ($record->parentid != $parentid) {
+            continue;
+        }
+
+        // In case the menu data somehow gets into a loop, prevent crashing the whole site.
+        if ($currentdepth > \totara_core\totara\menu\menu::MAX_DEPTH) {
+            debugging('Tried to construct a menu tree which is deeper than the maximum allowed or contains a cycle: ' . format_string($record->title));
             continue;
         }
 
@@ -1471,7 +1489,7 @@ function totara_build_menu_descendants($parentid, $allrecords) {
             continue;
         }
 
-        $descendants = totara_build_menu_descendants($record->id, $allrecords);
+        $descendants = totara_build_menu_descendants($record->id, $allrecords, $currentdepth);
 
         $url = $node->get_url(false);
 

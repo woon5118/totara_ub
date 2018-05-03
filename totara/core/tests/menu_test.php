@@ -140,10 +140,10 @@ class totara_core_menu_testcase extends advanced_testcase {
                 'url' => '',
                 'classname' => '\totara_core\totara\menu\home',
                 'custom' => menu::DEFAULT_ITEM,
-                'parentid' => $data->noderecords['node1a']->id]
-        );
+                'parentid' => $data->noderecords['node1a']->id,
+        ]);
         $data->noderecords['node2d'] = $generator->create_menu_item(
-            ['title' => 'node2d', 'visibility' => menu::SHOW_ALWAYS, 'url' => '.', 'parentid' => $data->noderecords['node1b']->id]);
+            ['title' => 'node2d', 'visibility' => menu::HIDE_ALWAYS, 'url' => '.', 'parentid' => $data->noderecords['node1b']->id]);
 
         $data->noderecords['node3a'] = $generator->create_menu_item(
             ['title' => 'node3a', 'visibility' => menu::SHOW_ALWAYS, 'url' => '.', 'parentid' => $data->noderecords['node2a']->id]);
@@ -152,7 +152,14 @@ class totara_core_menu_testcase extends advanced_testcase {
         $data->noderecords['node3c'] = $generator->create_menu_item(
             ['title' => 'node3c', 'visibility' => menu::SHOW_ALWAYS, 'url' => '', 'parentid' => $data->noderecords['node2b']->id]);
         $data->noderecords['node3d'] = $generator->create_menu_item(
-            ['title' => 'node3d', 'visibility' => menu::HIDE_ALWAYS, 'url' => '.', 'parentid' => $data->noderecords['node2b']->id]);
+            [
+                'title' => 'node3d',
+                'visibility' => menu::SHOW_ALWAYS,
+                'url' => '.',
+                'classname' => '\tool_sitepolicy\totara\menu\userpolicy',
+                'custom' => menu::DEFAULT_ITEM,
+                'parentid' => $data->noderecords['node2b']->id,
+        ]);
 
         return $data;
     }
@@ -175,7 +182,7 @@ class totara_core_menu_testcase extends advanced_testcase {
         $node3a = menu::get($data->noderecords['node3a']->id);
         $this->assertEquals(0, $node3a->max_relative_descendant_depth());
 
-        $unsavedemptyitem = \totara_core\totara\menu\menu::get();
+        $unsavedemptyitem = menu::get();
         $this->assertEquals(0, $unsavedemptyitem->max_relative_descendant_depth());
     }
 
@@ -193,7 +200,7 @@ class totara_core_menu_testcase extends advanced_testcase {
         $this->assertFalse($node2a->can_set_depth(menu::MAX_DEPTH + 1));
 
         // Test with a node which hasn't been saved yet.
-        $unsavedemptyitem = \totara_core\totara\menu\menu::get();
+        $unsavedemptyitem = menu::get();
         $this->assertFalse($unsavedemptyitem->can_set_depth(0));
         $this->assertTrue($unsavedemptyitem->can_set_depth(1));
         $this->assertTrue($unsavedemptyitem->can_set_depth(menu::MAX_DEPTH - 1));
@@ -358,7 +365,13 @@ class totara_core_menu_testcase extends advanced_testcase {
     public function test_totara_build_menu_descendants() {
         $data = $this->setup_tree_data();
 
-        $allrecords = \totara_core\totara\menu\menu::get_nodes();
+        $allrecords = menu::get_nodes();
+
+        // totara_build_menu_descendants can handle records which are menu::HIDE_ALWAYS (in $node->get_visibility()),
+        // but menu::get_nodes() should exclude those records anyway.
+        foreach ($allrecords as $record) {
+            $this->assertNotEquals('node2d', $record->title);
+        }
 
         $result = totara_build_menu_descendants($data->noderecords['node1a']->id, $allrecords);
 
@@ -368,12 +381,28 @@ class totara_core_menu_testcase extends advanced_testcase {
         //          => 3d
         //    => 2c
         // 3c is excluded because it is a leaf without a url.
-        // 3d is excluded because is is marked HIDE_ALWAYS.
+        // 3d is excluded because the feature is disabled.
         // 2b is excluded because it is a group without visibile descendants and without a URL.
         // 2c in included because, even though it has no url, the class provides one.
         $this->assertEquals('node2a', $result[0]->linktext);
         $this->assertEquals('node3a', $result[1]->linktext);
         $this->assertEquals('node3b', $result[2]->linktext);
         $this->assertEquals('node2c', $result[3]->linktext);
+
+        // Make sure that the loop prevention is working (we wouldn't want sites to be completely broken).
+        // Just hack it, by suggesting that the parent is already at depth 2 when we ask for descendants.
+        $result = totara_build_menu_descendants($data->noderecords['node1a']->id, $allrecords, 2);
+
+        // There are four debugging messages, one for each node that would be too deep to add.
+        $debuggingmessage = 'Tried to construct a menu tree which is deeper than the maximum allowed or contains a cycle: ';
+        $this->assertDebuggingCalledCount(4, [
+            $debuggingmessage . 'node3a',
+            $debuggingmessage . 'node3b',
+            $debuggingmessage . 'node3c',
+            $debuggingmessage . 'node3d',
+        ]);
+
+        $this->assertEquals('node2a', $result[0]->linktext);
+        $this->assertEquals('node2c', $result[1]->linktext);
     }
 }
