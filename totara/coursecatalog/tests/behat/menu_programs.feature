@@ -11,7 +11,7 @@ Feature: Test Programs menu item
     Then I should see "Programs" in the "#totaramenutable" "css_element"
     And I should see "Programs" in the totara menu
 
-  Scenario: Make sure Programs is not in totara menu if feature disabled
+  Scenario: Make sure Programs is not in totara menu but is still in the editor if feature disabled
     Given I am on a totara site
     And I log in as "admin"
     When I navigate to "Advanced features" node in "Site administration"
@@ -20,3 +20,4 @@ Feature: Test Programs menu item
     And I navigate to "Top navigation" node in "Site administration > Appearance"
     Then I should see "Programs" in the "#totaramenutable" "css_element"
     And I should see "Feature disabled" in the "Programs" "table_row"
+    And I should not see "Programs" in the totara menu
