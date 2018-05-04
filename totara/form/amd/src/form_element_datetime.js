@@ -90,7 +90,7 @@ define(['jquery', 'totara_form/form', 'totara_form/modernizr'], function($, Form
             deferreds.push(dateDeferred);
             // Polyfill the date/time functionality.
             require(['totara_form/polyfill_date-lazy'], function(date) {
-                date.init(id).then(function() {
+                date.init(id, true).then(function() {
                     dateDeferred.resolve();
                 });
             });

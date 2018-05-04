@@ -2285,12 +2285,12 @@ define(['jquery', 'jqueryui'], function($){
     */
     $.timepicker.version = "1.6.1";
 
-    datepoly = {
+    var datepoly = {
         initcalled: false,
         language: {},
         inited: null,
 
-        init: function(id) {
+        init: function(id, hastime) {
             if (datepoly.initcalled === false) {
                 // Load language strings.
                 datepoly.inited = $.Deferred();
@@ -2327,7 +2327,7 @@ define(['jquery', 'jqueryui'], function($){
             }
 
             datepoly.inited.done(function() {
-                if ($('#' + id).attr('type') === 'date') {
+                if (!hastime) {
                     datepoly.language.showTimepicker = false;
                     datepoly.language.timeFormat = '';
                     datepoly.language.showTime = false;
