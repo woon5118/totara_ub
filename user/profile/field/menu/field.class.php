@@ -30,8 +30,17 @@
  */
 class profile_field_menu extends profile_field_base {
 
-    /** @var array $options */
+    /**
+     * Options as they defined in database
+     * @var string[] $options
+     */
     public $options;
+
+    /**
+     * Options to be used in form select element (formatted)
+     * @var string[] $options
+     */
+    public $formoptions;
 
     public static $optionscache = array();
 
@@ -50,38 +59,36 @@ class profile_field_menu extends profile_field_base {
         // First call parent constructor.
         parent::__construct($fieldid, $userid);
 
-        // TOTARA - add static cache to improve performance for dropdowns with lot of items.
-        if (!isset(self::$optionscache[$fieldid]) or PHPUNIT_TEST) {
+        // Param 1 for menu type is the options.
+        if (isset($this->field->param1)) {
+            $this->options = explode("\n", $this->field->param1);
+        } else {
+            $this->options = array();
+        }
 
-            // Param 1 for menu type is the options.
-            if (isset($this->field->param1)) {
-                $options = explode("\n", $this->field->param1);
-            } else {
-                $options = array();
-            }
+        // Static cache used for performance
+        if (!isset(self::$optionscache[$fieldid]) or PHPUNIT_TEST) {
             self::$optionscache[$fieldid] = array();
 
             // TOTARA - changed to always use choosedots as it never makes sense to blindly save the first value.
             self::$optionscache[$fieldid][''] = get_string('choosedots');
-            foreach ($options as $key => $option) {
+            foreach ($this->options as $key => $option) {
                 self::$optionscache[$fieldid][$key] = format_string($option, true, ['context' => context_system::instance()]); // Multilang formatting.
             }
         }
-
-        // TODO: TL-7042 decide if we want MDL-43205 in Totara 2.9.0
 
         /// Set the data key.
         $this->datakey = '';
         if ($this->data !== null) {
             // Returns false if no match found, so we can't just
             // cast to an integer.
-            $match = array_search($this->data, self::$optionscache[$fieldid]);
+            $match = array_search($this->data, $this->options);
             if ($match !== false) {
                 $this->datakey = (int)$match;
             }
         }
 
-        $this->options = self::$optionscache[$fieldid];
+        $this->formoptions = self::$optionscache[$fieldid];
     }
 
     /**
@@ -100,7 +107,7 @@ class profile_field_menu extends profile_field_base {
      * @param moodleform $mform Moodle form instance
      */
     public function edit_field_add($mform) {
-        $mform->addElement('select', $this->inputname, format_string($this->field->name), $this->options);
+        $mform->addElement('select', $this->inputname, format_string($this->field->name), $this->formoptions);
     }
 
     /**
@@ -141,10 +148,10 @@ class profile_field_menu extends profile_field_base {
         }
 
         // Now get the corresponding option for that value.
-        $value = format_string($value); // format_string already applied to $option so adding here for accurate comparison.
         $selected = null;
         foreach ($this->options as $key => $option) {
             // Totara Sync matches with case insensitivity, do the same in sync preprocess for consistency.
+            // However, all other information (for example Multi-Language tags) must be exactly the same as defined in customfield).
             if (core_text::strtolower($option) === core_text::strtolower($value)) {
                 $selected = $key;
                 break;
@@ -218,7 +225,7 @@ class profile_field_menu extends profile_field_base {
      * @return string contains error message otherwise null
      */
     public function edit_validate_field($usernew) {
-        if (isset($usernew->{$this->inputname})) {
+        if (!empty($usernew->{$this->inputname})) {
             // Make sure the text of the selection option is used and not the value.
             $usernew->{$this->inputname} = $this->options[$usernew->{$this->inputname}];
         }
