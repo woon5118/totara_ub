@@ -29,6 +29,15 @@ namespace mod_assign\userdata;
 class preferences extends \core_user\userdata\plugin_preferences {
 
     /**
+     * Returns sort order.
+     *
+     * @return int
+     */
+    public static function get_sortorder() {
+        return 200;
+    }
+
+    /**
      * Returns an array of user preferences as strings.
      *
      * @param int $userid The user we are getting preferences for.

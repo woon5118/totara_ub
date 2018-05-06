@@ -38,6 +38,18 @@ use totara_userdata\userdata\target_user;
 class pending_enrolments extends item {
 
     /**
+     * Get main Frankenstyle component name (core subsystem or plugin).
+     * This is used for UI purposes to group items into components.
+     *
+     * NOTE: this can be overridden to move item to a different form group in UI,
+     *       for example local plugins and items to standard activities
+     *       or blocks may move items to their related plugins.
+     */
+    public static function get_main_component() {
+        return 'enrolments';
+    }
+
+    /**
      * This item allows purging of data.
      *
      * @param int $userstatus

@@ -54,6 +54,16 @@ require_once($CFG->dirroot .'/mod/assign/feedback/file/locallib.php');
  *   inefficient. Better to do mass deletions, all wrapped in a DB transaction.
  */
 class singleassignments extends item {
+
+    /**
+     * Returns sort order.
+     *
+     * @return int
+     */
+    public static function get_sortorder() {
+        return 100;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -61,14 +71,12 @@ class singleassignments extends item {
         return [CONTEXT_SYSTEM, CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE];
     }
 
-
     /**
      * {@inheritDoc}
      */
     public static function is_purgeable(int $userstatus) {
         return true;
     }
-
 
     /**
      * {@inheritDoc}

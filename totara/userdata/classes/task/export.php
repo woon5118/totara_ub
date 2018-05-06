@@ -23,6 +23,7 @@
 
 namespace totara_userdata\task;
 
+use totara_userdata\userdata\item;
 use \totara_userdata\userdata\manager;
 
 /**
@@ -69,13 +70,14 @@ final class export extends \core\task\adhoc_task {
         }
 
         $userto = $DB->get_record('user', array('id' => $export->usercreated), '*', MUST_EXIST);
-        $results = manager::get_results();
 
         $subject = get_string('notificationexportselfsubject', 'totara_userdata');
-
-        $a = new \stdClass();
-        $a->result = $results[$export->result];
-        $body = get_string('notificationexportselfmessage', 'totara_userdata', $a);
+        if ($export->result == item::RESULT_STATUS_SUCCESS) {
+            $availableuntil = userdate($export->timefinished + \totara_userdata\local\export::MAX_FILE_AVAILABILITY_TIME);
+            $body = get_string('notificationexportselfmessage', 'totara_userdata', $availableuntil);
+        } else {
+            $body = get_string('notificationexportselfmessage_unsuccessful', 'totara_userdata');
+        }
 
         $message = new \core\message\message();
         $message->courseid          = 0;

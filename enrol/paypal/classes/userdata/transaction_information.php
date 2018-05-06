@@ -45,7 +45,7 @@ class transaction_information extends item {
      *       or blocks may move items to their related plugins.
      */
     public static function get_main_component() {
-        return 'totara_core';
+        return 'enrolments';
     }
 
     /**

@@ -35,6 +35,15 @@ defined('MOODLE_INTERNAL') || die();
 class requests extends item {
 
     /**
+     * Returns sort order.
+     *
+     * @return int
+     */
+    public static function get_sortorder() {
+        return 100;
+    }
+
+    /**
      * String used for human readable name of user preferences. Defaults to preferences.
      *
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.

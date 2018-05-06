@@ -34,6 +34,18 @@ defined('MOODLE_INTERNAL') || die();
 class legacy_log extends item {
 
     /**
+     * Get main Frankenstyle component name (core subsystem or plugin).
+     * This is used for UI purposes to group items into components.
+     *
+     * NOTE: this can be overridden to move item to a different form group in UI,
+     *       for example local plugins and items to standard activities
+     *       or blocks may move items to their related plugins.
+     */
+    public static function get_main_component() {
+        return 'logs';
+    }
+
+    /**
      * Can user data of this item data be purged from system?
      *
      * @param int $userstatus target_user::STATUS_ACTIVE, target_user::STATUS_DELETED or target_user::STATUS_SUSPENDED
