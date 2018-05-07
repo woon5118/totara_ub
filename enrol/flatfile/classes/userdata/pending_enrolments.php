@@ -46,7 +46,16 @@ class pending_enrolments extends item {
      *       or blocks may move items to their related plugins.
      */
     public static function get_main_component() {
-        return 'enrolments';
+        return 'core_enrol';
+    }
+
+    /**
+     * Returns sort order.
+     *
+     * @return int
+     */
+    public static function get_sortorder() {
+        return 200;
     }
 
     /**

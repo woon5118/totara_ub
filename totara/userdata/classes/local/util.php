@@ -67,9 +67,9 @@ final class util {
                 return get_string('courses', 'core');
             case 'core_message':
                 return get_string('messaging', 'core_message');
-            case 'enrolments':
+            case 'core_enrol':
                 return get_string('enrolments', 'enrol');
-            case 'logs':
+            case 'tool_log':
                 return get_string('log', 'admin');
             case 'core_grades':
                 return get_string('gradebook', 'core_grades');

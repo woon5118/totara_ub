@@ -42,7 +42,7 @@ class legacy_log extends item {
      *       or blocks may move items to their related plugins.
      */
     public static function get_main_component() {
-        return 'logs';
+        return 'tool_log';
     }
 
     /**
