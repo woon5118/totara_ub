@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="tool/sitepolicy/db" VERSION="20180111" COMMENT="XMLDB file for tool/sitepolicy"
+<XMLDB PATH="tool/sitepolicy/db" VERSION="20180509" COMMENT="XMLDB file for tool/sitepolicy"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -35,9 +35,9 @@
         <FIELD NAME="language" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false" COMMENT="Language of the policy"/>
         <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Title of the policy"/>
         <FIELD NAME="policytext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The contents of the policy"/>
-        <FIELD NAME="policytextformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The format of the policytext field"/>
+        <FIELD NAME="policytextformat" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="The format of the policytext field"/>
         <FIELD NAME="whatsnew" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Field to put what has changed since the previous version"/>
-        <FIELD NAME="whatsnewformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The format of the whatsnew field"/>
+        <FIELD NAME="whatsnewformat" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="The format of the whatsnew field"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp of when the langauge version of the policy was created"/>
         <FIELD NAME="isprimary" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="If the localised policy is the Admin's primary version"/>
         <FIELD NAME="authorid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Who wrote the localised policy"/>

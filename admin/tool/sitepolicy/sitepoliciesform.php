@@ -44,7 +44,8 @@ $renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
 $params = [
     'previewnotification' => $OUTPUT->notification(get_string('policyispreview', 'tool_sitepolicy'), \core\output\notification::NOTIFY_INFO),
 ];
-$form = new tool_sitepolicy\form\versionform(['versionnumber' => 1, 'policytextformat' => FORMAT_HTML, 'preview' => ''], $params);
+$format = editors_get_preferred_format();
+$form = new tool_sitepolicy\form\versionform(['versionnumber' => 1, 'policytextformat' => $format, 'preview' => ''], $params);
 
 // We need to submit on preview button to ensure that the preview section contains the correct data
 // No need to submit on 'continue editing'
@@ -53,13 +54,14 @@ if ($form->is_cancelled()) {
 }
 if ($formdata = $form->get_data()) {
     if ($formdata->submitbutton) {
-        \tool_sitepolicy\sitepolicy::create_new_policy($formdata->title, $formdata->policytext, $formdata->statements, $formdata->language);
+        \tool_sitepolicy\sitepolicy::create_new_policy($formdata->title, $formdata->policytext, $formdata->statements, $formdata->language, null, (int)($formdata->policytextformat));
         $message = get_string('policynewsaved', 'tool_sitepolicy', $formdata->title);
         redirect(url_helper::sitepolicy_list(), $message, null, \core\output\notification::NOTIFY_SUCCESS);
     }
 
     if ($formdata->previewbutton) {
-        $form = new tool_sitepolicy\form\versionform(['versionnumber' => 1, 'policytextformat' => FORMAT_HTML, 'preview' => '1'], $params);
+        // Data have not been saved yet - thus need to stick to the original format
+        $form = new tool_sitepolicy\form\versionform(['versionnumber' => 1, 'policytextformat' => $formdata->policytextformat, 'preview' => '1'], $params);
     }
 }
 

@@ -270,6 +270,7 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
             'langprefix' => ',en,nl',
             'title' => 'Test policy',
             'statement' => 'Policy statement',
+            'statementformat' => FORMAT_PLAIN,
             'numoptions' => 2,
             'consentstatement' => 'Consent statement',
             'providetext' => 'yes',
@@ -312,6 +313,64 @@ class tool_sitepolicy_userconsent_test extends \advanced_testcase {
         $userconsent->set_timeconsented(time());
         $userconsent->save();
         $this->assertFalse(userconsent::has_user_consented($oneoption->id, 2));
+    }
+
+    /**
+     * Test user_has_answered
+     */
+    public function test_has_user_answered() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        /** @var \tool_sitepolicy_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+
+        $options = [
+            'hasdraft' => false,
+            'numpublished' => 1,
+            'allarchived' => false,
+            'authorid' => 2,
+            'languages' => 'es,en,nl',
+            'langprefix' => ',en,nl',
+            'title' => 'Test policy',
+            'statement' => 'Policy statement',
+            'statementformat' => FORMAT_PLAIN,
+            'numoptions' => 2,
+            'consentstatement' => 'Consent statement',
+            'providetext' => 'yes',
+            'withheldtext' => 'no',
+            'mandatory' => 'first'
+            ];
+
+        $sitepolicy = $generator->create_multiversion_policy($options);
+        $version = policyversion::from_policy_latest($sitepolicy);
+
+        $existingoptions = $DB->get_records('tool_sitepolicy_consent_options', ['policyversionid' => $version->get_id()]);
+        $oneoption = reset($existingoptions);
+        $this->assertEquals(2, count($existingoptions));
+
+        // No consent answered yet
+        foreach ($existingoptions as $option) {
+            $this->assertFalse(userconsent::has_user_answered($option->id, 2));
+        }
+
+        // User doesn't agree with this option
+        $userconsent = new userconsent();
+        $userconsent->set_userid(2);
+        $userconsent->set_consentoptionid($oneoption->id);
+        $userconsent->set_language('nl');
+        $userconsent->set_hasconsented(0);
+        $userconsent->set_timeconsented(time()-2);
+        $userconsent->save();
+        $this->assertTrue(userconsent::has_user_answered($oneoption->id, 2));
+
+        // Then user agrees with this option in a different language
+        $userconsent->set_language('es');
+        $userconsent->set_hasconsented(1);
+        $userconsent->set_timeconsented(time()-1);
+        $userconsent->save();
+        $this->assertTrue(userconsent::has_user_answered($oneoption->id, 2));
     }
 
     /**

@@ -62,6 +62,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'languages' => 'en',
                     'title' => 'Test policy singlelang_multiconsent',
                     'statement' => 'Policy statement singlelang_multiconsent',
+                    'statementformat' => FORMAT_MOODLE,
                     'numoptions' => 2,
                     'consentstatement' => 'Consent statement singlelang_multiconsent',
                     'providetext' => 'yes',
@@ -78,6 +79,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'langprefix' => ',nl ',
                     'title' => 'Test policy multilang_multiconsent',
                     'statement' => 'Policy statement multilang_multiconsent',
+                    'statementformat' => FORMAT_HTML,
                     'numoptions' => 2,
                     'consentstatement' => 'Consent statement multilang_multiconsent',
                     'providetext' => 'Yes',
@@ -94,6 +96,7 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
                     'langprefix' => ',nl ',
                     'title' => 'Test policy published',
                     'statement' => 'Policy statement published',
+                    'statementformat' => FORMAT_PLAIN,
                     'numoptions' => 2,
                     'consentstatement' => 'Consent statement published',
                     'providetext' => 'yes',
@@ -170,6 +173,9 @@ class tool_sitepolicy_sitepolicy_generator_test extends \advanced_testcase {
             if (isset($options['statement'])) {
                 $this->assertEquals($prefix . $options['statement'], $row->policytext);
             }
+            $expectedformat = $options['statementformat'] ?? FORMAT_HTML;
+            $this->assertEquals($expectedformat, $row->policytextformat);
+
             if (isset($options['authorid'])) {
                 $this->assertEquals($options['authorid'], $row->authorid);
             }

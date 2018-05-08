@@ -122,12 +122,15 @@ class versionform extends form {
             }
         }
 
+        // Use original format values for previewing editor data
         $options = [];
         $options['title'] = $data['title'];
         $options['policytext'] = $data['policytext'];
+        $options['policytextformat'] = $data['policytextformat'] ?? FORMAT_HTML;
         $options['viewonly']  = true;
         if ($versionnumber > 1) {
             $options['whatsnew'] = $data['whatsnew'];
+            $options['whatsnewformat'] = $data['whatsnewformat'] ?? FORMAT_HTML;
         }
 
         $options['statements'] = [];
@@ -179,6 +182,7 @@ class versionform extends form {
      */
     public static function prepare_current_data(localisedpolicy $localisedpolicy, bool $newpolicy, string $returnpage) {
 
+        // Passing editor formats as strings as the totara_form/element/editor expects it as a string when determining currently selected
         $version = $localisedpolicy->get_policyversion();
         $currentdata = [
             'versionnumber' => $version->get_versionnumber(),
@@ -186,9 +190,9 @@ class versionform extends form {
             'language' => $localisedpolicy->get_language(false),
             'title' => $localisedpolicy->get_title(false),
             'policytext' => $localisedpolicy->get_policytext(false),
-            'policytextformat' => FORMAT_HTML,
-            'whatsnew' => $localisedpolicy->get_whatsnew(),
-            'whatsnewformat' => FORMAT_HTML,
+            'policytextformat' => (string) $localisedpolicy->get_policytextformat(),
+            'whatsnew' => $localisedpolicy->get_whatsnew(false),
+            'whatsnewformat' => (string) $localisedpolicy->get_whatsnewformat(),
             'statements' => $localisedpolicy->get_statements(false),
             'localisedpolicy' => $localisedpolicy->get_id(),
             'policyversionid' => $version->get_id(),
@@ -203,7 +207,8 @@ class versionform extends form {
                 'policyversionid' => PARAM_INT,
                 'sitepolicyid' => PARAM_INT,
                 'newpolicy' => PARAM_BOOL,
-                'ret' => PARAM_TEXT],
+                'ret' => PARAM_TEXT,
+            ],
         ];
 
         return [$currentdata, $params];

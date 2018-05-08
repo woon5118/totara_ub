@@ -200,16 +200,17 @@ class sitepolicy {
      * @param statement[] $statements
      * @param string $language
      * @param int|null $authorid
+     * @param int $policytextformat- Note that the FORMAT_* definitions are strings.
+     *                               You need to convert it if passing it to this function.
      * @return sitepolicy
      * @throws \coding_exception
      * @throws \dml_transaction_exception
      */
-    public static function create_new_policy(string $title, string $policytext, array $statements, string $language, int $authorid = null): sitepolicy {
+    public static function create_new_policy(string $title, string $policytext, array $statements, string $language, int $authorid = null, int $policytextformat = null): sitepolicy {
         global $DB, $USER;
 
-        if ($authorid === null) {
-            $authorid = $USER->id;
-        }
+        $authorid = $authorid ?? $USER->id;
+        $policytextformat = $policytextformat ?? (int)FORMAT_HTML;
         $time = time();
 
         $trans = $DB->start_delegated_transaction();
@@ -225,7 +226,7 @@ class sitepolicy {
         $primarypolicy->set_authorid($authorid);
         $primarypolicy->set_timecreated($time);
         $primarypolicy->set_title($title);
-        $primarypolicy->set_policytext($policytext);
+        $primarypolicy->set_policytext($policytext, $policytextformat);
         $primarypolicy->set_statements($statements);
 
         $primarypolicy->save();

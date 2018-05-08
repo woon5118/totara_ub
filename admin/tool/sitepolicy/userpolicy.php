@@ -136,8 +136,10 @@ if (!empty($consentdata)) {
     // If user has consented before, show his previous answers
     $options = $currentdata['statements'];
     foreach ($options as $option) {
-        $hasconsent = userconsent::has_user_consented($option['dataid'], $userid);
-        $currentdata = array_merge($currentdata, ['option' . $option['dataid'] => (int)$hasconsent]);
+        if (userconsent::has_user_answered($option['dataid'], $userid)) {
+            $hasconsent = userconsent::has_user_consented($option['dataid'], $userid);
+            $currentdata = array_merge($currentdata, ['option' . $option['dataid'] => (int)$hasconsent]);
+        }
     }
 }
 

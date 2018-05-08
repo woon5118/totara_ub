@@ -27,8 +27,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/admin/tool/sitepolicy/db/upgradelib.php');
-
 /**
  * Upgrade the plugin.
  *
@@ -45,26 +43,31 @@ function xmldb_tool_sitepolicy_upgrade($oldversion) {
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2018050200) {
+    if ($oldversion < 2018050800) {
         // Add format fields for policytext and whatsnew.
         $table = new xmldb_table('tool_sitepolicy_localised_policy');
+        $field = new xmldb_field('policytextformat', XMLDB_TYPE_INTEGER, '2', null, null, null, '1', 'policytext');
 
-        $field = new xmldb_field('policytextformat', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'policytext');
         // Conditionally launch add field.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        $field = new xmldb_field('whatsnewformat', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'whatsnew');
+        $field = new xmldb_field('whatsnewformat', XMLDB_TYPE_INTEGER, '2', null, null, null, '1', 'whatsnew');
         // Conditionally launch add field.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        tool_sitepolicy_upgrade_convert_policytext_to_html();
+        $sql =
+            "UPDATE {tool_sitepolicy_localised_policy}
+                SET policytextformat = :policytextformat,
+                    whatsnewformat = :whatsnewformat";
+        $params = ['policytextformat' => FORMAT_PLAIN, 'whatsnewformat' => FORMAT_PLAIN];
+        $DB->execute($sql, $params);
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2018050200, 'tool', 'sitepolicy');
+        upgrade_plugin_savepoint(true, 2018050800, 'tool', 'sitepolicy');
     }
 
     return true;

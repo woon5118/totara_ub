@@ -269,6 +269,27 @@ class userconsent {
     }
 
     /**
+     * Determine whether the user has answered this option
+     *
+     * @param int $consentoptionid
+     * @param int $userid
+     * @return bool
+     **/
+    public static function has_user_answered(int $consentoptionid, int $userid = null): bool {
+        global $DB, $USER;
+
+        if (isguestuser()) {
+            return false;
+        }
+
+        $params = [
+            'consentoptionid' => $consentoptionid,
+            'userid' => $userid ?? $USER->id
+        ];
+        return (bool)$DB->count_records('tool_sitepolicy_user_consent', $params);
+    }
+
+    /**
      * Gets the users preferred language based on a fallback of: user lang, site lang, lang of primary version
      *
      * @param int $policyversionid

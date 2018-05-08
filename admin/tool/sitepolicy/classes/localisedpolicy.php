@@ -166,6 +166,15 @@ class localisedpolicy {
     }
 
     /**
+     * Gets policytextformat for localised policy
+     *
+     * @return int policytextformat
+     */
+    public function get_policytextformat(): int {
+        return $this->policytextformat;
+    }
+
+    /**
      * Gets whatsnew for localised polic
      * @param bool $formatted If set to true the text will be formatted for output before being returned.
      * @return string whatsnew
@@ -175,6 +184,15 @@ class localisedpolicy {
             return format_text($this->whatsnew, $this->whatsnewformat);
         }
         return $this->whatsnew;
+    }
+
+    /**
+     * Gets whatsnewformat for localised policy
+     *
+     * @return int whatsnewformat
+     */
+    public function get_whatsnewformat(): int {
+        return $this->whatsnewformat;
     }
 
     /**
@@ -236,17 +254,45 @@ class localisedpolicy {
     /**
      * Set policy text
      * @param string $policytext
+     * @param int $policytextformat - Note that the FORMAT_* definitions are strings.
+     *                                You need to convert it if passing it to this function.
      */
-    public function set_policytext(string $policytext) {
+    public function set_policytext(string $policytext, int $policytextformat = null) {
         $this->policytext = $policytext;
+        if (!is_null($policytextformat)) {
+            $this->policytextformat = $policytextformat;
+        }
+    }
+
+    /**
+     * Set policy text format
+     * @param int $policytextformat - Note that the FORMAT_* definitions are strings.
+     *                                You need to convert it if passing it to this function.
+     */
+    public function set_policytextformat(int $policytextformat) {
+        $this->policytextformat = $policytextformat;
     }
 
     /**
      * Set what's new text
      * @param string $whatsnew
+     * @param int $whatsnewformat - Note that the FORMAT_* definitions are strings.
+     *                              You need to convert it if passing it to this function.
      */
-    public function set_whatsnew(string $whatsnew) {
+    public function set_whatsnew(string $whatsnew, int $whatsnewformat = null) {
         $this->whatsnew = $whatsnew;
+        if (!is_null($whatsnewformat)) {
+            $this->whatsnewformat = $whatsnewformat;
+        }
+    }
+
+    /**
+     * Set whatsnew format
+     * @param int $whatsnewformat - Note that the FORMAT_* definitions are strings.
+     *                              You need to convert it if passing it to this function.
+     */
+    public function set_whatsnewformat(int $whatsnewformat) {
+        $this->whatsnewformat = $whatsnewformat;
     }
 
     /**
@@ -258,8 +304,8 @@ class localisedpolicy {
     }
 
     /**
-     * Sets policy text
-     * @param string $policytext
+     * Sets is_primary
+     * @param int $isprimary
      */
     public function set_isprimary(int $isprimary) {
         $this->isprimary = $isprimary;
@@ -298,7 +344,9 @@ class localisedpolicy {
         $this->language = $localisedpolicy->language;
         $this->title = $localisedpolicy->title;
         $this->policytext = $localisedpolicy->policytext;
+        $this->policytextformat = $localisedpolicy->policytextformat;
         $this->whatsnew = $localisedpolicy->whatsnew;
+        $this->whatsnewformat = $localisedpolicy->whatsnewformat;
         $this->timecreated = $localisedpolicy->timecreated;
         $this->isprimary = $localisedpolicy->isprimary;
         $this->authorid = $localisedpolicy->authorid;
@@ -391,7 +439,9 @@ class localisedpolicy {
         $entry->language = $this->language;
         $entry->title = $this->title;
         $entry->policytext = $this->policytext;
+        $entry->policytextformat = $this->policytextformat;
         $entry->whatsnew = $this->whatsnew;
+        $entry->whatsnewformat = $this->whatsnewformat;
         $entry->timecreated = $this->timecreated;
         $entry->isprimary = $this->isprimary;
         $entry->authorid = $this->authorid;
@@ -558,6 +608,7 @@ class localisedpolicy {
 
         $this->title = $from->get_title(false);
         $this->policytext = $from->get_policytext(false);
+        $this->policytextformat = $from->get_policytextformat();
 
         // Can't just copy consentoptions - we need to ensure that new objects are created
         $statements = $from->get_statements(true);

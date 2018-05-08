@@ -89,9 +89,9 @@ if ($form->is_cancelled()) {
 
         $primarypolicy->set_authorid($USER->id);
         $primarypolicy->set_title($formdata->title);
-        $primarypolicy->set_policytext($formdata->policytext);
+        $primarypolicy->set_policytext($formdata->policytext, $formdata->policytextformat);
         if (isset($formdata->whatsnew)) {
-            $primarypolicy->set_whatsnew($formdata->whatsnew);
+            $primarypolicy->set_whatsnew($formdata->whatsnew, $formdata->whatsnewformat);
         }
         $primarypolicy->set_statements($formdata->statements);
         $primarypolicy->save();
@@ -115,6 +115,8 @@ if ($form->is_cancelled()) {
         // currentdata contains the 'defaults' for the form which at this point should be the persisted values although the user
         // have changed it already
         $currentdata['preview'] = '1';
+        $currentdata['policytextformat'] = $formdata->policytextformat;
+        $currentdata['whatsnewformat'] = $formdata->whatsnewformat ?? FORMAT_HTML;
         $params['previewnotification'] = $OUTPUT->notification(get_string('policyispreview', 'tool_sitepolicy'), \core\output\notification::NOTIFY_INFO);
         $form = new \tool_sitepolicy\form\versionform($currentdata, $params);
     }

@@ -50,6 +50,7 @@ class tool_sitepolicy_generator extends component_generator_base {
      *      'langprefix' => [''], // Prefix to add each language's values to distinguish between languages
      *      'title' => 'Policy title',
      *      'statement' => 'Policy statement',
+     *      'statementformat' => FORMAT_HTML
      *      'numoptions' => 1, // Number of consent options per version
      *      'consentstatement' => 'Consent statement',
      *      'providetext' => 'yes',
@@ -219,6 +220,7 @@ class tool_sitepolicy_generator extends component_generator_base {
         $definition['langprefix'] = isset($options['langprefix']) ? explode(',', $options['langprefix']) : [''];
         $definition['title'] = $options['title'] ?? "Policy title";
         $definition['statement'] = $options['statement'] ?? "Policy statement";
+        $definition['statementformat'] = $options['statementformat'] ?? FORMAT_HTML;
 
         $numoptions = $options['numoptions'] ?? 1;
         if ((int)$numoptions < 1) {
@@ -259,6 +261,7 @@ class tool_sitepolicy_generator extends component_generator_base {
      *      'langprefix' => [''], // Prefix to add each language's values to distinguish between languages
      *      'title' => 'Policy title',
      *      'statement' => 'Policy statement',
+     *      'statementformat' => FORMAT_HTML,
      *      'consents' => [
      *          ['Consent statement', 'yes', 'no', true], // Consent text, agreed text, witheld text, mandatory
      *      ]
@@ -275,6 +278,7 @@ class tool_sitepolicy_generator extends component_generator_base {
             'langprefix' => [''],
             'title' => "Policy title",
             'statement' => "Policy statement",
+            'statementformat' => FORMAT_HTML,
             'consents' => [["Consent statement", 'yes', 'no', true]]
         ], $definition);
 
@@ -302,7 +306,7 @@ class tool_sitepolicy_generator extends component_generator_base {
             $policy->set_authorid($definition['authorid']);
             $policy->set_timecreated($definition['time']);
             $policy->set_title($langprefix . $definition['title']);
-            $policy->set_policytext($langprefix . $definition['statement']);
+            $policy->set_policytext($langprefix . $definition['statement'], $definition['statementformat']);
 
             $consents = [];
 

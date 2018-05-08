@@ -28,7 +28,11 @@ defined('MOODLE_INTERNAL') || die();
 use totara_form\form\element\radios;
 
 /**
- * Class statement
+ * The sitepolicy form element displays a sitepolicy statement as well as
+ * all consent statements associated with it.
+ * It ensures that rendering of a policy is done in a consistent manner both
+ * during previewing while creating the policy or obtaining actual consent
+ * from the user
  *
  * @package tool_sitepolicy\form\element
  */
@@ -68,6 +72,9 @@ class sitepolicy extends \totara_form\element {
         foreach ($options as $k => $v) {
             $this->options[(string)$k] = $v;
         }
+
+        $this->options['policytextformat'] = $this->options['policytextformat'] ?? FORMAT_HTML;
+        $this->options['whatsnewformat'] = $this->options['whatsnewformat'] ?? FORMAT_HTML;
     }
 
     /**
@@ -135,11 +142,11 @@ class sitepolicy extends \totara_form\element {
             'name' => $this->get_name(),
             'id' => $this->get_id(),
             'title' => $this->options['title'],
-            'policytext' => $this->options['policytext'],
+            'policytext' => format_text($this->options['policytext'], $this->options['policytextformat']),
         ];
 
         if (!empty($this->options['whatsnew'])) {
-            $result['whatsnew'] = $this->options['whatsnew'];
+            $result['whatsnew'] = format_text($this->options['whatsnew'], $this->options['whatsnewformat']);
         }
 
         $viewonly = $this->options['viewonly'] ?? false;

@@ -338,4 +338,57 @@ class tool_sitepolicy_sitepolicy_test extends \advanced_testcase {
         self::assertSame($expecteddraft->get_id(), $actualdraft->get_id());
     }
 
+    /**
+     * Tests the create_new_policy parameters
+     */
+    public function test_create_new_policy_parameters() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        self::assertCount(0, $list = sitepolicy::get_sitepolicylist());
+
+        $sql =
+            "SELECT *
+               FROM {tool_sitepolicy_localised_policy} lp
+               JOIN {tool_sitepolicy_policy_version} pv
+                 ON pv.id = lp.policyversionid
+             WHERE pv.sitepolicyid = :sitepolicyid";
+
+        $sitepolicies = [];
+
+        $sitepolicies['defaultformat'] = \tool_sitepolicy\sitepolicy::create_new_policy(
+            'Default format',
+            'I am the policy text',
+            [],
+            'en'
+        );
+        $row = $DB->get_record_sql($sql, ['sitepolicyid' => $sitepolicies['defaultformat']->get_id()]);
+        $this->assertEquals(FORMAT_HTML, $row->policytextformat);
+
+        $sitepolicies['plainformat'] = \tool_sitepolicy\sitepolicy::create_new_policy(
+            'Plain format',
+            'I am the plain policy text',
+            [],
+            'en',
+            null,
+            (int)FORMAT_PLAIN
+        );
+        $row = $DB->get_record_sql($sql, ['sitepolicyid' => $sitepolicies['plainformat']->get_id()]);
+        $this->assertEquals(FORMAT_PLAIN, $row->policytextformat);
+
+        $sitepolicies['markdownformat'] = \tool_sitepolicy\sitepolicy::create_new_policy(
+            'Markdown format',
+            'I am the **markdown** policy text',
+            [],
+            'en',
+            null,
+            (int)FORMAT_MARKDOWN
+        );
+        $row = $DB->get_record_sql($sql, ['sitepolicyid' => $sitepolicies['markdownformat']->get_id()]);
+        $this->assertEquals(FORMAT_MARKDOWN, $row->policytextformat);
+    }
 }

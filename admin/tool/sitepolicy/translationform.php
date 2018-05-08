@@ -86,10 +86,10 @@ if ($form->is_cancelled()) {
 
         $localisedpolicy->set_authorid($USER->id);
         $localisedpolicy->set_title($formdata->title);
-        $localisedpolicy->set_policytext($formdata->policytext);
+        $localisedpolicy->set_policytext($formdata->policytext, $formdata->policytextformat);
 
         if (!empty($formdata->whatsnew)) {
-            $localisedpolicy->set_whatsnew($formdata->whatsnew);
+            $localisedpolicy->set_whatsnew($formdata->whatsnew, $formdata->whatsnewformat);
         }
 
         $localisedpolicy->set_statements($formdata->statements);
@@ -103,6 +103,8 @@ if ($form->is_cancelled()) {
         // currentdata contains the 'defaults' for the form which at this point should be the persisted values although the user
         // may have changed it already
         $currentdata['preview'] = '1';
+        $currentdata['policytextformat'] = $formdata->policytextformat;
+        $currentdata['whatsnewformat'] = $formdata->whatsnewformat ?? FORMAT_HTML;
         $params['previewnotification'] = $OUTPUT->notification(get_string('policyispreview', 'tool_sitepolicy'), \core\output\notification::NOTIFY_INFO);
         $form = new \tool_sitepolicy\form\translationform($currentdata, $params);
     }

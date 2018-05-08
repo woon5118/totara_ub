@@ -73,7 +73,8 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
             'languages' => 'fr,nl,en',
             'langprefix' => 'fr,nl,en',
             'title' => 'Test policy all',
-            'statement' => "Policy statement\nall",
+            'statement' => "Policy statement<br />all",
+            'statementformat' => FORMAT_HTML,
             'numoptions' => 1,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -88,16 +89,18 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         $this->assertEquals('fr', $localisedpolicy->get_language());
         $this->assertEquals('fr Test policy all', $localisedpolicy->get_title(false));
         $this->assertEquals('fr Test policy all', $localisedpolicy->get_title(true));
-        $this->assertEquals("fr Policy statement\nall", $localisedpolicy->get_policytext(false));
-        $this->assertEquals('<div class="text_to_html">fr Policy statement<br />'."\n".'all</div>', $localisedpolicy->get_policytext(true));
+        $this->assertEquals("fr Policy statement<br />all", $localisedpolicy->get_policytext(false));
+        $this->assertEquals("fr Policy statement<br />all", $localisedpolicy->get_policytext(true));
+        $this->assertEquals(FORMAT_HTML, $localisedpolicy->get_policytextformat());
         $this->assertEquals(1, $localisedpolicy->is_primary());
 
         $localisedpolicy = localisedpolicy::from_version($version, ['language' => 'en']);
         $this->assertEquals('en', $localisedpolicy->get_language());
         $this->assertEquals('en Test policy all', $localisedpolicy->get_title(false));
         $this->assertEquals('en Test policy all', $localisedpolicy->get_title(true));
-        $this->assertEquals("en Policy statement\nall", $localisedpolicy->get_policytext(false));
-        $this->assertEquals('<div class="text_to_html">en Policy statement<br />'."\n".'all</div>', $localisedpolicy->get_policytext(true));
+        $this->assertEquals("en Policy statement<br />all", $localisedpolicy->get_policytext(false));
+        $this->assertEquals("en Policy statement<br />all", $localisedpolicy->get_policytext(true));
+        $this->assertEquals(FORMAT_HTML, $localisedpolicy->get_policytextformat());
         $this->assertEquals(0, $localisedpolicy->is_primary());
     }
 
@@ -117,7 +120,8 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
             'languages' => 'en',
             'langprefix' => 'en',
             'title' => 'Test policy <a href="test">all</a>',
-            'statement' => "Policy <a href='test'>statement</a> all\nnow",
+            'statement' => "A test policy statement\n============\n\nWith some **bold** markdown\n",
+            'statementformat' => FORMAT_MARKDOWN,
             'numoptions' => 1,
             'consentstatement' => 'Consent statement all',
             'providetext' => 'yes',
@@ -132,8 +136,9 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         $this->assertEquals('en', $localisedpolicy->get_language());
         $this->assertEquals('en Test policy <a href="test">all</a>', $localisedpolicy->get_title(false));
         $this->assertEquals('en Test policy all', $localisedpolicy->get_title(true));
-        $this->assertEquals("en Policy <a href='test'>statement</a> all\nnow", $localisedpolicy->get_policytext(false));
-        $this->assertEquals('<div class="text_to_html">en Policy <a href="test">statement</a> all<br />'."\n".'now</div>', $localisedpolicy->get_policytext(true));
+        $this->assertEquals("en A test policy statement\n============\n\nWith some **bold** markdown\n", $localisedpolicy->get_policytext(false));
+        $this->assertEquals("<h1>en A test policy statement</h1>\n\n<p>With some <strong>bold</strong> markdown</p>\n", $localisedpolicy->get_policytext(true));
+        $this->assertEquals(FORMAT_MARKDOWN, $localisedpolicy->get_policytextformat());
         $this->assertEquals(1, $localisedpolicy->is_primary());
         $this->assertEquals('', $localisedpolicy->get_whatsnew());
         // Ensure that it was created within the last 2 seconds.
@@ -209,6 +214,7 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         $this->assertEquals('en', $row->language);
         $this->assertEquals('', $row->title);
         $this->assertEquals('', $row->policytext);
+        $this->assertEquals(FORMAT_HTML, $row->policytextformat);
         $this->assertEquals('', $row->whatsnew);
         $this->assertFalse(empty($row->timecreated));
         $this->assertEquals(localisedpolicy::STATUS_PRIMARY, $row->isprimary);
@@ -216,8 +222,8 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
 
         $time = time() - 2;
         $localisedpolicy->set_title('The title');
-        $localisedpolicy->set_policytext('The policy text');
-        $localisedpolicy->set_whatsnew('The whatsnew text');
+        $localisedpolicy->set_policytext('The policy text', FORMAT_PLAIN);
+        $localisedpolicy->set_whatsnew('The whatsnew text', FORMAT_MARKDOWN);
         $localisedpolicy->set_timecreated($time);
         $localisedpolicy->set_isprimary(0);
         $localisedpolicy->set_authorid(2);
@@ -229,7 +235,9 @@ class tool_sitepolicy_localisedpolicy_test extends \advanced_testcase {
         $this->assertEquals('en', $row->language);
         $this->assertEquals('The title', $row->title);
         $this->assertEquals('The policy text', $row->policytext);
+        $this->assertEquals(FORMAT_PLAIN, $row->policytextformat);
         $this->assertEquals('The whatsnew text', $row->whatsnew);
+        $this->assertEquals(FORMAT_MARKDOWN, $row->whatsnewformat);
         $this->assertEquals($time, $row->timecreated);
         $this->assertEquals(localisedpolicy::STATUS_NOTPRIMARY, $row->isprimary);
         $this->assertEquals($version->get_id(), $row->policyversionid);

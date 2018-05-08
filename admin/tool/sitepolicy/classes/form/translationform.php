@@ -67,7 +67,9 @@ class translationform extends form {
         $policytitle->set_attribute('size', 1335);
         $policytitle->set_attribute('required', true);
 
-        $primarypolicy = $editsection->add(new static_html('primarypolicytext', '&nbsp;', '<div class="primarypolicybox">'.$this->parameters['primarypolicytext'].'</div>'));
+        $format = $this->parameters['primarypolicytextformat'] ?? FORMAT_HTML;
+        $primarypolicy = $editsection->add(new static_html('primarypolicytext', '&nbsp;',
+            '<div class="primarypolicybox">' . \format_text($this->parameters['primarypolicytext'], $format) . '</div>'));
         $policyeditor = $editsection->add(new editor('policytext', get_string('policystatement', 'tool_sitepolicy')));
         $policyeditor->set_attributes(['rows' => 20, 'required' => true]);
 
@@ -82,8 +84,9 @@ class translationform extends form {
             $whatschangedsection->set_collapsible(true);
             $whatschangedsection->set_expanded(true);
 
+            $format = $this->parameters['primarywhatsnewformat'] ?? FORMAT_HTML;
             $primarywhatsnew = $whatschangedsection->add(new static_html('primarywhatsnew', '&nbsp;',
-                '<div class="primarypolicybox">'.$this->parameters['primarywhatsnew'].'</div>'));
+                '<div class="primarypolicybox">' . \format_text($this->parameters['primarywhatsnew'], $format) . '</div>'));
             $policywhatsnew = $whatschangedsection->add(new editor('whatsnew', get_string('policyversionchanges', 'tool_sitepolicy')));
             $policywhatsnew->set_attributes(['rows' => 5]);
 
@@ -112,9 +115,11 @@ class translationform extends form {
         $options = [];
         $options['title'] = $data['title'];
         $options['policytext'] = $data['policytext'];
+        $options['policytextformat'] = $data['policytextformat'] ?? FORMAT_HTML;
         $options['viewonly']  = true;
         if (isset($data['whatsnew'])) {
             $options['whatsnew'] = $data['whatsnew'];
+            $options['whatsnewformat'] = $data['whatsnewformat'] ?? FORMAT_HTML;
         }
 
         $options['statements'] = [];
@@ -208,16 +213,17 @@ class translationform extends form {
             }
         }
 
+        // Passing editor formats as strings as the totara_form/element/editor expects it as a string when determining currently selected
         $currentdata = [
             'localisedpolicy' => $localisedpolicy->get_id(),
             'language' => $localisedpolicy->get_language(false),
             'policyversionid' => $localisedpolicy->get_policyversion()->get_id(),
             'title' => $localisedpolicy->get_title(false),
             'policytext' => $localisedpolicy->get_policytext(false),
-            'policytextformat' => FORMAT_HTML,
+            'policytextformat' => (string) $localisedpolicy->get_policytextformat(),
             'statements' => $options,
             'whatsnew' => $localisedpolicy->get_whatsnew(),
-            'whatsnewformat' => FORMAT_HTML,
+            'whatsnewformat' => (string) $localisedpolicy->get_whatsnewformat(),
             'preview' => '',
         ];
 
@@ -227,7 +233,9 @@ class translationform extends form {
             'primarylanguage' => $primarypolicy->get_language(false),
             'primarytitle' => $primarypolicy->get_title(false),
             'primarypolicytext' => $primarypolicy->get_policytext(false),
+            'primarypolicytextformat' => (string) $primarypolicy->get_policytextformat(),
             'primarywhatsnew' => $primarypolicy->get_whatsnew(),
+            'primarywhatsnewformat' => (string) $primarypolicy->get_whatsnewformat(),
         ];
         return [$currentdata, $params];
     }
