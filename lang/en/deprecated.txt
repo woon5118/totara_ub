@@ -65,4 +65,4 @@ configcustommenuitems,core_admin
 custommenuitems,core_admin
 custommenu,core_admin
 moodleorghubname,core_admin
-nativesqlsrvnonwindows,install
+nativesqlsrvnonwindows,core_install
