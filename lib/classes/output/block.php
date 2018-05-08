@@ -115,6 +115,7 @@ class block implements renderable {
         $block->header = array(
             'title'    => false,
             'controls' => false,
+            'no_header' => false
         );
         if ($title) {
             $block->header['title'] = $title;
@@ -131,6 +132,10 @@ class block implements renderable {
         $block->header['display'] = true;
         if (isset($bc->displayheader) && !$bc->displayheader) {
             unset($block->header);
+        }
+
+        if ($bc->noheader) {
+            $block->header['no_header'] = true;
         }
 
         $block->content = $bc->content;

@@ -3391,6 +3391,12 @@ class block_contents {
     public $skipid;
 
     /**
+     * @var bool If there is no block header to display set to true
+     *
+     */
+    public $noheader = false;
+
+    /**
      * @var int If this is the contents of a real block, this should be set
      * to the block_instance.id. Otherwise this should be set to 0.
      */

@@ -2228,14 +2228,16 @@ function mod_page_type_list($pagetype, $parentcontext = null, $currentcontext = 
  */
 function block_add_block_ui($page, $output, $region=null) {
     global $CFG;
-    if (!$page->user_is_editing() || !$page->user_can_edit_blocks()) {
+    if (!$page->user_is_editing() || !$page->user_can_edit_blocks() || $region == 'content') {
         return null;
     }
 
     $bc = new block_contents();
-    $bc->title = get_string('addblock');
     $bc->add_class('block_adminblock');
+    $bc->add_class('block_addblock');
     $bc->attributes['data-block'] = 'adminblock';
+    $bc->noheader = true;
+    $bc->title = get_string('addblock');
 
     // This part is needed; otherwise nothing will happen when a block is selected
     // for addition to a region. Also notice the "selectid" value; if this is not
@@ -2256,13 +2258,20 @@ function block_add_block_ui($page, $output, $region=null) {
     // Any query parameters that were in the original url need to be replicated
     // as hidden fields in the add block form. Otherwise, things will break.
     $actionurl = new moodle_url($page->url);
+    $region =  $region ?? $this->get_default_region();
     $hidden = [
         ["name" => "sesskey", "value" => sesskey()],
-        ["name" => "bui_addblockregion", "value" => $region ?? $this->get_default_region()]
+        ["name" => "bui_addblockregion", "value" => $region]
     ];
     foreach ($actionurl->params() as $key => $value) {
         $hidden[] = ["name" => $key, "value" => $value];
     }
+
+    $flexicon_plus = new \core\output\flex_icon('plus', array('alt'=> get_string('addblock')));
+    $data_flexicon_plus = [
+        'template' => $flexicon_plus->get_template(),
+        'context' => $flexicon_plus->export_for_template($output)
+    ];
 
     $context = [
         'hasblocks' => !empty($blocks),
@@ -2270,9 +2279,13 @@ function block_add_block_ui($page, $output, $region=null) {
         'hidden' => $hidden,
         'label' => $bc->title,
         'id' => $formid,
-        'blocks' => $blocks
+        'blocks' => $blocks,
+        'plusicon' => $data_flexicon_plus,
+        'addblockregion' => $region
     ];
     $bc->content = $output->render_from_template('core/add_new_block', $context);
+
+    $page->requires->js_call_amd('core/add_block_popover', 'init', array($blocks, $region));
 
     return $bc;
 }

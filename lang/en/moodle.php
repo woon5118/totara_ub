@@ -1348,6 +1348,7 @@ $string['noresetrecord'] = 'There is no record of that reset request. Please ini
 $string['noresults'] = 'No results';
 $string['normal'] = 'Normal';
 $string['normalfilter'] = 'Normal search';
+$string['noscript'] = 'Please enable JavaScript for this page to work';
 $string['nosite'] = 'Could not find site-level course';
 $string['nostudentsfound'] = 'No {$a} found';
 $string['nostudentsingroup'] = 'There are no learners in this group yet';

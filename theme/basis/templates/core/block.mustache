@@ -74,7 +74,7 @@
 
 <div{{#attributes}} {{name}}="{{value}}"{{/attributes}}>
 
-{{#header}}
+{{#header}}{{^no_header}}
     <div class="header block-header">
         {{#controls}}
             {{{control_output}}}
@@ -86,7 +86,7 @@
             {{/title}}
         </div>
     </div>
-{{/header}}
+{{/no_header}}{{/header}}
 
 <div class="content block-content" data-movetext="true">
     {{{content}}}

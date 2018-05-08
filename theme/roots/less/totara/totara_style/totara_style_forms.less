@@ -21,27 +21,18 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_roots
 
-// The following is a reduced set of styles derived from a design
-// guide to help standardise new and existing components.
-// If no existing style is suitable, consideration should be taken
-// on the feasibility of overwriting or replacing an existing style before
-// introducing additional styles.
-// Each style should have a totara_style- prefix
+.totara_style-textInput {
+    line-height: 1;
+    padding: @totara_style-spacing_small;
+    width: 280px;
+}
 
-// Include colour palette
-@import "totara_style/totara_style_sizes.less";
+.totara_style-textInput-withIcon {
+    padding-left: @totara_style-spacing_x_large;
+}
 
-// Include responsive breakpoints
-@import "totara_style/totara_style_breakpoints.less";
-
-// Include space sizing
-@import "totara_style/totara_style_spacing.less";
-
-// Include colour palette
-@import "totara_style/totara_style_colours.less";
-
-// Include font styles
-@import "totara_style/totara_style_typography.less";
-
-// Include form styles
-@import "totara_style/totara_style_forms.less";
+.totara_style-textInput-Icon {
+    left: @totara_style-spacing_small;
+    position: absolute;
+    top: @totara_style-size_11;
+}
