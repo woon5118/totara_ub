@@ -532,6 +532,10 @@ class core_backup_renderer extends plugin_renderer_base {
         $html .= $this->output->heading(get_string('importdatafrom'), 2, array('class' => 'header'));
         $html .= $this->backup_detail_pair(get_string('selectacourse', 'backup'), $this->render($courses));
         $attrs = array('type' => 'submit', 'value' => get_string('continue'), 'class' => 'btn btn-primary');
+        // Disable continue button if there are not courses.
+        if ($courses->get_count() == 0) {
+            $attrs['disabled'] = 'disabled';
+        }
         $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', $attrs));
         $html .= html_writer::end_tag('div');
         $html .= html_writer::end_tag('form');
@@ -906,66 +910,47 @@ class core_backup_renderer extends plugin_renderer_base {
     public function render_import_course_search(import_course_search $component) {
         $url = $component->get_url();
 
-        $output = html_writer::start_tag('div', array('class' => 'import-course-search'));
-        if ($component->get_count() === 0) {
-            $output .= $this->output->notification(get_string('nomatchingcourses', 'backup'));
-
-            $output .= html_writer::start_tag('div', array('class' => 'ics-search'));
-            $attrs = array(
-                'type' => 'text',
-                'name' => restore_course_search::$VAR_SEARCH,
-                'value' => $component->get_search(),
-                'class' => 'form-control'
-            );
-            $output .= html_writer::empty_tag('input', $attrs);
-            $attrs = array(
-                'type' => 'submit',
-                'name' => 'searchcourses',
-                'value' => get_string('search'),
-                'class' => 'btn btn-secondary'
-            );
-            $output .= html_writer::empty_tag('input', $attrs);
-            $output .= html_writer::end_tag('div');
-
-            $output .= html_writer::end_tag('div');
-            return $output;
-        }
-
-        $countstr = '';
+        $countsearchresults = $component->get_count();
+        $countstr = get_string('totalcoursesearchresults', 'backup', $countsearchresults);
         if ($component->has_more_results()) {
-            $countstr = get_string('morecoursesearchresults', 'backup', $component->get_count());
-        } else {
-            $countstr = get_string('totalcoursesearchresults', 'backup', $component->get_count());
+            $countstr = get_string('morecoursesearchresults', 'backup', $countsearchresults);
         }
 
+        $output = html_writer::start_tag('div', array('class' => 'import-course-search'));
         $output .= html_writer::tag('div', $countstr, array('class' => 'ics-totalresults'));
         $output .= html_writer::start_tag('div', array('class' => 'ics-results'));
 
-        $table = new html_table();
-        $table->head = array('', get_string('shortnamecourse'), get_string('fullnamecourse'));
-        $table->data = array();
-        foreach ($component->get_results() as $course) {
-            $row = new html_table_row();
-            $row->attributes['class'] = 'ics-course';
-            if (!$course->visible) {
-                $row->attributes['class'] .= ' dimmed';
+        if ($countsearchresults === 0)  {
+            $output .= get_string('nomatchingcoursesforsearch', 'backup', $component->get_search());
+        } else {
+            // Output table with the results.
+            $table = new html_table();
+            $table->head = array('', get_string('shortnamecourse'), get_string('fullnamecourse'));
+            $table->data = array();
+            foreach ($component->get_results() as $course) {
+                $row = new html_table_row();
+                $row->attributes['class'] = 'ics-course';
+                if (!$course->visible) {
+                    $row->attributes['class'] .= ' dimmed';
+                }
+                $row->cells = array(
+                    html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'importid', 'value' => $course->id)),
+                    format_string($course->shortname, true, array('context' => context_course::instance($course->id))),
+                    format_string($course->fullname, true, array('context' => context_course::instance($course->id)))
+                );
+                $table->data[] = $row;
             }
-            $row->cells = array(
-                html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'importid', 'value' => $course->id)),
-                format_string($course->shortname, true, array('context' => context_course::instance($course->id))),
-                format_string($course->fullname, true, array('context' => context_course::instance($course->id)))
-            );
-            $table->data[] = $row;
+            if ($component->has_more_results()) {
+                $cell = new html_table_cell(get_string('moreresults', 'backup'));
+                $cell->colspan = 3;
+                $cell->attributes['class'] = 'notifyproblem';
+                $row = new html_table_row(array($cell));
+                $row->attributes['class'] = 'rcs-course';
+                $table->data[] = $row;
+            }
+            $output .= html_writer::table($table);
         }
-        if ($component->has_more_results()) {
-            $cell = new html_table_cell(get_string('moreresults', 'backup'));
-            $cell->colspan = 3;
-            $cell->attributes['class'] = 'notifyproblem';
-            $row = new html_table_row(array($cell));
-            $row->attributes['class'] = 'rcs-course';
-            $table->data[] = $row;
-        }
-        $output .= html_writer::table($table);
+
         $output .= html_writer::end_tag('div');
 
         $output .= html_writer::start_tag('div', array('class' => 'ics-search'));
@@ -979,6 +964,13 @@ class core_backup_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'searchcourses',
             'value' => get_string('search'),
+            'class' => 'btn btn-secondary'
+        );
+        $output .= html_writer::empty_tag('input', $attrs);
+        $attrs = array(
+            'type' => 'submit',
+            'name' => 'clearsearch',
+            'value' => get_string('clear'),
             'class' => 'btn btn-secondary'
         );
         $output .= html_writer::empty_tag('input', $attrs);

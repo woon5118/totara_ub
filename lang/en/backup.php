@@ -197,6 +197,7 @@ $string['missingfilesinpool'] = 'Some files could not be saved during the backup
 $string['moodleversion'] = 'Totara version';
 $string['moreresults'] = 'There are too many results, enter a more specific search.';
 $string['nomatchingcourses'] = 'There are no courses to display';
+$string['nomatchingcoursesforsearch'] = 'No courses match your search "{$a}"';
 $string['norestoreoptions'] = 'There are no categories or existing courses you can restore to.';
 $string['originalwwwroot'] = 'URL of backup';
 $string['previousstage'] = 'Previous';
