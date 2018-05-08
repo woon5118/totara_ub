@@ -323,7 +323,7 @@ abstract class base {
 
     /**
      * Checks whether it makes sense for the tile to have visibility options
-     * for the visibility to be hidden the block must be on a users dashboard so the page pattern has to match my-totara-dashboard and
+     * for the visibility to be hidden the block must be on a users dashboard so the page pattern has to match totara-dashboard and
      * have a parent context level of user
      * @return bool whether the tile should have visibility options
      */
@@ -331,7 +331,7 @@ abstract class base {
         global $DB;
         $blockinstance = $DB->get_record('block_instances', ['id' => $this->blockid], 'pagetypepattern,parentcontextid', MUST_EXIST);
         $parent_context = \context::instance_by_id($blockinstance->parentcontextid);
-        return (!(preg_match('/^my-totara-dashboard/', $blockinstance->pagetypepattern) || preg_match('/^user-profile/', $blockinstance->pagetypepattern)) ||
+        return (!(preg_match('/^totara-dashboard/', $blockinstance->pagetypepattern) || preg_match('/^user-profile/', $blockinstance->pagetypepattern)) ||
             $parent_context->contextlevel != CONTEXT_USER);
     }
 

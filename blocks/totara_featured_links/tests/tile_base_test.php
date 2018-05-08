@@ -548,7 +548,7 @@ class block_totara_featured_links_tile_base_testcase extends test_helper {
         $tile1 = $this->blockgenerator->create_default_tile($blockinstance->id);
         $this->assertTrue($tile1->is_visibility_applicable());
         $block_data = $DB->get_record('block_instances', ['id' => $tile1->blockid]);
-        $block_data->pagetypepattern = 'my-totara-dashboard-1'; // Sets the block to be on a dashboard.
+        $block_data->pagetypepattern = 'totara-dashboard-1'; // Sets the block to be on a dashboard.
 
         $block_data->parentcontextid = array_values($DB->get_records('context', ['contextlevel' => 30], '', 'id'))[0]->id; // Sets the context to a users context.
         $DB->update_record('block_instances', $block_data);
