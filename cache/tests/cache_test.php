@@ -1794,8 +1794,8 @@ class core_cache_cache_testcase extends advanced_testcase {
      */
     public function test_sharing_with_version_on_dbmeta_and_config() {
         global $CFG, $DB;
-        /* @var cache_config_phpunittest $instance */
-        $instance = cache_config_phpunittest::instance();
+        /* @var cache_config_testing $instance */
+        $instance = cache_config_testing::instance();
         $instance->set_definition_sharing('core/databasemeta', cache_definition::SHARING_SITEID + cache_definition::SHARING_VERSION);
         $instance->set_definition_sharing('core/config', cache_definition::SHARING_SITEID + cache_definition::SHARING_VERSION);
         cache_helper::purge_all();
