@@ -256,6 +256,6 @@ $string['wwwroot'] = 'Web address';
 $string['wwwrooterror'] = 'The \'Web Address\' does not appear to be valid - this Totara installation doesn\'t appear to be there. The value below has been reset.';
 
 /*
- * @deprecated since Totara 12.0
+ * @deprecated since Moodle 3.3
  */
 $string['nativesqlsrvnonwindows'] = 'Microsoft Drivers for SQL Server for PHP are available only for Windows OS.';
