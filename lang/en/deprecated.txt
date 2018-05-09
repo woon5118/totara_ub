@@ -66,3 +66,5 @@ custommenuitems,core_admin
 custommenu,core_admin
 moodleorghubname,core_admin
 nativesqlsrvnonwindows,core_install
+loginpasswordautocomplete,core_admin
+loginpasswordautocomplete_help,core_admin

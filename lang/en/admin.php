@@ -686,8 +686,6 @@ $string['logguests'] = 'Log guest access';
 $string['logguests_help'] = 'This setting enables logging of actions by guest account and not logged in users. High profile sites may want to disable this logging for performance reasons. It is recommended to keep this setting enabled on production sites.';
 $string['loginpageautofocus'] = 'Autofocus login page form';
 $string['loginpageautofocus_help'] = 'Enabling this option improves usability of the login page, but automatically focusing fields may be considered an accessibility issue.';
-$string['loginpasswordautocomplete'] = 'Prevent password autocompletion on login form';
-$string['loginpasswordautocomplete_help'] = 'If enabled, users are not allowed to save their account password in their browser.';
 $string['loglifetime'] = 'Keep logs for';
 $string['logstorenotrequired'] = 'Log store not required';
 $string['logstoressupported'] = 'Log stores that support this report';
@@ -1327,3 +1325,9 @@ $string['custommenu'] = 'Custom menu';
 $string['moodleorghubname'] = 'Totara.net';
 $string['backup_shortname'] = 'Use course name in backup filename';
 $string['backup_shortnamehelp'] = 'Use the course name as part of the backup filename.';
+
+/*
+ * @deprecated since Totara 12.0
+ */
+$string['loginpasswordautocomplete'] = 'Prevent password autocompletion on login form';
+$string['loginpasswordautocomplete_help'] = 'If enabled, users are not allowed to save their account password in their browser.';

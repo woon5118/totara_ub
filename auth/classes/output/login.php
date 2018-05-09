@@ -65,8 +65,6 @@ class login implements renderable, templatable {
     public $instructions;
     /** @var moodle_url The form action login URL. */
     public $loginurl;
-    /** @var bool Whether the password can be auto completed. */
-    public $passwordautocomplete;
     /** @var bool Whether the username should be remembered. */
     public $rememberusername = false;
     /** @var bool Whether the "remember me" option was selected. */
@@ -104,7 +102,6 @@ class login implements renderable, templatable {
         $this->cookieshelpicon = new help_icon('cookiesenabled', 'core');
 
         $this->autofocusform = !empty($CFG->loginpageautofocus);
-        $this->passwordautocomplete = !empty($CFG->loginpasswordautocomplete);
 
         if (!empty($CFG->persistentloginenable)) {
             $this->rememberusername = true;
@@ -181,7 +178,6 @@ class login implements renderable, templatable {
         $data->rememberusername = $this->rememberusername;
         $data->rememberusernamechecked = $this->rememberusernamechecked;
         $data->rememberusernamelabel = $this->rememberusernamelabel;
-        $data->passwordautocomplete = $this->passwordautocomplete;
         $data->signupurl = $this->signupurl->out(false);
         $data->username = $this->username;
         $data->skiplinktext = get_string('skipa', 'access', get_string('login', 'core'));
