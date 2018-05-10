@@ -157,7 +157,8 @@ Feature: Enable Block blog menu in a course
     And I should see "S2 Second Blog"
     And I should not see "S1 First Blog"
 
-  Scenario: Teacher searches for student blogs
+  @javascript
+  Scenario: Teacher searches for student blogs in course
     Given I log in as "student1"
     And I follow "Course 1"
     And I follow "Add an entry about this course"

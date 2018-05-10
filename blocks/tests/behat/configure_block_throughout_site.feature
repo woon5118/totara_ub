@@ -27,6 +27,7 @@ Feature: Add and configure blocks throughout the site
     And I press "Save changes"
     And I log out
 
+  @javascript
   Scenario: Add and configure a block throughtout the site
     Given I log in as "manager1"
     And I am on site homepage
@@ -45,8 +46,7 @@ Feature: Add and configure blocks throughout the site
       | Default weight | -10 (first) |
     And I press "Save changes"
     And I follow "Course 1"
-    # The first block matching the pattern should be top-left block
-    And I should see "Comments" in the "//*[@id='region-pre' or @id='block-region-side-pre']/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' block ')]" "xpath_element"
+    And I should see "Comments" in the "//*[@id='region-top' or @id='block-region-top']/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' block ')]" "xpath_element"
 
   Scenario: Blocks on the dashboard page can have roles assigned to them
     Given I log in as "manager1"

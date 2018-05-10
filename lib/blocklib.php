@@ -832,14 +832,29 @@ class block_manager {
         }
     }
 
+    /**
+     * @param string $blockname
+     */
     public function add_block_at_end_of_default_region($blockname) {
         if (empty($this->birecordsbyregion)) {
             // No blocks or block regions exist yet.
             return;
         }
-        $defaulregion = $this->get_default_region();
+        $this->add_block_at_end_of_region($blockname, $this->get_default_region());
+    }
 
-        $lastcurrentblock = end($this->birecordsbyregion[$defaulregion]);
+    /**
+     * @param string $blockname
+     * @param string|null $region
+     */
+    public function add_block_at_end_of_region(string $blockname, string $region = null) {
+        if (empty($this->birecordsbyregion)) {
+            // No blocks or block regions exist yet.
+            return;
+        }
+        $region = $region ?? $this->get_default_region();
+
+        $lastcurrentblock = end($this->birecordsbyregion[$region]);
         if ($lastcurrentblock) {
             $weight = $lastcurrentblock->weight + 1;
         } else {
@@ -877,7 +892,7 @@ class block_manager {
         // Surely other pages like course-report will need this too, they just are not important
         // enough now. This will be decided in the coming days. (MDL-27829, MDL-28150)
 
-        $this->add_block($blockname, $defaulregion, $weight, false, $pagetypepattern, $subpage);
+        $this->add_block($blockname, $region, $weight, false, $pagetypepattern, $subpage);
     }
 
     /**
@@ -1238,9 +1253,9 @@ class block_manager {
                 $contents = $this->extracontent[$region];
             }
             $contents = array_merge($contents, $this->create_block_contents($this->blockinstances[$region], $output, $region));
-            if (($region == $this->defaultregion) && (!isset($this->page->theme->addblockposition) ||
-                    $this->page->theme->addblockposition == BLOCK_ADDBLOCK_POSITION_DEFAULT)) {
-                $addblockui = block_add_block_ui($this->page, $output);
+            if (!isset($this->page->theme->addblockposition)
+                || $this->page->theme->addblockposition == BLOCK_ADDBLOCK_POSITION_DEFAULT) {
+                $addblockui = block_add_block_ui($this->page, $output, $region);
                 if ($addblockui) {
                     $contents[] = $addblockui;
                 }
@@ -1403,6 +1418,9 @@ class block_manager {
 
         $addableblocks = $this->get_addable_blocks();
 
+        $region = optional_param('bui_addblockregion', null, PARAM_TEXT);
+        $region = $region ?? $this->get_default_region();
+
         if ($blocktype === '') {
             // Display add block selection.
             $addpage = new moodle_page();
@@ -1436,7 +1454,7 @@ class block_manager {
                 echo $OUTPUT->box(get_string('noblockstoaddhere'));
                 echo $OUTPUT->container($OUTPUT->action_link($addpage->url, get_string('back')), 'm-x-3 m-b-1');
             } else {
-                $url = new moodle_url($addpage->url, array('sesskey' => sesskey()));
+                $url = new moodle_url($addpage->url, array('sesskey' => sesskey(), 'bui_addblockregion' => $region));
                 echo $OUTPUT->render_from_template('core/add_block_body',
                     ['blocks' => array_values($addableblocks),
                      'url' => '?' . $url->get_query_string(false)]);
@@ -1452,7 +1470,7 @@ class block_manager {
             throw new moodle_exception('cannotaddthisblocktype', '', $this->page->url->out(), $blocktype);
         }
 
-        $this->add_block_at_end_of_default_region($blocktype);
+        $this->add_block_at_end_of_region($blocktype, $region);
 
         // If the page URL was a guess, it will contain the bui_... param, so we must make sure it is not there.
         $this->page->ensure_param_not_in_url('bui_addblock');
@@ -2208,8 +2226,8 @@ function mod_page_type_list($pagetype, $parentcontext = null, $currentcontext = 
  * @return block_contents an appropriate block_contents, or null if the user
  * cannot add any blocks here.
  */
-function block_add_block_ui($page, $output) {
-    global $CFG, $OUTPUT;
+function block_add_block_ui($page, $output, $region=null) {
+    global $CFG;
     if (!$page->user_is_editing() || !$page->user_can_edit_blocks()) {
         return null;
     }
@@ -2219,21 +2237,43 @@ function block_add_block_ui($page, $output) {
     $bc->add_class('block_adminblock');
     $bc->attributes['data-block'] = 'adminblock';
 
-    $missingblocks = $page->blocks->get_addable_blocks();
-    if (empty($missingblocks)) {
-        $bc->content = get_string('noblockstoaddhere');
-        return $bc;
+    // This part is needed; otherwise nothing will happen when a block is selected
+    // for addition to a region. Also notice the "selectid" value; if this is not
+    // provided, then just clicking on the selection HTML element will cause it
+    // to go to another block selection page!
+    $formid = html_writer::random_id('single_select');
+    $page->requires->yui_module(
+        'moodle-core-formautosubmit',
+        'M.core.init_formautosubmit',
+        [['selectid' => $formid, 'nothing' => '']]
+    );
+
+    $blocks = [];
+    foreach ($page->blocks->get_addable_blocks() as $block) {
+        $blocks[] = ["blockname" => $block->name, "blocktitle" => $block->title];
     }
 
-    $menu = array();
-    foreach ($missingblocks as $block) {
-        $menu[$block->name] = $block->title;
+    // Any query parameters that were in the original url need to be replicated
+    // as hidden fields in the add block form. Otherwise, things will break.
+    $actionurl = new moodle_url($page->url);
+    $hidden = [
+        ["name" => "sesskey", "value" => sesskey()],
+        ["name" => "bui_addblockregion", "value" => $region ?? $this->get_default_region()]
+    ];
+    foreach ($actionurl->params() as $key => $value) {
+        $hidden[] = ["name" => $key, "value" => $value];
     }
 
-    $actionurl = new moodle_url($page->url, array('sesskey'=>sesskey()));
-    $select = new single_select($actionurl, 'bui_addblock', $menu, null, array(''=>get_string('adddots')), 'add_block');
-    $select->set_label(get_string('addblock'), array('class'=>'accesshide'));
-    $bc->content = $OUTPUT->render($select);
+    $context = [
+        'hasblocks' => !empty($blocks),
+        'actionurl' => $actionurl->out_omit_querystring(true),
+        'hidden' => $hidden,
+        'label' => $bc->title,
+        'id' => $formid,
+        'blocks' => $blocks
+    ];
+    $bc->content = $output->render_from_template('core/add_new_block', $context);
+
     return $bc;
 }
 

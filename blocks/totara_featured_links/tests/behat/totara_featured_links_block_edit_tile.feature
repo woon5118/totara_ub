@@ -66,7 +66,7 @@ Feature: Block edit test block
       | textbody | some body              |
       | URL      | http://www.example.com |
     Then "Clear" "text" in the "//div[span[@class='icon-picker-delete-icon']]" "xpath_element" should not be visible
-    When I click on "Choose" "text"
+    When I click on "//span[@id='show-iconPicker-dialog']" "xpath_element"
     And I click on "//li[contains(@class, 'icon-picker-item')][5]" "xpath_element"
     And I click on "OK" "button"
 
