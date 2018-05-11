@@ -36,7 +36,7 @@ $version  = 2016120508.00;              // YYYYMMDD      = weekly release date o
 $release  = '3.2.8 (Build: 20180319)'; // Human-friendly version name
 
 $branch   = '32';                       // This version's branch.
-$maturity = MATURITY_ALPHA;         // This version's maturity level.
+$maturity = MATURITY_EVERGREEN;         // This version's maturity level.
 
 
 // TOTARA VERSION INFORMATION
@@ -47,7 +47,7 @@ $maturity = MATURITY_ALPHA;         // This version's maturity level.
 $TOTARA = new stdClass();
 
 $TOTARA->version    = '12dev';          // Please keep as string.
-$TOTARA->build      = '20180420.00';   // Please keep as string.
+$TOTARA->build      = '20180514.00';   // Please keep as string.
 
 if ($maturity == MATURITY_EVERGREEN) {
     $TOTARA->release = "Evergreen (Build: {$TOTARA->build})";
