@@ -339,6 +339,12 @@ require(['core/autoinitialise'], function(ai) {
 
         if (empty($this->M_cfg)) {
 
+            // It is possible that the $page->context is null, so we can't use $page->context->id.
+            $contextid = null;
+            if (!is_null($page->context)) {
+                $contextid = $page->context->id;
+            }
+
             $this->M_cfg = array(
                 'wwwroot'             => $CFG->wwwroot,
                 'sesskey'             => sesskey(),
@@ -348,7 +354,9 @@ require(['core/autoinitialise'], function(ai) {
                 'theme'               => $page->theme->name,
                 'jsrev'               => $this->get_jsrev(),
                 'admin'               => $CFG->admin,
-                'svgicons'            => $page->theme->use_svg_icons()
+                'svgicons'            => $page->theme->use_svg_icons(),
+                'usertimezone'        => usertimezone(),
+                'contextid'           => $contextid,
             );
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;

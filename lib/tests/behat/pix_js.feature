@@ -68,3 +68,6 @@ Feature: Javascript template rendering
     # Flex with alt data
     And "#template_flex_string_data .sr-only" "css_element" should not exist
     And "#template_flex_string_data .flex-icon.muppet" "css_element" should exist
+
+    # Userdate helper - should never be used as it is an XSS risk
+    And I should see "1 January 2011" in the "#template_userdata_helper" "css_element"

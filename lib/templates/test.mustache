@@ -35,7 +35,8 @@
     Example context (json):
     {
         "title": "hello",
-        "strkey": "viewmyteam"
+        "strkey": "viewmyteam",
+        "date": 1293876000
     }
 }}
 <div id="template_string_check">
@@ -97,4 +98,8 @@
 <div id="template_flex_string_data">
     <p>test flex icon with json data</p>
     <p>{{#flex_icon}} delete, {"alt":"{{#str}} skipa, access, {{title}} {{/str}}", "classes": "muppet"} {{/flex_icon}}</p>
+</div>
+<div id="template_userdata_helper">
+    <p>test flex icon with json data</p>
+    <p>{{#userdate}} {{{date}}}, {{#str}} strftimedate, langconfig {{/str}} {{/userdate}}</p>
 </div>
