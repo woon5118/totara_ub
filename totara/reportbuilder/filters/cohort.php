@@ -216,7 +216,7 @@ class rb_filter_cohort extends rb_filter_type {
         $jsdetails->strings = array(
             'totara_cohort' => array('choosecohorts')
         );
-        $jsdetails->args = array('filter_to_load' => 'cohort');
+        $jsdetails->args = array('filter_to_load' => 'cohort', null, null, $this->name, 'reportid' => $this->report->_id);
 
         foreach ($jsdetails->strings as $scomponent => $sstrings) {
             $PAGE->requires->strings_for_js($sstrings, $scomponent);
