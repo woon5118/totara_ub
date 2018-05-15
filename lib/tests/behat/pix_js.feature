@@ -71,3 +71,6 @@ Feature: Javascript template rendering
 
     # Userdate helper - should never be used as it is an XSS risk
     And I should see "1 January 2011" in the "#template_userdata_helper" "css_element"
+
+    # shorten helper
+    And I should see "Lorem ipsum dolor sit amet, ..." in the "#template_shorten_helper" "css_element"

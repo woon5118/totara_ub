@@ -292,6 +292,12 @@
     <licenseversion>2.0</licenseversion>
   </library>
   <library>
+    <location>amd/src/truncate.js</location>
+    <name>Truncate.js</name>
+    <license>MIT</license>
+    <version>0.0.1</version>
+  </library>
+  <library>
     <location>javascript_polyfill/src/es6-promise.auto.js</location>
     <name>ES6-Promise (subset of rsvp.js)</name>
     <license>MIT</license>

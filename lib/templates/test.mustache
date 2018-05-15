@@ -36,7 +36,8 @@
     {
         "title": "hello",
         "strkey": "viewmyteam",
-        "date": 1293876000
+        "date": 1293876000,
+        "another": "Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
     }
 }}
 <div id="template_string_check">
@@ -102,4 +103,8 @@
 <div id="template_userdata_helper">
     <p>test flex icon with json data</p>
     <p>{{#userdate}} {{{date}}}, {{#str}} strftimedate, langconfig {{/str}} {{/userdate}}</p>
+</div>
+<div id="template_shorten_helper">
+    <p>test flex icon with json data</p>
+    <p>{{#shortentext}} 30, {{another}} {{/shortentext}}</p>
 </div>
