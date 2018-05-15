@@ -28,6 +28,9 @@ require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_source.php')
 require_once($CFG->dirroot . '/totara/plan/rb_sources/rb_source_dp_course.php');
 require_once($CFG->dirroot . '/completion/completion_completion.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class course_grade_percent_test extends advanced_testcase {
 
     private $reportsource = null;

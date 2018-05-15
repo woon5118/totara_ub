@@ -28,7 +28,9 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/filters/lib.php');
 
-
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 

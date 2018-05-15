@@ -29,6 +29,9 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/renderer.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_renderer_testcase extends advanced_testcase {
     /**
      * Test that export select works with reportbuilder id and instance

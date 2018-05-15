@@ -34,6 +34,9 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase {
     // Warning: Massive amount of test data ahead.
     protected $user_info_field_data = array(

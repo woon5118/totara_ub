@@ -23,6 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_custom_fields_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 

@@ -35,6 +35,9 @@ require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/generator/lib.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 abstract class reportcache_advanced_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 

@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once("$CFG->dirroot/totara/reportbuilder/lib.php");
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_role_access_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 

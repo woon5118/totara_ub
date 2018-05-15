@@ -23,6 +23,9 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
 
     use \totara_reportbuilder\phpunit\report_testing;

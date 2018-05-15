@@ -27,10 +27,11 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
-
 /**
  * Class totara_reportbuilder_rb_jobassignment_cache_test
  * Test that the cahcing of reports with jobassignment filters works properly
+ *
+ * @group totara_reportbuilder
  */
 class totara_reportbuilder_rb_jobassignment_cache_test extends reportcache_advanced_testcase {
 

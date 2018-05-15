@@ -30,6 +30,9 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_rb_totarasynclog_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 15, 'fullname' => 'Sync log', 'shortname' => 'totarasynclog',

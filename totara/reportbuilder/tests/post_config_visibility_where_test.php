@@ -30,6 +30,8 @@ global $CFG;
  *
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose totara_reportbuilder_post_config_visibility_where_testcase totara/reportbuilder/tests/post_config_visibility_where_test.php
+ *
+ * @group totara_reportbuilder
  */
 class totara_reportbuilder_post_config_visibility_where_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;

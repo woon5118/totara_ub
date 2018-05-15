@@ -31,6 +31,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_lib_static_testcase extends advanced_testcase {
 
     /**

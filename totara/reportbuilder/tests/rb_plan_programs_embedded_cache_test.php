@@ -30,6 +30,9 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/program/program_assignments.class.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_rb_plan_programs_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 13, 'fullname' => 'Record of Learning: Programs', 'shortname' => 'plan_programs',

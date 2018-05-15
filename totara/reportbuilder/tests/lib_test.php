@@ -34,6 +34,9 @@ require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php'
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/email_setting_schedule.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_lib_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
     /** @var $rb reportbuilder */

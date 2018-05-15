@@ -21,6 +21,9 @@
  * @package totara_reportbuilder
  */
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_generator_testcase extends advanced_testcase {
     public function test_create_global_restriction() {
         global $DB;

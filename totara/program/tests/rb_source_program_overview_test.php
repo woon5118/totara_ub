@@ -23,6 +23,9 @@
  */
 global $CFG;
 
+/**
+ * @group totara_reportbuilder
+ */
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 //require_once ($CFG->dirroot.'/totara/program/rb_sources/rb_source_program_overview.php');
 class totara_program_rb_source_program_overview_testcase extends reportcache_advanced_testcase {

@@ -34,6 +34,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/db/upgradelib.php');
  * To test, run this from the command line from the $CFG->dirroot
  * vendor/bin/phpunit totara_reportbuilder_upgradelib_testcase
  *
+ * @group totara_reportbuilder
  */
 class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
     private $report, $user;

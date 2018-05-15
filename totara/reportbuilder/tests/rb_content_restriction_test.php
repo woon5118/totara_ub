@@ -26,6 +26,9 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_rb_content_restrictions_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 

@@ -30,6 +30,10 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
+/**
+ * @group totara_reportbuilder
+ * @group mod_facetoface
+ */
 class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array(

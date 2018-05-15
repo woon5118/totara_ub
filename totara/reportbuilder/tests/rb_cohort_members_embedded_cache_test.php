@@ -31,6 +31,9 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/lib.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_rb_cohort_members_embedded_cache_testcase extends reportcache_advanced_testcase {
     // Testcase data
     protected $report_builder_data = array('id' => 4, 'fullname' => 'Audience members', 'shortname' => 'cohort_members',

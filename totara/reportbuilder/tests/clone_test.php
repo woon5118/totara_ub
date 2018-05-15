@@ -21,6 +21,9 @@
  * @package totara_reportbuilder
  */
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_clone_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 

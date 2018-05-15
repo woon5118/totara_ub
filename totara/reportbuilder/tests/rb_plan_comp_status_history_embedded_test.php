@@ -29,6 +29,9 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
+/**
+ * @group totara_reportbuilder
+ */
 class totara_reportbuilder_rb_plan_comp_status_history_embedded_testcase extends advanced_testcase {
     /**
      * Prepare mock data for testing.

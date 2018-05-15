@@ -31,6 +31,8 @@ require_once($CFG->dirroot.'/totara/question/tests/question_testcase.php');
 /**
  * To run:
  * vendor/bin/phpunit --verbose totara_appraisal_rb_source_appraisal_detail_testcase
+ *
+ * @group totara_reportbuilder
  */
 class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_testcase {
     use totara_reportbuilder\phpunit\report_testing;
