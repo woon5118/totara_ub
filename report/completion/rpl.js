@@ -176,7 +176,6 @@ M.totara_completionrpl = M.totara_completionrpl || {
                     var node = $('a.rpledit span', cell);
                     node.parent().append(pix_rply);
                     node.remove();
-                    $('a.rpledit .flex-icon', cell).addClass('ft-size-300');
 
                     // Save value
                     value.text(inputvalue);
@@ -212,7 +211,6 @@ M.totara_completionrpl = M.totara_completionrpl || {
                     var node = $('a.rpledit span', cell);
                     node.parent().append(pix_rpln);
                     node.remove();
-                    $('a.rpledit .flex-icon', cell).addClass('ft-size-300');
                 }
 
                 // Toggle expander
