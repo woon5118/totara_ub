@@ -61,6 +61,6 @@ Feature: Restore course completion report rpl
     And I follow "Course 1"
     And I navigate to "Course completion" node in "Course administration > Reports"
     And I should see "Completed" in the "Student 1" "table_row"
+    And I click on "Show RPL" "link" in the "Student 2" "table_row"
     And I should see "Completed via RPL" in the "Student 2" "table_row"
     And I should see "Not completed" in the "Student 3" "table_row"
-
