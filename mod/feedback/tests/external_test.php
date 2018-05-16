@@ -675,9 +675,24 @@ class mod_feedback_external_testcase extends externallib_advanced_testcase {
     }
 
     /**
+     * Test get_non_respondents from an anonymous feedback.
+     */
+    public function test_get_non_respondents_from_anonymous_feedback() {
+        $this->setUser($this->student);
+        $this->expectException('moodle_exception');
+        $this->expectExceptionMessage(get_string('anonymous', 'feedback'));
+        mod_feedback_external::get_non_respondents($this->feedback->id);
+    }
+
+    /**
      * Test get_non_respondents.
      */
     public function test_get_non_respondents() {
+        global $DB;
+
+        // Force non anonymous.
+        $DB->set_field('feedback', 'anonymous', FEEDBACK_ANONYMOUS_NO, array('id' => $this->feedback->id));
+
         // Create another student.
         $anotherstudent = self::getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($anotherstudent->id, $this->course->id, $this->studentrole->id, 'manual');
@@ -705,7 +720,7 @@ class mod_feedback_external_testcase extends externallib_advanced_testcase {
         $result = external_api::clean_returnvalue(mod_feedback_external::get_non_respondents_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(1, $result['users']);
-        $this->assertEquals($anotherstudent->id, $result['users'][0]);
+        $this->assertEquals($anotherstudent->id, $result['users'][0]['userid']);
 
         // Create another student.
         $anotherstudent2 = self::getDataGenerator()->create_user();
