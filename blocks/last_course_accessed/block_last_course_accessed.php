@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2016 onwards Totara Learning Solutions LTD
  *
@@ -42,6 +42,11 @@ class block_last_course_accessed extends block_base {
         // Required for generating course completion progress bar.
         require_once("{$CFG->libdir}/completionlib.php");
 
+        // Use the hook to retrieve any course IDs we don't want to use
+        $exclude_courses = array();
+        $hook = new \block_last_course_accessed\hook\exclude_courses($exclude_courses);
+        $hook->execute();
+
         // If the content is already defined, return it.
         if ($this->content !== null) {
             return $this->content;
@@ -54,6 +59,10 @@ class block_last_course_accessed extends block_base {
         $this->content = new stdClass();
         $this->content->text = '';
 
+        // Mainain a list of accessed courses so we have one to display if we have to
+        // exclude any.
+        $accessed_courses = [];
+
         // The USER global has the data we need about last course access.
         // It will only exist if a course has been accessed. If it doesn't
         // exist, retrieve the data directly.
@@ -63,17 +72,24 @@ class block_last_course_accessed extends block_base {
             arsort($courseaccess);
             $timestamp = reset($courseaccess);
             $courseid = key($courseaccess);
-        } else {
-            $params = array('userid' => $USER->id);
-            // Get the course data delivered in the right order with the latest first, so use get_records.
-            $last_access = $DB->get_records('user_lastaccess', $params, 'timeaccess DESC', "courseid, timeaccess", 0, 1);
 
-            if ($last_access) {
-                // We should only have one record, so get the object from it.
-                $last_access = reset($last_access);
-                $courseid = $last_access->courseid;
-                $timestamp = $last_access->timeaccess;
+            $accessed_courses[$timestamp] = $courseid;
+        }
+
+        $params = array('userid' => $USER->id);
+        // Get the course data delivered in the right order with the latest first, so use get_records.
+        $last_access = $DB->get_records('user_lastaccess', $params, 'timeaccess DESC', "courseid, timeaccess");
+
+        if ($last_access) {
+            foreach ($last_access as $access) {
+                $accessed_courses[$access->timeaccess] = $access->courseid;
             }
+        }
+
+        if ($accessed_courses) {
+            $permitted_courses = array_diff($accessed_courses, $exclude_courses);
+            $courseid = reset($permitted_courses);
+            $timestamp = key($permitted_courses);
         }
 
         if (!isset($courseid) || !isset($timestamp)) {
