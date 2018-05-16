@@ -1,4 +1,4 @@
-@core @core_calendar
+@core @core_calendar @javascript
 Feature: Limit displayed upcoming events
   In order to filter what is displayed on the calendar
   As a user

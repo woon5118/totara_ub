@@ -1,4 +1,4 @@
-@block @block_html
+@block @block_html @javascript
 Feature: Adding and configuring HTML blocks
   In order to have one or multiple HTML blocks on a page
   As admin

@@ -1,4 +1,4 @@
-@totara @block @block_last_course_accessed
+@totara @block @block_last_course_accessed @javascript
 Feature: Site Administrator can enable and disable the LCA block.
 
   Background:

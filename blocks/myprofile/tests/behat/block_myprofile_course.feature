@@ -1,4 +1,4 @@
-@block @block_myprofile
+@block @block_myprofile @javascript
 Feature: The logged in user block allows users to view their profile information in a course
   In order to enable the logged in user block in a course
   As a teacher

@@ -1,4 +1,4 @@
-@block @block_section_links
+@block @block_section_links @javascript
 Feature: The section links block allows users to quickly navigate around a moodle course
   In order to navigate a moodle course
   As a teacher

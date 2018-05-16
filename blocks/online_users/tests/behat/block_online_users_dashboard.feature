@@ -1,4 +1,4 @@
-@block @block_online_users
+@block @block_online_users @javascript
 Feature: The online users block allow you to see who is currently online
   In order to use the online users block on the dashboard
   As a user

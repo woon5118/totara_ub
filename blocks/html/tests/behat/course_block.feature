@@ -1,4 +1,4 @@
-@block @block_html
+@block @block_html @javascript
 Feature: HTML blocks in a course
   In order to have one or multiple HTML blocks in a course
   As a teacher

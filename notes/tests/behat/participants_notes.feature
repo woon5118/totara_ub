@@ -1,10 +1,10 @@
-@core @core_notes
+@core @core_notes @javascript
 Feature: Add notes to course participants
   In order to share information with other staff
   As a teacher
   I need to add notes from the course particpants list
 
-  Scenario: An teacher can add multiple notes
+  Scenario: A teacher can add multiple notes
     Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
@@ -37,7 +37,6 @@ Feature: Add notes to course participants
     And I set the field with xpath "//tr[contains(normalize-space(.), 'Student 2')]//input[@type='checkbox']" to "1"
     And I set the field with xpath "//tr[contains(normalize-space(.), 'Student 3')]//input[@type='checkbox']" to "1"
     And I set the field "With selected users..." to "Add a new note"
-    And I press "OK"
     # Add a note to student 1, but leave student 2 empty and student 3 with space.
     When I set the field with xpath "//tr[contains(normalize-space(.), 'Student 1')]//textarea" to "Student 1 needs to pick up his game"
     And I set the field with xpath "//tr[contains(normalize-space(.), 'Student 2')]//textarea" to ""

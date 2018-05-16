@@ -1,4 +1,4 @@
-@totara @totara_dashboard
+@totara @totara_dashboard @javascript
   Feature: Test Dashboard defaults
     In order to test the correct behaviour related to the visibility settings for the dashboard feature
     As a admin
@@ -18,7 +18,6 @@
       And I should see "Latest announcements"
       And I log out
 
-      @javascript
     Scenario: Dashboard is default page for all users except admin by default
       When I log in as "student1"
       Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"

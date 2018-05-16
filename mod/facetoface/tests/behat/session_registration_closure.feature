@@ -77,7 +77,7 @@ Feature: Seminar Event Registration Closure
     And I click on "Sally Sal, sally@example.com" "option"
     And I click on "Jelly Jel, jelly@example.com" "option"
     And I click on "Minny Min, minny@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

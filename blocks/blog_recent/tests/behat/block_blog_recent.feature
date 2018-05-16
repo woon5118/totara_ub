@@ -1,4 +1,4 @@
-@block @block_blog_recent
+@block @block_blog_recent @javascript
 Feature: Feature: Users can use the recent blog entries block to view recent blog entries.
   In order to enable the recent blog entries in a course
   As a teacher

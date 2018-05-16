@@ -1,4 +1,4 @@
-@mod @mod_feedback
+@mod @mod_feedback @javascript
 Feature: Mapping courses in a feedback
   In order to collect the same feedback about multiple courses
   As a manager
@@ -73,7 +73,6 @@ Feature: Mapping courses in a feedback
     And I should not see "Mapped courses"
     And I should not see "Map feedback to courses"
 
-  @javascript
   Scenario: Site feedback is not mapped to any course
     And I log in as "user1"
     And I am on site homepage
@@ -134,7 +133,6 @@ Feature: Mapping courses in a feedback
     And I should see "1 (50.00 %)" in the "option c" "table_row"
     And I log out
 
-  @javascript
   Scenario: Site feedback is mapped to courses
     And I log in as "manager"
     And I am on site homepage
@@ -237,6 +235,7 @@ Feature: Mapping courses in a feedback
     And I turn editing mode on
     And I add the "Feedback" block
     And I add the "Quick Links" block
+    And I click on ".toggle-display.textmenu" "css_element" in the "Course feedback" activity
     And I click on "Delete" "link" in the "Course feedback" activity
     And I press "Yes"
     And I follow "Turn editing off"

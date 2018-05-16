@@ -1,4 +1,4 @@
-@core @core_my
+@core @core_my @block @javascript
 Feature: Reset dashboard page to default
   In order to remove customisations from dashboard page
   As a user

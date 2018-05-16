@@ -71,7 +71,7 @@ Feature: Seminar event cancellation calendar views
     Given I click on "Attendees" "link" in the "0 / 29" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Learner One, learner1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

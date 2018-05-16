@@ -149,7 +149,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -180,7 +180,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -213,7 +213,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -247,7 +247,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -279,7 +279,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -304,7 +304,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -351,7 +351,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -376,7 +376,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
@@ -435,7 +435,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"

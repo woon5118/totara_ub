@@ -75,7 +75,7 @@ Feature: Seminar Approval required
     And I click on "Sam2 Student2, student2@example.com" "option"
     And I click on "Sam3 Student3, student3@example.com" "option"
     And I click on "Sam4 Student4, student4@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
@@ -83,7 +83,7 @@ Feature: Seminar Approval required
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam5 Student5, student5@example.com" "option"
     And I click on "Sam6 Student6, student6@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
@@ -166,7 +166,7 @@ Feature: Seminar Approval required
     And I click on "Sam4 Student4, student4@example.com" "option"
     And I click on "Sam5 Student5, student5@example.com" "option"
     And I click on "Sam6 Student6, student6@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

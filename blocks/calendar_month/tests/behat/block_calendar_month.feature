@@ -1,4 +1,4 @@
-@block @block_calendar_month
+@block @block_calendar_month @javascript
 Feature: Enable the calendar block in a course and test it's functionality
   In order to enable the calendar block in a course
   As a teacher

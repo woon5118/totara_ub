@@ -1,4 +1,4 @@
-@block @block_comments
+@block @block_comments @javascript
 Feature: Enable Block comments on a course page and view comments
   In order to enable the comments block on a course page
   As a teacher
@@ -20,10 +20,8 @@ Feature: Enable Block comments on a course page and view comments
     And I follow "Course 1"
     And I turn editing mode on
     And I add the "Comments" block
-    And I follow "Show comments"
     And I add "I'm a comment from the teacher" comment to comments block
     And I log out
     When I log in as "student1"
     And I follow "Course 1"
-    And I follow "Show comments"
     Then I should see "I'm a comment from the teacher"

@@ -104,7 +104,7 @@ Feature: Seminar timezones in reports
     And I click on "Attendees" "link" in the "Room 1" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "First User, user1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I press "Continue"
     And I press "Confirm"
     And I wait until "First User" "text" exists
@@ -112,7 +112,7 @@ Feature: Seminar timezones in reports
     And I click on "Attendees" "link" in the "Room 2" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Second User, user2@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I press "Continue"
     And I press "Confirm"
     And I wait until "Second User" "text" exists

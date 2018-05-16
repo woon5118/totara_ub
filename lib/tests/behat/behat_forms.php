@@ -58,6 +58,19 @@ class behat_forms extends behat_base {
     }
 
     /**
+     * Presses button with exactly specified id|name|title|alt|value.
+     *
+     * @When /^I press exact "(?P<button_string>(?:[^"]|\\")*)"$/
+     * @throws ElementNotFoundException Thrown by behat_base::find
+     * @param string $button
+     * @returns array
+     */
+    public function press_button_exact($button) {
+        \behat_hooks::set_step_readonly(false);
+        $this->execute('behat_general::i_click_on', array($button, 'button_exact'));
+    }
+
+    /**
      * Press button with specified id|name|title|alt|value and switch to main window.
      *
      * @When /^I press "(?P<button_string>(?:[^"]|\\")*)" and switch to main window$/

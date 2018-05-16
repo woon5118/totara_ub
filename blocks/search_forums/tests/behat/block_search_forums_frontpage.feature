@@ -1,4 +1,4 @@
-@block @block_search_forums @mod_forum
+@block @block_search_forums @mod_forum @javascript
 Feature: The search forums block allows users to search for forum posts
   In order to search for a forum post
   As an administrator

@@ -114,7 +114,7 @@ Feature: Manage pre-defined rooms
     And I click on "User Three, user3@example.invalid" "option"
     And I click on "User Four, user4@example.invalid" "option"
     And I click on "User Five, user5@example.invalid" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
@@ -129,7 +129,7 @@ Feature: Manage pre-defined rooms
     And I set the field "menuf2f-actions" to "Add users"
     And I wait "1" seconds
     And I click on "User Six, user6@example.invalid" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

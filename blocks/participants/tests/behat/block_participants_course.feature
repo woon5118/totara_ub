@@ -1,4 +1,4 @@
-@block @block_participants
+@block @block_participants @javascript
 Feature: People Block used in a course
   In order to view participants in a course
   As a teacher

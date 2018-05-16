@@ -1,4 +1,4 @@
-@block @block_glossary_random
+@block @block_glossary_random @javascript
 Feature: Random glossary entry block is used in a course
   In order to show the entries from glossary
   As a teacher

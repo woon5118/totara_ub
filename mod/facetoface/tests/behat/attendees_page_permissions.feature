@@ -62,13 +62,13 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     # We must wait here, because the refresh may not happen before the save button is clicked otherwise.
     And I wait "1" seconds
     And I press "Continue"

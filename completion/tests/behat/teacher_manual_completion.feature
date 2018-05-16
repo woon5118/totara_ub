@@ -1,4 +1,4 @@
-@core @core_completion
+@core @core_completion @javascript
 Feature: Allow teachers to manually mark users as complete when configured
   In order for teachers to mark students as complete
   As a teacher
@@ -21,6 +21,7 @@ Feature: Allow teachers to manually mark users as complete when configured
     And I follow "Completion course"
     And completion tracking is "Enabled" in current course
     And I follow "Course completion"
+    And I expand all fieldsets
     And I set the field "Teacher" to "1"
     And I press "Save changes"
     And I turn editing mode on

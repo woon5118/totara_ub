@@ -42,7 +42,7 @@ Feature: User can add and remove LCA block to / from dashboard.
     # Add the block and check it's removed from the available blocks list.
     When I press "Customise this page"
     And I add the "Last Course Accessed" block
-    Then I should not see "Last Course Accessed" in the "Add a block" "select"
+    Then the add block selector should not contain "Last Course Accessed" block
     And I should see "Last Course Accessed" in the "Last Course Accessed" "block"
 
     # Remove the block and check it's added back to the list of available blocks.
@@ -50,7 +50,7 @@ Feature: User can add and remove LCA block to / from dashboard.
     And I follow "Delete Last Course Accessed block"
     Then I should see "Are you sure that you want to delete this block titled Last Course Accessed?"
     When I press "Yes"
-    Then I should see "Last Course Accessed" in the "Add a block" "select"
+    Then the add block selector should contain "Last Course Accessed" block
 
     And I log out
 
@@ -61,7 +61,7 @@ Feature: User can add and remove LCA block to / from dashboard.
     # Add the block and check it's removed from the available blocks list.
     When I press "Customise this page"
     And I add the "Last Course Accessed" block
-    Then I should not see "Last Course Accessed" in the "Add a block" "select"
+    Then the add block selector should not contain "Last Course Accessed" block
     And I should see "Last Course Accessed" in the "Last Course Accessed" "block"
 
     # Remove the block and check it's added back to the list of available blocks.
@@ -69,6 +69,6 @@ Feature: User can add and remove LCA block to / from dashboard.
     And I follow "Delete Last Course Accessed block"
     Then I should see "Are you sure that you want to delete this block titled Last Course Accessed?"
     When I press "Yes"
-    Then I should see "Last Course Accessed" in the "Add a block" "select"
+    Then the add block selector should contain "Last Course Accessed" block
 
     And I log out

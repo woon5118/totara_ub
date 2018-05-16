@@ -1,4 +1,4 @@
-@block @block_course_overview
+@block @block_course_overview @javascript
 Feature: View the course overview block on the dashboard and test it's functionality
   In order to view the course overview block on the dashboard
   As an admin
@@ -110,7 +110,6 @@ Feature: View the course overview block on the dashboard and test it's functiona
     And I follow "messages"
     And I should see "No messages"
 
-  @javascript
   Scenario: View the block by a user with the welcome area and the user having messages.
     Given the following config values are set as admin:
       | showwelcomearea | 1 | block_course_overview |

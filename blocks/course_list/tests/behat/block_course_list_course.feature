@@ -1,5 +1,5 @@
-@block @block_course_list
-Feature: Enable the course_list block on a course page and view it's contents
+@block @block_course_list @javascript
+Feature: Enable the course_list block on a course page and view its contents
   In order to enable the course list block on an course page
   As a teacher
   I can add the course list block to a course page
@@ -47,7 +47,7 @@ Feature: Enable the course_list block on a course page and view it's contents
     And I should see "Course 3" in the "My courses" "block"
     And I should not see "Course 4" in the "My courses" "block"
     And I follow "Course 3"
-    And I should see "Course 3"
+    And I should see "Course 3" in the page title
 
   Scenario: Add the course list block on course page and view as an admin
     Given I log in as "admin"

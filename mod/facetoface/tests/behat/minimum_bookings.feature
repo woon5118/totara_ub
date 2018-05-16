@@ -99,7 +99,7 @@ Feature: Minimum Seminar bookings
     And I click on "Student One, student1@example.com" "option"
     And I click on "Trainer One, trainer1@example.com" "option"
     And I click on "Teacher One, teacher1@example.com" "option"
-    And I click on "Add" "button"
+    And I press exact "add"
     And I click on "Continue" "button"
     And I click on "Confirm" "button"
     And I should see "Bulk add attendees success"

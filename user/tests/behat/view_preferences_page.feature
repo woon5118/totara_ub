@@ -53,6 +53,7 @@ Feature: Access to preferences page
     And I follow "Student 2"
     Then I should see "Preferences" in the "region-main" "region"
 
+  @javascript
   Scenario: A user with the appropriate permissions can view another user's permissions page.
     Given I log in as "admin"
     And I am on site homepage

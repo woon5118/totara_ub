@@ -1,4 +1,4 @@
-@block @block_blog_menu @mod_assign @block_blog_recent
+@block @block_blog_menu @mod_assign @block_blog_recent @javascript
 Feature: Students can use the recent blog entries block to view recent entries on an activity page
   In order to enable the recent blog entries block an activity page
   As a teacher

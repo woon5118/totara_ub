@@ -5,7 +5,7 @@ Feature: Use facetoface session roles
   I need to be able to setup session roles and see them in report
 
   @javascript
-  Scenario: Seup and view facetoface session roles
+  Scenario: Setup and view facetoface session roles
     Given I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | middlename | email                |
@@ -56,7 +56,7 @@ Feature: Use facetoface session roles
     And I click on "Attendees" "link" in the "Booking open" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Student2 Sam2, student2@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

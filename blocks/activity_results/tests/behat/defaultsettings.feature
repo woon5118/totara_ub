@@ -1,4 +1,4 @@
-@block @block_activity_results
+@block @block_activity_results @javascript
 Feature: The activity results block can have administrator set defaults
   In order to be customize the activity results block
   As an admin

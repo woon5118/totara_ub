@@ -24,7 +24,7 @@ Feature: Give a grade to a student for a seminar
             | Description         | Test seminar description |
             | Completion tracking | Show activity as complete when conditions are met |
             | Require grade       | 1 |
-        And I follow "Course completion"
+        And I click on "Course completion" "link" in the "Administration" "block"
         And I click on "Condition: Activity completion" "link"
         And I click on "Seminar - Test seminar name" "checkbox"
         And I press "Save changes"

@@ -35,7 +35,7 @@ Feature: Test Current Learning block
     # Add an image to the private files block to use later in the program.
     And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
-    And I select "Private files" from the "Add a block" singleselect
+    And I add the "Private files" block
     And I follow "Manage private files..."
     And I upload "blocks/current_learning/tests/fixtures/totara_logo.svg" file to "Files" filemanager
     And I click on "Save changes" "button"
@@ -51,7 +51,6 @@ Feature: Test Current Learning block
     And I select the text in the "id_summary_editor" Atto editor
     And I click on "Image" "button" in the "#fitem_id_summary_editor" "css_element"
     And I click on "Browse repositories..." "button"
-    And I click on "Private files" "link"
     And I click on "totara_logo.svg" "link"
     And I click on "Select this file" "button"
     And I set the field "Describe this image for someone who cannot see it" to "Its a picture"

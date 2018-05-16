@@ -175,9 +175,9 @@ Feature: Seminar sessions report overview
     And I click on the link "Attendees" in row 1
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
@@ -206,7 +206,7 @@ Feature: Seminar sessions report overview
     And I click on the link "Attendees" in row 1
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
@@ -243,7 +243,7 @@ Feature: Seminar sessions report overview
     And I follow "Attendees"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam6 Student6, student6@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
@@ -277,7 +277,7 @@ Feature: Seminar sessions report overview
     And I follow "Attendees"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam7 Student7, student7@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

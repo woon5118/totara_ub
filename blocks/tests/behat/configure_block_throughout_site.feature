@@ -28,11 +28,11 @@ Feature: Add and configure blocks throughout the site
     And I log out
 
   @javascript
-  Scenario: Add and configure a block throughtout the site
+  Scenario: Add and configure a block throughout the site
     Given I log in as "manager1"
     And I am on site homepage
     And I follow "Turn editing on"
-    And I add the "Comments" block
+    And I add the "Comments" block to the "top" region
     And I configure the "Comments" block
     And I set the following fields to these values:
       | Page contexts | Display throughout the entire site |
@@ -70,4 +70,4 @@ Feature: Add and configure blocks throughout the site
       | Block title | Foo " onload="document.getElementsByTagName('body')[0].remove()" alt=" |
       | Content     | Example |
     When I press "Save changes"
-    Then I should see "Course overview"
+    Then I should see "Current Learning"

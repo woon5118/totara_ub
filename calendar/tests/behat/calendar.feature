@@ -1,4 +1,4 @@
-@core @core_calendar
+@core @core_calendar @javascript
 Feature: Perform basic calendar functionality
   In order to ensure the calendar works as expected
   As an admin

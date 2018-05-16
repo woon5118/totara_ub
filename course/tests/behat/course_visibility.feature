@@ -52,6 +52,7 @@ Feature: Test course visibility
     And I add the "Courses" block
     And I log out
 
+  @javascript
   Scenario: Traditional course visibility works as expected
     Given I log in as "trainer1"
     When I click on "Dashboard" in the totara menu

@@ -61,6 +61,7 @@ Feature: The student can navigate to their grades page and user grade report.
     And I follow "Grades" in the user menu
     Then I should see "My badges from Acceptance test site web site"
 
+  @javascript
   Scenario: Log in as a parent and view a childs grades.
     When I log in as "admin"
     And I am on site homepage

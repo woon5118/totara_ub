@@ -1,4 +1,4 @@
-@block @block_completionstatus
+@block @block_completionstatus @javascript
 Feature: Enable Block Completion in a course
   In order to view the completion block in a course
   As a teacher

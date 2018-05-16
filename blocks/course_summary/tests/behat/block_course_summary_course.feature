@@ -1,4 +1,4 @@
-@block @block_course_summary
+@block @block_course_summary @javascript
 Feature: Course summary block used in a course
   In order to help particpants know the summary of a course
   As a teacher

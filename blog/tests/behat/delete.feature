@@ -1,4 +1,4 @@
-@core @core_blog
+@core @core_blog @javascript
 Feature: Delete a blog entry
   In order to manage my blog entries
   As a user

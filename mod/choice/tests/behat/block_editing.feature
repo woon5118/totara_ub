@@ -1,4 +1,4 @@
-@mod @mod_choice
+@mod @mod_choice @javascript
 Feature: Add choice activity
   In order to customise choice page
   As a teacher or admin

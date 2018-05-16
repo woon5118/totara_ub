@@ -1,4 +1,4 @@
-@core @core_my
+@core @core_my @block @javascript
 Feature: Reset all personalised pages to default
   In order to reset everyone's personalised pages
   As an admin

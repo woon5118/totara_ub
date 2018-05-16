@@ -293,7 +293,7 @@ Feature: Correct results are shown in the recent activity screen
     When I click on "C1" "link"
     And I click on "Test quiz 1" "link"
     And I click on "Edit quiz" "button"
-    And I click on "Add" "link"
+    And I click on "Add" "link" in the "div#region-main" "css_element"
     And I click on "a new question" "link"
     And I click on "True/False" "text"
     And I click on "Add" "button" in the ".chooserdialogue-mod_quiz-questionchooser" "css_element"

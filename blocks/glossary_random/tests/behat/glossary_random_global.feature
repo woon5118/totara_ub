@@ -1,4 +1,4 @@
-@block @block_glossary_random
+@block @block_glossary_random @javascript
 Feature: Random glossary entry block linking to global glossary
   In order to show the entries from glossary
   As a teacher

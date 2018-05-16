@@ -1,4 +1,4 @@
-@core @core_block
+@core @core_block @javascript
 Feature: Block appearances
   In order to configure blocks appearance
   As a teacher

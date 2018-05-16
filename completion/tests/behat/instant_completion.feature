@@ -88,7 +88,7 @@ Feature: Instant completion
       | Completion tracking                 | Show activity as complete when conditions are met |
       | completionusegrade                  | 1                                                 |
       | Grade to pass                       | 50                                                |
-    And I follow "Course completion"
+    And I click on "Course completion" "link" in the "Administration" "block"
     And I set the field "id_overall_aggregation" to "2"
     And I click on "Condition: Activity completion" "link"
     And I set the field "Assignment - Test assignment name" to "1"

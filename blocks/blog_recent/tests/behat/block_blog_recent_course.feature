@@ -1,4 +1,4 @@
-@block @block_blog_menu @block_blog_recent
+@block @block_blog_menu @block_blog_recent @javascript
 Feature: Students can use the recent blog entries block to view recent entries on a course page
   In order to enable the recent blog entries block a course page
   As a teacher

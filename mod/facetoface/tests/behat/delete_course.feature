@@ -51,7 +51,7 @@ Feature: Delete a course with a seminar
     And I press "Add"
     And I wait "1" seconds
     And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

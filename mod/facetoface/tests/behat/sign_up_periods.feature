@@ -46,7 +46,7 @@ Feature: Seminar sign-up periods
     And I click on "Attendees" "link"
     And I set the field "f2f-actions" to "Add users"
     And I click on "student@example.com" "option"
-    And I click on "Add" "button"
+    And I press exact "add"
     And I click on "Continue" "button"
     And I click on "Confirm" "button"
     And I switch to "Wait-list" tab

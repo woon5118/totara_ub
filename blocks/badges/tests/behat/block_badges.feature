@@ -1,4 +1,4 @@
-@block @block_badges
+@block @block_badges @javascript
 Feature: Enable Block Badges in a course without badges
   In order to view the badges block in a course
   As a teacher

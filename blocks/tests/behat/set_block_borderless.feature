@@ -1,4 +1,4 @@
-@core @core_block @totara
+@core @core_block @totara @javascript
   Feature: Any block can be set so that it has no border
     A User that can edit a block should be able to set it so that it has no border
     some block by default will have no border

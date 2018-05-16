@@ -1,4 +1,4 @@
-@block @block_online_users
+@block @block_online_users @javascript
 Feature: The online users block allow you to see who is currently online
   In order to enable the online users block on an course page
   As a teacher

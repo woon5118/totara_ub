@@ -1,4 +1,4 @@
-@block @block_completionstatus @block_selfcompletion
+@block @block_completionstatus @block_selfcompletion @javascript
 Feature: Enable Block Completion in a course using manual self completion
   In order to view the completion block in a course
   As a teacher

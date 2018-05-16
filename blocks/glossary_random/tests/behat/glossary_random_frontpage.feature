@@ -1,4 +1,4 @@
-@block @block_glossary_random
+@block @block_glossary_random @javascript
 Feature: Random glossary entry block can be added to the frontpage
   In order to show the entries from glossary on the frontpage
   As a teacher

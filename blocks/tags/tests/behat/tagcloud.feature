@@ -1,4 +1,4 @@
-@block @block_tags @core_tag
+@block @block_tags @core_tag @javascript
 Feature: Block tags displaying tag cloud
   In order to view system tags
   As a user

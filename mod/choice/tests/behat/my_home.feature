@@ -1,4 +1,4 @@
-@mod @mod_choice
+@mod @mod_choice @javascript
 Feature: Test the display of the choice module on Dashboard
   In order to know my status in a choice activity
   As a user
@@ -47,8 +47,9 @@ Feature: Test the display of the choice module on Dashboard
 
   Scenario: View my home as a student before answering the choice
     Given I log in as "student1"
-    Then I should see "You have Choices that need attention"
-    And I should see "Not answered yet"
+    And I should see "You have Choices that need attention"
+    When I click on "You have Choices that need attention" "text"
+    Then I should see "Not answered yet"
     And I log out
 
   Scenario: View my home as a student after answering the choice
@@ -71,6 +72,7 @@ Feature: Test the display of the choice module on Dashboard
     And "Save my choice" "button" should not exist
     And I log out
     When I log in as "teacher1"
-    Then I should see "You have Choices that need attention"
-    And I should see "View 1 responses"
+    And I should see "You have Choices that need attention"
+    When I click on "You have Choices that need attention" "text"
+    Then I should see "View 1 responses"
     And I log out

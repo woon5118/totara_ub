@@ -150,7 +150,7 @@ Feature: As a teacher I need to see an accurate list of subscribed users
     And I should not see "Teacher Teacher" in the "existingsubscribers" "select"
 
     When I set the field "potentialsubscribers" to "Student 2 (student.2@example.com)"
-    And I press "Add"
+    And I press exact "subscribe"
     Then I should see "Student 1" in the "potentialsubscribers" "select"
     And I should not see "Student 2" in the "potentialsubscribers" "select"
     And I should see "Student 3" in the "potentialsubscribers" "select"

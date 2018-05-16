@@ -1,4 +1,4 @@
-@core @core_block
+@core @core_block @javascript
 Feature: The context of a block can always be returned to it's original state.
   In order to revert actions when configuring blocks
   As an admin

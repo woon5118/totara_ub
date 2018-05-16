@@ -1,4 +1,4 @@
-@block @block_blog_menu
+@block @block_blog_menu @javascript
 Feature: Enable Block blog menu in an activity
   In order to enable the blog menu in an activity
   As a teacher

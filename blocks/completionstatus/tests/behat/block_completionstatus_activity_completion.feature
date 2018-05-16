@@ -1,4 +1,4 @@
-@block @block_completionstatus @totara_courseprogressbar
+@block @block_completionstatus @totara_courseprogressbar @javascript
 Feature: Enable Block Completion in a course using activity completion
   In order to view the completion block in a course
   As a teacher

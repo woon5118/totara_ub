@@ -19,7 +19,7 @@ Feature: Learner creates a learning plan and adds an image to description
         Given I log in as "learner1"
         And I click on "Dashboard" in the totara menu
         And I press "Customise this page"
-        And I select "Private files" from the "Add a block" singleselect
+        And I add the "Private files" block
         And I follow "Manage private files..."
         And I upload "totara/plan/tests/fixtures/pic1.png" file to "Files" filemanager
         And I click on "Save changes" "button"
@@ -44,7 +44,7 @@ Feature: Learner creates a learning plan and adds an image to description
         Given I log in as "learner1"
         And I click on "Dashboard" in the totara menu
         And I press "Customise this page"
-        And I select "Private files" from the "Add a block" singleselect
+        And I add the "Private files" block
         And I follow "Manage private files..."
         And I upload "totara/plan/tests/fixtures/pic1.png" file to "Files" filemanager
         And I press "Save changes"

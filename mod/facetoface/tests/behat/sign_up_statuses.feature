@@ -35,7 +35,7 @@ Feature: Sign up status
       | Description | Test seminar description |
     And I follow "View all events"
 
-  Scenario: Check session with booking full status is changed when event is cancelled .
+  Scenario: Check session with booking full status is changed when event is cancelled.
     # Create a session with status full and then cancel it.
     Given I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -62,7 +62,7 @@ Feature: Sign up status
       | searchtext | Sam |
     And I press "Search"
     And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

@@ -1,4 +1,4 @@
-@block @block_activity_modules
+@block @block_activity_modules @javascript
 Feature: Block activity modules
   In order to overview activity modules in a course
   As a manager

@@ -29,7 +29,7 @@ Feature: Teachers can reset wiki pages, tags and files
     And I press "Save"
     And I should see "Test tag 1" in the ".wiki-tags" "css_element"
     And I should see "Test tag 2" in the ".wiki-tags" "css_element"
-    And I follow "Comments"
+    And I switch to "Comments" tab
     And I follow "Add comment"
     And I set the following fields to these values:
       | Comment | Test comment |
@@ -57,7 +57,7 @@ Feature: Teachers can reset wiki pages, tags and files
     When I follow "View"
     Then I should not see "Test tag 1"
     And I should not see "Test tag 2"
-    And I follow "Comments"
+    And I switch to "Comments" tab
     And I should not see "Test comment"
     And I follow "Files"
     And I should not see "empty.txt"
@@ -73,7 +73,7 @@ Feature: Teachers can reset wiki pages, tags and files
     And I follow "Test wiki"
     Then I should not see "Test tag 1"
     And I should not see "Test tag 2"
-    And I follow "Comments"
+    And I switch to "Comments" tab
     And I should see "Test comment"
     And I follow "Files"
     And I should see "empty.txt"
@@ -89,7 +89,7 @@ Feature: Teachers can reset wiki pages, tags and files
     When I follow "Test wiki"
     Then I should see "Test tag 1"
     And I should see "Test tag 2"
-    And I follow "Comments"
+    And I switch to "Comments" tab
     And I should not see "Test comment"
     And I follow "Files"
     And I should see "empty.txt"

@@ -77,11 +77,11 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | searchtext | Sam |
     And I press "Search"
     And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
@@ -144,11 +144,11 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | searchtext | Sam |
     And I press "Search"
     And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press "Add"
+    And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
