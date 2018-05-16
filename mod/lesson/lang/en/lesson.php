@@ -59,6 +59,10 @@ $string['additionalattemptsremaining'] = 'Completed, You can re-attempt this les
 $string['addpage'] = 'Add a page';
 $string['addshortanswer'] = 'Create a Short answer question page';
 $string['addtruefalse'] = 'Create a True/false question page';
+$string['allowofflineattempts'] = 'Allow lesson to be attempted offline using the mobile app';
+$string['allowofflineattempts_help'] = 'If enabled, a mobile app user can download the lesson and attempt it offline.
+All the possible answers and correct responses will be downloaded as well.
+Note: It is not possible for a lesson to be attempted offline if it has a time limit.';
 $string['and'] = 'AND';
 $string['anchortitle'] = 'Start of main content';
 $string['answer'] = 'Answer';
@@ -374,6 +378,7 @@ $string['numberofpagesviewed'] = 'Number of questions answered: {$a}';
 $string['numberofpagesviewedheader'] = 'Number of questions answered';
 $string['numberofpagesviewednotice'] = 'Number of questions answered: {$a->nquestions} (You should answer at least {$a->minquestions})';
 $string['numerical'] = 'Numerical';
+$string['offlinedatamessage'] = 'You have worked on this attempt using a mobile device. Data was last saved to this site {$a} ago. Please check that you do not have any unsaved work.';
 $string['ongoing'] = 'Display ongoing score';
 $string['ongoing_help'] = 'If enabled, each page will display the learner\'s current points earned out of the total possible thus far.';
 $string['ongoingcustom'] = 'You have earned {$a->score} point(s) out of {$a->currenthigh} point(s) thus far.';
