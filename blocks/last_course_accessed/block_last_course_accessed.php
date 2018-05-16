@@ -130,6 +130,10 @@ class block_last_course_accessed extends block_base {
         $templateobject->course_name_link_title = get_string('access_course', 'block_last_course_accessed', $templateobject->course_name);
         $templateobject->last_accessed = $last_accessed;
 
+        // Use the hook to retrieve any custom content for the block template.
+        $hook = new \block_last_course_accessed\hook\template_content($templateobject);
+        $hook->execute();
+
         // Set the class to be used depending on the length of the course name.
         if (\core_text::strlen($templateobject->course_name) > 200) {
             $templateobject->course_name_class = 'small';
