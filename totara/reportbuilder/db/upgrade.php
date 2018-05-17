@@ -315,5 +315,19 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018041100, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2018051700) {
+        // Dropping unused preprocessor tables.
+        $tables = ['report_builder_group', 'report_builder_group_assign', 'report_builder_preproc_track'];
+        foreach ($tables as $table) {
+            $table = new xmldb_table($table);
+            if ($dbman->table_exists($table)) {
+                $dbman->drop_table($table);
+            }
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2018051700, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

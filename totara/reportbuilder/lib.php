@@ -37,7 +37,6 @@ require_once($CFG->libdir . '/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_source.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_preproc.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_embedded.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_join.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_column.php');
@@ -547,40 +546,36 @@ class reportbuilder {
         // Get any required js files that are specified by the source.
         $js = $this->src->get_required_jss();
 
-        // Only include show/hide code for tabular reports.
-        $graph = (substr($this->source, 0, strlen('graphical_feedback_questions')) == 'graphical_feedback_questions');
-        if (!$graph) {
-            $code[] = TOTARA_JS_DIALOG;
-            $jsdetails = new stdClass();
-            $jsdetails->initcall = 'M.totara_reportbuilder_showhide.init';
-            $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_showhide',
-                'fullpath' => '/totara/reportbuilder/showhide.js');
-            $jsdetails->args = array('hiddencols' => $this->js_get_hidden_columns());
-            $jsdetails->strings = array(
-                'totara_reportbuilder' => array('showhidecolumns'),
-                'moodle' => array('ok')
-            );
-            $js[] = $jsdetails;
+        $code[] = TOTARA_JS_DIALOG;
+        $jsdetails = new stdClass();
+        $jsdetails->initcall = 'M.totara_reportbuilder_showhide.init';
+        $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_showhide',
+            'fullpath' => '/totara/reportbuilder/showhide.js');
+        $jsdetails->args = array('hiddencols' => $this->js_get_hidden_columns());
+        $jsdetails->strings = array(
+            'totara_reportbuilder' => array('showhidecolumns'),
+            'moodle' => array('ok')
+        );
+        $js[] = $jsdetails;
 
-            // Add saved search.js.
-            $jsdetails = new stdClass();
-            $jsdetails->initcall = 'M.totara_reportbuilder_savedsearches.init';
-            $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_savedsearches',
-                'fullpath' => '/totara/reportbuilder/saved_searches.js');
-            $jsdetails->strings = array(
-                'totara_reportbuilder' => array('managesavedsearches'),
-                'form' => array('close')
-            );
-            $js[] = $jsdetails;
+        // Add saved search.js.
+        $jsdetails = new stdClass();
+        $jsdetails->initcall = 'M.totara_reportbuilder_savedsearches.init';
+        $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_savedsearches',
+            'fullpath' => '/totara/reportbuilder/saved_searches.js');
+        $jsdetails->strings = array(
+            'totara_reportbuilder' => array('managesavedsearches'),
+            'form' => array('close')
+        );
+        $js[] = $jsdetails;
 
-            $jsdetails = new \stdClass();
-            $jsdetails->initcall = 'M.totara_reportbuilder_export.init';
-            $jsdetails->jsmodule = array(
-                'name' => 'totara_reportbuilder_export',
-                'fullpath' => '/totara/reportbuilder/js/export.js'
-            );
-            $js[] = $jsdetails;
-        }
+        $jsdetails = new \stdClass();
+        $jsdetails->initcall = 'M.totara_reportbuilder_export.init';
+        $jsdetails->jsmodule = array(
+            'name' => 'totara_reportbuilder_export',
+            'fullpath' => '/totara/reportbuilder/js/export.js'
+        );
+        $js[] = $jsdetails;
 
         local_js($code);
         foreach ($js as $jsdetails) {
@@ -1005,19 +1000,11 @@ class reportbuilder {
                         continue;
                     }
                     $sourcename = $src->sourcetitle;
-                    $preproc = $src->preproc;
 
                     if ($src->selectable || $includenonselectable) {
                         if ($src->grouptype == 'all') {
                             $sourcestr = $source . '_grp_all';
                             $output[$sourcestr] = $sourcename;
-                        } else if ($src->grouptype != 'none') {
-                            // Create a source for every group that's based on this source's preprocessor.
-                            $groups = $DB->get_records('report_builder_group', array('preproc' => $preproc));
-                            foreach ($groups as $group) {
-                                $sourcestr = $source . '_grp_' . $group->id;
-                                $output[$sourcestr] = $sourcename . ': ' . $group->name;
-                            }
                         } else {
                             // Otherwise, just create a single source.
                             $output[$source] = $sourcename;
@@ -5029,246 +5016,6 @@ class reportbuilder {
         }
         $DB->set_field('report_builder', 'timemodified', time(), array('id' => $reportid));
         return true;
-    }
-
-
-    /**
-     * Return HTML to display the results of a feedback activity
-     */
-    function print_feedback_results() {
-        global $DB, $OUTPUT;
-
-        if ($this->is_initially_hidden()) {
-            return get_string('initialdisplay_pending', 'totara_reportbuilder');
-        }
-
-        // get paging parameters
-        define('DEFAULT_PAGE_SIZE', $this->recordsperpage);
-        define('SHOW_ALL_PAGE_SIZE', 9999);
-        $spage     = optional_param('spage', 0, PARAM_INT);                    // which page to show
-        $perpage   = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
-        $countfiltered = $this->get_filtered_count();
-
-        $out = '';
-        $groupid = $this->src->groupid;
-        $out .= $OUTPUT->box_start();
-
-        if (!$groupid) {
-            $out .= get_string('activitygroupnotfound', 'totara_reportbuilder');
-        }
-        $questionstable = "report_builder_fbq_{$groupid}_q";
-        $optionstable = "report_builder_fbq_{$groupid}_opt";
-        $answerstable = "report_builder_fbq_{$groupid}_a";
-
-        $questions = $DB->get_records($questionstable, null, 'sortorder');
-        $options = $DB->get_records($optionstable, null, 'qid, sortorder');
-        $grouped_options = array();
-        foreach ($options as $option) {
-            $grouped_options[$option->qid][] = $option;
-        }
-
-        // get first column and use as heading
-        $columns = $this->columns;
-        if (count($columns) > 0) {
-            $primary_field = current($columns);
-            if ($primary_field->required == true) {
-                $primary_field = null;
-            }
-
-            // get any extra (none required) columns
-            $additional_fields = array();
-            while($col = next($columns)) {
-                if ($col->required == false) {
-                    $additional_fields[] = $col;
-                }
-            }
-        }
-
-        // get data
-        list($sql, $params) = $this->build_query(false, true);
-
-        $baseid = $this->grouped ? 'min(base.id)' : 'base.id';
-
-        // use default sort data if set
-        if (isset($this->defaultsortcolumn)) {
-            if (isset($this->defaultsortorder) &&
-                $this->defaultsortorder == SORT_DESC) {
-                $order = 'DESC';
-            } else {
-                $order = 'ASC';
-            }
-
-            // see if sort element is in columns array
-            $set = false;
-            foreach ($this->columns as $col) {
-                if ($col->type . '_' . $col->value == $this->defaultsortcolumn) {
-                    $set = true;
-                }
-            }
-            if ($set) {
-                $sort = " ORDER BY {$this->defaultsortcolumn} {$order}, {$baseid}";
-            } else {
-                $sort = " ORDER BY {$baseid}";
-            }
-        } else {
-            $sort = " ORDER BY {$baseid}";
-        }
-        $reportdb = $this->get_report_db();
-        $data = $reportdb->get_records_sql($sql . $sort, $params, $spage * $perpage, $perpage);
-        $first = true;
-
-        foreach ($data as $item) {
-            // dividers between feedback results
-            if ($first) {
-                $pagingbar = new paging_bar($countfiltered, $spage, $perpage, $this->report_url());
-                $pagingbar->pagevar = 'spage';
-                $out .= $OUTPUT->render($pagingbar);
-
-                $first = false;
-            } else {
-                $out .= html_writer::empty_tag('hr', array('class' => 'feedback-separator'));
-            }
-
-            if (isset($primary_field)) {
-                // Print primary heading.
-                $primaryheading = $primary_field->heading;
-                $primaryvalue = $this->src->format_column_data($primary_field, 'html', $item, $this);
-                $out .= $OUTPUT->heading($primaryheading . ': ' . $primaryvalue, 2);
-            }
-
-            if (isset($additional_fields)) {
-                // Print secondary details.
-                foreach ($additional_fields as $additional_field) {
-                    $addheading = $additional_field->heading;
-                    $addvalue = $this->src->format_column_data($additional_field, 'html', $item, $this);
-                    $out .= html_writer::tag('strong', $addheading . ': '. $addvalue) . html_writer::empty_tag('br');
-                }
-            }
-
-            // print count of number of results
-            $out .= html_writer::tag('p', get_string('resultsfromfeedback', 'totara_reportbuilder', $item->responses_number));
-
-            // display answers
-            foreach ($questions as $question) {
-                $qnum = $question->sortorder;;
-                $qname = $question->name;
-                $qid = $question->id;
-                $out .= $OUTPUT->heading('Q' . $qnum . ': ' . $qname, 3);
-
-                switch($question->typ) {
-                case 'dropdown':
-                case 'dropdownrated':
-                case 'check':
-                case 'radio':
-                case 'radiorated':
-                    // if it's an option based question, display bar chart if there are options
-                    if (!array_key_exists($qid, $grouped_options)) {
-                        continue;
-                    }
-                    $out .= $this->get_feedback_option_answer($qid, $grouped_options[$qid], $item);
-                    break;
-                case 'textarea':
-                case 'textfield':
-                    // if it's a text based question, print all answers in a text field
-                    $out .= $this->get_feedback_standard_answer($qid, $item);
-                    break;
-                case 'numeric':
-                default:
-                }
-
-            }
-        }
-
-        $pagingbar = new paging_bar($countfiltered, $spage, $perpage, $this->report_url());
-        $pagingbar->pagevar = 'spage';
-        $out .= $OUTPUT->render($pagingbar);
-
-        $out .= $OUTPUT->box_end();
-
-        return $out;
-    }
-
-    function get_feedback_standard_answer($qid, $item) {
-        $out = '';
-        $count = 'q' . $qid . '_count';
-        $answer = 'q' . $qid . '_list';
-        if (isset($item->$count)) {
-            $out .= html_writer::tag('p', get_string('numresponses', 'totara_reportbuilder', $item->$count));
-        }
-        if (isset($item->$answer) && $item->$answer != '') {
-            $responses = str_replace(array('<br />'), array("\n"), $item->$answer);
-            $out .= html_writer::tag('textarea', $responses, array('rows' => '6', 'cols' => '100'));
-        }
-        return $out;
-    }
-
-    function get_feedback_option_answer($qid, $options, $item) {
-        $out = '';
-        $count = array();
-        $perc = array();
-        // group answer counts and percentages
-        foreach ($options as $option) {
-            $oid = $option->sortorder;
-            $countname = 'q' . $qid . '_' . $oid . '_sum';
-            $percname = 'q' . $qid . '_' . $oid . '_perc';
-            if (isset($item->$countname)) {
-                $count[$oid] = $item->$countname;
-            } else {
-                $count[$oid] = null;
-            }
-            if (isset($item->$percname)) {
-                $perc[$oid] = $item->$percname;
-            } else {
-                $perc[$oid] = null;
-            }
-        }
-        $maxcount = max($count);
-        $maxbarwidth = 100; // percent
-
-        $numresp = 'q' . $qid . '_total';
-        if (isset($item->$numresp)) {
-            $out .= html_writer::tag('p', get_string('numresponses', 'totara_reportbuilder', $item->$numresp));
-        }
-
-        $table =- new html_table();
-        $table->attributes['class'] = 'feedback-table';
-        foreach ($options as $option) {
-            $cells = array();
-            $oid = $option->sortorder;
-            $cell = new html_table_cell($oid);
-            $cell->attributes['class'] = 'feedback-option-number';
-            $cells[] = $cell;
-            $cell = new html_table_cell($option->name);
-            $cell->attributes['class'] = 'feedback-option-name';
-            $cells[] = $cell;
-            $barwidth = $perc[$oid];
-            $spacewidth = 100 - $barwidth;
-            $innertable = new html_table();
-            $innertable->attributes['class'] = 'feedback-bar-chart';
-            $innercells = array();
-            $cell = new html_table_cell('');
-            $cell->attributes['class'] = 'feedback-bar-color';
-            $cell->attributes['width'] = $barwidth.'%';
-            $innercells[] = $cell;
-            $cell = new html_table_cell('');
-            $cell->attributes['class'] = 'feedback-bar-blank';
-            $cell->attributes['width'] = $spacewidth.'%';
-            $innercells[] = $cell;
-            $innertable->data[] = new html_table_row($innercells);
-            $cell = new html_table_cell(html_writer::table($innertable));
-            $cell->attributes['class'] = 'feedback-option-chart';
-            $cells[] = $cell;
-            $content = $count[$oid];
-            if (isset($perc[$oid])) {
-                $content .= ' (' . $perc[$oid] . '%)';
-            }
-            $cell = new html_table_cell($content);
-            $cell->attributes['class'] = 'feedback-option-count';
-            $cells[] = $cell;
-            $table->data[] = new html_table_row($cells);
-        }
-        $out .= html_writer::table($table);
-        return $out;
     }
 
     /**

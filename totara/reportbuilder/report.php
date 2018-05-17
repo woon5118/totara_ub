@@ -70,10 +70,6 @@ if ($format != '') {
 $PAGE->requires->string_for_js('reviewitems', 'block_totara_alerts');
 $report->include_js();
 
-// display results as graph if report uses the graphical_feedback_questions source
-$graph = (substr($report->source, 0, strlen('graphical_feedback_questions')) ==
-    'graphical_feedback_questions');
-
 $fullname = format_string($report->fullname);
 $pagetitle = format_string(get_string('report', 'totara_reportbuilder').': '.$fullname);
 
@@ -95,11 +91,7 @@ $report->display_redirect_link();
 $report->display_restrictions();
 
 // Display heading including filtering stats.
-if ($graph) {
-    $heading = $fullname;
-} else {
-    $heading = $fullname . ': ' . $output->result_count_info($report);
-}
+$heading = $fullname . ': ' . $output->result_count_info($report);
 echo $output->heading($heading);
 echo $debughtml;
 
@@ -114,12 +106,9 @@ $report->display_sidebar_search();
 echo $report->display_saved_search_options();
 
 // Show results.
-if ($graph) {
-    print $report->print_feedback_results();
-} else {
-    echo $output->showhide_button($report->_id, $report->shortname);
-    echo $tablehtml;
-}
+echo $output->showhide_button($report->_id, $report->shortname);
+echo $tablehtml;
+
 
 // Export button.
 $output->export_select($report, $sid);
