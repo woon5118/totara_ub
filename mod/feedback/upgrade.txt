@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 This files describes API changes in /mod/feedback/*,
 information provided here is intended especially for developers.
 
