@@ -180,7 +180,10 @@ class block_totara_report_table extends block_base {
         try {
             reportbuilder::overrideuniqueid($this->get_uniqueid());
             reportbuilder::overrideignoreparams(true);
-            $report = new reportbuilder($id, null, false, $sid, null, false, array(), $globalrestrictionset);
+            $config = new rb_config();
+            $config->set_sid($sid);
+            $config->set_global_restriction_set($globalrestrictionset);
+            $report = reportbuilder::create($id, $config);
         } catch (moodle_exception $e) {
             // Don't break page if report became unavailable.
             return $this->content;

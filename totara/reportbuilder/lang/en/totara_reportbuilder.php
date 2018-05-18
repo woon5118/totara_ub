@@ -863,6 +863,7 @@ $string['reporttitle'] = 'Report Title';
 $string['reporttype'] = 'Report type';
 $string['reportupdated'] = 'Report Updated';
 $string['reportwithidnotfound'] = 'Report with id of \'{$a}\' not found in database.';
+$string['reportwithnamenotfound'] = 'Report with name of \'{$a}\' not found in database.';
 $string['restoredefaults'] = 'Restore Default Settings';
 $string['restrictaccess'] = 'Restrict access';
 $string['restrictcontent'] = 'Report content';

@@ -56,7 +56,7 @@ $newreport = empty($id);
 
 if ($newreport) {
     // Try to create report object to catch invalid data.
-    $report = new reportbuilder($reportid);
+    $report = reportbuilder::create($reportid);
     $schedule = new stdClass();
     $schedule->id = 0;
     $schedule->reportid = $reportid;
@@ -78,7 +78,7 @@ if ($newreport) {
     // This will be set accurately when processing the current system users later.
     $schedule->sendtoself = 0;
 
-    $report = new reportbuilder($schedule->reportid);
+    $report = reportbuilder::create($schedule->reportid);
 
     // Does this schedule belong to the current user.
     $myscheduledreport = ($USER->id == $schedule->userid);

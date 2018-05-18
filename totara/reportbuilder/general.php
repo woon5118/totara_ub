@@ -45,7 +45,7 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 
 $returnurl = $CFG->wwwroot . "/totara/reportbuilder/general.php?id=$id";
 
-$report = new reportbuilder($id);
+$report = reportbuilder::create($id);
 $schedule = array();
 if ($report->cache) {
     $cache = reportbuilder_get_cached($id);
@@ -90,7 +90,7 @@ if ($fromform = $mform->get_data()) {
 
     $DB->update_record('report_builder', $todb);
 
-    $report = new reportbuilder($id);
+    $report = reportbuilder::create($id);
     \totara_reportbuilder\event\report_updated::create_from_report($report, 'general')->trigger();
     totara_set_notification(get_string('reportupdated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
 }

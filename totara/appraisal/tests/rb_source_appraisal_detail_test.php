@@ -69,13 +69,15 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
 
         $rid = $this->create_report('appraisal_detail', 'Test report');
 
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'appraisal', 'name', null, null, null, 0);
         $this->add_column($report, 'rolelearner', 'answers', null, null, null, 0);
 
         // Mock report parameter.
         $_GET['appraisalid'] = $appraisal->get()->id;
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
         unset($_GET['appraisalid']);
 
         list($sql, $params, $cache) = $report->build_query();
@@ -93,7 +95,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
 
         $this->add_column($report, 'appraisal', 'timestarted', null, 'minimum', null, 0);
 
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
         list($sql, $params, $cache) = $report->build_query();
         $records = $DB->get_records_sql($sql, $params);
         $this->assertCount(1, $records);
@@ -101,7 +103,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         $this->assertFalse($report->src->cacheable);
         $this->enable_caching($report->_id);
 
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
         list($sql, $params, $cache) = $report->build_query();
         $this->assertSame(array(), $cache);
         $records = $DB->get_records_sql($sql, $params);
@@ -181,7 +183,9 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         // Create report 1.
         $rid = $this->create_report('appraisal_detail', 'Test report 1');
 
-        $report1 = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report1 = reportbuilder::create($rid, $config);
         $this->add_column($report1, 'appraisal', 'name', null, null, null, 0);
         $this->add_column($report1, 'rolelearner', 'answers', null, null, null, 0);
 
@@ -249,7 +253,9 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         // Create report 2.
         $rid = $this->create_report('appraisal_detail', 'Test report 2');
 
-        $report2 = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report2 = reportbuilder::create($rid, $config);
         $this->add_column($report2, 'appraisal', 'name', null, null, null, 0);
         $this->add_column($report2, 'rolelearner', 'answers', null, null, null, 0);
 
@@ -265,7 +271,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
 
         // Mock report parameter.
         $_GET['appraisalid'] = $appraisal2->get()->id;
-        $report2 = new reportbuilder($rid);
+        $report2 = reportbuilder::create($rid);
         unset($_GET['appraisalid']);
 
         // Mock objects to use in the display function.
@@ -314,7 +320,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
 
         // Mock report parameter.
         $_GET['appraisalid'] = $appraisal1->get()->id;
-        $report1 = new reportbuilder($rid);
+        $report1 = reportbuilder::create($rid);
         unset($_GET['appraisalid']);
 
         // Mock objects to use in the display function.
@@ -363,7 +369,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
 
         // Mock report parameter. We need to recreate the report object due to static vars.
         $_GET['appraisalid'] = $appraisal2->get()->id;
-        $report2 = new reportbuilder($rid);
+        $report2 = reportbuilder::create($rid);
         unset($_GET['appraisalid']);
 
         // Mock objects to use in the display function.

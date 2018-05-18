@@ -44,16 +44,18 @@ class auth_approved_util_testcase extends advanced_testcase {
         $this->assertEquals($report->report_url(), util::get_report_url($report->_id));
 
         // Any other embedded report.
-        $report = reportbuilder_get_embedded_report('cohort_admin', array(), false, 0);
+        $report = reportbuilder::create_embedded('cohort_admin');
         $this->assertEquals($report->report_url(), util::get_report_url($report->_id));
 
         // Custom report.
         $rid = $this->create_report('user', 'User report');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
         $this->assertEquals($report->report_url(), util::get_report_url($report->_id));
 
         // Messed up access control.
-        $report = reportbuilder_get_embedded_report('cohort_admin', array(), false, 0);
+        $report = reportbuilder::create_embedded('cohort_admin');
         $this->setUser(null);
         $this->assertEquals(util::get_report_url(0), util::get_report_url($report->_id));
     }

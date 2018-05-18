@@ -105,7 +105,7 @@ switch ($action) {
 
             // To be able to sort the filter back into the correct group of the select box
             // we need the translated label
-            $reportbuilder = new reportbuilder($reportid);
+            $reportbuilder = reportbuilder::create($reportid);
             $filter->typelabel = $reportbuilder->get_type_heading($filter->type);
 
             echo json_encode((array)$filter);

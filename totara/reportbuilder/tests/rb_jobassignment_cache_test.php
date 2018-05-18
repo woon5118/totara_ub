@@ -88,7 +88,7 @@ class totara_reportbuilder_rb_jobassignment_cache_test extends reportcache_advan
         $this->loadDataSet($this->createArrayDataSet(array('report_builder_filters' => $this->report_builder_filters_additional_data,
                                                            'report_builder_columns' => $this->report_builder_columns_additional_data)));
 
-        $report = new reportbuilder($this->report_builder_data['id']);
+        $report = reportbuilder::create($this->report_builder_data['id']);
         // Make sure the cached table is not longer valid.
         $this->assertFalse($report->get_cache_table());
 
@@ -114,7 +114,7 @@ class totara_reportbuilder_rb_jobassignment_cache_test extends reportcache_advan
         // Add columns and filters of the same value
         $this->loadDataSet($this->createArrayDataSet(array('report_builder_filters' => $this->report_builder_filters_additional_data)));
 
-        $report = new reportbuilder($this->report_builder_data['id']);
+        $report = reportbuilder::create($this->report_builder_data['id']);
         $this->assertFalse($report->get_cache_table());
 
         // Try to generate the new cache table

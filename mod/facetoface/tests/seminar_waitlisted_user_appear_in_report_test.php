@@ -75,16 +75,9 @@ class seminar_waitlisted_user_appear_in_report_test extends advanced_testcase
         $reportdata = (object)$data;
         $this->set_up_columns((object)$reportdata);
 
-        return new reportbuilder(
-            $id,
-            $reportdata->shortname,
-            false,
-            null,
-            $user->id,
-            false,
-            [],
-            null
-        );
+        $config = new rb_config();
+        $config->set_reportfor($user->id);
+        return reportbuilder::create($id, $config);
     }
 
     /**

@@ -50,7 +50,7 @@ class totara_reportbuilder_role_access_testcase extends advanced_testcase {
 
         $reportid = $this->create_report('user', 'report 1');
 
-        $rb = new reportbuilder($reportid);
+        $rb = reportbuilder::create($reportid);
 
         $enabled = reportbuilder::get_setting($reportid, 'role_access', 'enable');
         $this->assertSame('1', $enabled);

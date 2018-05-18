@@ -188,9 +188,9 @@ class rb_display_program_course_newline_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
         $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
-        $report = new reportbuilder(null, 'PO');
+        $report = reportbuilder::create_embedded('PO');
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
-        $row = new stdClass;
+        $row = new stdClass();
 
         $result = \totara_program\rb\display\program_course_newline::display('', 'html', $row, $column, $report);
         self::assertSame('', $result);
@@ -210,9 +210,9 @@ class rb_display_program_course_newline_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
         $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
-        $report = new reportbuilder(null, 'PO');
+        $report = reportbuilder::create_embedded('PO');
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
-        $row = new stdClass;
+        $row = new stdClass();
 
         $result = \totara_program\rb\display\program_course_newline::display('', 'html', $row, $column, $report);
         self::assertSame('', $result);
@@ -232,9 +232,9 @@ class rb_display_program_course_newline_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
         $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
-        $report = new reportbuilder(null, 'PO');
+        $report = reportbuilder::create_embedded('PO');
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
-        $row = new stdClass;
+        $row = new stdClass();
 
         $result = \totara_program\rb\display\program_course_newline::display('-1|-2|Test', 'html', $row, $column, $report);
         self::assertSame('Test', $result);
@@ -254,9 +254,9 @@ class rb_display_program_course_newline_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
         $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
-        $report = new reportbuilder(null, 'PO');
+        $report = reportbuilder::create_embedded('PO');
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
-        $row = new stdClass;
+        $row = new stdClass();
 
         $result = \totara_program\rb\display\program_course_newline::display('-1|-2|Test', 'html', $row, $column, $report);
         self::assertSame('Test', $result);
@@ -278,9 +278,9 @@ class rb_display_program_course_newline_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
         $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
-        $report = new reportbuilder(null, 'PO');
+        $report = reportbuilder::create_embedded('PO');
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
-        $row = new stdClass;
+        $row = new stdClass();
 
         $result = \totara_program\rb\display\program_course_newline::display('-1|-2|Test', 'html', $row, $column, $report);
         self::assertSame('Test', $result);
@@ -334,9 +334,9 @@ class rb_display_program_course_newline_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
         $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
-        $report = new reportbuilder(null, 'PO');
+        $report = reportbuilder::create_embedded('PO');
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
-        $row = new stdClass;
+        $row = new stdClass();
 
         $result = \totara_program\rb\display\program_course_newline::display('-1|-2|Test', 'html', $row, $column, $report);
         self::assertSame('Test', $result);

@@ -111,7 +111,7 @@ require_login();
 $PAGE->set_context($context);
 
 $reportid = required_param('reportid', PARAM_INT);
-$report = new reportbuilder($reportid);
+$report = reportbuilder::create($reportid);
 
 $capability = $report->embedded ? 'totara/reportbuilder:manageembeddedreports' : 'totara/reportbuilder:managereports';
 require_capability($capability, context_system::instance());

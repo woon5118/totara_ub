@@ -95,7 +95,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                     array('title' => $strdelete));
                 $cache = '';
                 if (!empty($CFG->enablereportcaching) && !empty($report->cache)) {
-                    $reportbuilder = new reportbuilder($report->id);
+                    $reportbuilder = reportbuilder::create($report->id);
                     if (empty($reportbuilder->get_caching_problems())) {
                         $cache = $this->cachenow_button($report->id, true);
                     }
@@ -195,7 +195,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                     array('title' => $strreload));
             $cache = '';
             if (!empty($CFG->enablereportcaching) && !empty($report->cache)) {
-                $reportbuilder = new reportbuilder($report->id);
+                $reportbuilder = reportbuilder::create($report->id);
                 if (empty($reportbuilder->get_caching_problems())) {
                     $cache = $this->cachenow_button($report->id, true);
                 }
@@ -412,7 +412,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $url = $report->get_current_url();
         } else {
             $id = $report;
-            $report = new reportbuilder($id);
+            $report = reportbuilder::create($id);
             if ($PAGE->has_set_url()) {
                 $url = $PAGE->url;
             } else {
@@ -459,7 +459,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             return '';
         }
         if (is_numeric($report)) {
-            $report = new reportbuilder($report);
+            $report = reportbuilder::create($report);
         }
         $notice = '';
         if ($report instanceof reportbuilder) {

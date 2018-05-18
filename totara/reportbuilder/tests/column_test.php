@@ -903,7 +903,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             $DB->insert_record('report_builder_columns', $col);
 
             // Create the reportbuilder object.
-            $rb = new reportbuilder($reportid);
+            $rb = reportbuilder::create($reportid);
 
             // We will be checking deprecated column's message for each column separately,
             // so there is no real need to re-check it again in the big report.
@@ -998,7 +998,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             $SESSION->{$filtername}[$fname] = array($search);
 
             // Create the reportbuilder object.
-            $rb = new reportbuilder($reportid);
+            $rb = reportbuilder::create($reportid);
 
             // Just try to get the count, we cannot guess the actual number here.
             $rb->get_filtered_count();
@@ -1043,7 +1043,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         }
 
         // Test we can execute the query with all columns and filters.
-        $rb = new reportbuilder($bigreportid);
+        $rb = reportbuilder::create($bigreportid);
         list($sql, $params, $cacheschedule) = $rb->build_query(false, true, false);
         $rs = $DB->get_counted_recordset_sql($sql, $params);
         $rs->close();
@@ -1118,7 +1118,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
         // Now generate the cache table and run the query.
         $this->enable_caching($bigreportid);
-        $rb = new reportbuilder($bigreportid);
+        $rb = reportbuilder::create($bigreportid);
         if ($rb->cache) {
             list($sql, $params, $cacheschedule) = $rb->build_query(false, true, true);
             $rs = $DB->get_counted_recordset_sql($sql, $params);

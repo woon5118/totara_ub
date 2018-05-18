@@ -30,7 +30,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-$format    = optional_param('format', '', PARAM_ALPHANUM);
+$format = optional_param('format', '', PARAM_ALPHANUM);
 $id = required_param('id', PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
@@ -55,9 +55,12 @@ if ($reportrecord->embedded) {
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 // New report object.
-$report = new reportbuilder($id, null, false, $sid, null, false, array(), $globalrestrictionset);
+$config = new rb_config();
+$config->set_sid($sid);
+$config->set_global_restriction_set($globalrestrictionset);
+$report = reportbuilder::create($id, $config);
 
-if (!$report->is_capable($id)) {
+if (!reportbuilder::is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 $report->handle_pre_display_actions();

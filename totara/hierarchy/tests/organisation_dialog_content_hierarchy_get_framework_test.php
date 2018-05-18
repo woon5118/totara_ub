@@ -79,7 +79,7 @@ class organisation_dialog_content_hierarchy_get_framework_test extends advanced_
             'accessmode' => 1
         ]);
 
-        $report = new reportbuilder(null, 'ROL');
+        $report = reportbuilder::create_embedded('ROL');
 
         $type = str_replace("rb_", "", rb_current_org_content::class);
         $DB->insert_records('report_builder_settings', [

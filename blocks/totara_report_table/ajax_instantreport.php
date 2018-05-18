@@ -70,7 +70,9 @@ $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($
 // Create the report object. Includes embedded report capability checks.
 $uniqueid = 'block_totara_report_table_' . $blockid;
 reportbuilder::overrideuniqueid($uniqueid);
-$report = new reportbuilder($id, null, false, null, null, false, array(), $globalrestrictionset);
+$config = new rb_config();
+$config->set_global_restriction_set($globalrestrictionset);
+$report = reportbuilder::create($id, $config);
 
 // Decide if require_login should be executed.
 if ($report->needs_require_login() and !isloggedin()) {

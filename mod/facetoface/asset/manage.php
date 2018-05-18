@@ -37,7 +37,7 @@ admin_externalpage_setup('modfacetofaceassets');
 
 $returnurl = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
 
-$report = reportbuilder_get_embedded_report('facetoface_assets', array(), false, 0);
+$report = reportbuilder::create_embedded('facetoface_assets');
 $redirectto = new moodle_url('/mod/facetoface/asset/manage.php', $report->get_current_url_params());
 
 // Handle actions.

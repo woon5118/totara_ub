@@ -115,7 +115,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstaccess', 'month', null, null, 0);
         $this->add_column($report, 'user', 'timemodified', null, null, null, 0);
@@ -124,7 +126,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->add_column($report, 'user', 'timecreated', 'weekday', null, null, 0);
         $this->add_column($report, 'user', 'custom_field_'.$field->id, null, null, null, 0);
 
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
 
         // Let's hack the column options in memory only, hopefully this will continue working in the future...
         $report->columns['user-firstaccess']->displayfunc = 'month';
@@ -265,7 +267,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('courses', 'Test courses report 1');
 
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         $this->add_column($report, 'course', 'summary', null, null, null, 0);
         $this->add_column($report, 'course', 'custom_field_'.$filefield->id, null, null, null, 0);
@@ -273,7 +277,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->add_column($report, 'course', 'custom_field_'.$multiselect->id.'_icon', null, null, null, 0);
         $this->add_column($report, 'course', 'custom_field_'.$areafield->id, null, null, null, 0);
 
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
 
         list($sql, $params, $cache) = $report->build_query();
 
@@ -337,12 +341,14 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('course_completion', 'Test courses report 1');
 
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         $this->add_column($report, 'user', 'institution', null, null, null, 0);
         $this->add_column($report, 'course_completion', 'iscomplete', null, 'percent', null, 0);
 
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
 
         list($sql, $params, $cache) = $report->build_query();
 
@@ -390,12 +396,14 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('course_completion', 'Test courses report 1');
 
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         $this->add_column($report, 'user', 'institution', null, null, null, 0);
         $this->add_column($report, 'course_completion', 'iscomplete', null, 'avg', null, 0);
 
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
 
         list($sql, $params, $cache) = $report->build_query();
 
@@ -418,7 +426,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -454,7 +464,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -480,7 +492,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -508,7 +522,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -558,7 +574,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -608,7 +626,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -658,7 +678,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         //
         // Two dates.
@@ -753,7 +775,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -803,7 +827,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -874,7 +900,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -904,7 +932,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -933,7 +963,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -982,7 +1014,9 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')

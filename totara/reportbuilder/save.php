@@ -38,12 +38,12 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_totara_menu_selected('myreports');
 
-$report = new reportbuilder($id);
+$report = reportbuilder::create($id);
 $returnurl = $report->report_url(true);
 
 $PAGE->set_url('/totara/reportbuilder/save.php', array_merge($report->get_current_url_params(), array('id' => $id)));
 
-if (isguestuser() or !$report->is_capable($id)) {
+if (isguestuser() or !reportbuilder::is_capable($id)) {
     // No saving for guests, sorry.
     print_error('nopermission', 'totara_reportbuilder');
 }

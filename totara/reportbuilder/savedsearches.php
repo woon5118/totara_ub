@@ -52,7 +52,9 @@ $PAGE->set_totara_menu_selected('myreports');
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
-$report = new reportbuilder($id, null, false, $sid);
+$config = new rb_config();
+$config->set_sid($sid);
+$report = reportbuilder::create($id, $config);
 
 // Get info about the saved search we are dealing with.
 if ($sid) {
@@ -63,7 +65,7 @@ if ($sid) {
     }
 }
 
-if (!$report->is_capable($id)) {
+if (!reportbuilder::is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 

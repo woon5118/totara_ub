@@ -77,7 +77,9 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
         $this->add_column($report, 'user', 'firstaccess', 'month', null, null, 0);
@@ -88,7 +90,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
         $this->add_column($report, 'user', 'namewithlinks', null, null, null, 0);
 
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
 
         // Let's hack the column options in memory only, hopefully this will continue working in the future...
         $report->columns['user-firstaccess']->displayfunc = 'month';
@@ -126,7 +128,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
     }
 
     protected function init_graph($rid) {
-        $report = new reportbuilder($rid);
+        $report = reportbuilder::create($rid);
         $graph = new \totara_reportbuilder\local\graph($report);
         $this->assertTrue($graph->is_valid());
         list($sql, $params, $cache) = $report->build_query(false, true);
@@ -150,7 +152,9 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
         $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
@@ -222,7 +226,9 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
         // Remove all should result in null data.
         $rid = $this->create_report('user', 'Test user report 1');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
         $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
@@ -245,11 +251,13 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         // No empty series the data has to be the same (not exactly the same because there are static properties in svggraph).
 
         $rid = $this->create_report('user', 'Test user report 2a');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
         $this->add_column($report, 'user', 'timecreated', 'dayyear', null, null, 0);
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $report = reportbuilder::create($rid, $config);
         $column = $report->columns['user-timecreated'];
         $this->assertTrue($column->is_graphable($report));
         $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('user-timecreated'), 'remove_empty_series=0');
@@ -275,13 +283,13 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         // Removal of empty series.
 
         $rid = $this->create_report('user', 'Test user report 3');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
         $this->add_column($report, 'user', 'timecreated', 'dayyear', null, null, 0);
         $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
         $this->add_column($report, 'statistics', 'coursesstarted', null, null, null, 0);
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $report = reportbuilder::create($rid, $config);
         $column = $report->columns['user-timecreated'];
         $this->assertTrue($column->is_graphable($report));
         $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('user-timecreated', 'statistics-coursescompleted', 'statistics-coursesstarted'), 'remove_empty_series=0');

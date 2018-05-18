@@ -42,7 +42,7 @@ admin_externalpage_setup($adminpage);
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
-$report = new reportbuilder($id);
+$report = reportbuilder::create($id);
 
 $currentdata = [
     'id' => $id,

@@ -130,7 +130,7 @@ if ($fromform = $mform->get_data()) {
                 $DB->insert_record('report_builder_search_cols', $todb);
             }
         }
-        $report = new reportbuilder($newid);
+        $report = reportbuilder::create($newid);
         \totara_reportbuilder\event\report_created::create_from_report($report, false)->trigger();
         $transaction->allow_commit();
         redirect($CFG->wwwroot . '/totara/reportbuilder/general.php?id='.$newid);

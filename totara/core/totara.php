@@ -954,7 +954,7 @@ function get_my_reports_list() {
     foreach ($reportbuilder_permittedreports as $key => $reportrecord) {
         if ($reportrecord->embedded) {
             try {
-                new reportbuilder($reportrecord->id);
+                reportbuilder::create($reportrecord->id);
             } catch (moodle_exception $e) {
                 if ($e->errorcode == "nopermission") {
                     // The report creation failed, almost certainly due to a failed is_capable check in an embedded report.

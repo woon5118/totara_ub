@@ -117,7 +117,9 @@ class hierarchylib_contentrestrictions_test extends advanced_testcase {
 
         // The Report for content restriction definition
         $data->reportid = $this->create_report('user', 'Test User Report');
-        $data->report = new reportbuilder($data->reportid, null, false, null, null, true);
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $data->report = reportbuilder::create($data->reportid, $config);
 
         $update = $DB->get_record('report_builder', ['id' => $data->reportid]);
         $update->accessmode = REPORT_BUILDER_ACCESS_MODE_NONE;

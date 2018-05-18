@@ -29,7 +29,7 @@ $debug = optional_param('debug', 0, PARAM_INT);
 
 admin_externalpage_setup('userdataexporttypes');
 
-$report = reportbuilder_get_embedded_report('userdata_export_types', array(), false, 0);
+$report = reportbuilder::create_embedded('userdata_export_types');
 
 $buttons = array();
 if (has_capability('totara/userdata:config', context_system::instance())) {

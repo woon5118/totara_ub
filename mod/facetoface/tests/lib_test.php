@@ -4526,7 +4526,6 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
             'assetid',
             'sessionsdateid = :dateid',
             ['dateid' => $did]);
-        sort($assets);
 
         sort($assets, SORT_NUMERIC);
         $this->assertEquals($testset, $assets, 'Asset sets do not match');

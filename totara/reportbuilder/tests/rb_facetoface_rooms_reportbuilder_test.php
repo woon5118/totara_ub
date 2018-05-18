@@ -89,40 +89,37 @@ class rb_facetoface_rooms_reportbuilder_test extends advanced_testcase
     private function set_up_report_builder(stdClass $user, $userembedded = false): reportbuilder {
         global $DB;
         $id = null;
-        if (!$userembedded) {
-            $rp = [
-                'shortname'         => "f2fr_test",
-                'source'            => 'facetoface_rooms',
-                'fullname'          => 'This is SPARTAN',
-                'hidden'            => 0,
-                'embed'             => 0,
-                'accessmode'        => 1,
-                'contentmode'       => 0,
-                'description'       => 'wowow',
-                'recordsperpage'    => 40,
-                'toolbarsearch'     => 1,
-                'globalrestriction' => 1,
-                'timemodified'      => time(),
-                'defaultsortorder'  => 4
-            ];
 
-            $id = $DB->insert_record("report_builder", (object)$rp);
+        $config = new rb_config();
+        $config->set_reportfor($user->id);
 
-            /** @var rb_source_facetoface_rooms $src */
-            $src = reportbuilder::get_source_object($rp['source']);
-            $this->set_up_columns($src, $id);
+        if ($userembedded) {
+            return reportbuilder::create_embedded('facetoface_rooms', $config);
         }
 
-        return new reportbuilder (
-            $id,
-            "facetoface_rooms",
-            false,
-            null,
-            $user->id,
-            false,
-            [],
-            null
-        );
+        $rp = [
+            'shortname'         => 'f2fr_test',
+            'source'            => 'facetoface_rooms',
+            'fullname'          => 'This is SPARTAN',
+            'hidden'            => 0,
+            'embed'             => 0,
+            'accessmode'        => 1,
+            'contentmode'       => 0,
+            'description'       => 'wowow',
+            'recordsperpage'    => 40,
+            'toolbarsearch'     => 1,
+            'globalrestriction' => 1,
+            'timemodified'      => time(),
+            'defaultsortorder'  => 4
+        ];
+
+        $id = $DB->insert_record('report_builder', (object)$rp);
+
+        /** @var rb_source_facetoface_rooms $src */
+        $src = reportbuilder::get_source_object($rp['source']);
+        $this->set_up_columns($src, $id);
+
+        return reportbuilder::create($id, $config);
     }
 
     /**

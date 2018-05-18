@@ -46,7 +46,7 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 
 $returnurl = new moodle_url('/totara/reportbuilder/performance.php', array('id' => $id));
 
-$report = new reportbuilder($id);
+$report = reportbuilder::create($id);
 
 $schedule = array();
 if ($report->cache) {
@@ -94,7 +94,7 @@ if ($fromform = $mform->get_data()) {
         reportbuilder_purge_cache($id, true);
     }
 
-    $report = new reportbuilder($id);
+    $report = reportbuilder::create($id);
     \totara_reportbuilder\event\report_updated::create_from_report($report, 'performance')->trigger();
     totara_set_notification(get_string('reportupdated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
 }

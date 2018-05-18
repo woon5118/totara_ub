@@ -56,7 +56,7 @@ abstract class reportcache_advanced_testcase extends advanced_testcase {
         global $DB, $SESSION;
         $SESSION->reportbuilder = array();
         if (is_numeric($shortname)) {
-            $report = new reportbuilder($shortname);
+            $report = reportbuilder::create($shortname);
         } else {
             $report = reportbuilder_get_embedded_report($shortname, $data, false, 0);
         }
@@ -83,7 +83,7 @@ abstract class reportcache_advanced_testcase extends advanced_testcase {
         global $SESSION;
         $SESSION->reportbuilder = array();
         if (is_numeric($shortname)) {
-            $report = new reportbuilder($shortname);
+            $report = reportbuilder::create($shortname);
         } else {
             $report = reportbuilder_get_embedded_report($shortname, $data, false, 0);
         }
