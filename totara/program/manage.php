@@ -684,10 +684,7 @@ if (!$programs) {
         $cell->text = html_writer::label($label, 'movetoid', false, array('class' => 'accesshide'));
         $cell->text .= html_writer::select($movetocategories, 'moveto', $id, null, array('id' => 'movetoid', 'class' => 'autosubmit'));
         $cell->text .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'categoryid', 'value' => $id));
-        $PAGE->requires->yui_module('moodle-core-formautosubmit',
-                        'M.core.init_formautosubmit',
-                        array(array('selectid' => 'movetoid', 'nothing' => $id))
-        );
+        $PAGE->requires->js_call_amd('totara_program/management', 'init_autosubmit', ['movetoid']);
         $table->data[] = new html_table_row(array($cell));
     }
 

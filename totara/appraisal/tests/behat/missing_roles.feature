@@ -109,7 +109,7 @@ Feature: Admin page that lists missing roles for one appraisal
     And I log in as "learner1"
     And I follow "Performance"
     And I follow "Latest Appraisal"
-    And I set the field with xpath "//div[@class='singleselect']//select" to "2"
+    And I set the field with xpath "//div[contains(concat(' ', @class, ' '), ' singleselect ')]//select" to "2"
     And I click on "View" "button"
 
     And I log out
