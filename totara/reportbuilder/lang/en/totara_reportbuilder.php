@@ -434,6 +434,7 @@ $string['globalrestrictionnotsupported'] = 'Report source does not support globa
 $string['globalrestrictionrecordsperpage'] = 'Global report restrictions number of records per page';
 $string['globalrestrictionrecordsperpage_desc'] = 'Number of records per page allows you define how many records display on a report page.';
 $string['globalrestrictions'] = 'Global report restrictions for report builder reports';
+$string['globalrestrictionsdisabled'] = 'Global report restrictions disabled';
 $string['globalrestrictiondescription'] = 'Global report restrictions are enabled separately for each report in the report\'s Content tab. Administrator may configure if global report restrictions are enabled automatically in all new reports.';
 $string['globalrestrictionnew'] = 'New restriction';
 $string['globalsettings'] = 'General settings';
