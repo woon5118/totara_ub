@@ -321,7 +321,7 @@ class job_assignment {
      * @return job_assignment
      */
     public static function create($data) {
-        global $DB, $TEXTAREA_OPTIONS, $USER;
+        global $CFG, $DB, $TEXTAREA_OPTIONS, $USER;
 
         if (!is_array($data)) {
             $data = (array)$data;
@@ -333,6 +333,9 @@ class job_assignment {
         }
         if (!isset($data['idnumber']) || $data['idnumber'] === "") {
             throw new exception('ID Number is required when creating new job assignment');
+        }
+        if (empty($CFG->totara_job_allowmultiplejobs) && $DB->record_exists('job_assignment', ['userid' => $data['userid']])) {
+            throw new exception('Attempting to create multiple job assignments for user');
         }
         foreach ($data as $key => $value) {
             if (!in_array($key, array('userid', 'fullname', 'shortname', 'idnumber', 'description', 'description_editor',
