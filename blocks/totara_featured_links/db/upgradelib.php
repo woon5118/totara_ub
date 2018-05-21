@@ -24,7 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 use block_totara_featured_links\tile\base;
-use block_totara_featured_links\tile\gallery_tile;
 
 /**
  * Copies the file that is required from a gallery tile to a new static tile.
@@ -85,5 +84,26 @@ function split_gallery_tiles_into_subtiles() {
             'tile_backgrounds',
             $gallerytile->id
         );
+    }
+}
+
+/**
+ * block_totara_featured_links_upgrade_set_default_heading_location
+ * Sets the default heading location on gallery tiles that do not have a heading_location
+ */
+function btfl_upgrade_set_default_heading_location() {
+    global $DB;
+    $sql = 'SELECT *
+              FROM {block_totara_featured_links_tiles} btflt
+             WHERE (' . $DB->sql_compare_text('type', 100) . '=\'block_totara_featured_links-default_tile\' AND parentid != 0)
+                OR ' . $DB->sql_compare_text('type', 100) . '=\'block_totara_featured_links-program_tile\'
+                OR ' . $DB->sql_compare_text('type', 100) . '=\'block_totara_featured_links-certification_tile\'';
+    $tiles = $DB->get_records_sql($sql);
+    foreach ($tiles as $tilerow) {
+        $tileinstance = base::get_tile_instance($tilerow);
+        if (!isset($tileinstance->data->heading_location)) {
+            $tileinstance->data->heading_location = base::HEADING_TOP;
+            $tileinstance->save_content($tileinstance->data);
+        }
     }
 }

@@ -164,6 +164,7 @@ class gallery_tile extends base implements meta_tile {
         if (!isset($data_obj->pauseonhover)) {
             $data_obj->pauseonhover = 0;
         }
+
         return $data_obj;
     }
 
@@ -236,6 +237,7 @@ class gallery_tile extends base implements meta_tile {
         if (isset($data->pauseonhover)) {
             $this->data->pauseonhover = $data->pauseonhover;
         }
+
         return;
     }
 

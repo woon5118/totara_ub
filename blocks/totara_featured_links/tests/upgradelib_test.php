@@ -23,6 +23,7 @@
 
 use block_totara_featured_links\tile\base;
 use block_totara_featured_links\tile\default_tile;
+use block_totara_featured_links\tile\gallery_tile;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -126,7 +127,7 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
     }
 
     /**
-     * Tests that the upgrade step to 2018032600 will work correctly.
+     * Tests the new type of gallery tiles are generated properly
      */
     public function test_upgrading_a_gallery_tile_makes_correct_static_tiles() {
         global $DB, $CFG;
@@ -193,5 +194,88 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
             ));
         }
         $this->assertEmpty($expectedimages);
+    }
+
+
+    private function get_data_with_empty_heading_location() {
+        $data = $this->get_setup_data();
+
+        /** @var block_totara_featured_links_generator $blockgenerator */
+        $blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
+
+        $block = $data->block;
+
+        // Creating program with default location.
+        $data->programtilewithlocation = $blockgenerator->create_program_tile($block->id);
+        $data->programtilewithlocation->data->url = '/';
+        $data->programtilewithlocation->data->heading_location = 'bottom';
+        $data->programtilewithlocation->save_content($data->programtilewithlocation->data);
+
+        // Creating program without default location.
+        $data->programtilewithoutlocation = $blockgenerator->create_program_tile($block->id);
+        $data->programtilewithoutlocation->data->url = '/';
+        $data->programtilewithoutlocation->save_content($data->programtilewithoutlocation->data);
+
+        // Creating certification with default location.
+        $data->certificationtilewithlocation = $blockgenerator->create_certification_tile($block->id);
+        $data->certificationtilewithlocation->data->url = '/';
+        $data->certificationtilewithlocation->data->heading_location = 'bottom';
+        $data->certificationtilewithlocation->save_content($data->certificationtilewithlocation->data);
+
+        // Creating certification without default location.
+        $data->certificationtilewithoutlocation = $blockgenerator->create_certification_tile($block->id);
+        $data->certificationtilewithoutlocation->data->url = '/';
+        $data->certificationtilewithoutlocation->save_content($data->certificationtilewithoutlocation->data);
+
+        // Lets trigger upgrade step to convert old gallery data to the new structure.
+        split_gallery_tiles_into_subtiles();
+
+        return $data;
+    }
+
+    /**
+     * Test that the default heading_location is added correctly when it is not set
+     * and that it doesnt effect the other heading locations
+     */
+    public function test_setting_default_heading_location_on_gallery_program_and_certification_tile() {
+        global $CFG, $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $data = $this->get_data_with_empty_heading_location();
+
+        require_once($CFG->dirroot.'/blocks/totara_featured_links/db/upgradelib.php');
+
+        // Test data before the upgrade of heading location.
+        $this->assertFalse(isset($data->programtilewithoutlocation->data->heading_location));
+        $this->assertEquals('bottom', $data->programtilewithlocation->data->heading_location);
+
+        $this->assertFalse(isset($data->certificationtilewithoutlocation->data->heading_location));
+        $this->assertEquals('bottom', $data->certificationtilewithlocation->data->heading_location);
+
+        $newtiles = $DB->get_records('block_totara_featured_links_tiles', ['parentid' => $data->oldgallerytile->id]);
+        foreach ($newtiles as $newtile) {
+            /** @var default_tile $newtileinstance */
+            $newtileinstance = base::get_tile_instance($newtile);
+            $this->assertFalse(isset($newtileinstance->data->heading_location));
+        }
+
+        btfl_upgrade_set_default_heading_location();
+
+        $data->programtilewithlocation = base::get_tile_instance($data->programtilewithlocation->id);
+        $data->programtilewithoutlocation = base::get_tile_instance($data->programtilewithoutlocation->id);
+        $data->certificationtilewithlocation = base::get_tile_instance($data->certificationtilewithlocation->id);
+        $data->certificationtilewithoutlocation = base::get_tile_instance($data->certificationtilewithoutlocation->id);
+
+        $this->assertEquals(base::HEADING_TOP, $data->programtilewithoutlocation->data->heading_location);
+        $this->assertEquals('bottom', $data->programtilewithlocation->data->heading_location);
+        $this->assertEquals(base::HEADING_TOP, $data->certificationtilewithoutlocation->data->heading_location);
+        $this->assertEquals('bottom', $data->certificationtilewithlocation->data->heading_location);
+
+        $newtiles = $DB->get_records('block_totara_featured_links_tiles', ['parentid' => $data->oldgallerytile->id]);
+        foreach ($newtiles as $newtile) {
+            /** @var default_tile $newtileinstance */
+            $newtileinstance = base::get_tile_instance($newtile);
+            $this->assertEquals(base::HEADING_TOP, $newtileinstance->data->heading_location);
+        }
     }
 }

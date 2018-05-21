@@ -55,8 +55,9 @@ function xmldb_block_totara_featured_links_upgrade($oldversion, $block) {
         upgrade_plugin_savepoint(true, 2017111600, 'block', 'totara_featured_links');
     }
 
-    // Move the existing gallery tiles into a gorup of static tiles with the same parent id
+    // Upgrade from T11 or less
     if ($oldversion < 2018032600) {
+        // Move the existing gallery tiles into a gorup of static tiles with the same parent id
 
         // Define field parentid to be added to block_totara_featured_links_tiles.
         $table = new xmldb_table('block_totara_featured_links_tiles');
@@ -98,6 +99,13 @@ function xmldb_block_totara_featured_links_upgrade($oldversion, $block) {
         }
 
         upgrade_block_savepoint(true, 2018061200, 'totara_featured_links');
+    }
+
+    if ($oldversion < 2018062000) {
+        // Fix the default values not being set on gallery, program and certification tiles.
+        btfl_upgrade_set_default_heading_location();
+
+        upgrade_block_savepoint(true, 2018062000, 'totara_featured_links');
     }
 
     // Change parentid field to Not Null in case someone is having Null values in there (MSSQl).

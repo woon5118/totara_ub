@@ -220,19 +220,22 @@ class default_tile extends base{
         // Moves a file from the draft area to a defined area
         // Saves the Draft area.
         $draftitemid = file_get_submitted_draft_itemid('background_img');
-        file_save_draft_area_files(
-            $draftitemid,
-            \context_block::instance($this->blockid)->id,
-            'block_totara_featured_links',
-            'tile_background',
-            $this->id,
-            ['subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1]
-        );
+        $blockcontext = \context_block::instance($this->blockid)->id;
+        if (!empty($draftitemid)) {
+            file_save_draft_area_files(
+                $draftitemid,
+                $blockcontext,
+                'block_totara_featured_links',
+                'tile_background',
+                $this->id,
+                ['subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1]
+            );
+        }
 
         // Gets the url to the new file.
         $fs = get_file_storage();
         $files = $fs->get_area_files(
-            \context_block::instance($this->blockid)->id,
+            $blockcontext,
             'block_totara_featured_links',
             'tile_background',
             $this->id,

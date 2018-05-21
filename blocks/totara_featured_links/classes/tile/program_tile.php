@@ -76,6 +76,9 @@ class program_tile extends learning_item_tile {
         if (isset($this->data_filtered->programid)) {
             $dataobj->program_name_id = $this->data_filtered->programid;
         }
+        if (!isset($this->data->heading_location)) {
+            $dataobj->heading_location = self::HEADING_TOP;
+        }
         return $dataobj;
     }
 
