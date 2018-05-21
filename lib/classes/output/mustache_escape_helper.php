@@ -46,7 +46,7 @@ class mustache_escape_helper {
             return $text;
         }
 
-        if (!preg_match('#^ *(\{{2,3})([a-zA-Z0-9_]+)\}{2,3} *$#', $text, $matches)) {
+        if (!preg_match('#^ *(\{{2,3})\s*([a-zA-Z0-9_]+)\s*\}{2,3} *$#', $text, $matches)) {
             // It's not a straight up variable but contained mustache processing tags. Don't trust it!
             $this->debugging('Escaped content contains unexpected mustache processing queues. It will be lost.');
             return '';

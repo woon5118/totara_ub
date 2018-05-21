@@ -129,6 +129,14 @@ class mustache_esc_helper_testcase extends advanced_testcase {
             $mustache->render('test', ['foo' => 'Foo'])
         );
 
+        // Spaces inside curly braces.
+        $loader->setTemplate('test', "{{#esc}} {{ foo }} {{/esc}}");
+        $this->assertEquals(
+            'Foo',
+            $mustache->render('test', ['foo' => 'Foo'])
+        );
+
+
         // Missing var
         $loader->setTemplate('test', "{{#esc}}{{foo}}{{/esc}}");
         $this->assertEquals(
