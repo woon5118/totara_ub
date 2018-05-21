@@ -1,5 +1,5 @@
 @core @core_user @javascript
-Feature: Enable/disable password field based on authentication selected.
+Feature: Create and edit user profile custom-fields.
   In order to use user profile fields
   As an admin
   I need to be able to create and edit fields

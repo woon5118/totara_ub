@@ -1,5 +1,5 @@
 @totara @totara_reportbuilder @javascript
-Feature: Graphs in Report buidler
+Feature: Graph source columns in the report builder
   In order to fail graph columns in Report builder
   As an admin
   I need to be able to notice an user to fix the graph columns

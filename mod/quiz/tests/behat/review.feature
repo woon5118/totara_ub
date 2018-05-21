@@ -6,44 +6,44 @@ Feature: Review quiz attempts
   As a student
   I need to answer some questions correctly and review my attempt
 
-Background:
-  Given I am on a totara site
-  And the following "users" exist:
-    | username | firstname | lastname | email |
-    | student1 | Student | 1 | student1@example.com |
-  And the following "courses" exist:
-    | fullname | shortname | category |
-    | Course 1 | C1        | 0        |
-  And the following "course enrolments" exist:
-    | user | course | role |
-    | student1 | C1 | student |
+  Background:
+    Given I am on a totara site
+    And the following "users" exist:
+      | username | firstname | lastname | email |
+      | student1 | Student | 1 | student1@example.com |
+    And the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 1 | C1        | 0        |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | student1 | C1 | student |
 
-  And the following "question categories" exist:
-    | contextlevel | reference | name           |
-    | Course       | C1        | Test questions |
-  And the following "questions" exist:
-    | questioncategory | qtype           | name             | template    |
-    | Test questions   | multichoice     | Multi-choice-001 | two_of_four |
-    | Test questions   | multichoice     | Multi-choice-002 | two_of_four |
-    | Test questions   | multichoice     | Multi-choice-003 | two_of_four |
-    | Test questions   | multichoice     | Multi-choice-004 | two_of_four |
-  And the following "activities" exist:
-    | activity   | name      | course | idnumber |
-    | quiz       | Test quiz | C1     | quiz1    |
-  And quiz "Test quiz" contains the following questions:
-    | Multi-choice-001 | 1 |
-    | Multi-choice-002 | 1 |
-    | Multi-choice-003 | 1 |
-    | Multi-choice-004 | 1 |
+    And the following "question categories" exist:
+      | contextlevel | reference | name           |
+      | Course       | C1        | Test questions |
+    And the following "questions" exist:
+      | questioncategory | qtype           | name             | template    |
+      | Test questions   | multichoice     | Multi-choice-001 | two_of_four |
+      | Test questions   | multichoice     | Multi-choice-002 | two_of_four |
+      | Test questions   | multichoice     | Multi-choice-003 | two_of_four |
+      | Test questions   | multichoice     | Multi-choice-004 | two_of_four |
+    And the following "activities" exist:
+      | activity   | name      | course | idnumber |
+      | quiz       | Test quiz | C1     | quiz1    |
+    And quiz "Test quiz" contains the following questions:
+      | Multi-choice-001 | 1 |
+      | Multi-choice-002 | 1 |
+      | Multi-choice-003 | 1 |
+      | Multi-choice-004 | 1 |
 
-  And I log in as "admin"
-  And I follow "Course 1"
-  And I follow "Test quiz"
-  And I follow "Edit quiz"
-  And I set the field "Maximum grade" to "4"
-  And I press "Save"
-  Then the field "Maximum grade" matches value "4.0"
-  And I log out
+    And I log in as "admin"
+    And I follow "Course 1"
+    And I follow "Test quiz"
+    And I follow "Edit quiz"
+    And I set the field "Maximum grade" to "4"
+    And I press "Save"
+    Then the field "Maximum grade" matches value "4.0"
+    And I log out
 
   @javascript
   Scenario: User answers some questions correct and review quiz attempt

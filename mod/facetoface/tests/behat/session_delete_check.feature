@@ -55,12 +55,12 @@ Feature: Confirm overlapping sessions can be removed
     Then I should not see "This date conflicts with an earlier date in this event"
     And I should see "Upcoming events"
 
-  Examples:
-    | starthour | startminute | finishhour | finishminute | timezone         |
-    | 12        | 00          | 13         | 00           | Pacific/Auckland |
-    | 15        | 00          | 16         | 00           | Pacific/Auckland |
-    | 15        | 30          | 16         | 30           | Pacific/Auckland |
-    | 14        | 30          | 15         | 30           | Pacific/Auckland |
-    | 14        | 30          | 16         | 30           | Pacific/Auckland |
-    | 15        | 05          | 15         | 55           | Pacific/Auckland |
-    | 03        | 00          | 04         | 00           | UTC              |
+    Examples:
+      | starthour | startminute | finishhour | finishminute | timezone         |
+      | 12        | 00          | 13         | 00           | Pacific/Auckland |
+      | 15        | 00          | 16         | 00           | Pacific/Auckland |
+      | 15        | 30          | 16         | 30           | Pacific/Auckland |
+      | 14        | 30          | 15         | 30           | Pacific/Auckland |
+      | 14        | 30          | 16         | 30           | Pacific/Auckland |
+      | 15        | 05          | 15         | 55           | Pacific/Auckland |
+      | 03        | 00          | 04         | 00           | UTC              |

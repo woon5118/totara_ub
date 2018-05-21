@@ -18,7 +18,7 @@ Feature: Reset dashboard page to default
       | student2 | C1 | student |
     And I log in as "student1"
     And I click on "Dashboard" in the totara menu
-  
+
   Scenario: Add blocks to page and reset
     When I press "Customise this page"
     And I add the "Online users" block

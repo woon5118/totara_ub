@@ -75,9 +75,9 @@ Feature: Single hierarchy report filter
     And the field "job_assignment-allorganisations_op" matches value "<type>"
     And the field "job_assignment-allorganisations_child" matches value "<includesub>"
 
-  Examples:
-    | type                 | includesub | u1      | u2      | u3      | u4      | u5      | organisation               |
-    | Any of the selected  | 0          | see     | not see | not see | not see | not see | Organisation 1z  |
-    | None of the selected | 0          | not see | see     | see     | see     | see     | Organisation 1z  |
-    | Any of the selected  | 1          | see     | see     | see     | not see | not see | Organisation 1z  |
-    | None of the selected | 1          | not see | not see | not see | see     | see     | Organisation 1z  |
+    Examples:
+      | type                 | includesub | u1      | u2      | u3      | u4      | u5      | organisation     |
+      | Any of the selected  | 0          | see     | not see | not see | not see | not see | Organisation 1z  |
+      | None of the selected | 0          | not see | see     | see     | see     | see     | Organisation 1z  |
+      | Any of the selected  | 1          | see     | see     | see     | not see | not see | Organisation 1z  |
+      | None of the selected | 1          | not see | not see | not see | see     | see     | Organisation 1z  |

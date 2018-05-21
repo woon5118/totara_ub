@@ -42,26 +42,25 @@ Feature: User can self complete an activity from within a single activity course
     And I reload the page
     And the field "I have completed this activity" matches value "0"
 
-
-  Examples:
-    | activity      | name            | req1            | reqvalue        |
-    | Assignment    | Assignment name | Description     | lorum ipsum     |
-    | Certificate   | Name            | Introduction    | lorum ipsum     |
-    | Chat          | Name            | Description     | lorum ipsum     |
-    | Choice        | Choice name     | Option 1        | lorum ipsum     |
-    | Database      | Name            | Description     | lorum ipsum     |
-    | External tool | Activity name   | Tool URL        | https://lti-examples.heroku.com/index.html |
-    | Feedback      | Name            | Description     | lorum ipsum     |
-    | Forum         | Forum name      | Description     | lorum ipsum     |
-    | Glossary      | Name            | Description     | lorum ipsum     |
-    #| Lesson        | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
-    | Page          | Name            | Page content    | lorum ipsum     |
-    #| Quiz          | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
-    | Seminar       | Name            | Description     | lorum ipsum     |
-    | Survey        | Name            | Survey type     | Critical incidents |
-    | Folder        | Name            | Description     | lorum ipsum     |
-    | URL           | Name            | External URL    | www.example.com |
-    | Wiki          | Wiki name       | First page name | lorum ipsum     |
+    Examples:
+      | activity      | name            | req1            | reqvalue        |
+      | Assignment    | Assignment name | Description     | lorum ipsum     |
+      | Certificate   | Name            | Introduction    | lorum ipsum     |
+      | Chat          | Name            | Description     | lorum ipsum     |
+      | Choice        | Choice name     | Option 1        | lorum ipsum     |
+      | Database      | Name            | Description     | lorum ipsum     |
+      | External tool | Activity name   | Tool URL        | https://lti-examples.heroku.com/index.html |
+      | Feedback      | Name            | Description     | lorum ipsum     |
+      | Forum         | Forum name      | Description     | lorum ipsum     |
+      | Glossary      | Name            | Description     | lorum ipsum     |
+     #| Lesson        | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
+      | Page          | Name            | Page content    | lorum ipsum     |
+     #| Quiz          | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
+      | Seminar       | Name            | Description     | lorum ipsum     |
+      | Survey        | Name            | Survey type     | Critical incidents |
+      | Folder        | Name            | Description     | lorum ipsum     |
+      | URL           | Name            | External URL    | www.example.com |
+      | Wiki          | Wiki name       | First page name | lorum ipsum     |
 
   Scenario: Confirm the book single activity course has self completion available inside itself
     And the following "courses" exist:
@@ -196,7 +195,7 @@ Feature: User can self complete an activity from within a single activity course
     And I reload the page
     And the field "I have completed this activity" matches value "0"
 
-  Examples:
-    | type      |
-    | Automatic |
-    | Embed     |
+    Examples:
+      | type      |
+      | Automatic |
+      | Embed     |

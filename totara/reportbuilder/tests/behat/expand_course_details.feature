@@ -93,7 +93,7 @@ Feature: Test expand course details in Reportbuilder
     And I should see "Manual enrolments, Program"
     And I log out
 
-@_alert
+  @_alert
   Scenario: Expand course detail in coursecatalog with all filters disabled
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu

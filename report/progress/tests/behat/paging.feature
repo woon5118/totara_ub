@@ -125,12 +125,12 @@ Feature: Paging on activity completion report
     And I should not see "Student C26"
     And I should not see "Student C29"
 
-  Examples:
-    | nextpage | previouspage |
-    | Next     | Previous     |
-    | Next     | 1            |
-    | 2        | Previous     |
-    | 2        | 1            |
+    Examples:
+      | nextpage | previouspage |
+      | Next     | Previous     |
+      | Next     | 1            |
+      | 2        | Previous     |
+      | 2        | 1            |
 
   Scenario: Activity completion report firstname filter and paging
     Given I navigate to "Activity completion" node in "Course administration > Reports"

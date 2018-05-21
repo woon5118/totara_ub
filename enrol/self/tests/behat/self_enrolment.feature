@@ -1,5 +1,5 @@
 @enrol @enrol_self
-Feature: Users can auto-enrol themself in courses where self enrolment is allowed
+Feature: Users can auto-enrol themselves in courses where self enrolment is allowed
   In order to participate in courses
   As a user
   I need to auto enrol me in courses

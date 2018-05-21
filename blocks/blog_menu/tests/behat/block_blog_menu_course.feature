@@ -1,8 +1,8 @@
 @block @block_blog_menu @javascript
 Feature: Students can use block blog menu in a course
-  In order students to use the blog menu in a course
+  In order for students to use the blog menu in a course
   As a student
-  I view blog menu block in a course
+  I must be able to view the blog menu block in a course
 
   Background:
     Given the following "users" exist:

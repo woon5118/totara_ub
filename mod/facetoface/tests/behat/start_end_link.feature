@@ -40,13 +40,13 @@ Feature: Confirm end date is adjusted when start date is altered
       | <field> | <start_value> |
     Then I should see "<end_value>" in the "#<end_field>" "css_element"
 
-  Examples:
-    | field             | start_value | end_value | end_field            |
-    | timestart[day]    | 2           | 2         | id_timefinish_day    |
-    | timestart[month]  | 2           | February  | id_timefinish_month  |
-    | timestart[year]   | 2021        | 2021      | id_timefinish_year   |
-    | timestart[hour]   | 12          | 13        | id_timefinish_hour   |
-    | timestart[minute] | 30          | 30        | id_timefinish_minute |
+    Examples:
+      | field             | start_value | end_value | end_field            |
+      | timestart[day]    | 2           | 2         | id_timefinish_day    |
+      | timestart[month]  | 2           | February  | id_timefinish_month  |
+      | timestart[year]   | 2021        | 2021      | id_timefinish_year   |
+      | timestart[hour]   | 12          | 13        | id_timefinish_hour   |
+      | timestart[minute] | 30          | 30        | id_timefinish_minute |
 
   Scenario: Alter seminar date by calendar
     Given I click on "Calendar" "link" in the "#fitem_id_timestart" "css_element"

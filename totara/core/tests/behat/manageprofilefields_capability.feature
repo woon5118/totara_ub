@@ -5,13 +5,13 @@ Feature: Test manageprofilefields capability
     I need to allow this capability to Site Manager and check that
     they can create new custom field
 
-Background:
+  Background:
     Given I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email |
       | manager1 | Manager | 1 | manager1@example.com |
 
-Scenario: Test that user with right capability can manage user profile custom fields
+  Scenario: Test that user with right capability can manage user profile custom fields
     Given I log in as "admin"
     And I set the following system permissions of "Site Manager" role:
       | capability | permission |
@@ -34,4 +34,3 @@ Scenario: Test that user with right capability can manage user profile custom fi
     # Remove this field
     When I click on "Delete" "link" in the "mytext" "table_row"
     Then I should see "Deleted"
-

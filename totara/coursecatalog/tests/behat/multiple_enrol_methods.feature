@@ -1,5 +1,5 @@
 @javascript @totara @totara_coursecatalog @enrol
-Feature: Users can auto-enrol themself in courses where self enrolment is allowed
+Feature: Users can auto-enrol themselves in courses where enrolment via plugins is enabled
   In order to participate in courses
   As a user
   I need to auto enrol me in courses

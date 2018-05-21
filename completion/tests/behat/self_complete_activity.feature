@@ -41,25 +41,25 @@ Feature: User can self complete an activity from within an activity
     And I follow "c1"
     Then I should see "Not completed: Activity Name. Select to mark as complete."
 
-  Examples:
-    | activity      | name            | req1            | reqvalue        |
-    | Assignment    | Assignment name | Description     | lorum ipsum     |
-    | Certificate   | Name            | Introduction    | lorum ipsum     |
-    | Chat          | Name            | Description     | lorum ipsum     |
-    | Choice        | Choice name     | Option 1        | lorum ipsum     |
-    | Database      | Name            | Description     | lorum ipsum     |
-    | External tool | Activity name   | Tool URL        | https://lti-examples.heroku.com/index.html |
-    | Feedback      | Name            | Description     | lorum ipsum     |
-    | Forum         | Forum name      | Description     | lorum ipsum     |
-    | Glossary      | Name            | Description     | lorum ipsum     |
-    #| Lesson        | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
-    | Page          | Name            | Page content    | lorum ipsum     |
-    #| Quiz          | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
-    | Seminar       | Name            | Description     | lorum ipsum     |
-    | Survey        | Name            | Survey type     | Critical incidents |
-    | Folder        | Name            | Description     | lorum ipsum     |
-    | URL           | Name            | External URL    | www.example.com |
-    | Wiki          | Wiki name       | First page name | lorum ipsum     |
+    Examples:
+      | activity      | name            | req1            | reqvalue        |
+      | Assignment    | Assignment name | Description     | lorum ipsum     |
+      | Certificate   | Name            | Introduction    | lorum ipsum     |
+      | Chat          | Name            | Description     | lorum ipsum     |
+      | Choice        | Choice name     | Option 1        | lorum ipsum     |
+      | Database      | Name            | Description     | lorum ipsum     |
+      | External tool | Activity name   | Tool URL        | https://lti-examples.heroku.com/index.html |
+      | Feedback      | Name            | Description     | lorum ipsum     |
+      | Forum         | Forum name      | Description     | lorum ipsum     |
+      | Glossary      | Name            | Description     | lorum ipsum     |
+     #| Lesson        | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
+      | Page          | Name            | Page content    | lorum ipsum     |
+     #| Quiz          | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
+      | Seminar       | Name            | Description     | lorum ipsum     |
+      | Survey        | Name            | Survey type     | Critical incidents |
+      | Folder        | Name            | Description     | lorum ipsum     |
+      | URL           | Name            | External URL    | www.example.com |
+      | Wiki          | Wiki name       | First page name | lorum ipsum     |
 
   @_file_upload
   Scenario Outline: Confirm the file activity has self completion available inside itself
@@ -93,10 +93,10 @@ Feature: User can self complete an activity from within an activity
     And I follow "c1"
     Then I should see "Not completed: Pictured. Select to mark as complete."
 
-  Examples:
-    | type      |
-    | Automatic |
-    | Embed     |
+    Examples:
+      | type      |
+      | Automatic |
+      | Embed     |
 
   Scenario: Confirm the book activity has self completion available inside itself
     And I log in as "admin"

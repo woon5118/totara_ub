@@ -272,13 +272,13 @@ Feature: Check that the visibility options for the tiles work correctly
     And I am on site homepage
     Then "default description" "link" should not exist
 
-    Scenario: Tests visibility options are not available on dashboard
-      When I click on "Dashboard" in the totara menu
-      And I click on "Customise this page" "button"
-      And I add the "Featured Links" block
-      And I click on "Add Tile" "link"
-      And I set the following fields to these values:
-        | URL | www.example.com |
-        | textbody | default description |
-      And I click on "Save changes" "button"
-      Then "Visibility" "link" should not exist
+  Scenario: Tests visibility options are not available on dashboard
+    When I click on "Dashboard" in the totara menu
+    And I click on "Customise this page" "button"
+    And I add the "Featured Links" block
+    And I click on "Add Tile" "link"
+    And I set the following fields to these values:
+      | URL | www.example.com |
+      | textbody | default description |
+    And I click on "Save changes" "button"
+    Then "Visibility" "link" should not exist

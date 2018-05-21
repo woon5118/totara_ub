@@ -143,15 +143,12 @@ Feature: Minimum Seminar bookings
     And I click on "Dashboard" in the totara menu
     And I should not see "Event under minimum bookings for: test activity"
 
-  Examples:
-    | notification to                        | student    | trainer    | teacher    | creator    | manager    |
-    | Learner                                | should     | should not | should not | should not | should not |
+    Examples:
+      | notification to                        | student    | trainer    | teacher    | creator    | manager    |
+      | Learner                                | should     | should not | should not | should not | should not |
 
-    # Trainer, otherwise it clicks on "Editing Trainer"
-    | id_s__facetoface_session_rolesnotify_4 | should not | should     | should not | should not | should not |
-    | Editing Trainer                        | should not | should not | should     | should not | should not |
-    | Course creator                         | should not | should not | should not | should     | should not |
-    | Site Manager                           | should not | should not | should not | should not | should     |
-
-
-
+      # Trainer, otherwise it clicks on "Editing Trainer"
+      | id_s__facetoface_session_rolesnotify_4 | should not | should     | should not | should not | should not |
+      | Editing Trainer                        | should not | should not | should     | should not | should not |
+      | Course creator                         | should not | should not | should not | should     | should not |
+      | Site Manager                           | should not | should not | should not | should not | should     |

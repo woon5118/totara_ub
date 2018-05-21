@@ -1,6 +1,6 @@
 @totara @totara_course
 Feature: Verify course reminder capability.
-Background:
+  Background:
     Given I am on a totara site
     And the following "users" exist:
         | username       | firstname | lastname | email                      |
@@ -30,9 +30,8 @@ Background:
         | Description | Test Feedback description |
     And I log out
 
-@javascript
-Scenario: Verify an admin user can access Reminders.
-
+  @javascript
+  Scenario: Verify an admin user can access Reminders.
     Given I log in as "admin"
     When I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
@@ -41,9 +40,8 @@ Scenario: Verify an admin user can access Reminders.
     Then I should see "Edit course reminders"
     And I log out
 
-@javascript
-Scenario: Verify a Site Manager can access Reminders.
-
+  @javascript
+  Scenario: Verify a Site Manager can access Reminders.
     Given I log in as "manager1"
     When I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
@@ -52,22 +50,20 @@ Scenario: Verify a Site Manager can access Reminders.
     Then I should see "Edit course reminders"
     And I log out
 
-@javascript
-Scenario: Verify a Site Manager cannot access Reminders when access is removed.
-
+  @javascript
+  Scenario: Verify a Site Manager cannot access Reminders when access is removed.
     Given I log in as "manager1"
     When I set the following system permissions of "Site Manager" role:
-        | capability                    | permission |
-        | moodle/course:managereminders | Prevent    |
+      | capability                    | permission |
+      | moodle/course:managereminders | Prevent    |
     And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should not see "Reminders"
     And I log out
 
-@javascript
-Scenario: Verify Editing Trainer can access Reminders.
-
+  @javascript
+  Scenario: Verify Editing Trainer can access Reminders.
     Given I log in as "editingtrainer"
     And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu

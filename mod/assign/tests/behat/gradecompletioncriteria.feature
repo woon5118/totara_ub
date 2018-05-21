@@ -41,7 +41,7 @@ Feature: Set the assignment activity grade completion criteria
       | assignfeedback_file_enabled     | 0                                                 |
       | Completion tracking             | Show activity as complete when conditions are met |
       | completionusegrade              | 1                                                 |
-      And I press "Save and return to course"
+    And I press "Save and return to course"
     Then I should see "Add an activity or resource"
     And I should not see "To enable this setting, you must select a Grade Type or enable the default Feedback Type"
 

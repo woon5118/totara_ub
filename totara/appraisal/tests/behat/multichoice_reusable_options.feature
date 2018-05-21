@@ -1,5 +1,5 @@
 @totara @totara_appraisal @javascript
-  Feature: Create and use multichoice option collections
+Feature: Create and use multichoice option collections
 
   Scenario: I can create and reuse multichoice option collections
     Given I am on a totara site

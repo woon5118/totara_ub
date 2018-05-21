@@ -189,7 +189,7 @@ Feature: Use the multi-item hierarchy filter
     # Org
     And I wait until the page is ready
     And I click on "Search by" "link" in the "legend.ftoggler" "css_element"
-        When I click on "Choose Organisations" "text" in the "Search by" "fieldset"
+    When I click on "Choose Organisations" "text" in the "Search by" "fieldset"
     Then I should see "Items to add"
     And I click on "Cancel" "button" in the "Choose Organisations" "totaradialogue"
     When I select "is any value" from the "User's Organisation(s) field limiter" singleselect

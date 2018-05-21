@@ -4,7 +4,7 @@ Feature: Filter session by pre-defined rooms
   As a site manager
   I need to create rooms
 
-Background:
+  Background:
     Given I am on a totara site
     And the following "courses" exist:
       | fullname | shortname | category |

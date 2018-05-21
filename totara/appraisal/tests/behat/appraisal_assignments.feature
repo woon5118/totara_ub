@@ -57,7 +57,7 @@ Feature: Test reported learners in appraisal assignments
     And the following "pages" exist in "totara_appraisal" plugin:
       | appraisal   | stage      | name      |
       | Appraisal1  | App1_Stage | App1_Page |
-     And the following "questions" exist in "totara_appraisal" plugin:
+    And the following "questions" exist in "totara_appraisal" plugin:
       | appraisal   | stage      | page      | name     | type          | default | ExtraInfo                          |
       | Appraisal1  | App1_Stage | App1_Page | App1-Q1  | ratingnumeric | 2       | Range:1-10,Display:slider          |
 

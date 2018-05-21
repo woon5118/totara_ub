@@ -16,13 +16,13 @@ Feature: Adding audience membership activity access restriction
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
-  And the following "cohorts" exist:
-      | name      | idnumber | contextlevel | reference |
-      | Audience1 | aud1     | System       |           |
-      | Audience2 | aud2     | System       |           |
-  And the following "cohort members" exist:
-      | user     | cohort |
-      | student1 | aud1   |
+    And the following "cohorts" exist:
+        | name      | idnumber | contextlevel | reference |
+        | Audience1 | aud1     | System       |           |
+        | Audience2 | aud2     | System       |           |
+    And the following "cohort members" exist:
+        | user     | cohort |
+        | student1 | aud1   |
 
 
   @javascript

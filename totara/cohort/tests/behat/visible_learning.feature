@@ -10,13 +10,13 @@ Feature: Assign visible learning to cohort
         | name | idnumber |
         | Cohort 1 | ASD |
         | Cohort 2 | DSA |
-      And the following "courses" exist:
-        | fullname | shortname | category |
-        | Course 1 | C1 | 0 |
-        | Course 2 | C2 | 0 |
-      And I log in as "admin"
-      And I set the following administration settings values:
-        | Enable audience-based visibility | 1 |
+    And the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 1 | C1 | 0 |
+      | Course 2 | C2 | 0 |
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | Enable audience-based visibility | 1 |
 
   @javascript
   Scenario: Assign courses as visible learning to a cohort

@@ -1,6 +1,6 @@
 @javascript @totara @totara_coursecatalog @enrol
-Feature: Users can auto-enrol themselves in courses where self enrolment is allowed
-  In order to test self-enrolments are working as expect in coursecatalog
+Feature: Users can auto-enrol themselves in courses where self enrolment is allowed from course-catalogue
+  In order to test self-enrolments are working as expect in course-catalog
   As a user
   I need to try to auto enrol me in courses
 

@@ -51,7 +51,7 @@ Feature: Edit quiz page - section headings
     And I change quiz section heading "" to "This is section one"
     Then I should see "This is section one"
 
- @javascript
+  @javascript
   Scenario: Modify section headings
     Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber |

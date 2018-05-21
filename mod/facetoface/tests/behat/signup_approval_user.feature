@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Seminar Signup Manager Approval
+Feature: Seminar Signup User Approval
   In order to signup to seminar
   As a learner
   I need to request approval from learner-manager

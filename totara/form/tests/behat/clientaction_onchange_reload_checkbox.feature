@@ -62,11 +62,11 @@ Feature: Totara form onchange reload client checkbox action test suite
     And "<checkbox>" row "Value" column of "form_results" table should contain "«<submitvalue>»"
     And "submitbutton" row "Value" column of "form_results" table should contain "«1»"
 
-  Examples:
-    | checkbox   | default | changed   | changedstatus | returnedstatus | submitvalue |
-    | checkbox_2 | 0       | 1         | checked       | unchecked      | 1           |
-    | checkbox_3 | 1       | 0         | unchecked     | checked        | 0           |
-    | checkbox_4 | 0       | 1         | checked       | unchecked      | 1           |
-    | checkbox_5 | 0       | 1         | checked       | unchecked      | banana      |
-    | checkbox_6 | 1       | 0         | checked       | unchecked      | apple       |
-    | checkbox_7 | 0       | 1         | unchanged     | unchecked      | banana      |
+    Examples:
+      | checkbox   | default | changed   | changedstatus | returnedstatus | submitvalue |
+      | checkbox_2 | 0       | 1         | checked       | unchecked      | 1           |
+      | checkbox_3 | 1       | 0         | unchecked     | checked        | 0           |
+      | checkbox_4 | 0       | 1         | checked       | unchecked      | 1           |
+      | checkbox_5 | 0       | 1         | checked       | unchecked      | banana      |
+      | checkbox_6 | 1       | 0         | checked       | unchecked      | apple       |
+      | checkbox_7 | 0       | 1         | unchanged     | unchecked      | banana      |

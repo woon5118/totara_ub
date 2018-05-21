@@ -57,9 +57,9 @@ Feature: Multichoice category report filter
     And I should <c1b> "Course 1b"
     And I should <c2> "Course 2"
 
-  Examples:
-    | type           | includesub | c0      | c1      | c1a     | c1b     | c2      |
-    | is equal to    | 0          | not see | see     | not see | not see | not see |
-    | isn't equal to | 0          | see     | not see | see     | see     | see     |
-    | is equal to    | 1          | not see | see     | see     | see     | not see |
-    | isn't equal to | 1          | see     | not see | not see | not see | see     |
+    Examples:
+      | type           | includesub | c0      | c1      | c1a     | c1b     | c2      |
+      | is equal to    | 0          | not see | see     | not see | not see | not see |
+      | isn't equal to | 0          | see     | not see | see     | see     | see     |
+      | is equal to    | 1          | not see | see     | see     | see     | not see |
+      | isn't equal to | 1          | see     | not see | not see | not see | see     |

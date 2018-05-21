@@ -48,7 +48,7 @@ Feature: Link appraisal with an appraisee job assignment.
       | appraisal           | stage  | name        |
       | Job assignment test | Stage1 | Stage1 Page |
       | Job assignment test | Stage2 | Stage2 Page |
-     And the following "questions" exist in "totara_appraisal" plugin:
+    And the following "questions" exist in "totara_appraisal" plugin:
       | appraisal           | stage  | page        | name    | type          | default | ExtraInfo                          |
       | Job assignment test | Stage1 | Stage1 Page | S1-desc | ratingnumeric | 5       | Range:1-10,Display:slider          |
       | Job assignment test | Stage2 | Stage2 Page | S2-desc | ratingnumeric | 5       | Range:1-10,Display:slider          |

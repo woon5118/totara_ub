@@ -122,57 +122,57 @@ Feature: Test visibility control of menu items
     And I should see "Guest only" in the totara menu
     And I should see "Everyone" in the totara menu
 
-    @javascript
-    Scenario: audience members see only the menu items they are configured to see
-      Given I am on a totara site
-      And the following "users" exist:
-        | username | firstname | lastname | email               |
-        | user1    | User      | One      | one@totaralms.com   |
-        | user2    | User      | Two      | two@totaralms.com   |
-        | user3    | User      | Three    | three@totaralms.com |
-      And the following "cohorts" exist:
-        | name     | idnumber |
-        | Cohort 1 | CH1      |
-        | Cohort 2 | CH2      |
-      And the following "cohort members" exist:
-        | user  | cohort |
-        | user2 | CH1    |
-        | user3 | CH2    |
-      When I log in as "admin"
-      And I create the following totara menu items:
-        | Menu title          | Visibility              | Menu default url address | Restrict access by audience |
-        | CH1 members only    | Use custom access rules | http://totaralms.com     | 1                           |
-        | CH2 members only    | Use custom access rules | http://totaralms.com     | 1                           |
-      And I navigate to "Top navigation" node in "Site administration > Appearance"
-      And I edit "CH1 members only" totara menu item
-      And I click on "Access" "link"
-      And I expand all fieldsets
-      And I click on "Restrict access by audience" "checkbox"
-      And I press "Add audiences"
-      And I click on "Cohort 1" "link"
-      And I press "OK"
-      And I wait "1" seconds
-      And I press "Save changes"
-      And I navigate to "Top navigation" node in "Site administration > Appearance"
-      And I edit "CH2 members only" totara menu item
-      And I click on "Access" "link"
-      And I expand all fieldsets
-      And I click on "Restrict access by audience" "checkbox"
-      And I press "Add audiences"
-      And I click on "Cohort 2" "link"
-      And I press "OK"
-      And I wait "1" seconds
-      And I press "Save changes"
-      And I log out
-      Then I log in as "user1"
-      And I should not see "CH1 members only" in the totara menu
-      And I should not see "CH2 members only" in the totara menu
-      And I log out
-      And I log in as "user2"
-      And I should see "CH1 members only" in the totara menu
-      And I should not see "CH2 members only" in the totara menu
-      And I log out
-      And I log in as "user3"
-      And I should not see "CH1 members only" in the totara menu
-      And I should see "CH2 members only" in the totara menu
-      And I log out
+  @javascript
+  Scenario: audience members see only the menu items they are configured to see
+    Given I am on a totara site
+    And the following "users" exist:
+      | username | firstname | lastname | email               |
+      | user1    | User      | One      | one@totaralms.com   |
+      | user2    | User      | Two      | two@totaralms.com   |
+      | user3    | User      | Three    | three@totaralms.com |
+    And the following "cohorts" exist:
+      | name     | idnumber |
+      | Cohort 1 | CH1      |
+      | Cohort 2 | CH2      |
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user2 | CH1    |
+      | user3 | CH2    |
+    When I log in as "admin"
+    And I create the following totara menu items:
+      | Menu title          | Visibility              | Menu default url address | Restrict access by audience |
+      | CH1 members only    | Use custom access rules | http://totaralms.com     | 1                           |
+      | CH2 members only    | Use custom access rules | http://totaralms.com     | 1                           |
+    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I edit "CH1 members only" totara menu item
+    And I click on "Access" "link"
+    And I expand all fieldsets
+    And I click on "Restrict access by audience" "checkbox"
+    And I press "Add audiences"
+    And I click on "Cohort 1" "link"
+    And I press "OK"
+    And I wait "1" seconds
+    And I press "Save changes"
+    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I edit "CH2 members only" totara menu item
+    And I click on "Access" "link"
+    And I expand all fieldsets
+    And I click on "Restrict access by audience" "checkbox"
+    And I press "Add audiences"
+    And I click on "Cohort 2" "link"
+    And I press "OK"
+    And I wait "1" seconds
+    And I press "Save changes"
+    And I log out
+    Then I log in as "user1"
+    And I should not see "CH1 members only" in the totara menu
+    And I should not see "CH2 members only" in the totara menu
+    And I log out
+    And I log in as "user2"
+    And I should see "CH1 members only" in the totara menu
+    And I should not see "CH2 members only" in the totara menu
+    And I log out
+    And I log in as "user3"
+    And I should not see "CH1 members only" in the totara menu
+    And I should see "CH2 members only" in the totara menu
+    And I log out

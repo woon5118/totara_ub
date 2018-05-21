@@ -1,7 +1,7 @@
 @totara @totara_dashboard
 Feature: Test Dashboard for cohort users
 
-@javascript
+  @javascript
   Scenario: Test Dashboard is assigned to users
     Given I am on a totara site
     And the following "users" exist:

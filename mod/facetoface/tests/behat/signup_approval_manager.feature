@@ -62,7 +62,7 @@ Feature: Seminar Signup Manager Approval
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 10   |
-  And I press "Save changes"
+    And I press "Save changes"
 
   Scenario: Student signs up with no manager assigned
     When I log out

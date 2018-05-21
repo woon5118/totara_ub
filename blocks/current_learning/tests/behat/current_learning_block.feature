@@ -169,40 +169,40 @@ Feature: Test Current Learning block
 
   @javascript
   Scenario: Learner can change pages in the Current Learning block
-   Given the following "courses" exist:
-    | fullname  | shortname | category | enablecompletion |
-    | Course 1  | C1        | 0        | 1                |
-    | Course 2  | C2        | 0        | 0                |
-    | Course 3  | C3        | 0        | 0                |
-    | Course 4  | C4        | 0        | 0                |
-    | Course 5  | C5        | 0        | 0                |
-    | Course 6  | C6        | 0        | 0                |
-    | Course 7  | C7        | 0        | 0                |
-    | Course 8  | C8        | 0        | 0                |
-    | Course 9  | C9        | 0        | 0                |
-    | Course 10 | C10       | 0        | 0                |
-    | Course 11 | C11       | 0        | 0                |
-    | Course 12 | C12       | 0        | 0                |
-    | Course 13 | C13       | 0        | 0                |
-    | Course 14 | C14       | 0        | 0                |
-    | Course 15 | C15       | 0        | 0                |
-  And the following "course enrolments" exist:
-    | user     | course | role    |
-    | learner1 | C1     | student |
-    | learner1 | C2     | student |
-    | learner1 | C3     | student |
-    | learner1 | C4     | student |
-    | learner1 | C5     | student |
-    | learner1 | C6     | student |
-    | learner1 | C7     | student |
-    | learner1 | C8     | student |
-    | learner1 | C9     | student |
-    | learner1 | C10    | student |
-    | learner1 | C11    | student |
-    | learner1 | C12    | student |
-    | learner1 | C13    | student |
-    | learner1 | C14    | student |
-    | learner1 | C15    | student |
+    Given the following "courses" exist:
+      | fullname  | shortname | category | enablecompletion |
+      | Course 1  | C1        | 0        | 1                |
+      | Course 2  | C2        | 0        | 0                |
+      | Course 3  | C3        | 0        | 0                |
+      | Course 4  | C4        | 0        | 0                |
+      | Course 5  | C5        | 0        | 0                |
+      | Course 6  | C6        | 0        | 0                |
+      | Course 7  | C7        | 0        | 0                |
+      | Course 8  | C8        | 0        | 0                |
+      | Course 9  | C9        | 0        | 0                |
+      | Course 10 | C10       | 0        | 0                |
+      | Course 11 | C11       | 0        | 0                |
+      | Course 12 | C12       | 0        | 0                |
+      | Course 13 | C13       | 0        | 0                |
+      | Course 14 | C14       | 0        | 0                |
+      | Course 15 | C15       | 0        | 0                |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | learner1 | C1     | student |
+      | learner1 | C2     | student |
+      | learner1 | C3     | student |
+      | learner1 | C4     | student |
+      | learner1 | C5     | student |
+      | learner1 | C6     | student |
+      | learner1 | C7     | student |
+      | learner1 | C8     | student |
+      | learner1 | C9     | student |
+      | learner1 | C10    | student |
+      | learner1 | C11    | student |
+      | learner1 | C12    | student |
+      | learner1 | C13    | student |
+      | learner1 | C14    | student |
+      | learner1 | C15    | student |
   And the following "activities" exist:
     | activity   | name              | intro           | course               | idnumber    | completion   |
     | label      | c1label1          | course1 label1  | C1                   | c1label1    | 1            |
@@ -219,25 +219,25 @@ Feature: Test Current Learning block
   And I set the field "Label - course1 label2" to "1"
   And I press "Save changes"
   And I log out
-  And I log in as "learner1"
-  When I click on "Dashboard" in the totara menu
-  Then I should see "Course 10"
+    And I log in as "learner1"
+    When I click on "Dashboard" in the totara menu
+    Then I should see "Course 10"
 
-  When I click on ".block_current_learning .pagination [data-page=2]" "css_element"
-  Then I should see "Course 5"
-  And I should not see "Course 10"
+    When I click on ".block_current_learning .pagination [data-page=2]" "css_element"
+    Then I should see "Course 5"
+    And I should not see "Course 10"
 
-  When I click on ".block_current_learning .pagination [data-page=1]" "css_element"
-  Then I should see "Course 10"
-  And I should not see "Course 5"
+    When I click on ".block_current_learning .pagination [data-page=1]" "css_element"
+    Then I should see "Course 10"
+    And I should not see "Course 5"
 
-  When I click on ".block_current_learning .pagination [data-page=next]" "css_element"
-  Then I should see "Course 5"
-  And I should not see "Course 10"
+    When I click on ".block_current_learning .pagination [data-page=next]" "css_element"
+    Then I should see "Course 5"
+    And I should not see "Course 10"
 
-  When I click on ".block_current_learning .pagination [data-page=prev]" "css_element"
-  Then I should see "Course 10"
-  And I should not see "Course 5"
+    When I click on ".block_current_learning .pagination [data-page=prev]" "css_element"
+    Then I should see "Course 10"
+    And I should not see "Course 5"
 
   # Check popover integration
   When I click on "0%" "text"

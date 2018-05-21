@@ -16,7 +16,7 @@ Feature: Add - Remove manager reservations in Seminar
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
-   And the following "course enrolments" exist:
+    And the following "course enrolments" exist:
       | user | course | role           |
       | student1 | C1 | student        |
       | student2 | C1 | student        |

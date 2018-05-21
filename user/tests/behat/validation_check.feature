@@ -1,7 +1,7 @@
 @user @auth @auth_email @javascript
 Feature: Confirm validation works when a date profile field is added
 
-Background:
+  Background:
     Given I am on a totara site
     And I log in as "admin"
     And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
@@ -18,7 +18,7 @@ Background:
     And I click on "Save changes" "button"
     And I log out
 
-Scenario: Confirm validation remains after a required date field is needed
+  Scenario: Confirm validation remains after a required date field is needed
     When I click on "Create new account" "button"
     And I start watching to see if a new page loads
     And I click on "Create my new account" "button"

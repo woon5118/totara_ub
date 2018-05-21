@@ -4,7 +4,7 @@ Feature: All customfields column generator
   As an admin
   I need to be able to add "All ... custom fields" column
 
- Background:
+  Background:
     Given I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email                |

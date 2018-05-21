@@ -1,5 +1,5 @@
 @totara @totara_reportbuilder @javascript
-Feature: Test unrestricted user columns can be added and viewed by the admin
+Feature: Test aggregated user columns can be added and viewed by the admin
   As an admin
   I create a report using the program overview report source
   I test that I can add the aggregated columns

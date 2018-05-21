@@ -37,11 +37,11 @@ Feature: Test restricting Totara custom menu access by roles
     And I log in as "testfailure"
     Then I should not see "test item" in the totara menu
 
-  Examples:
-    | role          | roleshortname |
-    | Site Manager  | manager       |
-    | Learner       | student       |
-    | Guest         | guest         |
+    Examples:
+      | role          | roleshortname |
+      | Site Manager  | manager       |
+      | Learner       | student       |
+      | Guest         | guest         |
 
   Scenario: Check visibility of menu item for authenticated user
     Given I click on "Restrict access by role" "text" in the "#fitem_id_role_enable" "css_element"

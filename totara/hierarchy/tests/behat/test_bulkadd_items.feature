@@ -26,13 +26,13 @@ Feature: It is possible to bulk add a hierarchy tree structure
     And I should see "3 items were successfully added to the hierarchy"
 
     Examples:
-            | hierarchy     | hierarchyplural | hierarchypluralcapital |
-            | position      | positions       | Positions              |
-            | organisation  | organisations   | Organisations          |
-            | competency    | competencies    | Competencies           |
-            | goal          | goals           | Goals                  |
+      | hierarchy     | hierarchyplural | hierarchypluralcapital |
+      | position      | positions       | Positions              |
+      | organisation  | organisations   | Organisations          |
+      | competency    | competencies    | Competencies           |
+      | goal          | goals           | Goals                  |
 
-    Scenario Outline: An invalid <hierarchy> structure gives a validation error
+  Scenario Outline: An invalid <hierarchy> structure gives a validation error
     Given I am on a totara site
     And the following "<hierarchy>" frameworks exist:
       | fullname                  | idnumber | description           |
@@ -56,8 +56,8 @@ Feature: It is possible to bulk add a hierarchy tree structure
     And I should not see "3 items were successfully added to the hierarchy"
 
     Examples:
-            | hierarchy     | hierarchyplural | hierarchypluralcapital |
-            | position      | positions       | Positions              |
-            | organisation  | organisations   | Organisations          |
-            | competency    | competencies    | Competencies           |
-            | goal          | goals           | Goals                  |
+      | hierarchy     | hierarchyplural | hierarchypluralcapital |
+      | position      | positions       | Positions              |
+      | organisation  | organisations   | Organisations          |
+      | competency    | competencies    | Competencies           |
+      | goal          | goals           | Goals                  |
