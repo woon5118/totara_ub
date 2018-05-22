@@ -86,5 +86,12 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017112000, 'totara', 'plan');
     }
 
+    if ($oldversion < 2018052300) {
+        // Clean up orphaned files from any previously deleted evidence.
+        totara_plan_upgrade_clean_deleted_evidence_files();
+
+        upgrade_plugin_savepoint(true, 2018052300, 'totara', 'plan');
+    }
+
     return true;
 }

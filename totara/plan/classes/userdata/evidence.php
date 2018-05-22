@@ -147,22 +147,8 @@ class evidence extends item {
 
         $evidencerecords = $DB->get_fieldset_select('dp_plan_evidence', 'id', 'userid = :userid', ['userid' => $user->id]);
 
-        $fs = get_file_storage();
-        $systemcontext = \context_system::instance();
-
+        // Delete the evidence items.
         foreach ($evidencerecords as $evidenceid) {
-            $cfdata = totara_plan_get_custom_fields($evidenceid);
-
-            foreach ($cfdata as $customfield) {
-                // Delete any custom field files
-                if ($customfield->datatype === 'file') {
-                    $fs->delete_area_files($systemcontext->id, 'totara_customfield', 'evidence_filemgr', $customfield->data);
-                } else if ($customfield->datatype === 'textarea') {
-                    $fs->delete_area_files($systemcontext->id, 'totara_customfield', 'evidence', $customfield->id);
-                }
-            }
-
-            // Delete the evidence item last
             \evidence_delete($evidenceid);
         }
 

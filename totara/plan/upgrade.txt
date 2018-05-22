@@ -7,6 +7,8 @@ Removed deprecated methods:
   * development_plan::get_manager()
   * development_plan::send_alert()
   * dp_base_component::display_back_to_index_link()
+* evidence_display_attachment() has been deprecated and should not longer be used. Please
+  consider using display_evidence_detail() instead.
 
 === 10 ===
 

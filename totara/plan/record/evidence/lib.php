@@ -26,6 +26,8 @@
 /**
  * Display attachments to an evidence
  *
+ * @deprecated since Totara 12
+ *
  * @global object $CFG
  * @global type $OUTPUT
  * @param int $userid
@@ -67,23 +69,14 @@ function evidence_display_attachment($userid, $evidenceid) {
  * Deletes a selected evidence item.
  *
  * @param int $evidenceid - dp_plan_evidence->id
- * @return boolean
  */
 function evidence_delete($evidenceid) {
-    global $DB, $TEXTAREA_OPTIONS;
+    global $DB;
 
     if (!$evidence = $DB->get_record('dp_plan_evidence', array('id' => $evidenceid))) {
         // Well we can't delete something that isn't there.
-        return false;
+        return;
     }
-
-    /** TODO: trigger evidence unlinked events, see T-14190.
-        $sql = "SELECT p.id, p.name
-                  FROM {dp_plan} p
-                  JOIN {dp_plan_evidence_relation} er ON er.planid = p.id
-                 WHERE er.evidenceid = :evidenceid";
-        $plans = $DB->get_records_sql($sql, array('evidenceid' => $item->id));
-    */
 
     $transaction = $DB->start_delegated_transaction();
 
@@ -93,23 +86,25 @@ function evidence_delete($evidenceid) {
     // Delete any evidence relations.
     $DB->delete_records('dp_plan_evidence_relation', array('evidenceid' => $evidence->id));
 
-    // Delete any linked files.
     $fs = get_file_storage();
-    $fs->delete_area_files($TEXTAREA_OPTIONS['context']->id, 'totara_plan', 'attachment', $evidence->id);
+    $systemcontext = \context_system::instance();
+
+    $cfdata = totara_plan_get_custom_fields($evidenceid);
+    foreach ($cfdata as $customfield) {
+        // Delete any custom field files
+        if ($customfield->datatype === 'file') {
+            $fs->delete_area_files($systemcontext->id, 'totara_customfield', 'evidence_filemgr', $customfield->data);
+        } else if ($customfield->datatype === 'textarea') {
+            $fs->delete_area_files($systemcontext->id, 'totara_customfield', 'evidence', $customfield->id);
+        }
+    }
 
     // Delete custom field data.
-    $fields = $DB->get_fieldset_select(
-        'dp_plan_evidence_info_data',
-        'id',
-        "evidenceid = :evidenceid",
-        array('evidenceid' => $evidence->id)
-    );
-
-    if (!empty($fields)) {
-        list($sqlin, $paramsin) = $DB->get_in_or_equal($fields);
-        $DB->delete_records_select('dp_plan_evidence_info_data_param', "dataid {$sqlin}", $paramsin);
-        $DB->delete_records_select('dp_plan_evidence_info_data', "id {$sqlin}", $paramsin);
-    }
+    $DB->delete_records_select('dp_plan_evidence_info_data_param',
+                               'EXISTS (SELECT 1 FROM {dp_plan_evidence_info_data} dpeid
+                                WHERE dpeid.id = dataid AND dpeid.evidenceid = :evidenceid)',
+                               array('evidenceid' => $evidence->id));
+    $DB->delete_records('dp_plan_evidence_info_data', array('evidenceid' => $evidence->id));
 
     $transaction->allow_commit();
 
@@ -214,10 +209,9 @@ function display_evidence_detail($evidenceid, $delete = false) {
 /**
  * Lists all components that are linked to the evidence id
  *
- * @global type $DB
- * @global type $OUTPUT
- * @param type $evidenceid Evidence ID to list items for
- * @return type string html output
+ * @param int $evidenceid Evidence ID to list items for
+ *
+ * @return string html output
  */
 function list_evidence_in_use($evidenceid) {
     global $DB, $OUTPUT;
