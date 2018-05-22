@@ -8,6 +8,8 @@ information provided here is intended especially for developers.
   * import_csv()
   * import_completions()
 * Removed deprecated file csv_iterator.php
+* totara_compl_import_cert.certificationid has been added as a field.
+* totara_compl_import_course.courseid has been added as a field.
 
 === 11 ===
 

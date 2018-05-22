@@ -37,11 +37,16 @@ require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 require_once($CFG->libdir . '/csvlib.class.php');
 require_once($CFG->libdir . '/completionlib.php');
 
-define('COURSE_HISTORY_IMPORT_USERS', 11);
-define('COURSE_HISTORY_IMPORT_COURSES', 11);
-define('COURSE_HISTORY_IMPORT_CSV_ROWS', 100); // Must be less than user * course counts.
-
+/**
+ * Class totara_completionimport_importcourse_testcase
+ *
+ * @group totara_completionimport
+ */
 class totara_completionimport_importcourse_testcase extends advanced_testcase {
+
+    const COUNT_USERS = 11;
+    const COUNT_COURSES = 11;
+    const COUNT_CSV_ROWS = 100; // Must be less than user * course counts.
 
     public function test_import() {
         global $DB;
@@ -59,24 +64,24 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $generatorstart = time();
         $this->assertEquals(1, $DB->count_records('course')); // Site course.
         $coursedefaults = array('enablecompletion' => COMPLETION_ENABLED);
-        for ($i = 1; $i <= COURSE_HISTORY_IMPORT_USERS; $i++) {
+        for ($i = 1; $i <= self::COUNT_USERS; $i++) {
             $this->getDataGenerator()->create_course($coursedefaults);
         }
         // Site course + generated courses.
-        $this->assertEquals(COURSE_HISTORY_IMPORT_USERS+1, $DB->count_records('course'),
+        $this->assertEquals(self::COUNT_USERS+1, $DB->count_records('course'),
             'Record count mismatch for courses');
 
         // Create users
         $this->assertEquals(2, $DB->count_records('user')); // Guest + Admin.
-        for ($i = 1; $i <= COURSE_HISTORY_IMPORT_COURSES; $i++) {
+        for ($i = 1; $i <= self::COUNT_COURSES; $i++) {
             $this->getDataGenerator()->create_user();
         }
         // Guest + Admin + generated users.
-        $this->assertEquals(COURSE_HISTORY_IMPORT_COURSES+2, $DB->count_records('user'),
+        $this->assertEquals(self::COUNT_COURSES+2, $DB->count_records('user'),
             'Record count mismatch for users');
 
         // Manual enrol should be set.
-        $this->assertEquals(COURSE_HISTORY_IMPORT_COURSES, $DB->count_records('enrol', array('enrol'=>'manual')),
+        $this->assertEquals(self::COUNT_COURSES, $DB->count_records('enrol', array('enrol'=>'manual')),
             'Manual enrol is not set for all courses');
 
         // Generate import data - product of user and course tables - exluding site course and admin/guest user.
@@ -94,7 +99,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
                         {course} c
                 WHERE   u.id > 2
                 AND     c.id > 1";
-        $imports = $DB->get_recordset_sql($sql, null, 0, COURSE_HISTORY_IMPORT_CSV_ROWS);
+        $imports = $DB->get_recordset_sql($sql, null, 0, self::COUNT_CSV_ROWS);
         if ($imports->valid()) {
             $count = 0;
             foreach ($imports as $import) {
@@ -121,7 +126,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
             }
         }
         $imports->close();
-        $this->assertEquals(COURSE_HISTORY_IMPORT_CSV_ROWS + $countevidence, $count, 'Record count mismatch when creating CSV file');
+        $this->assertEquals(self::COUNT_CSV_ROWS + $countevidence, $count, 'Record count mismatch when creating CSV file');
 
         // Time info for load testing - 4.4 minutes for 10,000 csv rows on postgresql.
         $generatorstop = time();
@@ -131,13 +136,13 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $importstop = time();
 
         $importtablename = get_tablename($importname);
-        $this->assertEquals(COURSE_HISTORY_IMPORT_CSV_ROWS + $countevidence, $DB->count_records($importtablename),
+        $this->assertEquals(self::COUNT_CSV_ROWS + $countevidence, $DB->count_records($importtablename),
             'Record count mismatch in the import table ' . $importtablename);
         $this->assertEquals($countevidence, $DB->count_records('dp_plan_evidence'),
             'There should be two evidence records');
-        $this->assertEquals(COURSE_HISTORY_IMPORT_CSV_ROWS, $DB->count_records('course_completions'),
+        $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('course_completions'),
             'Record count mismatch in the course_completions table');
-        $this->assertEquals(COURSE_HISTORY_IMPORT_CSV_ROWS, $DB->count_records('user_enrolments'),
+        $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('user_enrolments'),
             'Record count mismatch in the user_enrolments table');
     }
 }

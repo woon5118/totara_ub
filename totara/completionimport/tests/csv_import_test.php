@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
  * Class totara_completionimport_csv_import_testcase
  *
  * Tests methods within the \totara_completionimport\csv_import class.
+ *
+ * @group totara_completionimport
  */
 class totara_completionimport_csv_import_testcase extends advanced_testcase {
 

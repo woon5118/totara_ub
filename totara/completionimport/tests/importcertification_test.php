@@ -39,11 +39,16 @@ require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once($CFG->libdir  . '/csvlib.class.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
-define('CERT_HISTORY_IMPORT_USERS', 11);
-define('CERT_HISTORY_IMPORT_CERTIFICATIONS', 11);
-define('CERT_HISTORY_IMPORT_CSV_ROWS', 100); // Must be less than user * certification counts.
-
+/**
+ * Class totara_completionimport_importcertification_testcase
+ *
+ * @group totara_completionimport
+ */
 class totara_completionimport_importcertification_testcase extends reportcache_advanced_testcase {
+
+    const COUNT_USERS = 11;
+    const COUNT_CERTIFICATIONS = 11;
+    const COUNT_CSV_ROWS = 100; // Must be less than user * certification counts.
 
     // Used in import action tests below.
     private $users;
@@ -104,20 +109,20 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
 
         // Create some programs.
         $this->assertEquals(0, $DB->count_records('prog'), "Programs table isn't empty");
-        for ($i = 1; $i <= CERT_HISTORY_IMPORT_CERTIFICATIONS; $i++) {
+        for ($i = 1; $i <= self::COUNT_CERTIFICATIONS; $i++) {
             $certifications[$i] = $this->getDataGenerator()->create_certification(array('prog_idnumber' => 'ID' . $i));
         }
-        $this->assertEquals(CERT_HISTORY_IMPORT_CERTIFICATIONS, $DB->count_records('prog'),
+        $this->assertEquals(self::COUNT_CERTIFICATIONS, $DB->count_records('prog'),
             'Record count mismatch in program table');
-        $this->assertEquals(CERT_HISTORY_IMPORT_CERTIFICATIONS, $DB->count_records('certif'),
+        $this->assertEquals(self::COUNT_CERTIFICATIONS, $DB->count_records('certif'),
             'Record count mismatch for certif');
 
         // Create users.
         $this->assertEquals(2, $DB->count_records('user')); // Guest + Admin.
-        for ($i = 1; $i <= CERT_HISTORY_IMPORT_USERS; $i++) {
+        for ($i = 1; $i <= self::COUNT_USERS; $i++) {
             $this->getDataGenerator()->create_user();
         }
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records('user'),
+        $this->assertEquals(self::COUNT_USERS+2, $DB->count_records('user'),
             'Record count mismatch for users'); // Guest + Admin + generated users.
 
         // Generate import data - product of user and certif tables.
@@ -134,7 +139,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
                         p.availableuntil AS duedate
                 FROM    {user} u,
                         {prog} p";
-        $imports = $DB->get_recordset_sql($sql, null, 0, CERT_HISTORY_IMPORT_CSV_ROWS);
+        $imports = $DB->get_recordset_sql($sql, null, 0, self::COUNT_CSV_ROWS);
         if ($imports->valid()) {
             $count = 0;
             foreach ($imports as $import) {
@@ -149,7 +154,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
             }
         }
         $imports->close();
-        $this->assertEquals(CERT_HISTORY_IMPORT_CSV_ROWS, $count, 'Record count mismatch when creating CSV file');
+        $this->assertEquals(self::COUNT_CSV_ROWS, $count, 'Record count mismatch when creating CSV file');
 
         $generatorstop = time();
 
@@ -158,15 +163,15 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $importstop = time();
 
         $importtablename = get_tablename($importname);
-        $this->assertEquals(CERT_HISTORY_IMPORT_CSV_ROWS, $DB->count_records($importtablename),
+        $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records($importtablename),
             'Record count mismatch in the import table ' . $importtablename);
         $this->assertEquals(0, $DB->count_records('dp_plan_evidence'),
             'There should be no evidence records');
-        $this->assertEquals(CERT_HISTORY_IMPORT_CSV_ROWS, $DB->count_records('certif_completion'),
+        $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('certif_completion'),
             'Record count mismatch in the certif_completion table');
-        $this->assertEquals(CERT_HISTORY_IMPORT_CSV_ROWS, $DB->count_records('prog_completion'),
+        $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('prog_completion'),
             'Record count mismatch in the prog_completion table');
-        $this->assertEquals(CERT_HISTORY_IMPORT_CSV_ROWS, $DB->count_records('prog_user_assignment'),
+        $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('prog_user_assignment'),
             'Record count mismatch in the prog_user_assignment table');
     }
 
@@ -203,10 +208,10 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         // Create users.
         $this->assertEquals(2, $DB->count_records('user')); // Guest + Admin.
         $users = array();
-        for ($i = 1; $i <= CERT_HISTORY_IMPORT_USERS; $i++) {
+        for ($i = 1; $i <= self::COUNT_USERS; $i++) {
             $users[$i] = $this->getDataGenerator()->create_user();
         }
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records('user'),
+        $this->assertEquals(self::COUNT_USERS+2, $DB->count_records('user'),
             'Record count mismatch for users'); // Guest + Admin + generated users.
 
         // Associate some users to an audience - (users from 1-5).
@@ -245,7 +250,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
                         p.availableuntil AS duedate
                 FROM    {user} u,
                         {prog} p";
-        $imports = $DB->get_recordset_sql($sql, null, 0, CERT_HISTORY_IMPORT_CSV_ROWS);
+        $imports = $DB->get_recordset_sql($sql, null, 0, self::COUNT_CSV_ROWS);
         if ($imports->valid()) {
             $count = 0;
             foreach ($imports as $import) {
@@ -260,7 +265,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
             }
         }
         $imports->close();
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $count, 'Record count mismatch when creating CSV file');
+        $this->assertEquals(self::COUNT_USERS+2, $count, 'Record count mismatch when creating CSV file');
 
         $generatorstop = time();
 
@@ -319,15 +324,15 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         }
 
         $importtablename = get_tablename($importname);
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records($importtablename),
+        $this->assertEquals(self::COUNT_USERS+2, $DB->count_records($importtablename),
             'Record count mismatch in the import table ' . $importtablename);
         $this->assertEquals(0, $DB->count_records('dp_plan_evidence'),
             'There should be no evidence records');
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records('certif_completion'),
+        $this->assertEquals(self::COUNT_USERS+2, $DB->count_records('certif_completion'),
             'Record count mismatch in the certif_completion table');
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records('prog_completion'),
+        $this->assertEquals(self::COUNT_USERS+2, $DB->count_records('prog_completion'),
             'Record count mismatch in the prog_completion table');
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records('prog_user_assignment'),
+        $this->assertEquals(self::COUNT_USERS+2, $DB->count_records('prog_user_assignment'),
             'Record count mismatch in the prog_user_assignment table');
         $this->assertEquals(1, $DB->count_records('prog_future_user_assignment'),
             'Record count mismatch in the prog_future_user_assignment table');
@@ -336,7 +341,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
     /**
      * Creates:
      * - one cert
-     * - CERT_HISTORY_IMPORT_USERS users
+     * - self::COUNT_USERS users
      * - cohort
      * - first 10 users are in the cohort
      * - cohort is in the cert

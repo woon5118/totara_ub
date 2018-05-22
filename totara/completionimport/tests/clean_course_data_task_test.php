@@ -39,6 +39,11 @@ define('COURSE_IMPORT_USERS', 11);
 define('COURSE_IMPORT_COURSES', 11);
 define('COURSE_IMPORT_CSV_ROWS', 100);
 
+/**
+ * Class clean_course_data_task_testcase
+ *
+ * @group totara_completionimport
+ */
 class clean_course_data_task_testcase extends advanced_testcase {
 
     public function test_task() {

@@ -133,7 +133,8 @@ function get_tablename($importname) {
 
 /**
  * Returns the SQL to compare the shortname if not empty or idnumber if shortname is empty
- * @global object $DB
+ *
+ * @deprecated since Totara 12
  * @param string $relatedtable eg: "{course}" if a table or 'c' if its an alias
  * @param string $importtable eg: "{totara_compl_import_course}" or "i"
  * @param string $shortnamefield courseshortname or certificationshortname
@@ -142,6 +143,8 @@ function get_tablename($importname) {
  */
 function get_shortnameoridnumber($relatedtable, $importtable, $shortnamefield, $idnumberfield) {
     global $DB;
+
+    debugging(__FUNCTION__ . ' was deprecated in Totara 12. There is now a resolved reference to the course/cert on the import record', DEBUG_DEVELOPER);
 
     $notemptyshortname = $DB->sql_isnotempty($importtable, "{$importtable}.{$shortnamefield}", true, false);
     $notemptyidnumber = $DB->sql_isnotempty($importtable, "{$importtable}.{$idnumberfield}", true, false);
@@ -204,6 +207,13 @@ function get_default_config($pluginname, $configname, $default) {
  */
 function import_data_checks($importname, $importtime) {
     global $DB, $CFG;
+
+    // First up apply case insensitive matching if required.
+    totara_completionimport_apply_case_insensitive_mapping($importname, $importtime);
+
+    // Find and set reference to the course/cert records that actually exist.
+    // Must be done before import data checks is actually run.
+    totara_completionimport_resolve_references($importname, $importtime);
 
     list($sqlwhere, $stdparams) = get_importsqlwhere($importtime, '');
 
@@ -347,33 +357,11 @@ function import_data_checks($importname, $importtime) {
                 list($idsql, $idparams) = $DB->get_in_or_equal($idnumber, SQL_PARAMS_NAMED, 'param');
                 $params = array_merge($stdparams, $idparams);
                 $where = "{$sqlwhere} AND {$idnumberfield} {$idsql}";
-                $forcecaseinsensitive = get_default_config($pluginname, 'forcecaseinsensitive' . $importname, false);
-                // If case sensitive is enabled, fix shortname matching.
-                if ($forcecaseinsensitive) {
-                    // First try to find the course/certification shortname in course/prog table.
-                    $tblname = $importname == 'course' ? $importname : 'prog';
-                    $sql = "SELECT shortname FROM {{$tblname}} WHERE " . $DB->sql_like('idnumber', str_replace('= ', '', $idsql), false, false);
-                    $record = $DB->get_record_sql($sql, $idparams, IGNORE_MULTIPLE);
-                    if ($record) {
-                        $value = $record->shortname;
-                    } else {
-                        // No records exists, match the shortname from the first record.
-                        $sql = "SELECT {$shortnamefield} FROM {{$tablename}} {$where}";
-                        $record = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
-                        $value = $record->{$shortnamefield};
-                    }
-                    $update = "UPDATE {{$tablename}}
-                        SET {$shortnamefield} = :{$shortnamefield}
-                        {$where}";
-                    $whereparams = array_merge($params, array($shortnamefield => $value));
-                    $DB->execute($update, $whereparams);
-                } else {
-                    $params['errorstring'] = 'duplicateidnumber;';
-                    $sql = "UPDATE {{$tablename}}
+                $params['errorstring'] = 'duplicateidnumber;';
+                $sql = "UPDATE {{$tablename}}
                     SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . "
                     {$where}";
-                    $DB->execute($sql, $params);
-                }
+                $DB->execute($sql, $params);
             }
         }
     }
@@ -392,18 +380,14 @@ function import_data_checks($importname, $importtime) {
             // Course exists but there is no manual enrol record.
             $params = array('enrolname' => 'manual', 'errorstring' => 'nomanualenrol;');
             $params = array_merge($stdparams, $params);
-            $shortnameoridnumber = get_shortnameoridnumber("{course}", "{{$tablename}}", $shortnamefield, $idnumberfield);
             $sql = "UPDATE {{$tablename}}
                     SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . "
                     {$sqlwhere}
-                    AND EXISTS (SELECT {course}.id
-                                FROM {course}
-                                WHERE {$shortnameoridnumber})
+                    AND courseid IS NOT NULL
                     AND NOT EXISTS (SELECT {enrol}.id
                                 FROM {enrol}
-                                JOIN {course} ON {course}.id = {enrol}.courseid
                                 WHERE {enrol}.enrol = :enrolname
-                                AND {$shortnameoridnumber})";
+                                AND {enrol}.courseid = courseid)";
             $DB->execute($sql, $params);
         }
     }
@@ -415,6 +399,172 @@ function import_data_checks($importname, $importtime) {
             {$sqlwhere}
             AND " . $DB->sql_isnotempty($tablename, 'importerrormsg', true, true); // Note text = true.
     $DB->execute($sql, $params);
+}
+
+/**
+ * Applies case insensitive matching.
+ *
+ * Please note this function does not do what you expect.
+ * When enabled, course short names will be matched case insensitively.
+ *
+ *      1. If there are two or more courses with shortnames that use different case but have matching idnumbers then the name of the existing course will be matched.
+ *      2. If the inital match fails, the shortname for the duplicate records with matching idnumbers will be used.
+ *
+ * @param string $importname
+ * @param int $importtime
+ */
+function totara_completionimport_apply_case_insensitive_mapping($importname, $importtime) {
+    global $DB;
+
+    $pluginname = 'totara_completionimport_' . $importname;
+    $forcecaseinsensitive = get_default_config($pluginname, 'forcecaseinsensitive' . $importname, false);
+    if (!$forcecaseinsensitive) {
+        return;
+    }
+
+    list($sqlwhere, $stdparams) = get_importsqlwhere($importtime, '');
+
+    $shortnamefield = $importname . 'shortname';
+    $idnumberfield = $importname . 'idnumber';
+
+    $tablename = get_tablename($importname);
+    $columnnames = get_columnnames($importname);
+
+    // Unique ID numbers.
+    if (in_array($shortnamefield, $columnnames) && in_array($idnumberfield, $columnnames)) {
+        // I 'think' the count has to be included in the select even though we only need having count().
+        $notemptyidnumber = $DB->sql_isnotempty($tablename, "{{$tablename}}.{$idnumberfield}", true, false);
+        $shortimportname = sql_collation($shortnamefield);
+        $sql = "SELECT u.{$idnumberfield}, COUNT(*) AS shortnamecount
+                  FROM (
+                        SELECT DISTINCT {$shortimportname}, {$idnumberfield}
+                          FROM {{$tablename}}
+                               {$sqlwhere} AND
+                               {$notemptyidnumber}
+                       ) u
+              GROUP BY u.{$idnumberfield}
+                HAVING COUNT(*) > 1";
+        $idnumbers = $DB->get_records_sql($sql, $stdparams);
+        $idnumberlist = array_keys($idnumbers);
+
+        if (count($idnumberlist)) {
+            foreach ($idnumberlist as $idnumber) {
+
+                $idnumber_param = $DB->get_unique_param();
+                $params = array_merge($stdparams, [$idnumber_param => $idnumber]);
+                $where = "{$sqlwhere} AND {$idnumberfield} = :$idnumber_param";
+
+                // First try to find the course/certification shortname in course/prog table.
+                $tblname = $importname == 'course' ? $importname : 'prog';
+                $idnumber_like = $DB->sql_like('idnumber', ':' . $idnumber_param, false, false);
+                $sql = "SELECT shortname 
+                          FROM {{$tblname}} 
+                         WHERE {$idnumber_like}";
+                $record = $DB->get_record_sql($sql, [$idnumber_param => $idnumber], IGNORE_MULTIPLE);
+                if ($record) {
+                    $value = $record->shortname;
+                } else {
+                    // No records exists, match the shortname from the first record.
+                    $sql = "SELECT {$shortnamefield} 
+                              FROM {{$tablename}} 
+                                   {$where}";
+                    $record = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
+                    $value = $record->{$shortnamefield};
+                }
+                $update = "UPDATE {{$tablename}}
+                              SET {$shortnamefield} = :{$shortnamefield}
+                                  {$where}";
+                $whereparams = array_merge($params, array($shortnamefield => $value));
+                $DB->execute($update, $whereparams);
+            }
+        }
+    }
+}
+
+/**
+ * Works out if import records relate to actual courses/certifications, and updates them with a reference ID if they do.
+ *
+ * @param string $importname Either 'course' or 'certification'
+ * @param int $importtime
+ */
+function totara_completionimport_resolve_references($importname, $importtime) {
+    global $DB;
+
+    // Don't just trust it!
+    $importname = ($importname === 'course') ? 'course' : 'certification';
+
+    $tablename = get_tablename($importname);
+    list($timewhere, $timeparams) = get_importsqlwhere($importtime);
+    list($timewhereraw, $timeparamsraw) = get_importsqlwhere($importtime, '');
+
+    if ($importname === 'course') {
+        $ref_field = 'courseid';
+        $rs = $DB->get_recordset('course', null, '', 'id, idnumber, shortname');
+    } else {
+        $ref_field = 'certificationid';
+        $rs = $DB->get_recordset_select('prog', 'certifid IS NOT NULL', null, '', 'id, idnumber, shortname');
+    }
+
+    $map_idnumber = [];
+    $map_shortname = [];
+    foreach ($rs as $ref) {
+        if (!empty($ref->idnumber)) {
+            $map_idnumber[$ref->idnumber] = $ref;
+        }
+        // Shortname must be set for a course or certification.
+        $map_shortname[$ref->shortname] = $ref;
+    }
+    $rs->close();
+
+    $sql = "SELECT i.{$importname}shortname AS shortname, i.{$importname}idnumber AS idnumber, COUNT(i.id) AS instancecount
+              FROM {{$tablename}} i
+                   {$timewhere}
+          GROUP BY {$importname}shortname, {$importname}idnumber";
+    $rs = $DB->get_recordset_sql($sql, $timeparams);
+
+    foreach ($rs as $importrow) {
+        if ($importrow->idnumber === '' && $importrow->shortname === '') {
+            // Both are empty, no possible match.
+            continue;
+        }
+        $idnumber = $importrow->idnumber;
+        $shortname = $importrow->shortname;
+
+        if ($shortname != '' && $idnumber != '' && isset($map_shortname[$shortname]) && $map_shortname[$shortname]->idnumber === $idnumber) {
+            // Perfect match! Shortname and idnumber both set and match.
+            $sql = "UPDATE {{$tablename}}
+                       SET {$ref_field} = :ref
+                           {$timewhereraw} AND {$importname}idnumber = :idnumber AND {$importname}shortname = :shortname";
+            $params = [
+                'ref' => $map_shortname[$shortname]->id,
+                'idnumber' => $importrow->idnumber,
+                'shortname' => $importrow->shortname,
+            ];
+            $DB->execute($sql, $timeparamsraw + $params);
+        } else if ($shortname != '' && $idnumber == '' && isset($map_shortname[$shortname])) {
+            // Shortname set, idnumber not set, and shortname matches.
+            $sql = "UPDATE {{$tablename}}
+                       SET {$ref_field} = :ref
+                        {$timewhereraw} AND ({$importname}idnumber IS NULL OR {$importname}idnumber = '') AND {$importname}shortname = :shortname";
+            $params = [
+                'ref' => $map_shortname[$shortname]->id,
+                'shortname' => $importrow->shortname,
+            ];
+            $DB->execute($sql, $timeparamsraw + $params);
+        } else if ($shortname == '' && $idnumber != '' && isset($map_idnumber[$idnumber])) {
+            // Shortname not set, idnumber set, and idnumber matches.
+            $sql = "UPDATE {{$tablename}}
+                       SET {$ref_field} = :ref
+                           {$timewhereraw} AND ({$importname}shortname IS NULL OR {$importname}shortname = '') AND {$importname}idnumber = :idnumber";
+            $params = [
+                'ref' => $map_idnumber[$idnumber]->id,
+                'idnumber' => $importrow->idnumber,
+            ];
+            $DB->execute($sql, $timeparamsraw + $params);
+        }
+    }
+    $rs->close();
+    unset($map_idnumber, $map_shortname); // Ensure we give back this memory very explicitly.
 }
 
 /**
@@ -436,24 +586,18 @@ function create_evidence($importname, $importtime) {
 
     if ($importname == 'course') {
         // Add any missing courses to other training (evidence).
-        $shortnameoridnumber = get_shortnameoridnumber('c', 'i', $shortnamefield, $idnumberfield);
         $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield}, i.{$idnumberfield}, i.completiondateparsed, i.grade, i.customfields
                 FROM {{$tablename}} i
                 JOIN {user} u ON u.username = i.username
                 {$sqlwhere}
-                  AND NOT EXISTS (SELECT c.id
-                                FROM {course} c
-                                WHERE {$shortnameoridnumber})";
+                  AND i.courseid IS NULL";
     } else if ($importname == 'certification') {
         // Add any missing certifications to other training (evidence).
-        $shortnameoridnumber = get_shortnameoridnumber('p', 'i', $shortnamefield, $idnumberfield);
         $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield},  i.{$idnumberfield}, i.completiondateparsed, i.customfields
                 FROM {{$tablename}} i
                 JOIN {user} u ON u.username = i.username
-                LEFT JOIN {prog} p ON {$shortnameoridnumber}
-                    AND p.certifid IS NOT NULL
                 {$sqlwhere}
-                AND p.id IS NULL";
+                AND i.certificationid IS NULL";
     }
 
 
@@ -659,7 +803,6 @@ function import_course($importname, $importtime) {
     $params['enrolname'] = 'manual';
 
     $tablename = get_tablename($importname);
-    $shortnameoridnumber = get_shortnameoridnumber('c', 'i', 'courseshortname', 'courseidnumber');
     $sql = "SELECT i.id as importid,
                     i.completiondateparsed,
                     i.grade,
@@ -674,7 +817,7 @@ function import_course($importname, $importtime) {
                     cc.timecompleted as currenttimecompleted
             FROM {{$tablename}} i
             JOIN {user} u ON u.username = i.username
-            JOIN {course} c ON {$shortnameoridnumber}
+            JOIN {course} c ON c.id = i.courseid
             JOIN {enrol} e ON e.courseid = c.id AND e.enrol = :enrolname
             LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = u.id)
             LEFT JOIN {course_completions} cc ON cc.userid = u.id AND cc.course = c.id
@@ -973,16 +1116,11 @@ function import_certification($importname, $importtime) {
 
     list($importsqlwhere, $importsqlparams) = get_importsqlwhere($importtime);
 
-    // Create missing program assignments for individuals, in a form that will work for insert_records_via_batch().
-    // Note: Postgres objects to manifest constants being used as parameters where they are the left hand.
-    // of an SQL clause (eg 5 AS assignmenttype) so manifest constants are placed in the query directly (better anyway!).
-    $shortnameoridnumber = get_shortnameoridnumber('p', 'i', 'certificationshortname', 'certificationidnumber');
-
     // First find all programs that have a user who is in the import but who isn't yet assigned.
     $sql = "SELECT DISTINCT p.id
               FROM {totara_compl_import_cert} i
               JOIN {user} u ON u.username = i.username
-              JOIN {prog} p ON {$shortnameoridnumber}
+              JOIN {prog} p ON p.id = i.certificationid
              {$importsqlwhere}
                AND NOT EXISTS (SELECT pa.id FROM {prog_user_assignment} pa
                                 WHERE pa.programid = p.id AND pa.userid = u.id)
@@ -1000,7 +1138,7 @@ function import_certification($importname, $importtime) {
                    0 AS completioninstance
               FROM {totara_compl_import_cert} i
               JOIN {user} u ON u.username = i.username
-              JOIN {prog} p ON {$shortnameoridnumber}
+              JOIN {prog} p ON p.id = i.certificationid
              {$importsqlwhere}
                AND NOT EXISTS (SELECT pa.id FROM {prog_user_assignment} pa
                                 WHERE pa.programid = p.id AND pa.userid = u.id)
@@ -1043,7 +1181,7 @@ function import_certification($importname, $importtime) {
                     pua.id AS puaid,
                     pfa.id AS pfaid
             FROM {totara_compl_import_cert} i
-            JOIN {prog} p ON {$shortnameoridnumber}
+            JOIN {prog} p ON p.id = i.certificationid
             JOIN {certif} c ON c.id = p.certifid
             JOIN {user} u ON u.username = i.username
             LEFT JOIN {prog_assignment} pa ON pa.programid = p.id

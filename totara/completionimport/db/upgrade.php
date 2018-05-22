@@ -79,5 +79,35 @@ function xmldb_totara_completionimport_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016122800, 'totara', 'completionimport');
     }
 
+    if ($oldversion < 2018052200) {
+
+        // Define field courseid to be added to totara_compl_import_course.
+        $table = new xmldb_table('totara_compl_import_course');
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'id');
+
+        // Conditionally launch add field courseid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Completionimport savepoint reached.
+        upgrade_plugin_savepoint(true, 2018052200, 'totara', 'completionimport');
+    }
+
+    if ($oldversion < 2018052201) {
+
+        // Define field certificationid to be added to totara_compl_import_cert.
+        $table = new xmldb_table('totara_compl_import_cert');
+        $field = new xmldb_field('certificationid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'id');
+
+        // Conditionally launch add field certificationid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Completionimport savepoint reached.
+        upgrade_plugin_savepoint(true, 2018052201, 'totara', 'completionimport');
+    }
+
     return true;
 }

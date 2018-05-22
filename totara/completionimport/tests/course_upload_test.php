@@ -32,6 +32,11 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 
+/**
+ * Class totara_completionimport_course_upload_testcase
+ *
+ * @group totara_completionimport
+ */
 class totara_completionimport_course_upload_testcase extends advanced_testcase {
 
     protected $user1, $user2, $course1, $course2, $course3;
