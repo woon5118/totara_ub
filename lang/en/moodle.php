@@ -382,7 +382,9 @@ $string['coursesummary_help'] = 'The course summary is displayed in the list of 
 $string['coursetitle'] = 'Course: {$a->course}';
 $string['courseupdates'] = 'Course updates';
 $string['coursevisibility'] = 'Course visibility';
-$string['coursevisibility_help'] = 'This setting determines whether the course appears in the list of courses and whether students can access it. If set to Hide, then access is restricted to users with the capability to view hidden courses (such as teachers).';
+$string['coursevisibility_help'] = 'This setting determines whether the course appears in the list of courses. Apart from users granted the **viewhiddencourse** capability (course creators, editing trainers, trainers, and managers by default), users are not allowed to enter the course, even if enrolled.
+
+This setting allows a course administrator to set up a course as hidden and assign the learners to it, without the learners being able to see the course. The course administrator can then confirm that the details of the course and the set of assigned learners are correct before making the course visible to the learners at the appropriate time.';
 $string['create'] = 'Create';
 $string['createaccount'] = 'Create my new account';
 $string['createcategory'] = 'Create category';
@@ -2036,9 +2038,6 @@ $string['viewprofile'] = 'View profile';
 $string['views'] = 'Views';
 $string['viewsolution'] = 'view solution';
 $string['visible'] = 'Visible';
-$string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from users granted the **viewhiddencourse** capability (course creators, editing trainers, trainers, and managers by default), users are not allowed to enter the course, even if enrolled.
-
-This setting allows a course administrator to setup up a course as hidden and assign the learners to it, without the learners being able to see the course. The course administrator can then confirm that the details of the course and the set of assigned learners are correct before making the course visible to the learners at the appropriate time.';
 $string['visibletostudents'] = 'Visible to {$a}';
 $string['warning'] = 'Warning';
 $string['warningdeleteresource'] = 'Warning: {$a} is referred in a resource. Would you like to update the resource?';
@@ -2139,3 +2138,8 @@ $string['courseimage_help'] = 'Upload an image that will get displayed with the 
 // Deprecated since Moodle 3.1.
 $string['filetoolarge'] = 'is too large to upload';
 $string['maxbytesforfile'] = 'The file {$a} is larger than the maximum size allowed.';
+
+// Deprecated since Totara 12.0.
+$string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from users granted the **viewhiddencourse** capability (course creators, editing trainers, trainers, and managers by default), users are not allowed to enter the course, even if enrolled.
+
+This setting allows a course administrator to setup up a course as hidden and assign the learners to it, without the learners being able to see the course. The course administrator can then confirm that the details of the course and the set of assigned learners are correct before making the course visible to the learners at the appropriate time.';

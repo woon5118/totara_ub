@@ -68,3 +68,4 @@ moodleorghubname,core_admin
 nativesqlsrvnonwindows,core_install
 loginpasswordautocomplete,core_admin
 loginpasswordautocomplete_help,core_admin
+visible_help,core
