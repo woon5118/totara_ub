@@ -319,7 +319,9 @@ When reviewing assignments, trainers can leave feedback comments and upload file
 $string['modulename_link'] = 'mod/assignment/view';
 $string['modulenameplural'] = 'Assignments';
 $string['moreusers'] = '{$a} more...';
+$string['multiple'] = 'Multiple';
 $string['multipleteams'] = 'Member of more than one group';
+$string['multipleteams_desc'] = 'The assignment requires submission in groups. You are a member of more than one group. To be able to submit you must be member of exactly one group so that your submission can be mapped correctly to your group. Please contact your trainer to update your group membership.';
 $string['multipleteamsgrader'] = 'Member of more than one group, so unable to make submissions.';
 $string['mysubmission'] = 'My submission: ';
 $string['newsubmissions'] = 'Assignments submitted';
@@ -338,6 +340,7 @@ $string['nosavebutnext'] = 'Next';
 $string['nosubmission'] = 'Nothing has been submitted for this assignment';
 $string['nosubmissionsacceptedafter'] = 'No submissions accepted after ';
 $string['noteam'] = 'Not a member of any group';
+$string['noteam_desc'] = 'This assignment requires submission in groups. You are not a member of any group, so you cannot create a submission. Please contact your trainer to be added to a group.';
 $string['noteamgrader'] = 'Not a member of any group, so unable to make submissions.';
 $string['notgraded'] = 'Not graded';
 $string['notgradedyet'] = 'Not graded yet';

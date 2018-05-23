@@ -48,6 +48,7 @@ Feature: Submit assignment without group
     And I follow "Course 1"
     And I follow "Allow default group"
     Then I should not see "Not a member of any group"
+    And I should not see "This assignment requires submission in groups. You are not a member of any group"
     And I should see "Nothing has been submitted for this assignment"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -58,7 +59,8 @@ Feature: Submit assignment without group
     And I should see "Submitted for grading"
     And I follow "Course 1"
     And I follow "Require group membership"
-    And I should see "Not a member of any group"
+    And I should see "None" in the "Group" "table_row"
+    And I should see "This assignment requires submission in groups. You are not a member of any group"
     And I should see "Nothing has been submitted for this assignment"
     And I should not see "Add submission"
     And I am on homepage
@@ -120,7 +122,8 @@ Feature: Submit assignment without group
     And I log in as "student3"
     And I follow "Course 3"
     And I follow "Require group membership"
-    And I should see "Member of more than one group"
+    And I should see "Multiple" in the "Group" "table_row"
+    And I should see "The assignment requires submission in groups. You are a member of more than one group."
     And I should see "Nothing has been submitted for this assignment"
     And I should not see "Add submission"
     And I log out
