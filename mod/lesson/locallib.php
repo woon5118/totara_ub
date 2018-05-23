@@ -748,7 +748,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
             $timestart = 0;
             $timeend = 0;
             $usergrade = null;
-            $eol = false;
+            $eol = 0;
 
             // search for the grade record for this try. if not there, the nulls defined above will be used.
             foreach($grades as $grade) {
@@ -801,7 +801,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
             $timestart = 0;
             $timeend = 0;
             $usergrade = null;
-            $eol = false;
+            $eol = 0;
             // Search for the time record for this try. if not there, the nulls defined above will be used.
             foreach ($times as $time) {
                 // Check to see if the grade matches the correct user.
@@ -3118,7 +3118,8 @@ class lesson extends lesson_base {
         }
 
         // Progress calculation as a percent.
-        return round(count($viewedpageids) / count($validpages), 2) * 100;
+        $progress = round(count($viewedpageids) / count($validpages), 2) * 100;
+        return (int) $progress;
     }
 
     /**
@@ -3127,16 +3128,23 @@ class lesson extends lesson_base {
      * @param  int $pageid the given page id
      * @param  mod_lesson_renderer $lessonoutput the lesson output rendered
      * @param  bool $reviewmode whether we are in review mode or not
+     * @param  bool $redirect  Optional, default to true. Set to false to avoid redirection and return the page to redirect.
      * @return array the page object and contents
      * @throws moodle_exception
      * @since  Moodle 3.3
      */
-    public function prepare_page_and_contents($pageid, $lessonoutput, $reviewmode) {
+    public function prepare_page_and_contents($pageid, $lessonoutput, $reviewmode, $redirect = true) {
         global $USER, $CFG;
 
         $page = $this->load_page($pageid);
         // Check if the page is of a special type and if so take any nessecary action.
-        $newpageid = $page->callback_on_view($this->can_manage());
+        $newpageid = $page->callback_on_view($this->can_manage(), $redirect);
+
+        // Avoid redirections returning the jump to special page id.
+        if (!$redirect && is_numeric($newpageid) && $newpageid < 0) {
+            return array($newpageid, null, null);
+        }
+
         if (is_numeric($newpageid)) {
             $page = $this->load_page($newpageid);
         }
@@ -3177,7 +3185,7 @@ class lesson extends lesson_base {
             ob_end_clean();
         }
 
-        return array($page, $lessoncontent);
+        return array($page->id, $page, $lessoncontent);
     }
 
     /**
@@ -3309,7 +3317,7 @@ class lesson extends lesson_base {
             }
             // Inform teacher that s/he will not see the timer.
             if ($this->properties->timelimit) {
-                $lesson->add_message(get_string("teachertimerwarning", "lesson"));
+                $this->add_message(get_string("teachertimerwarning", "lesson"));
             }
         }
         // Report attempts remaining.
@@ -3500,7 +3508,7 @@ class lesson extends lesson_base {
 
                 $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $pageid));
             }
-            $data->reviewlesson = $url;
+            $data->reviewlesson = $url->out(false);
         } else if ($this->properties->modattempts && $canmanage) {
             $data->modattemptsnoteacher = true;
         }
@@ -4180,9 +4188,10 @@ abstract class lesson_page extends lesson_base {
      * is viewed
      *
      * @param bool $canmanage True if the user has the manage cap
+     * @param bool $redirect  Optional, default to true. Set to false to avoid redirection and return the page to redirect.
      * @return mixed
      */
-    public function callback_on_view($canmanage) {
+    public function callback_on_view($canmanage, $redirect = true) {
         return true;
     }
 
