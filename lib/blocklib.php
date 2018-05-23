@@ -2273,7 +2273,9 @@ function block_add_block_ui($page, $output, $region=null) {
 
     $blocks = [];
     foreach ($page->blocks->get_addable_blocks() as $block) {
-        $blocks[] = ["blockname" => $block->name, "blocktitle" => $block->title];
+        // At least 1 block (current learning) returns its title as a lang_string
+        // object, not as a normal string. Hence the typecast.
+        $blocks[] = ["blockname" => $block->name, "blocktitle" => (string)$block->title];
     }
 
     // Any query parameters that were in the original url need to be replicated

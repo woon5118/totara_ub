@@ -73,7 +73,7 @@ $THEME->layouts = array(
     // Standard Moodle themes have base layout without blocks.
     'base' => array(
         'file' => 'default.php',
-        'regions' => array('top', 'bottom', 'side-pre'),
+        'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
     ),
     // Standard layout with blocks, this is recommended for most pages with general information.
