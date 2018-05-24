@@ -9,6 +9,8 @@ Removed deprecated methods:
   * appraisal::get_missingrole_users()
   * appraisal::get_changedrole_users()
   * appraisal::get_live_role_assignments()
+* The dynamically created appraisal question data table columns have been changed from char to text. Any use of
+these columns in the where clause of sql queries will need to be changed to use $DB->sql_compare_text.
 
 === 10.0 ===
 
