@@ -24,6 +24,10 @@
     float: right;
 }
 
+#page-mod-quiz-attempt .mod_quiz-next-nav-wrn {
+    text-align: right;
+}
+
 #page-mod-quiz-attempt .submitbtns .mod_quiz-next-nav,
 #page-mod-quiz-review .submitbtns .mod_quiz-next-nav {
     float: right;

@@ -19,3 +19,5 @@ This files describes API changes in the quiz code,
   would) you will need to update your renderer.
 * Several methods relating to preview links/buttons/urls have a new optional
   argument to make the preview be of a particular variant.
+* mod_quiz_renderer::attempt_navigation_buttons has been changed to output warning text regarding 'next' navigation
+  when using 'sequential' navigation method with the addition of a new style 'mod_quiz-next-nav-wrn'.

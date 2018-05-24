@@ -502,6 +502,7 @@ $string['mustbesubmittedby'] = 'This attempt must be submitted by {$a}.';
 $string['name'] = 'Name';
 $string['navigatenext'] = 'Next page';
 $string['navigateprevious'] = 'Previous page';
+$string['navnextwarning'] = 'Please be aware that on this quiz there is no going back after moving to the next page.';
 $string['navmethod'] = 'Navigation method';
 $string['navmethod_free'] = 'Free';
 $string['navmethod_help'] = 'When sequential navigation is enabled a learner must progress through the quiz in order and may not return to previous pages nor skip ahead.';

@@ -551,6 +551,10 @@ class mod_quiz_renderer extends plugin_renderer_base {
     protected function attempt_navigation_buttons($page, $lastpage, $navmethod = 'free') {
         $output = '';
 
+        if ($navmethod == "sequential" && !$lastpage) {
+            $output .= html_writer::div($this->pix_icon('i/warning', '') . get_string('navnextwarning', 'quiz'), 'mod_quiz-next-nav-wrn');
+        }
+
         $output .= html_writer::start_tag('div', array('class' => 'submitbtns'));
         if ($page > 0 && $navmethod == 'free') {
             $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'previous',
