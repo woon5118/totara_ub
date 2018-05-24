@@ -93,6 +93,10 @@ information provided here is intended especially for developers.
 * Added Session storage JavaScript library
 * Added userdate Mustache helper - please don't use this as it has a potential XSS issue.
 * Added shortentext Mustache helper
+* Deprecated the following functions:
+    - flexible_table::get_initial_first() - use flexible_table::print_initials_bar() instead
+    - flexible_table::get_initial_last() - use flexible_table::print_initials_bar() instead
+    - flexible_table::print_one_initials_bar() - use flexible_table::print_initials_bar() instead
 
 === 11.0 ===
 

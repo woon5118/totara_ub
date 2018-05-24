@@ -263,6 +263,44 @@ if ($csv) {
     groups_print_course_menu($course, $CFG->wwwroot.'/report/completion/index.php?course='.$course->id);
 }
 
+if ($sifirst !== 'all') {
+    set_user_preference('ifirst', $sifirst);
+}
+if ($silast !== 'all') {
+    set_user_preference('ilast', $silast);
+}
+
+if (!empty($USER->preference['ifirst'])) {
+    $sifirst = $USER->preference['ifirst'];
+} else {
+    $sifirst = 'all';
+}
+
+if (!empty($USER->preference['ilast'])) {
+    $silast = $USER->preference['ilast'];
+} else {
+    $silast = 'all';
+}
+
+if ($sifirst !== 'all') {
+    set_user_preference('ifirst', $sifirst);
+}
+if ($silast !== 'all') {
+    set_user_preference('ilast', $silast);
+}
+
+if (!empty($USER->preference['ifirst'])) {
+    $sifirst = $USER->preference['ifirst'];
+} else {
+    $sifirst = 'all';
+}
+
+if (!empty($USER->preference['ilast'])) {
+    $silast = $USER->preference['ilast'];
+} else {
+    $silast = 'all';
+}
+
 // Generate where clause
 $where = array();
 $where_params = array();
@@ -313,40 +351,15 @@ $link = $CFG->wwwroot.'/report/completion/index.php?course='.$course->id;
 if (strlen($sort)) {
     $link .= '&amp;sort='.$sort;
 }
-$link .= '&amp;page=';
-
-// Build the the page by Initial bar
-$initials = array('first', 'last');
-$alphabet = explode(',', get_string('alphabet', 'langconfig'));
+$link .= '&amp;start=';
 
 $pagingbar = '';
-foreach ($initials as $initial) {
-    $var = 'si'.$initial;
 
-    $othervar = $initial == 'first' ? 'silast' : 'sifirst';
-    $othervar = $$othervar != 'all' ? "&amp;{$othervar}={$$othervar}" : '';
-
-    $pagingbar .= ' <div class="initialbar '.$initial.'initial">';
-    $pagingbar .= get_string($initial.'name').':&nbsp;';
-
-    if ($$var == 'all') {
-        $pagingbar .= '<strong>'.get_string('all').'</strong> ';
-    }
-    else {
-        $pagingbar .= "<a href=\"{$link}{$othervar}\">".get_string('all').'</a> ';
-    }
-
-    foreach ($alphabet as $letter) {
-        if ($$var === $letter) {
-            $pagingbar .= '<strong>'.$letter.'</strong> ';
-        }
-        else {
-            $pagingbar .= "<a href=\"$link&amp;$var={$letter}{$othervar}\">$letter</a> ";
-        }
-    }
-
-    $pagingbar .= '</div>';
-}
+// Initials bar.
+$prefixfirst = 'sifirst';
+$prefixlast = 'silast';
+$pagingbar .= $OUTPUT->initials_bar($sifirst, 'firstinitial', get_string('firstname'), $prefixfirst, $url);
+$pagingbar .= $OUTPUT->initials_bar($silast, 'lastinitial', get_string('lastname'), $prefixlast, $url);
 
 // Do we need a paging bar?
 if ($total > COMPLETION_REPORT_PAGE) {

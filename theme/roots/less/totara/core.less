@@ -1012,10 +1012,44 @@ audio.mediaplugin_html5audio {
 }
 
 .initialbar {
-    a,
-    strong {
-        padding-left: 3px;
-        padding-right: 3px;
+
+    overflow: auto;
+
+    .initialbarlabel {
+        display: inline-block;
+        min-width: 6em;
+        float: left;
+        white-space: nowrap;
+    }
+
+    .initialbar {
+        float: left;
+        display: inline-block;
+        white-space: nowrap;
+        margin: 0 0 0 -0.3em;
+        padding: 0;
+
+        li {
+            float: left;
+            list-style: none;
+        }
+    }
+
+    .letter {
+        display: inline-block;
+        height: 1.35em;
+        min-width: 1.35em;
+        text-align: center;
+    }
+    .letter.active {
+        font-weight: bold;
+    }
+
+    .initialbarall {
+        text-align: left;
+        min-width: 3.5em;
+        white-space: nowrap;
+        margin-left: 0.3em;
     }
 }
 
