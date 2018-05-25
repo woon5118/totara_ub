@@ -233,3 +233,5 @@ class mod_assign_base_testcase extends advanced_testcase {
     }
 
 }
+
+class_alias('mod_assign_testable_assign', 'testable_assign');
