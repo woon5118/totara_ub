@@ -125,7 +125,7 @@ class facetoface_notification extends data_object {
     // Required table fields.
     public $id;
 
-    public $type;
+    public $type = MDL_F2F_NOTIFICATION_MANUAL;
 
     public $title;
 
