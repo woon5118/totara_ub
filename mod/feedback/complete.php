@@ -91,6 +91,7 @@ $cansubmit = $feedbackcompletion->can_submit();
 
 // Initialise the form processing feedback completion.
 if (!$feedbackcompletion->is_empty() && $cansubmit) {
+    $feedbackcompletion->create_completed_tmp_from_last_completed();
     // Process the page via the form.
     $urltogo = $feedbackcompletion->process_page($gopage, $gopreviouspage);
 
