@@ -101,7 +101,7 @@ class profile_field_textarea extends profile_field_base {
      */
     public function edit_validate_field($usernew) {
         // Make sure we're using the right value for the text.
-        if (is_array($usernew->{$this->inputname}) && isset($usernew->{$this->inputname}['text'])) {
+        if (isset($usernew->{$this->inputname}) && is_array($usernew->{$this->inputname}) && isset($usernew->{$this->inputname}['text'])) {
             $usernew->{$this->inputname} = $usernew->{$this->inputname}['text'];
         }
 

@@ -218,8 +218,10 @@ class profile_field_menu extends profile_field_base {
      * @return string contains error message otherwise null
      */
     public function edit_validate_field($usernew) {
-        // Make sure the text of the selection option is used and not the value.
-        $usernew->{$this->inputname} = $this->options[$usernew->{$this->inputname}];
+        if (isset($usernew->{$this->inputname})) {
+            // Make sure the text of the selection option is used and not the value.
+            $usernew->{$this->inputname} = $this->options[$usernew->{$this->inputname}];
+        }
 
         return parent::edit_validate_field($usernew);
     }

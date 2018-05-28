@@ -135,10 +135,12 @@ class profile_field_date extends profile_field_base {
      * @return string contains error message otherwise null
      */
     public function edit_validate_field($usernew) {
-        // Convert the date to UTC noon so that it covers the same day in most timezones.
-        $date = userdate($usernew->{$this->inputname}, '%Y-%m-%d', 'UTC');
-        $date = explode('-', $date);
-        $usernew->{$this->inputname} = make_timestamp($date[0], $date[1], $date[2], 12, 0, 0, 'UTC');
+        if (isset($usernew->{$this->inputname})) {
+            // Convert the date to UTC noon so that it covers the same day in most timezones.
+            $date = userdate($usernew->{$this->inputname}, '%Y-%m-%d', 'UTC');
+            $date = explode('-', $date);
+            $usernew->{$this->inputname} = make_timestamp($date[0], $date[1], $date[2], 12, 0, 0, 'UTC');
+        }
 
         return parent::edit_validate_field($usernew);
     }
