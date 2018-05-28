@@ -35,9 +35,12 @@ trait report_trait {
      *                         include new table joins
      * @param string $join Name of the join that provides the 'user' table
      * @param string $field Name of user id field to join on
+     * @param string $jointype Type of join. For performance reasons it's better to use INNER, but only use INNER if the
+     *                         report base doesn't have rows with invalid or NULL values for userid (=$join.$field),
+     *                         because these rows would be dropped.
      * @return boolean True
      */
-    protected function add_totara_job_tables(&$joinlist, $join, $field) {
+    protected function add_totara_job_tables(&$joinlist, $join, $field, $jointype = 'LEFT') {
         global $DB;
 
         // All job fields listed by sortorder.
@@ -53,7 +56,7 @@ trait report_trait {
 
         $joinlist[] = new \rb_join(
             'alljobfields',
-            'LEFT',
+            $jointype,
             $jobfieldlistsubsql,
             "alljobfields.jfid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
@@ -83,7 +86,7 @@ trait report_trait {
 
         $joinlist[] = new \rb_join(
             'manallfields',
-            'LEFT',
+            $jointype,
             $manlistsubsql,
             "manallfields.manlistid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
@@ -113,7 +116,7 @@ trait report_trait {
 
         $joinlist[] = new \rb_join(
             'posallfields',
-            'LEFT',
+            $jointype,
             $poslistsubsql,
             "posallfields.poslistid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
@@ -143,7 +146,7 @@ trait report_trait {
 
         $joinlist[] = new \rb_join(
             'orgallfields',
-            'LEFT',
+            $jointype,
             $orglistsubsql,
             "orgallfields.orglistid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
@@ -164,7 +167,7 @@ trait report_trait {
 
         $joinlist[] = new \rb_join(
             'appallfields',
-            'LEFT',
+            $jointype,
             $applistsubsql,
             "appallfields.applistid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_MANY,

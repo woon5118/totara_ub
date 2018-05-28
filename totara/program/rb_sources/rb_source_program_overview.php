@@ -108,7 +108,7 @@ class rb_source_program_overview extends rb_base_source {
 
         $this->add_totara_program_tables($joinlist, 'base', 'programid');
         $this->add_core_user_tables($joinlist, 'base', 'userid');
-        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid', 'INNER');
         $this->add_core_course_category_tables($joinlist, 'course', 'category');
 
         if ($this->instancetype == 'program') {
