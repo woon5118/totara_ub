@@ -97,6 +97,10 @@ information provided here is intended especially for developers.
     - flexible_table::get_initial_first() - use flexible_table::print_initials_bar() instead
     - flexible_table::get_initial_last() - use flexible_table::print_initials_bar() instead
     - flexible_table::print_one_initials_bar() - use flexible_table::print_initials_bar() instead
+* $OUTPUT->pix_url has been deprecated - use $OUTPUT->pix_icon() for icons or $OUTPUT->image_url() for images. In
+  mustache templates, the pix helper is available (although we don't recommend using context variables inside it).
+* Added renderPix method to templates JavaScript library
+* Update pix_icon template, adding an "icon" class
 
 === 11.0 ===
 

@@ -6100,7 +6100,7 @@ function forum_print_recent_mod_activity($activity, $courseid, $detail, $modname
     $output .= html_writer::start_div($class);
     if ($detail) {
         $aname = s($activity->name);
-        $output .= html_writer::img($OUTPUT->pix_url('icon', $activity->type), $aname, ['class' => 'icon']);
+        $output .= $OUTPUT->pix_icon('icon', $aname, $activity->type);
     }
     $discussionurl = new moodle_url('/mod/forum/discuss.php', ['d' => $content->discussion]);
     $discussionurl->set_anchor('p' . $activity->content->id);

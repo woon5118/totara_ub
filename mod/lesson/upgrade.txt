@@ -4,6 +4,7 @@ This files describes API changes in the lesson code.
 
 * lesson::callback_on_view() has an additional optional parameter $redirect default to true.
   It can be set to false to avoid redirection and return the page to redirect.
+* mod_lesson_renderer::page_action_links() has been modified
 
 === 10 ===
 

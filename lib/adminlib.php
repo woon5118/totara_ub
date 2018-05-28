@@ -7121,18 +7121,18 @@ class admin_setting_manageantiviruses extends admin_setting {
                 if ($updowncount > 1) {
                     $updownurl = $baseurl;
                     $updownurl->params(array('action' => 'up', 'antivirus' => $antivirus));
-                    $updownimg = html_writer::img($OUTPUT->pix_url('t/up'), 'up', array('class' => 'iconsmall'));
+                    $updownimg = $OUTPUT->pix_icon('t/up', get_string('moveup'));
                     $updown = html_writer::link($updownurl, $updownimg);
                 } else {
-                    $updown .= html_writer::img($OUTPUT->pix_url('spacer'), '', array('class' => 'iconsmall'));
+                    $updown .= $OUTPUT->pix_icon('spacer');
                 }
                 if ($updowncount < $antiviruscount) {
                     $updownurl = $baseurl;
                     $updownurl->params(array('action' => 'down', 'antivirus' => $antivirus));
-                    $updownimg = html_writer::img($OUTPUT->pix_url('t/down'), 'down', array('class' => 'iconsmall'));
+                    $updownimg = $OUTPUT->pix_icon('t/down', get_string('movedown'));
                     $updown = html_writer::link($updownurl, $updownimg);
                 } else {
-                    $updown .= html_writer::img($OUTPUT->pix_url('spacer'), '', array('class' => 'iconsmall'));
+                    $updown .= $OUTPUT->pix_icon('spacer');
                 }
                 ++ $updowncount;
             }
@@ -7238,14 +7238,14 @@ class admin_setting_managelicenses extends admin_setting {
 
             if ($value->enabled == 1) {
                 $hideshow = html_writer::link($url.'&action=disable&license='.$value->shortname,
-                    html_writer::tag('img', '', array('src'=>$OUTPUT->pix_url('t/hide'), 'class'=>'iconsmall', 'alt'=>'disable')));
+                    $OUTPUT->pix_icon('t/hide', get_string('disable')));
             } else {
                 $hideshow = html_writer::link($url.'&action=enable&license='.$value->shortname,
-                    html_writer::tag('img', '', array('src'=>$OUTPUT->pix_url('t/show'), 'class'=>'iconsmall', 'alt'=>'enable')));
+                    $OUTPUT->pix_icon('t/show', get_string('enable')));
             }
 
             if ($value->shortname == $CFG->sitedefaultlicense) {
-                $displayname .= ' '.html_writer::tag('img', '', array('src'=>$OUTPUT->pix_url('t/locked'), 'class'=>'iconsmall', 'alt'=>get_string('default'), 'title'=>get_string('default')));
+                $displayname .= ' '.$OUTPUT->pix_icon('t/locked', get_string('default'));
                 $hideshow = '';
             }
 

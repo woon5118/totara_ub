@@ -410,7 +410,7 @@ class mod_lesson_renderer extends plugin_renderer_base {
         $url = new moodle_url('/mod/lesson/lesson.php', array('id' => $this->page->cm->id, 'pageid' => $page->id,
                 'action' => 'duplicate', 'sesskey' => sesskey()));
         $label = get_string('duplicatepagenamed', 'lesson', format_string($page->title));
-        $img = html_writer::img($this->output->pix_url('e/copy', 'mod_lesson'), $label, array('class' => 'iconsmall'));
+        $img = $this->output->pix_icon('e/copy', $label, 'mod_lesson');
         $actions[] = html_writer::link($url, $img, array('title' => $label));
 
         $url = new moodle_url('/mod/lesson/view.php', array('id' => $this->page->cm->id, 'pageid' => $page->id));

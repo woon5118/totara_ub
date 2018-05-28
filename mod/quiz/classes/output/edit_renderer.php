@@ -1079,9 +1079,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function question_bank_loading() {
-        return html_writer::div(html_writer::empty_tag('img',
-                array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->pix_url('i/loading'))),
-                'questionbankloading');
+        return html_writer::div($this->pix_icon('i/loading', get_string('loading')), 'questionbankloading');
     }
 
     /**

@@ -551,12 +551,13 @@ class totara_core_renderer extends plugin_renderer_base {
                 $file->get_filearea(), $id, $file->get_filepath(), $filename, true);
 
             // Build the icon data so we can use the core/pic_icon template.
+            /** @deprecated since Totara 12 */
             $attributes = array();
             $attributes[] = array ('name' => 'alt', 'value' => $name);
             $attributes[] = array ('name' => 'title', 'value' => $name);
             $attributes[] = array ('name' => 'class', 'value' => 'course_icon');
             $attributes[] = array ('name' => 'src', 'value' => $src);
-            $icon = array('id' => $file->get_pathnamehash(), 'attributes' => $attributes);
+            $icon = array('id' => $file->get_pathnamehash(), 'attributes' => $attributes, 'name' => $name, 'url' => $url);
             $icons[] = $icon;
         }
 
@@ -565,14 +566,15 @@ class totara_core_renderer extends plugin_renderer_base {
             if ($icon != '.' && $icon != '..') {
                 $id = str_replace('.png', '', $icon);
                 $name = ucwords(strtr($icon, array('.png' => '', '_' => ' ', '-' => ' ')));
-                $src = $this->pix_url("{$type}icons/{$id}", 'totara_core');
+                $src = $this->image_url("{$type}icons/{$id}", 'totara_core');
 
+                /** @deprecated since Totara 12 */
                 $attributes = array();
                 $attributes[] = array ('name' => 'alt', 'value' => $name);
                 $attributes[] = array ('name' => 'title', 'value' => $name);
                 $attributes[] = array ('name' => 'class', 'value' => 'course_icon');
                 $attributes[] = array ('name' => 'src', 'value' => $src);
-                $icon = array('id' => $id, 'attributes' => $attributes);
+                $icon = array('id' => $id, 'attributes' => $attributes, 'name' => $name, 'url' => $src);
                 $icons[] = $icon;
             }
         }

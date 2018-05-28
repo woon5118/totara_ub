@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Joby Harding <joby.harding@totaralms.com>
- * @author  Petr Skoda <petr.skoda@totaralms.com>
- * @package mod_feedback
+ * @author  Brian Barnes <brian.barnes@totaralearning.com>
+ * @package qtype_ddmarker
  */
 
 /* Developer documentation is in /pix/flex_icons.php file. */
-
 $icons = array(
-    'mod_feedback|icon' =>
+    'qtype_ddmarker|crosshairs' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bullhorn',
+                    'classes' => 'fa-crosshairs',
                 ),
         ),
-    'mod_feedback|notrequired' =>
+    'qtype_ddmarker|grid' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-question-circle-o',
+                    'classes' => 'fa-th',
                 ),
         ),
-);
-
-$aliases = array(
-    'mod_feeback|required' => 'required',
-    'mod_feeback|notrequired' => 'required',
 );

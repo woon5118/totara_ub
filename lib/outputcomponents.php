@@ -359,7 +359,7 @@ class user_picture implements renderable {
             $size = (int)$this->size;
         }
 
-        $defaulturl = $renderer->pix_url('u/'.$filename); // default image
+        $defaulturl = $renderer->image_url('u/'.$filename); // default image
 
         if ((!empty($CFG->forcelogin) and !isloggedin()) ||
             (!empty($CFG->forceloginforprofileimage) && (!isloggedin() || isguestuser()))) {
@@ -595,7 +595,7 @@ class pix_icon implements renderable, templatable {
         }
 
         if (empty($this->attributes['class'])) {
-            $this->attributes['class'] = 'smallicon';
+            $this->attributes['class'] = '';
         }
     }
 
@@ -616,12 +616,22 @@ class pix_icon implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
         $attributes = $this->attributes;
-        $attributes['src'] = $output->pix_url($this->pix, $this->component)->out(false);
+        $extraclasses = '';
+
+        if(isset($attributes['class'])) {
+            $extraclasses = $attributes['class'];
+            unset($attributes['class']);
+        }
+
+        $attributes['src'] = $output->image_url($this->pix, $this->component)->out(false);
         $templatecontext = array();
         foreach ($attributes as $name => $value) {
             $templatecontext[] = array('name' => $name, 'value' => $value);
         }
-        $data = array('attributes' => $templatecontext);
+        $data = array(
+            'attributes' => $templatecontext,
+            'extraclasses' => $extraclasses
+        );
 
         return $data;
     }
@@ -642,6 +652,18 @@ class pix_icon implements renderable, templatable {
             'title' => $attributes
         ];
     }
+}
+
+/**
+ * Data structure representing an activity icon.
+ *
+ * The difference is that activity icons will always render with the standard icon system (no font icons).
+ *
+ * @copyright 2017 Damyon Wiese
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package core
+ */
+class image_icon extends pix_icon {
 }
 
 /**
@@ -3550,7 +3572,7 @@ class block_contents {
     /**
      * @var array A (possibly empty) array of editing controls. Each element of
      * this array should be an array('url' => $url, 'icon' => $icon, 'caption' => $caption).
-     * $icon is the icon name. Fed to $OUTPUT->pix_url.
+     * $icon is the icon name. Fed to $OUTPUT->image_url.
      */
     public $controls = array();
 

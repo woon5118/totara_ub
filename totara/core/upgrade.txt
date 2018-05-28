@@ -39,6 +39,8 @@ information provided here is intended especially for developers.
 * Deprecated template totara_menu, instead use nav_prim (just the nav menu) or masthead (includes other masthead elements)
 * Deprecated class totara_core\output\totara_menu, instead use totara_core\output\masthead_menu
 * Deprecated function totara_core_renderer::render_totara_menu(), use totara_core_renderer::masthead() instead.
+* totara_core_renderer::icon_list() has changed
+* totara_core/icon_list mustache template has been updated
 
 === 11 ===
 

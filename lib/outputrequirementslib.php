@@ -348,7 +348,7 @@ require(['core/autoinitialise'], function(ai) {
             $this->M_cfg = array(
                 'wwwroot'             => $CFG->wwwroot,
                 'sesskey'             => sesskey(),
-                'loadingicon'         => $renderer->pix_url('i/loading_small', 'moodle')->out(false),
+                'loadingicon'         => $renderer->image_url('i/loading_small', 'moodle')->out(false),
                 'themerev'            => theme_get_revision(),
                 'slasharguments'      => (int)(!empty($CFG->slasharguments)),
                 'theme'               => $page->theme->name,

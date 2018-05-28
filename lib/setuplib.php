@@ -2001,6 +2001,21 @@ class renderer_base {
     }
 
     /**
+     * Return the direct URL for an image from the pix folder.
+     *
+     * Use this function sparingly and never for icons. For icons use pix_icon or the pix helper in a mustache template.
+     *
+     * @deprecated since Totara 12
+     * @param string $imagename the name of the icon.
+     * @param string $component specification of one plugin like in get_string()
+     * @return moodle_url
+     */
+    public function pix_url($imagename, $component = 'moodle') {
+        debugging('pix_url is deprecated. Use image_url for images and pix_icon for icons.', DEBUG_DEVELOPER);
+        return $this->page->theme->image_url($imagename, $component);
+    }
+
+    /**
      * Return the moodle_url for an image.
      *
      * The exact image location and extension is determined
@@ -2018,14 +2033,14 @@ class renderer_base {
      *                    overridden via theme/mytheme/pix_core/
      * 3/ plugin images - stored in mod/mymodule/pix,
      *                    overridden via theme/mytheme/pix_plugins/mod/mymodule/,
-     *                    example: pix_url('comment', 'mod_glossary')
+     *                    example: image_url('comment', 'mod_glossary')
      *
      * @param string $imagename the pathname of the image
      * @param string $component full plugin name (aka component) or 'theme'
      * @return moodle_url
      */
-    public function pix_url($imagename, $component = 'moodle') {
-        return $this->page->theme->pix_url($imagename, $component);
+    public function image_url($imagename, $component = 'moodle') {
+        return $this->page->theme->image_url($imagename, $component);
     }
 }
 
@@ -2139,17 +2154,30 @@ class bootstrap_renderer extends renderer_base {
     /**
      * Totara hack: make this compatible with renderer_base interface.
      *
+     * @deprecated since Totara 12
      * @param $imagename
      * @param string $component
      * @return moodle_url
      */
     public function pix_url($imagename, $component = 'moodle') {
+        debugging('pix_url is deprecated. Use image_url for images and pix_icon for icons.', DEBUG_DEVELOPER);
+        return $this->image_url($imagename, $component);
+    }
+
+    /**
+     * Totara hack: make this compatible with renderer_base interface.
+     *
+     * @param $imagename
+     * @param string $component
+     * @return moodle_url
+     */
+    public function image_url($imagename, $component = 'moodle') {
         global $OUTPUT, $PAGE;
 
         // If lib/outputlib.php has been loaded, call it.
         if (!empty($PAGE) and !empty($OUTPUT)) {
             $PAGE->initialise_theme_and_output();
-            return $OUTPUT->pix_url($imagename, $component);
+            return $OUTPUT->image_url($imagename, $component);
         }
 
         throw new coding_exception('Attempt to start output before enough information is known to initialise the theme.');

@@ -899,7 +899,7 @@ function totara_icon_url_and_alt($type, $icon, $alt = '') {
         if (empty($icon) || empty($imagelocation)) {
             $icon = 'default';
         }
-        $src = $OUTPUT->pix_url('/' . $iconpath . $icon, $component);
+        $src = $OUTPUT->image_url('/' . $iconpath . $icon, $component);
     }
 
     $replace = array('.png' => '', '_' => ' ', '-' => ' ');
@@ -1806,7 +1806,7 @@ function totara_get_icon($instanceid, $icontype) {
         if (empty($icon) || empty($imagelocation)) {
             $icon = 'default';
         }
-        $urlicon = $OUTPUT->pix_url('/' . $iconpath . $icon, $component);
+        $urlicon = $OUTPUT->image_url('/' . $iconpath . $icon, $component);
     }
 
     return $urlicon->out();

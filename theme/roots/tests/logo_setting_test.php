@@ -44,7 +44,7 @@ class theme_roots_site_logo_testcase extends advanced_testcase {
         $expected = array(
             'siteurl' => $CFG->wwwroot .'/',
             'shortname' => $SITE->shortname,
-            'logourl' => $OUTPUT->pix_url('logo', 'totara_core'),
+            'logourl' => $OUTPUT->image_url('logo', 'totara_core'),
             'logoalt' => get_string('totaralogo', 'totara_core'),
             'faviconurl' => $OUTPUT->favicon()
         );

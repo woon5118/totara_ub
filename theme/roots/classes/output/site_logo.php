@@ -53,7 +53,7 @@ class site_logo implements \renderable, \templatable {
         }
 
         if (empty($templatecontext['logourl'])) {
-            $templatecontext['logourl'] = $OUTPUT->pix_url('logo', 'totara_core');
+            $templatecontext['logourl'] = $OUTPUT->image_url('logo', 'totara_core');
         }
 
         if (!empty($PAGE->theme->settings->alttext)) {

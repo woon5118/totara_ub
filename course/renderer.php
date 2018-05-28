@@ -535,11 +535,8 @@ class core_course_renderer extends plugin_renderer_base {
                     'type' => 'hidden', 'name' => 'modulename', 'value' => $formattedname));
                 $output .= html_writer::empty_tag('input', array(
                     'type' => 'hidden', 'name' => 'completionstate', 'value' => $newstate));
-                $output .= html_writer::empty_tag('input', array(
-                    'type' => 'image',
-                    'src' => $this->output->pix_url('i/completion-'.$completionicon),
-                    'alt' => $imgalt, 'title' => $imgtitle,
-                    'aria-live' => 'polite'));
+                $output .= html_writer::tag('button',
+                    $this->output->pix_icon('i/completion-' . $completionicon, $imgalt), array('class' => 'btn btn-link'));
                 $output .= html_writer::end_tag('div');
                 $output .= html_writer::end_tag('form');
 

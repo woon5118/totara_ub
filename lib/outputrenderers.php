@@ -692,13 +692,13 @@ class core_renderer extends renderer_base {
             // Special case for site home page - please do not remove
             return '<div class="sitelink">' .
                    '<a title="Moodle" href="http://moodle.org/">' .
-                   '<img src="' . $this->pix_url('moodlelogo') . '" alt="'.get_string('moodlelogo').'" /></a></div>';
+                   '<img src="' . $this->image_url('moodlelogo') . '" alt="'.get_string('moodlelogo').'" /></a></div>';
 
         } else if (!empty($CFG->target_release) && $CFG->target_release != $CFG->release) {
             // Special case for during install/upgrade.
             return '<div class="sitelink">'.
                    '<a title="Moodle" href="http://docs.moodle.org/en/Administrator_documentation" onclick="this.target=\'_blank\'">' .
-                   '<img src="' . $this->pix_url('moodlelogo') . '" alt="'.get_string('moodlelogo').'" /></a></div>';
+                   '<img src="' . $this->image_url('moodlelogo') . '" alt="'.get_string('moodlelogo').'" /></a></div>';
 
         } else if ($this->page->course->id == $SITE->id || strpos($this->page->pagetype, 'course-view') === 0) {
             return '<div class="homelink"><a href="' . $CFG->wwwroot . '/">' .
@@ -1743,6 +1743,38 @@ class core_renderer extends renderer_base {
 
         return html_writer::tag('a', $icon.$text, $attributes);
     }
+
+    /**
+     * Return HTML for an image_icon.
+     *
+     * Theme developers: DO NOT OVERRIDE! Please override function
+     * {@link core_renderer::render_image_icon()} instead.
+     *
+     * Maintained for Moodle compatability.
+     *
+     * @param string $pix short pix name
+     * @param string $alt mandatory alt attribute
+     * @param string $component standard compoennt name like 'moodle', 'mod_forum', etc.
+     * @param array $attributes htm lattributes
+     * @return string HTML fragment
+     */
+    public function image_icon($pix, $alt, $component='moodle', array $attributes = null) {
+        $icon = new image_icon($pix, $alt, $component, $attributes);
+        return $this->render($icon);
+    }
+
+    /**
+     * Renders a pix_icon widget and returns the HTML to display it.
+     *
+     * Maintained for Moodle compatability (but does not use their icon system)
+     *
+     * @param image_icon $icon
+     * @return string HTML fragment
+     */
+    protected function render_image_icon(image_icon $icon) {
+        return $this->render_pix_icon($this, $icon);
+    }
+
 
     /**
      * Return HTML for a pix_icon.
@@ -3610,7 +3642,7 @@ EOD;
      * @return string The favicon URL
      */
     public function favicon() {
-        return $this->pix_url('favicon', 'theme');
+        return $this->image_url('favicon', 'theme');
     }
 
     /**

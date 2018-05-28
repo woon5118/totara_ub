@@ -215,7 +215,7 @@ function build_treeview($elements, $error_string, $hierarchy = null, $disabledli
                 }
             }
 
-            $addbutton_html = '<img src="'.$OUTPUT->pix_url('t/'.$buttons['addbutton']).'" class="addbutton" />';
+            $addbutton_html = '<img src="'.$OUTPUT->image_url('t/'.$buttons['addbutton']).'" class="addbutton" />';
 
             // Make disabled elements non-draggable and greyed out
             if (array_key_exists($element->id, $disabledlist)){
@@ -247,7 +247,7 @@ function build_treeview($elements, $error_string, $hierarchy = null, $disabledli
 
     // Add hidden button images that can later be used/cloned by js TODO: add tooltip get_string
     foreach ($buttons as $classname => $pic) {
-        $html .= '<img id="'.$classname.'_ex" src="'.$OUTPUT->pix_url('t/'.$pic).'"
+        $html .= '<img id="'.$classname.'_ex" src="'.$OUTPUT->image_url('t/'.$pic).'"
             class="'.$classname.'" style="display: none;" />';
     }
 
@@ -338,7 +338,7 @@ function build_category_treeview($list, $parents, $load_string) {
 
         // Add hidden button images that can later be used/cloned by js TODO: add tooltip get_string
         foreach ($buttons as $classname => $pic) {
-            $html .= '<img id="'.$classname.'_ex" src="'.$OUTPUT->pix_url('t/'.$pic).'"
+            $html .= '<img id="'.$classname.'_ex" src="'.$OUTPUT->image_url('t/'.$pic).'"
                 class="'.$classname.'" style="display: none;" />';
         }
     }
