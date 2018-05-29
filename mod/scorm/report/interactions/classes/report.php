@@ -569,10 +569,29 @@ class report extends \mod_scorm\report {
                     if ($candelete) {
                         echo \html_writer::start_tag('table', array('id' => 'commands'));
                         echo \html_writer::start_tag('tr').\html_writer::start_tag('td');
-                        echo \html_writer::link('javascript:select_all_in(\'DIV\', null, \'scormtablecontainer\');',
-                                                    get_string('selectall', 'scorm')).' / ';
-                        echo \html_writer::link('javascript:deselect_all_in(\'DIV\', null, \'scormtablecontainer\');',
-                                                    get_string('selectnone', 'scorm'));
+                        echo \html_writer::link('#', get_string('selectall', 'scorm'), array('id' => 'checkattempts'));
+                        echo ' / ';
+                        echo \html_writer::link('#', get_string('selectnone', 'scorm'), array('id' => 'uncheckattempts'));
+                        $PAGE->requires->js_amd_inline("
+                        require([], function() {
+                            document.getElementById('checkattempts').addEventListener('click', function (e) {
+                                e.preventDefault();
+                                var nodes = document.querySelectorAll('#attemptsform input[type=\"checkbox\"]');
+
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].checked = true;
+                                }
+                            });
+
+                            document.getElementById('uncheckattempts').addEventListener('click', function (e) {
+                                e.preventDefault();
+                                var nodes = document.querySelectorAll('#attemptsform input[type=\"checkbox\"]');
+
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].checked = false;
+                                }
+                            });
+                        });");
                         echo '&nbsp;&nbsp;';
                         echo \html_writer::empty_tag('input', array('type' => 'submit',
                                                                     'value' => get_string('deleteselected', 'scorm'),

@@ -1,6 +1,10 @@
 This files describes API changes in /mod/choice/*,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+* mod_choice_renderer::display_publish_name_vertical() has changed
+
 === 10 ===
 
 * Events mod_choice\event\answer_submitted and mod_choice\event\answer_updated

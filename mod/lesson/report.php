@@ -149,16 +149,34 @@ if ($action === 'delete') {
     echo html_writer::table($table);
 
     if (has_capability('mod/lesson:edit', $context)) {
-        $checklinks  = '<a href="javascript: checkall();">'.get_string('selectall').'</a> / ';
-        $checklinks .= '<a href="javascript: checknone();">'.get_string('deselectall').'</a>';
+        $checklinks  = '<a id="checkall" href="#">'.get_string('selectall').'</a> / ';
+        $checklinks .= '<a id="checknone" href="#">'.get_string('deselectall').'</a>';
         $checklinks .= html_writer::label('action', 'menuaction', false, array('class' => 'accesshide'));
         $options = array('delete' => get_string('deleteselected'));
         $attributes = array('id' => 'actionid', 'class' => 'custom-select m-l-1');
         $checklinks .= html_writer::select($options, 'action', 0, array('' => 'choosedots'), $attributes);
         $PAGE->requires->js_amd_inline("
-        require(['jquery'], function($) {
-            $('#actionid').change(function() {
-                $('#mod-lesson-report-form').submit();
+        require([], function() {
+            document.getElementById('actionid').addEventListener('change', function(e) {
+                document.getElementById('mod-lesson-report-form').submit();
+            });
+
+            document.getElementById('checkall').addEventListener('click', function (e) {
+                e.preventDefault();
+                var nodes = document.querySelectorAll('#mod-lesson-report-form input[type=\"checkbox\"]');
+
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].checked = true;
+                }
+            });
+
+            document.getElementById('checknone').addEventListener('click', function (e) {
+                e.preventDefault();
+                var nodes = document.querySelectorAll('#mod-lesson-report-form input[type=\"checkbox\"]');
+
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].checked = false;
+                }
             });
         });");
         echo $OUTPUT->box($checklinks, 'center');
