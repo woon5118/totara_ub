@@ -32,24 +32,24 @@ if ($ADMIN->fulltree) {
 
     // Favicon file setting.
     $name = "{$component}/favicon";
-    $title = new lang_string('favicon', $component);
-    $description = new lang_string('favicondesc', $component);
+    $title = new lang_string('favicon', 'totara_core');
+    $description = new lang_string('favicondesc', 'totara_core');
     $setting = new admin_setting_configstoredfile($name, $title, $description, 'favicon', 0, array('accepted_types' => '.ico'));
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);
 
     // Logo file setting.
     $name = "{$component}/logo";
-    $title = new lang_string('navlogo', $component);
-    $description = new lang_string('navlogo_desc', $component);
+    $title = new lang_string('logo', 'totara_core');
+    $description = new lang_string('logodesc', 'totara_core');
     $setting = new admin_setting_configstoredfile($name, $title, $description, 'logo',0 ,['accepted_types' => 'web_image']);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);
 
     // Logo alt text.
     $name = "{$component}/alttext";
-    $title = new lang_string('alttext', $component);
-    $description = new lang_string('alttextdesc', $component);
+    $title = new lang_string('alttext', 'totara_core');
+    $description = new lang_string('alttextdesc', 'totara_core');
     $setting = new admin_setting_configtext($name, $title, $description, '');
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);

@@ -3216,7 +3216,7 @@ EOD;
      *
      * @return string HTML fragment
      */
-    protected function navbar_button() {
+    public function navbar_button() {
         global $CFG;
 
         $iconbar = html_writer::tag('span', '', array('class' => 'icon-bar'));

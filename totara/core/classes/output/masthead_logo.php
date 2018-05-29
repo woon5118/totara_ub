@@ -23,14 +23,11 @@
  * @package   theme_roots
  */
 
-namespace theme_roots\output;
+namespace totara_core\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * @deprecated since 12.0. Use totara\core\classes\output\masthead_logo.php instead.
- */
-class site_logo implements \renderable, \templatable {
+class masthead_logo implements \renderable, \templatable {
 
     /**
      * Implements export_for_template().
@@ -40,8 +37,6 @@ class site_logo implements \renderable, \templatable {
      */
     public function export_for_template(\renderer_base $output) {
         global $PAGE, $SITE, $OUTPUT, $CFG;
-
-        debugging('The class theme_roots\output\site_logo has been deprecated since 12.0. Use totara\core\classes\output\masthead_logo.php instead.');
 
         $templatecontext = array(
             'siteurl' => $CFG->wwwroot . '/',

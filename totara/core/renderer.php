@@ -425,12 +425,37 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Render the masthead.
+     *
+     * @return string the html output
+     */
+    public function masthead(bool $hasguestlangmenu = true, bool $nocustommenu = false) {
+        $menudata = totara_build_menu();
+        $mastheadmenu = new totara_core\output\masthead_menu($menudata);
+        $mastheadlogo = new totara_core\output\masthead_logo();
+
+        $mastheaddata = new stdClass();
+        $mastheaddata->masthead_lang = $hasguestlangmenu && (!isloggedin() || isguestuser()) ? $this->output->lang_menu() : '';
+        $mastheaddata->masthead_logo = $mastheadlogo->export_for_template($this->output);
+        $mastheaddata->masthead_menu = $nocustommenu ? new stdClass() : $mastheadmenu->export_for_template($this->output);
+        $mastheaddata->masthead_plugins = $this->output->navbar_plugin_output();
+        $mastheaddata->masthead_search = $this->output->search_box();
+        $mastheaddata->masthead_toggle = $this->output->navbar_button();
+        $mastheaddata->masthead_usermenu = $this->output->user_menu();
+
+        return $this->render_from_template('totara_core/masthead', $mastheaddata);
+    }
+
+    /**
      * Renders the totara_menu and returns the HTML to display it.
+     * @deprecated since 12.0
      *
      * @param totara_menu $totaramenu
      * @return string HTML fragment
      */
     protected function render_totara_menu(totara_core\output\totara_menu $totaramenu) {
+        debugging('totara_core_renderer::ender_totara_menu was deprecated in 12.0. Instead, use totara_core_renderer::masthead.');
+
         $contextdata = $totaramenu->export_for_template($this);
 
         return $this->render_from_template('totara_core/totara_menu', $contextdata);

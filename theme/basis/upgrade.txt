@@ -10,6 +10,10 @@ This file describes API changes for 'theme_basis'.
 * Changed totara/core/templates/totara_menu.mustache, adding aria menu attributes
 * Added theme setting for navigation text color
 * Added propagation of color theme settings to new navigation in settings-noprocess.css
+* Changed totara/core/templates/totara_menu.mustache, adding aria menu attributes
+* Deprecated class theme_basis_totara_core_renderer
+* Deprecated templates\totara_core\totara_menu.mustache
+* Redesigned navigation implemented, deprecated navigation hasn't been removed
 
 === 10.0 ===
 

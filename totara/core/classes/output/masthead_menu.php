@@ -25,22 +25,14 @@ namespace totara_core\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * @deprecated since 12.0
- */
-class totara_menu implements \renderable, \templatable {
+class masthead_menu implements \renderable, \templatable {
 
     public $menuitems = array();
 
-    /**
-     * @deprecated since 12.0
-     */
     public function __construct($menudata, $parent=null, $selected_items=array()) {
         global $PAGE, $FULLME;
 
-        debugging('Class totara_core\output\totara_menu has been deprecated since 12.0');
-
-        // Gets selected items, only done first time
+        // Gets selected items, only done first time.
         if (!$selected_items && $PAGE->totara_menu_selected) {
             foreach ($menudata as $item) {
                 if ($PAGE->totara_menu_selected == $item->name) {
@@ -81,7 +73,7 @@ class totara_menu implements \renderable, \templatable {
 
         $count = 0;
         if ($numitems > 0) {
-            // Create Structure
+            // Create Structure.
             foreach ($currentlevel as $menuitem) {
                 $class_isfirst = ($count == 0 ? true : false);
                 $class_islast  = ($count == $numitems - 1 ? true : false);
@@ -90,12 +82,14 @@ class totara_menu implements \renderable, \templatable {
 
                 $children = new self($menudata, $menuitem->name, $selected_items);
                 $haschildren = ($children->has_children() ? true : false);
+                $externallink = ($menuitem->target == '_blank' ? true : false);
                 $url = new \moodle_url($menuitem->url);
                 $this->menuitems[] = array(
                     'class_name' => $menuitem->name,
                     'class_isfirst' => $class_isfirst,
                     'class_islast' => $class_islast,
                     'class_isselected' => $class_isselected,
+                    'external_link' => $externallink,
                     'linktext' => $menuitem->linktext,
                     'url' => $url->out(false),
                     'target' => $menuitem->target,
@@ -127,6 +121,55 @@ class totara_menu implements \renderable, \templatable {
     }
 
     /**
+     * Return the currently selected page's menu item or null.
+     *
+     * Note: This function may mutate the contextdata to ensure the
+     * .selected class is consistently applied.
+     *
+     * @param $contextdata stdClass
+     * @return array
+     */
+    protected function totara_menu_current_selected_item(&$contextdata) {
+
+        $currentitem = null;
+        $itemindex = -1;
+        $childselected = false;
+
+        foreach ($contextdata->menuitems as $i => $navitem) {
+
+            if ($currentitem !== null) {
+                break;
+            }
+
+            if ($navitem['class_isselected']) {
+                if (empty($navitem['children'])) {
+                    $currentitem = $navitem;
+                    $itemindex = $i;
+                }
+            }
+
+            foreach ($navitem['children'] as $childitem) {
+                if ($childitem['class_isselected']) {
+                    $currentitem = $navitem;
+                    $itemindex = $i;
+                    $childselected = true;
+                }
+            }
+        }
+
+        if ($currentitem !== null) {
+            // The .selected class is not consistently added so normalize TL-10596.
+            $contextdata->menuitems[$itemindex]['class_isselected'] = true;
+            // Add a class so we know it is the child item which is active.
+            if ($childselected) {
+                $contextdata->menuitems[$itemindex]['class_child_isselected'] = true;
+            }
+        }
+
+        return $currentitem;
+    }
+
+    /**
      * Export data to be used as the context for a mustache template to the menu.
      *
      * @param \renderer_base $output
@@ -136,6 +179,45 @@ class totara_menu implements \renderable, \templatable {
 
         $menudata = new \stdClass();
         $menudata->menuitems = $this->menuitems;
+
+        $currentselected = $this->totara_menu_current_selected_item($menudata);
+        $menudata->subnav = array();
+
+        if ($currentselected !== null) {
+            if (!empty($currentselected['children'])) {
+                $menudata->subnav = $currentselected['children'];
+            }
+        }
+
+        $menudata->subnav_has_items = !empty($menudata->subnav);
+
+        // If the first item is the default home link replace it with an icon.
+        if (!empty($menudata->menuitems)) {
+            $firstitem = $menudata->menuitems[0];
+            if ($firstitem['class_name'] === 'home') {
+                $icon = $output->flex_icon('home', array('alt' => $firstitem['linktext']));
+                $menudata->menuitems[0]['homeicon'] = $icon;
+            }
+
+            $burgermenu = $output->flex_icon('bars', array(
+                'alt' => get_string('togglenavigation', 'core'),
+                'classes' => 'totaraNav--icon_burger'
+            ));
+
+            $closemenu = $output->flex_icon('close', array(
+                'alt' => get_string('closebuttontitle', 'core'),
+                'classes' => 'totaraNav--icon_close_menu'
+            ));
+
+            $externallink = $output->flex_icon('external-link', array(
+                'alt' => get_string('openlinkinnewwindow', 'core'),
+                'classes' => 'totaraNav--icon_link_external'
+            ));
+
+            $menudata->burger_icon = $burgermenu;
+            $menudata->close_menu_icon = $closemenu;
+            $menudata->external_link_icon = $externallink;
+        }
 
         return $menudata;
     }

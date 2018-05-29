@@ -36,6 +36,9 @@ information provided here is intended especially for developers.
 * Removed deprecated file dialogs/dialog_content_manager.class.php
 * Changed totara/core/templates/totara_menu.mustache, adding aria menu attributes
 * Deprecated totara/core/js/goal.item.js file
+* Deprecated template totara_menu, instead use nav_prim (just the nav menu) or masthead (includes other masthead elements)
+* Deprecated class totara_core\output\totara_menu, instead use totara_core\output\masthead_menu
+* Deprecated function totara_core_renderer::render_totara_menu(), use totara_core_renderer::masthead() instead.
 
 === 11 ===
 

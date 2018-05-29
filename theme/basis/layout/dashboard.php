@@ -54,17 +54,6 @@ $PAGE->set_popup_notification_allowed(false);
 
 $themerenderer = $PAGE->get_renderer('theme_basis');
 
-// TODO improve on this legacy approach.
-$hastotaramenu = false;
-$totaramenu = '';
-if (isloggedin() && empty($PAGE->layout_options['nocustommenu'])) {
-    $menudata = totara_build_menu();
-    $totara_core_renderer = $PAGE->get_renderer('totara_core');
-    $totaramenu = $totara_core_renderer->totara_menu($menudata);
-    $hastotaramenu = !empty($totaramenu);
-}
-// END
-
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <?php require("{$CFG->dirroot}/theme/basis/layout/partials/head.php"); ?>
@@ -75,7 +64,23 @@ echo $OUTPUT->doctype() ?>
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
 
 <!-- Main navigation -->
-<?php require("{$CFG->dirroot}/theme/roots/layout/partials/header.php"); ?>
+<?php
+$totara_core_renderer = $PAGE->get_renderer('totara_core');
+/*
+// This commented code has been @deprecated since 12.0.
+$hastotaramenu = false;
+$totaramenu = '';
+if (isloggedin() && empty($PAGE->layout_options['nocustommenu'])) {
+    $menudata = totara_build_menu();
+    $totaramenu = $totara_core_renderer->totara_menu($menudata);
+    $hastotaramenu = !empty($totaramenu);
+}
+require("{$CFG->dirroot}/theme/roots/layout/partials/header.php");
+*/
+$hasguestlangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
+$nocustommenu = !empty($PAGE->layout_options['nocustommenu']);
+echo $totara_core_renderer->masthead($hasguestlangmenu, $nocustommenu);
+?>
 
 <!-- Breadcrumb and edit buttons -->
 <div class="container-fluid breadcrumb-container">

@@ -921,6 +921,13 @@ $icons = array(
                     'classes' => 'fa-share-square-o',
                 ),
         ),
+    'external-link' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-external-link',
+                ),
+        ),
     'external-link-square' =>
         array(
             'data' =>
@@ -1300,6 +1307,27 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-arrow-up'
+                ),
+        ),
+    'nav-down' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-chevron-down',
+                ),
+        ),
+    'nav-expand' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-chevron-right ft-flip-rtl',
+                ),
+        ),
+    'nav-expanded' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-chevron-down',
                 ),
         ),
     'navitem' =>

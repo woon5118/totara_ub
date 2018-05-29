@@ -5,6 +5,8 @@ This file describes API changes for 'theme_roots'.
 * New design guide library (TUI) added to standardise styles used throughout site
 * Replaced body font size with a TUI variable in bootstrap3/scaffolding.less
 * Added two new full width block regions 'top' and 'bottom'
+* Deprecated layout/partials/header.php
+* Redesigned navigation implemented, deprecated navigation hasn't been removed
 
 === 10.0 ===
 

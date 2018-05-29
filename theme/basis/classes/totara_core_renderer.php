@@ -29,9 +29,14 @@ global $CFG;
 
 require_once("{$CFG->dirroot}/totara/core/renderer.php");
 
+/**
+ * @deprecated since 12.0
+ */
 class theme_basis_totara_core_renderer extends totara_core_renderer {
 
     /**
+     * @deprecated since 12.0
+     *
      * Return the currently selected page's menu item or null.
      *
      * Note: This function may mutate the contextdata to ensure the
@@ -41,6 +46,8 @@ class theme_basis_totara_core_renderer extends totara_core_renderer {
      * @return array
      */
     protected function current_selected_item(&$contextdata) {
+
+        debugging('Class theme_basis_totara_core_renderer has been deprecated since 12.0');
 
         $currentitem = null;
         $itemindex = -1;
@@ -81,6 +88,8 @@ class theme_basis_totara_core_renderer extends totara_core_renderer {
     }
 
     /**
+     * @deprecated since 12.0
+     *
      * Render menu.
      *
      * @param \totara_core\output\totara_menu $totaramenu
@@ -89,6 +98,8 @@ class theme_basis_totara_core_renderer extends totara_core_renderer {
     protected function render_totara_menu(totara_core\output\totara_menu $totaramenu) {
 
         global $OUTPUT;
+
+        debugging('Class theme_basis_totara_core_renderer has been deprecated since 12.0');
 
         $contextdata = $totaramenu->export_for_template($this);
         $currentselected = $this->current_selected_item($contextdata);
