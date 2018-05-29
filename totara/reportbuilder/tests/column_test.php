@@ -897,14 +897,23 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             $col->value = $column->value;
             $col->heading = $column->defaultheading;
             $col->sortorder = $sortorder++;
-            $colid = $DB->insert_record('report_builder_columns', $col);
-
-            // Add column to the big report with everything.
-            $col->reportid = $bigreportid;
             $DB->insert_record('report_builder_columns', $col);
 
             // Create the reportbuilder object.
             $rb = new reportbuilder($reportid);
+
+            // We will be checking deprecated column's message for each column separately,
+            // so there is no real need to re-check it again in the big report.
+            // Therefore, we are skipping adding them to the big report with all the columns.
+            if ($column->deprecated) {
+                // Check there is a debugging message when a deprecated column is added to the report.
+                $this->assertDebuggingCalled("Column {$col->type}-{$col->value} is a deprecated column in source " . get_class($src));
+            } else {
+                // Add column to the big report with everything.
+                $col->reportid = $bigreportid;
+                $DB->insert_record('report_builder_columns', $col);
+            }
+
             $sql = $rb->build_query();
 
             $message = "\nReport title : {$title}\n";

@@ -11,6 +11,19 @@ information provided here is intended especially for developers.
   * reportbuilder_get_reports()
   * sql_group_concat()
   * totara_reportbuilder_renderer::print_result_count_string()
+* Added public 'deprecated' property to the rb_column_options class. Use this property to mark columns as deprecated and
+  warn users if their reports contain deprecated columns that should no longer be used.
+* Added rb_base_source::get_deprecated_column_options() which returns all deprecated the column options.
+* The following columns have been deprecated in rb_base_source::add_user_fields_to_columns():
+  * jobassignments
+  * jobpositionnames
+  * jobpositionidnumbers
+  * joborganisationnames
+  * joborganisationidnumbers
+  * jobmanagernames
+  * jobappraisernames
+  * jobtempmanagernames
+  Consider switching to the 'job_assignments' report source as an alternative.
 
 === 11.0 ===
 

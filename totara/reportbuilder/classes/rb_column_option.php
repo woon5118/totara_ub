@@ -329,6 +329,12 @@ class rb_column_option {
     public $issubquery;
 
     /**
+     * Is column deprecated?
+     * @var bool
+     */
+    public $deprecated;
+
+    /**
      * Generate a new column option instance
      *
      * Options provided by an associative array, e.g.:
@@ -339,7 +345,7 @@ class rb_column_option {
      *
      * @param string $type Type of the column
      * @param string $value Value of the column
-     * @param string $heading Name for the column
+     * @param string $name Name (heading) for the column
      * @param string $field Database field to use for this column
      * @param array $options Associative array of optional settings for the column
      */
@@ -369,6 +375,7 @@ class rb_column_option {
             'addtypetoheading' => false,
             'extracontext' => null,
             'issubquery' => false,
+            'deprecated' => false,
         );
         $options = array_merge($defaults, $options);
 

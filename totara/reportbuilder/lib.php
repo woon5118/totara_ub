@@ -1688,6 +1688,11 @@ class reportbuilder {
             }
             $columnoption = $this->columnoptions[$key];
 
+            // Debugging message for any developer using a deprecated column.
+            if ($columnoption->deprecated && (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING)) {
+                debugging("Column {$key} is a deprecated column in source " . get_class($this->src), DEBUG_DEVELOPER);
+            }
+
             if (!empty($columnoption->columngenerator)) {
                 /* Rather than putting the column into the list, we call the generator and it
                  * will supply an array of columns (0 or more) that should be included. We pass
@@ -1783,7 +1788,7 @@ class reportbuilder {
             $key = $option->type . '-' . $option->value;
 
             if ($this->embedobj && $embeddedheading = $this->embedobj->get_embedded_heading($option->type, $option->value)) {
-                // Use heading from embedded source, but do not add the type because embeded report has own default!
+                // Use heading from embedded source, but do not add the type because embedded report has own default!
                 $out[$key] = format_string($embeddedheading);
                 continue;
             } else {
@@ -1796,7 +1801,7 @@ class reportbuilder {
                 }
             }
 
-            // There may be more than one type of data (for exmaple, users), for example columns,
+            // There may be more than one type of data (for example, users)
             // so add the type to the heading to differentiate the types - if required.
             if (isset($option->addtypetoheading) && $option->addtypetoheading) {
                 $type = $this->get_type_heading($option->type);
@@ -4754,15 +4759,29 @@ class reportbuilder {
             return $ret;
         }
 
+        $deprecated_section = get_string('type_deprecated', 'totara_reportbuilder');
+        $deprecated = array();
         foreach ($columns as $column) {
             // don't include unselectable columns
             if (!$column->selectable) {
                 continue;
             }
+
             $section = $this->get_type_heading($column->type);
             $key = $column->type . '-' . $column->value;
-            $ret[$section][$key] = format_string($column->name);
+            if ($column->deprecated) {
+                $deprecated[$key] = get_string('deprecated', 'totara_reportbuilder', format_string($column->name));
+            }
+            else {
+                $ret[$section][$key] = format_string($column->name);
+            }
         }
+
+        // Add deprecated column options into their own group at the end of all options.
+        if (!empty($deprecated)) {
+            $ret[$deprecated_section] = $deprecated;
+        }
+
         return $ret;
     }
 

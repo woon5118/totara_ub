@@ -302,6 +302,12 @@ class rb_column {
     public $issubquery;
 
     /**
+     * Is column deprecated?
+     * @var bool
+     */
+    public $deprecated;
+
+    /**
      * Generate a new column instance
      *
      * Options provided by an associative array, e.g.:
@@ -336,6 +342,7 @@ class rb_column {
             'aggregate' => null,
             'extracontext' => null,
             'issubquery' => false,
+            'deprecated' => false,
         );
         $options = array_merge($defaults, $options);
 

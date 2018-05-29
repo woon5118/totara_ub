@@ -126,6 +126,7 @@ switch ($action) {
 
     case 'delete':
         $colid = required_param('cid', PARAM_INT);
+        $deprecated = optional_param('deprecated', false, PARAM_BOOL);
         $sql = 'SELECT rbc.*, rb.source
                   FROM {report_builder_columns} rbc
                   JOIN {report_builder} rb ON rbc.reportid = rb.id
@@ -150,9 +151,14 @@ switch ($action) {
         reportbuilder_set_status($reportid);
 
         if ($column) {
+            $column->deprecated = false;
             // Get the column group name.
-            // Is there a type string in the source file?
-            if (get_string_manager()->string_exists('type_' . $column->type, 'rb_source_' . $column->source)) {
+            // If the column is deprecated, just put it back to its deprecated option group.
+            if ($deprecated) {
+                $column->optgroup_label = get_string('type_deprecated', 'totara_reportbuilder');
+                $column->deprecated = true;
+            } else if (get_string_manager()->string_exists('type_' . $column->type, 'rb_source_' . $column->source)) {
+                // Is there a type string in the source file?
                 $column->optgroup_label = get_string('type_' . $column->type, 'rb_source_' . $column->source);
                 // How about in report builder?
             } else if (get_string_manager()->string_exists('type_' . $column->type, 'totara_reportbuilder')) {

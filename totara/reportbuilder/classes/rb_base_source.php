@@ -2626,6 +2626,8 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading
             )
         );
+
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'jobassignments',
@@ -2638,8 +2640,10 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading,
                 'extrafields' => array('userid' => "$join.id", 'deleted' => "$join.deleted"),
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'jobpositionnames',
@@ -2653,8 +2657,10 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'jobpositionidnumbers',
@@ -2668,8 +2674,10 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'joborganisationnames',
@@ -2683,8 +2691,10 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'joborganisationidnumbers',
@@ -2698,8 +2708,10 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'jobmanagernames',
@@ -2714,8 +2726,10 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'jobappraisernames',
@@ -2729,8 +2743,10 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
+        /** Deprecated since Totara 12 */
         $columnoptions[] = new rb_column_option(
             $groupname,
             'jobtempmanagernames',
@@ -2745,6 +2761,7 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
+                'deprecated' => true,
             )
         );
 
@@ -6302,6 +6319,21 @@ abstract class rb_base_source {
             }
         }
         return $grouped;
+    }
+
+    /**
+     * Get list of deprecated columns.
+     *
+     * @return array of column options that are deprecated
+     */
+    public function get_deprecated_column_options() {
+        $deprecated = array();
+        foreach ($this->columnoptions as $option) {
+            if ($option->deprecated) {
+                $deprecated[$option->type . '-' . $option->value] = true;
+            }
+        }
+        return $deprecated;
     }
 
     /**
