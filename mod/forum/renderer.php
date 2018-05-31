@@ -238,6 +238,7 @@ class mod_forum_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_big_search_form(\mod_forum\output\big_search_form $form) {
+        $this->page->requires->js_call_amd('mod_forum/big_search_form', 'init');
         return $this->render_from_template('mod_forum/big_search_form', $form->export_for_template($this));
     }
 

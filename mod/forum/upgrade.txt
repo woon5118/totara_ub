@@ -14,6 +14,11 @@ information provided here is intended especially for developers.
  * External function can_add_discussion now returns two additional fields:
    "canpindiscussions" that indicates if the user can add pinned discussions.
    "cancreateattachment" that indicates if the user can add attachments to the discussion.
+* The legacy forum.js file has been removed, this includes the js functions:
+    forum_produce_subscribe_link, forum_produce_tracking_link, lockoptions_timetoitems,
+    lockoptions_timefromitems, lockoptions, lockoption, unlockoption
+* The template mod_forum/big_search_form has been updated.
+* mod_forum_renderer::render_big_search_form has been updated to include the newly created mod_forum/big_search_form AMD module
 
 === 10 ===
 
