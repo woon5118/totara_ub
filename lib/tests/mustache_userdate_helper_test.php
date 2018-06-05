@@ -125,17 +125,22 @@ class mustache_userdate_helper_testcase extends advanced_testcase {
         $this->assertEquals('1 January 2011', $mustache->render('test'));
         $this->assertDebuggingCalled('userdate mustache helper in use - this has a potential XSS issue');
 
-        $loader->setTemplate('test', '{{#userdate}} {{date}}, {{#str}} strftimedate, langconfig {{/str}} {{/userdate}}');
-        $this->assertEquals('1 January 2011', $mustache->render('test', ['date' => 1293876000]));
-        $this->assertDebuggingCalled('userdate mustache helper in use - this has a potential XSS issue');
+        $debugging = array(
+            'userdate mustache helper in use - this has a potential XSS issue',
+            'Mustache processing quotes converted to square brackets for safety.'
+        );
 
-        $loader->setTemplate('test', '{{#userdate}} {{date}}, {{format}} {{/userdate}}');
+        $loader->setTemplate('test', '{{#userdate}} {{ date }}, {{#str}} strftimedate, langconfig {{/str}} {{/userdate}}');
+        $this->assertEquals('1 January 2011', $mustache->render('test', ['date' => 1293876000]));
+        $this->assertDebuggingCalledCount(2, $debugging);
+
+        $loader->setTemplate('test', '{{#userdate}} {{date}}, {{ format }} {{/userdate}}');
         $this->assertEquals('1 January 2011', $mustache->render('test', ['date' => 1293876000, 'format' => get_string('strftimedate', 'langconfig')]));
-        $this->assertDebuggingCalled('userdate mustache helper in use - this has a potential XSS issue');
+        $this->assertDebuggingCalledCount(2, $debugging);
 
         $loader->setTemplate('test', '{{#userdate}} {{{date}}}, {{{format}}} {{/userdate}}');
         $this->assertEquals('1 January 2011', $mustache->render('test', ['date' => 1293876000, 'format' => get_string('strftimedate', 'langconfig')]));
-        $this->assertDebuggingCalled('userdate mustache helper in use - this has a potential XSS issue');
+        $this->assertDebuggingCalledCount(2, $debugging);
     }
 
 
