@@ -2425,9 +2425,6 @@ function create_course($data, $editoroptions = NULL) {
     // purge appropriate caches in case fix_course_sortorder() did not change anything
     cache_helper::purge_by_event('changesincourse');
 
-    // new context created - better mark it as dirty
-    $context->mark_dirty();
-
     // Totara: Save the custom fields.
     $data->id = $course->id;
     customfield_save_data($data, 'course', 'course');
