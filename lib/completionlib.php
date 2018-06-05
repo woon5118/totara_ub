@@ -1064,6 +1064,7 @@ class completion_info {
 
         // Difficult to find affected users, just purge all completion cache.
         $this->get_completion_cache()->purge();
+        cache::make('core', 'coursecompletion')->purge();
         // Purge progressinfo cache also
         $this->get_progressinfo_cache()->purge();
     }
