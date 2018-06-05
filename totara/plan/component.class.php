@@ -906,7 +906,7 @@ abstract class dp_base_component {
                     $event = new stdClass;
                     $userfrom = $DB->get_record('user', array('id' => $USER->id));
                     $event->userfrom = $userfrom;
-                    $event->contexturl = $this->get_url();
+                    $event->contexturl = $this->get_url()->out(true);
                     $event->icon = $this->component.'-update';
                     $a = new stdClass;
                     $a->plan = format_string($this->plan->name);
@@ -927,7 +927,7 @@ abstract class dp_base_component {
             $event = new stdClass;
             $userfrom = $DB->get_record('user', array('id' => $USER->id));
             $event->userfrom = $userfrom;
-            $event->contexturl = $this->get_url();
+            $event->contexturl = $this->get_url()->out(true);
             $event->icon = $this->component.'-update';
             $a = new stdClass;
             $a->plan = format_string($this->plan->name);
@@ -973,7 +973,7 @@ abstract class dp_base_component {
                 foreach($managers as $manager) {
                     $event = new stdClass;
                     $event->userfrom = $USER;
-                    $event->contexturl = $this->get_url();
+                    $event->contexturl = $this->get_url()->out(true);
                     $event->icon = $this->component.'-'.$type;
                     $a = new stdClass;
 
@@ -1002,7 +1002,7 @@ abstract class dp_base_component {
         } else {
             $event = new stdClass;
             $event->userfrom = $USER;
-            $event->contexturl = $this->get_url();
+            $event->contexturl = $this->get_url()->out(true);
             $event->icon = $this->component.'-'.$type;
             $a = new stdClass;
 
@@ -1051,7 +1051,7 @@ abstract class dp_base_component {
                 foreach($managers as $manager) {
                     $event = new stdClass;
                     $event->userfrom = $USER;
-                    $event->contexturl = $this->get_url();
+                    $event->contexturl = $this->get_url()->out(true);
                     $event->icon = $this->component.'-complete';
                     $a = new stdClass;
 
@@ -1074,7 +1074,7 @@ abstract class dp_base_component {
         } else {
             $event = new stdClass;
             $event->userfrom = $USER;
-            $event->contexturl = $this->get_url();
+            $event->contexturl = $this->get_url()->out(true);
             $event->icon = $this->component.'-complete';
             $a = new stdClass;
 
