@@ -49,6 +49,7 @@ Background:
   Scenario: User answers some questions correct and review quiz attempt
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test quiz"
     And I press "Attempt quiz now"
@@ -80,6 +81,7 @@ Background:
     # Check the formatting of the grade in the review
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test quiz"
     Then I should see "Grade / 4"

@@ -21,6 +21,7 @@ Feature: Users completion of courses
       | user002 | C1     | student |
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I click on "Turn editing on" "button"
     And I add a "Choice" to section "1" and I fill the form with:
@@ -45,6 +46,7 @@ Feature: Users completion of courses
     And I click on "Choice - Activity Two" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 2" "link"
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name          | Activity Three                                    |
@@ -65,16 +67,19 @@ Feature: Users completion of courses
   Scenario: Test course deletion only removes records relating to that course
     When I log in as "user001"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I click on "Activity One" "link"
     And I click on "Option 1" "radio"
     And I press "Save my choice"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I click on "Activity Two" "link"
     And I click on "Option 2" "radio"
     And I press "Save my choice"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 2" "link"
     And I click on "Activity Three" "link"
     And I click on "Option 3" "radio"
@@ -83,11 +88,13 @@ Feature: Users completion of courses
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I navigate to "Completions archive" node in "Course administration"
     And I press "Continue"
     And I press "Continue"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 2" "link"
     And I navigate to "Completions archive" node in "Course administration"
     And I press "Continue"
@@ -115,6 +122,7 @@ Feature: Users completion of courses
   Scenario: Test instant and re-aggregation of course completion using activity completion
     When I log in as "user001"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I click on "Activity One" "link"
     And I click on "Option 1" "radio"
@@ -148,6 +156,7 @@ Feature: Users completion of courses
     When I log out
     And I log in as "user002"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I click on "Activity One" "link"
     And I click on "Option 1" "radio"
@@ -161,6 +170,7 @@ Feature: Users completion of courses
     When I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria and delete existing completion data"
@@ -197,6 +207,7 @@ Feature: Users completion of courses
     And I log out
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I navigate to "Course completion" node in "Course administration > Reports"
     And I complete the course via rpl for "fn_002 ln_002" with text "Test 1"

@@ -39,6 +39,7 @@ Feature: Seminar Signup Manager Approval
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -67,6 +68,7 @@ Feature: Seminar Signup Manager Approval
     When I log out
     When I log in as "sally"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -80,6 +82,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
     And I log in as "sally"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -109,6 +112,7 @@ Feature: Seminar Signup Manager Approval
     When I log out
     And I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -135,6 +139,7 @@ Feature: Seminar Signup Manager Approval
     Then I should see "Seminar booking confirmation"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"
@@ -150,6 +155,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
     And I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -181,6 +187,7 @@ Feature: Seminar Signup Manager Approval
     Then I should see "Seminar booking confirmation"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"

@@ -24,6 +24,7 @@ Feature: Seminar event custom field validation works as expected
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 13901"
     And I follow "View all events"
 

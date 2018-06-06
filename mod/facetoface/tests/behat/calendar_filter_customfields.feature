@@ -213,6 +213,7 @@ Feature: Filter seminar events in calendar by their customfields
 
     # Add 2 seminars using different custom fields and rooms
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
 
@@ -256,6 +257,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Seminar two        |

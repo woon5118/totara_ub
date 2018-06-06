@@ -35,6 +35,7 @@ Feature: Search pre-defined rooms in seminar
 
   Scenario: Try and search a room in seminar
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -120,6 +121,7 @@ Feature: Search pre-defined rooms in seminar
       | fullname | shortname | category |
       | Course 2 | C2        | 0        |
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

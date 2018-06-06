@@ -54,6 +54,7 @@ Feature: Attempt or preview quiz after role change
     And I should see "Answer saved" in the "2" "table_row"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Preview quiz now" "button" should exist
@@ -89,6 +90,7 @@ Feature: Attempt or preview quiz after role change
     And I should see "Answer saved" in the "2" "table_row"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Continue the last attempt" "button" should exist
@@ -122,6 +124,7 @@ Feature: Attempt or preview quiz after role change
     And "Preview quiz now" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Preview quiz now" "button" should exist
@@ -169,6 +172,7 @@ Feature: Attempt or preview quiz after role change
     And "Re-attempt quiz" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Attempt quiz now" "button" should exist
@@ -205,6 +209,7 @@ Feature: Attempt or preview quiz after role change
     And I should see "Answer saved" in the "2" "table_row"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Attempt quiz now" "button" should exist
@@ -242,6 +247,7 @@ Feature: Attempt or preview quiz after role change
     And I should see "Answer saved" in the "2" "table_row"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Continue the last preview" "button" should exist
@@ -276,6 +282,7 @@ Feature: Attempt or preview quiz after role change
     And "Re-attempt quiz" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Attempt quiz now" "button" should exist
@@ -324,6 +331,7 @@ Feature: Attempt or preview quiz after role change
     And "Preview quiz now" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Preview quiz now" "button" should exist
@@ -372,6 +380,7 @@ Feature: Attempt or preview quiz after role change
     Then "Re-attempt quiz" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then "Attempt quiz now" "button" should exist
@@ -390,6 +399,7 @@ Feature: Attempt or preview quiz after role change
     And "Back to the course" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 3"
     Then "Attempt quiz now" "button" should exist
@@ -442,6 +452,7 @@ Feature: Attempt or preview quiz after role change
     And I should see "Answer saved" in the "2" "table_row"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then I should see "Attempts allowed: 1"
@@ -456,6 +467,7 @@ Feature: Attempt or preview quiz after role change
     And I should see "Answer saved" in the "2" "table_row"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 3"
     Then I should see "Attempts allowed: 3"
@@ -489,12 +501,14 @@ Feature: Attempt or preview quiz after role change
     Then "Continue the last attempt" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 1"
     Then I should see "Attempts allowed: 1"
     And "Back to the course" "button" should exist
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Quiz 3"
     Then I should see "Attempts allowed: 3"

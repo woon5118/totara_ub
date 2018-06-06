@@ -22,6 +22,7 @@ Feature: Delete a course with a seminar
       | student2 | C1     | student        |
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

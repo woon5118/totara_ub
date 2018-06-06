@@ -25,6 +25,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     # Visit the course
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
@@ -35,6 +36,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I should see "Not tracked" in the "Last Course Accessed" "block"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
@@ -50,6 +52,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     # Create an activity on course 2 so we use RPL completion.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I turn editing mode on
     And I add a "Page" to section "1" and I fill the form with:
@@ -73,6 +76,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     # Visit the course.
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
@@ -83,6 +87,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I should see "No criteria" in the "Last Course Accessed" "block"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
@@ -93,6 +98,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I should see "0%" in the "Last Course Accessed" "block"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
     And I follow "Test Page"
@@ -106,6 +112,7 @@ Feature: Verify the LCA block content displays the correct information.
     Given I log in as "admin"
     # Create activities on course 2.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I turn editing mode on
     And I add a "Page" to section "1" and I fill the form with:
@@ -139,6 +146,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     # Visit the course.
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
@@ -202,6 +210,7 @@ Feature: Verify the LCA block content displays the correct information.
     # Login as admin so we can unenrol the learner.
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     Then I should see "C3" in the ".breadcrumb-nav" "css_element"
 
@@ -221,6 +230,7 @@ Feature: Verify the LCA block content displays the correct information.
     # Login as admin so we can unenrol the learner from Course 2.
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 

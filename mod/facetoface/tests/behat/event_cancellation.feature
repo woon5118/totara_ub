@@ -24,6 +24,7 @@ Feature: Seminar event cancellation basic
 
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -69,6 +70,7 @@ Feature: Seminar event cancellation basic
     When I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
@@ -103,6 +105,7 @@ Feature: Seminar event cancellation basic
     When I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
@@ -246,6 +249,7 @@ Feature: Seminar event cancellation basic
     When I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
@@ -261,6 +265,7 @@ Feature: Seminar event cancellation basic
     When I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
@@ -343,6 +348,7 @@ Feature: Seminar event cancellation basic
     When I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"

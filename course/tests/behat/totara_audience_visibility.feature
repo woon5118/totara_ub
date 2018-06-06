@@ -78,6 +78,7 @@ Feature: Set audience visibility when defining a course
     And I enrol "Student 3" user as "Learner"
 
     When I follow "Find Learning"
+    And I follow "Courses"
     Then I should see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"
@@ -86,6 +87,7 @@ Feature: Set audience visibility when defining a course
 
     When I log in as "student1"
     And I follow "Find Learning"
+    And I follow "Courses"
     Then I should see "Course 1"
     And I should not see "Course 2"
     And I should see "Course 3"
@@ -94,6 +96,7 @@ Feature: Set audience visibility when defining a course
 
     When I log in as "student2"
     And I follow "Find Learning"
+    And I follow "Courses"
     Then I should see "Course 1"
     And I should not see "Course 2"
     And I should not see "Course 3"
@@ -102,6 +105,7 @@ Feature: Set audience visibility when defining a course
 
     When I log in as "student3"
     And I follow "Find Learning"
+    And I follow "Courses"
     Then I should see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"

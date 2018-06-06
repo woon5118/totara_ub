@@ -70,6 +70,7 @@ Feature: Verify competency course count within learning plan
     # admin hiding a course
     Then I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I follow "Edit settings"
     And I set the field "visible" to "Hide"

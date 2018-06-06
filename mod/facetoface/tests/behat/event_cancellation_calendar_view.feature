@@ -28,6 +28,7 @@ Feature: Seminar event cancellation calendar views
 
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -91,6 +92,7 @@ Feature: Seminar event cancellation calendar views
     Given I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "1 / 29" "table_row"
@@ -99,6 +101,7 @@ Feature: Seminar event cancellation calendar views
     When I log out
     And I log in as "learner1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
@@ -126,6 +129,7 @@ Feature: Seminar event cancellation calendar views
     Given I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "1 / 29" "table_row"
@@ -134,6 +138,7 @@ Feature: Seminar event cancellation calendar views
     When I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
@@ -149,6 +154,7 @@ Feature: Seminar event cancellation calendar views
 
   Scenario: mod_facetoface_cancel_802: cancelled events do not re-create in calendar when seminar updated
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test Seminar"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -161,6 +167,7 @@ Feature: Seminar event cancellation calendar views
 
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"

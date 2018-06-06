@@ -146,7 +146,7 @@ Feature: Feedback360 assigned users
     When I follow "Activate"
     And I press "Continue"
     Then I should see "Assigned to 3 user(s)" in the "Test feedback" "table_row"
-    When I follow "Close"
+    When I click on "Close" "link" in the ".cell.lastcol" "css_element"
     And I press "Continue"
     Then I should see "Assigned to 3 user(s)" in the "Test feedback" "table_row"
 

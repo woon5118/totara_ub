@@ -52,6 +52,7 @@ Feature: Users are forced to get manager approval where required
   Scenario: Should be unable to enrol using seminar direct without a manager
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "You can not enrol yourself in this course."
 
@@ -68,6 +69,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Request approval"
@@ -84,6 +86,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "manager request already pending"
     And I follow "Withdraw pending request"
@@ -101,6 +104,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Request approval"
@@ -116,5 +120,6 @@ Feature: Users are forced to get manager approval where required
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "Topic 1"

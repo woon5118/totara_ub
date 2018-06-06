@@ -21,6 +21,7 @@ Feature: Suspend user in different session times
   Scenario: Create sessions with different dates and add users to a face to face sessions
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
 
@@ -147,6 +148,7 @@ Feature: Suspend user in different session times
     And I wait until the page is ready
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I follow "Test seminar name"
 

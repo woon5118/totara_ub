@@ -16,6 +16,7 @@ Feature: Seminar event notification must not be available for user after it has 
       | student1 | C1     | student        |
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -43,6 +44,7 @@ Feature: Seminar event notification must not be available for user after it has 
   Scenario Outline: Seminar booking confirmation notifications are not available when disabled
     Given I am on a totara site
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
@@ -50,6 +52,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I set the field "Status" to "<signup_enabled>"
     And I press "Save"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"
@@ -63,6 +66,7 @@ Feature: Seminar event notification must not be available for user after it has 
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     When I follow "Sign-up"
@@ -80,6 +84,7 @@ Feature: Seminar event notification must not be available for user after it has 
   Scenario Outline: Seminar booking cancellation notifications are not available when disabled
     Given I am on a totara site
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
@@ -87,6 +92,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I set the field "Status" to "<cancellation_enabled>"
     And I press "Save"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"

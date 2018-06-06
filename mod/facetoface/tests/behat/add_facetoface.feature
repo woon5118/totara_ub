@@ -22,6 +22,7 @@ Feature: Add a seminar event and session
   Scenario: Add and configure a seminar activity with a single session
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

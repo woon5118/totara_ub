@@ -62,6 +62,7 @@ Feature: Manage pre-defined rooms
     And I should see "6" in the "Room 2" "table_row"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -75,6 +76,7 @@ Feature: Manage pre-defined rooms
 
   Scenario: Fill a room
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -138,6 +140,7 @@ Feature: Manage pre-defined rooms
 
   Scenario: Try and clash a room
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -223,6 +226,7 @@ Feature: Manage pre-defined rooms
 
   Scenario: Clash a room with different timezones
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

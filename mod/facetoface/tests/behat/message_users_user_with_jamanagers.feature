@@ -27,6 +27,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
     Given I log in as "admin"
 
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Seminar 15838"
     And I follow "Add a new event"
@@ -59,6 +60,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
       | facetoface_selectjobassignmentonsignupglobal | 1 |
 
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Seminar 15838"
     And I follow "Add a new event"

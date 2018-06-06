@@ -23,6 +23,7 @@ Feature: Manager approval and declare of interest
   Scenario: Student cannot declare interest where not enabled
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -31,12 +32,14 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
 
   Scenario: Student can declare and withdraw interest where enabled
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -63,6 +66,7 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Declare interest"
     And I follow "Declare interest"
@@ -77,6 +81,7 @@ Feature: Manager approval and declare of interest
   Scenario: Student cannot declare interest until all sessions are fully booked if setting enabled.
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -104,6 +109,7 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
     And I follow "Sign-up"
@@ -112,12 +118,14 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Declare interest"
 
   Scenario: Student cannot declare interest if overbooking is enabled.
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -146,6 +154,7 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
     And I follow "Sign-up"
@@ -154,12 +163,14 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
 
   Scenario: Staff can view who has expressed interest
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -206,6 +217,7 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Declare interest" "link" in the "Test f2f 1" activity
     And I set the following fields to these values:
@@ -218,6 +230,7 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Declare interest" "link" in the "Test f2f 1" activity
     And I set the following fields to these values:
@@ -226,6 +239,7 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test f2f 1"
     And I follow "Declared interest report"
@@ -242,6 +256,7 @@ Feature: Manager approval and declare of interest
   Scenario: Student can declare interest when past sessions are not full and no upcoming sessions
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -269,6 +284,7 @@ Feature: Manager approval and declare of interest
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Declare interest"
     And I follow "Declare interest"

@@ -13,6 +13,7 @@ Feature: Edit quiz settings - detect missing required gradepass
       | Course 1 | C1        | 0        | 1                |
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
 

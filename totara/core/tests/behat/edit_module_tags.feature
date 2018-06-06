@@ -19,6 +19,7 @@ Feature: Create and edit activity pages handle tags correctly
 
   Scenario: Verify activity tags work as expected
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I press "Turn editing on"
     And I wait until the page is ready

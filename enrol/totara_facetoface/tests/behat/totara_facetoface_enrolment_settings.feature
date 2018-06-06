@@ -17,10 +17,12 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Seminar direct enrolment |
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -66,6 +68,7 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
   Scenario: Change Enrolment displayed on course page setting from default setting to a new one
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should see "Booking open" in the "1 January 2020" "table_row"
     And I should see "Booking open" in the "2 January 2020" "table_row"
@@ -74,6 +77,7 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I click on "Edit" "link" in the "Seminar direct enrolment" "table_row"
@@ -84,6 +88,7 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should see "Booking open" in the "1 January 2020" "table_row"
     And I should see "Booking open" in the "2 January 2020" "table_row"

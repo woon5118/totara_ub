@@ -68,6 +68,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
@@ -75,6 +76,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link_or_button"
     Then I should see "Your booking has been completed and you have been enrolled on 2 event(s)."
@@ -94,6 +96,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I press "Save changes"
     And I follow "Course 1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name  | Test student enrolment |
@@ -102,6 +105,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Course 1"
     And I click on "Join waitlist" "link_or_button"
@@ -166,6 +170,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
@@ -173,6 +178,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link_or_button"
     Then I should see "Your booking has been completed but requires approval from your manager."

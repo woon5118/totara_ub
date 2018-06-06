@@ -61,6 +61,7 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should see "Calculus"
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -74,6 +75,7 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -92,6 +94,7 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -110,6 +113,7 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -129,6 +133,7 @@ Feature: Test course visibility
 
     # Make Chemistry visible only to enrolled users.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Chemistry"
     And I navigate to "Edit settings" node in "Course administration"
     And I set the following fields to these values:
@@ -137,6 +142,7 @@ Feature: Test course visibility
 
     # Make Physics visible to enrolled users and selected audiences.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Physics"
     And I navigate to "Edit settings" node in "Course administration"
     And I set the following fields to these values:
@@ -145,6 +151,7 @@ Feature: Test course visibility
 
     # Make Calculus visible to no users.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Calculus"
     And I navigate to "Edit settings" node in "Course administration"
     And I set the following fields to these values:
@@ -173,6 +180,7 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -191,6 +199,7 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -209,6 +218,7 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -228,6 +238,7 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should not see "Chemistry"
     And I should not see "Physics"

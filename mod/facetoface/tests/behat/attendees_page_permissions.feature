@@ -30,6 +30,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I set the following administration settings values:
       | Enable restricted access | 1 |
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -81,6 +82,7 @@ Feature: Check attendees actions are performed by users with the right permissio
   Scenario: Check trainer actions on attendees page
     Given I log in as "trainer1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "View all events" "link"
     When I click on "Attendees" "link"
@@ -97,6 +99,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | mod/facetoface:takeattendance    | Prohibit   | editingteacher | Course       |        C1 |
     When I log in as "trainer1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
@@ -118,6 +121,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | mod/facetoface:viewcancellations | Prohibit   | editingteacher | Course       |        C1 |
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
@@ -130,6 +134,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I log out
     When I log in as "trainer1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
@@ -148,6 +153,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | mod/facetoface:viewattendees  | Prohibit   | editingteacher | Course       |        C1 |
     When I log in as "trainer1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "View all events" "link"
     Then "Attendees" "link" should not exist
@@ -162,6 +168,7 @@ Feature: Check attendees actions are performed by users with the right permissio
   Scenario: Check managers can view attendees page
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -196,6 +203,7 @@ Feature: Check attendees actions are performed by users with the right permissio
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Sign-up"
     And I press "Request approval"
@@ -220,5 +228,6 @@ Feature: Check attendees actions are performed by users with the right permissio
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "Cancel booking"

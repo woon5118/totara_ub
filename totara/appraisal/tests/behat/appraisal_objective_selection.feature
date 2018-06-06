@@ -93,6 +93,7 @@ Feature: Test appraisal objective selection
     # Log in as the learner and go to latest appraisal.
     And I log in as "learner"
     And I follow "Performance"
+    And I follow "Latest Appraisal"
     # Click Choose objectives to review.
     And I click on "Start" "button"
     And I click on "Choose objectives to review" "button"

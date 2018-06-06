@@ -28,6 +28,7 @@ Feature: Add a seminar with select position
   Scenario: Add and configure a seminar activity with a single session and position asked for but not mandated then sign up as user with no pos
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -54,6 +55,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -75,6 +77,7 @@ Feature: Add a seminar with select position
       | student1 | POS002   |
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -101,6 +104,7 @@ Feature: Add a seminar with select position
     And I log out
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -113,6 +117,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Attendees"
@@ -120,6 +125,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Attendees"
@@ -134,6 +140,7 @@ Feature: Add a seminar with select position
   Scenario: Add and configure a seminar activity with a single session and position asked for and mandated then try to sign up as user with no pos
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -161,6 +168,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -181,6 +189,7 @@ Feature: Add a seminar with select position
       | student1 | POS002   |
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -207,6 +216,7 @@ Feature: Add a seminar with select position
     And I log out
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -216,6 +226,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Attendees"

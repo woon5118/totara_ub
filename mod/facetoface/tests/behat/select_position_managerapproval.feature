@@ -34,6 +34,7 @@ Feature: Seminar Select position with Manager approval
 
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -77,6 +78,7 @@ Feature: Seminar Select position with Manager approval
   Scenario: Student signs up with two managers assigned
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -88,6 +90,7 @@ Feature: Seminar Select position with Manager approval
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"
@@ -95,6 +98,7 @@ Feature: Seminar Select position with Manager approval
     And I log out
     And I log in as "teacher2"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"

@@ -41,6 +41,7 @@ Feature: Test notification templates update all activities
 
     # Check F2F activity notification now.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Seminar TL-9052"
     When I navigate to "Notifications" node in "Seminar administration"
@@ -74,6 +75,7 @@ Feature: Test notification templates update all activities
 
     # Check F2F activity notification now.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Seminar TL-9052"
     When I navigate to "Notifications" node in "Seminar administration"
@@ -112,6 +114,7 @@ Feature: Test notification templates update all activities
 
     # Check F2F activity notification now.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

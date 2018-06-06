@@ -40,6 +40,7 @@ Feature: Seminar event cancellation status
     And I follow "Manage enrol plugins"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -74,6 +75,7 @@ Feature: Seminar event cancellation status
     And I press "Save and display"
 
     Then I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I set the field "Add method" to "Seminar direct enrolment"
@@ -83,6 +85,7 @@ Feature: Seminar event cancellation status
 #    Users requesting approval
     Given I log in as "learner1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -92,6 +95,7 @@ Feature: Seminar event cancellation status
 
     Given I log in as "learner2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -102,6 +106,7 @@ Feature: Seminar event cancellation status
 #   Learner Five requesting approval and immediately withdrawing his pending request
     Given I log in as "learner5"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -109,6 +114,7 @@ Feature: Seminar event cancellation status
     And I press "Request approval"
     And I should see "Your booking has been completed but requires approval from your manager."
     Then I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "It is not possible to sign up for these events (manager request already pending)."
     And I should see "Withdraw pending request"
@@ -120,6 +126,7 @@ Feature: Seminar event cancellation status
 #   Manager adding Learners 3 and 4 as attendees, approving Learner 1 and declining request for Learner 2
     Given I log in as "manager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -199,6 +206,7 @@ Feature: Seminar event cancellation status
 #  should not appear anywhere
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test Seminar"
     When I click on "Cancel event" "link" in the "3 / 10" "table_row"
@@ -218,6 +226,7 @@ Feature: Seminar event cancellation status
     Given I log out
     When I log in as "learner3"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -228,6 +237,7 @@ Feature: Seminar event cancellation status
 
     Given I log in as "manager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -247,6 +257,7 @@ Feature: Seminar event cancellation status
 
     When I log in as "learner5"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Cancel booking"
     And I follow "Cancel booking"
@@ -256,6 +267,7 @@ Feature: Seminar event cancellation status
 
     When I log in as "manager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Attendees" "link"
     Then I should see "Learner One" in the "#facetoface_sessions" "css_element"
@@ -270,6 +282,7 @@ Feature: Seminar event cancellation status
 
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test Seminar"
     When I click on "Cancel event" "link"

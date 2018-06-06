@@ -1,4 +1,4 @@
-@totara @totara_plan @totara_rol
+@totara @totara_plan @totara_rol @javascript
 Feature: Check Record of Learning feature visibility
   In order to control access to RoL
   As an admin
@@ -20,5 +20,7 @@ Feature: Check Record of Learning feature visibility
     And I press "Save changes"
 
     When I navigate to "Top navigation" node in "Site administration > Appearance"
-    Then I should not see "Record of Learning" in the "#totaramenutable" "css_element"
+    Then I should see "Record of Learning" in the "#totaramenutable" "css_element"
+    And I should see "Feature disabled" in the "Record of Learning" "table_row"
     And I should not see "Record of Learning" in the totara menu
+

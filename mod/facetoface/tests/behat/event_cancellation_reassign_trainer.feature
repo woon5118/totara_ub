@@ -23,6 +23,7 @@ Feature: Seminar event cancellation trainer can be reassigned
     And I click on "#id_s__facetoface_session_roles_4" "css_element"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -57,6 +58,7 @@ Feature: Seminar event cancellation trainer can be reassigned
   Scenario: Trainer should not be able to be assigned for a new event with the same date if he is already assigned for an event with the same dates
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test Seminar"
     And I follow "Add a new event"
@@ -85,6 +87,7 @@ Feature: Seminar event cancellation trainer can be reassigned
   Scenario: Trainer should be able to be assigned for a new event with the same date if he is already assigned for a cancelled event with the same dates
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test Seminar"
     And I follow "Cancel event"

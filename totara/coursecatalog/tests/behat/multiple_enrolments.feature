@@ -20,6 +20,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
       | Guest login button | Show |
 #    Make self-enrolment available for C1. Enrolment plugins for a Course 1: manual, self, program.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I click on "Enable" "link" in the "Self enrolment (Learner)" "table_row"
@@ -28,6 +29,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
     And I should see "Disable" in the "Self enrolment (Learner)" "table_row"
 #    Make sure Course 2 does not have self or guest enrolment enabled.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I should see "Disable" in the "Manual enrolments" "table_row"
@@ -36,6 +38,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
     And I should see "Enable" in the "Guest access" "table_row"
 #    Make sure Course 3 has self and guest enrolments enabled.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I click on "Enable" "link" in the "Self enrolment (Learner)" "table_row"
@@ -45,6 +48,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
   Scenario: Guest trying to auto enrol in courses
     Given I log in as "guest"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I click on ".rb-display-expand" "css_element" in the "Course 1" "table_row"
     Then "Enrol" "link_or_button" should not exist
     When I click on ".rb-display-expand" "css_element" in the "Course 2" "table_row"
@@ -55,11 +59,13 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
   Scenario: Student trying to auto enrol in courses
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I click on ".rb-display-expand" "css_element" in the "Course 1" "table_row"
     Then "Enrol" "link_or_button" should exist
     # Lets auto enrol and visit the page again.
     And I press "Enrol"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I click on ".rb-display-expand" "css_element" in the "Course 1" "table_row"
     Then "Launch course" "link_or_button" should exist
     When I click on ".rb-display-expand" "css_element" in the "Course 2" "table_row"
@@ -76,6 +82,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
     And I click on "Log in as" "link"
     And I press "Continue"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I click on ".rb-display-expand" "css_element" in the "Course 1" "table_row"
     Then "Enrol" "link_or_button" should exist
     When I click on ".rb-display-expand" "css_element" in the "Course 2" "table_row"

@@ -38,6 +38,7 @@ Feature: Minimum Seminar bookings
 
   Scenario: Confirm default minimum bookings is set correctly
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Turn editing on" "button"
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -71,6 +72,7 @@ Feature: Minimum Seminar bookings
     And I click on "<notification to>" "checkbox" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I press "Save changes"
     Given I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Turn editing on" "button"
     And I add a "Seminar" to section "1" and I fill the form with:

@@ -23,6 +23,7 @@ Feature: Cancellation for session
       | student2 | C1     | student        |
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -35,6 +36,7 @@ Feature: Cancellation for session
   Scenario: User can cancel their booking at any time until seminar session starts
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -60,6 +62,7 @@ Feature: Cancellation for session
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
@@ -74,6 +77,7 @@ Feature: Cancellation for session
     # Check that editing teacher can manage cancellation notes
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Attendees" in row 1
@@ -87,6 +91,7 @@ Feature: Cancellation for session
     # Check that teacher can not manage cancellation notes
     And I log in as "teacher2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Attendees" in row 1
@@ -99,6 +104,7 @@ Feature: Cancellation for session
   Scenario: User cannot cancel their booking (Never)
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -124,6 +130,7 @@ Feature: Cancellation for session
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
@@ -136,6 +143,7 @@ Feature: Cancellation for session
   Scenario: User can cancel their booking if cut-off period is not reached
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -161,6 +169,7 @@ Feature: Cancellation for session
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
@@ -171,6 +180,7 @@ Feature: Cancellation for session
 
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Edit event" "link"
@@ -196,6 +206,7 @@ Feature: Cancellation for session
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should not see "Cancel booking"
@@ -205,6 +216,7 @@ Feature: Cancellation for session
   Scenario: User can cancel their booking at any time until session starts even when cancellation note field is deleted
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -235,6 +247,7 @@ Feature: Cancellation for session
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1

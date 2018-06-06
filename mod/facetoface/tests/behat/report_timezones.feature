@@ -21,6 +21,7 @@ Feature: Seminar timezones in reports
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -160,6 +161,7 @@ Feature: Seminar timezones in reports
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -185,6 +187,7 @@ Feature: Seminar timezones in reports
     And I press "OK"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar 2 name        |

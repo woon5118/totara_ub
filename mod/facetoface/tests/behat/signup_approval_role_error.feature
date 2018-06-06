@@ -31,6 +31,7 @@ Feature: Seminar Signup Role Approval after creating an event
   Scenario: Learner is trying to sing-up when there is approval role and no trainer appointed.
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -44,6 +45,7 @@ Feature: Seminar Signup Role Approval after creating an event
     And I click on "s__facetoface_approvaloptions[approval_role_3]" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -54,6 +56,7 @@ Feature: Seminar Signup Role Approval after creating an event
 
     When I log in as "sally"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "Sign-up"
     Then I should see "This seminar requires role approval, there are no users assigned to this role. Please contact the site administrator"
@@ -61,6 +64,7 @@ Feature: Seminar Signup Role Approval after creating an event
 
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     And I click on "Edit event" "link"
@@ -71,6 +75,7 @@ Feature: Seminar Signup Role Approval after creating an event
 
     When I log in as "sally"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"

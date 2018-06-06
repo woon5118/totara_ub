@@ -41,6 +41,7 @@ Feature: Seminar Approval required
   @javascript
   Scenario: Update user's status code depending from session capacity when seminar approval required is changed to false
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -129,6 +130,7 @@ Feature: Seminar Approval required
   @javascript
   Scenario: Update user's status code with override enabled when seminar approval required is removed
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

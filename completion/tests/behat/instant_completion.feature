@@ -53,6 +53,7 @@ Feature: Instant completion
       | Quiz - Test quiz name | 1 |
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 2" "link"
     And completion tracking is "Enabled" in current course
     And I click on "Edit settings" "link" in the "Administration" "block"
@@ -77,6 +78,7 @@ Feature: Instant completion
       | id_criteria_course_value | Miscellaneous / Course 1 |
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 3" "link"
     And completion tracking is "Enabled" in current course
     And I add a "Assignment" to section "1" and I fill the form with:
@@ -104,6 +106,7 @@ Feature: Instant completion
       | user     | program  |
       | student1 | program1 |
     And I log in as "admin"
+    And I click on "Find Learning" in the totara menu
     And I click on "Programs" in the totara menu
     And I click on "Program1" "link"
     And I press "Edit program details"
@@ -124,6 +127,7 @@ Feature: Instant completion
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 2" "link"
     And I follow "Test quiz name2"
     And I press "Attempt quiz now"
@@ -134,6 +138,7 @@ Feature: Instant completion
     Then I should see "10.00 out of 10.00"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I follow "Test quiz name"
     And I press "Attempt quiz now"
@@ -144,6 +149,7 @@ Feature: Instant completion
     Then I should see "10.00 out of 10.00"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 3" "link"
     And I follow "Test assignment name"
     And I press "Add submission"

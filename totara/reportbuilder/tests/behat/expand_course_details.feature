@@ -21,6 +21,7 @@ Feature: Test expand course details in Reportbuilder
     And I am on homepage
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -33,6 +34,7 @@ Feature: Test expand course details in Reportbuilder
     And I press "Add method"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                    | Test seminar 2             |
@@ -61,6 +63,7 @@ Feature: Test expand course details in Reportbuilder
     And I press "Add method"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I add a "Page" to section "1" and I fill the form with:
       | Name                | Page 1 |
@@ -71,6 +74,7 @@ Feature: Test expand course details in Reportbuilder
   Scenario: Expand course detail in coursecatalog with filters
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should see "Cannot enrol (no seminar events in this course)"
@@ -93,6 +97,7 @@ Feature: Test expand course details in Reportbuilder
   Scenario: Expand course detail in coursecatalog with all filters disabled
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I press "Edit this report"
     And I switch to "Filters" tab
     # Deleting all filters
@@ -103,6 +108,7 @@ Feature: Test expand course details in Reportbuilder
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should see "Cannot enrol (no seminar events in this course)"

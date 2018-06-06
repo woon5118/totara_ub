@@ -33,6 +33,7 @@ Feature: Seminar Manager approval of waiting list
   Scenario: The second student to sign up to the session should go on waiting list
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -62,6 +63,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Sign-up"
     And I press "Sign-up"
@@ -70,6 +72,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
@@ -80,6 +83,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student3"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
@@ -90,6 +94,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"

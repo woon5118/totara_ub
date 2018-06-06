@@ -30,6 +30,7 @@ Feature: Check room details capability view for student and manager
     And I press "Add a room"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -52,6 +53,7 @@ Feature: Check room details capability view for student and manager
   Scenario: Login as a student and check seminar room details
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Room details" "link"
     When I switch to "popup" window
@@ -64,6 +66,7 @@ Feature: Check room details capability view for student and manager
   Scenario: Login as a manager and check seminar room details
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     When I click on "Room details" "link"
     When I switch to "popup" window

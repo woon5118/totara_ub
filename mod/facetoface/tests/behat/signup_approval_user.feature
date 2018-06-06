@@ -27,6 +27,7 @@ Feature: Seminar Signup Manager Approval
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 9360"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -36,6 +37,7 @@ Feature: Seminar Signup Manager Approval
   @javascript
   Scenario: Student gets approved through manager approval by "learner" role
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 9360"
     And I follow "Seminar 9360"
     And I follow "Add a new event"
@@ -44,6 +46,7 @@ Feature: Seminar Signup Manager Approval
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 9360"
     And I should see "Sign-up"
     And I follow "Sign-up"

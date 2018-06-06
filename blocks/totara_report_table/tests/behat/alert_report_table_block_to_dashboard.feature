@@ -28,6 +28,7 @@ Feature: Only Alerts Report table block on dashboard
     # Create a Seminar.
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"

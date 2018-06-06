@@ -24,6 +24,7 @@ Feature: Export seminar attendees
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -55,6 +56,7 @@ Feature: Export seminar attendees
   Scenario: Export seminar without job assignments on signup
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -69,6 +71,7 @@ Feature: Export seminar attendees
 
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "Attendees" in the "10 February 2025" "table_row"
@@ -90,6 +93,7 @@ Feature: Export seminar attendees
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -104,6 +108,7 @@ Feature: Export seminar attendees
 
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "Attendees" in the "10 February 2025" "table_row"
@@ -123,6 +128,7 @@ Feature: Export seminar attendees
     And I set the following administration settings values:
       | facetoface_selectjobassignmentonsignupglobal | 1 |
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -133,6 +139,7 @@ Feature: Export seminar attendees
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -148,6 +155,7 @@ Feature: Export seminar attendees
 
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "Attendees" in the "10 February 2025" "table_row"

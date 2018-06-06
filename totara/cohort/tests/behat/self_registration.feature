@@ -343,6 +343,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     # Create and confirm initial audience enrolments for courses.
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Edit settings" node in "Course administration"
     And I click on "Add enrolled audiences" "button"
@@ -357,6 +358,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Edit settings" node in "Course administration"
     And I click on "Add enrolled audiences" "button"
@@ -371,6 +373,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I navigate to "Edit settings" node in "Course administration"
     And I click on "Add enrolled audiences" "button"
@@ -397,6 +400,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
 
     # Check course enrolments for user 1 (but not user 2) as admin
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should see "fnameman lnameman" in the "userenrolment" "table"
@@ -406,6 +410,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should not see "fnameman lnameman" in the "userenrolment" "table"
@@ -415,6 +420,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should not see "fnameman lnameman" in the "userenrolment" "table"

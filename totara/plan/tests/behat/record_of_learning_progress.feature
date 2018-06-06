@@ -64,6 +64,7 @@ Feature: Ensure progress is shown in Record of Learning
 
     # Set course completion criteria
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -73,6 +74,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -82,6 +84,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -91,6 +94,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 4"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -100,6 +104,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 5"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -114,6 +119,7 @@ Feature: Ensure progress is shown in Record of Learning
     When I log in as "learner1"
     # course1 - 100%
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Not completed: course1 label1. Select to mark as complete." "link"
     And I click on "Not completed: course1 label2. Select to mark as complete." "link"
@@ -124,12 +130,14 @@ Feature: Ensure progress is shown in Record of Learning
 
     # course2 - 33%
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I click on "Not completed: course2 label1. Select to mark as complete." "link"
     Then I should see "Completed: course2 label1. Select to mark as not complete."
 
     # course3 - 66%
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I click on "Not completed: course3 label1. Select to mark as complete." "link"
     And I click on "Not completed: course3 label2. Select to mark as complete." "link"
@@ -138,10 +146,12 @@ Feature: Ensure progress is shown in Record of Learning
 
     # course4 - 0%
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 4"
 
     # course5 - 33%
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 5"
     And I click on "Not completed: course5 label1. Select to mark as complete." "link"
     Then I should see "Completed: course5 label1. Select to mark as not complete."

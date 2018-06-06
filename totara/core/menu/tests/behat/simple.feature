@@ -52,21 +52,22 @@ Feature: A basic test of the Totara custom menu
     When I click on "Show" "link" in the "Test item" "table_row"
     Then I should see "Test item" in the totara menu
 
+  @javascript
   Scenario: Move menu items
     Given I navigate to "Top navigation" node in "Site administration > Appearance"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
-      | Parent item              | Top         |
-      | Menu title               | Test item 2 |
-      | Visibility               | Show        |
-      | Menu default url address | /my/        |
+      | Parent item              | Top          |
+      | Menu title               | Another item |
+      | Visibility               | Show         |
+      | Menu default url address | /my/         |
     And I click on "Add new menu item" "button"
-    And I should see "Test item 2" in the totara menu
-    When I click on "Move up" "link" in the "Test item 2" "table_row"
-    Then "Test item 2" "link" should appear before "Test item" "link"
+    And I should see "Another item" in the totara menu
+    When I click on "Move up" "link" in the "Another item" "table_row"
+    Then "Another item" "link" should appear before "Test item" "link"
     When I navigate to "Top navigation" node in "Site administration > Appearance"
-    And I click on "Move down" "link" in the "Test item 2" "table_row"
-    Then "Test item" "link" should appear before "Test item 2" "link"
+    And I click on "Move down" "link" in the "Another item" "table_row"
+    Then "Test item" "link" should appear before "Another item" "link"
 
   Scenario: Delete menu items
     Given I navigate to "Top navigation" node in "Site administration > Appearance"

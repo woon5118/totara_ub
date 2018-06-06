@@ -141,6 +141,7 @@ Feature: The course tile should work as expected
       | user     | course   | role |
       | admin | course1  | student |
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets

@@ -141,6 +141,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
     # Sign-up for Seminar 1 and Seminar 2.
     When I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "115" "table_row"
     And I press "Sign-up"

@@ -31,6 +31,7 @@ Feature: Totara cohort generators
 
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I should see "First User"
@@ -38,6 +39,7 @@ Feature: Totara cohort generators
     And I should not see "Second User"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I should see "Second User"

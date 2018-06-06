@@ -96,12 +96,14 @@ Feature: Course enrolment through programs
     Given I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Edit settings" node in "Course administration"
     And I set the field "Visibility" to "Enrolled users only"
     And I press "Save and display"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Edit settings" node in "Course administration"
     And I set the field "Visibility" to "Enrolled users only"

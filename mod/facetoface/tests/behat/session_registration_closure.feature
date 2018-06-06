@@ -37,6 +37,7 @@ Feature: Seminar Event Registration Closure
     And I click on "s__facetoface_approvaloptions[approval_admin]" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -87,6 +88,7 @@ Feature: Seminar Event Registration Closure
     And I log out
     And I log in as "manager"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Test facetoface name" "link"
     And I follow "Attendees"
@@ -112,6 +114,7 @@ Feature: Seminar Event Registration Closure
     And I should see "Booked" in the "Sally Sal" "table_row"
 
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I click on "View all events" "link"
     And I click on "Edit event" "link" in the "1 January 2020" "table_row"

@@ -80,6 +80,7 @@ Feature: Test Quick Links block
     And I set the field "linkurl" to "https://www.totaralms.com/"
     And I click on "Add link" "button"
     Then I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "Course Links"
     And I should see "Totara" in the "Course Links" "block"
@@ -107,6 +108,7 @@ Feature: Test Quick Links block
     And I click on "Delete" "link" in the "Reports" "table_row"
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
     Then I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "Course Links"
     And I should not see "Home" in the "Course Links" "block"

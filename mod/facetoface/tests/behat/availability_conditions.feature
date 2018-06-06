@@ -63,6 +63,7 @@ Feature: Seminar availability based on activity completion
   Scenario: Signup link is not available until the completion restriction is met
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "Not available unless: The activity Certificate 1 is marked complete"
     And I should not see "Sign-up"
@@ -74,6 +75,7 @@ Feature: Seminar availability based on activity completion
   Scenario: Join Waitlist link is not available until the completion restriction is met
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Edit event" "link" in the "0 / 10" "table_row"
     And I click on "Delete" "link" in the "1 January 2020" "table_row"
@@ -82,6 +84,7 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "Not available unless: The activity Certificate 1 is marked complete"
     And I should not see "Join waitlist"
@@ -107,12 +110,14 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "Sign-up"
     And I log out
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should not see "Sign-up"
     And I log out
@@ -137,12 +142,14 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Join waitlist"
     And I log out
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should not see "Join waitlist"
     And I log out

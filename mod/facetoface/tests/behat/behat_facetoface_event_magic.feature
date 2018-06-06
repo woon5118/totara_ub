@@ -11,6 +11,7 @@ Feature: Test steps in behat_facetoface.php
 
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -60,6 +61,7 @@ Feature: Test steps in behat_facetoface.php
     When I use magic to adjust the seminar event "start" from "11/03/2026 10:00" "Pacific/Auckland" to "11/03/2000 09:00"
     And I use magic to adjust the seminar event "end" from "11/03/2026 16:00" "Pacific/Auckland" to "11/03/2000 14:00"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"

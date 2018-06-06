@@ -24,6 +24,7 @@ Feature: Users can expand the course info in course catalog
       | forcelogin | 0 |
     And I log out
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "Course summary"
 
@@ -32,6 +33,7 @@ Feature: Users can expand the course info in course catalog
     Given I am on homepage
     And I click on "#guestlogin input[type=submit]" "css_element"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "Course summary"
 
@@ -41,5 +43,6 @@ Feature: Users can expand the course info in course catalog
     And  I click on "#guestlogin input[type=submit]" "css_element"
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "Course summary"

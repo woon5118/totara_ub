@@ -37,6 +37,7 @@ Feature: Event Name Site Logs report filter
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I press "Enrol"
     Then I should see "Topic 1"
@@ -44,6 +45,7 @@ Feature: Event Name Site Logs report filter
 
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I press "Enrol"
     Then I should see "Topic 1"

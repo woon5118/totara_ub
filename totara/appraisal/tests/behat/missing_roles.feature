@@ -108,12 +108,14 @@ Feature: Admin page that lists missing roles for one appraisal
 
     And I log in as "learner1"
     And I follow "Performance"
+    And I follow "Latest Appraisal"
     And I set the field with xpath "//div[@class='singleselect']//select" to "2"
     And I click on "View" "button"
 
     And I log out
     And I log in as "manager1"
     And I follow "Performance"
+    And I follow "All Appraisals"
     And I follow "Appraisal1"
     And I click on "Start" "button"
     And I set the field with xpath "//fieldset[.//legend//a[text()='App1-Q1']]//input" to "Manager answer1"
@@ -130,6 +132,7 @@ Feature: Admin page that lists missing roles for one appraisal
     And I log out
     When I log in as "learner1"
     And I follow "Performance"
+    And I follow "Latest Appraisal"
     And I follow "Appraisal1"
     And I click on "View" "button"
 

@@ -20,6 +20,7 @@ Feature: Site Administrator can enable and disable the LCA block.
     And I click on "Hide" "link" in the "Last Course Accessed" "table_row"
 
     And I follow "Find Learning"
+    And I follow "Courses"
     And I follow "Course 1"
     Then I should not see "Last Course Accessed"
     And I log out

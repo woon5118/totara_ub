@@ -33,6 +33,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Add users to a seminar session with dates
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -71,6 +72,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Add and remove users to a Seminar session without dates (waitlist)
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -92,6 +94,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Add users by username via textarea
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -120,6 +123,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Add users by email via textarea
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -149,6 +153,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Add users via file upload and then remove
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -191,6 +196,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Use the allow scheduling conflicts checkbox
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -270,6 +276,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -305,6 +312,7 @@ Feature: Add - Remove seminar attendees
 
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -345,6 +353,7 @@ Feature: Add - Remove seminar attendees
 
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -369,6 +378,7 @@ Feature: Add - Remove seminar attendees
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"
@@ -435,6 +445,7 @@ Feature: Add - Remove seminar attendees
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Add a new event"

@@ -85,6 +85,7 @@ Feature: Seminar sessions report overview
 
     # 1: (1st activity of C1) Underbooked, upcoming, manager approval
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -133,6 +134,7 @@ Feature: Seminar sessions report overview
     # Prepare 4 sessions in three activities:
     # 2: (2nd activity of C1) Two dates, self approved, overbooked, 1st started, 2nd upcoming
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name 2      |
@@ -213,6 +215,7 @@ Feature: Seminar sessions report overview
 
     # 4: (1st activity of C2) Fully booked, ended, no one
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     #And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -250,6 +253,7 @@ Feature: Seminar sessions report overview
 
     # 5: (1st activity of C2) N/A, ended, no one
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name 4      |

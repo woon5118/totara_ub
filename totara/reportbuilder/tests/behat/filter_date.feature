@@ -121,6 +121,7 @@ Feature: Use the reportbuilder date filter
       | Course 19 | C19       | 1484737200 |
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I press "Edit this report"
     And I switch to "Filters" tab
     And I select "Course Start Date" from the "newstandardfilter" singleselect
@@ -134,6 +135,7 @@ Feature: Use the reportbuilder date filter
       | Timezone | Europe/London |
     And I press "Update profile"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I set the following fields to these values:
       | course-startdate_sck        | 1       |
       | course-startdate_sdt[day]   | 16      |
@@ -173,6 +175,7 @@ Feature: Use the reportbuilder date filter
       | Timezone | America/Los_Angeles |
     And I press "Update profile"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I set the following fields to these values:
       | course-startdate_sck        | 1       |
       | course-startdate_sdt[day]   | 16      |
@@ -212,6 +215,7 @@ Feature: Use the reportbuilder date filter
       | Timezone | Pacific/Auckland |
     And I press "Update profile"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I set the following fields to these values:
       | course-startdate_sck        | 1       |
       | course-startdate_sdt[day]   | 16      |
@@ -248,6 +252,7 @@ Feature: Use the reportbuilder date filter
     Given I am on a totara site
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"
     And I switch to "Filters" tab
     And I set the field "newsidebarfilter" to "Course Start Date"
@@ -264,6 +269,7 @@ Feature: Use the reportbuilder date filter
     Given I am on a totara site
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"
     And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "Course Start Date"

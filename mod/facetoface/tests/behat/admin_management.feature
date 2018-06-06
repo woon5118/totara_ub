@@ -18,6 +18,7 @@ Feature: Add and remove seminar Administrators
     And I click on "Manager and Administrative approval" "text"
     And I click on "Save changes" "button"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course 1"
     And I click on "Turn editing on" "button"
     And I add a "Seminar" to section "1"

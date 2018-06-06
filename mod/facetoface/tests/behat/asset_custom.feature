@@ -19,6 +19,7 @@ Feature: Manage custom assets by non-admin user
   Scenario: Add edit seminar custom asset as editing teacher
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -49,6 +50,7 @@ Feature: Manage custom assets by non-admin user
   Scenario: Confirm images work when adding an asset through a totaradialogue
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

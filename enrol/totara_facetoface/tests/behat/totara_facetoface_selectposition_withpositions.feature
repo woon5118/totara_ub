@@ -94,6 +94,7 @@ Feature: Users can enrol themself in courses with selected position where semina
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:

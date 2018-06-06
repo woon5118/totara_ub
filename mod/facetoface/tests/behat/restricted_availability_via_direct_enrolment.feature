@@ -21,12 +21,14 @@ Feature: Seminar availability based on activity completion using direct enrolmen
     And I select "Yes" from the "Enable existing enrolments" singleselect
     And I click on "Save changes" "button"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
 
     # Create a Seminar which will be available.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1"
@@ -53,6 +55,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
 
     # Create a Seminar and add restriction so it won't be available until the first activity is marked as completed.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add a "Seminar" to section "1"
     And I set the following fields to these values:
@@ -85,6 +88,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
   Scenario: Signup link is not available when availabilty conditions are not met when using seminar direct enrolment
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should not see "Sign up"
     And I should see "Available seminar"
@@ -98,6 +102,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | enableavailability  | 0 |
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should see "Test seminar 1"
     And I should see "Available seminar"
@@ -113,6 +118,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | student1 | C1     | student        |
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should see "Available seminar"
     And I should see "Test seminar 1"

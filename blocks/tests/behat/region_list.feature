@@ -44,6 +44,7 @@ Scenario: Ensure editing a block in a course lists the course layout options
     | name     | shortname |
     | course 1 | c1        |
   And I click on "Find Learning" in the totara menu
+  And I click on "Courses" in the totara menu
   And I click on "course 1" "link"
   And I click on "Turn editing on" "button"
   And I configure the "Navigation" block
@@ -64,6 +65,7 @@ Scenario: Ensure editing a block in an activity lists the activity layout option
     | name     | shortname |
     | course 1 | c1        |
   And I click on "Find Learning" in the totara menu
+  And I click on "Courses" in the totara menu
   And I click on "course 1" "link"
   And I click on "Turn editing on" "button"
   And I add a "Forum" to section "1" and I fill the form with:

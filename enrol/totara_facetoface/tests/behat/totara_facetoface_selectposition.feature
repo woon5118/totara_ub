@@ -86,6 +86,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Sign-up"
@@ -100,6 +101,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity."

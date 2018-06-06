@@ -112,6 +112,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Save changes"
 
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -227,6 +228,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
 
     # Course 1 setup
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -286,6 +288,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
 
     # Course 2 setup
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I follow "View all events"
     And I follow "Add a new event"

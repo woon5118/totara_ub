@@ -45,6 +45,7 @@ Feature: Seminar Signup Self Approval
       | Terms and conditions | Blah Blah Blah, agree? |
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -72,6 +73,7 @@ Feature: Seminar Signup Self Approval
 
   Scenario: Student signs up and self approves
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     And I follow "Edit settings"
@@ -84,6 +86,7 @@ Feature: Seminar Signup Self Approval
     And I log out
     And I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"

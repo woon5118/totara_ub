@@ -43,6 +43,7 @@ Feature: Allocate spaces for team in seminar
       | student4 | POS001   | sitemanager2 |
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -91,6 +92,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Manager can deallocate users that he has allocated in the current session
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -107,6 +109,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Capacity should be unaffected if removing allocation and create reservations when removing allocations is set to Yes
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -128,6 +131,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Capacity should be affected if removing allocation and create reservations when removing allocations is set to No
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -148,6 +152,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Manager cannot see users allocated from another managers
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -159,6 +164,7 @@ Feature: Allocate spaces for team in seminar
 
     When I log in as "sitemanager2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -168,6 +174,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Manager cannot deallocate self booked users even if he is their manager
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
@@ -177,6 +184,7 @@ Feature: Allocate spaces for team in seminar
 
     When I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -190,6 +198,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Manager cannot deallocate users in another activity even if he is their manager and he allocated the user
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -211,6 +220,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Allocate spaces for students in different sessions should be allowed if multiple sessions per signup is On
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -231,6 +241,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Allocate and remove spaces for students when student has self-booked
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
@@ -240,6 +251,7 @@ Feature: Allocate spaces for team in seminar
 
     When I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
@@ -266,6 +278,7 @@ Feature: Allocate spaces for team in seminar
   Scenario: Cannot allocate learners in already started event.
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -288,6 +301,7 @@ Feature: Allocate spaces for team in seminar
 
     When I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "Event in progress" in the "0 / 33" "table_row"

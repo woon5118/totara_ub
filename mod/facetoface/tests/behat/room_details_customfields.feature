@@ -139,6 +139,7 @@ Feature: Check room details with all possible custom fields
 
     # Use the room.
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
@@ -148,6 +149,7 @@ Feature: Check room details with all possible custom fields
     And I wait "1" seconds
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
 
     # View the room.

@@ -40,6 +40,7 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I press "Enrol"
     Then I should see "Incorrect enrolment key, please try again"
@@ -56,12 +57,13 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     And I set the following administration settings values:
       | forcelogin | 0 |
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add "Self enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I click on "Disable" "link" in the "Manual enrolments" "table_row"
     And I log out
-    And I click on ".site-logo" "css_element"
+    And I click on ".masthead_logo--header_link" "css_element"
     And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And "Enrol" "button" should not exist

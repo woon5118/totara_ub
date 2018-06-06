@@ -62,7 +62,7 @@ Feature: Test Team menu item
   Scenario: I can disable Team for everybody
     Given I am on a totara site
     And I log in as "admin"
-    And I should see "Team" in the "#totaramenu" "css_element"
+    And I should see "Team" in the ".totaraNav" "css_element"
     And I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable Team" to "Disable"
     And I press "Save changes"

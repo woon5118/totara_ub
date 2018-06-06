@@ -47,6 +47,7 @@ Feature: Certification completion date is based on course completion time
     And I click on "Save changes" "button"
     And I click on "Save all changes" "button"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course One"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

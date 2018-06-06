@@ -26,6 +26,7 @@ Feature: Take seminar attendance with job assignment on signup
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -58,6 +59,7 @@ Feature: Take seminar attendance with job assignment on signup
     # Sign both users up for the future event
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -72,6 +74,7 @@ Feature: Take seminar attendance with job assignment on signup
 
     Given I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -87,6 +90,7 @@ Feature: Take seminar attendance with job assignment on signup
     # Now change the event data to be in the past
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Edit event" "link" in the "10 February 2025" "table_row"
@@ -118,6 +122,7 @@ Feature: Take seminar attendance with job assignment on signup
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -132,6 +137,7 @@ Feature: Take seminar attendance with job assignment on signup
 
     Given I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -147,6 +153,7 @@ Feature: Take seminar attendance with job assignment on signup
     # Now change the event data to be in the past
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Edit event" "link" in the "10 February 2025" "table_row"
@@ -177,6 +184,7 @@ Feature: Take seminar attendance with job assignment on signup
     And I set the following administration settings values:
       | facetoface_selectjobassignmentonsignupglobal | 1 |
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -187,6 +195,7 @@ Feature: Take seminar attendance with job assignment on signup
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -202,6 +211,7 @@ Feature: Take seminar attendance with job assignment on signup
 
     Given I log in as "student2"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Sign-up"
@@ -217,6 +227,7 @@ Feature: Take seminar attendance with job assignment on signup
     # Now change the event data to be in the past
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Edit event" "link" in the "10 February 2025" "table_row"

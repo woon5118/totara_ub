@@ -51,6 +51,7 @@ Feature: Edit seminar notification templates
   @javascript
   Scenario: Updating templates can be set to update the notifications in a seminar activity
     When I click on "Find Learning" in the totara menu
+	And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -73,6 +74,7 @@ Feature: Edit seminar notification templates
       | Update all activities | 1                  |
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
@@ -86,6 +88,7 @@ Feature: Edit seminar notification templates
   @javascript
   Scenario: Updating templates can be set to not update the notifications in a seminar activity
     When I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -106,6 +109,7 @@ Feature: Edit seminar notification templates
       | Update all activities | 0                  |
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
