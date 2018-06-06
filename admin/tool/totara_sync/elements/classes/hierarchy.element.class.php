@@ -445,17 +445,26 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             $rs->close();
         }
 
-        /// Check parents
+        // Check parents.
+        if (empty($this->config->sourceallrecords)) {
+            $parentssql = " AND (s.parentidnumber NOT IN (SELECT idnumber FROM {{$synctable_clone}}))
+                AND s.parentidnumber NOT IN (SELECT idnumber FROM {{$elname}})";
+        } else {
+            $parentssql = "AND s.parentidnumber NOT IN (SELECT idnumber FROM {{$synctable_clone}})";
+        }
+
         $sql = "SELECT DISTINCT s.parentidnumber
                   FROM {{$synctable}} s
        LEFT OUTER JOIN {{$elname}} i
                     ON s.parentidnumber = i.idnumber
-                 WHERE s.parentidnumber IS NOT NULL AND s.parentidnumber != '' AND s.parentidnumber != '0'
-                   AND s.parentidnumber NOT IN (SELECT idnumber FROM {{$synctable_clone}})";
+                 WHERE s.parentidnumber IS NOT NULL AND s.parentidnumber != '' AND s.parentidnumber != '0'" .
+            $parentssql;
+
         $rs = $DB->get_recordset_sql($sql);
         if ($rs->valid()) {
             foreach ($rs as $r) {
-                $this->addlog(get_string('parentxnotexistinfile', 'tool_totara_sync', $r->parentidnumber), 'error', 'checksanity');
+                $lngstr = empty($this->config->sourceallrecords) ? 'parentxnotexist' : 'parentxnotexistinfile';
+                $this->addlog(get_string($lngstr, 'tool_totara_sync', $r->parentidnumber), 'error', 'checksanity');
             }
             $rs->close();
             return false;
@@ -482,6 +491,16 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
         $sql = "SELECT idnumber, parentidnumber
                   FROM {{$synctable}}";
         $nodes = $DB->get_records_sql_menu($sql);
+
+        // If source does not contain all data we need to also include current parents.
+        if (empty($this->config->sourceallrecords)) {
+            $items = $DB->get_records($elname, array(), '', 'id, idnumber, parentid');
+            foreach ($items as $item) {
+                if (!isset($nodes[$item->idnumber])) {
+                    $nodes[$item->idnumber] = ($item->parentid == 0) ? 0 : $items[$item->parentid]->idnumber;
+                }
+            }
+        }
 
         // Start eliminating nodes from the valid trees
         // Start at the top so get all the root nodes (no parentid)

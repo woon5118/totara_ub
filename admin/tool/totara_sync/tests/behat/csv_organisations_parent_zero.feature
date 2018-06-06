@@ -129,3 +129,98 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
       | Support               | 2 |
       | Marketing             | 1 |
     And I should not see "Development Team"
+
+  Scenario: Verify organisations CSV upload with a parent organisation sanity checks correctly when source does not contain all records.
+    Given I navigate to "Organisation" node in "Site administration > HR Import > Elements"
+    And I set the following fields to these values:
+      | Source contains all records | No  |
+    And I press "Save changes"
+    Then I should see "Settings saved"
+
+    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/organisations_parent_sanity_check_1.csv" file to "CSV" filemanager
+    And I press "Upload"
+    Then I should see "HR Import files uploaded successfully"
+
+    When I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    Then I should not see "Error"
+    And I should see "Running HR Import cron...Done!"
+
+    # All the records should have been added correctly.
+    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I follow "Organisation Framework 1"
+    Then I should see these hierarchy items at the following depths:
+      | org1  | 1 |
+      | org1a | 2 |
+      | org1b | 2 |
+      | org2  | 1 |
+
+    # Now lets run a sync again where the parent exists, but not in the source.
+    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/organisations_parent_sanity_check_2.csv" file to "CSV" filemanager
+    And I press "Upload"
+    Then I should see "HR Import files uploaded successfully"
+
+    When I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    Then I should not see "Error"
+    And I should see "Running HR Import cron...Done!"
+
+    # The record should have been added correctly.
+    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I follow "Organisation Framework 1"
+    Then I should see these hierarchy items at the following depths:
+      | org1  | 1 |
+      | org1a | 2 |
+      | org1b | 2 |
+      | org2  | 1 |
+      | org2b | 2 |
+
+    # Now lets run another sync where the parent does not exist.
+    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/organisations_parent_sanity_check_3.csv" file to "CSV" filemanager
+    And I press "Upload"
+    Then I should see "HR Import files uploaded successfully"
+
+    When I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    Then I should see "Error:org - sanity check failed, aborting..."
+
+    When I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I should see "parent O6 does not exist"
+
+  Scenario: Verify organisations CSV upload with a parent organisation sanity checks correctly when source contains all records.
+    Given I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/organisations_parent_sanity_check_4.csv" file to "CSV" filemanager
+    And I press "Upload"
+    Then I should see "HR Import files uploaded successfully"
+
+    When I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    Then I should see "Error:org - sanity check failed, aborting..."
+
+    When I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I should see "parent O6 does not exist in HR Import file"
+
+    # Lets run again with the missing parent within teh source to check the sync works.
+    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/organisations_parent_sanity_check_5.csv" file to "CSV" filemanager
+    And I press "Upload"
+    Then I should see "HR Import files uploaded successfully"
+
+    When I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    Then I should not see "Error"
+    And I should see "Running HR Import cron...Done!"
+
+    # The records should have been added correctly.
+    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I follow "Organisation Framework 1"
+    Then I should see these hierarchy items at the following depths:
+      | org1  | 1 |
+      | org1a | 2 |
+      | org1b | 2 |
+      | org2  | 1 |
+      | org3  | 1 |
+      | org3a | 2 |
