@@ -15,7 +15,7 @@ Feature: Set audience visibility when defining a course
     When I navigate to "Edit settings" node in "Course administration"
     Then I should not see "Audience-based visibility"
     And I should not see "Visibility"
-    And I should see "Visible" in the "General" "fieldset"
+    And I should see "Course visibility" in the "General" "fieldset"
 
   @javascript
   Scenario: Create courses with various audience visibility settings

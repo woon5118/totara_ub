@@ -48,7 +48,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I click on "Courses" in the totara menu
     And I click on "RoLCourseVisibility Test Course 1" "link"
     And I click on "Edit settings" "link" in the "Administration" "block"
-    And I set the field "Visible" to "0"
+    And I set the field "Course visibility" to "0"
     And I press "Save and display"
     Then I should see "Topic 1"
 
@@ -78,7 +78,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I click on "Courses" in the totara menu
     And I click on "RoLCourseVisibility Test Course 1" "link"
     And I click on "Edit settings" "link" in the "Administration" "block"
-    And I set the field "Visible" to "0"
+    And I set the field "Course visibility" to "0"
     And I press "Save and display"
     Then I should see "Topic 1"
 
@@ -108,7 +108,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I click on "Courses" in the totara menu
     And I click on "RoLCourseVisibility Test Course 1" "link"
     And I click on "Edit settings" "link" in the "Administration" "block"
-    And I set the field "Visible" to "0"
+    And I set the field "Course visibility" to "0"
     And I press "Save and display"
     Then I should see "Topic 1"
 
