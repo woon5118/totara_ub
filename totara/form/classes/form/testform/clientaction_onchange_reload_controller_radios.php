@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralms.com>
+ * @author Brian Barnes <brian.barnes@totaralearning.com>
  * @package totara_form
  */
 
@@ -25,7 +25,7 @@ namespace totara_form\form\testform;
 
 use totara_form\form_controller;
 
-class clientaction_onchange_reload_controller extends form_controller {
+class clientaction_onchange_reload_controller_radios extends form_controller {
 
     public function get_ajax_form_instance($idsuffix) {
 
@@ -34,10 +34,10 @@ class clientaction_onchange_reload_controller extends form_controller {
         require_capability('moodle/site:config', \context_system::instance());
 
         // Get the current data from id parameter.
-        $currentdata = clientaction_onchange_reload::get_current_data_for_test();
-        $currentdata['form_select'] = 'totara_form\form\testform\clientaction_onchange_reload';
+        $currentdata = clientaction_onchange_reload_radios::get_current_data_for_test();
+        $currentdata['form_select'] = 'totara_form\form\testform\clientaction_onchange_reload_radios';
 
-        return new clientaction_onchange_reload($currentdata, [], $idsuffix);
+        return new clientaction_onchange_reload_radios($currentdata, [], $idsuffix);
 
     }
 

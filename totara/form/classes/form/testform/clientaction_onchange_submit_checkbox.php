@@ -23,28 +23,26 @@
 
 namespace totara_form\form\testform;
 
-use totara_form\form\clientaction\onchange_reload;
+use totara_form\form\clientaction\onchange_submit;
 use totara_form\form\element\checkbox;
-use totara_form\form\element\static_html;
 use totara_form\form\group\section;
-use totara_form\form_controller;
 
 /**
- * Onchange reload client action test form.
+ * Onchange submit client action test form.
  *
  * @author Sam Hemelryk <sam.hemelryk@totaralms.com>
- * @copyright 2017 Totara Learning Solutions Ltd {@link http://www.totaralms.com/}
+ * @copyright 2016 Totara Learning Solutions Ltd {@link http://www.totaralms.com/}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package totara_form
  */
-class clientaction_onchange_reload extends form {
+class clientaction_onchange_submit_checkbox extends form {
 
     /**
      * Returns the name for this test form.
      * @return string
      */
     public static function get_form_test_name() {
-        return 'Onchange reload client action test';
+        return 'Onchange submit client checkbox action test';
     }
 
     /**
@@ -60,16 +58,6 @@ class clientaction_onchange_reload extends form {
     }
 
     /**
-     * Returns class responsible for form handling.
-     * This is intended especially for ajax processing.
-     *
-     * @return null|form_controller
-     */
-    public static function get_form_controller() {
-        return new clientaction_onchange_reload_controller();
-    }
-
-    /**
      * Defines this form.
      */
     public function definition() {
@@ -79,35 +67,22 @@ class clientaction_onchange_reload extends form {
         $this->model->add(new checkbox('checkbox_1', 'Checkbox without clientaction'));
 
         $checkbox = $this->model->add(new checkbox('checkbox_2', 'Checkbox'));
-        $this->model->add_clientaction(new onchange_reload($checkbox));
+        $this->model->add_clientaction(new onchange_submit($checkbox));
 
         $checkbox = $this->model->add(new checkbox('checkbox_3', 'Checkbox ignore empty'));
-        $this->model->add_clientaction((new onchange_reload($checkbox))->ignore_empty_values());
+        $this->model->add_clientaction((new onchange_submit($checkbox))->ignore_empty_values());
 
         $checkbox = $this->model->add(new checkbox('checkbox_4', 'Checkbox ignored values'));
-        $this->model->add_clientaction((new onchange_reload($checkbox))->add_ignored_value('0'));
+        $this->model->add_clientaction((new onchange_submit($checkbox))->add_ignored_value('0'));
 
         $checkbox = $this->model->add(new checkbox('checkbox_5', 'Checkbox custom values', 'banana', 'apple'));
-        $this->model->add_clientaction(new onchange_reload($checkbox));
+        $this->model->add_clientaction(new onchange_submit($checkbox));
 
         $checkbox = $this->model->add(new checkbox('checkbox_6', 'Checkbox custom values and ignored unchecked', 'banana', 'apple'));
-        $this->model->add_clientaction((new onchange_reload($checkbox))->add_ignored_value('apple'));
+        $this->model->add_clientaction((new onchange_submit($checkbox))->add_ignored_value('apple'));
 
         $checkbox = $this->model->add(new checkbox('checkbox_7', 'Checkbox custom values and ignored checked', 'banana', 'apple'));
-        $this->model->add_clientaction((new onchange_reload($checkbox))->add_ignored_value('banana'));
-
-        $items = $this->model->get_items()[0]->get_items();
-        $defaultdata = clientaction_onchange_reload::get_current_data_for_test();
-
-        foreach ($items as $item) {
-            if (isset($defaultdata[$item->get_name()]) && $item->get_data()[$item->get_name()] !== $defaultdata[$item->get_name()]) {
-                $this->model->add(new static_html($item->get_name() . '_reloaded', $item->get_name() . ' unchecked', 'success'));
-            } else if ($item->get_data()[$item->get_name()] !== 'apple' && $item->get_data()[$item->get_name()] !== '0') {
-                $this->model->add(new static_html($item->get_name() . '_reloaded', $item->get_name() . ' checked', 'unchecked'));
-            } else {
-                $this->model->add(new static_html($item->get_name() . '_reloaded', $item->get_name() . ' unchanged', 'success'));
-            }
-        }
+        $this->model->add_clientaction((new onchange_submit($checkbox))->add_ignored_value('banana'));
 
         $this->add_required_elements();
 

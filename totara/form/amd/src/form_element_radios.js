@@ -126,6 +126,14 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         return false;
     };
 
+    RadiosElement.prototype.showLoading = function() {
+        $(this.inputs).filter(':checked').siblings('.tf_loading').show();
+    };
+
+    RadiosElement.prototype.hideLoading = function() {
+        this.inputs.siblings('.tf_loading').hide();
+    };
+
     return RadiosElement;
 
 });

@@ -95,10 +95,16 @@
     .totara_form_element_checkboxes,
     .totara_form_element_radios,
     .totara_form_element_yesno {
-        .tf_element_input label {
-            padding-right: .6em;
-            padding-left: .6em;
-            color: @totara_form-text-color;
+        .tf_element_input {
+            label {
+                padding-right: 2rem;
+                padding-left: 0;
+                color: @totara_form-text-color;
+            }
+
+            .tf_loading {
+                margin-left: -1.8rem;
+            }
         }
     }
 
