@@ -510,7 +510,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
 
         if ($icon) {
             $html = html_writer::start_tag('div', array('class' => 'show-cachenow-dialog', 'id' => 'show-cachenow-dialog-' . $reportid, 'data-id' => $reportid));
-            $cacheicon = $this->output->flex_icon('cache', ['classes' => 'rb-genicon']);
+            $cacheicon = $this->output->flex_icon('cache', ['classes' => 'rb-genicon', 'alt' => get_string('cachereport', 'totara_reportbuilder')]);
             $html .= $cacheicon;
             $html .= html_writer::end_tag('div');
         } else {

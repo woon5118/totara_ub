@@ -111,6 +111,7 @@ $string['cachenow'] = 'Generate Now';
 $string['cachenow_help'] = 'If **Generate now** is checked, then report cache will be generated immediately after form submit.';
 $string['cachenow_title'] = 'Report cache';
 $string['cachepending'] = '{$a} There are changes to this report\'s configuration that have not yet been applied. The report will be updated next time the report is generated.';
+$string['cachereport'] = 'Generate report cache';
 $string['cannotviewembedded'] = 'Embedded reports can only be accessed through their embedded url';
 $string['category'] = 'Category';
 $string['changeglobalrestriction'] = 'change';
