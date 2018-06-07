@@ -146,5 +146,20 @@ function xmldb_feedback_upgrade($oldversion) {
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2016120501.02) {
+        $feedbackvalues = $DB->get_recordset('feedback_value');
+
+        foreach ($feedbackvalues as $record) {
+            $cleanedvalue = html_entity_decode(clean_text($record->value));
+            if ($cleanedvalue !== $record->value) {
+                $DB->set_field('feedback_value', 'value', $cleanedvalue, ['id' => $record->id]);
+            }
+        }
+
+        $feedbackvalues->close();
+
+        upgrade_mod_savepoint(true, 2016120501.02, 'feedback');
+    }
+
     return true;
 }

@@ -193,6 +193,6 @@ class feedback_item_textarea extends feedback_item_base {
     }
 
     public function create_value($data) {
-        return s($data);
+        return html_entity_decode(clean_text($data));
     }
 }
