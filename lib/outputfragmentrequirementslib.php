@@ -99,9 +99,7 @@ class fragment_requirements_manager extends page_requirements_manager {
                 }
             }
             // Append don't overwrite.
-            $output .= html_writer::script('require(["jquery"], function($) {
-                M.str = $.extend(true, M.str, ' . json_encode($strings) . ');
-            });');
+            $output .= html_writer::script('M.util.add_strings(' . json_encode($strings) . ');');
         }
 
         // Add variables.

@@ -1669,7 +1669,7 @@ class page_requirements_manager {
                     $strings[$component][$indentifier] = $langstring->out();
                 }
             }
-            $output .= html_writer::script(js_writer::set_variable('M.str', $strings));
+            $output .= html_writer::script('M.util.add_strings(' . json_encode($strings) . ');');
         }
 
         // Add variables.
