@@ -13,6 +13,7 @@ information provided here is intended especially for developers.
 * Checkboxes now validate clientside
 * utc10 date field now uses polyfil date pickers in desktop browsers
 * Removed custom build of modernizr and IE9 polyfil libraries (IE9 has not been supported since Totara 10)
+* Removed totara_form/form_clientaction_autosubmit AMD module as it is not used and does not have an equivilent source file
 
 === 10 ===
 
