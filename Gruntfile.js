@@ -122,7 +122,7 @@ module.exports = function(grunt) {
     var inAMD = path.basename(cwd) == 'amd';
 
     // Globbing pattern for matching all AMD JS source files.
-    var amdSrc = [inAMD ? cwd + '/src/*.js' : '**/amd/src/*.js'];
+    var amdSrc = [inAMD ? cwd + '/src/**/*.js' : '**/amd/src/**/*.js'];
 
     // Non AMD JS which still needs to uglify through grunt
     var independentSrc = [

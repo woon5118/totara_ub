@@ -52,11 +52,6 @@ $file = '/' . min_clean_param($file, 'SAFEPATH');
 $jsfiles = array();
 list($unused, $component, $module) = explode('/', $file, 3);
 
-// No subdirs allowed - only flat module structure please.
-if (strpos('/', $module) !== false) {
-    die('Invalid module');
-}
-
 // Some (huge) modules are better loaded lazily (when they are used). If we are requesting
 // one of these modules, only return the one module, not the combo.
 $lazysuffix = "-lazy.js";
