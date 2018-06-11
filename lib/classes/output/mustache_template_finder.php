@@ -110,9 +110,7 @@ class mustache_template_finder {
         }
         list($component, $templatename) = explode('/', $name, 2);
         $component = clean_param($component, PARAM_COMPONENT);
-        if (strpos($templatename, '/') !== false) {
-            throw new coding_exception('Templates cannot be placed in sub directories (' . s($name) . ' requested)');
-        }
+        $templatename = clean_param($templatename, PARAM_SAFEPATH);
 
         $dirs = self::get_template_directories_for_component($component, $themename);
 

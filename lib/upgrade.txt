@@ -42,6 +42,7 @@ information provided here is intended especially for developers.
 ** lib/templates/add_block_popover_content.mustache
 * core/login mustache template has changed, fixing an issue with a skip link
 * Added support for AMD modules in subdirectories (eg. core/sub/amdmodule is a valid AMD module)
+* Added support for using sub directories in templates folder.
 
 === 11.0 ===
 
