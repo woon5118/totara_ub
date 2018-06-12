@@ -3255,7 +3255,7 @@ EOD;
 
             $attributes = array();
             $attributes['itemscope'] = '';
-            $attributes['itemtype'] = 'http://data-vocabulary.org/Breadcrumb';
+            $attributes['itemtype'] = 'https://data-vocabulary.org/Breadcrumb';
             $content = html_writer::tag('span', $content, $attributes);
 
         } else {
