@@ -94,7 +94,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     And I should see "Completed certification : CP101"
 
     When I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
-    Then "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "1"
+    Then "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "0"
     And "Certification 2" row "Previous completions" column of "plan_certifications" table should contain "0"
 
   Scenario: Basic certification completion import case insensitive is turned off
