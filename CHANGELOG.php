@@ -3,6 +3,319 @@
 
 Totara Learn Changelog
 
+Release Evergreen (20th June 2018):
+===================================
+
+Key:           + Evergreen only
+
+Security issues:
+
+    TL-10268       Prevented EXCEL/ODS Macro Injection
+
+                   The Excel and Open Document Spreadsheet export functionality allowed the
+                   exporting of formulas when they were detected, which could lead to
+                   incorrect rendering and security issues on different reports throughout the
+                   code base. To prevent exploitation of this functionality, formula detection
+                   was removed and standard string type applied instead.
+
+                   The formula type is still in the code base and can still be used, however
+                   it now needs to be called directly using the "write_formula" method.
+
+    TL-17424       Improved the validation of the form used to edit block configuration
+
+                   Validation on the fields in the edit block configuration form has been
+                   improved, and only fields that the user is permitted to change are passed
+                   through this form.
+                   The result of logical operators are no longer passed through or relied
+                   upon.
+
+    TL-17785       MDL-62275: Improved validation of calculated question formulae
+
+Performance improvements:
+
+    TL-17615       Improved mapping of courses and certifications within the completion import tool
+
+                   Previously all mapping was done in SQL, and was repeated any time the
+                   mapping data was needed.
+                   On some database engines the SQL would perform poorly when applied to a
+                   large data set.
+                   This change introduces two new fields to capture the mapping, which is now
+                   calculated once and saved for future reference.
+                   This should lower resource use on the database when running completion
+                   import.
+
+Improvements:
+
+    TL-10651   +   HR Import now handles empty fields consistently
+
+                   Empty fields being imported into HR Import were inconsistently handled
+                   across field types, sources and elements. This makes changes to introduce
+                   consistency so if a field is left empty in the CSV or database then it will
+                   delete the existing data (except if the "Empty string behaviour in CSV"
+                   setting is set to "Empty strings are ignored").
+
+                   The main change in behaviour is with empty fields when custom fields are
+                   included in the import. Prior to this patch custom fields would sometimes
+                   not be erased when an empty field was imported. These should now be erased
+                   correctly (for CSV this is only when "Empty strings erase existing data" is
+                   set).
+
+    TL-16149   +   Added the ability to have images associated with courses, programs and certifications
+
+                   This improvement saw three notable changes made:
+
+                   1) An image can now be set for courses, programs, and certifications via
+                   their respective settings pages.
+                   2) An out of the box default image has been added for courses, programs,
+                   and certifications.
+                   3) The default image for courses, programs, and certifications can be
+                   overridden by an admin.
+
+    TL-16893   +   Removed unused content options from the program report source
+
+                   The program report source's "Hide currently unavailable content" setting
+                   had no effect and has been removed. The code governing the setting has
+                   also been deprecated. The functionality it previously offered is already
+                   provided by the Report Builder's visibility controls and capabilities
+                   relating to this.
+
+    TL-17288       Missing Seminar notifications can now be restored by a single bulk action
+
+                   During Totara upgrades from earlier versions to T9 and above, existing
+                   seminars are missing the new default notification templates. There is
+                   existing functionality to restore them by visiting each seminar
+                   notification one by one, which will take some time if there are a lot of
+                   seminars. This patch introduces new functionality to restore any missing
+                   templates for ALL existing seminars at once.
+
+    TL-17414       Improved information around the 'completions archive' functionality
+
+                   It now explicitly expresses that completion data will be permanently
+                   deleted and mentions that the data that will be archived is limited to: id,
+                   courseid, userid, timecompleted, and grade. It also mentions that this
+                   information will be available in the learner's Record of Learning.
+
+    TL-17439   +   Split block configuration settings into two sections
+
+                   The general section contains all the settings common to every block, and
+                   the new custom section contains settings specific to the block type.
+
+                   If you have any custom blocks please refer to the blocks/upgrade.txt file
+                   for more information.
+
+    TL-17517       Improved the user interface for Course Import when no courses match a search term
+    TL-17611       Added a hook to the Last Course Accessed block to allow courses to be excluded from being displayed
+
+                   This hook allows specified courses to be excluded from being displayed in
+                   the Last Course Accessed block. If the most recently accessed course is
+                   excluded then the next most recently accessed course is displayed.
+
+    TL-17613       Added a hook to the Last Course Accessed block to allow extra data to be passed to template
+
+                   This enables extra data to be passed through to the Last Course Accessed
+                   block template so that the display can be more easily modified without
+                   changing core code.
+
+    TL-17626       Prevented report managers from seeing performance data without specific capabilities
+
+                   Site managers will no longer have access to the following report columns as
+                   a default:
+
+                   Appraisal Answers: Learner's Answers, Learner's Rating Answers, Learner's
+                   Score, Manager's Answers, Manager's Rating Answers, Manager's
+                   Score, Manager's Manager Answers, Manager's Manager Rating Answers,
+                   Manager's Manager Score, Appraiser's Answers, Appraiser's Rating Answers,
+                   Appraiser's Score, All Roles' Answers, All Roles' Rating Answers, All
+                   Roles' Score.
+
+                   Goals: Goal Name, Goal Description
+
+                   This has been implemented to ensure site managers cannot access users'
+                   performance-related personal data. To give site managers access to this
+                   data the role must be updated with the following permissions:
+                   * totara/appraisal:viewallappraisals
+                   * totara/hierarchy:viewallgoals
+
+    TL-17661   +   Enabled missing gzip compression for uncached js files
+    TL-17738       Changed data-vocabulary.org URL in metadata to be https
+
+                   This URL is used to provide extra information for navigation breadcrumbs to
+                   search engines when your site is indexed.
+
+Bug fixes:
+
+    TL-16908       Made sure evidence files are being cleaned up when evidence is deleted
+    TL-16967       Fixed an 'invalidrecordunknown' error when creating Learning Plans for Dynamic Audiences
+
+                   Once the "Automatically assign by organisation" setting was set under the
+                   competencies section of Learning Plan templates, and new Learning Plans
+                   were created for Dynamic Audiences, a check for the first job assignment of
+                   the user was made. This first job assignment must exist otherwise an error
+                   was thrown for all users that did not have a job assignment. This has now
+                   been fixed and a check for all of the user's job assignments is made
+                   rather than just the first one.
+
+    TL-17102       Fixed saved searches not being applied to report blocks
+    TL-17289       Made message metadata usage consistent for alerts and blocks
+    TL-17364       Fixed displaying profile fields data in the self-registration request report
+    TL-17405       Fixed setuplib test case error when test executed separated
+    TL-17416       Prevented completion report link appearing in user profile page when user does not have permission to view reports.
+    TL-17486       Fixed display issue when using "Hide if there is nothing to display" setting in the report table block
+
+                   If the setting "Hide if there is nothing to display" was set for the report
+                   table block then the block would hide even if there was data. The setting
+                   now works correctly and only hides the block if the report contains no
+                   data.
+
+    TL-17523       Removed the ability to create multiple job assignments via the dialog when multiple jobs is disabled
+    TL-17524       Fixed exporting reports as PDF during scheduled tasks when the PHP memory limit is exceeded
+
+                   Generating PDF files as part of a scheduled report previously caused an
+                   error and aborted the entire scheduled task if a report had a large data
+                   set that exceeded the PDF memory limit. With this patch, the exception is
+                   still raised, but the export completes with the exception message in the
+                   PDF file notifying the user that they need to change their report. The
+                   scheduled task then continues on to the next report to be exported.
+
+    TL-17541       Fixed the help text for a setting in the course completion report
+
+                   The help text for the 'Show only active enrolments' setting in the course
+                   completion report was misleading, sounding like completion records for
+                   users with removed enrolments were going to be shown on the report. This
+                   has now been fixed to reflect the actual behaviour of the setting, which
+                   excludes records from removed enrolments.
+
+    TL-17542       Made sure that RPL completion information remains collapsed on the course completion report until it is explicitly expanded
+    TL-17590       Added missing parameters to the 'User is a member of audience' filter javascript call
+    TL-17601       Made the edit and delete icons in the calendar use Flex icons so they are now Font Awesome icons
+
+                   In Totara 9 the edit and delete buttons for events on calendars were
+                   switched over to the new Flex icon API, this was mistakenly overwritten in
+                   a later patch. This patch moves the edit and delete buttons back to the
+                   Flex icon API as intended.
+
+    TL-17610       Setup cron user and course before each scheduled or adhoc task
+
+                   Before this patch we set the admin user and the course at the beginning of
+                   the cron run. Any task could have overridden the user. But if the task did
+                   not take care of resetting the user at the end it affected all following
+                   tasks, potentially creating unwanted results. Same goes for the course. To
+                   avoid any interference we now set the admin user and the default course
+                   before each task to make sure all get the same environment.
+
+    TL-17612       Added a warning by the "next page" button when using sequential navigation
+
+                   When the quiz is using sequential navigation, learners are unaware that
+                   they cannot navigate back to a question. A warning has been introduced when
+                   sequential navigation is in place to make the learner aware of this.
+
+    TL-17622       Fixed validation of custom user profile fields during self-registration
+    TL-17628       Prevented access to global report restriction interface when feature is disabled
+    TL-17630       Fixed Error in help text when editing seminar notifications
+
+                   in the 'body_help' string replaced [session:room:placeholder] with
+                   [session:room:cf_placeholder] as all custom field placeholders have to have
+                   the cf_ prefix in the notification.
+
+    TL-17632   +   Ensured that recursion in mustache helpers is prevented when debugging is off
+    TL-17633       Removed misleading information in the program/certification extension help text
+
+                   Previously the help text stated "This option will appear before the due
+                   date (when it is close)" which was not accurate as the option always
+                   appeared during the program/certification enrollment period. This statement
+                   has now been removed.
+
+    TL-17645   +   Mustache esc helper now supports full mustache syntax
+    TL-17647       Raised MySQL limitation on the amount of questions for Appraisals.
+
+                   Due to MySQL/MariaDB row size limit there could only be about 85 questions
+                   of types "text" in one appraisal. Creating appraisals with higher numbers
+                   of questions caused an error on activation. Changes have been made to the
+                   way the questions are stored so that now it's possible to have up to about
+                   186 questions of these types when using MySQL/MariaDB.
+
+                   On the appraisal creation page a warning message has been added that is
+                   shown when the limit is about to be exceeded due to the amount of added
+                   questions.
+
+                   Also, when this error still occurs on activation, an informative error
+                   message will be shown instead of the MySQL error message.
+
+    TL-17656       Fixed notification type validation when creating a new notification
+
+                   When creating a new seminar notification and using the default values, the
+                   save process was failing because a notification type default value was
+                   missed. Now the default value for the notification type is "Send now"
+
+    TL-17662       Fixed user roles not being added on re-enrolment into course after resetting course
+    TL-17702       Fixed display issue when editing forum subscribers
+    TL-17711       Fixed message URL in the component alerts
+    TL-17716       Fixed HR Import sanity checks for Hierarchy parents when source does not contain all records
+
+                   When the Organisation / Position elements are set to "source does not
+                   contain all records" there are sanity checks to ensure that, if an item has
+                   a parent, the parent currently exists or will exist before the record is
+                   imported.
+
+                   Prior to this patch, only the source records were being used to determine
+                   if the parent exists. This only works when the element is set to "source
+                   contains all records".
+
+                   This patch ensures that when the element is set to  "source does not
+                   contain all records", the sanity check also includes the existing data to
+                   determine if a parent exists.
+
+    TL-17722       Fixed issue with HTML entities being stored in Feedback module responses
+
+                   In the Feedback module, if a text area question was being used, some
+                   characters were being saved into the database as HTML encoded entities.
+                   This resulted in exports and some displays incorrectly showing HTML
+                   entities in place of these characters.
+
+    TL-17724       Fixed nonfunctional cleanup script for incorrectly deleted users
+    TL-17725   +   Fixed display issue when selecting a course icon
+
+                   When selecting a course icon, if the last icon in a row was selected, the
+                   first icon in the following row previously appeared directly below the
+                   selected icon.
+
+                   This fix will require LESS recompilation for those themes that use LESS
+                   inheritance
+
+    TL-17729       Dialogs no longer overwrite JavaScript strings
+
+                   In some situations it was possible for strings required in JavaScript to be
+                   removed. This will no longer happen.
+
+    TL-17730       Added 'alt' text to report cache icon
+    TL-17732       Fixed a regression in the Current Learning block caused by TL-16820
+
+                   The export_for_template() function in the course user learning item was
+                   incorrectly calling get_owner() when it should have been using has_owner().
+
+    TL-17744       Fixed header tags being the same size as all other text in the HTML block
+
+API changes:
+
+    TL-16918   +   Removed Polyfills required for IE9
+
+                   As of Totara 10, IE9 was no longer supported. This issue removes the
+                   polyfills that enabled IE9 to have the same functionality as more modern
+                   browsers.
+
+    TL-17746   +   Removed Minified AMD modules with no Source files
+
+                   The following minified AMD JavaScript modules were removed as they are not
+                   used and have no source files:
+                    * 'block_totara_featured_links/course_dialog'
+                    * 'block_totara_featured_links/icon_picker'
+                    * 'totara_form/form_clientaction_autosubmit'
+
+Contributions:
+
+    * Jo Jones at Kineo UK - TL-17524
+
+
 Release Evergreen (14th May 2018):
 ==================================
 
