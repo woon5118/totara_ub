@@ -2257,26 +2257,34 @@ class global_navigation extends navigation_node {
 
         // Create a node to add user information under.
         $usersnode = null;
-        if (!$issitecourse) {
-            // Not the current user so add it to the participants node for the current course.
-            $usersnode = $coursenode->get('participants', navigation_node::TYPE_CONTAINER);
+
+        if ($iscurrentuser && !$forceforcontext) {
+            // If it's the current user the information will go under the profile root node
+            $usersnode = $this->rootnodes['myprofile'];
             $userviewurl = new moodle_url('/user/view.php', $baseargs);
-        } else if ($USER->id != $user->id) {
-            // This is the site so add a users node to the root branch.
-            $usersnode = $this->rootnodes['users'];
-            if (has_capability('moodle/course:viewparticipants', $coursecontext)) {
-                $usersnode->action = new moodle_url('/user/index.php', array('id' => $course->id));
+        } else {
+            if (!$issitecourse) {
+                // Not the current user so add it to the participants node for the current course.
+                $usersnode = $coursenode->get('participants', navigation_node::TYPE_CONTAINER);
+                $userviewurl = new moodle_url('/user/view.php', $baseargs);
+            } else {
+                // This is the site so add a users node to the root branch.
+                $usersnode = $this->rootnodes['users'];
+                if (has_capability('moodle/course:viewparticipants', $coursecontext)) {
+                    $usersnode->action = new moodle_url('/user/index.php', array('id' => $course->id));
+                }
+                $userviewurl = new moodle_url('/user/profile.php', $baseargs);
             }
-            $userviewurl = new moodle_url('/user/profile.php', $baseargs);
+            if (!$usersnode) {
+                // We should NEVER get here, if the course hasn't been populated
+                // with a participants node then the navigaiton either wasn't generated
+                // for it (you are missing a require_login or set_context call) or
+                // you don't have access.... in the interests of no leaking informatin
+                // we simply quit...
+                return false;
+            }
         }
-        if (!$usersnode) {
-            // We should NEVER get here, if the course hasn't been populated
-            // with a participants node then the navigaiton either wasn't generated
-            // for it (you are missing a require_login or set_context call) or
-            // you don't have access.... in the interests of no leaking informatin
-            // we simply quit...
-            return false;
-        }
+
         // Add a branch for the current user.
         // Only reveal user details if $user is the current user, or a user to which the current user has access.
         $viewprofile = true;

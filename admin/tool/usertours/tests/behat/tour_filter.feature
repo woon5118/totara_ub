@@ -60,3 +60,25 @@ Feature: Apply tour filters to a tour
     And I am on site homepage
     And I follow "Course 1"
     And I should see "Welcome to your course tour."
+
+#    Test for TL-17755 regression
+    @javascript
+    Scenario: Add a tour with settings block disabled
+      Given I log in as "admin"
+      And I follow "Dashboard"
+      And I press "Customise this page"
+      And I configure the "Administration" block
+      And I expand all fieldsets
+      And I set the field "Visible" to "Yes"
+      And I press "Save changes"
+      And I am on site homepage
+      And I add a new user tour with:
+        | Name                | First tour |
+        | Description         | My first tour |
+        | Apply to URL match  | /dashboard/% |
+        | Tour is enabled     | 1 |
+      And I add steps to the "First tour" tour:
+        | targettype                  | Title             | Content |
+        | Display in middle of page   | Welcome           | Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful |
+      When I follow "Dashboard"
+      Then I should see "Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful"

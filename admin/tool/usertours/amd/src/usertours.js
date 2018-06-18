@@ -25,9 +25,12 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
          * @param   {Number}    context     The context of the current page.
          */
         init: function(tourId, startTour, context) {
-            // Only one tour per page is allowed.
-            usertours.tourId = tourId;
+            // Only one tour per page is allowed
+            if (usertours.tourId && usertours.context) {
+                return;
+            }
 
+            usertours.tourId = tourId;
             usertours.context = context;
 
             if (typeof startTour === 'undefined') {

@@ -157,6 +157,13 @@ class block_navigation extends block_base {
         if (!$navigation = $this->get_navigation()) {
             return null;
         }
+
+        // TOTARA: Hide the myprofile node by default. By default we add profile navigation as a drop down of the user top right.
+        $myprofile = $navigation->get('myprofile', navigation_node::TYPE_USER);
+        if ($myprofile) {
+            $myprofile->hide();
+        }
+
         $expansionlimit = null;
         if (!empty($this->config->expansionlimit)) {
             $expansionlimit = $this->config->expansionlimit;
