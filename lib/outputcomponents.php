@@ -3425,8 +3425,10 @@ class initials_bar implements renderable, templatable {
         $this->class    = $class;
         $this->title    = $title;
         $this->urlvar    = $urlvar;
-        $this->url    = $url;
         $this->alpha    = $alpha;
+
+        $this->url    = new moodle_url($url);
+        $this->url->remove_params('page');
     }
 
     /**
