@@ -812,7 +812,7 @@ class totara_sync_element_user extends totara_sync_element {
         }
         if (property_exists($syncfields, 'email') && !$this->config->allowduplicatedemails) {
             // Get duplicated emails.
-            $badids = $this->get_duplicated_values($synctable, $synctable_clone, 'email', 'duplicateuserswithemailx');
+            $badids = $this->get_duplicated_values($synctable, $synctable_clone, 'LOWER(email)', 'duplicateuserswithemailx');
             $invalidids = array_merge($invalidids, $badids);
             // Get empty emails.
             $badids = $this->check_empty_values($synctable, 'email', 'emptyvalueemailx');
@@ -868,7 +868,7 @@ class totara_sync_element_user extends totara_sync_element {
      * @return array with invalid ids from synctable for duplicated values
      */
     function get_duplicated_values($synctable, $synctable_clone, $field, $identifier) {
-        global $CFG, $DB;
+        global $DB;
 
         $params = array();
         $invalidids = array();
@@ -883,7 +883,7 @@ class totara_sync_element_user extends totara_sync_element {
             debugging('Job assignments no longer updated via user source. Please use the jobassignment element.', DEBUG_DEVELOPER);
         }
 
-        $sql = "SELECT id, idnumber, $field
+        $sql = "SELECT id, idnumber, $field as duplicatefield
                   FROM {{$synctable}}
                  WHERE $field IN (SELECT $field FROM {{$synctable_clone}} $extracondition GROUP BY $field HAVING count($field) > 1)";
         $rs = $DB->get_recordset_sql($sql, $params);
@@ -1074,7 +1074,7 @@ class totara_sync_element_user extends totara_sync_element {
         $sql = "SELECT s.id, s.idnumber, s.$field
                   FROM {{$synctable}} s
             INNER JOIN {user} u ON s.idnumber <> u.idnumber
-                   AND s.$field = u.$field";
+                   AND LOWER(s.$field) = LOWER(u.$field)"; // Usernames and emails should always be compared in lowercase.
         if (empty($this->config->sourceallrecords)) {
             $sql .= ' AND s.deleted = ?'; // Avoid users that will be deleted.
             $params[0] = 0;

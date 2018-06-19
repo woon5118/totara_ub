@@ -792,7 +792,7 @@ if ($formdata = $mform2->is_cancelled()) {
                 $userserrors++;
                 continue;
 
-            } else if ($DB->record_exists('user', array('email'=>$user->email))) {
+            } else if ($DB->record_exists_select('user', "LOWER(email) = LOWER(:email)", array('email' => $user->email))) {
                 if ($noemailduplicates) {
                     $upt->track('email', $stremailduplicate, 'error');
                     $upt->track('status', $strusernotaddederror, 'error');

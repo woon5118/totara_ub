@@ -73,7 +73,7 @@ class tool_totara_sync_user_csv_check_sanity_testcase extends advanced_testcase 
         // This user is deleted and we try to undelete, but allow_create is off, so fail.
         $user13 = $this->getDataGenerator()->create_user(array('idnumber' => 'idnum013', 'totarasync' => 1));
         delete_user($user13);
-        // Causes the 17th record to fail due to existing user with the same email address (and different idnumber).
+        // Causes the 17th and 35th records to fail due to existing user with the same email address (and different idnumber).
         $this->getDataGenerator()->create_user(array('idnumber' => 'idx2', 'email' => 'e17@x.nz'));
         // Causes the 30th record to fail due to existing user with totara sync flag turned off.
         $this->getDataGenerator()->create_user(array('idnumber' => 'idnum030', 'totarasync' => 0));
@@ -268,39 +268,40 @@ class tool_totara_sync_user_csv_check_sanity_testcase extends advanced_testcase 
         $this->assertCount(13, $DB->get_records('totara_sync_log'));
 
         // Get duplicated emails.
-        $badids = $element->get_duplicated_values($synctable, $synctable_clone, 'email', 'duplicateuserswithemailx');
+        $badids = $element->get_duplicated_values($synctable, $synctable_clone, 'LOWER(email)', 'duplicateuserswithemailx');
         sort($badids);
-        $this->assertEquals(array(14, 15), $badids);
-        $this->assertCount(15, $DB->get_records('totara_sync_log'));
+        $this->assertEquals(array(14, 15, 17, 35), $badids);
+        $this->assertCount(17, $DB->get_records('totara_sync_log'));
 
         // Get empty emails.
         $badids = $element->check_empty_values($synctable, 'email', 'emptyvalueemailx');
         $this->assertEquals(array(16), $badids);
-        $this->assertCount(16, $DB->get_records('totara_sync_log'));
+        $this->assertCount(18, $DB->get_records('totara_sync_log'));
 
         // Check emails against the DB to avoid saving repeated values.
         $badids = $element->check_values_in_db($synctable, 'email', 'duplicateusersemailxdb');
-        $this->assertEquals(array(17), $badids);
-        $this->assertCount(17, $DB->get_records('totara_sync_log'));
+        sort($badids);
+        $this->assertEquals(array(17, 35), $badids);
+        $this->assertCount(20, $DB->get_records('totara_sync_log'));
 
         // Get invalid emails.
         $badids = $element->get_invalid_emails($synctable);
         sort($badids);
         $this->assertEquals(array(16, 18), $badids); // Empty email address is also invalid.
-        $this->assertCount(19, $DB->get_records('totara_sync_log'));
+        $this->assertCount(22, $DB->get_records('totara_sync_log'));
 
         // Can't check custom field sanity check in this test - it's too complicated.
 
         // Check for users with the totarasync flag turned off.
         $badids = $element->check_user_sync_disabled($synctable);
         $this->assertEquals(array(30), $badids);
-        $this->assertCount(20, $DB->get_records('totara_sync_log'));
+        $this->assertCount(23, $DB->get_records('totara_sync_log'));
 
         // Check invalid country.
         $badids = $element->check_invalid_countrycode($synctable);
         sort($badids);
         $this->assertEquals(array(32,33), $badids);
-        $this->assertCount(22, $DB->get_records('totara_sync_log')); // Warning was logged.
+        $this->assertCount(25, $DB->get_records('totara_sync_log')); // Warning was logged.
     }
 
     /**
@@ -334,9 +335,10 @@ class tool_totara_sync_user_csv_check_sanity_testcase extends advanced_testcase 
             // Record with idnum31 is not here because it was merged with just a warning.
             32 => 'idnum032',
             33 => 'idnum033',
+            35 => 'idnum035'
         ), $invalididnumbers);
 
-        $this->assertEquals(22, count($DB->get_records('totara_sync_log')));
+        $this->assertEquals(25, count($DB->get_records('totara_sync_log')));
     }
 
 }

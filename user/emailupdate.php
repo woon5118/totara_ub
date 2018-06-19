@@ -60,7 +60,7 @@ if (empty($preferences['newemailattemptsleft'])) {
     $user->email = $preferences['newemail'];
 
     // Detect duplicate before saving.
-    if ($DB->get_record('user', array('email' => $user->email))) {
+    if ($DB->record_exists_select('user', "LOWER(email) = LOWER(:email) AND id <> :userid", ['email' => $user->email, 'userid' => $user->id])) {
         redirect(new moodle_url('/user/view.php', ['id' => $user->id]), get_string('emailnowexists', 'auth'));
     } else {
         // Update user email.

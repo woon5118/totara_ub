@@ -297,9 +297,9 @@ $string['fieldduplicated'] = 'The value \'{$a->value}\' for {$a->fieldname} is a
 $string['fieldduplicateddate'] = 'The date of {$a->date} ({$a->timestamp}) for {$a->fieldname} is a duplicate of existing data and must be unique. Skipped user {$a->idnumber}';
 $string['fieldmustbeunique'] = 'The value \'{$a->value}\' for {$a->fieldname} is duplicated in the uploaded data and must be unique. Skipped user {$a->idnumber}';
 $string['nosourceconfigured'] = 'No source configured, please set configuration <a href=\'{$a}\'>here</a>';
-$string['duplicateuserswithidnumberx'] = 'Duplicate users with idnumber {$a->idnumber}. Skipped user {$a->idnumber}';
-$string['duplicateuserswithusernamex'] = 'Duplicate users with username {$a->username}. Skipped user {$a->idnumber}';
-$string['duplicateuserswithemailx'] = 'Duplicate users with email {$a->email}. Skipped user {$a->idnumber}';
+$string['duplicateuserswithidnumberx'] = 'Duplicate users with idnumber {$a->duplicatefield}. Skipped user {$a->idnumber}';
+$string['duplicateuserswithusernamex'] = 'Duplicate users with username {$a->duplicatefield}. Skipped user {$a->idnumber}';
+$string['duplicateuserswithemailx'] = 'Duplicate users with email {$a->duplicatefield}. Skipped user {$a->idnumber}';
 $string['duplicateusernamexdb'] = 'Username {$a->username} is already registered. Skipped user {$a->idnumber}';
 $string['duplicateusersemailxdb'] = 'Email {$a->email} is already registered. Skipped user {$a->idnumber}';
 $string['duplicateidnumberx'] = 'Duplicate idnumber {$a}';
