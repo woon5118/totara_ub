@@ -34,7 +34,8 @@
         "loginurl": "http://example.com/stable_master/login/index.php",
         "rememberusername": true,
         "rememberusernamechecked": true,
-        "rememberusernamelabel": 'Remeber username'
+        "rememberusernamelabel": 'Remeber username',
+        "skiplinktext": "Skip log in block",
         "passwordautocomplete": false,
         "signupurl": "http://localhost/stable_master/login/signup.php",
         "cookieshelpiconformatted": "",
@@ -48,12 +49,8 @@
 <div class="loginbox clearfix onecolumn">
 {{/hasinstructions}}
 
+    <a class="skip-block" href="#login-skipped">{{skiplinktext}}</a>
     <div class="loginpanel">
-        {{#cansignup}}
-            <div class="skiplinks">
-                <a class="skip" href="{{signupurl}}">{{#str}} tocreatenewaccount {{/str}}</a>
-            </div>
-        {{/cansignup}}
 
         <h2>{{#str}} login {{/str}}</h2>
 
@@ -125,6 +122,7 @@
         {{/canloginasguest}}
 
     </div>
+    <span id="login-skipped" class="skip-block-to"></span>
 
     <div class="signuppanel">
     {{#hasinstructions}}

@@ -184,6 +184,7 @@ class login implements renderable, templatable {
         $data->passwordautocomplete = $this->passwordautocomplete;
         $data->signupurl = $this->signupurl->out(false);
         $data->username = $this->username;
+        $data->skiplinktext = get_string('skipa', 'access', get_string('login', 'core'));
 
         return $data;
     }

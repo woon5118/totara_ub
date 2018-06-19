@@ -40,6 +40,7 @@ information provided here is intended especially for developers.
 ** lib/templates/add_new_block.mustache
 * New mustache template for add block popover
 ** lib/templates/add_block_popover_content.mustache
+* core/login mustache template has changed, fixing an issue with a skip link
 
 === 11.0 ===
 
