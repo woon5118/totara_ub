@@ -86,12 +86,12 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                     $('textarea#id_managerprefix_editor').val('');
                 }
                 // Try to update editor
-                var bodyeditor = Y.one('#id_body_editor').getData('Editor');
+                var bodyeditor = Y.one('#id_body_editor').getData('editor');
                 if(bodyeditor && typeof bodyeditor.updateFromTextArea === "function") {
                     bodyeditor.updateFromTextArea();
                 }
 
-                var prefixeditor = Y.one('#id_managerprefix_editor').getData('Editor');
+                var prefixeditor = Y.one('#id_managerprefix_editor').getData('editor');
                 if(prefixeditor && typeof prefixeditor.updateFromTextArea === "function") {
                     prefixeditor.updateFromTextArea();
                 }
