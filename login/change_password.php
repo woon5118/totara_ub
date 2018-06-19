@@ -155,6 +155,7 @@ $fullname = fullname($USER, true);
 $PAGE->set_title($strchangepassword);
 $PAGE->set_heading($fullname);
 echo $OUTPUT->header();
+echo $OUTPUT->heading($strchangepassword);
 
 if (get_user_preferences('auth_forcepasswordchange')) {
     echo $OUTPUT->notification(get_string('forcepasswordchangenotice'));
