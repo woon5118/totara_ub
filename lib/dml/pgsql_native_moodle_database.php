@@ -369,6 +369,12 @@ class pgsql_native_moodle_database extends moodle_database {
                 if ($matches[5] === 'id') {
                     continue;
                 }
+                // Totara: Full text search has a special index format.
+                $fulltextsearch = false;
+                if (strpos($matches[5], 'to_tsvector') === 0) {
+                    $matches[5] = preg_replace('/^to_tsvector\(\'.*\'::regconfig, /', '', $matches[5]);
+                    $fulltextsearch = true;
+                }
                 $columns = explode(',', $matches[5]);
                 foreach ($columns as $k=>$column) {
                     $column = trim($column);
@@ -379,7 +385,7 @@ class pgsql_native_moodle_database extends moodle_database {
                     $columns[$k] = $this->trim_quotes($column);
                 }
                 $indexes[$row['indexname']] = array('unique'=>!empty($matches[1]),
-                                              'columns'=>$columns);
+                                              'columns'=>$columns, 'fulltextsearch'=>$fulltextsearch);
             }
             pg_free_result($result);
         }

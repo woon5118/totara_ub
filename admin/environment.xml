@@ -481,6 +481,8 @@
       </CUSTOM_CHECK>
       <CUSTOM_CHECK file="lib/upgradelib.php" function="check_mysql_large_prefix" level="required">
       </CUSTOM_CHECK>
+      <CUSTOM_CHECK file="lib/environmentlib.php" function="check_full_text_search" level="required">
+      </CUSTOM_CHECK>
     </CUSTOM_CHECKS>
   </TOTARA>
 </COMPATIBILITY_MATRIX>

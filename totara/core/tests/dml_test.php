@@ -770,4 +770,71 @@ ORDER BY tt1.groupid";
     public static function trueFalseProvider() {
         return [[true], [false]];
     }
+
+    /**
+     * Make sure the full text search indexes are created and visible.
+     */
+    public function test_get_indexes_full_text_search() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $tablename = 'test_table';
+        $table = new xmldb_table($tablename);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('high', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_field('low', XMLDB_TYPE_TEXT, null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_index('course', XMLDB_INDEX_NOTUNIQUE, array('course'));
+        $table->add_index('course-id', XMLDB_INDEX_UNIQUE, array('course', 'id'));
+        $table->add_index('high', XMLDB_INDEX_NOTUNIQUE, array('high'), array('full_text_search'));
+        $table->add_index('low', XMLDB_INDEX_NOTUNIQUE, array('low'), array('full_text_search'));
+        $dbman->create_table($table);
+
+        $indices = $DB->get_indexes($tablename);
+        $this->assertInternalType('array', $indices);
+        $this->assertCount(4, $indices);
+
+        // Ignore the index names here.
+
+        $coursex = null;
+        $courseidx = null;
+        $highx = null;
+        $lowx = null;
+        foreach ($indices as $index) {
+            if ($index['columns'] === array('course')) {
+                $coursex = (object)$index;
+                continue;
+            }
+            if ($index['columns'] === array('course', 'id')) {
+                $courseidx = (object)$index;
+                continue;
+            }
+            if ($index['columns'] === array('high')) {
+                $highx = (object)$index;
+                continue;
+            }
+            if ($index['columns'] === array('low')) {
+                $lowx = (object)$index;
+                continue;
+            }
+        }
+        $this->assertNotNull($coursex);
+        $this->assertNotNull($courseidx);
+        $this->assertNotNull($highx);
+        $this->assertNotNull($lowx);
+
+        $this->assertFalse($coursex->unique);
+        $this->assertTrue($courseidx->unique);
+        $this->assertFalse($highx->unique);
+        $this->assertFalse($lowx->unique);
+
+        $this->assertFalse($coursex->fulltextsearch);
+        $this->assertFalse($courseidx->fulltextsearch);
+        $this->assertTrue($highx->fulltextsearch);
+        $this->assertTrue($lowx->fulltextsearch);
+
+        $dbman->drop_table($table);
+    }
 }

@@ -445,6 +445,48 @@ class mysqli_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Returns the language used for full text search.
+     *
+     * NOTE: admin must run admin/cli/rebuild_full_text_search_indexes.php after change of lang!
+     *
+     * @since Totara 12
+     *
+     * @return string
+     */
+    public function get_ftslanguage() {
+        $dbcollation = $this->get_dbcollation();
+        if (!empty($this->dboptions['ftslanguage'])) {
+            $sc = $this->dboptions['ftslanguage'];
+            // Make sure that the charset matches!
+            if (strpos($sc, 'utf8mb4_') === 0 and strpos($dbcollation, 'utf8mb4_')) {
+                return $sc;
+            }
+            if (strpos($sc, 'utf8_') === 0 and strpos($dbcollation, 'utf8_')) {
+                return $sc;
+            }
+        }
+        // Guess the right value, we expect they are using a variant of _cs_as.
+        if ($dbcollation === 'utf8_bin') {
+            return 'utf8_unicode_ci';
+        }
+        if ($dbcollation === 'utf8mb4_bin') {
+            return 'utf8mb4_unicode_ci';
+        }
+        if (substr($dbcollation, -3) === '_ci') {
+            // This is not a supported collation, but anyway.
+            return $dbcollation;
+        }
+        if (substr($dbcollation, -6) === '_as_cs') {
+            return substr($dbcollation, 0, -6) . '_ai_ci';
+        }
+        if (substr($dbcollation, -3) === '_cs') {
+            return substr($dbcollation, 0, -3) . '_ci';
+        }
+        // No more guessing, use the same collation.
+        return $dbcollation;
+    }
+
+    /**
      * Diagnose database and tables, this function is used
      * to verify database and driver settings, db engine types, etc.
      *
@@ -661,7 +703,7 @@ class mysqli_native_moodle_database extends moodle_database {
                     continue;
                 }
                 if (!isset($indexes[$res->Key_name])) {
-                    $indexes[$res->Key_name] = array('unique'=>empty($res->Non_unique), 'columns'=>array());
+                    $indexes[$res->Key_name] = array('unique'=>empty($res->Non_unique), 'columns'=>array(), 'fulltextsearch'=>($res->Index_type==='FULLTEXT'));
                 }
                 $indexes[$res->Key_name]['columns'][$res->Seq_in_index-1] = $res->Column_name;
             }

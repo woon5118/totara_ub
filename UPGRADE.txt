@@ -7,6 +7,7 @@ point release version. For upgrading a Moodle site see MOODLEUPGRADE.txt.
 New requirements:
 
 * PostgreSQL 9.4 or later
+* MS SQL Server - full text search must be enabled.
 
 NOTE: To upgrade you must be on Totara 9.0 or later.
 

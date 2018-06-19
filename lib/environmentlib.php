@@ -1668,3 +1668,32 @@ function restrict_php_version(&$result, $version) {
         return true;
     }
 }
+
+/**
+ * Totara: This function verifies that the database supports full text search.
+ *
+ * @param environment_results $result
+ * @return environment_results|null updated results object, or null
+ */
+function check_full_text_search(environment_results $result) {
+    global $DB;
+
+    $dbfamily = $DB->get_dbfamily();
+    $ftslanguage = $DB->get_ftslanguage();
+
+    $result->setInfo("Full text search support ({$ftslanguage})");
+    $result->setCurrentVersion($ftslanguage);
+
+    if ($dbfamily === 'mssql') {
+        $installed = $DB->get_field_sql("SELECT FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')");
+        if ($installed == 1) {
+            $result->setStatus(true);
+        } else {
+            $result->setStatus(false);
+        }
+        return $result;
+    }
+
+    $result->setStatus(true);
+    return $result;
+}

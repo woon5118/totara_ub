@@ -12,7 +12,7 @@ Before installing Totara you should have a server with:
 * PHP Memory limit of at least 256MB
 * Access to a supported database (PostgreSQL 9.4 or greater, Mysql 5.7.11 or greater, MariaDB 10.2.6 or greater, MSSQL 2016 or greater).
   * If your database is MySQL or MariaDB, your database must use Barracuda file format.
-  * If your database is MSSQL, your database user must have the permissions: ALTER SETTINGS(SERVER).
+  * If your database is MSSQL, your database user must have the permissions: ALTER SETTINGS(SERVER), full text search must be enabled.
 * A domain name that resolves to your server
 
 Supported desktop browsers: recent Google Chrome, recent Firefox, recent Safari 11, Microsoft Internet Explorer 11, recent Microsoft Edge

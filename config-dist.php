@@ -70,6 +70,29 @@ $CFG->dboptions = array(
 //    $CFG->dboptions['dbcollation'] = 'utf8mb4_unicode_ci';
 
 
+// Totara full text search supports one language only, you need to configure
+// it here before installation or upgrade to Totara 12 otherwise the default
+// value will be used. If you change it later you need to run following CLI script
+// to rebuild all full text search indexes: admin/cli/rebuild_full_text_search_indexes.php
+//
+// PostgreSQL is using 'english' configuration for full text search by default,
+// for list of available options see result of "SELECT cfgname FROM pg_ts_config;". For example:
+//    $CFG->dboptions['ftslanguage'] = 'english';
+//    $CFG->dboptions['ftslanguage'] = 'simple';
+//    $CFG->dboptions['ftslanguage'] = 'german';
+//
+// MS SQL Server is using 'English' language by default, list of options is at
+// https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-fulltext-languages-transact-sql?view=sql-server-2017
+//    $CFG->dboptions['ftslanguage'] = 'English';
+//    $CFG->dboptions['ftslanguage'] = 'German';
+//
+// MySQL is using case and accent insensitive collation for full text search by default,
+// you can specify a different collation here, for example:
+//    $CFG->dboptions['ftslanguage'] = 'utf8_unicode_ci';
+//    $CFG->dboptions['ftslanguage'] = 'utf8mb4_0900_as_ci';
+//    $CFG->dboptions['ftslanguage'] = 'utf8mb4_de_pb_0900_ai_ci';
+
+
 //=========================================================================
 // 2. WEB SITE LOCATION
 //=========================================================================

@@ -497,37 +497,52 @@ class sqlsrv_native_moodle_database extends moodle_database {
         $result = sqlsrv_query($this->sqlsrv, $sql);
         $this->query_end($result);
 
-        if ($result) {
-            $lastindex = '';
-            $unique = false;
-            $columns = array ();
+        if (!$result) {
+            return array();
+        }
 
-            while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
-                if ($lastindex and $lastindex != $row['index_name'])
-                    { // Save lastindex to $indexes and reset info
-                    $indexes[$lastindex] = array
-                     (
-                      'unique' => $unique,
-                      'columns' => $columns
-                     );
+        $fulltextsearch = false;
+        while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+            if (preg_match('/^(.*)([^_]+)_fts$/', $row['index_name'], $matches)) {
+                $fulltextsearch = $matches[1];
+                continue;
 
-                    $unique = false;
-                    $columns = array ();
+            } else if (!isset($indexes[$row['index_name']])) {
+                $indexes[$row['index_name']] = array(
+                    'unique' => empty($row['is_unique']) ? false : true,
+                    'columns' => array($row['column_name']),
+                    'fulltextsearch' => false,
+                );
+
+            } else {
+                $indexes[$row['index_name']]['columns'][] = $row['column_name'];
+            }
+        }
+        $this->free_result($result);
+
+        if ($fulltextsearch !== false) {
+            // We need to find the fake full text search indices the slow way.
+            $sql = "SELECT ic.column_id, c.name AS column_name
+                            FROM sys.fulltext_indexes i
+                            JOIN sys.fulltext_index_columns ic ON i.object_id = ic.object_id
+                            JOIN sys.tables t ON i.object_id = t.object_id
+                            JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
+                           WHERE t.name = '$tablename' ";
+
+            $this->query_start($sql, null, SQL_QUERY_AUX);
+            $result = sqlsrv_query($this->sqlsrv, $sql);
+            $this->query_end($result);
+
+            if ($result) {
+                while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+                    $indexes[$fulltextsearch . $row['column_name'] . '_fts'] = array(
+                        'unique'  => false,
+                        'columns' => array($row['column_name']),
+                        'fulltextsearch'  => true,
+                    );
                 }
-                $lastindex = $row['index_name'];
-                $unique = empty($row['is_unique']) ? false : true;
-                $columns[] = $row['column_name'];
+                $this->free_result($result);
             }
-
-            if ($lastindex) { // Add the last one if exists
-                $indexes[$lastindex] = array
-                 (
-                  'unique' => $unique,
-                  'columns' => $columns
-                 );
-            }
-
-            $this->free_result($result);
         }
         return $indexes;
     }

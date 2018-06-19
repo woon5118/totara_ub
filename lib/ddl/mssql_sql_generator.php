@@ -331,6 +331,69 @@ class mssql_sql_generator extends sql_generator {
             throw new coding_exception($error);
         }
 
+        $hints = $xmldb_index->getHints();
+        $fields = $xmldb_index->getFields();
+        if (in_array('full_text_search', $hints)) {
+            $tablename = $this->getTableName($xmldb_table);
+            $fieldname = reset($fields);
+
+            // Note that accessing database at this stage is not allowed because we create list of sql commands before execution.
+            $sqls = array();
+
+            // Create search catalogue for this instance if it does not exist.
+            $prefix = $this->mdb->get_prefix();
+            $sqls[] = "IF NOT EXISTS (SELECT 1 FROM sys.fulltext_catalogs WHERE name = '{$prefix}search_catalog') 
+                         BEGIN
+                           CREATE FULLTEXT CATALOG {$prefix}search_catalog
+                         END";
+            $indexname = $this->getNameForObject($xmldb_table->getName(), 'id', 'fts'); // Yes, 'id' is corect here because it is shared by all full text search indices.
+            $language = $this->mdb->get_ftslanguage();
+            // Microsoft is using either language code numbers or names of languages.
+            if (is_number($language)) {
+                $language = intval($language);
+            } else {
+                $language = "'$language'";
+            }
+
+            // Add required unique index if it does not exist yet.
+            $sqls[] = "IF NOT EXISTS (SELECT 1
+                                        FROM sys.indexes i
+                                        JOIN sys.index_columns ic ON i.object_id = ic.object_id AND i.index_id = ic.index_id
+                                        JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
+                                        JOIN sys.tables t ON i.object_id = t.object_id
+                                       WHERE t.name = '{$tablename}' AND i.name = '{$indexname}' AND c.name = 'id') 
+                         BEGIN
+                           CREATE UNIQUE INDEX {$indexname} ON {$tablename}(id) 
+                         END";
+
+            $sqls[] = "IF EXISTS (SELECT 1
+                                    FROM sys.fulltext_indexes i
+                                    JOIN sys.fulltext_index_columns ic ON i.object_id = ic.object_id
+                                    JOIN sys.tables t ON i.object_id = t.object_id
+                                    JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
+                                   WHERE t.name = '{$tablename}')
+                         BEGIN
+                           ALTER FULLTEXT INDEX ON {$tablename} ADD ({$fieldname} Language {$language})
+                         END
+                       ELSE
+                         BEGIN
+                           IF EXISTS (SELECT 1
+                                        FROM sys.fulltext_indexes i
+                                        JOIN sys.tables t ON i.object_id = t.object_id
+                                       WHERE t.name = '{$tablename}')
+                             BEGIN
+                               ALTER FULLTEXT INDEX ON {$tablename} ADD ({$fieldname} Language {$language})
+                             END
+                           ELSE
+                             BEGIN
+                               CREATE FULLTEXT INDEX ON {$tablename} ({$fieldname} Language {$language})
+                                 KEY INDEX {$indexname} ON {$prefix}search_catalog WITH CHANGE_TRACKING AUTO
+                             END 
+                         END";
+
+            return $sqls;
+        }
+
         // NOTE: quiz_report table has a messed up nullable name field, ignore it.
 
         if ($xmldb_index->getUnique() and count($xmldb_index->getFields()) === 1 and $xmldb_table->getName() !== 'quiz_reports') {
@@ -350,6 +413,25 @@ class mssql_sql_generator extends sql_generator {
             }
         }
         return parent::getCreateIndexSQL($xmldb_table, $xmldb_index);
+    }
+
+    /**
+     * Given one xmldb_table and one xmldb_index, return the SQL statements needed to drop the index from the table.
+     *
+     * @param xmldb_table $xmldb_table The xmldb_table instance to drop the index on.
+     * @param xmldb_index $xmldb_index The xmldb_index to drop.
+     * @return array An array of SQL statements to drop the index.
+     */
+    public function getDropIndexSQL($xmldb_table, $xmldb_index) {
+        if (in_array('full_text_search', $xmldb_index->getHints())) {
+            $results = array();
+            $tablename = $this->getTableName($xmldb_table);
+            $fieldname = $xmldb_index->getFields()[0];
+            $results[] = "ALTER FULLTEXT INDEX ON {$tablename} DROP ({$fieldname})";
+            return $results;
+        }
+
+        return parent::getDropIndexSQL($xmldb_table, $xmldb_index);
     }
 
     /**

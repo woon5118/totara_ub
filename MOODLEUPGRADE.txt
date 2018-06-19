@@ -7,7 +7,7 @@ Totara migration requirements:
 
 * Moodle 3.2.8 (Build: 20180319)
 * Oracle database is not supported.
-* MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER).
+* MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER), full text search must be enabled.
 * all other requirements listed in INSTALL.txt
 
 NOTE: Additional plugins, custom themes or customised Moodle code are likely to

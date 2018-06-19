@@ -255,6 +255,22 @@ abstract class moodle_database {
     }
 
     /**
+     * Returns the language used for full text search.
+     *
+     * NOTE: admin must run admin/cli/rebuild_full_text_search_indexes.php after change of lang!
+     *
+     * @since Totara 12
+     *
+     * @return string
+     */
+    public function get_ftslanguage() {
+        if (!empty($this->dboptions['ftslanguage'])) {
+            return $this->dboptions['ftslanguage'];
+        }
+        return 'English';
+    }
+
+    /**
      * Returns the db related part of config.php
      * @return stdClass
      */

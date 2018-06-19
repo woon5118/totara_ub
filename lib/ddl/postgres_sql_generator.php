@@ -147,10 +147,25 @@ class postgres_sql_generator extends sql_generator {
      * @throws coding_exception Thrown if the xmldb_index does not validate with the xmldb_table.
      */
     public function getCreateIndexSQL($xmldb_table, $xmldb_index) {
-        $sqls = parent::getCreateIndexSQL($xmldb_table, $xmldb_index);
+        if ($error = $xmldb_index->validateDefinition($xmldb_table)) {
+            throw new coding_exception($error);
+        }
 
         $hints = $xmldb_index->getHints();
         $fields = $xmldb_index->getFields();
+        if (in_array('full_text_search', $hints)) {
+            $tablename = $this->getTableName($xmldb_table);
+            $fieldname = reset($fields);
+            $indexname = $this->getNameForObject($xmldb_table->getName(), $fieldname, 'fts');
+            $language = $this->mdb->get_ftslanguage();
+
+            $sqls = array();
+            $sqls[] = "CREATE INDEX {$indexname} ON {$tablename} USING GIN(to_tsvector('{$language}', {$fieldname}))";
+            return $sqls;
+        }
+
+        $sqls = parent::getCreateIndexSQL($xmldb_table, $xmldb_index);
+
         if (in_array('varchar_pattern_ops', $hints) and count($fields) == 1) {
             // Add the pattern index and keep the normal one, keep unique only the standard index to improve perf.
             foreach ($sqls as $sql) {

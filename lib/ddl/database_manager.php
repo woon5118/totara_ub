@@ -1130,6 +1130,69 @@ class database_manager {
     }
 
     /**
+     * Rebuild all full text search indexes using current $CFG->dboptions['ftslanguage']
+     * setting in config.php.
+     *
+     * @since Totara 12
+     *
+     * @param xmldb_structure $schema
+     * @return array list of processed full text search indexes.
+     */
+    public function rebuild_full_text_search_indexes(xmldb_structure $schema) {
+        global $DB;
+        $dbman = $DB->get_manager();
+
+        $result = array();
+
+        /** @var xmldb_table[] $tables */
+        $tables = $schema->getTables();
+
+        foreach ($tables as $table) {
+            if (!$dbman->table_exists($table)) {
+                // This should not happen.
+                continue;
+            }
+            /** @var xmldb_index[] $indexes */
+            $indexes = $table->getIndexes();
+            foreach ($indexes as $index) {
+                if (!in_array('full_text_search', $index->getHints())) {
+                    continue;
+                }
+                $r = new stdClass();
+                $r->table = $DB->get_prefix() . $table->getName();
+                $r->column = $index->getFields()[0];
+                $r->error = null;
+                $r->debuginfo = null;
+                $r->success = true;
+                if ($dbman->index_exists($table, $index)) {
+                    try {
+                        $dbman->drop_index($table, $index);
+                    } catch (moodle_exception $ex) {
+                        // This should not happen, fail if the index still exists.
+                        if ($dbman->index_exists($table, $index)) {
+                            $r->success = false;
+                            $r->error = $ex->getMessage();
+                            $r->debuginfo = $ex->debuginfo;
+                            $result[] = $r;
+                            continue;
+                        }
+                    }
+                }
+                try {
+                    $dbman->add_index($table, $index);
+                } catch (moodle_exception $ex) {
+                    $r->success = false;
+                    $r->error = $ex->getMessage();
+                    $r->debuginfo = $ex->debuginfo;
+                }
+                $result[] = $r;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Store full database snapshot.
      *
      * @since Totara 10.0
