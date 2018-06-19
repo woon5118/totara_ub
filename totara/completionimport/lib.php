@@ -508,6 +508,11 @@ function totara_completionimport_resolve_references($importname, $importtime) {
     $map_idnumber = [];
     $map_shortname = [];
     foreach ($rs as $ref) {
+
+        // Trim the shortname and idnumber. We are also trimming the imported shortname and idnumber for the matching.
+        $ref->shortname = trim($ref->shortname);
+        $ref->idnumber = trim($ref->idnumber);
+
         if (!empty($ref->idnumber)) {
             $map_idnumber[$ref->idnumber] = $ref;
         }
@@ -523,12 +528,14 @@ function totara_completionimport_resolve_references($importname, $importtime) {
     $rs = $DB->get_recordset_sql($sql, $timeparams);
 
     foreach ($rs as $importrow) {
-        if ($importrow->idnumber === '' && $importrow->shortname === '') {
+
+        $idnumber = trim($importrow->idnumber);
+        $shortname = trim($importrow->shortname);
+
+        if ($idnumber === '' && $shortname === '') {
             // Both are empty, no possible match.
             continue;
         }
-        $idnumber = $importrow->idnumber;
-        $shortname = $importrow->shortname;
 
         if ($shortname != '' && $idnumber != '' && isset($map_shortname[$shortname]) && $map_shortname[$shortname]->idnumber === $idnumber) {
             // Perfect match! Shortname and idnumber both set and match.

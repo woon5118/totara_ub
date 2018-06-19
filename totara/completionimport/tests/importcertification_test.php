@@ -175,6 +175,154 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
             'Record count mismatch in the prog_user_assignment table');
     }
 
+    /**
+     * Test the test_completionimport_resolve_references() function to ensure the certificationid is matched correctly from
+     * the csv shortname and idnumber fields.
+     */
+    public function test_completionimport_resolve_references() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        set_config('enablecompletion', 1);
+
+        // Create a certification
+        $cert1 =  $this->getDataGenerator()->create_certification(array(
+            'prog_shortname' => 'cert1',
+            'prog_idnumber' => 'certid1'
+        ));
+
+        // Create another certification with blank spaces in the shortname and idnumber fields.
+        $cert2 =  $this->getDataGenerator()->create_certification(array(
+            'prog_shortname' => '   cert2   ',
+            'prog_idnumber' => '   certid2   '
+        ));
+
+        // Create a user.
+        $user1 = $this->getDataGenerator()->create_user();
+
+        $importname = 'certification';
+        $importtablename = get_tablename($importname);
+        $pluginname = 'totara_completionimport_' . $importname;
+        $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+        $completiondate = date($csvdateformat, time());
+        $importstart = time();
+
+        // Generate import data.
+        $fields = array('username', 'certificationshortname', 'certificationidnumber', 'completiondate', 'duedate');
+
+        //
+        // Test completion is saved correctly.
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['certificationshortname'] = $cert1->shortname;
+        $data['certificationidnumber'] = $cert1->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['duedate'] = $completiondate;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($cert1->id, $import->certificationid, 'The certification was not matched');
+
+        //
+        // Test completion is saved correctly when csv has empty spaces in shortname and idnumber
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = '   ' . $cert1->shortname . '   ';
+        $data['certificationidnumber'] = '   ' . $cert1->idnumber . '   ';
+        $data['completiondate'] = $completiondate;
+        $data['duedate'] = $completiondate;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($cert1->id, $import->certificationid, 'The certification was not matched');
+
+        //
+        // Test completion is saved correctly when certification has empty spaces in shortname and idnumber.
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['certificationshortname'] = $cert2->shortname;
+        $data['certificationidnumber'] = $cert2->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['duedate'] = $completiondate;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($cert2->id, $import->certificationid, 'The certification was not matched');
+
+        //
+        // Test completion is saved correctly when certification and csv has empty spaces in shortname and idnumber, crazy hey!
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = '   ' . $cert2->shortname . '   ';
+        $data['certificationidnumber'] = '   ' . $cert2->idnumber . '   ';
+        $data['completiondate'] = $completiondate;
+        $data['duedate'] = $completiondate;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($cert2->id, $import->certificationid, 'The certification was not matched');
+
+        //
+        // Test evidence is created when certification is not found.
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['certificationshortname'] = 'cert3';
+        $data['certificationidnumber'] = 'cert3';
+        $data['completiondate'] = $completiondate;
+        $data['duedate'] = $completiondate;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(1, $DB->count_records('dp_plan_evidence'), 'Evidence should be created');
+        $this->assertEquals(null, $import->certificationid, 'A certificationid should not be set');
+    }
+
     /* Check that users are assigned to the certification with the correct assignment type.
      * When a certification is created users could be already assigned via audience, individual assignment
      * or any other assignment type. If that happens, we need to make sure we are creating the user-program

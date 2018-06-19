@@ -145,4 +145,152 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('user_enrolments'),
             'Record count mismatch in the user_enrolments table');
     }
+
+    /**
+     * Test the test_completionimport_resolve_references() function to ensure the courseid is matched correctly from
+     * the csv courseshortname and idnumber fields.
+     */
+    public function test_completionimport_resolve_references() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        set_config('enablecompletion', 1);
+
+        // Create a course with completion enabled.
+        $course1 = $this->getDataGenerator()->create_course(array(
+            'enablecompletion' => COMPLETION_ENABLED,
+            'shortname' => 'course1',
+            'idnumber' => '1'));
+
+        // Create another course with completion enabled and blank spaces in the shortname and idnumber fields.
+        $course2 = $this->getDataGenerator()->create_course(array(
+            'enablecompletion' => COMPLETION_ENABLED,
+            'shortname' => '   course2   ',
+            'idnumber' => '   2   '));
+
+        // Create a user.
+        $user1 = $this->getDataGenerator()->create_user();
+
+        $importname = 'course';
+        $importtablename = get_tablename($importname);
+        $pluginname = 'totara_completionimport_' . $importname;
+        $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+        $completiondate = date($csvdateformat, time());
+        $importstart = time();
+
+        // Generate import data.
+        $fields = array('username', 'courseshortname', 'courseidnumber', 'completiondate', 'grade');
+
+        //
+        // Test completion is saved correctly.
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = $course1->shortname;
+        $data['courseidnumber'] = $course1->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 77;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($course1->id, $import->courseid, 'The course was not matched');
+
+        //
+        // Test completion is saved correctly when csv has empty spaces in shortname and idnumber
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = '   ' . $course1->shortname . '   ';
+        $data['courseidnumber'] = '   ' . $course1->idnumber . '   ';
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 77;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($course1->id, $import->courseid, 'The course was not matched');
+
+        //
+        // Test completion is saved correctly when course has empty spaces in shortname and idnumber.
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = $course2->shortname;
+        $data['courseidnumber'] = $course2->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 77;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($course2->id, $import->courseid, 'The course was not matched');
+
+        //
+        // Test completion is saved correctly when course and csv has empty spaces in shortname and idnumber, crazy hey!
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = '   ' . $course2->shortname . '   ';
+        $data['courseidnumber'] = '   ' . $course2->idnumber . '   ';
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 77;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals($course2->id, $import->courseid, 'The course was not matched');
+
+        //
+        // Test evidence is created when course is not found.
+        //
+
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = 'course3';
+        $data['courseidnumber'] = 'course3';
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 77;
+        $content .= implode(",", $data) . "\n";
+
+        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+
+        $importdata = $DB->get_records($importtablename, null, 'id asc');
+        $import = end($importdata);
+
+        $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
+        $this->assertEquals(1, $DB->count_records('dp_plan_evidence'), 'Evidence should be created');
+        $this->assertEquals(null, $import->courseid, 'A courseid should not be set');
+    }
 }
