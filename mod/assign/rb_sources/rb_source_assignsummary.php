@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_assignsummary extends rb_base_source {
+    use \core_course\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $defaultcolumns, $defaultfilters, $requiredcolumns;
@@ -88,8 +89,8 @@ class rb_source_assignsummary extends rb_base_source {
         $a = array();
 
         // Join courses and categories.
-        $this->add_course_table_to_joinlist($a, 'base', 'assignment_course');
-        $this->add_course_category_table_to_joinlist($a, 'course', 'category');
+        $this->add_core_course_tables($a, 'base', 'assignment_course');
+        $this->add_core_course_category_tables($a, 'course', 'category');
 
         return $a;
     }
@@ -175,8 +176,8 @@ class rb_source_assignsummary extends rb_base_source {
         }
 
         // Course and category fields.
-        $this->add_course_fields_to_columns($columnoptions);
-        $this->add_course_category_fields_to_columns($columnoptions);
+        $this->add_core_course_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -223,8 +224,8 @@ class rb_source_assignsummary extends rb_base_source {
         }
 
         // Course and category filters.
-        $this->add_course_fields_to_filters($filteroptions);
-        $this->add_course_category_fields_to_filters($filteroptions);
+        $this->add_core_course_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions);
 
         return $filteroptions;
     }

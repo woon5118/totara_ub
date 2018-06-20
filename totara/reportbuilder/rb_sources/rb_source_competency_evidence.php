@@ -26,6 +26,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_competency_evidence extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -112,8 +115,8 @@ class rb_source_competency_evidence extends rb_base_source {
         );
 
         // include some standard joins
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -306,8 +309,8 @@ class rb_source_competency_evidence extends rb_base_source {
         );
 
         // include some standard columns
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -445,8 +448,8 @@ class rb_source_competency_evidence extends rb_base_source {
 
         );
         // include some standard filters
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
 
         return $filteroptions;
     }

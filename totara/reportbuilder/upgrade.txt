@@ -24,6 +24,41 @@ information provided here is intended especially for developers.
   * jobappraisernames
   * jobtempmanagernames
   Consider switching to the 'job_assignments' report source as an alternative.
+* The following functions have been deprecated and moved into traits
+  * add_course_table_to_joinlist instead use add_core_course_tables in \course\rb\source\report_trait
+  * add_course_fields_to_columns instead use add_core_course_columns in \course\rb\source\report_trait
+  * add_course_fields_to_filters instead use add_core_course_filters in \core_course\rb\source\report_trait
+  * add_course_category_table_to_joinlist instead use add_core_course_category_tables in \core_course\rb\source\report_trait
+  * add_course_category_fields_to_columns instead use add_core_course_category_columns in \core_course\rb\source\report_trait
+  * add_course_category_fields_to_filters instead use add_core_course_category_filters in \core_course\rb\source\report_trait
+  * add_user_table_to_joinlist instead use add_core_user_tables in \core_user\rb\source\report_trait
+  * add_user_fields_to_columns instead use add_core_user_columns in \core_user\rb\source\report_trait
+  * add_user_fields_to_filters instead use add_core_user_fields in \core_user\rb\source\report_trait
+  * add_context_table_to_joinlist instead use add_context_tables in \totara_reportbuilder\rb\source\report_trait
+  * add_program_table_to_joinlist instead use add_totara_program_tables in \totara_program\rb\source\report_trait
+  * add_program_fields_to_columns instead use add_totara_program_columns in \totara_program\rb\source\report_trait
+  * add_program_fields_to_filters instead use add_totara_program_filters in \totara_program\rb\source\report_trait
+  * add_certification_table_to_joinlist instead use add_totara_certification_tables in \totara_certification\rb\source\report_trait
+  * add_certification_fields_to_columns instead use add_totara_certification_columns in \totara_certification\rb\source\report_trait
+  * add_certification_fields_to_filters instead use add_totara_certification_filters in \totara_certification\rb\source\report_trait
+  * add_job_assignment_table_to_joinlist instead use add_totara_job_tables in \totara_job\rb\source\report_trait
+  * add_job_assignment_fields_to_columns instead use add_totara_job_columns in \totara_job\rb\source\report_trait
+  * add_job_assignment_fields_to_filters instead use add_totara_job_filters in \totara_job\rb\source\report_trait
+  * add_job_custom_field_joins instead use add_totara_job_custom_field_tables in \totara_job\rb\source\report_trait
+  * add_job_custom_field_columns instead use add_totara_job_custom_field_columns in \totara_job\rb\source\report_trait
+  * add_job_custom_field_filters instead use add_totara_job_custom_field_filters in \totara_job\rb\source\report_trait
+  * add_core_tag_tables_to_joinlist instead use add_core_tag_tables in \core_tag\rb\source\report_trait
+  * add_core_tag_fields_to_columns instead use add_core_tag_columns in \core_tag\rb\source\report_trait
+  * add_core_tag_fields_to_filters instead use add_core_tag_filters in \core_tag\rb\source\report_trait
+  * add_cohort_user_tables_to_joinlist instead use add_totara_cohort_user_tables in \totara_cohort\rb\source\report_trait
+  * add_cohort_course_table_to_joinlist instead use add_totara_cohort_course_tables in \totara_cohort\rb\source\report_trait
+  * add_cohort_program_tables_to_joinlist instead use add_totara_cohort_program_tables in \totara_cohort\rb\source\report_trait
+  * add_cohort_user_fields_to_columns instead use add_totara_cohort_user_columns in \totara_cohort\rb\sources\report_trait
+  * add_cohort_course_fields_to_columns instead use add_totara_cohort_course_columns in \totara_cohort\rb\source\report_trait
+  * add_cohort_program_fields_to_columns instead use add_totara_cohort_program_columns in \totara_cohort\rb\source\report_trait
+  * add_cohort_user_fields_to_filters instead use add_totara_cohort_user_filters in \totara_cohort\rb\source\report_trait
+  * add_cohort_course_fields_to_filters instead use add_totara_cohort_course_filters in \totara_cohort\rb\source\report_trait
+  * add_cohort_program_fields_to_filters instead use add_totara_cohort_program_filters in \totara_cohort\rb\source\report_trait
 
 === 11.0 ===
 

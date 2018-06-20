@@ -27,10 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once('rb_source_goal_details.php');
 
 class rb_source_goal_status_history extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
     public $contentoptions, $defaultcolumns, $defaultfilters, $embeddedparams;
     public $sourcetitle, $shortname;
-
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         global $DB;
@@ -101,8 +103,8 @@ class rb_source_goal_status_history extends rb_base_source {
             )
         );
 
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -179,8 +181,8 @@ class rb_source_goal_status_history extends rb_base_source {
             )
         );
 
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -218,8 +220,8 @@ class rb_source_goal_status_history extends rb_base_source {
             )
         );
 
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
 
         return $filteroptions;
     }

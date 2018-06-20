@@ -28,6 +28,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 class rb_source_program_completion extends rb_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_program\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -136,10 +141,10 @@ class rb_source_program_completion extends rb_base_source {
             ),
         );
 
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_category_table_to_joinlist($joinlist, 'program', 'category');
-        $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'programid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_core_course_category_tables($joinlist, 'program', 'category');
+        $this->add_totara_cohort_program_tables($joinlist, 'base', 'programid');
 
         return $joinlist;
     }
@@ -343,11 +348,11 @@ class rb_source_program_completion extends rb_base_source {
         );
 
         // Include some standard columns.
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'program');
-        $this->add_program_fields_to_columns($columnoptions, 'program', "totara_{$this->instancetype}");
-        $this->add_cohort_program_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'program');
+        $this->add_totara_program_columns($columnoptions, 'program', "totara_{$this->instancetype}");
+        $this->add_totara_cohort_program_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -505,11 +510,11 @@ class rb_source_program_completion extends rb_base_source {
         );
 
         // Include some standard filters.
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_course_category_fields_to_filters($filteroptions, 'prog', 'category');
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
-        $this->add_program_fields_to_filters($filteroptions, "totara_{$this->instancetype}");
-        $this->add_cohort_program_fields_to_filters($filteroptions, "totara_{$this->instancetype}");
+        $this->add_core_user_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions, 'prog', 'category');
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_totara_program_filters($filteroptions, "totara_{$this->instancetype}");
+        $this->add_totara_cohort_program_filters($filteroptions, "totara_{$this->instancetype}");
 
         return $filteroptions;
     }

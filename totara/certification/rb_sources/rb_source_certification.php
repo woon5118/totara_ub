@@ -28,6 +28,10 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/program/rb_sources/rb_source_program.php');
 
 class rb_source_certification extends rb_source_program {
+    use \core_course\rb\source\report_trait;
+    use \totara_cohort\rb\source\report_trait;
+    use \totara_program\rb\source\report_trait;
+    use \totara_certification\rb\source\report_trait;
 
     /**
      * Overwrite instance type value of totara_visibility_where() in rb_source_program->post_config().
@@ -59,10 +63,10 @@ class rb_source_certification extends rb_source_program {
     protected function define_columnoptions() {
 
         // Include some standard columns, override parent so they say certification.
-        $this->add_program_fields_to_columns($columnoptions, 'base', 'totara_certification');
-        $this->add_certification_fields_to_columns($columnoptions, 'certif', 'totara_certification');
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base', 'programcount');
-        $this->add_cohort_program_fields_to_columns($columnoptions);
+        $this->add_totara_program_columns($columnoptions, 'base', 'totara_certification');
+        $this->add_totara_certification_columns($columnoptions, 'certif', 'totara_certification');
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'base', 'programcount');
+        $this->add_totara_cohort_program_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -77,7 +81,7 @@ class rb_source_certification extends rb_source_program {
 
         $joinlist = parent::define_joinlist();
 
-        $this->add_certification_table_to_joinlist($joinlist, 'base', 'certifid');
+        $this->add_totara_certification_tables($joinlist, 'base', 'certifid');
 
         return $joinlist;
     }
@@ -86,10 +90,10 @@ class rb_source_certification extends rb_source_program {
         $filteroptions = array();
 
         // Include some standard filters, override parent so they say certification.
-        $this->add_program_fields_to_filters($filteroptions, 'totara_certification');
-        $this->add_certification_fields_to_filters($filteroptions, 'totara_certification');
-        $this->add_course_category_fields_to_filters($filteroptions, 'base', 'category');
-        $this->add_cohort_program_fields_to_filters($filteroptions, 'totara_certification');
+        $this->add_totara_program_filters($filteroptions, 'totara_certification');
+        $this->add_totara_certification_filters($filteroptions, 'totara_certification');
+        $this->add_core_course_category_filters($filteroptions, 'base', 'category');
+        $this->add_totara_cohort_program_filters($filteroptions, 'totara_certification');
 
         return $filteroptions;
     }

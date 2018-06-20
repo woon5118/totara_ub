@@ -25,6 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_tool_sitepolicy extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $requiredcolumns;
 
@@ -122,7 +124,7 @@ class rb_source_tool_sitepolicy extends rb_base_source {
 
         );
         // optionally include some standard joins
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
         return $joinlist;
     }
 
@@ -249,7 +251,7 @@ class rb_source_tool_sitepolicy extends rb_base_source {
                 'base.timeconsented',
                 array('displayfunc' => 'nice_datetime')),
             );
-        $this->add_user_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
         return $columnoptions;
     }
 
@@ -298,7 +300,7 @@ class rb_source_tool_sitepolicy extends rb_base_source {
                 array('selectfunc' => 'userlanguage')),
 
         );
-        $this->add_user_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
         return $filteroptions;
     }
 

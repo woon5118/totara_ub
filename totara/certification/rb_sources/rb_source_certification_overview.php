@@ -29,6 +29,9 @@ require_once($CFG->dirroot . '/totara/certification/lib.php');
 require_once($CFG->dirroot . '/totara/program/rb_sources/rb_source_program_overview.php');
 
 class rb_source_certification_overview extends rb_source_program_overview {
+    use \core_user\rb\source\report_trait;
+    use \core_course\rb\source\report_trait;
+    use \totara_certification\rb\source\report_trait;
 
     /**
      * Overwrite instance type value of totara_visibility_where() in rb_source_program->post_config().
@@ -126,7 +129,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'certif_completion'
         );
 
-        $this->add_certification_table_to_joinlist($joinlist, 'program', 'certifid');
+        $this->add_totara_certification_tables($joinlist, 'program', 'certifid');
 
         return $joinlist;
     }
@@ -136,7 +139,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
 
         $columnoptions = parent::define_columnoptions();
 
-        $this->add_certification_fields_to_columns($columnoptions, 'certif', 'totara_certification');
+        $this->add_totara_certification_columns($columnoptions, 'certif', 'totara_certification');
 
         // Override the parent (program) timeduenice columnoption
         foreach ($columnoptions as $i => $co) {
@@ -331,7 +334,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
     protected function define_filteroptions() {
         $filteroptions = parent::define_filteroptions();
 
-        $this->add_certification_fields_to_filters($filteroptions, 'totara_certification');
+        $this->add_totara_certification_filters($filteroptions, 'totara_certification');
 
         $filteroptions[] = new rb_filter_option(
             'certif_completion',

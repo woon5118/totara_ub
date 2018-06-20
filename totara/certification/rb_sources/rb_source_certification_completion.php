@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/totara/program/rb_sources/rb_source_program_compl
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 
 class rb_source_certification_completion extends rb_source_program_completion {
+    use \totara_certification\rb\source\report_trait;
 
     /**
      * Overwrite instance type value of totara_visibility_where() in rb_source_program->post_config().
@@ -75,7 +76,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
     protected function define_joinlist() {
         $joinlist = parent::define_joinlist();
 
-        $this->add_certification_table_to_joinlist($joinlist, 'program', 'certifid');
+        $this->add_totara_certification_tables($joinlist, 'program', 'certifid');
 
         $joinlist[] = new rb_join(
             'certif_completion',
@@ -106,7 +107,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
     protected function define_columnoptions() {
         $columnoptions = parent::define_columnoptions();
 
-        $this->add_certification_fields_to_columns($columnoptions, 'certif', 'totara_certification');
+        $this->add_totara_certification_columns($columnoptions, 'certif', 'totara_certification');
 
         // Remove the columns that we are going to replace with certification versions.
         foreach ($columnoptions as $key => $columnoption) {
@@ -226,7 +227,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
     protected function define_filteroptions() {
         $filteroptions = parent::define_filteroptions();
 
-        $this->add_certification_fields_to_filters($filteroptions, 'totara_certification');
+        $this->add_totara_certification_filters($filteroptions, 'totara_certification');
 
         // Remove the filters that we are going to replace with certification versions.
         foreach ($filteroptions as $key => $filteroption) {

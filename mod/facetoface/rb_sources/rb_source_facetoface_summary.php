@@ -27,6 +27,10 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
 class rb_source_facetoface_summary extends rb_facetoface_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $sourcetitle;
@@ -100,11 +104,11 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         );
 
         $this->add_session_status_to_joinlist($joinlist);
-        $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
-        $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'allattendees', 'userid');
-        $this->add_user_table_to_joinlist($joinlist, 'allattendees', 'userid');
-        $this->add_user_table_to_joinlist($joinlist, 'sessions', 'usermodified', 'modifiedby');
+        $this->add_core_course_tables($joinlist, 'facetoface', 'course');
+        $this->add_core_course_category_tables($joinlist, 'course', 'category');
+        $this->add_totara_job_tables($joinlist, 'allattendees', 'userid');
+        $this->add_core_user_tables($joinlist, 'allattendees', 'userid');
+        $this->add_core_user_tables($joinlist, 'sessions', 'usermodified', 'modifiedby');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
         $this->add_facetoface_currentuserstatus_to_joinlist($joinlist);
 
@@ -362,8 +366,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_facetoface_currentuserstatus_to_columns($columnoptions);
 
         // Include some standard columns.
-        $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_course_fields_to_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions);
+        $this->add_core_course_columns($columnoptions);
         $this->add_assets_fields_to_columns($columnoptions);
         $this->add_rooms_fields_to_columns($columnoptions);
 
@@ -456,8 +460,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_facetoface_currentuserstatus_to_filters($filteroptions);
 
         // Add session custom fields to filters.
-        $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_course_fields_to_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions);
+        $this->add_core_course_filters($filteroptions);
 
         return $filteroptions;
     }

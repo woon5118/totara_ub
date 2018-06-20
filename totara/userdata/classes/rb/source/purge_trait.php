@@ -27,6 +27,8 @@ use rb_column_option;
 use rb_filter_option;
 use rb_join;
 
+use core_user\rb\source\report_trait as user_trait;
+
 /**
  * Trait purge_trait
  *
@@ -36,6 +38,13 @@ use rb_join;
  * @property rb_filter_option[] $filteroptions
  */
 trait purge_trait {
+
+    use user_trait {
+        add_core_user_tables as user_trait_add_core_user_tables;
+        add_core_user_columns as user_trait_add_core_user_columns;
+        add_core_user_filters as user_trait_add_core_user_filters;
+    }
+
     /** @var string $purgejoin */
     protected $purgejoin = null;
 
@@ -88,8 +97,8 @@ trait purge_trait {
     protected function add_purge_joins() {
         $join = $this->purgejoin;
 
-        $this->add_user_table_to_joinlist($this->joinlist, $join, 'userid');
-        $this->add_user_table_to_joinlist($this->joinlist, $join, 'usercreated', 'usercreated');
+        $this->user_trait_add_core_user_tables($this->joinlist, $join, 'userid');
+        $this->user_trait_add_core_user_tables($this->joinlist, $join, 'usercreated', 'usercreated');
     }
 
     /**
@@ -201,8 +210,8 @@ trait purge_trait {
             )
         );
 
-        $this->add_user_fields_to_columns($this->columnoptions);
-        $this->add_user_fields_to_columns($this->columnoptions, 'usercreated', 'usercreated', true);
+        $this->user_trait_add_core_user_columns($this->columnoptions);
+        $this->user_trait_add_core_user_columns($this->columnoptions, 'usercreated', 'usercreated', true);
 
         // A bit of hackery to get links to user info page instead of profile.
         foreach ($this->columnoptions as $columnotion) {
@@ -286,8 +295,8 @@ trait purge_trait {
             )
         );
 
-        $this->add_user_fields_to_filters($this->filteroptions);
-        $this->add_user_fields_to_filters($this->filteroptions, 'usercreated', true);
+        $this->user_trait_add_core_user_filters($this->filteroptions);
+        $this->user_trait_add_core_user_filters($this->filteroptions, 'usercreated', true);
     }
 
     /**

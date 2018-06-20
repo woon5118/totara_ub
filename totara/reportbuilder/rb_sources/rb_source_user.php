@@ -31,6 +31,8 @@ require_once("{$CFG->dirroot}/completion/completion_completion.php");
  * A report builder source for the "user" table.
  */
 class rb_source_user extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -214,8 +216,8 @@ class rb_source_user extends rb_base_source {
             'user_extra');
 
 
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'id');
-        $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'id', 'basecohort');
+        $this->add_totara_job_tables($joinlist, 'base', 'id');
+        $this->add_totara_cohort_user_tables($joinlist, 'base', 'id', 'basecohort');
 
         return $joinlist;
     }
@@ -230,8 +232,8 @@ class rb_source_user extends rb_base_source {
         global $DB;
 
         $columnoptions = array();
-        $this->add_user_fields_to_columns($columnoptions, 'base');
-        $this->add_job_assignment_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions, 'base');
+        $this->add_totara_job_columns($columnoptions);
 
         // A column to display a user's profile picture
         $columnoptions[] = new rb_column_option(
@@ -475,7 +477,7 @@ class rb_source_user extends rb_base_source {
             )
         );
 
-        $this->add_user_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
 
         $roles = get_roles_used_in_context(context_system::instance());
 
@@ -494,7 +496,7 @@ class rb_source_user extends rb_base_source {
             'base.id'
         );
 
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base');
+        $this->add_totara_job_filters($filteroptions, 'base');
 
         return $filteroptions;
     }

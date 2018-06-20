@@ -27,6 +27,9 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 class rb_source_program_membership extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \totara_program\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -81,8 +84,8 @@ class rb_source_program_membership extends rb_base_source {
     protected function define_joinlist() {
         $joinlist = array();
 
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_program_table_to_joinlist($joinlist, 'base', 'programid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_program_tables($joinlist, 'base', 'programid');
 
         $joinlist[] = new rb_join(
             'prog_completion',
@@ -109,8 +112,8 @@ class rb_source_program_membership extends rb_base_source {
     protected function define_columnoptions() {
         $columnoptions = array();
 
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_program_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_program_columns($columnoptions);
 
         $columnoptions[] = new rb_column_option(
             'progmembership',
@@ -153,8 +156,8 @@ class rb_source_program_membership extends rb_base_source {
     protected function define_filteroptions() {
         $filteroptions = array();
 
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_program_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_program_filters($filteroptions);
 
         $filteroptions[] = new rb_filter_option(
             'progmembership',

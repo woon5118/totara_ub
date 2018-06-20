@@ -360,4 +360,27 @@ trait report_trait {
         );
     }
 
+    /**
+     * Adds the course table to the $joinlist array
+     *
+     * @param array &$joinlist Array of current join options
+     *                         Passed by reference and updated to
+     *                         include new table joins
+     * @param string $join Name of the join that provides the
+     *                     'course id' field
+     * @param string $field Name of course id field to join on
+     * @param int $contextlevel Name of course id field to join on
+     * @param string $jointype Type of join (INNER, LEFT, RIGHT)
+     */
+    protected function add_context_tables(&$joinlist, $join, $field, $contextlevel, $jointype = 'LEFT') {
+
+        $joinlist[] = new \rb_join(
+            'ctx',
+            $jointype,
+            '{context}',
+            "ctx.instanceid = $join.$field AND ctx.contextlevel = $contextlevel",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join
+        );
+    }
 }

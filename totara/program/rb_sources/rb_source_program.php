@@ -31,6 +31,10 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 class rb_source_program extends rb_base_source {
+    use \core_course\rb\source\report_trait;
+    use \totara_cohort\rb\source\report_trait;
+    use \totara_program\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -87,8 +91,8 @@ class rb_source_program extends rb_base_source {
             ),
         );
 
-        $this->add_course_category_table_to_joinlist($joinlist, 'base', 'category');
-        $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'id');
+        $this->add_core_course_category_tables($joinlist, 'base', 'category');
+        $this->add_totara_cohort_program_tables($joinlist, 'base', 'id');
 
         return $joinlist;
     }
@@ -96,9 +100,9 @@ class rb_source_program extends rb_base_source {
     protected function define_columnoptions() {
 
         // include some standard columns
-        $this->add_program_fields_to_columns($columnoptions, 'base');
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base', 'programcount');
-        $this->add_cohort_program_fields_to_columns($columnoptions);
+        $this->add_totara_program_columns($columnoptions, 'base');
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'base', 'programcount');
+        $this->add_totara_cohort_program_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -108,9 +112,9 @@ class rb_source_program extends rb_base_source {
         $filteroptions = array();
 
         // include some standard filters
-        $this->add_program_fields_to_filters($filteroptions);
-        $this->add_course_category_fields_to_filters($filteroptions, 'base', 'category');
-        $this->add_cohort_program_fields_to_filters($filteroptions, 'totara_program');
+        $this->add_totara_program_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions, 'base', 'category');
+        $this->add_totara_cohort_program_filters($filteroptions, 'totara_program');
 
         return $filteroptions;
     }

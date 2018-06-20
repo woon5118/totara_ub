@@ -35,6 +35,10 @@ require_once($CFG->dirroot . '/completion/completion_completion.php');
  * A report builder source for DP courses
  */
 class rb_source_dp_course extends rb_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -203,11 +207,11 @@ class rb_source_dp_course extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
 
-        $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid', 'INNER');
-        $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
-        $this->add_user_table_to_joinlist($joinlist, 'base','userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_cohort_course_tables_to_joinlist($joinlist, 'base', 'courseid');
+        $this->add_core_course_tables($joinlist, 'base', 'courseid', 'INNER');
+        $this->add_context_tables($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
+        $this->add_core_user_tables($joinlist, 'base','userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_totara_cohort_course_tables($joinlist, 'base', 'courseid');
 
         return $joinlist;
     }
@@ -221,7 +225,7 @@ class rb_source_dp_course extends rb_base_source {
     protected function define_columnoptions() {
         $columnoptions = array();
 
-        $this->add_course_fields_to_columns($columnoptions);
+        $this->add_core_course_columns($columnoptions);
 
         $columnoptions[] = new rb_column_option(
                 'plan',
@@ -481,9 +485,9 @@ class rb_source_dp_course extends rb_base_source {
                 )
              );
 
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_cohort_course_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_totara_cohort_course_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -554,9 +558,9 @@ class rb_source_dp_course extends rb_base_source {
                 'number'
         );
 
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
-        $this->add_cohort_course_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_totara_cohort_course_filters($filteroptions);
 
         return $filteroptions;
     }

@@ -33,6 +33,12 @@ require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_sour
  * Class rb_source_facetoface_signin
  */
 class rb_source_facetoface_signin extends rb_facetoface_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_tag\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $sourcetitle, $requiredcolumns;
@@ -152,14 +158,14 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         );
 
         // Include some standard joins.
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course', 'INNER');
-        $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
-        $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_core_tag_tables_to_joinlist('core', 'course', $joinlist, 'facetoface', 'course');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_core_course_tables($joinlist, 'facetoface', 'course', 'INNER');
+        $this->add_context_tables($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
+        $this->add_core_course_category_tables($joinlist, 'course', 'category');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_core_tag_tables('core', 'course', $joinlist, 'facetoface', 'course');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
-        $this->add_cohort_course_tables_to_joinlist($joinlist, 'facetoface', 'course');
+        $this->add_totara_cohort_course_tables($joinlist, 'facetoface', 'course');
 
         return $joinlist;
     }
@@ -357,13 +363,13 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
 
         // Include some standard columns.
         $this->add_rooms_fields_to_columns($columnoptions, 'room');
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_course_fields_to_columns($columnoptions);
-        $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_core_tag_fields_to_columns('core', 'course', $columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_core_course_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_tag_columns('core', 'course', $columnoptions);
         $this->add_facetoface_session_roles_to_columns($columnoptions);
-        $this->add_cohort_course_fields_to_columns($columnoptions);
+        $this->add_totara_cohort_course_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -468,13 +474,13 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
 
         // Include some standard filters.
         $this->add_rooms_fields_to_filters($filteroptions);
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_course_fields_to_filters($filteroptions);
-        $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
-        $this->add_core_tag_fields_to_filters('core', 'course', $filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_core_course_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_core_tag_filters('core', 'course', $filteroptions);
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
-        $this->add_cohort_course_fields_to_filters($filteroptions);
+        $this->add_totara_cohort_course_filters($filteroptions);
 
         return $filteroptions;
     }

@@ -31,6 +31,9 @@ require_once($CFG->dirroot.'/cohort/lib.php');
  * A report builder source for the "cohorts" table.
  */
 class rb_source_cohort extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \core_tag\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -120,9 +123,9 @@ class rb_source_cohort extends rb_base_source {
                         )
         );
 
-        $this->add_user_table_to_joinlist($joinlist, 'members', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'members', 'userid');
-        $this->add_core_tag_tables_to_joinlist('core', 'cohort', $joinlist, 'base', 'id');
+        $this->add_core_user_tables($joinlist, 'members', 'userid');
+        $this->add_totara_job_tables($joinlist, 'members', 'userid');
+        $this->add_core_tag_tables('core', 'cohort', $joinlist, 'base', 'id');
 
         return $joinlist;
     }
@@ -258,9 +261,9 @@ class rb_source_cohort extends rb_base_source {
             array('joins' => 'course_category')
         );
 
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_core_tag_fields_to_columns('core', 'cohort', $columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_tag_columns('core', 'cohort', $columnoptions);
 
         return $columnoptions;
     }
@@ -297,8 +300,8 @@ class rb_source_cohort extends rb_base_source {
                 'simplemode' => true,
             )
         );
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_core_tag_fields_to_filters('core', 'cohort', $filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_core_tag_filters('core', 'cohort', $filteroptions);
 
         return $filteroptions;
     }

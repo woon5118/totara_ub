@@ -2283,8 +2283,12 @@ abstract class rb_base_source {
      * @param string $field Name of user id field to join on
      * @param string $alias Use custom user table alias
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_user_table_to_joinlist(&$joinlist, $join, $field, $alias = 'auser') {
+
+        debugging('add_user_table_to_joinlist has been deprecated. Please use add_core_user_tables in \course\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         if (isset($this->addeduserjoins[$alias])) {
             debugging("User join '{$alias}' was already added to the source", DEBUG_DEVELOPER);
         } else {
@@ -2323,10 +2327,13 @@ abstract class rb_base_source {
      *                          to differentiate between fields with the same name.
      *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_user_fields_to_columns(&$columnoptions,
         $join='auser', $groupname = 'user', $addtypetoheading = false) {
         global $DB, $CFG;
+
+        debugging('add_user_fields_to_columns has been deprecated. Please use add_core_user_columns in \course\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         if ($join === 'base' and !isset($this->addeduserjoins['base'])) {
             $this->addeduserjoins['base'] = array('join' => 'base');
@@ -2782,9 +2789,12 @@ abstract class rb_base_source {
      *                          string with the key "type_{$groupname}" in your
      *                          report source language file.
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
         global $CFG;
+
+        debugging('add_user_fields_to_columns has been deprecated. Please use add_core_user_columns in \course\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $found = false;
         foreach ($this->addeduserjoins as $join => $unused) {
@@ -3047,8 +3057,11 @@ abstract class rb_base_source {
      * @param string $field Name of course id field to join on
      * @param string $jointype Type of Join (INNER, LEFT, RIGHT)
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_course_table_to_joinlist(&$joinlist, $join, $field, $jointype = 'LEFT') {
+
+        debugging('add_course_table_to_joinlist has been deprecated. Please use add_core_course_tables in \course\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $joinlist[] = new rb_join(
             'course',
@@ -3072,8 +3085,11 @@ abstract class rb_base_source {
      * @param int $contextlevel Name of course id field to join on
      * @param string $jointype Type of join (INNER, LEFT, RIGHT)
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_context_table_to_joinlist(&$joinlist, $join, $field, $contextlevel, $jointype = 'LEFT') {
+
+        debugging('add_context_table_to_joinlist has been deprecated. Please use add_context_tables in \totara_reportbuilder\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $joinlist[] = new rb_join(
             'ctx',
@@ -3093,11 +3109,13 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @param string $join Name of the join that provides the 'course' table
-     *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_course_fields_to_columns(&$columnoptions, $join='course') {
         global $DB;
+
+        debugging('add_course_fields_to_columns has been deprecated. Please use add_core_course_columns in \course\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $columnoptions[] = new rb_column_option(
             'course',
@@ -3322,8 +3340,12 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_course_fields_to_filters(&$filteroptions) {
+
+        debugging('add_course_fields_to_filters has been deprecated. Please use add_core_course_filters in \core_course\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         $filteroptions[] = new rb_filter_option(
             'course',
             'fullname',
@@ -3437,8 +3459,11 @@ abstract class rb_base_source {
      *                     'program id' field
      * @param string $field Name of table containing program id field to join on
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_program_table_to_joinlist(&$joinlist, $join, $field) {
+
+        debugging('add_program_table_to_joinlist is deprecated. Please use add_totara_program_tables in \totara_program\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $joinlist[] = new rb_join(
             'program',
@@ -3459,11 +3484,13 @@ abstract class rb_base_source {
      *                              this method
      * @param string $join Name of the join that provides the 'program' table
      * @param string $langfile Source for translation, totara_program or totara_certification
-     *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_program_fields_to_columns(&$columnoptions, $join = 'program', $langfile = 'totara_program') {
         global $DB;
+
+        debugging('add_program_fields_to_columns is deprecated. Please use add_totara_program_columns in \totara_program\rb\source\report_trait instead');
 
         $columnoptions[] = new rb_column_option(
             'prog',
@@ -3605,8 +3632,12 @@ abstract class rb_base_source {
      *                              this method
      * @param string $langfile Source for translation, totara_program or totara_certification
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_program_fields_to_filters(&$filteroptions, $langfile = 'totara_program') {
+
+        debugging('add_program_fields_to_filters is deprecated. Please use add_totara_program_filters in \totara_program\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         $filteroptions[] = new rb_filter_option(
             'prog',
             'fullname',
@@ -3655,8 +3686,11 @@ abstract class rb_base_source {
      * @param string $join Name of the join that provides the
      *                     'certif id' field
      * @param string $field Name of table containing program id field to join on
+     * @deprecated since Totara 12.0
      */
     protected function add_certification_table_to_joinlist(&$joinlist, $join, $field) {
+
+        debugging('add_certification_table_to_joinlist is deprecated. Please use add_totara_certification_tables in \totara_certification\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $joinlist[] = new rb_join(
             'certif',
@@ -3676,10 +3710,13 @@ abstract class rb_base_source {
      *                              this method
      * @param string $join Name of the join that provides the 'program' table
      * @param string $langfile Source for translation, totara_program or totara_certification
-     *
      * @return Boolean
+     * @deprecated since Totara 12.0
      */
     protected function add_certification_fields_to_columns(&$columnoptions, $join = 'certif', $langfile = 'totara_certification') {
+
+        debugging('add_certification_fields_to_columns is deprecated. Please use add_totara_certification_columns in \totara_certification\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         $columnoptions[] = new rb_column_option(
             'certif',
             'recertifydatetype',
@@ -3734,8 +3771,11 @@ abstract class rb_base_source {
      *                              this method
      * @param string $langfile Source for translation, totara_program or totara_certification
      * @return boolean
+     * @deprecated since Totara 12.0
      */
     protected function add_certification_fields_to_filters(&$filteroptions, $langfile = 'totara_certification') {
+
+        debugging('add_certification_fields_to_filters is deprecated. Please use add_totara_certification_filters in \totara_certification\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $filteroptions[] = new rb_filter_option(
             'certif',
@@ -3781,9 +3821,12 @@ abstract class rb_base_source {
      * @param string $join Name of the join that provides the 'course' table
      * @param string $field Name of category id field to join on
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_course_category_table_to_joinlist(&$joinlist,
         $join, $field) {
+
+        debugging('add_course_category_table_to_joinlist is deprecated. Please use add_core_course_category_tables in \core_course\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $joinlist[] = new rb_join(
             'course_category',
@@ -3809,9 +3852,13 @@ abstract class rb_base_source {
      * @param string $coursejoin Name of the join that provides the
      *                           'course' table
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_course_category_fields_to_columns(&$columnoptions,
         $catjoin='course_category', $coursejoin='course', $column='coursecount') {
+
+        debugging('add_course_category_fields_to_columns is deprecated. Please use add_core_course_category_columns in \core_course\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         $columnoptions[] = new rb_column_option(
             'course_category',
             'name',
@@ -3865,8 +3912,12 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_course_category_fields_to_filters(&$filteroptions) {
+
+        debugging('add_course_category_fields_to_filters is deprecated. Please use add_core_course_category_filters in \core_course\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         $filteroptions[] = new rb_filter_option(
             'course_category',
             'id',
@@ -3898,9 +3949,12 @@ abstract class rb_base_source {
      * @param string $join Name of the join that provides the 'user' table
      * @param string $field Name of user id field to join on
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_job_assignment_tables_to_joinlist(&$joinlist, $join, $field) {
         global $DB;
+
+        debugging('add_job_assignment_tables_to_joinlist is deprecated. Please use add_totara_job_tables in \totara_job\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         // All job fields listed by sortorder.
         $jobfieldlistsubsql = "
@@ -4052,9 +4106,12 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_job_assignment_fields_to_columns(&$columnoptions) {
         global $CFG, $DB;
+
+        debugging('add_job_assignment_fields_to_columns is deprecated. Please use add_totara_job_columns in \totara_job\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         // Job assignment field columns.
         $columnoptions[] = new rb_column_option(
@@ -4446,9 +4503,12 @@ abstract class rb_base_source {
      * @param string $userjoin Table name to join to which has the user's id
      * @param string $userfield Field name containing the user's id
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_job_assignment_fields_to_filters(&$filteroptions, $userjoin = 'auser', $userfield = 'id') {
         global $DB, $CFG;
+
+        debugging('add_job_assignment_fields_to_filters is deprecated. Please use add_totara_job_filters in \totara_job\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         // Job assignment field filters.
         $filteroptions[] = new rb_filter_option(
@@ -5177,7 +5237,7 @@ abstract class rb_base_source {
 
         $this->add_custom_fields_for($columnoption->type, $join, $columnoption->field, $this->joinlist,
                 $columnoptions, $this->filteroptions, 'all', true);
-        foreach($columnoptions as $option) {
+        foreach ($columnoptions as $option) {
             $result[] = new rb_column(
                     $option->type,
                     $option->value,
@@ -5443,9 +5503,12 @@ abstract class rb_base_source {
      * @param string $join          The table to take the userid from
      * @param string $joinfield     The field to take the userid from
      * @param array  $joinlist
+     * @deprecated since Totara 12.0
      */
     private function add_job_custom_field_joins($prefix, $fields, $join, $joinfield, &$joinlist) {
         global $DB;
+
+        debugging('add_job_custom_field_joins is deprecated. Please use add_totara_job_custom_field_tables in \totara_job\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         // We need a join for each custom field to get them concatenating.
         foreach ($fields as $field) {
@@ -5494,7 +5557,11 @@ abstract class rb_base_source {
         return true;
     }
 
+    /**
+     * @deprecated since Totara 12.0
+     */
     private function add_job_custom_field_columns($prefix, $fields, &$columnoptions) {
+        debugging('add_job_custom_field_columns is deprecated. Please use add_totara_job_custom_field_columns in \totara_job\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         foreach ($fields as $field) {
             $uniquename = "{$prefix}_custom_{$field->id}";
@@ -5554,9 +5621,12 @@ abstract class rb_base_source {
      * @param string $userjoin Table name to join to which has the user's id
      * @param string $userfield Field name containing the user's id
      * @return bool
+     * @deprecated since Totara 12.0
      */
     private function add_job_custom_field_filters($prefix, $fields, &$filteroptions, $userjoin = 'auser', $userfield = 'id') {
         global $CFG;
+
+        debugging('add_job_custom_field_filters is deprecated. Please use add_totara_job_custom_field_filters in \totara_job\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         foreach ($fields as $field) {
             $uniquename = "{$prefix}_custom_{$field->id}";
@@ -5740,10 +5810,12 @@ abstract class rb_base_source {
      *                     $type table
      * @param string $field Name of course id field to join on
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_core_tag_tables_to_joinlist($component, $itemtype, &$joinlist, $join, $field) {
         global $DB;
 
+        debugging('add_core_tag_tables_to_joinlist is deprecated. Please use add_core_tag_tables in \core_tag\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $idlist = $DB->sql_group_concat($DB->sql_cast_2char('t.id'), '|');
         $joinlist[] = new rb_join(
@@ -5808,9 +5880,12 @@ abstract class rb_base_source {
      * @param string $tagnames name of the join that provides the 'tagnames' table.
      *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_core_tag_fields_to_columns($component, $itemtype, &$columnoptions, $tagids='tagids', $tagnames='tagnames') {
         global $DB;
+
+        debugging('add_core_tag_fields_to_columns is deprecated. Please use add_core_tag_columns in \core_tag\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $columnoptions[] = new rb_column_option(
             'tags',
@@ -5861,9 +5936,12 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_core_tag_fields_to_filters($component, $itemtype, &$filteroptions) {
         global $DB;
+
+        debugging('add_core_tag_fields_to_filters is deprecated. Please use add_core_tag_filters in \core_tag\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         // Only get the tags in the collection for this item type.
         $tagcollectionid = core_tag_area::get_collection($component, $itemtype);
@@ -5915,7 +5993,6 @@ abstract class rb_base_source {
         return true;
     }
 
-
     /**
      * Adds the cohort user tables to the $joinlist array
      *
@@ -5926,9 +6003,12 @@ abstract class rb_base_source {
      *                     'user' table
      * @param string $field Name of user id field to join on
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_user_tables_to_joinlist(&$joinlist, $join, $field, $alias = 'ausercohort') {
         global $DB;
+
+        debugging('add_cohort_user_tables_to_joinlist is deprecated. Please use add_totara_cohort_user_tables in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $idlist = $DB->sql_group_concat_unique($DB->sql_cast_2char('cm.cohortid'),'|');
         $joinlist[] = new rb_join(
@@ -5956,9 +6036,12 @@ abstract class rb_base_source {
      *                     'course' table
      * @param string $field Name of course id field to join on
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_course_tables_to_joinlist(&$joinlist, $join, $field) {
         global $CFG, $DB;
+
+        debugging('add_cohort_course_tables_to_joinlist is deprecated. Please use add_totara_cohort_course_tables in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         require_once($CFG->dirroot . '/cohort/lib.php');
 
@@ -5990,9 +6073,12 @@ abstract class rb_base_source {
      *                     table containing the program id
      * @param string $field Name of program id field to join on
      * @return boolean True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_program_tables_to_joinlist(&$joinlist, $join, $field) {
         global $CFG, $DB;
+
+        debugging('add_cohort_program_tables_to_joinlist is deprecated. Please use add_totara_cohort_program_tables in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         require_once($CFG->dirroot . '/cohort/lib.php');
 
@@ -6024,10 +6110,13 @@ abstract class rb_base_source {
      *                          'cohortuser' table.
      *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_user_fields_to_columns(&$columnoptions,
                                                          $join='ausercohort', $groupname = 'user',
                                                          $addtypetoheading = false) {
+
+        debugging('add_cohort_user_fields_to_columns is deprecated. Please use add_totara_cohort_user_columns in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $columnoptions[] = new rb_column_option(
             $groupname,
@@ -6055,8 +6144,12 @@ abstract class rb_base_source {
      *                          'cohortenrolledcourse' table.
      *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_course_fields_to_columns(&$columnoptions, $cohortenrolledids='cohortenrolledcourse') {
+
+        debugging('add_cohort_course_fields_to_columns is deprecated. Please use add_totara_cohort_course_columns in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         $columnoptions[] = new rb_column_option(
             'cohort',
             'enrolledcoursecohortids',
@@ -6079,8 +6172,12 @@ abstract class rb_base_source {
      *                          'cohortenrolledprogram' table.
      *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_program_fields_to_columns(&$columnoptions, $cohortenrolledids='cohortenrolledprogram') {
+
+        debugging('add_cohort_program_fields_to_columns is deprecated. Please use add_totara_cohort_program_columns in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
         $columnoptions[] = new rb_column_option(
             'cohort',
             'enrolledprogramcohortids',
@@ -6099,8 +6196,11 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_user_fields_to_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
+
+        debugging('add_cohort_user_fields_to_filters is deprecated. Please use add_totara_cohort_user_filters in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         if (!has_capability('moodle/cohort:view', context_system::instance())) {
             return true;
@@ -6123,8 +6223,11 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_course_fields_to_filters(&$filteroptions) {
+
+        debugging('add_cohort_course_fields_to_filters is deprecated. Please use add_totara_cohort_course_filters in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         if (!has_capability('moodle/cohort:view', context_system::instance())) {
             return true;
@@ -6150,8 +6253,11 @@ abstract class rb_base_source {
      * @param string $langfile Source for translation, totara_program or totara_certification
      *
      * @return True
+     * @deprecated since Totara 12.0
      */
     protected function add_cohort_program_fields_to_filters(&$filteroptions, $langfile) {
+
+        debugging('add_cohort_program_fields_to_filters is deprecated. Please use add_totara_cohort_program_filters in \totara_cohort\rb\source\report_trait instead instead', DEBUG_DEVELOPER);
 
         if (!has_capability('moodle/cohort:view', context_system::instance())) {
             return true;

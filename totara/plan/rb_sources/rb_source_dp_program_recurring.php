@@ -33,6 +33,10 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 class rb_source_dp_program_recurring extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -96,9 +100,9 @@ class rb_source_dp_program_recurring extends rb_base_source {
                 'completion_organisation.id = base.organisationid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
-        $this->add_context_table_to_joinlist($joinlist, 'base', 'programid', CONTEXT_PROGRAM, 'INNER');
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_context_tables($joinlist, 'base', 'programid', CONTEXT_PROGRAM, 'INNER');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -202,8 +206,8 @@ class rb_source_dp_program_recurring extends rb_base_source {
             )
         );
 
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -291,8 +295,8 @@ class rb_source_dp_program_recurring extends rb_base_source {
                 'date'
             );
 
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
 
         return $filteroptions;
     }

@@ -32,6 +32,9 @@ require_once($CFG->dirroot . '/totara/certification/lib.php');
  * A report builder source for Certifications
  */
 class rb_source_dp_certification_history extends rb_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -153,9 +156,9 @@ class rb_source_dp_certification_history extends rb_base_source {
                 array('prog', 'prog_completion')
         );
 
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_category_table_to_joinlist($joinlist, 'prog', 'category');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_core_course_category_tables($joinlist, 'prog', 'category');
 
         return $joinlist;
     }
@@ -332,9 +335,9 @@ class rb_source_dp_certification_history extends rb_base_source {
         );
 
         // Include some standard columns.
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'prog');
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'prog');
 
         return $columnoptions;
     }
@@ -421,9 +424,9 @@ class rb_source_dp_certification_history extends rb_base_source {
             )
         );
 
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
-        $this->add_course_category_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_core_course_category_filters($filteroptions);
 
         return $filteroptions;
     }

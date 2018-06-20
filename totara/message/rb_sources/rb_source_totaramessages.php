@@ -29,6 +29,9 @@ require_once($CFG->dirroot.'/totara/message/lib.php');
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_totaramessages extends rb_base_source {
+    use \totara_job\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -101,11 +104,11 @@ class rb_source_totaramessages extends rb_base_source {
         );
 
         // Include a join for the user that the message was sent to.
-        $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridto', 'userto');
+        $this->add_core_user_tables($joinlist, 'msg', 'useridto', 'userto');
 
         // Include some standard joins. Including the user the message was sent from.
-        $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridfrom');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
+        $this->add_core_user_tables($joinlist, 'msg', 'useridfrom');
+        $this->add_totara_job_tables($joinlist, 'msg', 'useridfrom');
 
         return $joinlist;
     }
@@ -217,11 +220,11 @@ class rb_source_totaramessages extends rb_base_source {
         );
 
         // Add columns for the user the message was sent to.
-        $this->add_user_fields_to_columns($columnoptions, 'userto', 'userto', true);
+        $this->add_core_user_columns($columnoptions, 'userto', 'userto', true);
 
         // Include some standard columns. Including the user that the message was sent from.
-        $this->add_user_fields_to_columns($columnoptions, 'auser', 'user', true);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions, 'auser', 'user', true);
+        $this->add_totara_job_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -263,11 +266,11 @@ class rb_source_totaramessages extends rb_base_source {
         );
 
         // Add filters for the user the message was sent to.
-        $this->add_user_fields_to_filters($filteroptions, 'userto', true);
+        $this->add_core_user_filters($filteroptions, 'userto', true);
 
         // Include some standard filters. Including the user that the message was sent from.
-        $this->add_user_fields_to_filters($filteroptions, 'user', true);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'msg', 'useridfrom'); // Note these relate to the sender.
+        $this->add_core_user_filters($filteroptions, 'user', true);
+        $this->add_totara_job_filters($filteroptions, 'msg', 'useridfrom'); // Note these relate to the sender.
 
         return $filteroptions;
     }

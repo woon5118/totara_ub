@@ -28,6 +28,9 @@ global $CFG;
 require_once($CFG->dirroot . '/completion/completion_completion.php');
 
 class rb_source_course_completion_all extends rb_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -99,9 +102,9 @@ class rb_source_course_completion_all extends rb_base_source {
     protected function define_joinlist() {
         $joinlist = array();
 
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid', 'INNER');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_core_course_tables($joinlist, 'base', 'courseid', 'INNER');
 
         return $joinlist;
     }
@@ -150,9 +153,9 @@ class rb_source_course_completion_all extends rb_base_source {
             );
         }
 
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_course_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_course_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -191,9 +194,9 @@ class rb_source_course_completion_all extends rb_base_source {
             );
         }
 
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
-        $this->add_course_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_core_course_filters($filteroptions);
 
         return $filteroptions;
     }

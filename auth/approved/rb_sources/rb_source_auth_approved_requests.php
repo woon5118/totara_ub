@@ -28,6 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_auth_approved_requests extends rb_base_source {
+    use \core_user\rb\source\report_trait;
 
     public $base;
     public $joinlist;
@@ -53,6 +54,11 @@ class rb_source_auth_approved_requests extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
+
+        // Add the created user info.
+        $this->add_core_user_tables($this->joinlist, 'base', 'userid', 'auser');
+        $this->add_core_user_columns($this->columnoptions, 'auser', 'user', true);
+        $this->add_core_user_filters($this->filteroptions, 'user', true);
 
         // NOTE: we cannot add more user type columns in Totara 9 - see TL-12609 for more info.
 

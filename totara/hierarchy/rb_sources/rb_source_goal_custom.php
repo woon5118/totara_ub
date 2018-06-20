@@ -25,6 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_goal_custom extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
     public $defaultcolumns, $defaultfilters, $embeddedparams;
     public $sourcetitle, $shortname, $scheduleable, $cacheable;
@@ -128,7 +130,7 @@ class rb_source_goal_custom extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             )
         );
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -248,7 +250,7 @@ class rb_source_goal_custom extends rb_base_source {
             ),
         );
 
-        $this->add_user_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -300,7 +302,7 @@ class rb_source_goal_custom extends rb_base_source {
                 )
             )
         );
-        $this->add_user_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
         return $filteroptions;
     }
 

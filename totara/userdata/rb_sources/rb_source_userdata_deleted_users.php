@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
  * Reportbuildersource for deleted users.
  */
 final class rb_source_userdata_deleted_users extends rb_base_source {
+    use \core_user\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -117,7 +118,7 @@ final class rb_source_userdata_deleted_users extends rb_base_source {
 
         $columnoptions = array();
 
-        $this->add_user_fields_to_columns($columnoptions, 'base');
+        $this->add_core_user_columns($columnoptions, 'base');
 
         $columnoptions[] = new rb_column_option(
             'suspended_purge_type',
@@ -207,7 +208,7 @@ final class rb_source_userdata_deleted_users extends rb_base_source {
     protected function define_filteroptions() {
         $filteroptions = array();
 
-        $this->add_user_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
 
         $filteroptions[] = new rb_filter_option(
             'suspended_purge_type',

@@ -24,6 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_upgrade_log extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -62,7 +64,7 @@ class rb_source_upgrade_log extends rb_base_source {
     protected function define_joinlist() {
         $joinlist = array();
 
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -127,7 +129,7 @@ class rb_source_upgrade_log extends rb_base_source {
             ),
         );
 
-        $this->add_user_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -204,7 +206,7 @@ class rb_source_upgrade_log extends rb_base_source {
             array()
         );
 
-        $this->add_user_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
 
         return $filteroptions;
     }

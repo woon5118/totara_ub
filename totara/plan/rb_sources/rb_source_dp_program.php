@@ -32,6 +32,11 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 class rb_source_dp_program extends rb_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle, $instancetype;
@@ -139,11 +144,11 @@ class rb_source_dp_program extends rb_base_source {
                 'completion_organisation.id = program_completion.organisationid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
-        $this->add_context_table_to_joinlist($joinlist, 'base', 'id', CONTEXT_PROGRAM, 'INNER');
-        $this->add_course_category_table_to_joinlist($joinlist, 'base', 'category');
-        $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'id');
-        $this->add_user_table_to_joinlist($joinlist, 'program_completion', 'userid');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'program_completion', 'userid');
+        $this->add_context_tables($joinlist, 'base', 'id', CONTEXT_PROGRAM, 'INNER');
+        $this->add_core_course_category_tables($joinlist, 'base', 'category');
+        $this->add_totara_cohort_program_tables($joinlist, 'base', 'id');
+        $this->add_core_user_tables($joinlist, 'program_completion', 'userid');
+        $this->add_totara_job_tables($joinlist, 'program_completion', 'userid');
 
         return $joinlist;
     }
@@ -323,10 +328,10 @@ class rb_source_dp_program extends rb_base_source {
         );
 
         // Include some standard columns.
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base');
-        $this->add_cohort_program_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'base');
+        $this->add_totara_cohort_program_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -424,10 +429,10 @@ class rb_source_dp_program extends rb_base_source {
             get_string('completeddate', 'rb_source_program_completion'),
             'date'
         );
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'program_completion', 'userid');
-        $this->add_course_category_fields_to_filters($filteroptions, 'base', 'category');
-        $this->add_cohort_program_fields_to_filters($filteroptions, 'totara_program');
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'program_completion', 'userid');
+        $this->add_core_course_category_filters($filteroptions, 'base', 'category');
+        $this->add_totara_cohort_program_filters($filteroptions, 'totara_program');
 
         return $filteroptions;
     }

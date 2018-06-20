@@ -28,6 +28,9 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 
 class rb_source_certification_membership extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \totara_certification\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -82,8 +85,8 @@ class rb_source_certification_membership extends rb_base_source {
     protected function define_joinlist() {
         $joinlist = array();
 
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_certification_table_to_joinlist($joinlist, 'base', 'certifid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_certification_tables($joinlist, 'base', 'certifid');
 
         $joinlist[] = new rb_join(
             'certif_completion',
@@ -99,8 +102,8 @@ class rb_source_certification_membership extends rb_base_source {
     protected function define_columnoptions() {
         $columnoptions = array();
 
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_certification_fields_to_columns($columnoptions, 'certif', 'totara_certification');
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_certification_columns($columnoptions, 'certif', 'totara_certification');
 
         $columnoptions[] = new rb_column_option(
             'certmembership',
@@ -156,8 +159,8 @@ class rb_source_certification_membership extends rb_base_source {
     protected function define_filteroptions() {
         $filteroptions = array();
 
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_certification_fields_to_filters($filteroptions, 'totara_certification');
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_certification_filters($filteroptions, 'totara_certification');
 
         $filteroptions[] = new rb_filter_option(
             'certmembership',

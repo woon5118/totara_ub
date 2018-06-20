@@ -25,6 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_facetoface_interest extends rb_base_source {
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $sourcetitle;
@@ -99,10 +103,10 @@ class rb_source_facetoface_interest extends rb_base_source {
         );
 
         // Include some standard joins.
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
-        $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_core_course_tables($joinlist, 'facetoface', 'course');
+        $this->add_core_course_category_tables($joinlist, 'course', 'category');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -152,10 +156,10 @@ class rb_source_facetoface_interest extends rb_base_source {
         );
 
         // Include some standard columns.
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_course_fields_to_columns($columnoptions);
-        $this->add_course_category_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_course_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions);
         // Redirect the display of 'user' columns (to insert 'unassigned' when needed).
         foreach ($columnoptions as $key => $columnoption) {
             if (!($columnoption->type == 'user' && $columnoption->value == 'fullname')) {
@@ -192,10 +196,10 @@ class rb_source_facetoface_interest extends rb_base_source {
         );
 
         // Include some standard filters.
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions, 'base', 'userid');
-        $this->add_course_fields_to_filters($filteroptions);
-        $this->add_course_category_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_core_course_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions);
 
         return $filteroptions;
     }
