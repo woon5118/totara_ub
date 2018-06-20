@@ -100,7 +100,7 @@
             <span class="collapsed-icon">{{#flex_icon}}collapsed{{/flex_icon}}</span>
             <span class="expanded-icon">{{#flex_icon}}expanded{{/flex_icon}}</span>
         </span>
-        <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">
+        <span tabindex="0" data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">
             {{#icondata}}{{#context}}{{> &&template}}{{/context}}{{/icondata}}
         </span>
         <a href="{{url_view}}">
@@ -108,7 +108,7 @@
         </a>
         <div class="block_current_learning-row-item__status">
             {{#dueinfo}}
-                <span class="label {{state}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+                <span class="label {{state}}" tabindex="0" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
                     {{#alert}}{{#flex_icon}}warning{{/flex_icon}}{{/alert}} {{duetext}}
                 </span>
             {{/dueinfo}}
@@ -141,7 +141,7 @@
                             {{#progress}}
                                 <div class="block_current_learning-row-item__status">
                                     {{#duetext}}
-                                        <span class="label label-{{tooltip-state}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+                                        <span class="label label-{{tooltip-state}}" tabindex="0" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
                                             {{duetext}}
                                         </span>
                                     {{/duetext}}

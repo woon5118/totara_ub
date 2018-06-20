@@ -65,11 +65,11 @@
 }}
 <li id="block_current_learning-program-{{id}}" class="block_current_learning-item block_current_learning-program">
 <div class="block_current_learning-row-item">
-    <span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">{{#icondata}}{{#context}}{{> &&template}}{{/context}}{{/icondata}}</span>
+    <span tabindex="0" data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">{{#icondata}}{{#context}}{{> &&template}}{{/context}}{{/icondata}}</span>
     <a href="{{{url_view}}}"><h3>{{{fullname}}}</h3></a>
     <div class="block_current_learning-row-item__status">
         {{#dueinfo}}
-            <span class="label {{state}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{tooltip}}">{{#alert}}{{#flex_icon}}warning{{/flex_icon}}{{/alert}} {{duetext}}</span>
+            <span class="label {{state}}" tabindex="0" data-toggle="tooltip" data-placement="top" data-container="body" title="{{tooltip}}">{{#alert}}{{#flex_icon}}warning{{/flex_icon}}{{/alert}} {{duetext}}</span>
         {{/dueinfo}}
         {{#progress}}
             {{#pbar}}
