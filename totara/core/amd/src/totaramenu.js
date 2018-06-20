@@ -33,13 +33,20 @@ define(['jquery'], function($) {
             $menu = $($menu);
         }
 
-        $menu.on('focus', '> ul > li > a', function() {
-            var $focusedElement = $(this);
-            $focusedElement.closest('ul')
-                .find('ul')
+        $menu.on('focus', '> ul > li > a', function(e) {
+            var $focusedElement = $(e.target);
+            var parent = $focusedElement.closest('ul');
+            parent.find('[aria-expanded]').attr('aria-expanded', false);
+            parent.find('ul')
                 .removeAttr('style');
+
+            if (e.target.hasAttribute('aria-expanded')) {
+                e.target.setAttribute('aria-expanded', true);
+            }
+
             $focusedElement.siblings('ul')
-                .show();
+                .show()
+                .attr('aria-expanded', true);
         });
     };
 

@@ -7,6 +7,7 @@ This file describes API changes for 'theme_basis'.
 * Deprecated theme_basis_renderer::page_footer_nav()
 * Deprecated theme_basis_renderer::render_page_footer_nav()
 * Deprecated theme_basis\output\page_footer_nav
+* Changed totara/core/templates/totara_menu.mustache, adding aria menu attributes
 
 === 10.0 ===
 

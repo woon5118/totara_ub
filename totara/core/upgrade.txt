@@ -34,6 +34,7 @@ information provided here is intended especially for developers.
   * totara_core_renderer::print_totara_progressbar()
   * totara_core_renderer::print_icons_list()
 * Removed deprecated file dialogs/dialog_content_manager.class.php
+* Changed totara/core/templates/totara_menu.mustache, adding aria menu attributes
 
 === 11 ===
 

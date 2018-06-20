@@ -83,17 +83,17 @@
         <div id="totara-navbar" class="totara-navbar navbar-collapse collapse">
             <div class="totara-menu">
                 {{! The following ID is for compatibility with JavaScript }}
-                {{! accessibility YUI module for menu navigation.         }}
+                {{! accessibility AMD module for menu navigation.         }}
                 <nav id="totaramenu" class="totara-menu-nav">
-                    <ul class="totara-menu-nav-list navbar navbar-nav">
+                    <ul class="totara-menu-nav-list navbar navbar-nav" role="menu">
                         {{#menuitems}}
                         <li class="totara-menu-nav-item menu-{{class_name}}{{#haschildren}} haschildren{{/haschildren}}{{#class_isfirst}} first{{/class_isfirst}}{{#class_islast}} last{{/class_islast}}{{#class_isselected}} selected{{/class_isselected}}{{#class_child_isselected}} child-selected{{/class_child_isselected}}">
-                            <a class="totara-menu-nav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}{{#haschildren}}<div class="totara-menu-arrow-up"></div>{{/haschildren}}</a>
+                            <a class="totara-menu-nav-item-link" target="{{target}}" href="{{url}}" role="menuitem"{{#haschildren}} aria-expanded="false"{{/haschildren}}>{{{linktext}}}{{#haschildren}}<div class="totara-menu-arrow-up"></div>{{/haschildren}}</a>
                             {{#haschildren}}
-                            <ul class="totara-menu-nav-list navbar navbar-nav">
+                            <ul class="totara-menu-nav-list navbar navbar-nav" role="menu">
                                 {{#children}}
                                 <li class="totara-menu-nav-item menu-{{class_name}}{{#class_isfirst}} first{{/class_isfirst}}{{#class_islast}} last{{/class_islast}}{{#class_isselected}} selected{{/class_isselected}}">
-                                    <a class="totara-menu-nav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}</a>
+                                    <a class="totara-menu-nav-item-link" target="{{target}}" href="{{url}}" role="menuitem">{{{linktext}}}</a>
                                 </li>
                                 {{/children}}
                             </ul>
