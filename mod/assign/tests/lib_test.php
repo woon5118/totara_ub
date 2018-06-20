@@ -114,7 +114,7 @@ class mod_assign_lib_testcase extends advanced_testcase {
         $this->assertEquals(1, count($overview));
         // Submissions without a grade.
         $this->assertRegExp('/.*Open Assignment.*/', $overview[$course->id]['assign']);
-        $this->assertRegExp('/.*Assignment with submissions.*/', $overview[$course->id]['assign']);
+        $this->assertNotRegExp('/.*Assignment with submissions.*/', $overview[$course->id]['assign']);
 
         $this->setUser($teacher);
         $overview = array();
@@ -122,7 +122,7 @@ class mod_assign_lib_testcase extends advanced_testcase {
         $this->assertEquals(1, count($overview));
         // Submissions without a grade.
         $this->assertRegExp('/.*Open Assignment.*/', $overview[$course->id]['assign']);
-        $this->assertRegExp('/.*Assignment with submissions.*/', $overview[$course->id]['assign']);
+        $this->assertNotRegExp('/.*Assignment with submissions.*/', $overview[$course->id]['assign']);
 
         // Let us grade a submission.
         $this->setUser($teacher);
@@ -138,18 +138,14 @@ class mod_assign_lib_testcase extends advanced_testcase {
 
         $overview = array();
         assign_print_overview($courses, $overview);
-        $this->assertEquals(1, count($overview));
         // Now assignment 4 should not show up.
-        $this->assertNotRegExp('/.*Open Assignment.*/', $overview[$course->id]['assign']);
-        $this->assertRegExp('/.*Assignment with submissions.*/', $overview[$course->id]['assign']);
+        $this->assertEmpty($overview);
 
         $this->setUser($teacher);
         $overview = array();
         assign_print_overview($courses, $overview);
-        $this->assertEquals(1, count($overview));
         // Now assignment 4 should not show up.
-        $this->assertNotRegExp('/.*Open Assignment.*/', $overview[$course->id]['assign']);
-        $this->assertRegExp('/.*Assignment with submissions.*/', $overview[$course->id]['assign']);
+        $this->assertEmpty($overview);
     }
 
     /**
