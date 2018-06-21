@@ -157,7 +157,6 @@ Feature: Manager approval and declare of interest
 
   Scenario: Staff can view who has expressed interest
     When I log in as "teacher1"
-    And I follow "Course 1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                       | Test f2f 1                      |

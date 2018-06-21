@@ -27,7 +27,6 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | Custom instance name | Test student enrolment |
 
     # Create a Seminar which will be available.
-    And I click on "Find Learning" in the totara menu
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1"
     And I set the following fields to these values:
