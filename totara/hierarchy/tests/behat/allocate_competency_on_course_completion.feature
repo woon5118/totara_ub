@@ -20,10 +20,7 @@ Feature: Verify completion of a course triggers assigning a competency.
 
     # Add a page activity to course 2.
     When I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Page" to section "1" and I fill the form with:
       | Name                | Course Completion Page |
       | Description         | -         |

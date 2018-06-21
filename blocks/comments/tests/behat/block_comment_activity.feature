@@ -20,8 +20,7 @@ Feature: Enable Block comments on an activity page and view comments
       | activity | course | idnumber | name           | intro                 |
       | page    | C1      | page1    | Test page name | Test page description |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I follow "Test page name"
     And I add the "Comments" block
     And I add "I'm a comment from the teacher" comment to comments block

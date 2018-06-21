@@ -16,8 +16,7 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
       | Name | Test lesson name |

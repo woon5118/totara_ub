@@ -19,9 +19,7 @@ Feature: View an outline report
       | student1 | C1 | student |
       | student2 | C1 | student |
     When I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Forum name |
       | Description | Forum description |
@@ -68,8 +66,7 @@ Feature: View an outline report
     And I follow "Book name"
     And I log out
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Activity report" node in "Course administration > Reports"
     Then I should see "2 by 2 users" in the "Book name" "table_row"
     And I should see "1 by 1 users" in the "Forum name" "table_row"
@@ -101,8 +98,7 @@ Feature: View an outline report
     Given I navigate to "Manage log stores" node in "Site administration > Plugins > Logging"
     And "Enable" "link" should exist in the "Legacy log" "table_row"
     And I click on "Disable" "link" in the "Standard log" "table_row"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Activity report" node in "Course administration > Reports"
     Then I should see "No log reader enabled"
 

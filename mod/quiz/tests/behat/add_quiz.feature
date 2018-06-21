@@ -17,8 +17,7 @@ Feature: Add a quiz
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name        | Test quiz name        |
       | Description | Test quiz description |

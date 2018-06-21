@@ -35,8 +35,7 @@ Feature: In a lesson activity, a non editing teacher can grade essay questions
       | student3 | G3 |
     And I log in as "teacher1"
     And I am on homepage
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
       | Description | Test lesson description |

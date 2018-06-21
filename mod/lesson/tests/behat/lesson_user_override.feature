@@ -26,8 +26,7 @@ Feature: Lesson user override
       | activity | name             | intro                   | course | idnumber |
       | lesson   | Test lesson name | Test lesson description | C1     | lesson1  |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I follow "Test lesson name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"

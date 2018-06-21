@@ -27,8 +27,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                                            | Test seminar name 1        |
       | Description                                                     | Test seminar description 1 |
@@ -52,8 +51,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 2"
-    And I turn editing mode on
+    And I am on "Course 2" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                                            | Test seminar name 1        |
       | Description                                                     | Test seminar description 1 |

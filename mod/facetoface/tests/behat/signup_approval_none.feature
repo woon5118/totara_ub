@@ -38,10 +38,7 @@ Feature: Seminar Signup No Approval
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
-    And I turn editing mode on
+    And I am on "Classroom Connect Course" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                | Classroom Connect       |
       | Description         | Classroom Connect Tests |

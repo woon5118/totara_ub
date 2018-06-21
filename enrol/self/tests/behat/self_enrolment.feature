@@ -38,8 +38,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I press "Enrol me"
     Then I should see "Topic 1"
     And I should not see "Enrolment options"
@@ -52,8 +51,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
       | Enrolment key | moodle_rules |
     And I log out
     And I log in as "student1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set the following fields to these values:
       | Enrolment key | moodle_rules |
     And I press "Enrol me"
@@ -63,8 +61,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
 
   Scenario: Self-enrolment disabled
     Given I log in as "student1"
-    And I am on site homepage
-    When I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
 
   Scenario: Self-enrolment enabled requiring a group enrolment key
@@ -83,8 +80,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set the following fields to these values:
       | Enrolment key | Test-groupenrolkey1 |
     And I press "Enrol me"

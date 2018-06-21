@@ -18,8 +18,7 @@ Feature: Managers can create courses
     And I enrol "Student 1" user as "Student"
     And I log out
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I follow "Announcements"
     And "Add a new topic" "button" should exist
     And "Subscription mode > Forced subscription" "link" should not exist in current page administration

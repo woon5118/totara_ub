@@ -10,8 +10,7 @@ Feature: Set the assignment activity grade completion criteria
       | fullname | shortname | category | enablecompletion |
       | Course 1 | C1        | 0        | 1                |
     And I log in as "admin"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name      | Test assignment name        |
       | Description          | Test assignment description |

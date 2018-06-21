@@ -15,8 +15,7 @@ Feature: Block appearances
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Turn editing on"
     And I add a "Survey" to section "1" and I fill the form with:
       | Name | Test survey name |

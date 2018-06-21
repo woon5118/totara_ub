@@ -37,8 +37,7 @@ Feature: The search forums block allows users to search for forum posts on cours
     And I add a new topic to "Announcements" forum with:
       | Subject | My subject |
       | Message | My message |
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I follow "Announcements"
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets

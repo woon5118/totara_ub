@@ -57,8 +57,7 @@ Feature: Unlocking without deleting course completion data
     And I expand "Reports" node
     And I follow "Activity completion"
     And "Student First" user has completed "Test forum name" activity
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I follow "Test forum name"
     And I follow "Edit settings"
     And I set the following fields to these values:
@@ -127,8 +126,7 @@ Feature: Unlocking without deleting course completion data
     And I follow "Activity completion"
     And "Student First" user has completed "Test forum name" activity
     And "Student First" user has completed "Test label" activity
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
@@ -202,8 +200,7 @@ Feature: Unlocking without deleting course completion data
     And I follow "Activity completion"
     And "Student First" user has completed "Test forum name" activity
     And "Student First" user has completed "Test label" activity
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
@@ -223,8 +220,7 @@ Feature: Unlocking without deleting course completion data
     And I should see "Status: Complete"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I follow "Test assignment name"
     And I follow "Edit settings"
     And I set the following fields to these values:

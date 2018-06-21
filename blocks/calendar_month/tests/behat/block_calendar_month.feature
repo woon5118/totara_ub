@@ -21,8 +21,7 @@ Feature: Enable the calendar block in a course and test it's functionality
 
   Scenario: Add the block to a the course
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     When I add the "Calendar" block
     Then I should see "Events key" in the "Calendar" "block"
 
@@ -37,8 +36,7 @@ Feature: Enable the calendar block in a course and test it's functionality
       | id_name | Site Event |
     And I log out
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Calendar" block
     And I hover over today in the calendar
     Then I should see "Site Event"
@@ -54,8 +52,7 @@ Feature: Enable the calendar block in a course and test it's functionality
       | id_name | Site Event |
     And I log out
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Calendar" block
     And I create a calendar event with form data:
       | id_eventtype | Course |
@@ -69,8 +66,7 @@ Feature: Enable the calendar block in a course and test it's functionality
   @javascript
   Scenario: View a course event in the calendar block
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Calendar" block
     And I create a calendar event with form data:
       | id_eventtype | Course |
@@ -82,8 +78,7 @@ Feature: Enable the calendar block in a course and test it's functionality
   @javascript
   Scenario: Filter course events in the calendar block
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Calendar" block
     And I create a calendar event with form data:
       | id_eventtype | Course |
@@ -102,8 +97,7 @@ Feature: Enable the calendar block in a course and test it's functionality
   @javascript
   Scenario: View a user event in the calendar block
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Calendar" block
     And I create a calendar event with form data:
       | id_eventtype | User |
@@ -116,8 +110,7 @@ Feature: Enable the calendar block in a course and test it's functionality
   @javascript
   Scenario: Filter user events in the calendar block
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Calendar" block
     And I create a calendar event with form data:
       | id_eventtype | Course |

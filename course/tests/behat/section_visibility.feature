@@ -18,8 +18,7 @@ Feature: Show/hide course sections
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test hidden forum 11 name |
       | Description | Test hidden forum 11 description |

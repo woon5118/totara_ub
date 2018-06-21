@@ -71,10 +71,7 @@ Feature: Test notification templates according TL-10404
       | ccmanager | 0 |
     And I click on "Save changes" "button"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 10404"
-    And I turn editing mode on
+    And I am on "Course 10404" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name | Seminar TL-10404A |
     And I follow "Seminar TL-10404A"

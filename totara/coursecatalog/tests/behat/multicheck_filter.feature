@@ -16,8 +16,7 @@ Feature: Filter courses by multicheck filters on sidebar
       | Course Beta 1  | B1        |
     And I log in as "admin"
     And I click on "Courses" in the totara menu
-    And I follow "Course Alpha 1"
-    And I turn editing mode on
+    And I am on "Course Alpha 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Assignment1 |
     And I add a "Quiz" to section "2" and I fill the form with:

@@ -19,8 +19,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
       | student1 | C1 | student |
     # Add the assignment.
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |

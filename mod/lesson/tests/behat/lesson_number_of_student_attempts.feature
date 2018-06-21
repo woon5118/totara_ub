@@ -31,8 +31,7 @@ Feature: In Dashboard, teacher can see the number of student attempts to lessons
     And I add the "Course overview" block
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
 
   Scenario: number of student attempts
     Given I add a "Lesson" to section "1"

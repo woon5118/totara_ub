@@ -39,8 +39,7 @@ Feature: A teacher can delete questions in the question bank
 
   @javascript
   Scenario: Delete a question used in a quiz
-    Given I follow "Course 1"
-    And I turn editing mode on
+    Given I am on "Course 1" course homepage with editing mode on
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name | Test quiz |
     And I add a "True/False" question to the "Test quiz" quiz with:

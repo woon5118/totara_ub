@@ -370,8 +370,7 @@ Feature: We can use calculated grade totals
   Scenario: Natural aggregation with drop lowest
     When I log out
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I set the following settings for grade item "Sub category 1":

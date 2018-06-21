@@ -18,8 +18,7 @@ Feature: Toggle activities visibility from the course page
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Description | Test forum description |
@@ -52,8 +51,7 @@ Feature: Toggle activities visibility from the course page
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "2" and I fill the form with:
       | Forum name | Test forum name |
       | Description | Test forum description |
@@ -79,8 +77,7 @@ Feature: Toggle activities visibility from the course page
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "2" and I fill the form with:
       | Forum name | Test forum name |
       | Description | Test forum description |

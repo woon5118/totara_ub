@@ -43,8 +43,7 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
       | Enrolment key | Test-groupenrolkey1 |
     And I press "Save changes"
 
-    Given I follow "Course 1"
-    And I turn editing mode on
+    Given I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name  | Test forum name        |
       | Description | Test forum description |

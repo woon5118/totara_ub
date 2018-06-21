@@ -27,8 +27,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
       | student1 | G1    |
       | student2 | G1    |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name                   | Test assignment name |
       | Description                       | Submit your PDF file |

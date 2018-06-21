@@ -17,8 +17,7 @@ Feature: Blog posts are always displayed in reverse chronological order
       | teacher1  | C1        | editingteacher  |
       | student1  | C1        | student         |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name  | Course blog forum                               |
       | Description | Single discussion forum description             |
@@ -68,8 +67,7 @@ Feature: Blog posts are always displayed in reverse chronological order
       | Message | Reply to the first post |
     And I press "Post to forum"
     And I wait to be redirected
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Course blog forum"
     #
     # Make sure the order of the blog posts is still reverse chronological.

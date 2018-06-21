@@ -22,8 +22,7 @@ Feature: Test we can manually archive course completion.
   @javascript
   Scenario: Test completion can be archived with manually enrolled courses
     Given I log in as "admin"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Self completion" block
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -56,8 +55,7 @@ Feature: Test we can manually archive course completion.
       | program   | user     |
       | compltest | learner1 |
     And I log in as "admin"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Self completion" block
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -90,8 +88,7 @@ Feature: Test we can manually archive course completion.
   @javascript @totara_reportbuilder
   Scenario: Grades are archived but can be viewed via report builder
     Given I log in as "admin"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Expand all" "link"
     And I set the following fields to these values:
@@ -112,8 +109,7 @@ Feature: Test we can manually archive course completion.
     And I should see "5–35"
     And I should see "0–35"
 
-    When I follow "Grader report"
-    And I turn editing mode on
+    When I am on "Grader report" course homepage with editing mode on
     And I give the grade "0" to the user "Learner One" for the grade item "Course total"
     And I give the grade "10" to the user "Learner Two" for the grade item "Course total"
     And I give the grade "20" to the user "Learner Three" for the grade item "Course total"

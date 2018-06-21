@@ -19,8 +19,7 @@ Feature: Update a choice activity removing options
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name | Choice name |
       | Description | Choice Description |

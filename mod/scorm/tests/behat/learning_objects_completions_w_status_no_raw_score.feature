@@ -19,8 +19,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
       | student1 | C1     | student        |
 
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "SCORM package" to section "1"
     And I set the following fields to these values:
       | Name           | Multi-sco SCORM package |

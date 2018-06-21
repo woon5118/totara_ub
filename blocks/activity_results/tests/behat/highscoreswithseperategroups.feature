@@ -42,8 +42,7 @@ Feature: The activity results block displays student in separate groups scores
       | student5 | G3 |
       | student6 | G3 |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment |
       | Description | Offline text |

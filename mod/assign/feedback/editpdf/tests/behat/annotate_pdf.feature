@@ -29,8 +29,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I am on site homepage
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Submit your PDF file |
@@ -104,8 +103,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
       | G1       | G1    |
       | G1       | G2    |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Submit your PDF file |

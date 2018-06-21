@@ -17,8 +17,7 @@ Feature: Course summary block used in a course
       | student1    | C101   | student |
       | teacher1    | C101   | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Course/site summary" block
     And I log out
 

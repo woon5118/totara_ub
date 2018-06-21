@@ -21,8 +21,7 @@ Feature: Enable Block Completion in a course using manual completion by others
 
   Scenario: Add the block to a the course and mark a student complete.
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Course completion status" block
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -54,8 +53,7 @@ Feature: Enable Block Completion in a course using manual completion by others
 
   Scenario: Add the block to a the course and require multiple roles to mark a student complete.
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Course completion status" block
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets

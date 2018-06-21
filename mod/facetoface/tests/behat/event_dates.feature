@@ -17,10 +17,7 @@ Feature: I can add and edit seminar session dates
   @javascript
   Scenario: I can edit a past seminar session
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
@@ -79,10 +76,7 @@ Feature: I can add and edit seminar session dates
   @javascript
   Scenario: I can edit a future seminar session
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
@@ -144,10 +138,7 @@ Feature: I can add and edit seminar session dates
   @javascript
   Scenario: I can edit a past seminar session with a minimum bookings and cutoff
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
@@ -219,10 +210,7 @@ Feature: I can add and edit seminar session dates
   @javascript
   Scenario: I can edit a future seminar session with a minimum bookings and cutoff
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |

@@ -19,8 +19,7 @@ Feature: Students can use block blog menu in a course
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Blog menu" block
     And I log out
 

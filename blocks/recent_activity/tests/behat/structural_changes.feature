@@ -47,8 +47,7 @@ Feature: View structural changes in recent activity block
 
   Scenario: Check that Added module information is displayed respecting view capability
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     When I add a "Forum" to section "1" and I fill the form with:
       | name        | ForumVisibleGroups |
       | Description | No description     |
@@ -143,8 +142,7 @@ Feature: View structural changes in recent activity block
 
   Scenario: Updates and deletes in recent activity block
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | name        | ForumNew       |
       | Description | No description |
@@ -189,8 +187,7 @@ Feature: View structural changes in recent activity block
     And I wait "1" seconds
     # Delete forum as a teacher
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I delete "ForumUpdated" activity
     And I run all adhoc tasks
     And I log out

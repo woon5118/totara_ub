@@ -17,8 +17,7 @@ Feature: In a participation report, admin can filter student actions
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Book" to section "1" and I fill the form with:
       | Name | Test book name |
       | Description | Test book |
@@ -42,8 +41,7 @@ Feature: In a participation report, admin can filter student actions
     And I follow "Test book name"
     And I log out
     When I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Course participation" node in "Course administration > Reports"
     And I set the field "instanceid" to "Test book name"
     And I set the field "roleid" to "Student"
@@ -72,8 +70,7 @@ Feature: In a participation report, admin can filter student actions
     And I follow "Test book name"
     And I log out
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Course participation" node in "Course administration > Reports"
     And I set the field "instanceid" to "Test book name"
     And I set the field "roleid" to "Student"
@@ -87,8 +84,7 @@ Feature: In a participation report, admin can filter student actions
     And I follow "Test book name"
     And I log out
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Course participation" node in "Course administration > Reports"
     And I set the field "instanceid" to "Test book name"
     And I set the field "roleid" to "Student"

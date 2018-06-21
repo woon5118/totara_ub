@@ -26,10 +26,7 @@ Feature: Seminar Signup User Approval
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 9360"
-    And I turn editing mode on
+    And I am on "Course 9360" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Seminar 9360     |
       | approvaloptions   | approval_manager |

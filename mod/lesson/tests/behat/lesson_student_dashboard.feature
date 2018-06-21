@@ -28,8 +28,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I add the "Course overview" block
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
 
   Scenario: A completed lesson with only questions that allows multiple attempts
     Given I follow "Test lesson name"

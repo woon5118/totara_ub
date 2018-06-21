@@ -160,8 +160,7 @@ Feature: View the course overview block on the dashboard and test it's functiona
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Course meta link" "table_row"
-    And I am on site homepage
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I navigate to "Enrolment methods" node in "Users"
     And I add "Course meta link" enrolment method with:
       | Link course | C1 |

@@ -23,8 +23,7 @@ Feature: Backup user data
   @javascript
   Scenario: Delete and restore a quiz with user data
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name        | Quiz 1                |
       | Description | Test quiz description |
@@ -55,8 +54,7 @@ Feature: Backup user data
     And I should see "5.00 out of 10.00"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I delete "Quiz 1" activity
     And I run all adhoc tasks
     And I navigate to "Recycle bin" node in "Course administration"

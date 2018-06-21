@@ -22,10 +22,7 @@ Feature: Sign up to a seminar
       | student1 | C1     | student        |
       | student2 | C1     | student        |
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Label" to section "1" and I fill the form with:
       | Label text | Course view page |
     And I add a "Seminar" to section "1" and I fill the form with:

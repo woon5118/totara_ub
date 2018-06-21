@@ -17,8 +17,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Blog menu" block
     And I add the "Recent blog entries" block
     And I log out
@@ -97,8 +96,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
     And I should see "This is my awesome blog!"
     Then I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I configure the "Recent blog entries" block
     And I set the following fields to these values:
       | id_config_numberofrecentblogentries | 2 |

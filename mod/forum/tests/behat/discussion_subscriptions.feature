@@ -15,9 +15,7 @@ Feature: A user can control their own subscription preferences for a discussion
       | user | course | role |
       | student1 | C1 | student |
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
 
   Scenario: An optional forum can have discussions subscribed to
     Given I add a "Forum" to section "1" and I fill the form with:
@@ -135,8 +133,7 @@ Feature: A user can control their own subscription preferences for a discussion
     And "You are not subscribed to this discussion. Click to subscribe." "link" should exist in the "Test post subject two" "table_row"
     And I log out
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
@@ -181,8 +178,7 @@ Feature: A user can control their own subscription preferences for a discussion
     And "You are not subscribed to this discussion. Click to subscribe." "link" should exist in the "Test post subject two" "table_row"
     And I log out
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:

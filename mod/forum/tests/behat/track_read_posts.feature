@@ -84,8 +84,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
   Scenario: Tracking forum posts forced with user tracking on
     Given the following config values are set as admin:
       | forum_allowforcedreadtracking | 1 |
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Given I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
@@ -107,8 +106,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
   Scenario: Tracking forum posts forced with user tracking off
     Given the following config values are set as admin:
       | forum_allowforcedreadtracking | 1 |
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Given I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
@@ -130,8 +128,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
   Scenario: Tracking forum posts forced (with force disabled) with user tracking on
     Given the following config values are set as admin:
       | forum_allowforcedreadtracking | 1 |
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Given I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
@@ -161,8 +158,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
   Scenario: Tracking forum posts forced (with force disabled) with user tracking off
     Given the following config values are set as admin:
       | forum_allowforcedreadtracking | 1 |
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Given I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
@@ -227,8 +223,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | forum_longpost                | 50|
       | forum_trackreadposts          | 1 |
       | forum_allowforcedreadtracking | 1 |
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Given I add a "Forum" to section "1" and I fill the form with:
       | Forum name    | Test forum name                |
       | Forum type    | Standard forum for general use |

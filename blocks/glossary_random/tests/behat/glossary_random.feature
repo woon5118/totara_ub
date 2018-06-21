@@ -19,8 +19,7 @@ Feature: Random glossary entry block is used in a course
 
   Scenario: Student can not see the block if it is not configured
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Random glossary entry" block
     Then I should see "Please configure this block using the edit icon" in the "block_glossary_random" "block"
     And I log out
@@ -34,8 +33,7 @@ Feature: Random glossary entry block is used in a course
       | activity | name         | intro                     | course | idnumber  | defaultapproval |
       | glossary | GlossaryAuto | Test glossary description | C1     | glossary1 | 1               |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Random glossary entry" block
     And I configure the "block_glossary_random" block
     And I set the following fields to these values:
@@ -80,8 +78,7 @@ Feature: Random glossary entry block is used in a course
       | activity | name           | intro                     | course | idnumber  | defaultapproval |
       | glossary | GlossaryManual | Test glossary description | C1     | glossary2 | 0               |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Random glossary entry" block
     And I configure the "block_glossary_random" block
     And I set the following fields to these values:

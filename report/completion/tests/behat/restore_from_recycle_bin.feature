@@ -47,8 +47,7 @@ Feature: Restore course completion report rpl
 
     # Set course completion via RPL
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration > Reports"
     And I complete the course via rpl for "Student 2" with text "Completed via RPL 1"
 
@@ -58,8 +57,7 @@ Feature: Restore course completion report rpl
     And I press "Continue"
     And I click on "Recycle bin" "link"
     And I click on "Restore" "link" in the "Course 1" "table_row"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration > Reports"
     And I should see "Completed" in the "Student 1" "table_row"
     And I click on "Show RPL" "link" in the "Student 2" "table_row"

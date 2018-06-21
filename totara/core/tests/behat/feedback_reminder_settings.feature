@@ -11,8 +11,7 @@ Feature: Settings for feedback reminders are displayed as expected
       | Course One | course1   | 1                |
     And I log in as "admin"
     And I click on "Courses" in the totara menu
-    And I follow "Course One"
-    And I turn editing mode on
+    And I am on "Course One" course homepage with editing mode on
     And I add a "Feedback" to section "1" and I fill the form with:
       | Name                | Feedback1             |
       | Description         | Feedback1 description |

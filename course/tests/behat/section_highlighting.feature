@@ -18,8 +18,7 @@ Feature: Topic's course sections highlighting
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     When I turn section "1" highlighting on
     Then section "1" should be highlighted
     And I turn section "2" highlighting on

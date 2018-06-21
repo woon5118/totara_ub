@@ -19,8 +19,7 @@ Feature: Scorm multi-sco review mode.
   @javascript
   Scenario: Test review mode with a single sco completion.
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
@@ -57,8 +56,7 @@ Feature: Scorm multi-sco review mode.
   @javascript
   Scenario: Test review mode with all scos completed.
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Enable completion tracking | Yes |

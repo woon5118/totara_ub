@@ -17,8 +17,7 @@ Feature: HTML blocks in a course
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
     And I set the field "Content" to "First block content"

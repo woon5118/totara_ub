@@ -19,10 +19,7 @@ Feature: Take attendance for a seminar with multiple sessions
 
     # Create the seminar.
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
-    And I follow "course1"
-    And I turn editing mode on
+    And I am on "course1" course homepage with editing mode on
     And I add the "Course completion status" block
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                    | seminar1                                          |

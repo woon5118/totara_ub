@@ -9,9 +9,7 @@ Feature: In a report, admin can filter log data by action
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     # Create Action.
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment 1 |

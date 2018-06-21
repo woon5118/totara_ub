@@ -60,10 +60,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
 
   # Create a wait-list, add users to it and change session dates that result in conflict.
   Scenario: change wait-list to session dates with booking conflicts
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    Given I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
@@ -116,10 +113,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
 
   # Create an event, add users to it and change session dates that result in conflict.
   Scenario: change event dates that result in booking conflicts
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    Given I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
@@ -183,10 +177,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
 
   # Create a seminar and an event with the same day than seminar1 and check it's saved because there are not booking conflicts.
   Scenario: seminar with same dates can be created if they don't lead to booking conflicts
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    Given I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
@@ -213,10 +204,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
 
   # Modify an event to have the same dates than seminar1 and check it's saved because there are not booking conflicts.
   Scenario: seminar events can be modified to have same dates as others if they don't lead to booking conflicts
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    Given I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |

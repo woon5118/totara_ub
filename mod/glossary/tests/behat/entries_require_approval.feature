@@ -19,8 +19,7 @@ Feature: A teacher can choose whether glossary entries require approval
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     Given I add a "Glossary" to section "1" and I fill the form with:
       | Name | Test glossary name |
       | Description | Test glossary entries require approval |

@@ -21,15 +21,13 @@ Feature: The online users block allow you to see who is currently online
 
   Scenario: Add the online users on course page and see myself
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     When I add the "Online users" block
     Then I should see "Teacher 1" in the "Online users" "block"
 
   Scenario: Add the online users on course page and see other logged in users
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Online users" block
     And I log out
     And I log in as "student2"

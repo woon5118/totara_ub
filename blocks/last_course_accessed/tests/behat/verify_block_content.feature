@@ -51,10 +51,7 @@ Feature: Verify the LCA block content displays the correct information.
     Given I log in as "admin"
 
     # Create an activity on course 2 so we use RPL completion.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
-    And I turn editing mode on
+    And I am on "Course 2" course homepage with editing mode on
     And I add a "Page" to section "1" and I fill the form with:
       | Name                | Test Page                               |
       | Description         | -                                       |
@@ -111,10 +108,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     Given I log in as "admin"
     # Create activities on course 2.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
-    And I turn editing mode on
+    And I am on "Course 2" course homepage with editing mode on
     And I add a "Page" to section "1" and I fill the form with:
       | Name                | Test Page                               |
       | Description         | -                                       |

@@ -27,10 +27,7 @@ Feature: Add a seminar with select position
   @javascript
   Scenario: Add and configure a seminar activity with a single session and position asked for but not mandated then sign up as user with no pos
     When I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
@@ -76,10 +73,7 @@ Feature: Add a seminar with select position
       | student1 | POS001   |
       | student1 | POS002   |
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
@@ -139,10 +133,7 @@ Feature: Add a seminar with select position
   @javascript
   Scenario: Add and configure a seminar activity with a single session and position asked for and mandated then try to sign up as user with no pos
     When I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
@@ -188,10 +179,7 @@ Feature: Add a seminar with select position
       | student1 | POS001   |
       | student1 | POS002   |
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |

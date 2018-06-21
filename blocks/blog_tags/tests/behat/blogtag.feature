@@ -21,8 +21,7 @@ Feature: Adding blog tag block
       | teacher1 | c1     | editingteacher |
       | student1 | c1     | student        |
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Blog tags" block
     # TODO MDL-57120 site "Blogs" link not accessible without navigation block.
     And I add the "Navigation" block if not present

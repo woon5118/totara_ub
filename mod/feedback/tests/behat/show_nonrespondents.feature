@@ -38,8 +38,7 @@ Feature: Show users who have not responded to the feedback survey
   Scenario: See users who have not responded
     # Set up a feedback.
     When I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Feedback" to section "1" and I fill the form with:
       | Name                | Frogs                                             |
       | Description         | x                                                 |

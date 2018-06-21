@@ -17,8 +17,7 @@ Feature: Allow choice preview
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
 
   Scenario: Enable the choice preview option and view the activity as a student before the opening time
     Given I add a "Choice" to section "1" and I fill the form with:

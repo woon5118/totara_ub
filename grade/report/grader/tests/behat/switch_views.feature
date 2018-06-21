@@ -18,8 +18,7 @@ Feature: We can change what we are viewing on the grader report
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name 1 |
       | Description | Submit your online text |
@@ -56,8 +55,7 @@ Feature: We can change what we are viewing on the grader report
 
   @javascript
   Scenario: View and minimise the grader report containing hidden activities
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I open "Test assignment name 2" actions menu
     And I click on "Hide" "link" in the "Test assignment name 2" activity
     And I follow "Course 1"
@@ -85,8 +83,7 @@ Feature: We can change what we are viewing on the grader report
 
   @javascript
   Scenario: View and minimise the grader report containing hidden activities without the 'moodle/grade:viewhidden' capability
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I open "Test assignment name 2" actions menu
     And I click on "Hide" "link" in the "Test assignment name 2" activity
     And I log out

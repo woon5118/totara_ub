@@ -19,8 +19,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment 1 |
       | Description | Offline text |
@@ -106,8 +105,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
     And I should see "This is my awesome blog!"
     Then I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I follow "Test assignment 1"
     And I configure the "Recent blog entries" block
     And I set the following fields to these values:

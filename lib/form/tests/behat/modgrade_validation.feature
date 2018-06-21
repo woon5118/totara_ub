@@ -32,8 +32,7 @@ Feature: Using the activity grade form element
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
@@ -80,8 +79,7 @@ Feature: Using the activity grade form element
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
@@ -134,8 +132,7 @@ Feature: Using the activity grade form element
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
@@ -160,8 +157,7 @@ Feature: Using the activity grade form element
 
   Scenario: Attempting to change the maximum grade when ratings exist
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
@@ -197,8 +193,7 @@ Feature: Using the activity grade form element
   @javascript
   Scenario: Attempting to change the maximum grade when no rescaling option has been chosen
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |

@@ -25,8 +25,7 @@ Feature: Basic recycle bin functionality
 
   Scenario: Restore a deleted assignment
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assign |
       | Description | Test |
@@ -64,8 +63,7 @@ Feature: Basic recycle bin functionality
   @javascript
   Scenario: Deleting a single item from the recycle bin
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assign |
       | Description | Test |
@@ -84,8 +82,7 @@ Feature: Basic recycle bin functionality
   @javascript
   Scenario: Deleting all the items from the recycle bin
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assign 1 |
       | Description | Test 1 |

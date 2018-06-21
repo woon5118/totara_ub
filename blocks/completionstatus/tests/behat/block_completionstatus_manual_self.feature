@@ -17,8 +17,7 @@ Feature: Enable Block Completion in a course using manual self completion
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Course completion status" block
     And I add the "Self completion" block
     And I navigate to "Course completion" node in "Course administration"

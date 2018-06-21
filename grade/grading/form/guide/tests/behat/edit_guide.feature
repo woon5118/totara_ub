@@ -17,8 +17,7 @@ Feature: Marking guides can be created and edited
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment 1 name      |
       | Description     | Test assignment description |

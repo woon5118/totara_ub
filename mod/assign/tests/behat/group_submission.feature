@@ -27,8 +27,7 @@ Feature: Group assignment submissions
       | name | course | idnumber |
       | Group 1 | C1 | G1 |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
@@ -91,8 +90,7 @@ Feature: Group assignment submissions
       | student1 | G1 |
       | student2 | G1 |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
@@ -177,9 +175,7 @@ Feature: Group assignment submissions
       | GG1      | G1    |
       | GG1      | G2    |
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
@@ -215,8 +211,7 @@ Feature: Group assignment submissions
     And I press "Save changes"
     And I log out
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I should see "3" in the "Groups" "table_row"
     And I should see "3" in the "Submitted" "table_row"

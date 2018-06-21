@@ -312,8 +312,7 @@ Feature: Initials bar
       | activity | course | idnumber | name           | intro                       | assignsubmission_onlinetext_enabled | assignsubmission_file_enabled |
       | assign   | C1     | assign1  | TestAssignment | Test assignment description | 0                                   | 0                             |
     And I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "TestAssignment"
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets

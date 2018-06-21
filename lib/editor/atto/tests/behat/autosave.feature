@@ -19,8 +19,7 @@ Feature: Atto Autosave
     And I set the field "Autosave frequency" to "3"
     And I set the field with xpath "//select[@name='s_editor_atto_autosavefrequency[u]']" to "seconds"
     And I click on "Save changes" "button"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I set the field with xpath "//select[@name='summary_editor[format]']" to "1"
     And I click on "Save and display" "button"

@@ -48,8 +48,7 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I follow "Course 1"
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
