@@ -113,8 +113,17 @@ class course_tile extends learning_item_tile {
         global $CFG;
         $data = parent::get_content_wrapper_template_data($renderer, $settings);
         if (!empty($this->get_course())) {
-            $data['url'] = $CFG->wwwroot.'/course/view.php?id='.$this->get_course()->id;
+            $courseid = $this->get_course()->id;
+            $data['url'] = $CFG->wwwroot.'/course/view.php?id='.$courseid;
+            $data['background_img'] = false;
+
+            // Get course tile image to use it as background.
+            $image = course_get_image($courseid);
+            if ($image) {
+                $data['background_img'] = $image;
+            }
         }
+
         return $data;
     }
 

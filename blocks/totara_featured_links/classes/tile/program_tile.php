@@ -98,6 +98,7 @@ class program_tile extends learning_item_tile {
         $data = parent::get_content_template_data();
         $data['heading'] = $this->get_program()->fullname;
         $data['progress_bar'] = $progressbar;
+
         return $data;
     }
 
@@ -112,7 +113,15 @@ class program_tile extends learning_item_tile {
         global $CFG;
         $data = parent::get_content_wrapper_template_data($renderer, $settings);
         if (!empty($this->get_program())) {
-            $data['url'] = $CFG->wwwroot.'/totara/program/view.php?id='.$this->get_program()->id;
+            $programid = $this->get_program()->id;
+            $data['url'] = $CFG->wwwroot.'/totara/program/view.php?id='.$programid;
+            $data['background_img'] = false;
+
+            // Get program tile image to use it as background.
+            $image = $this->get_program()->get_image($programid);
+            if ($image) {
+                $data['background_img'] = $image;
+            }
         }
         return $data;
     }
