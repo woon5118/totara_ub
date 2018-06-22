@@ -24,12 +24,12 @@ Feature: Javascript template rendering
     # Old style pix
     And "#template_pix_alt img[alt='test case']" "css_element" should exist
     And "#template_pix_alt img[title='test case']" "css_element" should exist
-    And "#template_pix_alt img.smallicon" "css_element" should exist
+    And "#template_pix_alt img.icon" "css_element" should exist
 
     # Old style pix with string
     And "#template_pix_alt_variable img[alt='']" "css_element" should exist
     And "#template_pix_alt_variable img[title='']" "css_element" should exist
-    And "#template_pix_alt_variable img.smallicon" "css_element" should exist
+    And "#template_pix_alt_variable img.icon" "css_element" should exist
 
     # Old style pix with data
     And "#template_pix_alt_json img[alt='']" "css_element" should exist
