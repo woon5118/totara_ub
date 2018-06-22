@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* New function \context->delete_capabilities() correctly handles caching when deleting all of a context's capabilities.
 * Following functions have been deprecated, please use get_roles_used_in_context.
     - get_roles_on_exact_context()
     - get_roles_with_assignment_on_context()
