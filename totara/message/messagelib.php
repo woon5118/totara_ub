@@ -310,7 +310,11 @@ function tm_alert_send($eventdata) {
         $eventdata->contexturl     = '';
         $eventdata->contexturlname = '';
     } else {
-        $eventdata->fullmessagehtml .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('viewdetailshere', 'totara_message', $eventdata->contexturl);
+        $contexturl = $eventdata->contexturl;
+        if ($eventdata->contexturl instanceof moodle_url) {
+            $contexturl = $eventdata->contexturl->out();
+        }
+        $eventdata->fullmessagehtml .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('viewdetailshere', 'totara_message', $contexturl);
     }
 
     $result = tm_message_send($eventdata);
