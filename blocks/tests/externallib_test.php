@@ -45,7 +45,9 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
      * Test get_course_blocks
      */
     public function test_get_course_blocks() {
-        global $DB, $FULLME;
+        global $DB, $PAGE;
+
+        $PAGE->set_url('/test.php');
 
         $this->resetAfterTest(true);
 
@@ -53,6 +55,7 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $studentrole->id);
+
 
         $page = new moodle_page();
         $page->set_context(context_course::instance($course->id));
@@ -70,15 +73,18 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
         $result = external_api::clean_returnvalue(core_block_external::get_course_blocks_returns(), $result);
 
         // Expect the new block.
-        $this->assertCount(1, $result['blocks']);
-        $this->assertEquals($newblock, $result['blocks'][0]['name']);
+        $this->assertGreaterThanOrEqual(1, count($result['blocks']));
+        $blocknames = array_map(function($block) { return $block['name']; }, $result['blocks']);
+        $this->assertContains($newblock, $blocknames);
     }
 
     /**
      * Test get_course_blocks on site home
      */
     public function test_get_course_blocks_site_home() {
-        global $DB, $FULLME;
+        global $PAGE;
+
+        $PAGE->set_url('/test.php');
 
         $this->resetAfterTest(true);
 
@@ -99,15 +105,18 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
         $result = external_api::clean_returnvalue(core_block_external::get_course_blocks_returns(), $result);
 
         // Expect the new block.
-        $this->assertCount(1, $result['blocks']);
-        $this->assertEquals($newblock, $result['blocks'][0]['name']);
+        $this->assertGreaterThanOrEqual(1, count($result['blocks']));
+        $blocknames = array_map(function($block) { return $block['name']; }, $result['blocks']);
+        $this->assertContains($newblock, $blocknames);
     }
 
     /**
      * Test get_course_blocks
      */
     public function test_get_course_blocks_overrides() {
-        global $DB, $CFG, $FULLME;
+        global $DB, $CFG, $PAGE;
+
+        $PAGE->set_url('/test.php');
 
         $this->resetAfterTest(true);
 
@@ -125,8 +134,8 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
         // We need to execute the return values cleaning process to simulate the web service server.
         $result = external_api::clean_returnvalue(core_block_external::get_course_blocks_returns(), $result);
 
-        // Expect 5 default blocks.
-        $this->assertCount(5, $result['blocks']);
+        // TOTARA: We have 7 blocks on the page by default.
+        $this->assertCount(7, $result['blocks']);
 
         $expectedblocks = array('navigation', 'settings', 'participants', 'search_forums', 'course_list',
                                 'calendar_upcoming', 'recent_activity');
