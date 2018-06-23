@@ -4395,3 +4395,41 @@ function course_check_module_updates_since($cm, $from, $fileareas = array(), $fi
 
     return $updates;
 }
+
+/**
+ * Determine the return URL following the creation of a course.
+ *
+ * @param int $courseid ID of the course that was created.
+ * @param int $categoryid ID of the category the course was created in.
+ * @param string $returnto String representing the requested return location.
+ * @param string $returnurl Local URL path requested.
+ *
+ * @return \moodle_url URL to return to.
+ */
+function course_get_return_url($courseid, $categoryid, $returnto=0, $returnurl=''): \moodle_url {
+    global $CFG;
+    if ($returnto === 'url' && confirm_sesskey() && $returnurl) {
+        // If returnto is 'url' then $returnurl may be used as the destination to return to after saving or cancelling.
+        // Sesskey must be specified, and would be set by the form anyway.
+        return new moodle_url($returnurl);
+    }
+
+    switch ($returnto) {
+        case 'category':
+            return new moodle_url($CFG->wwwroot . '/course/index.php', array('categoryid' => $categoryid));
+        case 'catmanage':
+            return new moodle_url($CFG->wwwroot . '/course/management.php', array('categoryid' => $categoryid));
+        case 'topcatmanage':
+            return new moodle_url($CFG->wwwroot . '/course/management.php');
+        case 'topcat':
+            return new moodle_url($CFG->wwwroot . '/course/');
+        case 'pending':
+            return new moodle_url($CFG->wwwroot . '/course/pending.php');
+    }
+
+    if (!empty($courseid)) {
+        return new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $courseid));
+    }
+
+    return new moodle_url($CFG->wwwroot . '/course/');
+}

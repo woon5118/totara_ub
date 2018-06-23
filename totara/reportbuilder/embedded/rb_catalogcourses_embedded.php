@@ -128,8 +128,10 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
         $buttons .= ob_get_contents();
         ob_end_clean();
 
-        if ($categoryid !== false) {
-            $createurl = new moodle_url("/course/edit.php", array('category' => $categoryid));
+        $wm = new \core_course\workflow_manager\coursecreate();
+        $wm->set_params(['category' => $categoryid]);
+        if ($wm->workflows_available()) {
+            $createurl = $wm->get_url();
             $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get');
             $buttons .= $OUTPUT->render($createbutton);
         }

@@ -1705,13 +1705,13 @@ class core_course_renderer extends plugin_renderer_base {
         // Add action buttons
         $output .= $this->container_start('buttons');
         $context = get_category_or_system_context($coursecat->id);
-        if (has_capability('moodle/course:create', $context)) {
-            // Print link to create a new course, for the 1st available category.
-            if ($coursecat->id) {
-                $url = new moodle_url('/course/edit.php', array('category' => $coursecat->id, 'returnto' => 'category'));
-            } else {
-                $url = new moodle_url('/course/edit.php', array('category' => $CFG->defaultrequestcategory, 'returnto' => 'topcat'));
-            }
+
+        $wm = new \core_course\workflow_manager\coursecreate();
+        $params = ['category' => !empty($coursecat->id) ? $coursecat->id : $CFG->defaultrequestcategory];
+        $params['returnto'] = ($coursecat->id) ? 'category' : 'topcat';
+        $wm->set_params($params);
+        if ($wm->workflows_available()) {
+            $url = $wm->get_url();
             $output .= $this->single_button($url, get_string('addnewcourse'), 'get');
         }
         ob_start();
@@ -2054,7 +2054,7 @@ class core_course_renderer extends plugin_renderer_base {
         $chelper->set_attributes(array('class' => 'frontpage-course-list-all'));
         $courses = coursecat::get(0)->get_courses($chelper->get_courses_display_options());
         $totalcount = coursecat::get(0)->get_courses_count($chelper->get_courses_display_options());
-        if (!$totalcount && !$this->page->user_is_editing() && has_capability('moodle/course:create', context_system::instance())) {
+        if (!$totalcount && !$this->page->user_is_editing()) {
             // Print link to create a new course, for the 1st available category.
             return $this->add_new_course_button();
         }
@@ -2069,8 +2069,17 @@ class core_course_renderer extends plugin_renderer_base {
     public function add_new_course_button() {
         global $CFG;
         // Print link to create a new course, for the 1st available category.
+        $wm = new \core_course\workflow_manager\coursecreate();
+        $wm->set_params([
+            'category' => $CFG->defaultrequestcategory,
+            'returnto' => 'topcat',
+        ]);
+        $url = $wm->get_url();
+        if (!$wm->workflows_available()) {
+            return '';
+        }
+
         $output = $this->container_start('buttons');
-        $url = new moodle_url('/course/edit.php', array('category' => $CFG->defaultrequestcategory, 'returnto' => 'topcat'));
         $output .= $this->single_button($url, get_string('addnewcourse'), 'get');
         $output .= $this->container_end('buttons');
         return $output;

@@ -3791,4 +3791,86 @@ class core_course_courselib_testcase extends advanced_testcase {
         );
         $this->assertEquals($CFG->wwwroot . "/pluginfile.php/{$context->id}/course/images/{$course->id}/example.txt", course_get_image($course->id));
     }
+
+    public function course_get_return_url_data_provider() {
+        return [
+            // Requests for a specific url should use it.
+            // This will throw exception due to missing sesskey.
+            [
+                'courseid' => 1,
+                'categoryid' => 3,
+                'returnto' => 'url',
+                'returnurl' => '/some/url/path',
+                'expectedurl' => new \moodle_url('/some/url/path'),
+            ],
+            // Requests to return to a specific category should go there.
+            [
+                'courseid' => 1,
+                'categoryid' => 3,
+                'returnto' => 'category',
+                'returnurl' => 'anything',
+                'expectedurl' => new \moodle_url('/course/index.php', ['categoryid' => 3]),
+            ],
+            // Requests to specific category on management page should go there.
+            [
+                'courseid' => 1,
+                'categoryid' => 2,
+                'returnto' => 'catmanage',
+                'returnurl' => 'anything',
+                'expectedurl' => new \moodle_url('/course/management.php', ['categoryid' => 2]),
+            ],
+            // Requests to top of management page should go there.
+            [
+                'courseid' => 1,
+                'categoryid' => 2,
+                'returnto' => 'topcatmanage',
+                'returnurl' => 'anything',
+                'expectedurl' => new \moodle_url('/course/management.php'),
+            ],
+            // Requests to top category should go to course index.
+            [
+                'courseid' => 1,
+                'categoryid' => 2,
+                'returnto' => 'topcat',
+                'returnurl' => 'anything',
+                'expectedurl' => new \moodle_url('/course/'),
+            ],
+            // Requests for pending courses should go to pending page.
+            [
+                'courseid' => 1,
+                'categoryid' => 2,
+                'returnto' => 'pending',
+                'returnurl' => 'anything',
+                'expectedurl' => new \moodle_url('/course/pending.php'),
+            ],
+            // No specific return but valid courseid should go to course.
+            [
+                'courseid' => 1,
+                'categoryid' => 2,
+                'returnto' => '0',
+                'returnurl' => '',
+                'expectedurl' => new \moodle_url('/course/view.php', ['id' => 1]),
+            ],
+            // No specific return and no valid courseid should go to course index.
+            [
+                'courseid' => 0,
+                'categoryid' => 2,
+                'returnto' => '0',
+                'returnurl' => '',
+                'expectedurl' => new \moodle_url('/course/'),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider course_get_return_url_data_provider
+     */
+    public function test_course_get_return_url(int $courseid, int $categoryid, ?string $returnto, ?string $returnurl, \moodle_url $expectedurl) {
+        if ($returnto == 'url') {
+            // Explicit URL request checks sesskey which we don't have here.
+            $this->expectException('moodle_exception');
+        }
+        $url = course_get_return_url($courseid, $categoryid, $returnto, $returnurl);
+        $this->assertEquals($expectedurl, $url);
+    }
 }
