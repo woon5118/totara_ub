@@ -167,6 +167,9 @@ $defaults['groupmodeforce'] = $courseconfig->groupmodeforce;
 $defaults['visible'] = $courseconfig->visible;
 $defaults['lang'] =  $courseconfig->lang;
 $defaults['enablecompletion'] = $courseconfig->enablecompletion;
+if (!empty($CFG->audiencevisibility)) {
+    $defaults['audiencevisible'] = $courseconfig->visiblelearning; // TOTARA audiencevisible field.
+}
 
 // Course template.
 if (isset($options['templatecourse'])) {

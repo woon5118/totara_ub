@@ -87,12 +87,23 @@ class tool_uploadcourse_step2_form extends tool_uploadcourse_base_form {
         $mform->addElement('select', 'defaults[category]', get_string('coursecategory'), $displaylist);
         $mform->addHelpButton('defaults[category]', 'coursecategory');
 
-        $choices = array();
-        $choices['0'] = get_string('hide');
-        $choices['1'] = get_string('show');
-        $mform->addElement('select', 'defaults[visible]', get_string('visible'), $choices);
-        $mform->addHelpButton('defaults[visible]', 'visible');
-        $mform->setDefault('defaults[visible]', $courseconfig->visible);
+        if (empty($CFG->audiencevisibility)) {
+            $choices = array();
+            $choices['0'] = get_string('hide');
+            $choices['1'] = get_string('show');
+            $mform->addElement('select', 'defaults[visible]', get_string('visible'), $choices);
+            $mform->addHelpButton('defaults[visible]', 'visible');
+            $mform->setDefault('defaults[visible]', $courseconfig->visible);
+        } else {
+            $choices = array(
+                COHORT_VISIBLE_NOUSERS => get_string('visiblenousers', 'totara_cohort'),
+                COHORT_VISIBLE_ENROLLED => get_string('visibleenrolled', 'totara_cohort'),
+                COHORT_VISIBLE_AUDIENCE => get_string('visibleaudience', 'totara_cohort'),
+                COHORT_VISIBLE_ALL => get_string('visibleall', 'totara_cohort'));
+            $mform->addElement('select', 'defaults[audiencevisible]', get_string('audiencevisibility', 'totara_cohort'), $choices);
+            $mform->addHelpButton('defaults[audiencevisible]', 'visiblelearning', 'totara_cohort');
+            $mform->setDefault('defaults[audiencevisible]', get_config('moodlecourse', 'visiblelearning'));
+        }
 
         $mform->addElement('date_selector', 'defaults[startdate]', get_string('startdate'));
         $mform->addHelpButton('defaults[startdate]', 'startdate');

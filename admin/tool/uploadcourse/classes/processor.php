@@ -167,7 +167,11 @@ class tool_uploadcourse_processor {
         }
 
         // TOTARA OVERRIDE - we need completion settings in here.
+        // We also need to set audience visible field which is called visiblelearning in moodlecourse.
         $courseconfig = (array) get_config('moodlecourse');
+        if (!empty($CFG->audiencevisibility)) {
+            $courseconfig['audiencevisible'] = $courseconfig['visiblelearning'];
+        }
         foreach ($defaults as $name => $value) {
             // Override the course defaults with the upload defaults.
             $courseconfig[$name] = $value;
