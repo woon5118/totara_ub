@@ -112,8 +112,15 @@ require_once($CFG->libdir . '/outputcomponents.php');
             'popover' => array(
                 'contenttemplate' => false,
                 'contenttemplatecontext' => false,
-                'title' => $title,
-                'contentraw' => $content
+                'title' => 'my title',
+                'contentraw' => 'Hi there',
+                'arrow_placement' => null,
+                'close_on_focus_out' => true,
+                'placement_max_height' => null,
+                'max_height' => null,
+                'placement_max_width' => null,
+                'max_width' => null,
+                'trigger' => ''
             )
         );
 
