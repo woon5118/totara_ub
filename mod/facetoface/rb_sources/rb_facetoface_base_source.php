@@ -604,6 +604,11 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         if (empty($roomname)) {
             return '';
         }
+
+        if ($row->custom) {
+            $roomname .= get_string("roomcustom", "mod_facetoface");
+        }
+
         return html_writer::link(
             new moodle_url('/mod/facetoface/room.php', array('roomid' => $row->roomid)),
             $roomname
@@ -755,7 +760,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 'dbdatatype' => 'text',
                 'displayfunc' => 'room_name_link',
                 'defaultheading' => get_string('name', 'rb_source_facetoface_rooms'),
-                'extrafields' => array('roomid' => "$join.id")
+                'extrafields' => array('roomid' => "$join.id", 'custom' => "{$join}.custom")
             )
         );
 

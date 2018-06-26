@@ -42,6 +42,28 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
      */
     protected $urlparams = array();
 
+    /**
+     * The default condition that is always appearing in the sql
+     * for the report builder source
+     * @see reportbuilder::build_query
+     * @var string
+     */
+    public $sourcewhere;
+
+    /**
+     * Attribute for setting the default join table for
+     * the report builder source.
+     *
+     * Use string if it is only one join,
+     * or array if it is multiple joins (preferred array)
+     *
+     * The value is the name of the join for report builder.
+     * @example $rb_join->name
+     * @see rb_join::name
+     * @var string | array
+     */
+    public $sourcejoins;
+
     public function __construct(rb_global_restriction_set $globalrestrictionset = null) {
 
         $this->base = '{facetoface_room}';
@@ -53,6 +75,8 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->paramoptions = $this->define_paramoptions();
+        $this->sourcewhere = " ( base.custom = 0 OR assigned.cntdates IS NOT NULL ) ";
+        $this->sourcejoins = array("assigned") ;
         $this->add_customfields();
 
     parent::__construct();
@@ -104,7 +128,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
                 'nosort' => true,
                 'joins' => 'assigned',
                 'capability' => 'totara/core:modconfig',
-                'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
+                'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates', 'custom' => 'base.custom'),
                 'displayfunc' => 'actions',
                 'hidden' => false
             )
@@ -209,10 +233,15 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
             new pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
         );
 
-        $output[] = $OUTPUT->action_icon(
-            new moodle_url('/mod/facetoface/room/edit.php', array('id' => $roomid)),
-            new pix_icon('t/edit', get_string('edit'))
-        );
+        if ($row->custom) {
+            $output[] = $OUTPUT->pix_icon('t/edit', get_string('nocustomroomedit', 'mod_facetoface'), 'moodle', array('class' => 'disabled iconsmall'));
+        }
+        else {
+            $output[] = $OUTPUT->action_icon(
+                new moodle_url('/mod/facetoface/room/edit.php', array('id' => $roomid)),
+                new pix_icon('t/edit', get_string('edit'))
+            );
+        }
 
         if ($row->hidden && $this->embeddedurl) {
             $params = array_merge($this->urlparams, array('show' => $roomid, 'sesskey' => sesskey()));

@@ -57,7 +57,11 @@ class behat_totara_data_generators extends behat_base {
             'global rooms' => array(
                 'datagenerator' => 'global_room_for_behat',
                 'required' => array('name'),
-            )
+            ),
+            'custom rooms' => array(
+                'datagenerator' => 'custom_room_for_behat',
+                'required'      => array('name'),
+            ),
         ),
         'totara_core' => array(
             'custom profile fields' => array(
@@ -247,6 +251,10 @@ class behat_totara_data_generators extends behat_base {
             'report_restrictions' => array(
                 'datagenerator' => 'global_restriction',
                 'required' => array()
+            ),
+            'standard_report' => array(
+                'datagenerator' => 'default_standard_report',
+                'required' => array('fullname', 'shortname', 'source'),
             )
         ),
         'auth_approved' => array(

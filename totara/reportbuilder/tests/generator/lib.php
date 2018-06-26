@@ -295,6 +295,58 @@ class totara_reportbuilder_generator extends component_generator_base {
         $recipient = $DB->get_record('report_builder_schedule_email_systemuser', array('id' => $recipient->id));
         return $recipient;
     }
+
+    /**
+     * First created the report
+     * then injected the default columns
+     * for the report
+     *
+     * @param array $record
+     */
+    public function create_default_standard_report($record) {
+        global $DB;
+        $addon = array(
+            'hidden'            => 0,
+            'accessmode'        => 0,
+            'contentmode'       => 0,
+            'recordsperpage'    => 40,
+            'toolbarsearch'     => 1,
+            'globalrestriction' =>  0,
+            'timemodified'      => time(),
+            'defaultsortorder'  => 4,
+            'embed'             => 0
+        );
+
+        if (!is_array($record)) {
+            $record = (array)$record;
+        }
+        $record = array_merge($record, $addon);
+        $id = $DB->insert_record("report_builder", (object)$record, true);
+
+        $src = reportbuilder::get_source_object($record['source']);
+
+        $so = 1;
+        $columnoptions = $src->columnoptions;
+
+        /** @var rb_column_option $columnoption */
+        foreach ($columnoptions as $columnoption) {
+            $item = array(
+                'reportid'      => $id,
+                'type'          => $columnoption->type,
+                'value'         => $columnoption->value,
+                'heading'       => $columnoption->name,
+                'hidden'        => $columnoption->hidden,
+                'transform'     => $columnoption->transform,
+                'aggregate'     => $columnoption->aggregate,
+                'sortorder'     => $so,
+                'customheading' => 0
+            );
+
+            $DB->insert_record("report_builder_columns", (object)$item);
+            $so+= 1;
+        }
+
+    }
 }
 
 /**
