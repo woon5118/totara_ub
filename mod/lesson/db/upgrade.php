@@ -120,6 +120,27 @@ function xmldb_lesson_upgrade($oldversion) {
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2016120501) {
+
+        // Delete orphaned lesson answer and response files.
+        $sql = "SELECT DISTINCT f.contextid, f.component, f.filearea, f.itemid
+                  FROM {files} f
+             LEFT JOIN {lesson_answers} la ON f.itemid = la.id
+                 WHERE component = :component
+                   AND (filearea = :fileareaanswer OR filearea = :filearearesponse)
+                   AND la.id IS NULL";
+
+        $orphanedfiles = $DB->get_recordset_sql($sql, array('component' => 'mod_lesson', 'fileareaanswer' => 'page_answers',
+            'filearearesponse' => 'page_responses'));
+        $fs = get_file_storage();
+        foreach ($orphanedfiles as $file) {
+            $fs->delete_area_files($file->contextid, $file->component, $file->filearea, $file->itemid);
+        }
+        $orphanedfiles->close();
+
+        upgrade_mod_savepoint(true, 2016120501, 'lesson');
+    }
+
     if ($oldversion < 2016120515) {
         // Define new fields to be added to lesson.
         $table = new xmldb_table('lesson');
@@ -145,27 +166,6 @@ function xmldb_lesson_upgrade($oldversion) {
 
     // Automatically generated Moodle v3.3.0 release upgrade line.
     // Put any upgrade step following this.
-
-    if ($oldversion < 2017051501) {
-
-        // Delete orphaned lesson answer and response files.
-        $sql = "SELECT DISTINCT f.contextid, f.component, f.filearea, f.itemid
-                  FROM {files} f
-             LEFT JOIN {lesson_answers} la ON f.itemid = la.id
-                 WHERE component = :component
-                   AND (filearea = :fileareaanswer OR filearea = :filearearesponse)
-                   AND la.id IS NULL";
-
-        $orphanedfiles = $DB->get_recordset_sql($sql, array('component' => 'mod_lesson', 'fileareaanswer' => 'page_answers',
-            'filearearesponse' => 'page_responses'));
-        $fs = get_file_storage();
-        foreach ($orphanedfiles as $file) {
-            $fs->delete_area_files($file->contextid, $file->component, $file->filearea, $file->itemid);
-        }
-        $orphanedfiles->close();
-
-        upgrade_mod_savepoint(true, 2017051501, 'lesson');
-    }
 
     return true;
 }
