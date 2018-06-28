@@ -5,7 +5,7 @@ These instructions detail the process for upgrading a Moodle site to Totara.
 
 Totara migration requirements:
 
-* Moodle 3.2.8 (Build: 20180319)
+* Moodle 3.3.1 (Build: 20170710)
 * Oracle database is not supported.
 * MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER), full text search must be enabled.
 * all other requirements listed in INSTALL.txt
