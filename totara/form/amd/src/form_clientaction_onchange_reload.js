@@ -98,7 +98,39 @@ define([
                     return;
                 }
                 value = element.getValue();
-                if (typeof this.initialValues[elementid] !== 'undefined' && this.initialValues[elementid] !== value) {
+
+                var equal = (function(initial, newValue) {
+                    if (typeof initial === 'undefined') {
+                        if (typeof newValue === 'undefined' || newValue === '' || (Array.isArray(newValue) && newValue.length === 0)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    var index;
+                    // Array compairison
+                    if (Array.isArray(initial) && Array.isArray(newValue)) {
+                        if (initial.length !== newValue.length) {
+                            return false;
+                        }
+                        for (index = 0; index < newValue.length; index++) {
+                            if (initial[index] !== newValue[index]) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    // traditional string compairson
+                    if (initial === newValue) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })(this.initialValues[elementid], value);
+
+                if (!equal) {
                     this.initialValues[elementid] = value;
 
                     // Check if it is an ignored value. If so we don't reload.
