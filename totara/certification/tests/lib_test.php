@@ -298,6 +298,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletion->timecompleted = 100;
         $certcompletion->timewindowopens = 200;
         $certcompletion->timeexpires = 300;
+        $certcompletion->baselinetimeexpires = 300;
         $progcompletion->timedue = 300;
         $this->assertEquals(array(), certif_get_completion_errors($certcompletion, $progcompletion));
         $this->assertTrue(certif_write_completion($certcompletion, $progcompletion));
@@ -316,6 +317,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletion->timecompleted = 100;
         $certcompletion->timewindowopens = 200;
         $certcompletion->timeexpires = 300;
+        $certcompletion->baselinetimeexpires = 300;
         $progcompletion->timedue = 300;
         $progcompletion->timecompleted = 0;
         $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
@@ -414,6 +416,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletion->timecompleted = 0;
         $certcompletion->timewindowopens = 0;
         $certcompletion->timeexpires = 0;
+        $certcompletion->baselinetimeexpires = 0;
         $this->assertTrue(certif_write_completion($certcompletion, $progcompletion)); // Contains data validation, so we don't need to check it here.
 
         // Indirectly call write_certif_completion, causing the user to be marked certified again.
@@ -2329,6 +2332,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(0, $certcompletion->timecompleted);
         $this->assertEquals(0, $certcompletion->timewindowopens);
         $this->assertEquals(0, $certcompletion->timeexpires);
+        $this->assertEquals(0, $certcompletion->baselinetimeexpires);
         $this->assertGreaterThanOrEqual($timebefore, $certcompletion->timemodified);
         $this->assertLessThanOrEqual($timeafter, $certcompletion->timemodified);
 
@@ -2383,6 +2387,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(0, $newcertcompletion->timecompleted);
         $this->assertEquals(0, $newcertcompletion->timewindowopens);
         $this->assertEquals(0, $newcertcompletion->timeexpires);
+        $this->assertEquals(0, $newcertcompletion->baselinetimeexpires);
         $this->assertGreaterThanOrEqual($timebefore, $newcertcompletion->timemodified);
         $this->assertLessThanOrEqual($timeafter, $newcertcompletion->timemodified);
 
@@ -2416,6 +2421,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals($certcompletion->timecompleted, $newcertcompletion->timecompleted);
         $this->assertEquals($certcompletion->timewindowopens, $newcertcompletion->timewindowopens);
         $this->assertEquals($certcompletion->timeexpires, $newcertcompletion->timeexpires);
+        $this->assertEquals($certcompletion->baselinetimeexpires, $newcertcompletion->baselinetimeexpires);
         $this->assertEquals($certcompletion->timemodified, $newcertcompletion->timemodified);
 
         // Check that the log was created.
@@ -2456,6 +2462,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $certcompletionhistory->timewindowopens = 0;
         $certcompletionhistory->timeexpires = 0;
+        $certcompletionhistory->baselinetimeexpires = 0;
         $certcompletionhistory->timecompleted = 0;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2508,6 +2515,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $certcompletionhistory->timewindowopens = 345;
         $certcompletionhistory->timeexpires = 456;
+        $certcompletionhistory->baselinetimeexpires = 454;
         $certcompletionhistory->timecompleted = 234;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2560,6 +2568,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_DUE;
         $certcompletionhistory->timewindowopens = 345;
         $certcompletionhistory->timeexpires = 456;
+        $certcompletionhistory->baselinetimeexpires = 454;
         $certcompletionhistory->timecompleted = 234;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2612,6 +2621,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $certcompletionhistory->timewindowopens = 345;
         $certcompletionhistory->timeexpires = 456;
+        $certcompletionhistory->baselinetimeexpires = 456;
         $certcompletionhistory->timecompleted = 234;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 0;
@@ -2626,6 +2636,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_EXPIRED;
         $certcompletionhistory->timewindowopens = 0;
         $certcompletionhistory->timeexpires = 0;
+        $certcompletionhistory->baselinetimeexpires = 0;
         $certcompletionhistory->timecompleted = 0;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2697,6 +2708,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $certcompletionhistory->timewindowopens = 0;
         $certcompletionhistory->timeexpires = 0;
+        $certcompletionhistory->baselinetimeexpires = 0;
         $certcompletionhistory->timecompleted = 0;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2755,6 +2767,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $certcompletionhistory->timewindowopens = 345;
         $certcompletionhistory->timeexpires = 456;
+        $certcompletionhistory->baselinetimeexpires = 456;
         $certcompletionhistory->timecompleted = 234;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2814,6 +2827,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_DUE;
         $certcompletionhistory->timewindowopens = 345;
         $certcompletionhistory->timeexpires = 456;
+        $certcompletionhistory->baselinetimeexpires = 456;
         $certcompletionhistory->timecompleted = 234;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2873,6 +2887,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $certcompletionhistory->timewindowopens = 345;
         $certcompletionhistory->timeexpires = 456;
+        $certcompletionhistory->baselinetimeexpires = 456;
         $certcompletionhistory->timecompleted = 234;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 0;
@@ -2887,6 +2902,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_EXPIRED;
         $certcompletionhistory->timewindowopens = 0;
         $certcompletionhistory->timeexpires = 0;
+        $certcompletionhistory->baselinetimeexpires = 0;
         $certcompletionhistory->timecompleted = 0;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -2946,6 +2962,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $certcompletionhistory->timewindowopens = 345;
         $certcompletionhistory->timeexpires = 456;
+        $certcompletionhistory->baselinetimeexpires = 456;
         $certcompletionhistory->timecompleted = 234;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 0;
@@ -2960,6 +2977,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletionhistory->renewalstatus = CERTIFRENEWALSTATUS_EXPIRED;
         $certcompletionhistory->timewindowopens = 0;
         $certcompletionhistory->timeexpires = 0;
+        $certcompletionhistory->baselinetimeexpires = 0;
         $certcompletionhistory->timecompleted = 0;
         $certcompletionhistory->timemodified = 123;
         $certcompletionhistory->unassigned = 1;
@@ -3080,6 +3098,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                     'timecompleted' => 100,
                     'timewindowopens' => 200,
                     'timeexpires' => 300,
+                    'baselinetimeexpires' => 300,
                 ),
                 array(
                     'status' => STATUS_PROGRAM_COMPLETE,
@@ -3095,6 +3114,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                     'timecompleted' => 100,
                     'timewindowopens' => 200,
                     'timeexpires' => 300,
+                    'baselinetimeexpires' => 300,
                 ),
                 array(
                     'status' => STATUS_PROGRAM_COMPLETE,
@@ -3110,6 +3130,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                     'timecompleted' => 100,
                     'timewindowopens' => 200,
                     'timeexpires' => 300,
+                    'baselinetimeexpires' => 300,
                 ),
                 array(
                     'status' => STATUS_PROGRAM_INCOMPLETE,
@@ -3124,6 +3145,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                     'timecompleted' => 100,
                     'timewindowopens' => 200,
                     'timeexpires' => 300,
+                    'baselinetimeexpires' => 300,
                 ),
                 array(
                     'status' => STATUS_PROGRAM_INCOMPLETE,
@@ -3354,6 +3376,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $certcompletion->timecompleted = 100;
         $certcompletion->timewindowopens = 200;
         $certcompletion->timeexpires = 300;
+        $certcompletion->baselinetimeexpires = 300;
         $progcompletion->status = STATUS_PROGRAM_COMPLETE;
         $progcompletion->timecompleted = 100;
         $progcompletion->timedue = 300;
@@ -3935,6 +3958,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $originalcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $originalcompletion->timewindowopens = 1000;
         $originalcompletion->timeexpires = 1500;
+        $originalcompletion->baselinetimeexpires = 1500;
         $originalcompletion->timecompleted = 500;
         $originalcompletion->timemodified = time();
         $DB->insert_record('certif_completion', $originalcompletion);
@@ -4081,6 +4105,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $originalhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
         $originalhistory->timewindowopens = 1000;
         $originalhistory->timeexpires = 1500;
+        $originalhistory->baselinetimeexpires = 1500;
         $originalhistory->timecompleted = 500;
         $originalhistory->timemodified = time();
         $originalhistory->unassigned = 0;

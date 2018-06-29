@@ -1178,6 +1178,7 @@ function import_certification($importname, $importtime) {
                     cc.renewalstatus AS currentrenewalstatus,
                     cc.timewindowopens AS currenttimewindowopens,
                     cc.timeexpires AS currenttimeexpires,
+                    cc.baselinetimeexpires AS currentbaselinetimeexpires,
                     cc.timecompleted AS currenttimecompleted,
                     pc.id AS pcid,
                     pc.status AS currentprogstatus,
@@ -1264,9 +1265,12 @@ function import_certification($importname, $importtime) {
         // Calculate completion times.
         $timecompleted = $recordtoprocess->importcompletiondate;
         $importtimedue = totara_date_parse_from_format($csvdateformat, $recordtoprocess->importduedate);
-        $base = get_certiftimebase($recordtoprocess->recertifydatetype, $recordtoprocess->currenttimeexpires, $timecompleted, $importtimedue,
+        //TL-17804: Use baselinetimeexpires instead of timeexpires so we don't get unexpected shifts in recertification
+        //windows when granting extensions
+        $base = get_certiftimebase($recordtoprocess->recertifydatetype, $recordtoprocess->currentbaselinetimeexpires, $timecompleted, $importtimedue,
             $recordtoprocess->activeperiod, $recordtoprocess->minimumactiveperiod, $recordtoprocess->windowperiod);
         $certcompletion->timeexpires = get_timeexpires($base, $recordtoprocess->activeperiod);
+        $certcompletion->baselinetimeexpires = $certcompletion->timeexpires;
         $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $recordtoprocess->windowperiod);
         $certcompletion->timecompleted = $timecompleted;
         $progcompletion->timedue = $certcompletion->timeexpires;
@@ -1315,6 +1319,7 @@ function import_certification($importname, $importtime) {
             $currentcertcompletion->timecompleted = $recordtoprocess->currenttimecompleted;
             $currentcertcompletion->timewindowopens = $recordtoprocess->currenttimewindowopens;
             $currentcertcompletion->timeexpires = $recordtoprocess->currenttimeexpires;
+            $currentcertcompletion->baselinetimeexpires = $recordtoprocess->currentbaselinetimeexpires;
             $currentprogcompletion = new stdClass();
             $currentprogcompletion->status = $recordtoprocess->currentprogstatus;
             $currentprogcompletion->timecompleted = $recordtoprocess->currentprogtimecompleted;
@@ -1329,6 +1334,7 @@ function import_certification($importname, $importtime) {
                 $base = get_certiftimebase($recordtoprocess->recertifydatetype, 0, $timecompleted, $importtimedue,
                     $recordtoprocess->activeperiod, $recordtoprocess->minimumactiveperiod, $recordtoprocess->windowperiod);
                 $certcompletion->timeexpires = get_timeexpires($base, $recordtoprocess->activeperiod);
+                $certcompletion->baselinetimeexpires = $certcompletion->timeexpires;
                 $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $recordtoprocess->windowperiod);
                 $progcompletion->timedue = $certcompletion->timeexpires;
 
@@ -1431,6 +1437,7 @@ function import_certification($importname, $importtime) {
                 $certcompletionhistory->renewalstatus = $recordtoprocess->currentrenewalstatus;
                 $certcompletionhistory->timemodified = $importtime;
                 $certcompletionhistory->timeexpires = $recordtoprocess->currenttimeexpires;
+                $certcompletionhistory->baselinetimeexpires = $recordtoprocess->currentbaselinetimeexpires;
                 $certcompletionhistory->timewindowopens = $recordtoprocess->currenttimewindowopens;
                 $certcompletionhistory->timecompleted = $recordtoprocess->currenttimecompleted;
                 $certcompletionhistory->unassigned = 0;
@@ -1451,6 +1458,7 @@ function import_certification($importname, $importtime) {
                 $base = get_certiftimebase($recordtoprocess->recertifydatetype, 0, $timecompleted, $importtimedue,
                     $recordtoprocess->activeperiod, $recordtoprocess->minimumactiveperiod, $recordtoprocess->windowperiod);
                 $certcompletion->timeexpires = get_timeexpires($base, $recordtoprocess->activeperiod);
+                $certcompletion->baselinetimeexpires = $certcompletion->timeexpires;
                 $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $recordtoprocess->windowperiod);
                 $progcompletion->timedue = $certcompletion->timeexpires;
                 $matchinghistoryid = $DB->get_field('certif_completion_history', 'id',
@@ -1493,6 +1501,7 @@ function import_certification($importname, $importtime) {
                 $certcompletionhistory->renewalstatus = $recordtoprocess->currentrenewalstatus;
                 $certcompletionhistory->timemodified = $importtime;
                 $certcompletionhistory->timeexpires = $recordtoprocess->currenttimeexpires;
+                $certcompletionhistory->baselinetimeexpires = $recordtoprocess->currentbaselinetimeexpires;
                 $certcompletionhistory->timewindowopens = $recordtoprocess->currenttimewindowopens;
                 $certcompletionhistory->timecompleted = $recordtoprocess->currenttimecompleted;
                 $certcompletionhistory->unassigned = 0;

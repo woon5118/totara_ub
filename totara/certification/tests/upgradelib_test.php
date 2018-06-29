@@ -107,6 +107,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $certcompletion->timecompleted = $now - DAYSECS * 10;
         $certcompletion->timewindowopens = $now + DAYSECS * 10;
         $certcompletion->timeexpires = $now + DAYSECS * 20;
+        $certcompletion->baselinetimeexpires = $certcompletion->timeexpires;
         $progcompletion->status = STATUS_PROGRAM_COMPLETE;
         $progcompletion->timecompleted = $now - DAYSECS * 10;
         $progcompletion->timedue = $now + DAYSECS * 20;
@@ -279,6 +280,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $certcompletion->timecompleted = 1100;
         $certcompletion->timewindowopens = 1200;
         $certcompletion->timeexpires = 1300;
+        $certcompletion->baselinetimeexpires = 1300;
         $progcompletion->timedue = 1300;
         $progcompletion->timecompleted = 1100;
         $progcompletion->status = STATUS_PROGRAM_COMPLETE;
@@ -293,6 +295,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $certcompletion->timecompleted = 1100;
         $certcompletion->timewindowopens = 1200;
         $certcompletion->timeexpires = 1300;
+        $certcompletion->baselinetimeexpires = 1300;
         $progcompletion->timedue = 1300;
         $progcompletion->timecompleted = 0;
         $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
@@ -307,6 +310,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $certcompletion->timecompleted = 0;
         $certcompletion->timewindowopens = 0;
         $certcompletion->timeexpires = 0;
+        $certcompletion->baselinetimeexpires = 0;
         $progcompletion->timedue = 1300;
         $progcompletion->timecompleted = 0;
         $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
@@ -321,6 +325,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $certcompletion->timecompleted = 9100;
         $certcompletion->timewindowopens = 9200;
         $certcompletion->timeexpires = 9300;
+        $certcompletion->baselinetimeexpires = 9300;
         $progcompletion->timedue = 9300;
         $progcompletion->timecompleted = 9100;
         $progcompletion->status = STATUS_PROGRAM_COMPLETE;
@@ -335,6 +340,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $certcompletion->timecompleted = 9100;
         $certcompletion->timewindowopens = 9200;
         $certcompletion->timeexpires = 9300;
+        $certcompletion->baselinetimeexpires = 9300;
         $progcompletion->timedue = 9300;
         $progcompletion->timecompleted = 0;
         $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
@@ -349,6 +355,7 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $certcompletion->timecompleted = 0;
         $certcompletion->timewindowopens = 0;
         $certcompletion->timeexpires = 0;
+        $certcompletion->baselinetimeexpires = 0;
         $progcompletion->timedue = 9300;
         $progcompletion->timecompleted = 0;
         $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;

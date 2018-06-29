@@ -58,5 +58,32 @@ function xmldb_totara_certification_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017121100, 'totara', 'certification');
     }
 
+    if ($oldversion < 2018112000) {
+        $table = new xmldb_table('certif_completion');
+        $field = new xmldb_field('baselinetimeexpires', XMLDB_TYPE_INTEGER, '10', null, false, null);
+
+        // Create new field for default expiry in the completion table.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            $sql = 'UPDATE {certif_completion} SET baselinetimeexpires = timeexpires WHERE timeexpires IS NOT NULL';
+            $DB->execute($sql);
+        }
+
+        $table = new xmldb_table('certif_completion_history');
+        $field = new xmldb_field('baselinetimeexpires', XMLDB_TYPE_INTEGER, '10', null, false, null);
+
+        // Create new field for default expiry in the completion history table.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            $sql = 'UPDATE {certif_completion_history} SET baselinetimeexpires = timeexpires WHERE timeexpires IS NOT NULL';
+            $DB->execute($sql);
+        }
+
+        // Savepoint reached
+        upgrade_plugin_savepoint(true, 2018112000, 'totara', 'certification');
+    }
+
     return true;
 }

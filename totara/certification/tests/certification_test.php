@@ -283,6 +283,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
             }
             if ($record->timeexpires > 0) {
                 $record->timeexpires = strtotime("-335 day", $record->timeexpires);
+                $record->baselinetimeexpires = $record->timeexpires;
             }
             if ($record->timecompleted > 0) {
                 $record->timecompleted = strtotime("-335 day", $record->timecompleted);
@@ -387,6 +388,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
             }
             if ($record->timeexpires > 0) {
                 $record->timeexpires = strtotime("-335 day", $record->timeexpires);
+                $record->baselinetimeexpires = $record->timeexpires;
             }
             if ($record->timecompleted > 0) {
                 $record->timecompleted = strtotime("-335 day", $record->timecompleted);
@@ -540,6 +542,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 $this->assertEquals(CERTIFSTATUS_ASSIGNED, $certifcompletion->status); // Status assigned.
                 $this->assertEquals(CERTIFRENEWALSTATUS_NOTDUE, $certifcompletion->renewalstatus); // Not due for renewal.
                 $this->assertEquals(0, $certifcompletion->timeexpires); // No expiry.
+                $this->assertEquals(0, $certifcompletion->baselinetimeexpires); // No expiry.
                 $this->assertEquals(0, $certifcompletion->timewindowopens); // No window.
                 $this->assertEquals(0, $certifcompletion->timecompleted); // Not completed.
                 // When record was created.
@@ -650,6 +653,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_RECERT, $certifcompletion->certifpath); // Recertification path.
                     $this->assertEquals(CERTIFSTATUS_COMPLETED, $certifcompletion->status); // Status completed.
                     $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->timeexpires));
+                    $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->baselinetimeexpires));
                     $this->assertEquals(userdate($timewindowopens), userdate($certifcompletion->timewindowopens));
                     $this->assertEquals(userdate($this->firstcompletiontime), userdate($certifcompletion->timecompleted)); // Completed.
                     // When record was modified.
@@ -659,6 +663,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_CERT, $certifcompletion->certifpath); // Primary certification path.
                     $this->assertEquals(CERTIFSTATUS_ASSIGNED, $certifcompletion->status); // Status assigned.
                     $this->assertEquals(0, $certifcompletion->timeexpires); // No expiry.
+                    $this->assertEquals(0, $certifcompletion->baselinetimeexpires); // No expiry.
                     $this->assertEquals(0, $certifcompletion->timewindowopens); // No window.
                     $this->assertEquals(0, $certifcompletion->timecompleted); // Not completed.
                     // When record was created.
@@ -767,6 +772,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_RECERT, $certifcompletion->certifpath); // Recertification path.
                     $this->assertEquals(CERTIFSTATUS_COMPLETED, $certifcompletion->status); // Status completed.
                     $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->timeexpires));
+                    $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->baselinetimeexpires));
                     $this->assertEquals(userdate($timewindowopens), userdate($certifcompletion->timewindowopens));
                     $this->assertEquals(userdate($this->firstcompletiontime), userdate($certifcompletion->timecompleted)); // Completed.
                     // When record was modified.
@@ -777,6 +783,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_CERT, $certifcompletion->certifpath); // Primary certification path.
                     $this->assertEquals(CERTIFSTATUS_ASSIGNED, $certifcompletion->status); // Status assigned.
                     $this->assertEquals(0, $certifcompletion->timeexpires); // No expiry.
+                    $this->assertEquals(0, $certifcompletion->baselinetimeexpires); // No expiry.
                     $this->assertEquals(0, $certifcompletion->timewindowopens); // No window.
                     $this->assertEquals(0, $certifcompletion->timecompleted); // Not completed.
                     // When record was created.
@@ -917,6 +924,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_RECERT, $certifcompletion->certifpath); // Recertification path.
                     $this->assertEquals(CERTIFSTATUS_COMPLETED, $certifcompletion->status); // Status completed.
                     $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->timeexpires));
+                    $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->baselinetimeexpires));
                     $this->assertEquals(userdate($timewindowopens), userdate($certifcompletion->timewindowopens));
                     $this->assertEquals(userdate($this->secondcompletiontime), userdate($certifcompletion->timecompleted)); // Completed.
                     // When record was modified.
@@ -927,6 +935,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_RECERT, $certifcompletion->certifpath); // Recertification path.
                     $this->assertEquals(CERTIFSTATUS_COMPLETED, $certifcompletion->status); // Status completed.
                     $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->timeexpires));
+                    $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->baselinetimeexpires));
                     $this->assertEquals(userdate($timewindowopens), userdate($certifcompletion->timewindowopens));
                     $this->assertEquals(userdate($this->firstcompletiontime), userdate($certifcompletion->timecompleted)); // Completed.
                     // When record was modified.
@@ -937,6 +946,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_CERT, $certifcompletion->certifpath); // Primary certification path.
                     $this->assertEquals(CERTIFSTATUS_ASSIGNED, $certifcompletion->status); // Status assigned.
                     $this->assertEquals(0, $certifcompletion->timeexpires); // No expiry.
+                    $this->assertEquals(0, $certifcompletion->baselinetimeexpires); // No expiry.
                     $this->assertEquals(0, $certifcompletion->timewindowopens); // No window.
                     $this->assertEquals(0, $certifcompletion->timecompleted); // Not completed.
                     // When record was created.
@@ -1075,6 +1085,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_RECERT, $certifcompletion->certifpath); // Recertification path.
                     $this->assertEquals(CERTIFSTATUS_COMPLETED, $certifcompletion->status); // Status completed.
                     $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->timeexpires));
+                    $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->baselinetimeexpires));
                     $this->assertEquals(userdate($timewindowopens), userdate($certifcompletion->timewindowopens));
                     $this->assertEquals(userdate($this->secondcompletiontime), userdate($certifcompletion->timecompleted)); // Completed.
                     // When record was modified.
@@ -1091,6 +1102,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     }
                     $this->assertEquals(CERTIFPATH_CERT, $certifcompletion->certifpath); // Back to primary certification path.
                     $this->assertEquals(0, $certifcompletion->timeexpires); // No expiry.
+                    $this->assertEquals(0, $certifcompletion->baselinetimeexpires); // No expiry.
                     $this->assertEquals(0, $certifcompletion->timewindowopens); // No window.
                     $this->assertEquals(0, $certifcompletion->timecompleted); // Not completed.
                     // When record was created.
@@ -1248,6 +1260,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_RECERT, $certifcompletion->certifpath); // Recertification path.
                     $this->assertEquals(CERTIFSTATUS_COMPLETED, $certifcompletion->status); // Status completed.
                     $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->timeexpires));
+                    $this->assertEquals(userdate($timeexpires), userdate($certifcompletion->baselinetimeexpires));
                     $this->assertEquals(userdate($timewindowopens), userdate($certifcompletion->timewindowopens));
                     $this->assertEquals(userdate($this->thirdcompletiontime), userdate($certifcompletion->timecompleted)); // Completed.
                     // When record was modified.
@@ -1259,6 +1272,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals(CERTIFPATH_CERT, $certifcompletion->certifpath); // Back to primary certification path.
                     $this->assertEquals(CERTIFSTATUS_ASSIGNED, $certifcompletion->status); // Status assigned, as if newly assigned.
                     $this->assertEquals(0, $certifcompletion->timeexpires); // No expiry.
+                    $this->assertEquals(0, $certifcompletion->baselinetimeexpires); // No expiry.
                     $this->assertEquals(0, $certifcompletion->timewindowopens); // No window.
                     $this->assertEquals(0, $certifcompletion->timecompleted); // Not completed.
                     // When record was created.
