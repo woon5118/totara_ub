@@ -70,10 +70,15 @@ $CFG->dboptions = array(
 //    $CFG->dboptions['dbcollation'] = 'utf8mb4_unicode_ci';
 
 
-// Totara full text search supports one language only, you need to configure
+//=========================================================================
+// 1b. FULL TEXT SEARCH
+//=========================================================================
+
+// Totara Full Text Search supports one language only, you need to configure
 // it here before installation or upgrade to Totara 12 otherwise the default
 // value will be used. If you change it later you need to run following CLI script
-// to rebuild all full text search indexes: admin/cli/rebuild_full_text_search_indexes.php
+// to rebuild all full text search indexes: admin/cli/fts_rebuild_indexes.php
+// It is recommended that the language selected here is compatible with $CFG->lang.
 //
 // PostgreSQL is using 'english' configuration for full text search by default,
 // for list of available options see result of "SELECT cfgname FROM pg_ts_config;". For example:
@@ -81,16 +86,32 @@ $CFG->dboptions = array(
 //    $CFG->dboptions['ftslanguage'] = 'simple';
 //    $CFG->dboptions['ftslanguage'] = 'german';
 //
-// MS SQL Server is using 'English' language by default, list of options is at
-// https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-fulltext-languages-transact-sql?view=sql-server-2017
-//    $CFG->dboptions['ftslanguage'] = 'English';
-//    $CFG->dboptions['ftslanguage'] = 'German';
+// NOTE: PostgreSQL does not support Japanese and other languages with very short
+//       words without spaces in between, enable the following setting to get
+//       a basic experimental support of these languages.
+//       If the value changes then you need to run: admin/cli/fts_repopulate_tables.php
+//    $CFG->dboptions['fts3bworkaround'] = true;
 //
 // MySQL is using case and accent insensitive collation for full text search by default,
 // you can specify a different collation here, for example:
 //    $CFG->dboptions['ftslanguage'] = 'utf8_unicode_ci';
 //    $CFG->dboptions['ftslanguage'] = 'utf8mb4_0900_as_ci';
 //    $CFG->dboptions['ftslanguage'] = 'utf8mb4_de_pb_0900_ai_ci';
+//
+// NOTE: MySQL does not support Japanese and other languages with very short
+//       words without spaces in between, enable the following setting to get
+//       a basic experimental support of these languages.
+//       If the value changes then you need to run: admin/cli/fts_repopulate_tables.php
+//    $CFG->dboptions['fts3bworkaround'] = true;
+//
+// MS SQL Server is using 'English' language by default, list of options is at
+// https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-fulltext-languages-transact-sql?view=sql-server-2017
+//    $CFG->dboptions['ftslanguage'] = 'English';
+//    $CFG->dboptions['ftslanguage'] = 'German';
+//    $CFG->dboptions['ftslanguage'] = 'Japanese';
+//    $CFG->dboptions['ftslanguage'] = 1028; // Traditional Chinese
+//    $CFG->dboptions['ftslanguage'] = 2052; // Simplified Chinese
+//
 
 
 //=========================================================================

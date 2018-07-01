@@ -257,7 +257,7 @@ abstract class moodle_database {
     /**
      * Returns the language used for full text search.
      *
-     * NOTE: admin must run admin/cli/rebuild_full_text_search_indexes.php after change of lang!
+     * NOTE: admin must run admin/cli/fts_rebuild_indexes.php after change of lang!
      *
      * @since Totara 12
      *
@@ -268,6 +268,26 @@ abstract class moodle_database {
             return $this->dboptions['ftslanguage'];
         }
         return 'English';
+    }
+
+    /**
+     * Is the workaround for Japanese, Chinese and similar languages
+     * with very short words without spaces in between enabled?
+     *
+     * This is intended for MySQL and PostgreSQL only because
+     * MS SQL Server has better language support in full text search.
+     *
+     * NOTE: admin must run admin/cli/fts_repopulate_tables.php after change of this setting!
+     *
+     * @since Totara 12
+     *
+     * @return bool
+     */
+    public function get_fts3bworkaround() {
+        if (!empty($this->dboptions['fts3bworkaround'])) {
+            return (bool)$this->dboptions['fts3bworkaround'];
+        }
+        return false;
     }
 
     /**
@@ -2645,6 +2665,188 @@ abstract class moodle_database {
             $rv .= " INTERSECT (".$selects[$i].')';
         }
         return $rv;
+    }
+
+    /**
+     * This is a nasty hack that tries to work around missing support for
+     * Japanese and similar languages with very short words without spaces
+     * in between in PostgreSQL and MySQL.
+     *
+     * @since Totara 12
+     *
+     * @param string|null $text
+     * @return string|null
+     */
+    public function apply_fts_3b_workaround(?string $text) {
+        if (is_null($text)) {
+            return $text;
+        }
+        // It is probably better to use English locale here so that
+        // ICU does not use language dictionaries, the results should be
+        // good enough and we prefer consistency when mixing languages.
+        $i = IntlBreakIterator::createWordInstance('en_AU');
+        $i->setText($text);
+        $words = array();
+        foreach($i->getPartsIterator() as $word) {
+            $bytelength = strlen($word);
+            if ($bytelength <= 2) {
+                // Shortcut, this cannot be Chinese or Japanese word.
+                $words[] = $word;
+                continue;
+            }
+            $charlength = core_text::strlen($word);
+            if ($bytelength === $charlength*3) {
+                // Looks like something in Japanese, Chinese or similar - short words without spaces in between.
+                if ($charlength === 1) {
+                    $code = core_text::utf8ord($word);
+                    if ($code >= 0x3000 and $code <= 0x303f) {
+                        // Japanese punctuation characters - ignore all by replacing with space.
+                        $words[] = ' ';
+                        continue;
+                    }
+                }
+                if ($charlength < 3) {
+                    // Word is too short - pad with some ASCII character
+                    // to make it look like a word from supported language.
+                    $word = $word.'xx';
+                }
+                // Add spaces around to allow databases to recognise this as a word.
+                $words[] = ' '.$word.' ';
+                continue;
+            }
+            $words[] = $word;
+        }
+        $text = implode($words);
+        return $text;
+    }
+
+    /**
+     * Strip text formatting from content before storing
+     * content in full text search table.
+     *
+     * @since Totara 12
+     *
+     * @param string|null $content
+     * @param int $format one of format constants FORMAT_PLAIN, FORMAT_MOODLE, FORMAT_HTML, FORMAT_MARKDOWN
+     * @return string|null
+     */
+    public function unformat_fts_content(?string $content, int $format) {
+        if (is_null($content)) {
+            return null;
+        }
+
+        if ($format == FORMAT_PLAIN) {
+            // Mostly idnumbers, use FORMAT_HTML for titles that support multilang.
+            return $content;
+        }
+
+        if ($format == FORMAT_MARKDOWN) {
+            // This is not accurate, but hopefully enough to get correct search results.
+            $content = str_replace('*', ' ', $content); // No italic or bold.
+            $content = str_replace('_', ' ', $content); // No italic or bold.
+            $content = preg_replace('/^\s*>\s*/m', '', $content); // Remove block quotes.
+        }
+
+        // Convert html to plain text.
+        $content = preg_replace('/<br ?\/?>/i', "\n", $content);
+        $content = strip_tags($content);
+
+        // Non-ascii characters may be encoded in different ways.
+        $content = core_text::entities_to_utf8($content, true);
+
+        // Clean up whitespace a bit to reduce size.
+        $content = preg_replace('/  +/', ' ', $content);
+
+        // Optionally add workarounds for languages with very short words without spaces in between.
+        if ($this->get_fts3bworkaround()) {
+            $content = $this->apply_fts_3b_workaround($content);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Build a natural language search subquery using database specific search functions.
+     *
+     * @since Totara 12
+     *
+     * @param string $table        database table name
+     * @param array  $searchfields ['field_name'=>weight, ...] eg: ['high'=>3, 'medium'=>2, 'low'=>1]
+     * @param string $searchtext   natural language search text
+     * @return array [sql, params[]]
+     */
+    protected function build_fts_subquery(string $table, array $searchfields, string $searchtext): array {
+        throw new coding_exception('Database driver does not support full text search');
+    }
+
+    /**
+     * Get a valid natural language search subquery that should be joined to itself
+     * to get search results, this query returns 'id' and 'score' columns only.
+     *
+     * For latin based languages the search words should be at least 3 characters long,
+     * otherwise they may be ignored. Also note that incomplete words are ignored.
+     * Stop words cannot be configured in Totara, use $CFG->dboptions['ftslanguage'] and
+     * $CFG->dboptions['fts3bworkaround'] to configure the full text search language.
+     *
+     *
+     * How to use this method?
+     *
+     * 1/ First of all create a new search table and populate it with search data
+     *    unformatted using $DB->unformat_fts_content() method.
+     *
+     * 2/ Then obtain the search subquery:
+     *     -  list($ftssql, $params) = $DB->get_fts_subquery('my_search_table', 'Physics', ['fullname' => 1])
+     *     -  list($ftssql, $params) = $DB->get_fts_subquery('my_search_table', 'Physics', ['shortname' => 3, 'fullname' => 2, 'summary' => 1])
+     *
+     * 3/ Finally use the $ftssql as a join table:
+     *
+     *      $sql = "SELECT c.id, c.fullname
+     *                FROM {my_search_table} mst
+     *                JOIN {$ftssql} fts ON fts.id = mst.id
+     *                JOIN {course} c ON c.id = mst.courseid
+     *               WHERE c.visible = 1
+     *            ORDER BY fts.score DESC, c.fullname ASC";
+     *      $results = $DB->get_records_sql($sql, $params);
+     *
+     *
+     * @since Totara 12
+     *
+     * @param string $table        database table name
+     * @param array  $searchfields ['field_name'=>weight, ...] eg: ['high'=>3, 'medium'=>2, 'low'=>1]
+     * @param string $searchtext   natural language search text
+     *
+     * @return array [sql, params[]]
+     */
+    public final function get_fts_subquery(string $table, array $searchfields, string $searchtext): array {
+        // Basic parameter validation to prevent SQL injections,
+        // invalid names of fields and tables will result in exception during query execution.
+        if (!preg_match('/^[a-z_][a-z0-9_]+$/', $table)) {
+            throw new coding_exception('Invalid full text search table name.');
+        }
+        if (empty($searchfields)) {
+            throw new coding_exception('The search fields are empty, at least one full text search field is required.');
+        }
+        foreach ($searchfields as $searchfield => $weight) {
+            if (!preg_match('/^[a-z_][a-z0-9_]+$/', $searchfield)) {
+                throw new coding_exception('Invalid full text search field name.');
+            }
+            if (!is_number($weight) or $weight <= 0) {
+                throw new coding_exception('The weight associated with search field (' . $searchfield . ') must be a positive number.');
+            }
+        }
+
+        if (trim($searchtext) === '') {
+            // Developers must use this method only when searching for something,
+            // so return nothing if search text is missing.
+            debugging('Full text search text is empty, developers should make sure user entered something.', DEBUG_DEVELOPER);
+            return ["(SELECT id, 1 AS score FROM {{$table}} WHERE 1=2)", array()];
+        }
+
+        if ($this->get_fts3bworkaround()) {
+            $searchtext = $this->apply_fts_3b_workaround($searchtext);
+        }
+
+        return $this->build_fts_subquery($table, $searchfields, $searchtext);
     }
 
     /**

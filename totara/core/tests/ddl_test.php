@@ -181,6 +181,8 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $ids[1] = $DB->insert_record($tablename, array('course' => 11, 'high' => 'zlutoucky Konicek')); // 'Green horse' in Czech without accents.
         $ids[2] = $DB->insert_record($tablename, array('course' => 12, 'high' => 'abc def'));
 
+        $this->wait_for_mssql_fts_indexing($tablename);
+
         if ($DB->get_dbfamily() === 'postgres') {
             // By default PostgreSQL is accent sensitive, you nee to create a new config to make accent insensitive searches,
             // see http://rachbelaid.com/postgres-full-text-search-is-good-enough/
@@ -188,24 +190,21 @@ class totara_core_ddl_testcase extends database_driver_testcase {
             $ftslanguage = $DB->get_ftslanguage();
             $sql = "SELECT t.id, t.course
                       FROM {{$tablename}} t
-                     WHERE to_tsvector('$ftslanguage', t.high) @@ to_tsquery(:search)
+                     WHERE to_tsvector('$ftslanguage', t.high) @@ plainto_tsquery(:search)
                   ORDER BY t.id";
             $params = array('search' => 'zLUtoucky');
 
         } else if ($DB->get_dbfamily() === 'mysql') {
             $sql = "SELECT t.id, t.course
                       FROM {{$tablename}} t
-                     WHERE MATCH (t.high) AGAINST (:search IN BOOLEAN MODE)
+                     WHERE MATCH (t.high) AGAINST (:search IN NATURAL LANGUAGE MODE)
                   ORDER BY t.id";
             $params = array('search' => 'zLUtoucky');
 
         } else if ($DB->get_dbfamily() === 'mssql') {
-            // Oh well, MS SQL Server needs time to index the data, we need to wait a few seconds.
-            sleep(10);
-
             $sql = "SELECT t.id, t.course
                       FROM {{$tablename}} t
-                      WHERE CONTAINS(t.high, :search) 
+                      WHERE FREETEXT(t.high, :search) 
                   ORDER BY t.id";
             $params = array('search' => 'zLUtoucky');
         }
@@ -395,7 +394,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
 
         $schema = $this->load_schema(__DIR__ . '/fixtures/xmldb_search_table.xml');
 
-        $result = $dbman->rebuild_full_text_search_indexes($schema);
+        $result = $dbman->fts_rebuild_indexes($schema);
         $this->assertTrue($dbman->index_exists($table, $indexhigh));
         $this->assertTrue($dbman->index_exists($table, $indexlow));
         $this->assertCount(2, $result);
@@ -415,7 +414,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $dbman->drop_index($table, $indexlow);
         $this->assertTrue($dbman->index_exists($table, $indexhigh));
         $this->assertFalse($dbman->index_exists($table, $indexlow));
-        $result = $dbman->rebuild_full_text_search_indexes($schema);
+        $result = $dbman->fts_rebuild_indexes($schema);
         $this->assertTrue($dbman->index_exists($table, $indexhigh));
         $this->assertTrue($dbman->index_exists($table, $indexlow));
         $this->assertCount(2, $result);
@@ -456,5 +455,21 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         }
 
         return $schema;
+    }
+
+    /**
+     * Oh well, MS SQL Server needs time to index the data, we need to wait a few seconds.
+     * @param string $tablename
+     */
+    public function wait_for_mssql_fts_indexing(string $tablename) {
+        $DB = $this->tdb;
+
+        if ($DB->get_dbfamily() !== 'mssql') {
+            return;
+        }
+
+        /** @var sqlsrv_native_moodle_database $DB */
+        $done = $DB->fts_wait_for_indexing($tablename, 10);
+        $this->assertTrue($done);
     }
 }

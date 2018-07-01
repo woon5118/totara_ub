@@ -483,6 +483,8 @@
       </CUSTOM_CHECK>
       <CUSTOM_CHECK file="lib/environmentlib.php" function="check_full_text_search" level="required">
       </CUSTOM_CHECK>
+      <CUSTOM_CHECK file="lib/environmentlib.php" function="check_icu_version" level="optional">
+      </CUSTOM_CHECK>
     </CUSTOM_CHECKS>
   </TOTARA>
 </COMPATIBILITY_MATRIX>

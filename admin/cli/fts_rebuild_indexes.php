@@ -50,14 +50,14 @@ Options:
 --execute             Rebuild all full text search indexes
 
 Example:
-\$sudo -u www-data /usr/bin/php admin/cli/rebuild_full_text_search_indexes.php --execute
+\$sudo -u www-data /usr/bin/php admin/cli/fts_rebuild_indexes.php --execute
 ";
 
     echo $help;
-    if (!$options['execute']) {
-        exit(1);
+    if ($options['help']) {
+        exit(0);
     }
-    exit(0);
+    exit(1);
 }
 
 if (empty($CFG->version)) {
@@ -74,7 +74,7 @@ $dbmanager = $DB->get_manager();
 $schema = $dbmanager->get_install_xml_schema();
 
 $errorfound = false;
-$result = $dbmanager->rebuild_full_text_search_indexes($schema);
+$result = $dbmanager->fts_rebuild_indexes($schema);
 
 foreach ($result as $r) {
     cli_separator();
@@ -86,7 +86,7 @@ foreach ($result as $r) {
         cli_writeln('error');
         cli_writeln('');
         cli_writeln('  error: ' . $r->error);
-        cli_writeln('  debuginfo: ' . $r->debuginfor);
+        cli_writeln('  debuginfo: ' . $r->debuginfo);
     }
 }
 cli_separator();

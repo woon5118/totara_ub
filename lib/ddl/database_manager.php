@@ -1138,7 +1138,7 @@ class database_manager {
      * @param xmldb_structure $schema
      * @return array list of processed full text search indexes.
      */
-    public function rebuild_full_text_search_indexes(xmldb_structure $schema) {
+    public function fts_rebuild_indexes(xmldb_structure $schema) {
         global $DB;
         $dbman = $DB->get_manager();
 

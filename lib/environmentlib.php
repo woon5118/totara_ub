@@ -1697,3 +1697,22 @@ function check_full_text_search(environment_results $result) {
     $result->setStatus(true);
     return $result;
 }
+
+/**
+ * Totara: This function verifies that the ICU library is new enough,
+ * otherwise the word boundary detection may not work properly for Japanese and Chinese.
+ *
+ * @param environment_results $result
+ * @return environment_results|null updated results object, or null
+ */
+function check_icu_version(environment_results $result) {
+    $result->setInfo('International Components for Unicode (ICU) - 57.1 or later is recommended');
+
+    if (!defined('INTL_ICU_VERSION') or version_compare('57', INTL_ICU_VERSION, '>')) {
+        $result->setStatus(false);
+    } else {
+        $result->setStatus(true);
+    }
+
+    return $result;
+}

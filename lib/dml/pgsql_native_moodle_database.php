@@ -1558,4 +1558,46 @@ class pgsql_native_moodle_database extends moodle_database {
 
         return $recordset;
     }
+
+    /**
+     * Build a natural language search subquery using database specific search functions.
+     *
+     * @since Totara 12
+     *
+     * @param string $table        database table name
+     * @param array  $searchfields ['field_name'=>weight, ...] eg: ['high'=>3, 'medium'=>2, 'low'=>1]
+     * @param string $searchtext   natural language search text
+     * @return array [sql, params[]]
+     */
+    protected function build_fts_subquery(string $table, array $searchfields, string $searchtext): array {
+        $language = $this->get_ftslanguage();
+        $paramname = $this->get_unique_param('fts');
+
+        if (preg_match('/^\s*"[^"]+"\s*$/', $searchtext)) {
+            // One exact phrase search.
+            $searchtext = trim($searchtext);
+            $searchtext = trim($searchtext, '"');
+            $serverinfo = $this->get_server_info();
+            if (version_compare($serverinfo['version'], '9.6', '<')) {
+                // Old PostgreSQL version, bad luck, the results will be less accurate.
+                $q = "plainto_tsquery('{$language}',:{$paramname})";
+            } else {
+                $q = "phraseto_tsquery('{$language}',:{$paramname})";
+            }
+        } else {
+            $q = "plainto_tsquery('{$language}',:{$paramname})";
+        }
+
+        $score = array();
+        foreach ($searchfields as $field => $weight) {
+            $score[] = "COALESCE(ts_rank(to_tsvector('{$language}',{$field}),query),0)*{$weight}";
+        }
+
+        $scoresum = implode(' + ', $score);
+        $sql = "SELECT basesearch.id, {$scoresum} AS score
+                  FROM {{$table}} basesearch, {$q} query
+                 WHERE {$scoresum} > 0.00000001";
+
+        return array("({$sql})", array($paramname => $searchtext));
+    }
 }

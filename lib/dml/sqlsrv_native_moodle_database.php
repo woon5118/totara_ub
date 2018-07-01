@@ -1730,4 +1730,75 @@ class sqlsrv_native_moodle_database extends moodle_database {
 
         return $recordset;
     }
+
+    /**
+     * Build a natural language search subquery using database specific search functions.
+     *
+     * @since Totara 12
+     *
+     * @param string $table        database table name
+     * @param array  $searchfields ['field_name'=>weight, ...] eg: ['high'=>3, 'medium'=>2, 'low'=>1]
+     * @param string $searchtext   natural language search text
+     * @return array [sql, params[]]
+     */
+    protected function build_fts_subquery(string $table, array $searchfields, string $searchtext): array {
+        $language = $this->get_ftslanguage();
+        // Microsoft is using either language code numbers or names of languages.
+        if (is_number($language)) {
+            $language = intval($language);
+        } else {
+            $language = "'$language'";
+        }
+
+        $params = array();
+        $searchjoin = array();
+        $score = array();
+
+        foreach ($searchfields as $field => $weight) {
+            $paramname = $this->get_unique_param('fts');
+            $params[$paramname] = $searchtext;
+            $searchjoin[] = "LEFT JOIN FREETEXTTABLE({{$table}},{$field},:{$paramname},LANGUAGE $language) AS join_{$field} ON basesearch.id = join_{$field}.[KEY]";
+            $score[] = "COALESCE(join_{$field}.RANK,0)*{$weight}";
+        }
+
+        $searchjoins = implode("\n", $searchjoin);
+        $scoresum = implode(' + ', $score);
+        $sql = "SELECT basesearch.id, {$scoresum} AS score
+                  FROM {{$table}} basesearch
+                       {$searchjoins}
+                 WHERE {$scoresum} > 0";
+
+        return array("({$sql})", $params);
+    }
+
+    /**
+     * Wait for MS SQL Server to index table with full text search data.
+     *
+     * NOTE: this is intended mainly for testing purposes
+     *
+     * @param string $tablename
+     * @param int $maxtime
+     * @return bool success, false if not indexed in $maxtime
+     */
+    public function fts_wait_for_indexing(string $tablename, int $maxtime = 10) {
+        $prefix = $this->get_prefix();
+
+        $timestart = time();
+
+        $sql = "SELECT COUNT('x')
+                  FROM sys.fulltext_indexes i
+                  JOIN sys.fulltext_catalogs c ON (c.name = :catalog AND i.fulltext_catalog_id = c.fulltext_catalog_id)
+                  JOIN sys.tables t ON i.object_id = t.object_id
+                 WHERE t.name = :table AND i.has_crawl_completed = 0";
+        $params = array('catalog' => $prefix . 'search_catalog', 'table' => $prefix . $tablename);
+
+        while($this->count_records_sql($sql, $params)) {
+            if ($timestart + $maxtime < time()) {
+                return false;
+            }
+            sleep(1);
+        }
+
+        return true;
+    }
 }

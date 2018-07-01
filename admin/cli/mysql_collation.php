@@ -64,7 +64,7 @@ It is strongly recommended to stop the web server before the conversion.
 This script should be executed before upgrade.
 
 Full text search columns are not being updated correctly by this script,
-use admin/cli/rebuild_full_text_search_indexes.php afterwards.
+use admin/cli/fts_rebuild_indexes.php afterwards.
 
 Options:
 --collation=COLLATION Convert MySQL tables to different collation

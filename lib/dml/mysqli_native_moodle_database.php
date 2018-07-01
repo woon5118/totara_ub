@@ -447,7 +447,7 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Returns the language used for full text search.
      *
-     * NOTE: admin must run admin/cli/rebuild_full_text_search_indexes.php after change of lang!
+     * NOTE: admin must run admin/cli/fts_rebuild_indexes.php after change of lang!
      *
      * @since Totara 12
      *
@@ -458,10 +458,10 @@ class mysqli_native_moodle_database extends moodle_database {
         if (!empty($this->dboptions['ftslanguage'])) {
             $sc = $this->dboptions['ftslanguage'];
             // Make sure that the charset matches!
-            if (strpos($sc, 'utf8mb4_') === 0 and strpos($dbcollation, 'utf8mb4_')) {
+            if (strpos($sc, 'utf8mb4_') === 0 and strpos($dbcollation, 'utf8mb4_') === 0) {
                 return $sc;
             }
-            if (strpos($sc, 'utf8_') === 0 and strpos($dbcollation, 'utf8_')) {
+            if (strpos($sc, 'utf8_') === 0 and strpos($dbcollation, 'utf8_') === 0) {
                 return $sc;
             }
         }
@@ -2015,5 +2015,33 @@ class mysqli_native_moodle_database extends moodle_database {
         $count = $recordset->get_count_without_limits();
 
         return $recordset;
+    }
+
+    /**
+     * Build a natural language search subquery using database specific search functions.
+     *
+     * @since Totara 12
+     *
+     * @param string $table        database table name
+     * @param array  $searchfields ['field_name'=>weight, ...] eg: ['high'=>3, 'medium'=>2, 'low'=>1]
+     * @param string $searchtext   natural language search text
+     * @return array [sql, params[]]
+     */
+    protected function build_fts_subquery(string $table, array $searchfields, string $searchtext): array {
+        $params = array();
+        $score = array();
+
+        foreach ($searchfields as $field => $weight) {
+            $paramname = $this->get_unique_param('fts');
+            $params[$paramname] = $searchtext;
+            $score[] = "(MATCH ({$field}) AGAINST (:{$paramname} IN NATURAL LANGUAGE MODE))*{$weight}";
+        }
+
+        $scoresum = implode(' + ', $score);
+        $sql = "SELECT id, {$scoresum} AS score
+                  FROM {{$table}}
+                HAVING score > 0";
+
+        return array("({$sql})", $params);
     }
 }
