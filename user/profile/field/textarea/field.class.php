@@ -41,6 +41,18 @@ class profile_field_textarea extends profile_field_base {
     }
 
     /**
+     * Sets the default value for this field instance
+     * Overwrites the base class method
+     *
+     * @param  moodleform $mform instance of the moodleform class
+     */
+    public function edit_field_set_default($mform) {
+        if (!empty($this->field->defaultdata)) {
+            $mform->setDefault($this->inputname, array('text' => $this->field->defaultdata));
+        }
+    }
+
+    /**
      * Overwrite base class method, data in this field type is potentially too large to be included in the user object.
      * @return bool
      */
