@@ -6,9 +6,10 @@ vendor/
 admin/tool/usertours/amd/src/tour.js
 admin/tool/usertours/amd/src/popper.js
 auth/cas/CAS/
-auth/fc/fcFPP.php
 blocks/totara_featured_links/spectrum/
 blocks/totara_featured_links/amd/src/spectrum.js
+blocks/totara_featured_links/slick/
+blocks/totara_featured_links/amd/src/slick.js
 enrol/lti/ims-blti/
 filter/algebra/AlgParser.pm
 filter/mathjaxloader/contrib/a11y/
