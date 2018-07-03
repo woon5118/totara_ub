@@ -888,7 +888,7 @@ $string['schedule'] = 'Schedule';
 $string['scheduledaily'] = 'Daily';
 $string['scheduledemailtosettings'] = 'Email Settings';
 $string['scheduledreportfrequency'] = 'Minimum scheduled report frequency';
-$string['scheduledreportfrequency_desc'] = 'This setting allows to set Schedule setting which is used in the scheduled reports to control how often scheduled report cron runs.';
+$string['scheduledreportfrequency_desc'] = 'This setting allows you to set the minimum period a report can be run in, this is useful to prevent reports being run too frequently on larger sites and thus causing slowness for your system';
 $string['scheduledreportmessage'] = 'Attached is a copy of the \'{$a->reportname}\' report in {$a->exporttype}. {$a->savedtext}
 
 You have been sent this report by {$a->sender}.
