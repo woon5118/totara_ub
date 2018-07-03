@@ -125,10 +125,9 @@ class block_gaccess extends block_list {
 
             if (!empty($gs['icon_name'])) {
                 $icon = $OUTPUT->pix_icon($gs['icon_name'], $gs['service'], 'block_gaccess');
-            }
-            else {
+            } else {
                 // Default to a check graphic
-                $icon = $OUTPUT->pix_icon('i/valid', $service);
+                $icon = $OUTPUT->pix_icon('i/valid', $gs['service']);
             }
             $this->content->items[] = "<a ".$target.". title=\"".$gs['service']."\"  href=\"".$gs['relayurl']."\">".$icon . '&nbsp;' . $gs['service']."</a>";
         }
