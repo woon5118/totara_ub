@@ -56,6 +56,11 @@ if ($data = data_submitted() and confirm_sesskey()) {
             case 'site': redirect("$CFG->wwwroot/");
             case 'admin': redirect("$CFG->wwwroot/$CFG->admin/");
         }
+
+        // Process block functions before redirect
+        $PAGE->blocks->load_blocks();
+        $PAGE->blocks->process_url_actions();
+
         redirect($PAGE->url);
     } else {
         $errormsg = get_string('errorwithsettings', 'admin');
