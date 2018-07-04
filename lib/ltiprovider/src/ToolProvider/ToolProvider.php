@@ -664,6 +664,43 @@ EOD;
 
     }
 
+    /**
+     * Confirms that any parameters that would be part of an OAuth signature check either include a matching
+     * value in $_POST or have no corresponding $_POST parameter at all.
+     *
+     * This is to ensure that when we take values directly from $_POST, that they were validated by the
+     * signature check. If any values are being taken from $_GET or the Authorization header, ensure
+     * that the parameter is also valid. Alternatively, fetch the value via a line like below:
+     *
+     * $value = $request->get_parameter($name);
+     *
+     * @param OAuth\OAuthRequest $request - a request object which has been verified.
+     * @throws OAuth\OAuthException - While this method isn't within the OAuth library, it is in some
+     * ways extending the check done by the OAuthServer::verify_request() check.
+     */
+    private function verify_request_against_post($request) {
+        // We cycle through the parameters processed into the $request object as this has url decoded parameter names.
+        // Doing a foreach on $_POST we may incorrectly reject a value because the name had url encoding
+        // and so was not found in the request parameters.
+        foreach ($request->get_parameters() as $name => $value) {
+            if (isset($_POST[$name])) {
+                if (is_array($value)) {
+                    if (!in_array($_POST[$name], $value)) {
+                        throw new OAuth\OAuthException('Found a value that could not be verified');
+                    }
+                    // Checking for empty $_POST[$name] after array check because it is ok to
+                    // have an empty $_POST[$name] if a non-empty $value array contains an empty element.
+                } else if (empty($_POST[$name])) {
+                    if (!empty($value)) {
+                        throw new OAuth\OAuthException('Found a value that could not be verified');
+                    }
+                } else if (\core_text::strpos($value, $_POST[$name]) === false) {
+                    throw new OAuth\OAuthException('Found a value that could not be verified');
+                }
+            }
+        }
+    }
+
 /**
  * Check the authenticity of the LTI launch request.
  *
@@ -773,6 +810,8 @@ EOD;
                     $server->add_signature_method($method);
                     $request = OAuth\OAuthRequest::from_request();
                     $res = $server->verify_request($request);
+                    // This additional verification is required when values are being taken directly from $_POST.
+                    $this->verify_request_against_post($request);
                 } catch (\Exception $e) {
                     $this->ok = false;
                     if (empty($this->reason)) {
