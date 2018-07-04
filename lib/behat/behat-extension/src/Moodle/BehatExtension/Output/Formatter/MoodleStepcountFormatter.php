@@ -50,6 +50,11 @@ class MoodleStepcountFormatter implements Formatter {
     private static $stepcount = 0;
 
     /**
+     * @var int Total count for steps in all feaure files.
+     */
+    private static $totalcount = 0;
+
+    /**
      * @var OutputPrinter
      */
     private $printer;
@@ -92,6 +97,7 @@ class MoodleStepcountFormatter implements Formatter {
             'tester.feature_tested.before'     => 'beforeFeature',
             'tester.feature_tested.after'      => 'afterFeature',
             'tester.step_tested.after'         => 'afterStep',
+            'tester.exercise_completed.after'  => 'afterCompletion',
         );
     }
 
@@ -155,5 +161,15 @@ class MoodleStepcountFormatter implements Formatter {
      */
     public function afterStep(AfterStepTested $event) {
         self::$stepcount++;
+        self::$totalcount++;
+    }
+
+    /**
+     * Listens to "exercise_completed.after" event.
+     *
+     * @param Event $event
+     */
+    public function afterCompletion(AfterExerciseCompleted $event) {
+        $this->printer->writeln('Total Steps: ' . self::$totalcount);
     }
 }
