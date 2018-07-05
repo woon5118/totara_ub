@@ -1630,6 +1630,22 @@ function totara_plan_comment_add($comment) {
         $event->icon = $icon;
 
         if ($comment->commentarea == 'plan_overview') {
+            $helper = new \totara_plan\add_comment_helper($userto);
+            $loggedoffref = \totara_plan\add_comment_helper::COMPETENCY_PLAN_COMMENT_LOGGEDOFF;
+            $helper->add_user_preference($loggedoffref, get_user_preferences($loggedoffref, null, $userto));
+
+            $loggedinref = \totara_plan\add_comment_helper::COMPETENCY_PLAN_COMMENT_LOGGEDIN;
+            $helper->add_user_preference($loggedinref, get_user_preferences($loggedinref, null, $userto));
+
+            // ONLY Check for plan_overview comment area
+            // if the user has the preference saying that
+            // not sending email on event of new comment added,
+            // either when they are loggedin or loggedoff
+            // then it will make the method to skip the part of sending email
+            if (!$helper->is_sending_email_notification(time())) {
+                continue;
+            }
+
             $subject = $stringmanager->get_string('commentmsg:planoverview', 'totara_plan', $msgobj, $userto->lang);
             $fullmsg = $stringmanager->get_string('commentmsg:planoverviewdetail', 'totara_plan', $msgobj, $userto->lang);
         } else {
