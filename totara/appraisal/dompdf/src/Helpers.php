@@ -783,7 +783,8 @@ class Helpers
     {
         // Totara: this must be safe, so allow pluginfile images only!
         global $CFG;
-        if (strpos($uri, 'totara/appraisal/dompdf/lib/res/html.css') !== false) {
+        $cssfilepath = 'totara'.DIRECTORY_SEPARATOR.'appraisal'.DIRECTORY_SEPARATOR.'dompdf'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'res'.DIRECTORY_SEPARATOR.'html.css';
+        if (strpos(realpath($uri), $cssfilepath) !== false) {
             if (realpath($uri) === realpath("$CFG->dirroot/totara/appraisal/dompdf/lib/res/html.css")) {
                 $data = file_get_contents("$CFG->dirroot/totara/appraisal/dompdf/lib/res/html.css");
                 if ($offset > 0) {
