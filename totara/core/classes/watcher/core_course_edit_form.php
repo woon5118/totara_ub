@@ -306,6 +306,7 @@ class core_course_edit_form {
      * @throws \coding_exception
      */
     protected static function add_enrolled_learning_controls_to_form(edit_form_definition_complete $hook) {
+        global $OUTPUT;
 
         if (!enrol_is_enabled('cohort')) {
             // Nothing to do here, cohort enrolment is not available.
@@ -330,6 +331,14 @@ class core_course_edit_form {
         $beforename = 'groups';
         $mform->insertElementBefore(
             $mform->createElement('header','enrolledcohortshdr', get_string('enrolledcohorts', 'totara_cohort')),
+            $beforename
+        );
+
+        // Audience deletion warning message.
+        $warning = $OUTPUT->notification(get_string('cohortdeletionwarning', 'totara_cohort'), 'warning');
+
+        $mform->insertElementBefore(
+            $mform->createElement('html', $warning),
             $beforename
         );
 
@@ -565,6 +574,7 @@ class core_course_edit_form {
         $newcohorts = !empty($data->cohortsenrolled) ? explode(',', $data->cohortsenrolled) : array();
 
         if ($todelete = array_diff(array_keys($currentcohorts), $newcohorts)) {
+            ignore_user_abort(true);
             // Delete removed cohorts
             foreach ($todelete as $cohortid) {
                 totara_cohort_delete_association($cohortid, $currentcohorts[$cohortid]->associd, COHORT_ASSN_ITEMTYPE_COURSE);
@@ -616,6 +626,7 @@ class core_course_edit_form {
         $visiblecohorts = !empty($visiblecohorts) ? $visiblecohorts : array();
         $newvisible = !empty($data->cohortsvisible) ? explode(',', $data->cohortsvisible) : array();
         if ($todelete = array_diff(array_keys($visiblecohorts), $newvisible)) {
+            ignore_user_abort(true);
             // Delete removed cohorts.
             foreach ($todelete as $cohortid) {
                 totara_cohort_delete_association($cohortid, $visiblecohorts[$cohortid]->associd,

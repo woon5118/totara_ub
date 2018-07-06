@@ -99,6 +99,7 @@ if (!empty($delid)) {
         // You cannot delete an unknown association!
         throw new coding_exception('Invalid association specified for deletion.');
     }
+    ignore_user_abort(true);
     totara_cohort_delete_association($cohortid, $delid, $type, $value);
 }
 

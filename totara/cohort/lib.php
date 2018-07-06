@@ -260,12 +260,8 @@ function totara_cohort_delete_association($cohortid, $assid, $instancetype, $val
             // Get cohort enrol plugin instance
             $enrolinstance = $DB->get_record('enrol', array('id' => $assid));
             if (!empty($enrolinstance)) {
-                $transaction = $DB->start_delegated_transaction();
-
                 $enrolplugin = enrol_get_plugin('cohort');
                 $enrolplugin->delete_instance($enrolinstance);  // this also unenrols peeps - no need to sync
-
-                $transaction->allow_commit();
 
                 // Trigger event.
                 $log[] = "associationid={$assid}";

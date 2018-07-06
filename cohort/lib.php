@@ -187,6 +187,7 @@ function cohort_delete_cohort($cohort) {
 
     //delete associations
     $associations = totara_cohort_get_associations($cohort->id);
+    ignore_user_abort(true);
     foreach ($associations as $ass) {
         totara_cohort_delete_association($cohort->id, $ass->id, $ass->type);
     }

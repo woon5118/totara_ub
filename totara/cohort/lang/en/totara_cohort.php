@@ -141,6 +141,8 @@ rules and verify they are correct.';
 $string['cohortdateactive'] = 'Active';
 $string['cohortdatealreadyended'] = 'Already ended';
 $string['cohortdatenotyetstarted'] = 'Not yet started';
+$string['cohortdeletionwarning'] = 'Note: Audience deletion may take minutes to process, depending on its size. 
+Once completed, the audience association will be removed from this course.';
 $string['cohortenrolledlearningselect'] = 'To view enrolled learning, first <a href="{$a}">select an audience</a> then click the "Enrolled Learning" tab.';
 $string['cohortenrolledreportname'] = 'Audience: Enrolled Learning';
 $string['cohortglobalsettings'] = 'Audience global settings';
@@ -195,6 +197,8 @@ $string['copy'] = 'Copy';
 $string['courseadditionwarning'] = 'Note: When adding courses, enrolment changes are performed in the background and take a few minutes to appear.';
 $string['coursecohortsenrolled'] = 'Course audiences (enrolled)';
 $string['coursecohortsvisible'] = 'Course audiences (visible)';
+$string['coursedeletionwarning'] = 'Note: Course deletion may take minutes to process, depending on audience size. 
+Once completed, the course association will be removed from this audience.';
 $string['createdynamiccohort'] = 'Create dynamic audience';
 $string['createforexistingautoplan'] = 'have an existing, automatically created plan based on this template';
 $string['createforexistingcompleteplan'] = 'have a completed plan based on this template';
