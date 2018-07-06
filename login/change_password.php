@@ -67,7 +67,7 @@ if (!isloggedin() or isguestuser()) {
 }
 
 $PAGE->set_context(context_user::instance($USER->id));
-$PAGE->set_pagelayout('login');
+$PAGE->set_pagelayout('standard');
 $PAGE->set_course($course);
 
 // do not require change own password cap if change forced
