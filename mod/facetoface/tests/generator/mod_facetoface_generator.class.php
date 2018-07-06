@@ -547,4 +547,12 @@ class mod_facetoface_generator extends testing_module_generator {
     public function create_custom_room_for_behat(array $record) {
         $this->add_custom_room($record);
     }
+
+    /**
+     * @param array $record
+     */
+    public function create_global_asset_for_behat(array $record) {
+        $record['custom'] = 0;
+        $this->add_asset($record);
+    }
 }
