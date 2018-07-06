@@ -358,10 +358,6 @@ class development_plan {
 
         // add role-independent settings from individual component tables
         foreach ($DP_AVAILABLE_COMPONENTS as $component) {
-            // only include if the component is enabled
-            if (!$this->get_component($component)->get_setting('enabled')) {
-                continue;
-            }
             $this->get_component($component)->initialize_settings($this->settings);
         }
 
