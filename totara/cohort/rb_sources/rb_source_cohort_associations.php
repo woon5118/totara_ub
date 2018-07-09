@@ -386,6 +386,17 @@ class rb_source_cohort_associations extends rb_base_source {
         }
 
         if ($canedit) {
+            global $PAGE;
+
+            //Require JS to intercept the delete call
+            $jsmodule = array(
+                'name' => 'totara_cohortlearning',
+                'fullpath' => '/totara/cohort/dialog/learningitem.js',
+                'requires' => array('json'));
+            $PAGE->requires->js_init_call('M.totara_cohortlearning.init', array(), false, $jsmodule);
+            $PAGE->requires->strings_for_js(array('assignenrolledlearningcourse', 'assignenrolledlearningprogram',
+                'assignenrolledlearningcertification', 'deletelearningconfirm', 'savinglearning'),
+                'totara_cohort');
             return $this->cohort_association_delete_link($associationid, $row);
         }
         return '';
