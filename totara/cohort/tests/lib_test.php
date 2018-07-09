@@ -235,8 +235,7 @@ class totara_cohort_lib_testcase extends advanced_testcase {
         $this->assertSame((string)ENROL_INSTANCE_ENABLED, $enrolinstance->status);
         $this->assertSame((string)$this->course->id, $enrolinstance->courseid);
 
-        $expected = [
-            'core\event\enrol_instance_created',
+        $expectedeventsaftersync = [
             'totara_core\event\bulk_enrolments_started',
             'core\event\user_enrolment_created',
             'core\event\user_enrolment_created',
@@ -271,6 +270,9 @@ class totara_cohort_lib_testcase extends advanced_testcase {
             'core\event\role_assigned',
             'core\event\role_assigned',
             'totara_core\event\bulk_role_assignments_ended',
+        ];
+        $expected = [
+            'core\event\enrol_instance_created',
             'totara_cohort\event\enrolled_course_item_added',
         ];
         $this->assertSame(count($expected), $sink->count());
@@ -278,6 +280,16 @@ class totara_cohort_lib_testcase extends advanced_testcase {
         foreach ($events as $event) {
             $this->assertInstanceOf(array_shift($expected), $event);
         }
+
+        // user enrolments is now part of an adhoc task.
+        $sink->clear();
+        phpunit_util::run_all_adhoc_tasks();
+        $this->assertSame(count($expectedeventsaftersync), $sink->count());
+        $eventsaftersync = $sink->get_events();
+        foreach ($eventsaftersync as $event) {
+            $this->assertInstanceOf(array_shift($expectedeventsaftersync), $event);
+        }
+
         $event = array_shift($events);
         $eventdata = $event->get_data();
         $this->assertInstanceOf('core\event\enrol_instance_created', $event);

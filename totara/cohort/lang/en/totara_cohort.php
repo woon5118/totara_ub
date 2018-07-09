@@ -192,6 +192,7 @@ $string['confirmnousers'] = 'No users require having learning plans created.';
 $string['contains'] = 'contains';
 $string['continue'] = 'Do you want to continue?';
 $string['copy'] = 'Copy';
+$string['courseadditionwarning'] = 'Note: When adding courses, enrolment changes are performed in the background and take a few minutes to appear.';
 $string['coursecohortsenrolled'] = 'Course audiences (enrolled)';
 $string['coursecohortsvisible'] = 'Course audiences (visible)';
 $string['createdynamiccohort'] = 'Create dynamic audience';

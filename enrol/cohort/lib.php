@@ -103,7 +103,6 @@ class enrol_cohort_plugin extends enrol_plugin {
      * @return int id of new instance, null if can not be created
      */
     public function add_instance($course, array $fields = null) {
-        global $CFG;
 
         if (!empty($fields['customint2']) && $fields['customint2'] == COHORT_CREATE_GROUP) {
             // Create a new group for the cohort if requested.
@@ -115,10 +114,11 @@ class enrol_cohort_plugin extends enrol_plugin {
 
         $result = parent::add_instance($course, $fields);
 
-        require_once("$CFG->dirroot/enrol/cohort/locallib.php");
-        $trace = new null_progress_trace();
-        enrol_cohort_sync($trace, $course->id);
-        $trace->finished();
+        // Process enrolments in an adhoc task.
+        $adhoctask = new \totara_cohort\task\enrol_audience_in_course_task();
+        $adhoctask->set_custom_data(array('cohortid' => $fields['customint1'], 'courseid' => $course->id));
+        $adhoctask->set_component('totara_cohort');
+        \core\task\manager::queue_adhoc_task($adhoctask);
 
         return $result;
     }

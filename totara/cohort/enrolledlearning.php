@@ -183,6 +183,9 @@ if ($canedit && totara_feature_visible('certifications') && has_capability('tota
 
 echo html_writer::end_tag('div');
 
+// Course addition warning message.
+echo $OUTPUT->notification(get_string('courseadditionwarning', 'totara_cohort'), 'warning');
+
 $report->display_search();
 $report->display_sidebar_search();
 

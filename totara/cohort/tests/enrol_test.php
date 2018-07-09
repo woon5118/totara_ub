@@ -57,6 +57,8 @@ class totara_cohort_enrol_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('user_enrolments', array()));
 
         $id = $cohortplugin->add_instance($course1, array('customint1' => $cohort1->id, 'roleid' => $studentrole->id));
+        // user enrolments is now part of an adhoc task.
+        phpunit_util::run_all_adhoc_tasks();
 
         $this->assertEquals(2, $DB->count_records('role_assignments', array()));
         $this->assertEquals(2, $DB->count_records('user_enrolments', array()));
