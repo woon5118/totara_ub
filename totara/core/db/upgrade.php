@@ -345,5 +345,14 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018032600, 'totara', 'core');
     }
 
+    if ($oldversion < 2018071000) {
+        // Remove docroot setting if it matches previous default.
+        if (get_config('core', 'docroot') == 'http://docs.moodle.org') {
+            set_config('docroot', '');
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018071000, 'totara', 'core');
+    }
     return true;
 }
