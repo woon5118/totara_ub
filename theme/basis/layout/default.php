@@ -27,29 +27,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$knownregionpre = $PAGE->blocks->is_known_region('side-pre');
-$knownregionpost = $PAGE->blocks->is_known_region('side-post');
-$knownregiontop = $PAGE->blocks->is_known_region('top');
-$knownregionbottom = $PAGE->blocks->is_known_region('bottom');
-
-$grid = new theme_roots\output\bootstrap_grid();
-
-if ($PAGE->blocks->region_has_content('side-pre', $OUTPUT)) {
-    $grid->has_side_pre();
-}
-
-if ($PAGE->blocks->region_has_content('side-post', $OUTPUT)) {
-    $grid->has_side_post();
-}
-
-if ($PAGE->blocks->region_has_content('top', $OUTPUT)) {
-    $grid->has_top();
-}
-
-if ($PAGE->blocks->region_has_content('bottom', $OUTPUT)) {
-    $grid->has_bottom();
-}
-
 $PAGE->set_popup_notification_allowed(false);
 
 $themerenderer = $PAGE->get_renderer('theme_basis');
@@ -57,8 +34,6 @@ $themerenderer = $PAGE->get_renderer('theme_basis');
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <?php require("{$CFG->dirroot}/theme/basis/layout/partials/head.php"); ?>
-
-<?php $regions = $grid->get_regions_classes($PAGE->blocks->get_add_block_regions()); ?>
 
 <body <?php echo $OUTPUT->body_attributes(); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
@@ -86,7 +61,7 @@ echo $totara_core_renderer->masthead($hasguestlangmenu, $nocustommenu);
 <div class="container-fluid breadcrumb-container">
     <div class="row">
         <div class="col-sm-12">
-            <?php echo $OUTPUT->full_header(); ?>
+            <?php echo $themerenderer->full_header(); ?>
         </div>
     </div>
 </div>
@@ -95,37 +70,17 @@ echo $totara_core_renderer->masthead($hasguestlangmenu, $nocustommenu);
 <div id="page" class="container-fluid">
     <div id="page-content">
 
-        <?php
-        if ($knownregiontop) {?>
-            <div id="region-top" class="row">
-                <?php echo $OUTPUT->blocks('top', $regions['top']); ?>
-            </div>
-        <?php
-        }?>
-
+        <?php echo $themerenderer->blocks_top(); ?>
         <div class="row">
-            <div id="region-main" class="<?php echo $regions['content']; ?>">
-                <?php echo $OUTPUT->course_content_header(); ?>
-                <?php echo $OUTPUT->main_content(); ?>
-                <?php echo $OUTPUT->course_content_footer(); ?>
+            <div id="region-main" class="<?php echo $themerenderer->main_content_classes(); ?>">
+                <?php echo $themerenderer->course_content_header(); ?>
+                <?php echo $themerenderer->main_content(); ?>
+                <?php echo $themerenderer->course_content_footer(); ?>
             </div>
-            <?php
-            if ($knownregionpre) {
-                echo $OUTPUT->blocks('side-pre', $regions['pre']);
-            }?>
-            <?php
-            if ($knownregionpost) {
-                echo $OUTPUT->blocks('side-post', $regions['post']);
-            }?>
+            <?php echo $themerenderer->blocks_pre(); ?>
+            <?php echo $themerenderer->blocks_post(); ?>
         </div>
-
-        <?php
-        if ($knownregionbottom) {?>
-            <div id="region-bottom" class="row">
-                <?php echo $OUTPUT->blocks('bottom', $regions['bottom']); ?>
-            </div>
-        <?php
-        }?>
+        <?php echo $themerenderer->blocks_bottom(); ?>
 
     </div>
 </div>

@@ -24,37 +24,11 @@
  * @author      Petr Skoda <petr.skoda@totaralms.com>
  */
 
-$hassidepre = $PAGE->blocks->region_has_content('side-pre', $OUTPUT);
-$hassidepost = $PAGE->blocks->region_has_content('side-post', $OUTPUT);
-$hastop = $PAGE->blocks->region_has_content('top', $OUTPUT);
-$hasbottom = $PAGE->blocks->region_has_content('bottom', $OUTPUT);
-
-$knownregionpre = $PAGE->blocks->is_known_region('side-pre');
-$knownregionpost = $PAGE->blocks->is_known_region('side-post');
-$knownregiontop = $PAGE->blocks->is_known_region('top');
-$knownregionbottom = $PAGE->blocks->is_known_region('bottom');
-
-$grid = new theme_roots\output\bootstrap_grid();
-
-if ($hassidepre) {
-    $grid->has_side_pre();
-}
-
-if ($hassidepost) {
-    $grid->has_side_post();
-}
-
-if ($hastop) {
-    $grid->has_top();
-}
-
-if ($hasbottom) {
-    $grid->has_bottom();
-}
-
-$regions = $grid->get_regions_classes();
+defined('MOODLE_INTERNAL') || die();
 
 $PAGE->set_popup_notification_allowed(false);
+
+$themerenderer = $PAGE->get_renderer('theme_roots');
 
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
@@ -83,8 +57,8 @@ echo $OUTPUT->doctype() ?>
 
     <div id="moodle-navbar" class="navbar-collapse collapse">
         <ul class="nav pull-right">
-            <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
-            <li class="navbar-text"><?php echo $OUTPUT->login_info(false) ?></li>
+            <li><?php echo $themerenderer->page_heading_menu(); ?></li>
+            <li class="navbar-text"><?php echo $themerenderer->login_info(false) ?></li>
         </ul>
     </div>
     </div>
@@ -92,58 +66,35 @@ echo $OUTPUT->doctype() ?>
 <header class="moodleheader">
     <div class="container-fluid">
     <a href="<?php echo $CFG->wwwroot ?>" class="logo"></a>
-    <?php echo $OUTPUT->page_heading(); ?>
+    <?php echo $themerenderer->page_heading(); ?>
     </div>
 </header>
 
 <div id="page" class="container-fluid">
     <header id="page-header" class="clearfix">
         <div id="page-navbar" class="clearfix">
-            <nav class="breadcrumb-nav" role="navigation" aria-label="breadcrumb"><?php echo $OUTPUT->navbar(); ?></nav>
-            <div class="breadcrumb-button"><?php echo $OUTPUT->page_heading_button(); ?></div>
+            <nav class="breadcrumb-nav" role="navigation" aria-label="breadcrumb"><?php echo $themerenderer->navbar(); ?></nav>
+            <div class="breadcrumb-button"><?php echo $themerenderer->page_heading_button(); ?></div>
         </div>
 
         <div id="course-header">
-            <?php echo $OUTPUT->course_header(); ?>
+            <?php echo $themerenderer->course_header(); ?>
         </div>
     </header>
 
     <div id="page-content">
 
-        <?php
-        if ($knownregiontop) {?>
-            <div id="region-top" class="row">
-                <?php echo $OUTPUT->blocks('top', $regions['top']); ?>
-            </div>
-            <?php
-        }?>
-
+        <?php echo $themerenderer->blocks_top(); ?>
         <div class="row">
-            <div id="region-main" class="<?php echo $regions['content']; ?>">
-                <?php
-                echo $OUTPUT->course_content_header();
-
-                echo $OUTPUT->main_content();
-                echo $OUTPUT->course_content_footer();
-                ?>
+            <div id="region-main" class="<?php echo $themerenderer->main_content_classes(); ?>">
+                <?php echo $themerenderer->course_content_header(); ?>
+                <?php echo $themerenderer->main_content(); ?>
+                <?php echo $themerenderer->course_content_footer(); ?>
             </div>
-            <?php
-            if ($knownregionpre) {
-                echo $OUTPUT->blocks('side-pre', $regions['pre']);
-            }?>
-            <?php
-            if ($knownregionpost) {
-                echo $OUTPUT->blocks('side-post', $regions['post']);
-            }?>
+            <?php echo $themerenderer->blocks_pre(); ?>
+            <?php echo $themerenderer->blocks_post(); ?>
         </div>
-
-        <?php
-        if ($knownregionbottom) {?>
-            <div id="region-bottom" class="row">
-                <?php echo $OUTPUT->blocks('bottom', $regions['bottom']); ?>
-            </div>
-            <?php
-        }?>
+        <?php echo $themerenderer->blocks_bottom(); ?>
 
     </div>
 
