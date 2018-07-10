@@ -35,7 +35,7 @@ class backup_totara_featured_links_block_structure_step extends backup_block_str
             'tiles',
             ['id'],
             [
-                'id', 'type', 'sortorder', 'timecreated', 'timemodified', 'dataraw', 'visibility', 'audienceaggregation',
+                'type', 'sortorder', 'timecreated', 'timemodified', 'dataraw', 'visibility', 'audienceaggregation',
                 'presetsraw', 'presetsaggregation', 'overallaggregation', 'tilerules', 'audienceshowing', 'presetshowing',
                 'tilerulesshowing', 'parentid'
             ]
@@ -47,7 +47,7 @@ class backup_totara_featured_links_block_structure_step extends backup_block_str
             'subtiles',
             ['id'],
             [
-                'id', 'type', 'sortorder', 'timecreated', 'timemodified', 'dataraw', 'visibility', 'audienceaggregation',
+                'type', 'sortorder', 'timecreated', 'timemodified', 'dataraw', 'visibility', 'audienceaggregation',
                 'presetsraw', 'presetsaggregation', 'overallaggregation', 'tilerules', 'audienceshowing', 'presetshowing',
                 'tilerulesshowing', 'parentid'
             ]

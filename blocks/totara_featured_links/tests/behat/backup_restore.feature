@@ -16,7 +16,7 @@ Feature: The content of the featured links blocks should be carried over when ba
 
     And I add the "Featured Links" block
     And I configure the "Featured Links" block
-    And I set the field "Title for the block" to "Featured Links1"
+    And I set the field "Block title (no title if blank)" to "Featured Links1"
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link" in the "Featured Links1" "block"
     And I set the following fields to these values:
