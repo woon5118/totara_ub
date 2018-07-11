@@ -234,6 +234,11 @@ abstract class base {
             $DB->delete_records('block_totara_featured_links_tiles', ['parentid' => $this->id]);
             // Remove the row form the tiles table.
             $DB->delete_records('block_totara_featured_links_tiles', ['id' => $this->id]);
+            // Remove cohort_visibility records if there are any.
+            $DB->delete_records(
+                'cohort_visibility',
+                ['instanceid' => $this->id, 'instancetype' => COHORT_ASSN_ITEMTYPE_FEATURED_LINKS]
+            );
             $transaction->allow_commit();
         } catch (Exception $e) {
             $transaction->rollback($e);

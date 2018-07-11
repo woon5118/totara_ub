@@ -79,5 +79,26 @@ function xmldb_block_totara_featured_links_upgrade($oldversion, $block) {
 
         upgrade_block_savepoint(true, 2018032600, 'totara_featured_links');
     }
+
+    // Remove orphaned cohort_visibility records product of deleting featured link blocks.
+    if ($oldversion < 2018061200) {
+
+        $sql = "SELECT cv.id
+                FROM {cohort_visibility} cv
+                WHERE instancetype = :instancetype
+                  AND NOT EXISTS (
+                      SELECT 1 
+                      FROM {block_totara_featured_links_tiles}
+                      WHERE id = cv.instanceid
+                  )";
+        $params = array('instancetype' => COHORT_ASSN_ITEMTYPE_FEATURED_LINKS);
+        $orphaned = $DB->get_records_sql($sql, $params);
+        if (!empty($orphaned)) {
+            $DB->delete_records_list('cohort_visibility', 'id', array_keys($orphaned));
+        }
+
+        upgrade_block_savepoint(true, 2018061200, 'totara_featured_links');
+    }
+
     return true;
 }

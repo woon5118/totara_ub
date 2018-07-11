@@ -65,15 +65,32 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
 
         $instance1 = $this->blockgenerator->create_instance();
         $instance2 = $this->blockgenerator->create_instance();
-        $this->blockgenerator->create_default_tile($instance1->id);
-        $this->blockgenerator->create_default_tile($instance1->id);
+        $tile1 = $this->blockgenerator->create_default_tile($instance1->id);
+        $tile2 = $this->blockgenerator->create_default_tile($instance1->id);
+        $tile3 = $this->blockgenerator->create_default_tile($instance2->id);
+        $tile4 = $this->blockgenerator->create_default_tile($instance2->id);
         $this->blockgenerator->create_default_tile($instance2->id);
-        $this->blockgenerator->create_default_tile($instance2->id);
-        $this->blockgenerator->create_default_tile($instance2->id);
+
+        // Add visibility for audiences.
+        $audience1 = $this->getDataGenerator()->create_cohort();
+        $audience2 = $this->getDataGenerator()->create_cohort();
+        $data = new \stdClass();
+        $data->visibility = block_totara_featured_links\tile\base::VISIBILITY_CUSTOM;
+        $data->audience_showing = 1;
+        $data->audiences_visible = $audience1->id.','.$audience2->id;
+        $tile1->save_visibility($data);
+        $tile2->save_visibility($data);
+        $tile3->save_visibility($data);
+        $data->audiences_visible = $audience1->id;
+        $tile4->save_visibility($data);
 
         $this->assertEquals(2, $DB->count_records('block_instances', ['blockname' => 'totara_featured_links']));
         $this->assertEquals(2, $DB->count_records('block_totara_featured_links_tiles', ['blockid' => $instance1->id]));
         $this->assertEquals(3, $DB->count_records('block_totara_featured_links_tiles', ['blockid' => $instance2->id]));
+        $this->assertEquals(2, $DB->count_records('cohort_visibility', ['instanceid' => $tile1->id]));
+        $this->assertEquals(2, $DB->count_records('cohort_visibility', ['instanceid' => $tile2->id]));
+        $this->assertEquals(2, $DB->count_records('cohort_visibility', ['instanceid' => $tile3->id]));
+        $this->assertEquals(1, $DB->count_records('cohort_visibility', ['instanceid' => $tile4->id]));
 
         // To delete the block we use the block API, this will in turn be expected to call >instance_delete().
         blocks_delete_instance($instance1);
@@ -81,6 +98,10 @@ class block_totara_featured_links_block_totara_featured_links_testcase extends t
         $this->assertEquals(1, $DB->count_records('block_instances', ['blockname' => 'totara_featured_links']));
         $this->assertEquals(0, $DB->count_records('block_totara_featured_links_tiles', ['blockid' => $instance1->id]));
         $this->assertEquals(3, $DB->count_records('block_totara_featured_links_tiles', ['blockid' => $instance2->id]));
+        $this->assertEquals(0, $DB->count_records('cohort_visibility', ['instanceid' => $tile1->id]));
+        $this->assertEquals(0, $DB->count_records('cohort_visibility', ['instanceid' => $tile2->id]));
+        $this->assertEquals(2, $DB->count_records('cohort_visibility', ['instanceid' => $tile3->id]));
+        $this->assertEquals(1, $DB->count_records('cohort_visibility', ['instanceid' => $tile4->id]));
     }
 
     /**

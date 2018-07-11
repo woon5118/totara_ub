@@ -60,10 +60,27 @@ class block_totara_featured_links_external_testcase extends test_helper {
         $instance = $this->blockgenerator->create_instance();
         $tile1 = $this->blockgenerator->create_default_tile($instance->id);
 
+        // Add visibility for audiences.
+        $audience1 = $this->getDataGenerator()->create_cohort();
+        $audience2 = $this->getDataGenerator()->create_cohort();
+        $data = new \stdClass();
+        $data->visibility = block_totara_featured_links\tile\base::VISIBILITY_CUSTOM;
+        $data->audience_showing = 1;
+        $data->audiences_visible = $audience1->id.','.$audience2->id;
+        $tile1->save_visibility($data);
+
         $this->assertTrue($DB->record_exists('block_totara_featured_links_tiles', ['id' => $tile1->id]));
+        $this->assertTrue($DB->record_exists(
+            'cohort_visibility',
+            ['instanceid' => $tile1->id, 'instancetype' => COHORT_ASSN_ITEMTYPE_FEATURED_LINKS])
+        );
         $this->assertTrue(block_totara_featured_links\external::remove_tile($tile1->id));
         $this->assertFalse(block_totara_featured_links\external::remove_tile($tile1->id));
         $this->assertFalse($DB->record_exists('block_totara_featured_links_tiles', ['id' => $tile1->id]));
+        $this->assertFalse($DB->record_exists(
+            'cohort_visibility',
+            ['instanceid' => $tile1->id, 'instancetype' => COHORT_ASSN_ITEMTYPE_FEATURED_LINKS])
+        );
     }
 
     public function test_remove_tile_not_loggedin() {

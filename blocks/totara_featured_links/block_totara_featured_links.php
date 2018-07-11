@@ -141,7 +141,19 @@ class block_totara_featured_links extends block_base {
      */
     public function instance_delete() {
         global $DB;
-        $DB->delete_records('block_totara_featured_links_tiles', ['blockid' => $this->instance->id]);
+
+        $select = "instanceid IN (SELECT id FROM {block_totara_featured_links_tiles} WHERE blockid = :blockid) AND
+                   instancetype = :instancetype";
+        $params = ['blockid' => $this->instance->id, 'instancetype' => COHORT_ASSN_ITEMTYPE_FEATURED_LINKS];
+        $transaction = $DB->start_delegated_transaction();
+        try {
+            $DB->delete_records_select('cohort_visibility', $select, $params);
+            $DB->delete_records('block_totara_featured_links_tiles', ['blockid' => $this->instance->id]);
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
+        }
+
         return parent::instance_delete();
     }
 
