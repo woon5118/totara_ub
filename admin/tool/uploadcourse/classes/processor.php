@@ -129,6 +129,7 @@ class tool_uploadcourse_processor {
      * @param array $defaults default data value
      */
     public function __construct(csv_import_reader $cir, array $options, array $defaults = array()) {
+        global $CFG;
 
         if (!isset($options['mode']) || !in_array($options['mode'], array(self::MODE_CREATE_NEW, self::MODE_CREATE_ALL,
                 self::MODE_CREATE_OR_UPDATE, self::MODE_UPDATE_ONLY))) {
