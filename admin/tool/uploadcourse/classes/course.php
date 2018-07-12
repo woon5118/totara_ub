@@ -97,7 +97,7 @@ class tool_uploadcourse_course {
     /** @var array fields allowed as course data. */
     static protected $validfields = array('fullname', 'shortname', 'idnumber', 'category', 'visible', 'startdate', 'enddate',
         'summary', 'format', 'theme', 'lang', 'newsitems', 'showgrades', 'showreports', 'legacyfiles', 'maxbytes',
-        'groupmode', 'groupmodeforce', 'groupmodeforce', 'enablecompletion', 'completionstartonenrol', 'audiencevisible'); // TOTARA OVERRIDE - needed the completionstartonenrol and audiencevisible fields.
+        'groupmode', 'groupmodeforce', 'groupmodeforce', 'enablecompletion', 'completionstartonenrol', 'audiencevisible', 'coursetype'); // TOTARA OVERRIDE - needed the completionstartonenrol, audiencevisible and coursetype fields.
 
     /** @var array fields required on course creation. */
     static protected $mandatoryfields = array('fullname', 'category');
@@ -479,6 +479,35 @@ class tool_uploadcourse_course {
                 $this->error($key, $message);
             }
             return false;
+        }
+
+        // validating the coursetype field from csv data
+        // sometimes user does not provide the course type value,
+        // therefore the array $coursedata might end up
+        // with empty string for key `coursetype` or the key is not there at all
+        if (!empty($coursedata['coursetype'])) {
+            $coursetypeid = $coursedata['coursetype'];
+            if (!is_numeric($coursedata['coursetype']) && is_string($coursedata['coursetype'])) {
+                $coursetypeid = tool_uploadcourse_helper::get_coursetypeid_from_string($coursedata['coursetype']);
+
+                // if it is a string such as (blended, seminar or elearning), reset it to integer id
+                $coursedata['coursetype'] = $coursetypeid;
+            }
+
+            $validcoursetypes = array(
+                TOTARA_COURSE_TYPE_ELEARNING,
+                TOTARA_COURSE_TYPE_BLENDED,
+                TOTARA_COURSE_TYPE_FACETOFACE
+            );
+
+            if (is_null($coursetypeid) || !in_array($coursetypeid, $validcoursetypes, false)) {
+                $lang = new lang_string("coursetypenotsupported", "tool_uploadcourse");
+                $this->error("coursetypenotsupported", $lang);
+                return false;
+            }
+        } else {
+            // By default, the course type is E-Learning
+            $coursedata['coursetype'] = TOTARA_COURSE_TYPE_ELEARNING;
         }
 
         // If the course does not exist, or will be forced created.

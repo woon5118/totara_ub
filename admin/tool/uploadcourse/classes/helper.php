@@ -478,4 +478,63 @@ class tool_uploadcourse_helper {
         return $id;
     }
 
+    /**
+     * Method of getting the nice course type name
+     * base on the parameter $type, since it could
+     * either is a null | integer | string.
+     * However if it is something else that the sytem does
+     * not support, then the return value is null, otherwise
+     * a nice format string for course type
+     *
+     * @param int | null | string   $type The course type
+     *
+     * @return string | null        string if the method could find the match base on $type,
+     *                              otherwise null would be returned
+     */
+    public static function get_course_type_name($type) {
+        if (empty($type)) {
+            // If the type id is not provided,
+            // then the default value should be 0
+            $type = TOTARA_COURSE_TYPE_ELEARNING;
+        } else if (!is_numeric($type) && is_string($type)) {
+            $type = self::get_coursetypeid_from_string($type);
+        }
+
+        $coursetypemap = array(
+            TOTARA_COURSE_TYPE_ELEARNING    => get_string("elearning", "totara_core"),
+            TOTARA_COURSE_TYPE_BLENDED      => get_string("blended", "totara_core"),
+            TOTARA_COURSE_TYPE_FACETOFACE   => get_string("facetoface", "totara_core")
+        );
+
+        if (isset($coursetypemap[$type])) {
+            return $coursetypemap[$type];
+        }
+
+        return null;
+    }
+
+    /**
+     * Method returning an integer, which is one of the
+     * constant's value pre-defined for the course type.
+     *
+     * However, it will return null, if the string $type is
+     * not found in the pre-defined map for course type
+     *
+     * Global TOTARA_COURSE_TYPES = [
+     *  'elearning' => 0    // TOTARA_COURSE_TYPE_ELEARNING
+     *  'blended' => 1      // TOTARA_COURSE_TYPE_BLENDED
+     *  'facetoface' => 2   // TOTARA_COURSE_TYPE_FACETOFACE
+     * ]
+     *
+     * @param string $type
+     * @return int | null
+     */
+    public static function get_coursetypeid_from_string($type) {
+        global $TOTARA_COURSE_TYPES;
+        if (isset($TOTARA_COURSE_TYPES[$type])) {
+            return (int) $TOTARA_COURSE_TYPES[$type];
+        }
+        return null;
+    }
+
 }

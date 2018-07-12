@@ -219,6 +219,10 @@ class tool_uploadcourse_processor {
 
             $data = $this->parse_line($line);
             $course = $this->get_course($data);
+
+            $coursetype = isset($data['coursetype']) ? $data['coursetype'] : null;
+            $data['coursetype_name'] = tool_uploadcourse_helper::get_course_type_name($coursetype);
+
             if ($course->prepare()) {
                 $course->proceed();
 
@@ -359,6 +363,10 @@ class tool_uploadcourse_processor {
             $data = $this->parse_line($line);
             $course = $this->get_course($data);
             $result = $course->prepare();
+
+            //setting up the course type name, even though there is a null one
+            $coursetype = isset($data['coursetype']) ? $data['coursetype'] : null;
+            $data['coursetype_name'] = tool_uploadcourse_helper::get_course_type_name($coursetype);
             if (!$result) {
                 $tracker->output($this->linenb, $result, $course->get_errors(), $data);
             } else {
