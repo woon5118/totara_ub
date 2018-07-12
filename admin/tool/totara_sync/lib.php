@@ -235,6 +235,9 @@ function totara_sync_get_elements($onlyenabled=false) {
         if ($element == 'pos' && totara_feature_disabled('positions')) {
             continue;
         }
+        if ($element == 'comp' && totara_feature_disabled('competencies')) {
+            continue;
+        }
 
         if ($onlyenabled) {
             if (!get_config('totara_sync', 'element_'.$element.'_enabled')) {

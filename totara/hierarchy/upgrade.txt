@@ -25,6 +25,7 @@ information provided here is intended especially for developers.
   * rb_source_org::rb_display_orgnamelink(), please call totara_hierarchy\rb\display\org_name_link::display() instead.
   * rb_source_pos::rb_display_posnamelink(), please call totara_hierarchy\rb\display\pos_name_link::display() instead.
   * rb_source_goal_status_history::rb_display_scope(), please call totara_hierarchy\rb\display\goal_status_history_link::display() instead.
+* Added field totarasync to the comp table
 
 === 10 ===
 

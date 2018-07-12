@@ -204,5 +204,20 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018031700, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2018090300) {
+
+        // Define field totarasync to be added to comp.
+        $table = new xmldb_table('comp');
+        $field = new xmldb_field('totarasync', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sortthread');
+
+        // Conditionally launch add field totarasync.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hierarchy savepoint reached.
+        upgrade_plugin_savepoint(true, 2018090300, 'totara', 'hierarchy');
+    }
+
     return true;
 }

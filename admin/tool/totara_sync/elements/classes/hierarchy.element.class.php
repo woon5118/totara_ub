@@ -383,7 +383,8 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
 
         if (isset($newitem->typeid) && !empty($newitem->typeid)) {
             // Add/update custom field data
-            if ($newcustomfields = json_decode($newitem->customfields)) {
+            if (isset($newitem->customfields)) {
+                $newcustomfields = json_decode($newitem->customfields);
                 foreach ($newcustomfields as $name=>$value) {
                     if ($value === null) {
                         continue; // Null means "don't update the existing data", so skip this field.

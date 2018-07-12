@@ -484,10 +484,10 @@ class tool_totara_sync_org_database_testcase extends totara_sync_database_testca
 
         // We need field mappings here because the customfield names are
         // stupid, we can fix this after TL-16723 is fixed
-        $source->set_config('import_customfield_text'.$orgtype->id, '1');
-        $source->set_config('import_customfield_menu'.$orgtype->id, '1');
-        $source->set_config('fieldmapping_customfield_text'.$orgtype->id, 'textcf1');
-        $source->set_config('fieldmapping_customfield_menu'.$orgtype->id, 'menucf1');
+        $source->set_config('import_customfield_' .$orgtype->id . '_text'.$orgtype->id, '1');
+        $source->set_config('import_customfield_' .$orgtype->id . '_menu'.$orgtype->id, '1');
+        $source->set_config('fieldmapping_customfield_' .$orgtype->id . '_text'.$orgtype->id, 'textcf1');
+        $source->set_config('fieldmapping_customfield_' .$orgtype->id . '_menu'.$orgtype->id, 'menucf1');
 
         $entry = new stdClass();
         $entry->idnumber = 'org2';

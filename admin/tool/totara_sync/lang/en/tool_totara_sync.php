@@ -34,9 +34,11 @@ $string['totara_sync:manageuser'] = 'Manage HR Import users';
 $string['totara_sync:manageorg'] = 'Manage HR Import organisations';
 $string['totara_sync:managepos'] = 'Manage HR Import positions';
 $string['totara_sync:managejobassignment'] = 'Manage HR Import job assignments';
+$string['totara_sync:managecomp'] = 'Manage HR Import competencies';
 $string['totara_sync:uploaduser'] = 'Upload HR Import users';
 $string['totara_sync:uploadorg'] = 'Upload HR Import organisations';
 $string['totara_sync:uploadpos'] = 'Upload HR Import positions';
+$string['totara_sync:uploadcomp'] = 'Upload HR Import competencies';
 $string['totara_sync:uploadjobassignment'] = 'Upload HR Import job assignments';
 $string['totara_sync:deletesynclog'] = 'Clear the HR Import Logs';
 $string['settingssaved'] = 'Settings saved';
@@ -67,6 +69,8 @@ $string['displayname:org'] = 'Organisation';
 $string['settings:org'] = 'Organisation element settings';
 $string['displayname:pos'] = 'Position';
 $string['settings:pos'] = 'Position element settings';
+$string['displayname:comp'] = 'Competency';
+$string['settings:comp'] = 'Competency element settings';
 $string['removeitems'] = 'Remove items';
 $string['removeitemsdesc'] = 'Specify what to do with internal items during HR Import when item was removed from source.';
 
@@ -128,10 +132,14 @@ $string['displayname:totara_sync_source_org_csv'] = 'CSV';
 $string['displayname:totara_sync_source_org_database'] = 'External Database';
 $string['displayname:totara_sync_source_pos_csv'] = 'CSV';
 $string['displayname:totara_sync_source_pos_database'] = 'External Database';
+$string['displayname:totara_sync_source_comp_csv'] = 'CSV';
+$string['displayname:totara_sync_source_comp_database'] = 'External Database';
 $string['settings:totara_sync_source_org_csv'] = 'Organisation - CSV source settings';
 $string['settings:totara_sync_source_org_database'] = 'Organisation - external database source settings';
 $string['settings:totara_sync_source_pos_csv'] = 'Position - CSV source settings';
 $string['settings:totara_sync_source_pos_database'] = 'Position - external database source settings';
+$string['settings:totara_sync_source_comp_csv'] = 'Competency - CSV source settings';
+$string['settings:totara_sync_source_comp_database'] = 'Competency - external database source settings';
 
 // User
 $string['displayname:totara_sync_source_user_csv'] = 'CSV';
@@ -176,6 +184,11 @@ $string['csvimportfilestructinfo'] = 'The current config requires a CSV file wit
 $string['shortname'] = 'Shortname';
 $string['parentidnumber'] = 'Parent';
 $string['typeidnumber'] = 'Type';
+
+// Competency
+$string['aggregationmethod'] = 'Aggregation method';
+$string['unrecognisedaggregrationmethod'] = 'Unrecognised aggregation method value: {$a}';
+$string['aggregrationmethodmusthavevalue'] = 'The aggregation method must be given a value for item with idnumber: {$a}';
 
 // Job assignment
 $string['appraiserxnotexistjobassignment'] = 'User \'{$a->appraiseridnumber}\' does not exist and was set to be assigned as appraiser. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
