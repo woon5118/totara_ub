@@ -100,7 +100,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_join(
                 'sessiondate',
-                'INNER',
+                'LEFT',
                 '{facetoface_sessions_dates}',
                 '(sessiondate.sessionid = base.sessionid)',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
