@@ -176,7 +176,7 @@ Feature: Allocate spaces for team in seminar
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I should see "Your request was accepted"
     And I log out
 
     When I log in as "sitemanager1"
@@ -243,7 +243,7 @@ Feature: Allocate spaces for team in seminar
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I should see "Your request was accepted"
     And I log out
 
     When I log in as "sitemanager1"

@@ -108,7 +108,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I follow "Course 1"
     And I click on "Join waitlist" "link_or_button"
     And I click on "Sign-up" "link_or_button"
-    Then I should see "Your booking has been completed."
+    Then I should see "Your request was accepted"
     And I should see "Wait-listed"
 
   Scenario: Auto enrol using seminar direct with manager approval required
@@ -178,4 +178,4 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link_or_button"
-    Then I should see "Your booking has been completed but requires approval from your manager."
+    Then I should see "Your request was sent to your manager for approval."

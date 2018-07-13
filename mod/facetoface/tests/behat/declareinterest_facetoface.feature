@@ -105,7 +105,7 @@ Feature: Manager approval and declare of interest
     And I should not see "Declare interest"
     And I follow "Sign-up"
     And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I should see "Your request was accepted"
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
@@ -147,7 +147,7 @@ Feature: Manager approval and declare of interest
     And I should not see "Declare interest"
     And I follow "Sign-up"
     And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I should see "Your request was accepted"
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
