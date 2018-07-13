@@ -38,7 +38,6 @@ Feature: User can change their password
 
     When I click on "Change password" "link"
     Then I should see "Change password"
-    And I should not see the "Navigation" block
 
     When I set the following fields to these values:
     | Current password | Pass-w0rd1 |
@@ -46,7 +45,6 @@ Feature: User can change their password
     | New password (again) | Pass-w0rd2 |
     And I press "Save changes"
     Then I should see "Password has been changed"
-    And I should not see the "Navigation" block
 
     When I press "Continue"
     And I log out
@@ -84,7 +82,6 @@ Feature: User can change their password
       | Password | monkey |
     And I press "Log in"
     Then I should see "Change password"
-    And I should not see the "Navigation" block
 
     When I set the following fields to these values:
       | Current password | monkey |
@@ -92,7 +89,6 @@ Feature: User can change their password
       | New password (again) | Pass-w0rd1 |
     And I press "Save changes"
     Then I should see "Password has been changed"
-    And I should not see the "Navigation" block
 
     When I press "Continue"
     And I log out
