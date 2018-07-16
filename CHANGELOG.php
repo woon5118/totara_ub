@@ -3,6 +3,266 @@
 
 Totara Learn Changelog
 
+Release Evergreen (18th July 2018):
+===================================
+
+Key:           + Evergreen only
+
+Security issues:
+
+    TL-17320       Fixed validation issue when checking LTI parameters
+
+                   On a site that has published a course as an LTI tool, a user may have been
+                   able to trick the validation system into validating against the wrong
+                   values. This could have allowed the user to set parameters to values
+                   different to those supplied by the consumer site. This vulnerability has
+                   been fixed.
+
+Improvements:
+
+    TL-17668   +   Added support for full text searching
+
+                   This improvement saw the introduction of the following full text search
+                   features:
+                   * Full text search indexes can now be added to fields within the Totara database.
+                   * Full text searches can now be run on these indexes.
+
+                   This functionality will be used by the new catalog to provide better searching.
+
+                   To get the best possible result from full text searches, sites should set
+                   the full text search language that will be used in the creation of indexes
+                   within their sites config.php file. For more information on how to do this,
+                   please refer to the config-dist.php file provided with Totara. All
+                   information is under the "FULL TEXT SEARCH" heading.
+
+                   Technical documentation for developers can be found at
+                   https://help.totaralearning.com/display/DEV/Full+text+search
+                   For those intending to add full text search to their plugins and
+                   customisations, we recommend that you read and follow the instructions in
+                   the technical documentation. Most importantly always define a new table to
+                   use for full text searching, have a cron routine that ensures it is kept up
+                   to date, and use event observers to keep it up to date with live changes.
+
+    TL-14714   +   Added onchange support to radio form elements
+
+                   Allow radio groups to use the onchange client action in the Totara forms
+                   library.
+
+    TL-14939   +   Made it possible for Report Builder columns to be flagged as deprecated
+    TL-14966   +   Added a new conditional access restriction based on time since activity completion
+
+                   Access to an activity can now be restricted based on time since completing
+                   another activity.
+
+    TL-16150   +   Added image for course and program tiles in featured links
+    TL-16727   +   Moved all report builder functions that added columns, filters and joins from base source in to traits
+
+                   All function that added columns, filters and joins have been deprecated and
+                   moved into traits within the report sources associated component.
+
+    TL-17353       Updated the description for "Minimum scheduled report frequency" in the Report Builder general settings
+    TL-17494   +   Improved the work flow of adding blocks to editable regions
+
+                   * Removed the existing "Add a block" block.
+                   * Each editable region now has a dotted border, when editing is enabled.
+                   * Added a "+" icon button to the centre of every block region.
+                   * Clicking the "+" button opens a modal dialogue with a list of all
+                   available block types and a search input.
+                   * The search input provides real-time filtering of the block type list.
+                   * Clicking a block name reloads the page and that block will be added to
+                   the same region.
+
+    TL-17720       Added 'audience visible' default course option to the upload course tool
+    TL-17790       Improved the HTML of the change password page
+
+                   Previously the "Change password" heading was in a legend, this patch moves
+                   it to a proper HTML heading.
+
+    TL-17791       Added role HTML attributes to the Totara menu
+    TL-17795       Tooltips in the "Current learning" block are now displayed when focused via the tab key
+    TL-17891       Changed the Change password page to use the standard page layout
+
+                   This gives the Change password page the standard navigation and blocks
+
+    TL-17905   +   Updated the default value for the 'docroot' setting
+
+                   Previously, error pages included a link to Moodle documentation, which
+                   often didn't exist for Totara-specific errors. This change removes the
+                   default documentation root so the 'More information about this error' link
+                   is no longer shown.
+
+                   If you wish to restore the links, set the docroot back to
+                   [http://docs.moodle.org|http://docs.moodle.org/] after upgrading.
+
+Bug fixes:
+
+    TL-14015   +   Deprecated unused totara/core/js/goal.item.js file
+    TL-16293       Fixed user profile custom fields "Dropdown Menu" to store non-formatted data
+
+                   This fix has several consequences:
+                   1) Whenever special characters (&, <, and >) were used in user custom
+                      profile field, it was not found in dynamic audiences. It was fixed
+                      by storing unfiltered values on save. Existing values will not be changed.
+                   2) Improved multi language support of this custom field, which will display
+                      item in user's preferred language (or default language if the user's
+                      language is not given in the item).
+                   3) Totara "Dropdown Menu" customfield also fixed on save.
+
+                   Existing values that were stored previously, will not be automatically
+                   fixed during upgrade. To fix them either:
+                   1) Edit instance that holds value (e.g. user profile or seminar event),
+                      re-select the value and save.
+                   2) Use a special tool that we will provide upon request. This tool can work
+                      in two modes: automatic or manual. In automatic mode it will attempt to
+                      search filtered values and provide a confirmation form before fixing them.
+                      In manual mode it will search for all inconsistent values (values that
+                      don't have a relevant menu item in dropdown menu customfield settings)
+                      across all supported components and allow you to choose to update them to
+                      an existing menu item. To get this tool please request it on support board.
+
+    TL-16795       Added support for backing up and restoring featured links blocks inside of courses
+
+                   Due to a significant improvement in the capability of Gallery tiles in
+                   Totara 12, backups created in versions prior to Totara 12 that include a
+                   Featured Links Block with Gallery tiles, will not restore fully in Totara
+                   12.
+
+    TL-17324       Made completion imports trim leading and trailing spaces from the 'shortname' and 'idnumber' fields
+
+                   Previously leading and trailing spaces on the 'shortname' or 'idnumber'
+                   fields, were causing inconsistencies while matching upload data to existing
+                   records during course and certification completion uploads. This patch now
+                   trims any leading or trailing spaces from these fields while doing the
+                   matching.
+
+    TL-17385       Fixed an error when viewing the due date column in program reports that don't allow the display of the total count
+    TL-17397       Fixed category level roles being unable to restrict access to category level audiences
+    TL-17417   +   Fixed an issue with links not being generated correctly within the totara_message component
+
+                   This was primarily an issue with the "more details" link in messages sent
+                   when commenting on a user's learning plan.
+
+    TL-17420       Formatted any dates in program emails based on the recipient's selected language package
+    TL-17511       Made sure compound records in reports are not aggregated and added a new jobs counting column
+    TL-17531       Fixed user report performance issue when joining job assignments
+
+                   This fix improves performance for certain reports when adding columns from
+                   the "All User's job assignments" section. The fix applies to the following
+                   report sources:
+                    * Appraisal Status
+                    * Audience Members
+                    * Badges Issued
+                    * Competency Status
+                    * Competency Status History
+                    * Goal Status
+                    * Learning Plans
+                    * Program Completion
+                    * Program Overview
+                    * Record of Learning: Recurring Programs
+                    * User
+
+    TL-17631       Custom seminar rooms are now able to be viewed and edited within the report builder
+    TL-17655       Fixed the prefix auto-fill functionality for Seminar notifications "Body" and "Manager copy prefix" fields
+
+                   Previously while creating or editing seminar notifications, the drop-down
+                   selector that pre-populated text fields for notifications using a chosen
+                   template's data was only populating the title input. This has been fixed to
+                   also pre-populate the "Body" and "Manager copy prefix" message fields.
+
+    TL-17657       Fixed an error causing a debugging message in the facetoface_get_users_by_status() function
+
+                   Previously when the function was called with the include reservations
+                   parameter while multiple reservations were available, there were some
+                   fields added to the query that were causing a debugging message to be
+                   displayed.
+
+    TL-17714       Made sure custom user profile textareas have default values set (where one is supplied) on signup page
+    TL-17733       Made sure duplicate user email addresses are validated as duplicate regardless of the text case
+
+                   Previously it was possible to sign up or update email addresses which would
+                   duplicate an existing email address, but in a different text case (test vs
+                   TEST). Now, we ignore the text case during sign up, email address update,
+                   HR sync, and user upload by an administrator. The way user accounts are
+                   validated by the authentication methods has not changed.
+
+    TL-17789       Fixed an accessibility issue with an incorrect skip link on the login page
+    TL-17818       Fixed the database error when uploading an AICC package via SCORM package activity
+    TL-17834       Fixed empty JSON being returned when deleting enrolled learning from a custom report
+    TL-17845       Fixed SCORM height issue when side navigation was turned on
+
+                   In some SCORM modules the height of the player was broken when the side
+                   navigation was turned on. The height of the player is now calculated
+                   correctly with both side and drop down navigation.
+
+    TL-17847       Reduced specificity of fix for TL-17744
+
+                   The June releases of Totara included a fix for heading levels in an HTML
+                   block. This increased the specificity of the CSS causing it to override
+                   other CSS declarations (this included some in the featured links block).
+                   This is now fixed in a different manner, maintaining the
+                   existing specificity.
+
+    TL-17858       Fixed the ability to delete blocks from admin settings pages
+
+                   A bug was preventing the deletion of blocks on some admin pages, this
+                   affected all pages with a URL in the form of
+                   <site>/admin/settings.php?section=<sectionname>.  Blocks on these pages are
+                   now removed correctly.
+
+    TL-17868       Fixed a bug which assumed a job must have a manager when messaging attendees of a Seminar
+
+                   Prior to this fix due to a bug in code it was not possible to send a
+                   message to Seminar attendees, cc'ing their managers, if the attendee job
+                   assignments were tracked, and there was at least one attendee who had a
+                   manager, and at least one attendee who had a job assignment which did not
+                   have a manager. This has now been fixed.
+
+                   When messaging attendees, having selected to cc their managers, if an
+                   attendee does not have a manager the attendee will still receive the
+                   message.
+
+    TL-17869       Fixed SQL query in display function in "Pending registrations" report
+
+                   The SQL being used in the display function caused an error in MySQL and
+                   MariaDB
+
+    TL-17881       Ensured that Learning plan component settings are also loaded for disabled items
+
+                   When a Learning Plan template has a component that is not enabled, such as
+                   courses, linked courses added to competencies, for example, caused a
+                   failure in the 'Create learning plans for users in this audience' feature.
+                   This was due to settings not being initialised for Learning Plan components
+                   that are not enabled, this patch ensures that initialisation of components
+                   occurs when they are either enabled or disabled.
+
+    TL-17885       Display seminar assets on reports even when they are being used in an ongoing event
+
+                   When the Asset Availability filter is being used in a report, assets that
+                   are available but currently in use (by an ongoing event at the time of
+                   searching) should not be excluded from the report. Assets should only be
+                   excluded if they are not available between the dates/times specified in the
+                   filter.
+
+    TL-17894       Fixed the display of Seminar approval settings when they have been disabled at the system level
+
+                   When an admin disabled an approval option on the seminar global settings
+                   page, and there was an existing seminar using the approval option, the
+                   approval option would then display as an empty radio selector on that
+                   seminar's settings page, and none of the approval options would be
+                   displayed as selected. However unless a different approval option was
+                   selected the seminar would continue using the disabled option.
+                   This patch fixes the display issue by making the previously empty radio
+                   selector correctly display the disabled setting's name, and marking it as
+                   selected. As before, the disabled approval option can still be used for
+                   existing seminars until it is changed to a different setting. When the
+                   setting is changed for the seminar the now disabled approval option will no
+                   longer be displayed.
+
+Contributions:
+
+    *  Grace Ashton at Kineo.com - TL-17657
+
+
 Release Evergreen (20th June 2018):
 ===================================
 
