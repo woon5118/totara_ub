@@ -15,7 +15,7 @@ Feature: Totara form onchange reload client radios action test suite
   Scenario: Changing the value of "radios without clientaction" does not reload the form
     When I start watching to see if a new page loads
     And I set the following Totara form fields to these values:
-      | radios without clientaction | one |
+      | radios without clientaction | two |
     Then a new page should not have loaded since I started watching
     And I wait for pending js
     And I should see "radios_1 unchanged"
@@ -64,7 +64,7 @@ Feature: Totara form onchange reload client radios action test suite
 
   Examples:
     | radios   | default | changed   | changedstatus | returnedstatus | submitvalue |
-    | radios_2 | one     | two       | changed       | unchanged      | 1           |
+    | radios_2 | one     | two       | changed       | changed        | 1           |
     | radios_3 | one     | two       | changed       | unchanged      | 1           |
     | radios_4 | one     | two       | changed       | changed        | b           |
     | radios_5 | two     | one       | unchanged     | changed        | a           |

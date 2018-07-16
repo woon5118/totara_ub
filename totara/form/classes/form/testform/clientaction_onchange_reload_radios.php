@@ -53,9 +53,9 @@ class clientaction_onchange_reload_radios extends form {
      */
     public static function get_current_data_for_test() {
         return [
-            'radios_1' => 0,
-            'radios_2' => 0,
-            'radios_3' => 0,
+            'radios_1' => '0',
+            'radios_2' => '0',
+            'radios_3' => '0',
             'radios_4' => 'a',
             'radios_5' => 'b',
             'radios_6' => 'a',
@@ -112,11 +112,12 @@ class clientaction_onchange_reload_radios extends form {
         $defaultdata = clientaction_onchange_reload_radios::get_current_data_for_test();
 
         foreach ($items as $item) {
-            $value = $item->get_data()[$item->get_name()];
-            if (isset($defaultdata[$item->get_name()]) && $value !== $defaultdata[$item->get_name()]) {
-                $this->model->add(new static_html($item->get_name() . '_reloaded', $item->get_name() . ' changed', $value));
+            $name = $item->get_name();
+            $value = $item->get_data()[$name];
+            if (isset($defaultdata[$name]) && $value === $defaultdata[$name]) {
+                $this->model->add(new static_html($name . '_reloaded', $name . ' unchanged', $value));
             } else {
-                $this->model->add(new static_html($item->get_name() . '_reloaded', $item->get_name() . ' unchanged', $value));
+                $this->model->add(new static_html($name . '_reloaded', $name . ' changed', $value));
             }
         }
 
