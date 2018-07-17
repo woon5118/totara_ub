@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Piers Harding <piers@catalyst.net.nz>
- * @author Alastair Munro <alastair.munro@totaralms.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara
  * @subpackage hierarchy
  */
 
 /**
- * Formslib template for generating an export report form
+ * Formslib template for generating an export all frameworks form
  */
 
 if (!defined('MOODLE_INTERNAL')) {
@@ -33,10 +32,10 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once "$CFG->dirroot/lib/formslib.php";
 
-class hierarchy_export_form extends moodleform {
+class hierarchy_export_frameworks_form extends moodleform {
 
     /**
-     * Definition of the export report form
+     * Definition of the export frameworks form
      */
     function definition() {
         global $HIERARCHY_EXPORT_OPTIONS;
@@ -48,19 +47,22 @@ class hierarchy_export_form extends moodleform {
             $select[$option] = get_string('export'.$option, 'totara_hierarchy');
         }
 
+        $attributes = $this->_customdata['attributes'] ?? '';
+
         if (count($select) == 0) {
             // no export options - don't show form
             return false;
         } else if (count($select) == 1) {
             // no options - show a button
             $mform->addElement('hidden', 'format', key($select));
-            $mform->addElement('submit', 'export', current($select));
+            $mform->addElement('submit', 'export', current($select), $attributes);
         } else {
-
-            // show Export dropdown
-            $attributes = $this->_customdata['attributes'] ?? '';
-            $mform->addElement('select', 'format', get_string('format', 'totara_hierarchy'), $select, $attributes);
-            $mform->addElement('submit', 'export', get_string('exportitems', 'totara_hierarchy'), $attributes);
+            // show pulldown menu
+            $group=array();
+            $group[] =& $mform->createElement('select', 'format', get_string('exportframeworks', 'totara_hierarchy'), $select, $attributes);
+            $group[] =& $mform->createElement('submit', 'export', get_string('export', 'totara_hierarchy'), $attributes);
+            $mform->addGroup($group, 'exportframeworksgroup', get_string('exportframeworks', 'totara_hierarchy'), array(' '), false);
+            $mform->addHelpButton('exportframeworksgroup', 'exportframeworks', 'totara_hierarchy');
         }
     }
 }

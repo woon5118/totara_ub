@@ -645,6 +645,14 @@ $CFG->directorypermissions = 02777;
 //      $CFG->thirdpartyexeclist = array('/full/path/to/bin' => true, '/another/path/to/script.sh' => false);
 //
 //
+// In Totara 12.0 the data being exported for hierarchy frameworks were changed to export all fields instead of
+// a hierarchical presentation of the elements in the framework.
+// If $CFG->hierarchylegacyexport is set to 1, the old hierarchycal presentation of the elements in the framework
+// will be exported.
+//
+//      $CFG->hierarchylegacyexport = 0;
+//
+//
 //=========================================================================
 // 7. SETTINGS FOR DEVELOPMENT SERVERS - not intended for production use!!!
 //=========================================================================
