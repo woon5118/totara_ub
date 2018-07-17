@@ -21,7 +21,9 @@
  * @package totara_reportbuilder
  */
 
-namespace totara_reportbuilder\rb\display;
+namespace totara_customfield\rb\display;
+
+use totara_reportbuilder\rb\display\base;
 
 /**
  * Display class intended for showing a user's name and links to their profile.

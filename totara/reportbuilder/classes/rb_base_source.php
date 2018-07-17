@@ -35,6 +35,8 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
  */
 abstract class rb_base_source {
 
+    use \totara_customfield\rb\source\report_trait;
+
     /*
      * Used in default pre_display_actions function.
      */
@@ -77,6 +79,7 @@ abstract class rb_base_source {
         // Extending classes should add own component to this array before calling parent constructor,
         // this allows us to lookup display classes at more locations.
         $this->usedcomponents[] = 'totara_reportbuilder';
+        $this->usedcomponents[] = 'totara_customfield';
 
         // check that child classes implement required properties
         $properties = array(
@@ -133,83 +136,11 @@ abstract class rb_base_source {
                 // Most likely somebody did not add any user columns, in that case do not add custom fields and rely on the BC fallback later.
                 continue;
             }
-            $this->add_custom_user_fields($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
+            $this->add_core_customfield_user($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
             $this->addeduserjoins[$join]['processed'] = true;
         }
 
-        //create array to store the join functions and join table
-        $joindata = array();
-        $base = $this->base;
-        //if any of the join tables are customfield-related, ensure the customfields are added
-        foreach ($this->joinlist as $join) {
-            //tables can be joined multiple times so we set elements of an associative array as joinfunction => jointable
-            $table = $join->table;
-            switch ($table) {
-                case '{user}':
-                    if ($join->name !== 'auser') {
-                        break;
-                    }
-                    $joindata['add_custom_user_fields'] = 'auser'; // This is a fallback only for sources that does not add user fields properly!
-                    break;
-                case '{course}':
-                    $joindata['add_custom_course_fields'] = 'course';
-                    break;
-                case '{prog}':
-                    $joindata['add_custom_prog_fields'] = 'prog';
-                    break;
-                case '{comp}':
-                    $joindata['add_custom_competency_fields'] = 'comp';
-                    break;
-                case '{goal}':
-                    $joindata['add_custom_goal_fields'] = 'goal';
-                    break;
-                case '{goal_personal}':
-                    $joindata['add_custom_personal_goal_fields'] = 'goal_personal';
-                    break;
-                case '{dp_plan_evidence}':
-                    $joindata['add_custom_evidence_fields'] = 'dp_plan_evidence';
-                    break;
-            }
-        }
-        //now ensure customfields fields are added if there are no joins but the base table is customfield-related
-        switch ($base) {
-            case '{user}':
-                $joindata['add_custom_user_fields'] = 'base'; // This is a fallback only for sources that does not add user fields properly!
-                break;
-            case '{course}':
-                $joindata['add_custom_course_fields'] = 'base';
-                break;
-            case '{prog}':
-                $joindata['add_custom_prog_fields'] = 'base';
-                break;
-            case '{org}':
-                $joindata['add_custom_organisation_fields'] = 'base';
-                break;
-            case '{pos}':
-                $joindata['add_custom_position_fields'] = 'base';
-                break;
-            case '{comp}':
-                $joindata['add_custom_competency_fields'] = 'base';
-                break;
-            case '{goal}':
-                $joindata['add_custom_goal_fields'] = 'base';
-                break;
-            case '{goal_personal}':
-                $joindata['add_custom_personal_goal_fields'] = 'base';
-                break;
-            case '{dp_plan_evidence}':
-                $joindata['add_custom_evidence_fields'] = 'base';
-                break;
-        }
-        //and then use the flags to call the appropriate add functions
-        foreach ($joindata as $joinfunction => $jointable) {
-            $this->$joinfunction($this->joinlist,
-                                 $this->columnoptions,
-                                 $this->filteroptions,
-                                 $jointable
-                                );
-
-        }
+        $this->add_totara_customfield_base();
     }
 
     /**
@@ -5221,21 +5152,28 @@ abstract class rb_base_source {
      * Generic function for adding custom fields to the reports
      * Intentionally optimized into one function to reduce number of db queries
      *
-     * @param string $cf_prefix - prefix for custom field table e.g. everything before '_info_field' or '_info_data'
-     * @param string $join - join table in joinlist used as a link to main query
-     * @param string $joinfield - joinfield in data table used to link with main table
-     * @param array $joinlist - array of joins passed by reference
-     * @param array $columnoptions - array of columnoptions, passed by reference
-     * @param array $filteroptions - array of filters, passed by reference
-     * @param string $suffix - instead of custom_field_{$id}, column name will be custom_field_{$id}{$suffix}. Use short prefixes
-     *                         to avoid hiting column size limitations
-     * @param bool $nofilter - do not create filter for custom fields. It is useful when customfields are dynamically added by
-     *                         column generator
+     * @deprecated since Totara 12.0
+     *
+     * @param string $cf_prefix     - prefix for custom field table e.g. everything before '_info_field' or
+     *                              '_info_data'
+     * @param string $join          - join table in joinlist used as a link to main query
+     * @param string $joinfield     - joinfield in data table used to link with main table
+     * @param array  $joinlist      - array of joins passed by reference
+     * @param array  $columnoptions - array of columnoptions, passed by reference
+     * @param array  $filteroptions - array of filters, passed by reference
+     * @param string $suffix        - instead of custom_field_{$id}, column name will be custom_field_{$id}{$suffix}.
+     *                              Use short prefixes to avoid hiting column size limitations
+     * @param bool   $nofilter      - do not create filter for custom fields. It is useful when customfields are
+     *                              dynamically added by column generator
+     *
+     * @return bool
      */
     protected function add_custom_fields_for($cf_prefix, $join, $joinfield,
         array &$joinlist, array &$columnoptions, array &$filteroptions, $suffix = '', $nofilter = false) {
 
         global $CFG, $DB;
+
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         if (strlen($suffix)) {
             if (!preg_match('/^[a-zA-Z]{1,5}$/', $suffix)) {
@@ -5567,8 +5505,8 @@ abstract class rb_base_source {
 
         $join = empty($columnoption->joins) ? 'base' : $columnoption->joins;
 
-        $this->add_custom_fields_for($columnoption->type, $join, $columnoption->field, $this->joinlist,
-                $columnoptions, $this->filteroptions, 'all', true);
+        $this->add_totara_customfield_component($columnoption->type, $join, $columnoption->field, $this->joinlist,
+                                                $columnoptions, $this->filteroptions, 'all', true);
         foreach ($columnoptions as $option) {
             $result[] = new rb_column(
                     $option->type,
@@ -5585,6 +5523,7 @@ abstract class rb_base_source {
     /**
      * Adds user custom fields to the report.
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -5598,6 +5537,8 @@ abstract class rb_base_source {
         array &$filteroptions, $basejoin = 'auser', $groupname = 'user', $addtypetoheading = false, $nofilter = false) {
 
         global $DB;
+
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_core_customfield_user in core_user\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         if (!empty($this->addeduserjoins[$basejoin]['processed'])) {
             // Already added.
@@ -5759,19 +5700,34 @@ abstract class rb_base_source {
         return true;
     }
 
+    /**
+     * @deprecated since Totara 12.0
+     * @param array  $joinlist
+     * @param array  $columnoptions
+     * @param array  $filteroptions
+     * @param string $basetable
+     *
+     * @return bool
+     * @throws ReportBuilderException
+     * @throws coding_exception
+     */
     protected function add_custom_evidence_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions, $basetable = 'dp_plan_evidence') {
-        return $this->add_custom_fields_for('dp_plan_evidence',
-                                            $basetable,
-                                            'evidenceid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
+
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('dp_plan_evidence',
+                                                       $basetable,
+                                                       'evidenceid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
     }
 
     /**
      * Adds course custom fields to the report
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -5780,17 +5736,21 @@ abstract class rb_base_source {
      */
     protected function add_custom_course_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions, $basetable = 'course') {
-        return $this->add_custom_fields_for('course',
-                                            $basetable,
-                                            'courseid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
+
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('course',
+                                                       $basetable,
+                                                       'courseid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
     }
 
     /**
      * Adds course custom fields to the report
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -5799,12 +5759,15 @@ abstract class rb_base_source {
      */
     protected function add_custom_prog_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions, $basetable = 'prog') {
-        return $this->add_custom_fields_for('prog',
-                                            $basetable,
-                                            'programid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
+
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('prog',
+                                                       $basetable,
+                                                       'programid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
     }
 
     /**
@@ -5813,6 +5776,7 @@ abstract class rb_base_source {
      * Note: this wont work for users job assignments since they're all grouped.
      * but this would still be good for other base tables like the organisation source.
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -5820,12 +5784,15 @@ abstract class rb_base_source {
      */
     protected function add_custom_organisation_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions) {
-        return $this->add_custom_fields_for('org_type',
-                                            'organisation',
-                                            'organisationid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
+
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('org_type',
+                                                       'organisation',
+                                                       'organisationid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
     }
 
     /**
@@ -6056,6 +6023,7 @@ abstract class rb_base_source {
      * Note: this wont work for users job assignments since they're all grouped.
      * but this would still be good for other base tables like the organisation source.
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -6063,19 +6031,22 @@ abstract class rb_base_source {
      */
     protected function add_custom_position_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions) {
-        return $this->add_custom_fields_for('pos_type',
-                                            'position',
-                                            'positionid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
+
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('pos_type',
+                                                       'position',
+                                                       'positionid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
 
     }
-
 
     /**
      * Adds custom goal fields to the report
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -6083,18 +6054,21 @@ abstract class rb_base_source {
      */
     protected function add_custom_goal_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions) {
-        return $this->add_custom_fields_for('goal_type',
-                                            'goal',
-                                            'goalid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
-    }
 
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('goal_type',
+                                                       'goal',
+                                                       'goalid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
+    }
 
     /**
      * Adds custom personal goal fields to the report
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -6102,18 +6076,21 @@ abstract class rb_base_source {
      */
     protected function add_custom_personal_goal_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions) {
-        return $this->add_custom_fields_for('goal_user',
-                                            'goal_personal',
-                                            'goal_userid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
-    }
 
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('goal_user',
+                                                       'goal_personal',
+                                                       'goal_userid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
+    }
 
     /**
      * Adds custom competency fields to the report
      *
+     * @deprecated since Totara 12.0
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
@@ -6121,13 +6098,15 @@ abstract class rb_base_source {
      */
     protected function add_custom_competency_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions) {
-        return $this->add_custom_fields_for('comp_type',
-                                            'competency',
-                                            'competencyid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
 
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
+
+        return $this->add_totara_customfield_component('comp_type',
+                                                       'competency',
+                                                       'competencyid',
+                                                       $joinlist,
+                                                       $columnoptions,
+                                                       $filteroptions);
     }
 
     /**

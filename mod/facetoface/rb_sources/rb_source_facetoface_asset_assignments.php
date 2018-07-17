@@ -235,7 +235,7 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
     }
 
     protected function add_customfields() {
-        $this->add_custom_fields_for(
+        $this->add_totara_customfield_component(
             'facetoface_room',
             'room',
             'facetofaceroomid',
@@ -244,7 +244,7 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
             $this->filteroptions
         );
 
-        $this->add_custom_fields_for(
+        $this->add_totara_customfield_component(
             'facetoface_asset',
             'asset',
             'facetofaceassetid',
@@ -253,7 +253,7 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
             $this->filteroptions
         );
 
-        $this->add_custom_fields_for(
+        $this->add_totara_customfield_component(
             'facetoface_session',
             'sessions',
             'facetofacesessionid',

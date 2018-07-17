@@ -667,8 +667,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      * @return void
      */
     protected function add_customfields() {
-        $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
-        $this->add_custom_fields_for('facetoface_signup', 'base', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_totara_customfield_component('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_totara_customfield_component('facetoface_signup', 'base', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
     }
 
     //

@@ -609,26 +609,10 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     }
 
     protected function add_customfields() {
-        $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
-        $this->add_custom_fields_for('facetoface_sessioncancel', 'sessions', 'facetofacesessioncancelid', $this->joinlist, $this->columnoptions, $this->filteroptions);
-
-        $this->add_custom_fields_for(
-            'facetoface_room',
-            'room',
-            'facetofaceroomid',
-            $this->joinlist,
-            $this->columnoptions,
-            $this->filteroptions
-        );
-
-        $this->add_custom_fields_for(
-            'facetoface_asset',
-            'asset',
-            'facetofaceassetid',
-            $this->joinlist,
-            $this->columnoptions,
-            $this->filteroptions
-        );
+        $this->add_totara_customfield_component('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_totara_customfield_component('facetoface_sessioncancel', 'sessions', 'facetofacesessioncancelid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_totara_customfield_component('facetoface_room', 'room', 'facetofaceroomid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_totara_customfield_component('facetoface_asset', 'asset', 'facetofaceassetid', $this->joinlist, $this->columnoptions, $this->filteroptions);
     }
 
     protected function define_paramoptions() {

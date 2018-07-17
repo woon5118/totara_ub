@@ -536,17 +536,18 @@ trait report_trait {
         return true;
     }
 
-
     /**
      * Adds some common user field to the $filteroptions array
      *
-     * @param array &$filteroptions Array of current filter options
-     *                              Passed by reference and updated by
-     *                              this method
-     * @param string $groupname Name of group to filter. If you are defining
-     *                          a custom group name, you must define a language
-     *                          string with the key "type_{$groupname}" in your
-     *                          report source language file.
+     * @param array  &$filteroptions   Array of current filter options
+     *                                 Passed by reference and updated by
+     *                                 this method
+     * @param string $groupname        Name of group to filter. If you are defining
+     *                                 a custom group name, you must define a language
+     *                                 string with the key "type_{$groupname}" in your
+     *                                 report source language file.
+     * @param bool   $addtypetoheading Add the column type to the column heading
+     *
      * @return True
      */
     protected function add_core_user_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
@@ -752,5 +753,180 @@ trait report_trait {
         return true;
     }
 
+    /**
+     * Adds user custom fields to the report.
+     *
+     * @param array  $joinlist         Array of current joins
+     * @param array  $columnoptions    Array of current column options
+     * @param array  $filteroptions    Array of current filter options
+     * @param string $basejoin         Join table in joinlist used as a link to main query
+     * @param string $groupname        Name of group to filter and add fields to
+     * @param bool   $addtypetoheading Add the column type to the column heading
+     * @param bool   $nofilter         Flag indicating if filter needs to be added
+     *
+     * @return boolean
+     */
+    protected function add_core_customfield_user(array &$joinlist, array &$columnoptions, array &$filteroptions,
+                                                 $basejoin = 'auser', $groupname = 'user', $addtypetoheading = false, $nofilter = false) {
+        global $DB;
 
+        if (!empty($this->addeduserjoins[$basejoin]['processed'])) {
+            // Already added.
+            return false;
+        }
+
+        $jointable = false;
+        if ($basejoin === 'base') {
+            $jointable = $this->base;
+        } else {
+            foreach ($joinlist as $object) {
+                if ($object->name === $basejoin) {
+                    $jointable = $object->table;
+                    break;
+                }
+            }
+        }
+
+        // Check if there are any visible custom fields of this type.
+        $items = $DB->get_recordset('user_info_field');
+        foreach ($items as $record) {
+            $id = $record->id;
+            $joinname = "{$basejoin}_cf_{$id}";
+            $value = "custom_field_{$id}";
+            $name = isset($record->fullname) ? $record->fullname : $record->name;
+
+            $column_options = array();
+            $column_options['joins'] = array($joinname);
+            $column_options['extracontext'] = (array)$record;
+            $column_options['addtypetoheading'] = $addtypetoheading;
+            $column_options['displayfunc'] = 'userfield_' . $record->datatype;
+
+            if ($record->visible != PROFILE_VISIBLE_ALL) {
+                // If the field is not visible to all we need the userid to enable visibility checks.
+                if ($jointable === '{user}') {
+                    $column_options['extrafields'] = array('userid' => "{$basejoin}.id");
+                } else {
+                    $column_options['extrafields'] = array('userid' => "{$joinname}.userid");
+                }
+            }
+
+            if ($record->visible == PROFILE_VISIBLE_NONE) {
+                // If profile field isn't available to everyone require a capability to display the column.
+                $column_options['capability'] = 'moodle/user:viewalldetails';
+            }
+
+            $filter_options = array();
+            $filter_options['addtypetoheading'] = $addtypetoheading;
+
+            $columnsql = "{$joinname}.data";
+
+            switch ($record->datatype) {
+                case 'textarea':
+                    $column_options['extrafields']["format"] = "{$joinname}.dataformat";
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    $filtertype = 'textarea';
+                    break;
+
+                case 'menu':
+                    $default = $record->defaultdata;
+                    if ($default !== '' and $default !== null) {
+                        // Note: there is no safe way to inject the default value into the query, use extra join instead.
+                        $fieldjoin = $joinname . '_fielddefault';
+                        $joinlist[] = new \rb_join(
+                            $fieldjoin,
+                            'INNER',
+                            "{user_info_field}",
+                            "{$fieldjoin}.id = {$id}",
+                            REPORT_BUILDER_RELATION_MANY_TO_ONE
+                        );
+                        $columnsql = "COALESCE({$columnsql}, {$fieldjoin}.defaultdata)";
+                        $column_options['joins'][] = $fieldjoin;
+                    }
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    $filtertype = 'menuofchoices';
+                    $filter_options['selectchoices'] = $this->list_to_array($record->param1,"\n");
+                    $filter_options['simplemode'] = true;
+                    break;
+
+                case 'checkbox':
+                    $default = (int)$record->defaultdata;
+                    $columnsql = "CASE WHEN ( {$columnsql} IS NULL OR {$columnsql} = '' ) THEN {$default} ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
+                    $filtertype = 'select';
+                    $filter_options['selectchoices'] = array(0 => get_string('no'), 1 => get_string('yes'));
+                    $filter_options['simplemode'] = true;
+                    break;
+
+                case 'datetime':
+                    $columnsql = "CASE WHEN {$columnsql} = '' THEN NULL ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
+                    $column_options['dbdatatype'] = 'timestamp';
+                    $filtertype = 'date';
+                    if ($record->param3) {
+                        $filter_options['includetime'] = true;
+                    }
+                    break;
+
+                case 'date': // Midday in UTC, date without timezone.
+                    $columnsql = "CASE WHEN {$columnsql} = '' THEN NULL ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
+                    $column_options['dbdatatype'] = 'timestamp';
+                    $filtertype = 'date';
+                    break;
+
+                case 'text':
+                    $default = $record->defaultdata;
+                    if ($default !== '' and $default !== null) {
+                        // Note: there is no safe way to inject the default value into the query, use extra join instead.
+                        $fieldjoin = $joinname . '_fielddefault';
+                        $joinlist[] = new \rb_join(
+                            $fieldjoin,
+                            'INNER',
+                            "{user_info_field}",
+                            "{$fieldjoin}.id = {$id}",
+                            REPORT_BUILDER_RELATION_MANY_TO_ONE
+                        );
+                        $columnsql = "COALESCE({$columnsql}, {$fieldjoin}.defaultdata)";
+                        $column_options['joins'][] = $fieldjoin;
+                    }
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    $filtertype = 'text';
+                    break;
+
+                default:
+                    // Unsupported customfields.
+                    continue 2;
+            }
+
+            $joinlist[] = new \rb_join(
+                $joinname,
+                'LEFT',
+                "{user_info_data}",
+                "{$joinname}.userid = {$basejoin}.id AND {$joinname}.fieldid = {$id}",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                $basejoin
+            );
+            $columnoptions[] = new \rb_column_option(
+                $groupname,
+                $value,
+                $name,
+                $columnsql,
+                $column_options
+            );
+
+            if (!$nofilter) {
+                $filteroptions[] = new \rb_filter_option(
+                    $groupname,
+                    $value,
+                    $name,
+                    $filtertype,
+                    $filter_options
+                );
+            }
+        }
+
+        $items->close();
+
+        return true;
+    }
 }

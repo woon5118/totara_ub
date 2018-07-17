@@ -124,6 +124,17 @@ information provided here is intended especially for developers.
   * rb_source_upgrade_log::rb_display_backtrace()
   * rb_source_upgrade_log::rb_display_upgradelogtype()
   * rb_source_user::rb_display_extension_link()
+* The following functions have been deprecated and moved into traits:
+  * add_custom_fields_for instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_user_fields instead use add_core_customfield_user in core_user\rb\source\report_trait
+  * add_custom_evidence_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_course_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_prog_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_organisation_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_position_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_goal_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_personal_goal_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+  * add_custom_competency_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
 
 === 11.0 ===
 

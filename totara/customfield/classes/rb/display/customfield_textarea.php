@@ -18,10 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralms.com>
- * @package totara_reportbuilder
+ * @package totara_customfield
  */
 
-namespace totara_reportbuilder\rb\display;
+namespace totara_customfield\rb\display;
+
+use totara_reportbuilder\rb\display\base;
 
 /**
  * Class describing column display formatting.

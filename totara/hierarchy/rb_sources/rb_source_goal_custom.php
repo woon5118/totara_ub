@@ -445,7 +445,7 @@ class rb_source_goal_custom extends rb_base_source {
 
         switch($customgoal->datatype) {
             case 'checkbox':
-                $displayfunc = "yes_no";
+                $displayfunc = "yes_or_no";
                 break;
             case 'multiselect':
                 $multi = "_text";

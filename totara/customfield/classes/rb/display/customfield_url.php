@@ -18,10 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Player <simon.player@totaralms.com>
- * @package totara_reportbuilder
+ * @package totara_customfield
  */
 
-namespace totara_reportbuilder\rb\display;
+namespace totara_customfield\rb\display;
+
+use totara_reportbuilder\rb\display\base;
 
 /**
  * Class customfield_url
