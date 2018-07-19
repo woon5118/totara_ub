@@ -189,6 +189,21 @@ class profile_field_menu extends profile_field_base {
     }
 
     /**
+     * Function export the user readable value of the selected
+     * menu item
+     *
+     * @param stdClass $user
+     * @return string selected item
+     */
+    public function export_load_user_data($user) {
+        if (empty($this->data)) {
+            $user->{$this->inputname} = '';
+        } else {
+            $user->{$this->inputname} = clean_text($this->options[$this->datakey]);
+        }
+    }
+
+    /**
      * HardFreeze the field if locked.
      * @param moodleform $mform instance of the moodleform class
      */

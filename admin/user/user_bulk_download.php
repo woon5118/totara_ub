@@ -79,7 +79,7 @@ if ($dataformat) {
         foreach ($extrafields as $field) {
             $newfield = 'profile_field_'.$field->datatype;
             $formfield = new $newfield($field->id, $user->id);
-            $formfield->edit_load_user_data($user);
+            $formfield->export_load_user_data($user);
         }
         $userprofiledata = array();
         foreach ($fields as $field => $unused) {
