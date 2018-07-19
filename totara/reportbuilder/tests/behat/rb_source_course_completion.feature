@@ -27,6 +27,7 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I click on "Audience 1" "link"
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I press "Save and display"
+    And I run the scheduled task "\enrol_cohort\task\sync_members"
     When I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | Course Completion Report |
@@ -46,6 +47,7 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I click on "Audience 1" "link"
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I press "Save and display"
+    And I run the scheduled task "\enrol_cohort\task\sync_members"
     When I navigate to "Create report" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
       | Report Name | Course Completion Report |
@@ -54,4 +56,5 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I switch to "Columns" tab
     And I add the "Enrolment Types" column to the report
     And I follow "View This Report"
-    Then I should see "Audience sync, Manual enrolments"
+    Then I should see "Audience sync" in the "Course 1" "table_row"
+    And I should see "Manual enrolments" in the "Course 1" "table_row"
