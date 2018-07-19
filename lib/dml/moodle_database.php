@@ -817,6 +817,9 @@ abstract class moodle_database {
                 }
             }
             if ($integersonly) {
+                foreach ($items as $k => $v) {
+                    $items[$k] = "'" . $v . "'";
+                }
                 if ($equal) {
                     $sql = 'IN (' . implode(',', $items) . ')';
                 } else {
