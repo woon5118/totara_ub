@@ -78,6 +78,7 @@ Feature: Suspend enrolled course users
     And I follow "Miscellaneous"
     And I follow "Course 1"
     And I press "Save"
+    And I run the scheduled task "\enrol_cohort\task\sync_members"
     And I log out
 
     When I log in as "learner1"
@@ -127,6 +128,7 @@ Feature: Suspend enrolled course users
     And I follow "Miscellaneous"
     And I follow "Course 1"
     And I press "Save"
+    And I run the scheduled task "\enrol_cohort\task\sync_members"
     And I log out
 
     When I log in as "learner1"
@@ -183,6 +185,7 @@ Feature: Suspend enrolled course users
     And I follow "Miscellaneous"
     And I follow "Course 1"
     And I press "Save"
+    And I run the scheduled task "\enrol_cohort\task\sync_members"
     And I log out
 
     When I log in as "learner1"
@@ -209,11 +212,8 @@ Feature: Suspend enrolled course users
     Then I should see "Topic 1"
     And I log out
 
-    # Now run the cron tasks
-    # The legacy enrolment plugin cron updates cohort_members (same as \totara_cohort\task\update_cohort_task)
-    # as well as user_enrolments (same as the ad-hoc task \totara_cohort\task\sync_dynamic_cohort_task)
-    # Therefore only calling the legacy cron task here
-    When I run the scheduled task "\core\task\legacy_plugin_cron_task"
+    # Now run the cron task
+    When I run the scheduled task "\enrol_cohort\task\sync_members"
     And I log in as "learner1"
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
