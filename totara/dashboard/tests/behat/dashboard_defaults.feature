@@ -18,11 +18,11 @@ Feature: Test Dashboard defaults
     And I should see "Latest announcements"
     And I log out
 
-    Scenario: Dashboard is default page for all users except admin by default
-      When I log in as "student1"
-      Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
-      And I should not see "Make Dashboard my default page"
-      And I should see "Current Learning"
+  Scenario: Dashboard is default page for all users except admin by default
+    When I log in as "student1"
+    Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
+    And I should not see "Make Dashboard my default page"
+    And I should see "Current Learning"
 
     When I click on "Home" in the totara menu
     Then I should see "Latest announcements"

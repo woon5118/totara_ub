@@ -62,10 +62,10 @@ Feature: Totara form onchange reload client radios action test suite
     And "<radios>" row "Value" column of "form_results" table should contain "«<submitvalue>»"
     And "submitbutton" row "Value" column of "form_results" table should contain "«1»"
 
-  Examples:
-    | radios   | default | changed   | changedstatus | returnedstatus | submitvalue |
-    | radios_2 | one     | two       | changed       | changed        | 1           |
-    | radios_3 | one     | two       | changed       | unchanged      | 1           |
-    | radios_4 | one     | two       | changed       | changed        | b           |
-    | radios_5 | two     | one       | unchanged     | changed        | a           |
-    | radios_6 | one     | two       | changed       | unchanged      | b           |
+    Examples:
+      | radios   | default | changed   | changedstatus | returnedstatus | submitvalue |
+      | radios_2 | one     | two       | changed       | changed        | 1           |
+      | radios_3 | one     | two       | changed       | unchanged      | 1           |
+      | radios_4 | one     | two       | changed       | changed        | b           |
+      | radios_5 | two     | one       | unchanged     | changed        | a           |
+      | radios_6 | one     | two       | changed       | unchanged      | b           |

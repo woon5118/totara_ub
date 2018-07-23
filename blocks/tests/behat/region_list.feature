@@ -1,8 +1,8 @@
 @core @core_block @javascript
 Feature: Ensure page layouts are listed correctly
-    In order for blocks to show in layouts
-    As a user
-    I need to set regions throughout the site
+  In order for blocks to show in layouts
+  As a user
+  I need to set regions throughout the site
 
   Background:
     Given I am on a totara site

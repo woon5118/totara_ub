@@ -2,13 +2,13 @@
 Feature: Disabling approval options in global settings would
   not cause the empty radio button in seminar module's settings
 
-Background: I am on totara site
-  And the following "users" exist:
-    | username | firstname | lastname | email               |
-    | user1    | user      | lastname | email@something.com |
-  And the following "courses" exist:
-    | fullname  | shortname | category |
-    | Course101 | C101      | 0        |
+  Background: I am on totara site
+    And the following "users" exist:
+      | username | firstname | lastname | email               |
+      | user1    | user      | lastname | email@something.com |
+    And the following "courses" exist:
+      | fullname  | shortname | category |
+      | Course101 | C101      | 0        |
 
   @javascript
   Scenario: Disabled approval options in global settings are not affect to seminars module's settings

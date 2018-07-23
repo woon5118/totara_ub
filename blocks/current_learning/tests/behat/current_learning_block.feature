@@ -203,22 +203,22 @@ Feature: Test Current Learning block
       | learner1 | C13    | student |
       | learner1 | C14    | student |
       | learner1 | C15    | student |
-  And the following "activities" exist:
-    | activity   | name              | intro           | course               | idnumber    | completion   |
-    | label      | c1label1          | course1 label1  | C1                   | c1label1    | 1            |
-    | label      | c1label2          | course1 label2  | C1                   | c1label2    | 1            |
-  And I log in as "admin"
+    And the following "activities" exist:
+      | activity   | name              | intro           | course               | idnumber    | completion   |
+      | label      | c1label1          | course1 label1  | C1                   | c1label1    | 1            |
+      | label      | c1label2          | course1 label2  | C1                   | c1label2    | 1            |
+    And I log in as "admin"
 
-  # Set course completion criteria
-  And I click on "Find Learning" in the totara menu
-  And I click on "Courses" in the totara menu
-  And I follow "Course 1"
-  And I navigate to "Course completion" node in "Course administration"
-  And I expand all fieldsets
-  And I set the field "Label - course1 label1" to "1"
-  And I set the field "Label - course1 label2" to "1"
-  And I press "Save changes"
-  And I log out
+    # Set course completion criteria
+    And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
+    And I follow "Course 1"
+    And I navigate to "Course completion" node in "Course administration"
+    And I expand all fieldsets
+    And I set the field "Label - course1 label1" to "1"
+    And I set the field "Label - course1 label2" to "1"
+    And I press "Save changes"
+    And I log out
     And I log in as "learner1"
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 10"
@@ -239,9 +239,9 @@ Feature: Test Current Learning block
     Then I should see "Course 10"
     And I should not see "Course 5"
 
-  # Check popover integration
-  When I click on "0%" "text"
-  Then I should see "All of the following criteria"
+    # Check popover integration
+    When I click on "0%" "text"
+    Then I should see "All of the following criteria"
 
   @javascript
   Scenario: Learner can see course and program progress in the Current Learning block
