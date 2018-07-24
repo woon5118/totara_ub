@@ -132,6 +132,7 @@ trait report_trait {
             "{$join}.fullname",
             [
                 'joins' => [$join],
+                'displayfunc' => 'format_string'
             ]
         );
         $this->columnoptions[] = new \rb_column_option(
@@ -187,6 +188,7 @@ trait report_trait {
             "{$join}.id",
             [
                 'joins' => [$join],
+                'displayfunc' => 'integer'
             ]
         );
         $this->columnoptions[] = new \rb_column_option(
@@ -239,7 +241,8 @@ trait report_trait {
             get_string('numcolumns', 'totara_reportbuilder'),
             'CASE WHEN column_count.count IS NULL THEN 0 ELSE column_count.count END',
             [
-                'joins' => 'column_count'
+                'joins' => 'column_count',
+                'displayfunc' => 'integer'
             ]
         );
         $this->columnoptions[] = new \rb_column_option(
@@ -248,7 +251,8 @@ trait report_trait {
             get_string('numfilters', 'totara_reportbuilder'),
             'CASE WHEN filter_count.count IS NULL THEN 0 ELSE filter_count.count END',
             [
-                'joins' => 'filter_count'
+                'joins' => 'filter_count',
+                'displayfunc' => 'integer'
             ]
         );
         $this->columnoptions[] = new \rb_column_option(
@@ -257,7 +261,8 @@ trait report_trait {
             get_string('numscheduled', 'totara_reportbuilder'),
             'CASE WHEN scheduled_count.count IS NULL THEN 0 ELSE scheduled_count.count END',
             [
-                'joins' => 'scheduled_count'
+                'joins' => 'scheduled_count',
+                'displayfunc' => 'integer'
             ]
         );
         $this->columnoptions[] = new \rb_column_option(
@@ -266,7 +271,8 @@ trait report_trait {
             get_string('numsaved', 'totara_reportbuilder'),
             'CASE WHEN saved_count.count IS NULL THEN 0 ELSE saved_count.count END',
             [
-                'joins' => 'saved_count'
+                'joins' => 'saved_count',
+                'displayfunc' => 'integer'
             ]
         );
         $this->columnoptions[] = new \rb_column_option(

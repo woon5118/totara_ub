@@ -157,7 +157,8 @@ class rb_source_assign extends rb_base_source {
                 array(
                     'joins' => 'assign',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             ),
 
@@ -170,7 +171,8 @@ class rb_source_assign extends rb_base_source {
                 array(
                     'joins' => 'assign',
                     'dbdatatype' => 'text',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'editor_textarea'
                 )
             ),
 
@@ -226,7 +228,8 @@ class rb_source_assign extends rb_base_source {
                 array(
                     'joins' => 'assign_comments',
                     'dbdatatype' => 'text',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'editor_textarea'
                 )
             ),
 

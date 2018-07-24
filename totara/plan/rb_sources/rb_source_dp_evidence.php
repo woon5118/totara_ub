@@ -155,7 +155,8 @@ class rb_source_dp_evidence extends rb_base_source {
                 'base.name',
                 array(
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text')
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -223,7 +224,8 @@ class rb_source_dp_evidence extends rb_base_source {
             get_string('evidencetype', 'rb_source_dp_evidence'),
             'base.evidencetypename',
             array('dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
 
         $columnoptions[] = new rb_column_option(

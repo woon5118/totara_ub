@@ -47,7 +47,8 @@ trait report_trait {
             "$join.fullname",
             array('joins' => $join,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new \rb_column_option(
             'course',
@@ -146,7 +147,8 @@ trait report_trait {
             "$join.shortname",
             array('joins' => $join,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'plaintext')
         );
         $columnoptions[] = new \rb_column_option(
             'course',
@@ -163,7 +165,8 @@ trait report_trait {
             'id',
             get_string('courseid', 'totara_reportbuilder'),
             "$join.id",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'displayfunc' => 'integer')
         );
         $columnoptions[] = new \rb_column_option(
             'course',
@@ -445,7 +448,8 @@ trait report_trait {
             "$catjoin.name",
             array('joins' => $catjoin,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new \rb_column_option(
             'course_category',
@@ -478,7 +482,8 @@ trait report_trait {
             'id',
             get_string('coursecategoryid', 'totara_reportbuilder'),
             "$coursejoin.category",
-            array('joins' => $coursejoin)
+            array('joins' => $coursejoin,
+                  'displayfunc' => 'integer')
         );
         return true;
     }

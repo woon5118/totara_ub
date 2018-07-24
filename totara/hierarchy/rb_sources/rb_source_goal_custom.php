@@ -176,7 +176,8 @@ class rb_source_goal_custom extends rb_base_source {
                 'goal',
                 'goalname',
                 get_string('goalname', 'rb_source_goal_custom'),
-                'base.name'
+                'base.name',
+                array('displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'goal',
@@ -246,7 +247,8 @@ class rb_source_goal_custom extends rb_base_source {
                 get_string('status', 'rb_source_goal_custom'),
                 'goal_scale_values.name',
                 array(
-                    'joins' => 'goal_scale_values'
+                    'joins' => 'goal_scale_values',
+                    'displayfunc' => 'format_string'
                 )
             ),
         );

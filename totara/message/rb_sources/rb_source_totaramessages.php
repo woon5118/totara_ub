@@ -124,7 +124,8 @@ class rb_source_totaramessages extends rb_base_source {
                 'msg.subject',
                 array('joins' => 'msg',
                       'dbdatatype' => 'text',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'message_values',
@@ -133,7 +134,8 @@ class rb_source_totaramessages extends rb_base_source {
                 'msg.fullmessagehtml',
                 array('joins' => 'msg',
                       'dbdatatype' => 'text',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_text')
             ),
             new rb_column_option(
                 'message_values',
@@ -216,6 +218,7 @@ class rb_source_totaramessages extends rb_base_source {
                 array('nosort' => true,
                       'noexport' => true,
                       'hidden' => 1,
+                      'displayfunc' => 'integer'
                     )
             ),
         );

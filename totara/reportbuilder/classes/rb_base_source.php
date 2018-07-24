@@ -2907,7 +2907,7 @@ abstract class rb_base_source {
                 JOIN {job_assignment} ja ON ja.positionid = p.id
                WHERE ja.userid = $join.id AND p.fullname IS NOT NULL)",
             array(
-                'displayfunc' => 'formatstring',
+                'displayfunc' => 'format_string',
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
@@ -2943,7 +2943,7 @@ abstract class rb_base_source {
                 JOIN {job_assignment} ja ON ja.organisationid = o.id
                WHERE ja.userid = $join.id AND o.fullname IS NOT NULL)",
             array(
-                'displayfunc' => 'formatstring',
+                'displayfunc' => 'format_string',
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,

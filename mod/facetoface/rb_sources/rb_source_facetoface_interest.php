@@ -122,7 +122,8 @@ class rb_source_facetoface_interest extends rb_base_source {
                 'facetoface.name',
                 array('joins' => 'facetoface',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'facetoface',
@@ -153,6 +154,7 @@ class rb_source_facetoface_interest extends rb_base_source {
                 array(
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             ),
         );

@@ -98,7 +98,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $report->columns['user-timecreated']->displayfunc = 'weekday';
 
         $column = $report->columns['user-id'];
-        $this->assertFalse($column->is_graphable($report));
+        $this->assertTrue($column->is_graphable($report));
 
         $column = $report->columns['user-username'];
         $this->assertFalse($column->is_graphable($report));

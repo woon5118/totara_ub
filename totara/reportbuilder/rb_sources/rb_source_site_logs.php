@@ -118,13 +118,15 @@ class rb_source_site_logs extends rb_base_source {
                 get_string('module', 'rb_source_site_logs'),
                 'base.module',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'log',
                 'cmid',
                 get_string('cmid', 'rb_source_site_logs'),
-                'base.cmid'
+                'base.cmid',
+                array('displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'log',
@@ -132,7 +134,8 @@ class rb_source_site_logs extends rb_base_source {
                 get_string('action', 'rb_source_site_logs'),
                 $DB->sql_concat('base.module', "' '", 'base.action'),
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'log',
@@ -151,7 +154,8 @@ class rb_source_site_logs extends rb_base_source {
                 get_string('url', 'rb_source_site_logs'),
                 'base.url',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'log',
@@ -159,7 +163,8 @@ class rb_source_site_logs extends rb_base_source {
                 get_string('info', 'rb_source_site_logs'),
                 'base.info',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
         );
 

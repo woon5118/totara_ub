@@ -186,14 +186,14 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'capacity',
                 get_string('sesscapacity', 'rb_source_facetoface_signin'),
                 'sessions.capacity',
-                array('joins' => 'sessions', 'dbdatatype' => 'integer')
+                array('joins' => 'sessions', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'session',
                 'numattendees',
                 get_string('numattendees', 'rb_source_facetoface_signin'),
                 'attendees.number',
-                array('joins' => 'attendees', 'dbdatatype' => 'integer')
+                array('joins' => 'attendees', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'session',
@@ -231,7 +231,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'facetoface.name',
                 array('joins' => 'facetoface',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text')
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'facetoface',
@@ -336,7 +337,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 array(
                     'joins' => 'sessions',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             );
             if (!get_config(null, 'facetoface_hidediscount')) {
@@ -348,7 +350,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                     array(
                         'joins' => 'sessions',
                         'dbdatatype' => 'char',
-                        'outputformat' => 'text'
+                        'outputformat' => 'text',
+                        'displayfunc' => 'format_string'
                     )
                 );
                 $columnoptions[] = new rb_column_option(
@@ -357,7 +360,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                     get_string('discountcode', 'rb_source_facetoface_signin'),
                     'base.discountcode',
                     array('dbdatatype' => 'text',
-                        'outputformat' => 'text')
+                        'outputformat' => 'text',
+                        'displayfunc' => 'format_string')
                 );
             }
         }

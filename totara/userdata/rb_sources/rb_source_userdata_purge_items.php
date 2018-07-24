@@ -79,14 +79,16 @@ final class rb_source_userdata_purge_items extends rb_base_source {
             'purge_item',
             'id',
             'ID',
-            "base.id"
+            "base.id",
+            array('displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
             'purge_item',
             'name',
             get_string('itemname', 'totara_userdata'),
-            "base.name"
+            "base.name",
+            array('displayfunc' => 'format_string')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -105,7 +107,8 @@ final class rb_source_userdata_purge_items extends rb_base_source {
             'purge_item',
             'component',
             get_string('itemcomponent', 'totara_userdata'),
-            "base.component"
+            "base.component",
+            array('displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(

@@ -164,7 +164,8 @@ class rb_source_dp_program extends rb_base_source {
             "base.fullname",
             array('joins' => 'base',
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new rb_column_option(
             'program',
@@ -173,7 +174,8 @@ class rb_source_dp_program extends rb_base_source {
             "base.shortname",
             array('joins' => 'base',
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'plaintext')
         );
         $columnoptions[] = new rb_column_option(
             'program',
@@ -190,7 +192,8 @@ class rb_source_dp_program extends rb_base_source {
             'id',
             get_string('programid', 'totara_program'),
             "base.id",
-            array('joins' => 'base')
+            array('joins' => 'base',
+                  'displayfunc' => 'integer')
         );
         $columnoptions[] = new rb_column_option(
             'program',
@@ -325,6 +328,7 @@ class rb_source_dp_program extends rb_base_source {
             array(
                 'joins' => 'program_completion_history',
                 'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 

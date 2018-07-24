@@ -41,9 +41,9 @@ class totara_reportbuilder_tabexport_source_testcase extends advanced_testcase {
 
         $expected = array();
         $expected[] = array('User ID', 'User First Name', 'User Last Name');
-        $expected[] = array($user->id, $user->firstname, $user->lastname);
-        $expected[] = array($admin->id, $admin->firstname, $admin->lastname);
-        $expected[] = array($guest->id, $guest->firstname, $guest->lastname);
+        $expected[] = array((int)$user->id, $user->firstname, $user->lastname);
+        $expected[] = array((int)$admin->id, $admin->firstname, $admin->lastname);
+        $expected[] = array((int)$guest->id, $guest->firstname, $guest->lastname);
 
         $rid = $this->create_report('user', 'Test user report 1');
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));

@@ -30,7 +30,25 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
     /**
-     * Ensure all columns where 'displayfunc' is set, a display class is being used.
+     * Ensure all columns have 'displayfunc' set.
+     */
+    public function test_all_columns_have_displayfunc() {
+        $sourcelist = reportbuilder::get_source_list(true);
+        foreach ($sourcelist as $sourcename => $title) {
+
+            $src = reportbuilder::get_source_object($sourcename, true); // Caching here is completely fine.
+
+            foreach ($src->columnoptions as $column) {
+                // Check columns have a displayfunc defined.
+                // Note: We are ignoring columns that use generators.
+                $missingdisplayfunc = $column->selectable !== false && empty($column->displayfunc) && empty($column->columngenerator);
+                $this->assertFalse($missingdisplayfunc, "displayfunc not defined for $column->type, $column->value in $sourcename rb source");
+            }
+        }
+    }
+
+    /**
+     * Ensure all column 'displayfunc' option uses a display class.
      * All display functions 'rb_display_*' should now be deprecated.
      */
     public function test_display_display_class_exists() {
@@ -125,7 +143,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertInstanceOf('stdClass', $row);
         $processed = $report->src->process_data_row($row, 'html', $report);
 
-        $this->assertSame($row->user_id, $processed[0]);
+        $this->assertSame((int)$row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('10 Jan 2013', $processed[2]);
         $this->assertStringStartsWith('10 Jan 2013 at ', $processed[3]);
@@ -135,7 +153,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $processed = $report->src->process_data_row($row, 'pdf', $report);
 
-        $this->assertSame($row->user_id, $processed[0]);
+        $this->assertSame((int)$row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('10 Jan 2013', $processed[2]);
         $this->assertStringStartsWith('10 Jan 2013 at ', $processed[3]);
@@ -145,7 +163,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $processed = $report->src->process_data_row($row, 'excel', $report);
 
-        $this->assertSame($row->user_id, $processed[0]);
+        $this->assertSame((int)$row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('date', $processed[2][0]);
         $this->assertSame('1357812000', $processed[2][1]);
@@ -159,7 +177,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $processed = $report->src->process_data_row($row, 'ods', $report);
 
-        $this->assertSame($row->user_id, $processed[0]);
+        $this->assertSame((int)$row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('date', $processed[2][0]);
         $this->assertSame('1357812000', $processed[2][1]);

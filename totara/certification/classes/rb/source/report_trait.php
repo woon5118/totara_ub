@@ -78,7 +78,8 @@ trait report_trait {
             "$join.activeperiod",
             array('joins' => $join,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new \rb_column_option(
@@ -88,7 +89,8 @@ trait report_trait {
             "$join.windowperiod",
             array('joins' => $join,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'plaintext')
         );
 
         return true;

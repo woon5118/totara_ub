@@ -151,6 +151,7 @@ class rb_source_job_assignments extends rb_base_source {
             array(
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -161,6 +162,7 @@ class rb_source_job_assignments extends rb_base_source {
             array(
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
+                'displayfunc' => 'plaintext'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -220,6 +222,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => array('pos'),
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -232,6 +235,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => array('pos'),
+                'displayfunc' => 'plaintext'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -244,6 +248,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => 'postype',
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -257,6 +262,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => 'postype',
+                'displayfunc' => 'plaintext'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -269,6 +275,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => 'posframework',
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -319,6 +326,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => array('org'),
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -331,6 +339,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => array('org'),
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -343,6 +352,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => 'orgtype',
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -368,6 +378,7 @@ class rb_source_job_assignments extends rb_base_source {
                 'outputformat' => 'text',
                 'addtypetoheading' => true,
                 'joins' => 'orgframework',
+                'displayfunc' => 'format_string'
             )
         );
         $columnoptions[] = new rb_column_option(

@@ -184,7 +184,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 array(
                     'joins' => 'prog',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
 
@@ -222,7 +223,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 array(
                     'joins' => 'prog',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'plaintext'
                 )
         );
 
@@ -243,7 +245,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 'base',
                 'certifid',
                 get_string('certificationid', 'rb_source_dp_certification'),
-                'base.certifid'
+                'base.certifid',
+                array('displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(

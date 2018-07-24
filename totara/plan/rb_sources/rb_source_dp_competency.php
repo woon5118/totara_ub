@@ -250,7 +250,8 @@ from
                     'defaultheading' => get_string('plan', 'rb_source_dp_competency'),
                     'joins' => 'dp_competency',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -307,7 +308,8 @@ from
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_competency'),
                     'joins' => 'template',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -342,7 +344,8 @@ from
                     'defaultheading' => get_string('competencyname', 'rb_source_dp_competency'),
                     'joins' => 'competency',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
 
@@ -366,7 +369,8 @@ from
                 array(
                     'joins' => 'priority',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
 
@@ -402,7 +406,8 @@ from
                 array(
                     'joins' => 'comp_type',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             );
 
@@ -412,7 +417,8 @@ from
                 get_string('competencytypeid', 'rb_source_dp_competency'),
                 'competency.typeid',
                 array(
-                    'joins' => 'competency'
+                    'joins' => 'competency',
+                    'displayfunc' => 'integer'
                 )
         );
 
@@ -433,7 +439,8 @@ from
                 array(
                     'joins' => array('dp_competency', 'scale_value', 'evidence_scale_value'),
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
 
@@ -496,7 +503,8 @@ from
                 get_string('courses', 'rb_source_dp_competency'),
                 'linkedcourses.count',
                 array(
-                    'joins' => 'linkedcourses'
+                    'joins' => 'linkedcourses',
+                    'displayfunc' => 'integer'
                 )
         );
 

@@ -304,6 +304,7 @@ trait report_trait {
             get_string('userid', 'totara_reportbuilder'),
             "$join.id",
             array('joins' => $join,
+                  'displayfunc' => 'integer',
                   'addtypetoheading' => $addtypetoheading
             )
         );
@@ -418,7 +419,7 @@ trait report_trait {
                 JOIN {job_assignment} ja ON ja.positionid = p.id
                WHERE ja.userid = $join.id AND p.fullname IS NOT NULL)",
             array(
-                'displayfunc' => 'formatstring',
+                'displayfunc' => 'format_string',
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,
@@ -452,7 +453,7 @@ trait report_trait {
                 JOIN {job_assignment} ja ON ja.organisationid = o.id
                WHERE ja.userid = $join.id AND o.fullname IS NOT NULL)",
             array(
-                'displayfunc' => 'formatstring',
+                'displayfunc' => 'format_string',
                 'joins' => $join,
                 'addtypetoheading' => $addtypetoheading,
                 'issubquery' => true,

@@ -93,6 +93,7 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
             "asset.names",
             array(
                 'joins' => 'asset',
+                'displayfunc' => 'format_text'
             )
         );
 

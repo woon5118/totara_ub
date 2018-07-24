@@ -42,7 +42,7 @@ class integer extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return (int)$value;
+        return is_null($value) ? $value : (int)$value;
     }
 
     /**

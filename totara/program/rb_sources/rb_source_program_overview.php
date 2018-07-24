@@ -371,7 +371,8 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'cplorganisation',
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'displayfunc' => 'plaintext'
             )
 
         );
@@ -384,7 +385,8 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'cplorganisation',
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string'
             )
         );
 
@@ -396,7 +398,8 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'cplorganisation_type',
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string'
             )
         );
 
@@ -409,7 +412,8 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'cplposition',
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string'
             )
 
         );
@@ -422,7 +426,8 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'cplposition_type',
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string'
             )
 
         );

@@ -139,7 +139,8 @@ final class rb_source_userdata_deleted_users extends rb_base_source {
             'suspended_purge_type.id',
             array(
                 'addtypetoheading' => true,
-                'joins' => array('suspended_purge_type')
+                'joins' => array('suspended_purge_type'),
+                'displayfunc' => 'integer'
             )
         );
 
@@ -162,7 +163,8 @@ final class rb_source_userdata_deleted_users extends rb_base_source {
             'deleted_purge_type.id',
             array(
                 'addtypetoheading' => true,
-                'joins' => array('deleted_purge_type')
+                'joins' => array('deleted_purge_type'),
+                'displayfunc' => 'integer'
             )
         );
 

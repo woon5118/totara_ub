@@ -72,6 +72,7 @@ trait text_report_trait {
             'joins'        => $joinname,
             'dbdatatype'   => 'text',
             'outputformat' => 'text',
+            'displayfunc'  => 'format_string'
         ];
         $columnsql = "{$joinname}.data";
 

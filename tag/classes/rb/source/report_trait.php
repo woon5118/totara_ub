@@ -123,7 +123,8 @@ trait report_trait {
             "$tagnames.namelist",
             array('joins' => $tagnames,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
 
         // Only get the tags in the collection for this item type.

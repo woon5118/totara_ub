@@ -242,14 +242,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'capacity',                 // Value.
                 get_string('sesscapacity', 'rb_source_facetoface_sessions'),    // Name.
                 'sessions.capacity',        // Field.
-                array('joins' => 'sessions', 'dbdatatype' => 'integer')         // Options array.
+                array('joins' => 'sessions', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')         // Options array.
             ),
             new rb_column_option(
                 'session',
                 'numattendees',
                 get_string('numattendees', 'rb_source_facetoface_sessions'),
                 'attendees.number',
-                array('joins' => 'attendees', 'dbdatatype' => 'integer')
+                array('joins' => 'attendees', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'session',
@@ -324,7 +324,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'facetoface.name',
                 array('joins' => 'facetoface',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'facetoface',
@@ -440,7 +441,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'pos.fullname',
                 array('joins' => 'pos',
                     'dbdatatype' => 'text',
-                    'outputformat' => 'text')
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'session',
@@ -448,7 +450,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('selectedjobassignmentedit', 'mod_facetoface'),
                 'selected_job_assignment.fullname',
                 array(
-                    'columngenerator' => 'job_assignment_edit')
+                    'columngenerator' => 'job_assignment_edit',
+                    'displayfunc' => 'f2f_job_assignment_edit')
                 ),
             new rb_column_option(
                 'status',
@@ -508,7 +511,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => 'sessions',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             );
             if (!get_config(null, 'facetoface_hidediscount')) {
@@ -520,7 +524,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     array(
                         'joins' => 'sessions',
                         'dbdatatype' => 'char',
-                        'outputformat' => 'text'
+                        'outputformat' => 'text',
+                        'displayfunc' => 'format_string'
                     )
                 );
                 $columnoptions[] = new rb_column_option(
@@ -529,7 +534,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     get_string('discountcode', 'rb_source_facetoface_sessions'),
                     'base.discountcode',
                     array('dbdatatype' => 'text',
-                        'outputformat' => 'text')
+                        'outputformat' => 'text',
+                        'displayfunc' => 'format_string')
                 );
             }
         }
@@ -863,7 +869,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             get_string('allsignupcustomfields', 'rb_source_facetoface_sessions'),
             'facetofacesignupid',
             array(
-                'columngenerator' => 'allcustomfieldssignupmanage'
+                'columngenerator' => 'allcustomfieldssignupmanage',
+                'displayfunc' => 'f2f_all_signup_customfields_manage'
             )
         );
         $this->add_totara_customfield_component('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
@@ -961,7 +968,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('actions', 'facetoface'),
                 'NULL',
                 [
-                    'displayfunc' => 'allcustomfieldssignupmanage',
+                    'displayfunc' => 'f2f_all_signup_customfields_manage',
                     'noexport' => true,
                     'dbdatatype' => 'text',
                     'outputformat' => 'text',

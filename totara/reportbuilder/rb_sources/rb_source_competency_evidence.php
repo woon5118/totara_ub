@@ -137,13 +137,15 @@ class rb_source_competency_evidence extends rb_base_source {
                 'scale_values.name',    // Field.
                 array('joins' => 'scale_values',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text') // Options.
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string') // Options.
             ),
             new rb_column_option(
                 'competency_evidence',
                 'proficiencyid',
                 get_string('proficiencyid', 'rb_source_competency_evidence'),
-                'base.proficiency'
+                'base.proficiency',
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -163,7 +165,8 @@ class rb_source_competency_evidence extends rb_base_source {
                 'competency_evidence',
                 'organisationid',
                 get_string('completionorgid', 'rb_source_competency_evidence'),
-                'base.organisationid'
+                'base.organisationid',
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -177,7 +180,8 @@ class rb_source_competency_evidence extends rb_base_source {
                 'organisationpath',
                 get_string('completionorgpath', 'rb_source_competency_evidence'),
                 'completion_organisation.path',
-                array('joins' => 'completion_organisation')
+                array('joins' => 'completion_organisation',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -186,27 +190,31 @@ class rb_source_competency_evidence extends rb_base_source {
                 'completion_organisation.fullname',
                 array('joins' => 'completion_organisation',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'competency_evidence',
                 'positionid',
                 get_string('completionposid', 'rb_source_competency_evidence'),
-                'base.positionid'
+                'base.positionid',
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'competency_evidence',
                 'positionid2',
                 get_string('completionposid', 'rb_source_competency_evidence'),
                 'base.positionid',
-                array('selectable' => false)
+                array('selectable' => false,
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'competency_evidence',
                 'positionpath',
                 get_string('completionpospath', 'rb_source_competency_evidence'),
                 'completion_position.path',
-                array('joins' => 'completion_position')
+                array('joins' => 'completion_position',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -215,7 +223,8 @@ class rb_source_competency_evidence extends rb_base_source {
                 'completion_position.fullname',
                 array('joins' => 'completion_position',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -235,7 +244,8 @@ class rb_source_competency_evidence extends rb_base_source {
                 get_string('assessororg', 'rb_source_competency_evidence'),
                 'base.assessorname',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'competency',
@@ -244,7 +254,8 @@ class rb_source_competency_evidence extends rb_base_source {
                 'competency.fullname',
                 array('joins' => 'competency',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'competency',
@@ -253,7 +264,8 @@ class rb_source_competency_evidence extends rb_base_source {
                 'competency.shortname',
                 array('joins' => 'competency',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'competency',
@@ -281,21 +293,24 @@ class rb_source_competency_evidence extends rb_base_source {
                 'competency',
                 'id',
                 get_string('competencyid', 'rb_source_competency_evidence'),
-                'base.competencyid'
+                'base.competencyid',
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'competency',
                 'id2',
                 get_string('competencyid', 'rb_source_competency_evidence'),
                 'base.competencyid',
-                array('selectable' => false)
+                array('selectable' => false,
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'competency',
                 'path',
                 get_string('competencypath', 'rb_source_competency_evidence'),
                 'competency.path',
-                array('joins' => 'competency')
+                array('joins' => 'competency',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'competency',

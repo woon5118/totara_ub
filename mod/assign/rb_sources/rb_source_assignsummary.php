@@ -111,7 +111,8 @@ class rb_source_assignsummary extends rb_base_source {
                 get_string('assignmentname', 'rb_source_assignsummary'),
                 'base.assignment_name',
                 array('dbdatatype' => 'char',
-                'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
 
             // Assignment intro.
@@ -121,7 +122,8 @@ class rb_source_assignsummary extends rb_base_source {
                 get_string('assignmentintro', 'rb_source_assignsummary'),
                 'base.assignment_intro',
                 array('dbdatatype' => 'text',
-                'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_text')
             ),
 
             // Assignment maxgrade.
@@ -129,7 +131,8 @@ class rb_source_assignsummary extends rb_base_source {
                 'base',
                 'maxgrade',
                 get_string('assignmentmaxgrade', 'rb_source_assignsummary'),
-                'base.assignment_maxgrade'
+                'base.assignment_maxgrade',
+                array('displayfunc' => 'integer')
             ),
 
             // User count.
@@ -137,7 +140,8 @@ class rb_source_assignsummary extends rb_base_source {
                 'base',
                 'user_count',
                 get_string('usercount', 'rb_source_assignsummary'),
-                'base.user_count'
+                'base.user_count',
+                array('displayfunc' => 'integer')
             )
         );
 

@@ -130,7 +130,8 @@ class rb_source_scorm extends rb_base_source {
                 'scorm.name',
                 array('joins' => 'scorm',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'sco',
@@ -139,7 +140,8 @@ class rb_source_scorm extends rb_base_source {
                 'sco.title',
                 array('joins' => 'sco',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'sco',
@@ -168,14 +170,16 @@ class rb_source_scorm extends rb_base_source {
                 'totaltime',
                 get_string('totaltime', 'rb_source_scorm'),
                 $DB->sql_compare_text('sco_totaltime.value', 1024),
-                array('joins' => 'sco_totaltime')
+                array('joins' => 'sco_totaltime',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'sco',
                 'scoreraw',
                 get_string('score', 'rb_source_scorm'),
                 $DB->sql_compare_text('sco_scoreraw.value', 1024),
-                array('joins' => 'sco_scoreraw')
+                array('joins' => 'sco_scoreraw',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'sco',
@@ -192,21 +196,24 @@ class rb_source_scorm extends rb_base_source {
                 'scoremin',
                 get_string('minscore', 'rb_source_scorm'),
                 $DB->sql_compare_text('sco_scoremin.value', 1024),
-                array('joins' => 'sco_scoremin')
+                array('joins' => 'sco_scoremin',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'sco',
                 'scoremax',
                 get_string('maxscore', 'rb_source_scorm'),
                 $DB->sql_compare_text('sco_scoremax.value', 1024),
-                array('joins' => 'sco_scoremax')
+                array('joins' => 'sco_scoremax',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'sco',
                 'attempt',
                 get_string('attemptnum', 'rb_source_scorm'),
                 'base.attempt',
-                array('dbdatatype' => 'integer')
+                array('dbdatatype' => 'integer',
+                      'displayfunc' => 'integer')
             ),
         );
 

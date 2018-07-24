@@ -140,7 +140,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -151,7 +152,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -163,7 +165,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                     'grouping' => 'count',
                     'displayfunc' => 'f2f_session_spaces',
                     'extrafields' => array('overall_capacity' => 'base.capacity'),
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -174,7 +177,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -185,7 +189,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -196,7 +201,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -207,7 +213,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -218,14 +225,16 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
                 'session',
                 'details',
                 get_string('sessdetails', 'rb_source_facetoface_sessions'),
-                'base.details'
+                'base.details',
+                array('displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'session',
@@ -242,7 +251,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 get_string('minbookings', 'rb_source_facetoface_summary'),
                 'base.mincapacity',
                 array(
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
         );
@@ -254,7 +264,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 get_string('normalcost', 'rb_source_facetoface_summary'),
                 'base.normalcost',
                 array(
-                    'dbdatatype' => 'decimal'
+                    'dbdatatype' => 'decimal',
+                    'displayfunc' => 'format_string'
                 )
             );
             if (!get_config(null, 'facetoface_hidediscount')) {
@@ -264,7 +275,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                     get_string('discountcost', 'rb_source_facetoface_summary'),
                     'base.discountcost',
                     array(
-                        'dbdatatype' => 'decimal'
+                        'dbdatatype' => 'decimal',
+                        'displayfunc' => 'format_string'
                     )
                 );
             }
@@ -276,7 +288,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             get_string('sessionid', 'rb_source_facetoface_room_assignments'),
             'base.id',
             array(
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 
@@ -286,7 +299,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             get_string('sesscapacity', 'rb_source_facetoface_sessions'),
             'base.capacity',
             array(
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -296,7 +310,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             'attendees.number',
             array(
                 'joins' => 'attendees',
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 

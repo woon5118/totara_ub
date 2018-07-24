@@ -172,14 +172,16 @@ class rb_source_feedback_summary extends rb_base_source {
                 'feedback.name',
                 array('joins' => 'feedback',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'trainer',
                 'id',
                 get_string('trainerid', 'rb_source_feedback_summary'),
                 'sessiontrainer.userid',
-                array('joins' => 'sessiontrainer')
+                array('joins' => 'sessiontrainer',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'trainer',
@@ -188,14 +190,16 @@ class rb_source_feedback_summary extends rb_base_source {
                 $DB->sql_fullname('trainer.firstname', 'trainer.lastname'),
                 array('joins' => 'trainer',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'trainer',
                 'organisationid',
                 get_string('trainerorgid', 'rb_source_feedback_summary'),
                 'trainer_job_assignment.organisationid',
-                array('joins' => 'trainer_job_assignment')
+                array('joins' => 'trainer_job_assignment',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'trainer',
@@ -204,14 +208,16 @@ class rb_source_feedback_summary extends rb_base_source {
                 'trainer_organisation.fullname',
                 array('joins' => 'trainer_organisation',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'trainer',
                 'positionid',
                 get_string('trainerposid', 'rb_source_feedback_summary'),
                 'trainer_job_assignment.positionid',
-                array('joins' => 'trainer_job_assignment')
+                array('joins' => 'trainer_job_assignment',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'trainer',
@@ -220,7 +226,8 @@ class rb_source_feedback_summary extends rb_base_source {
                 'trainer_position.fullname',
                 array('joins' => 'trainer_position',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
         );
         // include some standard columns

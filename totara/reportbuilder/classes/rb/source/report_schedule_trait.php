@@ -205,7 +205,8 @@ trait report_schedule_trait {
             "schedule_recipient_external.email",
             [
                 'grouping' => 'list_unique',
-                'joins' => 'schedule_recipient_external'
+                'joins' => 'schedule_recipient_external',
+                'displayfunc' => 'plaintext'
             ]
         );
         $this->columnoptions[] = new \rb_column_option(

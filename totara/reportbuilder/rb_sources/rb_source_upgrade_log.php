@@ -83,35 +83,35 @@ class rb_source_upgrade_log extends rb_base_source {
                 'plugin',
                 get_string('colplugin', 'rb_source_upgrade_log'),
                 'base.plugin',
-                array('dbdatatype' => 'char', 'outputformat' => 'text')
+                array('dbdatatype' => 'char', 'outputformat' => 'text', 'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'upgrade_log',
                 'version',
                 get_string('colversion', 'rb_source_upgrade_log'),
                 'base.version',
-                array()
+                array('displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'upgrade_log',
                 'targetversion',
                 get_string('coltargetversion', 'rb_source_upgrade_log'),
                 'base.targetversion',
-                array()
+                array('displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'upgrade_log',
                 'info',
                 get_string('colinfo', 'rb_source_upgrade_log'),
                 'base.info',
-                array('dbdatatype' => 'char', 'outputformat' => 'text')
+                array('dbdatatype' => 'char', 'outputformat' => 'text', 'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'upgrade_log',
                 'details',
                 get_string('coldetails', 'rb_source_upgrade_log'),
                 'base.details',
-                array('dbdatatype' => 'text')
+                array('dbdatatype' => 'text', 'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'upgrade_log',

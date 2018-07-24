@@ -296,7 +296,8 @@ class rb_source_course_completion extends rb_base_source {
                 'course_completion',
                 'organisationid',
                 get_string('completionorgid', 'rb_source_course_completion'),
-                'base.organisationid'
+                'base.organisationid',
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -319,13 +320,15 @@ class rb_source_course_completion extends rb_base_source {
                 'completion_organisation.fullname',
                 array('joins' => 'completion_organisation',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'course_completion',
                 'positionid',
                 get_string('completionposid', 'rb_source_course_completion'),
-                'base.positionid'
+                'base.positionid',
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -348,7 +351,8 @@ class rb_source_course_completion extends rb_base_source {
                 'completion_position.fullname',
                 array('joins' => 'completion_position',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'course_completion',

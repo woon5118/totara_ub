@@ -150,7 +150,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 'base',
                 'id',
                 get_string('columnbaseid', 'rb_source_completionimport_course'),
-                'base.id'
+                'base.id',
+                array('displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -158,7 +159,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 'rownumber',
                 get_string('columnbaserownumber', 'rb_source_completionimport_course'),
                 'base.rownumber',
-                array('dbdatatype' => 'integer')
+                array('dbdatatype' => 'integer',
+                      'displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -202,14 +204,16 @@ class rb_source_completionimport_course extends rb_base_source {
                 'importuser.username',
                 array('joins' => 'importuser',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
                 'base',
                 'importuserid',
                 get_string('columnbaseimportuserid', 'rb_source_completionimport_course'),
-                'base.importuserid'
+                'base.importuserid',
+                array('displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -229,7 +233,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 get_string('columnbaseusername', 'rb_source_completionimport_course'),
                 'base.username',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -238,7 +243,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 get_string('columnbasecourseshortname', 'rb_source_completionimport_course'),
                 'base.courseshortname',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -255,7 +261,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 'base',
                 'completiondate',
                 get_string('columnbasecompletiondate', 'rb_source_completionimport_course'),
-                'base.completiondate'
+                'base.completiondate',
+                array('displayfunc' => 'plaintext')
                 // NOTE: This is not an integer timestamp in install.xml.
         );
 
@@ -263,7 +270,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 'base',
                 'grade',
                 get_string('columnbasegrade', 'rb_source_completionimport_course'),
-                'base.grade'
+                'base.grade',
+                array('displayfunc' => 'plaintext')
         );
 
         return $columnoptions;

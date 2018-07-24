@@ -71,14 +71,16 @@ final class rb_source_userdata_export_type_items extends rb_base_source {
             'export_type_item',
             'id',
             'ID',
-            'base.id'
+            'base.id',
+            array('displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
             'export_type_item',
             'name',
             get_string('itemname', 'totara_userdata'),
-            'base.name'
+            'base.name',
+            array('displayfunc' => 'format_string')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -97,7 +99,8 @@ final class rb_source_userdata_export_type_items extends rb_base_source {
             'export_type_item',
             'component',
             get_string('itemcomponent', 'totara_userdata'),
-            'base.component'
+            'base.component',
+            array('displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(

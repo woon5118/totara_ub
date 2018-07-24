@@ -182,7 +182,8 @@ class rb_source_pos extends rb_base_source {
                 get_string('shortname', 'rb_source_pos'),
                 "base.shortname",
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'pos',
@@ -216,7 +217,8 @@ class rb_source_pos extends rb_base_source {
                 'postype.fullname',
                 array('joins' => 'postype',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'pos',
@@ -236,7 +238,8 @@ class rb_source_pos extends rb_base_source {
                 "framework.fullname",
                 array('joins' => 'framework',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'pos',
@@ -272,7 +275,8 @@ class rb_source_pos extends rb_base_source {
                 'parent.fullname',
                 array('joins' => 'parent',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'pos',
@@ -281,7 +285,8 @@ class rb_source_pos extends rb_base_source {
                 'comps.list',
                 array('joins' => 'comps',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'pos',
@@ -303,7 +308,8 @@ class rb_source_pos extends rb_base_source {
                 'membercount',
                 get_string('membercount', 'rb_source_pos'),
                 'COALESCE(member.membercount, 0)',
-                array('joins' => 'member')
+                array('joins' => 'member',
+                      'displayfunc' => 'integer')
             ),
             // A count of all members of this position and its child positions.
             new rb_column_option(
@@ -311,7 +317,8 @@ class rb_source_pos extends rb_base_source {
                 'membercountcumulative',
                 get_string('membercountcumulative', 'rb_source_pos'),
                 'COALESCE(membercumulative.membercountcumulative, 0)',
-                array('joins' => 'membercumulative')
+                array('joins' => 'membercumulative',
+                      'displayfunc' => 'integer')
             ),
         );
 

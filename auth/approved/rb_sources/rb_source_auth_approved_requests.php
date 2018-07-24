@@ -218,7 +218,8 @@ class rb_source_auth_approved_requests extends rb_base_source {
                 get_string('organisationframework', 'totara_hierarchy'),
                 'organisation_framework.fullname',
                 array(
-                    'joins' => array('organisation_framework')
+                    'joins' => array('organisation_framework'),
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(
@@ -227,7 +228,8 @@ class rb_source_auth_approved_requests extends rb_base_source {
                 get_string('organisation', 'totara_job'),
                 'organisation.fullname',
                 array(
-                    'joins' => array('organisation')
+                    'joins' => array('organisation'),
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(
@@ -247,7 +249,8 @@ class rb_source_auth_approved_requests extends rb_base_source {
                 get_string('positionframework', 'totara_hierarchy'),
                 'position_framework.fullname',
                 array(
-                    'joins' => array('position_framework')
+                    'joins' => array('position_framework'),
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(
@@ -256,7 +259,8 @@ class rb_source_auth_approved_requests extends rb_base_source {
                 get_string('position', 'totara_job'),
                 'position.fullname',
                 array(
-                    'joins' => array('position')
+                    'joins' => array('position'),
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(

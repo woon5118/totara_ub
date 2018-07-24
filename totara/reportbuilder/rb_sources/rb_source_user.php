@@ -287,7 +287,7 @@ class rb_source_user extends rb_base_source {
             get_string('suspendedpurgetype', 'totara_userdata'),
             'suspended_purge_type.fullname',
             array(
-                'displayfunc' => 'formatstring',
+                'displayfunc' => 'format_string',
                 'joins' => array('suspended_purge_type')
             )
         );
@@ -299,7 +299,8 @@ class rb_source_user extends rb_base_source {
             'suspended_purge_type.id',
             array(
                 'addtypetoheading' => true,
-                'joins' => array('suspended_purge_type')
+                'joins' => array('suspended_purge_type'),
+                'displayfunc' => 'integer'
             )
         );
 
@@ -309,7 +310,7 @@ class rb_source_user extends rb_base_source {
             get_string('deletedpurgetype', 'totara_userdata'),
             'deleted_purge_type.fullname',
             array(
-                'displayfunc' => 'formatstring',
+                'displayfunc' => 'format_string',
                 'joins' => array('deleted_purge_type')
             )
         );
@@ -321,7 +322,8 @@ class rb_source_user extends rb_base_source {
             'deleted_purge_type.id',
             array(
                 'addtypetoheading' => true,
-                'joins' => array('deleted_purge_type')
+                'joins' => array('deleted_purge_type'),
+                'displayfunc' => 'integer'
             )
         );
 

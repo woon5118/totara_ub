@@ -243,7 +243,8 @@ class rb_source_program_completion extends rb_base_source {
             'progcompletion',
             'organisationid',
             get_string('completionorgid', 'rb_source_program_completion'),
-            'base.organisationid'
+            'base.organisationid',
+            array('displayfunc' => 'integer')
         );
 
         $columnoptions[] =new rb_column_option(
@@ -251,7 +252,8 @@ class rb_source_program_completion extends rb_base_source {
             'organisationid2',
             get_string('completionorgid', 'rb_source_program_completion'),
             'base.organisationid',
-            array('selectable' => false)
+            array('selectable' => false,
+                  'displayfunc' => 'integer')
         );
 
         $columnoptions[] =new rb_column_option(
@@ -269,14 +271,16 @@ class rb_source_program_completion extends rb_base_source {
             'completion_organisation.fullname',
             array('joins' => 'completion_organisation',
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
 
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'positionid',
             get_string('completionposid', 'rb_source_program_completion'),
-            'base.positionid'
+            'base.positionid',
+            array('displayfunc' => 'integer')
         );
 
         $columnoptions[] =new rb_column_option(
@@ -284,7 +288,8 @@ class rb_source_program_completion extends rb_base_source {
             'positionid2',
             get_string('completionposid', 'rb_source_program_completion'),
             'base.positionid',
-            array('selectable' => false)
+            array('selectable' => false,
+                  'displayfunc' => 'integer')
         );
 
         $columnoptions[] =new rb_column_option(
@@ -302,7 +307,8 @@ class rb_source_program_completion extends rb_base_source {
             'completion_position.fullname',
             array('joins' => 'completion_position',
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
 
         $columnoptions[] = new rb_column_option(

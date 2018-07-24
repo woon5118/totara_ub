@@ -115,6 +115,7 @@ trait export_trait {
             array(
                 'addtypetoheading' => ($join !== 'base'),
                 'joins' => array($join),
+                'displayfunc' => 'integer'
             )
         );
 
@@ -136,6 +137,7 @@ trait export_trait {
             "$join.contextid",
             array(
                 'joins' => array($join),
+                'displayfunc' => 'integer'
             )
         );
 

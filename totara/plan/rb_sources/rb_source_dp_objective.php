@@ -153,7 +153,8 @@ class rb_source_dp_objective extends rb_base_source {
                     'defaultheading' => get_string('plan', 'rb_source_dp_objective'),
                     'joins' => 'dp',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -210,7 +211,8 @@ class rb_source_dp_objective extends rb_base_source {
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_objective'),
                     'joins' => 'template',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -243,7 +245,8 @@ class rb_source_dp_objective extends rb_base_source {
                 'base.fullname',
                 array(
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text')
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -269,7 +272,8 @@ class rb_source_dp_objective extends rb_base_source {
                 'base.shortname',
                 array(
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text')
+                    'outputformat' => 'text',
+                    'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -308,7 +312,8 @@ class rb_source_dp_objective extends rb_base_source {
                 array(
                     'joins' => 'priority',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
 
@@ -318,7 +323,7 @@ class rb_source_dp_objective extends rb_base_source {
                 get_string('objapproved', 'rb_source_dp_objective'),
                 'base.approved',
                 array(
-                    'displayfunc' => 'plan_item_status'
+                    'displayfunc' => 'plan_item_status',
                 )
         );
 
@@ -330,7 +335,8 @@ class rb_source_dp_objective extends rb_base_source {
                 array(
                     'joins' => 'objective_scale_value',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
 

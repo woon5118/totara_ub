@@ -68,7 +68,8 @@ trait report_trait {
             "$join.fullname",
             array('joins' => $join,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new \rb_column_option(
             'prog',
@@ -77,7 +78,8 @@ trait report_trait {
             "$join.shortname",
             array('joins' => $join,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new \rb_column_option(
             'prog',
@@ -94,7 +96,8 @@ trait report_trait {
             'id',
             get_string('programid', $langfile),
             "$join.id",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'displayfunc' => 'integer')
         );
         $columnoptions[] = new \rb_column_option(
             'prog',

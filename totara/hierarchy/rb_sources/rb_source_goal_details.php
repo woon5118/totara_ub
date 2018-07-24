@@ -139,6 +139,7 @@ class rb_source_goal_details extends rb_base_source {
                       'dbdatatype' => 'char',
                       'outputformat' => 'text',
                       'capability' => 'totara/hierarchy:viewallgoals',
+                      'displayfunc' => 'format_string'
                     )
             ),
             new rb_column_option(
@@ -149,7 +150,8 @@ class rb_source_goal_details extends rb_base_source {
                 array('joins' => 'goalframework',
                       'defaultheading' => get_string('goalframeworknameheading', 'rb_source_goal_details'),
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'goal',
@@ -159,7 +161,8 @@ class rb_source_goal_details extends rb_base_source {
                 array('joins' => 'scalevalue',
                       'defaultheading' => get_string('goaluserstatusheading', 'rb_source_goal_details'),
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'goal',

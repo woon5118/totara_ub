@@ -140,7 +140,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'course_completion',
                 'organisationid',
                 get_string('completionorgid', 'rb_source_course_completion_by_org'),
-                'base.organisationid'
+                'base.organisationid',
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -149,6 +150,7 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'completion_organisation.path',
                 array(
                     'joins' => 'completion_organisation',
+                    'displayfunc' => 'plaintext',
                 )
             ),
             new rb_column_option(
@@ -169,7 +171,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'completion_organisation.fullname',
                 array('joins' => 'completion_organisation',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             // aggregated columns
             new rb_column_option(
@@ -183,7 +186,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                     'joins' => 'auser',
                     'grouping' => 'comma_list_unique',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(
@@ -191,7 +195,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'total',
                 get_string('numofrecords', 'rb_source_course_completion_by_org'),
                 'base.id',
-                array('grouping' => 'count')
+                array('grouping' => 'count',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -201,7 +206,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                     '(base.rpl IS NULL OR ' .
                     $DB->sql_isempty('base', 'rpl', false, false) .
                     ') THEN 1 ELSE NULL END',
-                array('grouping' => 'count')
+                array('grouping' => 'count',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -211,7 +217,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                     '(base.rpl IS NULL OR ' .
                     $DB->sql_isempty('base', 'rpl', false, false) .
                     ') THEN 1 ELSE 0 END',
-                array('grouping' => 'percent')
+                array('grouping' => 'percent',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -221,7 +228,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                     '(base.rpl IS NOT NULL AND ' .
                     $DB->sql_isnotempty('base', 'rpl', false, false) .
                     ') THEN 1 ELSE NULL END',
-                array('grouping' => 'count')
+                array('grouping' => 'count',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -231,7 +239,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 '(base.rpl IS NOT NULL AND ' .
                 $DB->sql_isnotempty('base', 'rpl', false, false) .
                 ') THEN 1 ELSE 0 END',
-                array('grouping' => 'percent')
+                array('grouping' => 'percent',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -241,7 +250,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                     '(base.timecompleted IS NULL OR ' .
                     'base.timecompleted = 0) ' .
                     'THEN 1 ELSE NULL END',
-                array('grouping' => 'count')
+                array('grouping' => 'count',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',
@@ -253,7 +263,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
                     '(base.timestarted IS NULL OR ' .
                     'base.timestarted = 0) ' .
                     'THEN 1 ELSE NULL END',
-                array('grouping' => 'count')
+                array('grouping' => 'count',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'course_completion',

@@ -127,7 +127,8 @@ class rb_source_cohort_members extends rb_base_source {
             'cohort.name', // Table alias and field name.
             array('joins'=>array('cohort'),
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text') // Options.
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string') // Options.
         );
         $columnoptions[] = new rb_column_option(
             'cohort',

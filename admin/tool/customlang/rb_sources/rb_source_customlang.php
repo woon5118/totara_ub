@@ -77,7 +77,8 @@ class rb_source_customlang extends rb_base_source {
                 "base.lang",
                 array(
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'plaintext'
                 )
             ),
             new rb_column_option(
@@ -87,7 +88,8 @@ class rb_source_customlang extends rb_base_source {
                 "base.stringid",
                 array(
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'plaintext'
                 )
             ),
             new rb_column_option(
@@ -97,7 +99,8 @@ class rb_source_customlang extends rb_base_source {
                 "base.original",
                 array(
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(
@@ -107,7 +110,8 @@ class rb_source_customlang extends rb_base_source {
                 "base.local",
                 array(
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(
@@ -122,14 +126,16 @@ class rb_source_customlang extends rb_base_source {
                 'name',
                 get_string('component', 'rb_source_customlang'),
                 "customlang_component.name",
-                array('joins' => 'customlang_component')
+                array('joins' => 'customlang_component',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'customlang_component',
                 'version',
                 get_string('componentversion', 'rb_source_customlang'),
                 "customlang_component.version",
-                array('joins' => 'customlang_component')
+                array('joins' => 'customlang_component',
+                      'displayfunc' => 'plaintext')
             ),
         );
 

@@ -129,7 +129,8 @@ class rb_source_dp_plan extends rb_base_source {
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_plan'),
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -209,7 +210,8 @@ class rb_source_dp_plan extends rb_base_source {
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_plan'),
                     'joins' => 'template',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(

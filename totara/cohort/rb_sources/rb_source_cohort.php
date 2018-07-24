@@ -146,7 +146,8 @@ class rb_source_cohort extends rb_base_source {
             get_string('name', 'totara_cohort'), // Name for the column.
             'base.name', // Table alias and field name.
             array('dbdatatype' => 'char',
-                  'outputformat' => 'text') // Options.
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string') // Options.
         );
         $columnoptions[] = new rb_column_option(
             'cohort',
@@ -185,7 +186,8 @@ class rb_source_cohort extends rb_base_source {
             'CASE WHEN membercount.count IS NULL THEN 0 ELSE membercount.count END',
             array(
                 'joins' => array('membercount'),
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -240,7 +242,8 @@ class rb_source_cohort extends rb_base_source {
             "course_category.name",
             array('joins' => 'course_category',
                 'dbdatatype' => 'char',
-                'outputformat' => 'text')
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string')
         );
         $columnoptions[] = new rb_column_option(
             'course_category',
@@ -259,7 +262,8 @@ class rb_source_cohort extends rb_base_source {
             'id',
             get_string('coursecategoryid', 'totara_reportbuilder'),
             "course_category.id",
-            array('joins' => 'course_category')
+            array('joins' => 'course_category',
+                  'displayfunc' => 'integer')
         );
 
         $this->add_core_user_columns($columnoptions);

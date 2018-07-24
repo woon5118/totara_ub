@@ -132,7 +132,8 @@ class rb_source_goal_summary extends rb_base_source {
                 'base.fullname',
                 array('defaultheading' => get_string('goalnameheading', 'rb_source_goal_summary'),
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'goal',
@@ -150,7 +151,8 @@ class rb_source_goal_summary extends rb_base_source {
                 'COALESCE(numberassigned.c, 0)',
                 array('joins' => 'numberassigned',
                       'defaultheading' => get_string('goalnumberofusersassignedheading', 'rb_source_goal_summary'),
-                      'dbdatatype' => 'integer'
+                      'dbdatatype' => 'integer',
+                      'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -159,6 +161,7 @@ class rb_source_goal_summary extends rb_base_source {
                 get_string('goalscalevaluescolumn', 'rb_source_goal_summary'),
                 'scalevalues_',
                 array('columngenerator' => 'scalevalues',
+                      'displayfunc' => 'integer',
                       'defaultheading' => get_string('goalscalevaluesheading', 'rb_source_goal_summary'))
             ),
             new rb_column_option(
@@ -167,7 +170,8 @@ class rb_source_goal_summary extends rb_base_source {
                 get_string('goaltypename', 'rb_source_goal_summary'),
                 'goaltype.fullname',
                 array(
-                    'joins' => 'goaltype'
+                    'joins' => 'goaltype',
+                    'displayfunc' => 'format_string'
                 )
             ),
             new rb_column_option(

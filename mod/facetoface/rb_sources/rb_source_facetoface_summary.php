@@ -136,7 +136,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -147,7 +148,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -170,7 +172,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -181,7 +184,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -192,7 +196,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -203,7 +208,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -214,7 +220,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -222,7 +229,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'details',
                 get_string('sessdetails', 'rb_source_facetoface_sessions'),
                 'sessions.details',
-                array('joins' => 'sessions')
+                array('joins' => 'sessions',
+                      'displayfunc' => 'format_text')
             ),
             new rb_column_option(
                 'session',
@@ -280,7 +288,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'sessions.mincapacity',
                 array(
                     'joins' => 'sessions',
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -309,7 +318,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'sessions.normalcost',
                 array(
                     'joins' => 'sessions',
-                    'dbdatatype' => 'decimal'
+                    'dbdatatype' => 'decimal',
+                    'displayfunc' => 'format_string'
                 )
             );
             if (!get_config(null, 'facetoface_hidediscount')) {
@@ -320,7 +330,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     'sessions.discountcost',
                     array(
                         'joins' => 'sessions',
-                        'dbdatatype' => 'decimal'
+                        'dbdatatype' => 'decimal',
+                        'displayfunc' => 'format_string'
                     )
                 );
             }

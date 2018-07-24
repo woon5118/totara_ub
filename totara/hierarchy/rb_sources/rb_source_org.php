@@ -173,7 +173,8 @@ class rb_source_org extends rb_base_source {
                 get_string('shortname', 'rb_source_org'),
                 "base.shortname",
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'org',
@@ -207,7 +208,8 @@ class rb_source_org extends rb_base_source {
                 'orgtype.fullname',
                 array('joins' => 'orgtype',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'org',
@@ -227,7 +229,8 @@ class rb_source_org extends rb_base_source {
                 "framework.fullname",
                 array('joins' => 'framework',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'org',
@@ -263,7 +266,8 @@ class rb_source_org extends rb_base_source {
                 'parent.fullname',
                 array('joins' => 'parent',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'org',
@@ -272,7 +276,8 @@ class rb_source_org extends rb_base_source {
                 'comps.list',
                 array('joins' => 'comps',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'org',
@@ -294,7 +299,8 @@ class rb_source_org extends rb_base_source {
                 'membercount',
                 get_string('membercount', 'rb_source_org'),
                 'COALESCE(member.membercount, 0)',
-                array('joins' => 'member')
+                array('joins' => 'member',
+                      'displayfunc' => 'integer')
             ),
             // A count of all members of this organisation and its child organisation.
             new rb_column_option(
@@ -302,7 +308,8 @@ class rb_source_org extends rb_base_source {
                 'membercountcumulative',
                 get_string('membercountcumulative', 'rb_source_org'),
                 'COALESCE(membercumulative.membercountcumulative, 0)',
-                array('joins' => 'membercumulative')
+                array('joins' => 'membercumulative',
+                      'displayfunc' => 'integer')
             ),
         );
 

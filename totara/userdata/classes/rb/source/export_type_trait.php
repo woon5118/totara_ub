@@ -102,6 +102,7 @@ trait export_type_trait {
             "$join.id",
             array(
                 'joins' => array($join),
+                'displayfunc' => 'integer'
             )
         );
 
@@ -114,7 +115,7 @@ trait export_type_trait {
                 'addtypetoheading' => ($join !== 'base'),
                 'defaultheading' => get_string('exporttype', 'totara_userdata'),
                 'dbdatatype' => 'char',
-                'displayfunc' => 'formatstring',
+                'displayfunc' => 'format_string',
                 'outputformat' => 'text',
                 'joins' => array($join),
             )
@@ -156,6 +157,7 @@ trait export_type_trait {
                 'dbdatatype' => 'text',
                 'outputformat' => 'text',
                 'joins' => array($join),
+                'displayfunc' => 'format_text'
             )
         );
 

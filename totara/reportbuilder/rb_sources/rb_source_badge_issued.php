@@ -166,14 +166,16 @@ class rb_source_badge_issued extends rb_base_source {
                 'issuercontact',
                 get_string('issuercontact', 'rb_source_badge_issued'),
                 'badge.issuercontact',
-                array('joins' => 'badge')
+                array('joins' => 'badge',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'badge',
                 'name',
                 get_string('badgename', 'rb_source_badge_issued'),
                 'badge.name',
-                array('joins' => 'badge')
+                array('joins' => 'badge',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'badge',
@@ -195,7 +197,7 @@ class rb_source_badge_issued extends rb_base_source {
                 get_string('badgedescription', 'rb_source_badge_issued'),
                 'badge.description',
                 array(
-                    'displayfunc' => 'formatstring',
+                    'displayfunc' => 'format_string',
                     'joins' => 'badge',
                 )
             )

@@ -47,7 +47,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'facetoface.id',
             array(
                 'joins' => array('facetoface'),
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 
@@ -57,7 +58,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             get_string('ftfname', 'rb_source_facetoface_sessions'),
             'facetoface.name',
             array(
-                'joins' => array('facetoface')
+                'joins' => array('facetoface'),
+                'displayfunc' => 'format_string'
             )
         );
 
@@ -111,7 +113,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'sessions.id',
             array(
                 'joins' => 'sessions',
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 
@@ -122,7 +125,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'sessions.capacity',
             array(
                 'joins' => 'sessions',
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -158,7 +162,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'attendees.number',
             array(
                 'joins' => 'attendees',
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 
@@ -752,6 +757,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => $join,
                 'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 
@@ -762,7 +768,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             "$join.name",
             array(
                 'joins' => $join,
-                'dbdatatype' => 'text'
+                'dbdatatype' => 'text',
+                'displayfunc' => 'format_string'
             )
         );
 
@@ -825,6 +832,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => $join,
                 'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 
@@ -921,7 +929,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             "$join.id",
             array(
                 'joins' => $join,
-                'dbdatatype' => 'integer'
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
             )
         );
 
@@ -932,7 +941,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             "$join.name",
             array(
                 'joins' => $join,
-                'dbdatatype' => 'text'
+                'dbdatatype' => 'text',
+                'displayfunc' => 'format_string'
             )
         );
 

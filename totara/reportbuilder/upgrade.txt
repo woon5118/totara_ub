@@ -138,6 +138,7 @@ information provided here is intended especially for developers.
 * Added a new filter option 'help' which accepts array of ['string', 'component'] to override default filter help popup
   language string, note it follows rules of addHelpButton, so if you supply string named 'myhelpstring' the system
   would look for 'myhelpstring' and 'myhelpstring_help'.
+* totara_reportbuilder\rb\display\formatstring has been renamed to totara_reportbuilder\rb\display\format_string, please update all uses.
 
 === 11.0 ===
 

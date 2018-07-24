@@ -134,7 +134,8 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('targetaction', 'rb_source_site_logstore'),
                 $DB->sql_concat('base.target', "' '", 'base.action'),
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -149,7 +150,8 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('eventclass', 'rb_source_site_logstore'),
                 'base.eventname',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -171,7 +173,8 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('action', 'rb_source_site_logstore'),
                 'base.action',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -179,7 +182,8 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('target', 'rb_source_site_logstore'),
                 'base.target',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -187,14 +191,16 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('objecttable', 'rb_source_site_logstore'),
                 'base.objecttable',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'logstore_standard_log',
                 'objectid',
                 get_string('objectid', 'rb_source_site_logstore'),
                 'base.objectid',
-                array('dbdatatype' => 'integer')
+                array('dbdatatype' => 'integer',
+                      'displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -202,7 +208,8 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('origin', 'rb_source_site_logstore'),
                 'base.origin',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'logstore_standard_log',

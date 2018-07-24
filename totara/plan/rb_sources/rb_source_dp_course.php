@@ -238,7 +238,8 @@ class rb_source_dp_course extends rb_base_source {
                     'defaultheading' => get_string('plan', 'rb_source_dp_course'),
                     'joins' => 'dp_course',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -306,7 +307,8 @@ class rb_source_dp_course extends rb_base_source {
                 array(
                     'joins' => 'priority',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
 
@@ -355,7 +357,8 @@ class rb_source_dp_course extends rb_base_source {
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_course'),
                     'joins' => 'dp_template',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -484,6 +487,7 @@ class rb_source_dp_course extends rb_base_source {
                 'course_completion_history.historycount',
                 array(
                     'joins' => 'course_completion_history',
+                    'displayfunc' => 'integer'
                 )
              );
 

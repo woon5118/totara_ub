@@ -118,7 +118,8 @@ class rb_source_dp_program_recurring extends rb_base_source {
             "prog.fullname",
             array('joins' => 'prog',
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new rb_column_option(
             'program',
@@ -142,7 +143,8 @@ class rb_source_dp_program_recurring extends rb_base_source {
             "prog.shortname",
             array('joins' => 'prog',
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'plaintext')
         );
         $columnoptions[] = new rb_column_option(
             'program',
@@ -158,7 +160,8 @@ class rb_source_dp_program_recurring extends rb_base_source {
             'program',
             'id',
             get_string('programid', 'totara_program'),
-            "base.programid"
+            "base.programid",
+            array('displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(

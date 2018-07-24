@@ -136,7 +136,8 @@ class rb_source_cohort_associations extends rb_base_source {
             get_string('associationname', 'totara_cohort'),
             'base.name',
             array('dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new rb_column_option(
             'associations',
@@ -177,7 +178,8 @@ class rb_source_cohort_associations extends rb_base_source {
             'cohort.name',
             array('joins' => 'cohort',
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new rb_column_option(
             'cohort',

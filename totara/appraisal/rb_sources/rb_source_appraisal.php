@@ -212,6 +212,7 @@ class rb_source_appraisal extends rb_base_source {
                 'activestage.name',
                 array('joins' => 'activestage',
                       'defaultheading' => get_string('userappraisalactivestagenameheading', 'rb_source_appraisal'),
+                      'displayfunc' => 'format_string',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
@@ -232,6 +233,7 @@ class rb_source_appraisal extends rb_base_source {
                 'appraisal.name',
                 array('joins' => 'appraisal',
                       'defaultheading' => get_string('appraisalnameheading', 'rb_source_appraisal'),
+                      'displayfunc' => 'format_string',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),

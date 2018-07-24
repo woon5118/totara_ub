@@ -139,6 +139,7 @@ class rb_source_goal_status_history extends rb_base_source {
                       'dbdatatype' => 'char',
                       'outputformat' => 'text',
                       'capability' => 'totara/hierarchy:viewallgoals',
+                      'displayfunc' => 'format_string'
                     )
             ),
             new rb_column_option(
@@ -157,7 +158,8 @@ class rb_source_goal_status_history extends rb_base_source {
                 array('joins' => 'scalevalue',
                       'defaultheading' => get_string('goalscalevalueheading', 'rb_source_goal_status_history'),
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'format_string')
             ),
             new rb_column_option(
                 'history',

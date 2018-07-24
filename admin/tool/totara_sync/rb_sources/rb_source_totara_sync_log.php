@@ -69,13 +69,15 @@ class rb_source_totara_sync_log extends rb_base_source {
                 'totara_sync_log',
                 'id',
                 'id',
-                "base.id"
+                "base.id",
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'totara_sync_log',
                 'runid',
                 get_string('runid', 'tool_totara_sync'),
-                "base.runid"
+                "base.runid",
+                array('displayfunc' => 'integer')
             ),
             new rb_column_option(
                 'totara_sync_log',
@@ -91,7 +93,8 @@ class rb_source_totara_sync_log extends rb_base_source {
                 get_string('element', 'tool_totara_sync'),
                 "base.element",
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'totara_sync_log',
@@ -106,7 +109,8 @@ class rb_source_totara_sync_log extends rb_base_source {
                 get_string('action', 'tool_totara_sync'),
                 "base.action",
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
             new rb_column_option(
                 'totara_sync_log',
@@ -114,7 +118,8 @@ class rb_source_totara_sync_log extends rb_base_source {
                 get_string('info', 'tool_totara_sync'),
                 "base.info",
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
             ),
         );
 

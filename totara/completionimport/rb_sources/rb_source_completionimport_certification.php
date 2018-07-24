@@ -158,7 +158,8 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'base',
                 'id',
                 get_string('columnbaseid', 'rb_source_completionimport_certification'),
-                'base.id'
+                'base.id',
+                array('displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -166,7 +167,8 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'rownumber',
                 get_string('columnbaserownumber', 'rb_source_completionimport_certification'),
                 'base.rownumber',
-                array('dbdatatype' => 'integer')
+                array('dbdatatype' => 'integer',
+                      'displayfunc' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -210,14 +212,16 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'importuser.username',
                 array('joins' => 'importuser',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
                 'base',
                 'importuserid',
                 get_string('columnbaseimportuserid', 'rb_source_completionimport_course'),
-                'base.importuserid'
+                'base.importuserid',
+                array('displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -237,7 +241,8 @@ class rb_source_completionimport_certification extends rb_base_source {
                 get_string('columnbaseusername', 'rb_source_completionimport_certification'),
                 'base.username',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -246,7 +251,8 @@ class rb_source_completionimport_certification extends rb_base_source {
                 get_string('columnbasecertificationshortname', 'rb_source_completionimport_certification'),
                 'base.certificationshortname',
                 array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -264,14 +270,15 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'completiondate',
                 get_string('columnbasecompletiondate', 'rb_source_completionimport_certification'),
                 'base.completiondate',
-                array('dbdatatype' => 'timestamp')
+                array('displayfunc' => 'plaintext')
         );
 
         $columnoptions[] = new rb_column_option(
                 'base',
                 'duedate',
                 get_string('columnbaseduedate', 'rb_source_completionimport_certification'),
-                'base.duedate'
+                'base.duedate',
+                array('displayfunc' => 'plaintext')
         );
 
         return $columnoptions;
