@@ -119,6 +119,12 @@ class auth_plugin_connect extends auth_plugin_base {
             return;
         }
 
+        // Add ?nosso=1 to the login page URL if you needs to log in without SSO to local site directly.
+        $nosso = optional_param('nosso', 0, PARAM_BOOL);
+        if ($nosso) {
+            return;
+        }
+
         if (!empty($SESSION->authconnectssofailed)) {
             // No automatic SSO.
             return;
@@ -126,10 +132,6 @@ class auth_plugin_connect extends auth_plugin_base {
 
         if (data_submitted()) {
             // Let them post username and password directly.
-            return;
-        }
-
-        if (!empty($SESSION->loginerrormsg)) {
             return;
         }
 

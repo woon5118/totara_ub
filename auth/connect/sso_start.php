@@ -70,5 +70,6 @@ if (!$ssourl) {
 
 unset($SESSION->loginerrormsg);
 unset($SESSION->authconnectssofailed);
+unset($SESSION->has_timed_out);
 
 redirect($ssourl);
