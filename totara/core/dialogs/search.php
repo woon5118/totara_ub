@@ -543,10 +543,9 @@ switch ($searchtype) {
 
         // Custom rooms for session id.
         $sqlsess = '';
-        $joinsess = '';
+        $joinsess = 'LEFT JOIN {facetoface_sessions_dates} fsd ON (r.id = fsd.roomid)';
         if ($sessionid) {
-            $joinsess = 'LEFT JOIN {facetoface_sessions_dates} fsd ON (r.id = fsd.roomid)';
-            $sqlsess = 'OR r.custom > 0 AND fsd.id = ?';
+            $sqlsess = 'OR fsd.sessionid = ? ';
             $params = array_merge($params, array($sessionid));
         }
         $search_info->id = 'r.id';
@@ -558,7 +557,7 @@ switch ($searchtype) {
                 {$joinsess}
             WHERE
                 {$searchsql}
-                AND (r.custom = 0 {$sqlsess})
+                AND (r.custom=0 OR fsd.id IS NULL {$sqlsess})
                 AND r.hidden = 0
         ";
 
