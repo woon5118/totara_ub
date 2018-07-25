@@ -1503,6 +1503,9 @@ class core_renderer extends renderer_base {
                             'value'    => $button->label,
                             'disabled' => $button->disabled ? 'disabled' : null,
                             'title'    => $button->tooltip);
+        if ($button->primary) {
+            $attributes['class'] = 'form-submit btn-primary';
+        }
 
         if ($button->actions) {
             $id = html_writer::random_id('single_button');
