@@ -189,6 +189,8 @@ class totara_program_renderer extends plugin_renderer_base {
      * @return string HTML fragment
      */
     public function display_edit_assignment_form($programidorinstance, $categories, $certificationpath) {
+        global $ASSIGNMENT_CATEGORY_CLASSNAMES;
+
         $dropdown_options = array();
         $out = '';
         $out .= html_writer::start_tag('form', array('name' => 'form_prog_assignments', 'method' => 'post', 'class' => 'mform'));
@@ -204,6 +206,8 @@ class totara_program_renderer extends plugin_renderer_base {
             throw new coding_exception('programidorinstance must be a program id (integer) or instance of program class');
         }
 
+        $canaddcohort = false;
+
         if ($program->has_expired()) {
             $learners = $program->get_program_learners();
             if (empty($learners)) {
@@ -214,6 +218,15 @@ class totara_program_renderer extends plugin_renderer_base {
             $out .= html_writer::tag('p', get_string('learnerswereassigned', 'totara_program', $learnercount));
         } else {
             $programtime = $program->content->get_total_time_allowance($certificationpath);
+
+            $context = context_program::instance($program->id);
+            $contextids = $context->get_parent_context_ids(true);
+            foreach ($contextids as $contextid) {
+                if (has_capability("moodle/cohort:view", context::instance_by_id($contextid))) {
+                    $canaddcohort = true;
+                    break;
+                }
+            }
 
             if ($programtime > 0) {
                 $out .= prog_format_seconds($programtime);
@@ -233,6 +246,10 @@ class totara_program_renderer extends plugin_renderer_base {
                 $canadd = false;
             } else {
                 $canadd = true;
+            }
+
+            if ((get_class($category) === $ASSIGNMENT_CATEGORY_CLASSNAMES[ASSIGNTYPE_COHORT]) && !$canaddcohort) {
+                $canadd = false;
             }
 
             $category->build_table($program);
