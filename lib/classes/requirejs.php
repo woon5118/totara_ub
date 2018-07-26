@@ -32,7 +32,19 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_requirejs {
 
-    private static function get_amd_module_name($component, $jsfilename, $debug = false) {
+    /**
+     * Check a single module exists and return the full path to it.
+     *
+     * The expected location for amd modules is:
+     *  <componentdir>/amd/src/modulename.js
+     *
+     * @param string $component The component determines the folder the js file should be in.
+     * @param string $jsfilename The filename for the module (with the js extension).
+     * @param boolean $debug If true, returns the paths to the original (unminified) source files.
+     * @return array $files An array of mappings from module names to file paths.
+     *                      Empty array if the file does not exist.
+     */
+    public static function find_one_amd_module($component, $jsfilename, $debug = false) {
         $jsfileroot = core_component::get_component_directory($component);
         if (!$jsfileroot) {
             return array();
@@ -48,30 +60,12 @@ class core_requirejs {
         }
 
         $filename = $srcdir . '/' . $module . $minpart . '.js';
-        return ['module' => $module, 'filename' => $filename];
-    }
-
-    /**
-     * Check a single module exists and return the full path to it.
-     *
-     * The expected location for amd modules is:
-     *  <componentdir>/amd/src/modulename.js
-     *
-     * @param string $component The component determines the folder the js file should be in.
-     * @param string $jsfilename The filename for the module (with the js extension).
-     * @param boolean $debug If true, returns the paths to the original (unminified) source files.
-     * @return array $files An array of mappings from module names to file paths.
-     *                      Empty array if the file does not exist.
-     */
-    public static function find_one_amd_module($component, $jsfilename, $debug = false) {
-        $amdmodule = self::get_amd_module_name($component, $jsfilename, $debug);
-
-        if (!file_exists($amdmodule['filename'])) {
+        if (!file_exists($filename)) {
             return array();
         }
 
-        $fullmodulename = $component . '/' . $amdmodule['module'];
-        return array($fullmodulename => $amdmodule['filename']);
+        $fullmodulename = $component . '/' . $module;
+        return array($fullmodulename => $filename);
     }
 
     /**
@@ -128,28 +122,16 @@ class core_requirejs {
                 // Skip it - RecursiveDirectoryIterator fatals if the directory is not readable as an iterator.
                 continue;
             }
-
-            $iter = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($srcdir, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::SELF_FIRST,
-                RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
-            );
-
-            $paths = array($srcdir);
-            foreach ($iter as $path => $item) {
+            $items = new RecursiveDirectoryIterator($srcdir);
+            foreach ($items as $item) {
                 $extension = $item->getExtension();
                 if ($extension === 'js') {
                     $filename = str_replace('.min', '', $item->getBaseName('.js'));
                     // We skip lazy loaded modules.
                     if (strpos($filename, '-lazy') === false) {
-                        $fpath = str_replace($srcdir . '/', '', $item->getRealPath());
-                        $fpath = str_replace('.js', '', $fpath);
-                        $fpath = str_replace('.min', '', $fpath);
-                        $modulename = $component . '/' . $fpath;
+                        $modulename = $component . '/' . $filename;
                         $jsfiles[$modulename] = $item->getRealPath();
                     }
-                } else if ($item->isDir()) {
-                    $paths[] = $path;
                 }
                 unset($item);
             }

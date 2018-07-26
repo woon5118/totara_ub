@@ -41,36 +41,13 @@ class core_requirejs_testcase extends advanced_testcase {
     public function test_find_one() {
         global $CFG;
 
-        $method = new ReflectionMethod('core_requirejs::get_amd_module_name');
-        $method->setAccessible(true);
-        $result = $method->invoke(null, 'core', 'test/test', false);
-
         // Find a core module.
-        $result = $method->invoke(null, 'core', 'templates', false);
-        $path = $CFG->dirroot . '/lib/amd/build/templates.min.js';
-        $expected = ['module' => 'templates', 'filename' => $path];
-        $this->assertEquals($expected, $result);
-
         $result = core_requirejs::find_one_amd_module('core', 'templates', false);
-        $expected = ['core/templates' => $path];
-        $this->assertEquals($expected, $result);
-
-        $result = $method->invoke(null, 'core', 'templates', true);
-        $path = $CFG->dirroot . '/lib/amd/src/templates.js';
-        $expected = ['module' => 'templates', 'filename' => $path];
+        $expected = ['core/templates' => $CFG->dirroot . '/lib/amd/build/templates.min.js'];
         $this->assertEquals($expected, $result);
 
         $result = core_requirejs::find_one_amd_module('core', 'templates', true);
-        $expected = ['core/templates' => $path];
-        $this->assertEquals($expected, $result);
-
-        // Test in a sub directory
-        $result = $method->invoke(null, 'core', 'test/test', false);
-        $expected = ['module' => 'test/test', 'filename' => $CFG->dirroot . '/lib/amd/build/test/test.min.js'];
-        $this->assertEquals($expected, $result);
-
-        $result = $method->invoke(null, 'core', 'test/test', true);
-        $expected = ['module' => 'test/test', 'filename' => $CFG->dirroot . '/lib/amd/src/test/test.js'];
+        $expected = ['core/templates' => $CFG->dirroot . '/lib/amd/src/templates.js'];
         $this->assertEquals($expected, $result);
 
         // Find a subsystem module (none exist yet).
@@ -79,12 +56,8 @@ class core_requirejs_testcase extends advanced_testcase {
         $this->assertEquals($expected, $result);
 
         // Find a plugin module.
-        $result = $method->invoke(null, 'mod_assign', 'grading_panel', true);
-        $path = $CFG->dirroot . '/mod/assign/amd/src/grading_panel.js';
-        $expected = ['module' => 'grading_panel', 'filename' => $path];
-        $this->assertEquals($expected, $result);
         $result = core_requirejs::find_one_amd_module('mod_assign', 'grading_panel', true);
-        $expected = ['mod_assign/grading_panel' => $path];
+        $expected = ['mod_assign/grading_panel' => $CFG->dirroot . '/mod/assign/amd/src/grading_panel.js'];
         $this->assertEquals($expected, $result);
     }
 
