@@ -55,6 +55,8 @@ class rb_source_facetoface_interest extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_interest');
+        $this->usedcomponents[] = 'totara_cohort';
+
         parent::__construct();
     }
 

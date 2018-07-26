@@ -63,6 +63,7 @@ class rb_source_program_overview extends rb_base_source {
         $this->sourcejoins = $this->get_source_joins();
         $this->usedcomponents[] = 'totara_program';
         $this->usedcomponents[] = 'totara_certification';
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -455,7 +456,7 @@ class rb_source_program_overview extends rb_base_source {
                         'cscid'    => 'prog_courseset_course.id'
                     ),
                     'nosort' => true, // You can't sort concatenated columns.
-                    'displayfunc' => 'coursename_list',
+                    'displayfunc' => 'program_course_name_list',
                     'style' => array('white-space' => 'pre'),
                 )
             );
@@ -473,7 +474,7 @@ class rb_source_program_overview extends rb_base_source {
                         'cscid'    => 'prog_courseset_course.id'
                     ),
                     'nosort' => true, // You can't sort concatenated columns.
-                    'displayfunc' => 'course_status_list',
+                    'displayfunc' => 'program_course_status_list',
                     'style' => array('white-space' => 'pre'),
                 )
             );
@@ -609,7 +610,7 @@ class rb_source_program_overview extends rb_base_source {
             ),
             array(
                 'joins' => 'course_category',
-                'displayfunc' => 'link_course_category',
+                'displayfunc' => 'course_category_link',
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
@@ -617,7 +618,7 @@ class rb_source_program_overview extends rb_base_source {
                 ),
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'category_link_list',
+                'displayfunc' => 'program_category_link_list',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -771,10 +772,16 @@ class rb_source_program_overview extends rb_base_source {
         return $requiredcolumns;
     }
 
-    //
-    // Source specific column display methods.
-    //
+    /**
+     * Display the program completion status
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @return string
+     */
     function rb_display_program_completion_status($status, $row) {
+        debugging('rb_source_program_overview::rb_display_program_completion_status has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if (is_null($status)) {
             return '';
         }
@@ -788,11 +795,13 @@ class rb_source_program_overview extends rb_base_source {
     /**
      * Displays course statuses as html links.
      *
+     * @deprecated Since Totara 12.0
      * @param array $data
      * @param object Report row $row
      * @return string html link
      */
     public function rb_display_course_status_list($data, $row) {
+        debugging('rb_source_program_overview::rb_display_course_status_list has been deprecated since Totara 12.0. Use totara_program\rb\display\program_course_status_list::display', DEBUG_DEVELOPER);
         global $COMPLETION_STATUS;
         if (empty($data)) {
             return '';
@@ -812,11 +821,13 @@ class rb_source_program_overview extends rb_base_source {
     /**
      * Displays categories as html links.
      *
+     * @deprecated Since Totara 12.0
      * @param array $data
      * @param object Report row $row
      * @return string html link
      */
     public function rb_display_category_link_list($data, $row) {
+        debugging('rb_source_program_overview::rb_display_category_link_list has been deprecated since Totara 12.0. Use totara_program\rb\display\program_category_link_list::display', DEBUG_DEVELOPER);
         $output = array();
         if (empty($data)) {
             return '';
@@ -838,11 +849,13 @@ class rb_source_program_overview extends rb_base_source {
     /**
      * Displays course names as html links.
      *
+     * @deprecated Since Totara 12.0
      * @param array $data
      * @param object Report row $row
      * @return string html link
      */
     public function rb_display_coursename_list($data, $row) {
+        debugging('rb_source_program_overview::rb_display_coursename_list has been deprecated since Totara 12.0. Use totara_program\rb\display\program_course_name_list::display', DEBUG_DEVELOPER);
         if (empty($data)) {
             return '';
         }

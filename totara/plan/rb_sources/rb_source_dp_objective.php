@@ -62,6 +62,7 @@ class rb_source_dp_objective extends rb_base_source {
         $this->defaultfilters = array();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_objective');
+        $this->usedcomponents[] = 'totara_plan';
         parent::__construct();
     }
 
@@ -163,7 +164,7 @@ class rb_source_dp_objective extends rb_base_source {
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_objective'),
                     'joins' => 'dp',
-                    'displayfunc' => 'planlink',
+                    'displayfunc' => 'plan_link',
                     'extrafields' => array( 'plan_id' => 'dp.id' )
                 )
         );
@@ -252,7 +253,7 @@ class rb_source_dp_objective extends rb_base_source {
                 'base.fullname',
                 array(
                     'defaultheading' => get_string('fullname', 'rb_source_dp_objective'),
-                    'displayfunc' => 'objectivelink',
+                    'displayfunc' => 'plan_objective_name_link',
                     'extrafields' => array(
                         'objective_id' => 'base.id',
                         'plan_id' => 'dp.id',
@@ -352,7 +353,7 @@ class rb_source_dp_objective extends rb_base_source {
                 'objective_scale_value.name',
                 array(
                     'joins' => 'objective_scale_value',
-                    'displayfunc' => 'proficiency_and_approval',
+                    'displayfunc' => 'plan_objective_status',
                     'defaultheading' => get_string('objstatus', 'rb_source_dp_objective'),
                     'extrafields' => array('approved' => 'base.approved')
                 )
@@ -531,12 +532,15 @@ class rb_source_dp_objective extends rb_base_source {
 
     /**
      * Generate the objective name with a link to the objective details page
+     *
+     * @deprecated Since Totara 12.0
      * @global object $CFG
      * @param string $objective Objective name
      * @param object $row Object containing other fields
      * @return string
      */
     public function rb_display_objectivelink($objective, $row) {
+        debugging('rb_source_dp_objective::rb_display_objectivelink has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_objective_name_link::display', DEBUG_DEVELOPER);
         global $OUTPUT;
         if (empty($objective)) {
             return '';
@@ -544,7 +548,16 @@ class rb_source_dp_objective extends rb_base_source {
         return $OUTPUT->action_link(new moodle_url('/totara/plan/components/objective/view.php', array('id' => $row->plan_id, 'itemid' => $row->objective_id)), $objective);
     }
 
+    /**
+     * Display status
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @return string
+     */
     function rb_display_proficiency_and_approval($status, $row) {
+        debugging('rb_source_dp_objective::rb_display_proficiency_and_approval has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_objective_status::display', DEBUG_DEVELOPER);
         global $CFG;
         // needed for approval constants
         require_once($CFG->dirroot . '/totara/plan/lib.php');

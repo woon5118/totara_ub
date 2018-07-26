@@ -88,6 +88,8 @@ class rb_source_dp_certification_history extends rb_base_source {
         $this->base = $sql;
         $this->joinlist = $this->define_joinlist();
         $this->usedcomponents[] = 'totara_certification';
+        $this->usedcomponents[] = 'totara_program';
+        $this->usedcomponents[] = 'totara_cohort';
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
         $this->contentoptions = $this->define_contentoptions();
@@ -96,6 +98,7 @@ class rb_source_dp_certification_history extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_certification_history');
+
         parent::__construct();
     }
 
@@ -193,7 +196,7 @@ class rb_source_dp_certification_history extends rb_base_source {
                 array(
                     'joins' => 'prog',
                     'defaultheading' => get_string('certificationname', 'totara_program'),
-                    'displayfunc' => 'link_program_icon',
+                    'displayfunc' => 'program_icon_link',
                     'extrafields' => array(
                         'programid' => 'prog.id',
                         'userid' => 'base.userid',
@@ -559,8 +562,17 @@ class rb_source_dp_certification_history extends rb_base_source {
         return $defaultfilters;
     }
 
-
+    /**
+     * Display program icon with name and link.
+     *
+     * @deprecated Since Totara 12.0
+     * @param $certificationname
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_program_icon($certificationname, $row, $isexport = false) {
+        debugging('rb_source_dp_certification_history::rb_display_link_program_icon has been deprecated since Totara 12.0. Use totara_program\rb\display\program_icon_link::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return $certificationname;
         }

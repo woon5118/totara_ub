@@ -53,6 +53,7 @@ class rb_source_course_completion_all extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = $this->define_sourcetitle();
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 
@@ -132,7 +133,7 @@ class rb_source_course_completion_all extends rb_base_source {
                 get_string('grade', 'rb_source_course_completion_all'),
                 'base.grade',
                 array(
-                    'displayfunc' => 'grade_string',
+                    'displayfunc' => 'course_grade_string',
                     'extrafields' => array(
                         'grademax' => 'base.grademax',
                         'grademin' => 'base.grademin',

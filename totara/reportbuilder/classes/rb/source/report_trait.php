@@ -195,7 +195,7 @@ trait report_trait {
             get_string('reportembedded', 'totara_reportbuilder'),
             "{$join}.embedded",
             [
-                'displayfunc' => 'yes_no',
+                'displayfunc' => 'yes_or_no',
                 'joins' => [$join],
             ]
         );
@@ -205,7 +205,7 @@ trait report_trait {
             get_string('reporthidden', 'totara_reportbuilder'),
             "{$join}.hidden",
             [
-                'displayfunc' => 'yes_no',
+                'displayfunc' => 'yes_or_no',
                 'joins' => [$join],
             ]
         );

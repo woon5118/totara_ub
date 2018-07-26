@@ -41,6 +41,7 @@ class rb_source_pos extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_pos');
+        $this->usedcomponents[] = 'totara_hierarchy';
 
         parent::__construct();
     }
@@ -170,7 +171,7 @@ class rb_source_pos extends rb_base_source {
                 'fullname',
                 get_string('name', 'rb_source_pos'),
                 "base.fullname",
-                array('displayfunc' => 'posnamelink',
+                array('displayfunc' => 'pos_name_link',
                       'extrafields' => array('posid' => 'base.id'),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
@@ -252,7 +253,7 @@ class rb_source_pos extends rb_base_source {
                 'visible',
                 get_string('visible', 'rb_source_pos'),
                 'base.visible',
-                array('displayfunc' => 'yes_no')
+                array('displayfunc' => 'yes_or_no')
             ),
             new rb_column_option(
                 'pos',
@@ -472,11 +473,13 @@ class rb_source_pos extends rb_base_source {
     /**
      * Displays position name as html link
      *
+     * @deprecated Since Totara 12.0
      * @param string $posname
      * @param object Report row $row
      * @return string html link
      */
     public function rb_display_posnamelink($posname, $row) {
+        debugging('rb_source_pos::rb_display_posnamelink has been deprecated since Totara 12.0. Use totara_hierarchy\rb\display\pos_name_link::display', DEBUG_DEVELOPER);
         if (empty($posname)) {
             return '';
         }

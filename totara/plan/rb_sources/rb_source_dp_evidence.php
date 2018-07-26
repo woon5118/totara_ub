@@ -92,6 +92,7 @@ class rb_source_dp_evidence extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_evidence');
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->define_sourcejoins();
+        $this->usedcomponents[] = 'totara_plan';
         parent::__construct();
     }
 
@@ -164,7 +165,7 @@ class rb_source_dp_evidence extends rb_base_source {
                 'base.name',
                 array(
                     'defaultheading' => get_string('name'),
-                    'displayfunc' => 'evidenceview',
+                    'displayfunc' => 'plan_evidence_name_link',
                     'extrafields' => array(
                         'evidence_id' => 'base.id',
                     ),
@@ -198,7 +199,7 @@ class rb_source_dp_evidence extends rb_base_source {
             'base.name',
             array(
                 'defaultheading' => get_string('viewevidence', 'rb_source_dp_evidence'),
-                'displayfunc' => 'viewevidencelink',
+                'displayfunc' => 'plan_evidence_view_link',
                 'extrafields' => array(
                     'evidence_id' => 'base.id',
                 ),
@@ -230,7 +231,7 @@ class rb_source_dp_evidence extends rb_base_source {
             'evidenceinuse',
             get_string('evidenceinuse', 'rb_source_dp_evidence'),
             'base.evidenceinuse',
-            array('displayfunc' => 'evidenceinuse')
+            array('displayfunc' => 'plan_evidence_in_use')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -239,7 +240,7 @@ class rb_source_dp_evidence extends rb_base_source {
             get_string('actionlinks', 'rb_source_dp_evidence'),
             'base.id',
             array(
-                'displayfunc' => 'actionlinks',
+                'displayfunc' => 'plan_evidence_action_links',
                 'extrafields' => array(
                     'userid' => 'base.userid',
                     'readonly' => 'base.readonly',
@@ -342,23 +343,29 @@ class rb_source_dp_evidence extends rb_base_source {
 
     /**
      * Generate the evidence link to the details page
+     *
+     * @deprecated Since Totara 12.0
      * @param string $evidence evidence name
      * @param object $row Object containing other fields
      * @return string
      */
     public function rb_display_viewevidencelink($evidence, $row) {
+        debugging('rb_source_dp_evidence::rb_display_viewevidencelink has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_evidence_view_link::display', DEBUG_DEVELOPER);
         $url = new moodle_url('/totara/plan/record/evidence/view.php', array('id' => $row->evidence_id ));
         return html_writer::link($url, get_string('viewevidence', 'rb_source_dp_evidence'));
     }
 
     /**
      * Generate the evidence name with a link to the evidence details page
+     *
+     * @deprecated Since Totara 12.0
      * @global object $CFG
      * @param string $evidence evidence name
      * @param object $row Object containing other fields
      * @return string
      */
     public function rb_display_evidenceview($evidencename, $row, $isexport) {
+        debugging('rb_source_dp_evidence::rb_display_evidenceview has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_evidence_name_link::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return $evidencename;
         } else {
@@ -371,11 +378,13 @@ class rb_source_dp_evidence extends rb_base_source {
     /**
      * Displays evidence name as html link
      *
+     * @deprecated Since Totara 12.0
      * @param string $evidencelink
      * @param object Report row $row
      * @return string html link
      */
     public function rb_display_evidencelink($evidencelink, $row) {
+        debugging('rb_source_dp_evidence::rb_display_evidencelink has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         global $OUTPUT;
         if (empty($evidencelink)) {
             return '';
@@ -383,7 +392,16 @@ class rb_source_dp_evidence extends rb_base_source {
         return $OUTPUT->action_link(new moodle_url($evidencelink), $evidencelink);
     }
 
+    /**
+     * Display action links
+     *
+     * @deprecated Since Totara 12.0
+     * @param $evidenceid
+     * @param $row
+     * @return string
+     */
     public function rb_display_actionlinks($evidenceid, $row) {
+        debugging('rb_source_dp_evidence::rb_display_actionlinks has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_evidence_action_links::display', DEBUG_DEVELOPER);
         global $USER, $OUTPUT;
 
         $out = '';
@@ -414,11 +432,29 @@ class rb_source_dp_evidence extends rb_base_source {
         return $out;
     }
 
+    /**
+     * Display evidence in use
+     *
+     * @deprecated Since Totara 12.0
+     * @param $evidenceinuse
+     * @param $row
+     * @return string
+     */
     public function rb_display_evidenceinuse($evidenceinuse, $row) {
+        debugging('rb_source_dp_evidence::rb_display_evidenceinuse has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_evidence_in_use::display', DEBUG_DEVELOPER);
         return (empty($evidenceinuse)) ? get_string('no') : get_string('yes');
     }
 
+    /**
+     * Display evidence description
+     *
+     * @deprecated Since Totara 12.0
+     * @param $description
+     * @param $row
+     * @return string
+     */
     public function rb_display_description($description, $row) {
+        debugging('rb_source_dp_evidence::rb_display_description has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $description = file_rewrite_pluginfile_urls($description, 'pluginfile.php',
                 context_system::instance()->id, 'totara_plan', 'dp_plan_evidence', $row->evidence_id );
         return(format_text($description, FORMAT_HTML));

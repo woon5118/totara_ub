@@ -50,6 +50,7 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultfilters = $this->define_defaultfilters();
+        $this->usedcomponents[] = 'totara_cohort';
         $this->add_customfields();
 
         parent::__construct();

@@ -55,6 +55,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_course_completion_by_org');
+        $this->usedcomponents[] = 'totara_hierarchy';
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
         $this->populate_hierarchy_name_map(array('org'));
@@ -156,7 +158,7 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'completion_organisation.path',
                 array(
                     'joins' => 'completion_organisation',
-                    'displayfunc' => 'nice_hierarchy_path',
+                    'displayfunc' => 'hierarchy_nice_path',
                     'extrafields' => array('hierarchytype' => '\'org\'')
                 )
             ),

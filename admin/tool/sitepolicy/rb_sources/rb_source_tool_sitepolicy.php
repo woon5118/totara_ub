@@ -215,7 +215,7 @@ class rb_source_tool_sitepolicy extends rb_base_source {
                 get_string('userreponseconsented', 'rb_source_tool_sitepolicy'),
                 'base.hasconsented',
                 array(
-                    'displayfunc' => 'yes_no')),
+                    'displayfunc' => 'yes_or_no')),
 
             new rb_column_option(
                 'userpolicy',

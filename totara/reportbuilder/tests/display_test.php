@@ -29,6 +29,32 @@ defined('MOODLE_INTERNAL') || die();
 class totara_reportbuilder_display_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
+    /**
+     * Ensure all columns where 'displayfunc' is set, a display class is being used.
+     * All display functions 'rb_display_*' should now be deprecated.
+     */
+    public function test_display_display_class_exists() {
+        $sourcelist = reportbuilder::get_source_list(true);
+        foreach ($sourcelist as $sourcename => $title) {
+
+            $src = reportbuilder::get_source_object($sourcename, true); // Caching here is completely fine.
+
+            foreach ($src->columnoptions as $column) {
+                if (!empty($column->displayfunc)) {
+                    $hasdisplayclass = false;
+                    foreach ($src->get_used_components() as $component) {
+                        $classname = "\\$component\\rb\\display\\$column->displayfunc";
+                        if (class_exists($classname)) {
+                            $hasdisplayclass = true;
+                        }
+                    }
+
+                    $this->assertTrue($hasdisplayclass, "Display class " . $classname . " not found for '" . $title . "' report");
+                }
+            }
+        }
+    }
+
     public function test_aggregation() {
         global $DB, $CFG, $OUTPUT, $PAGE;
         require_once($CFG->libdir . '/excellib.class.php');
@@ -262,7 +288,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame('Some html TEXT', $processed[4]);
     }
 
-    public function test_percent() {
+    public function test_completion_percent() {
         global $DB, $CFG;
         require_once($CFG->libdir . '/completionlib.php');
 
@@ -376,7 +402,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
         $report = new reportbuilder($rid, null, false, null, null, true);
 
-        // Mock objects to use it in the display function.
+        // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
             ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
             ->getMock();
@@ -403,4 +429,575 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $message = \totara_reportbuilder\rb\display\yes_or_no::display("0", $format, $row, $column, $report);
         $this->assertEquals('No', $message, 'Failing that "0" value matches "No" in yes_or_no display function');
     }
+
+    function test_nice_time() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\nice_time::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('11:25', $display);
+
+        $display = \totara_reportbuilder\rb\display\nice_time::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('11:25', $display);
+
+        $display = \totara_reportbuilder\rb\display\nice_time::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+    }
+
+    function test_nice_datetime_seconds() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\nice_datetime_seconds::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 Dec 2017 at 11:25:15', $display);
+
+        $display = \totara_reportbuilder\rb\display\nice_datetime_seconds::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 Dec 2017 at 11:25:15', $display);
+
+        $display = \totara_reportbuilder\rb\display\nice_datetime_seconds::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+    }
+
+    function test_nice_datetime_in_timezone() {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook', array('extrafields' => array('timezone' => true))))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
+
+        self::assertEquals('99', $CFG->forcetimezone);
+
+        // Testing display function.
+        $CFG->forcetimezone = '	Australia/Perth';
+
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Unknown Timezone', $display);
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Unknown Timezone', $display);
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+
+        $row->$extrafieldrow = 'Pacific/Auckland';
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+
+        $row->$extrafieldrow = 'Australia/Perth';
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+
+        // Reset.
+        $CFG->forcetimezone = '99';
+    }
+
+    function test_delimitedlist_date_in_timezone() {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook', array('extrafields' => array('timezone' => true))))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
+
+        self::assertEquals('99', $CFG->forcetimezone);
+
+        // Testing display function.
+        $CFG->forcetimezone = '	Australia/Perth';
+
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Unknown Timezone', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Unknown Timezone', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        $row->$extrafieldrow = 'Pacific/Auckland';
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        $row->$extrafieldrow = 'Australia/Perth';
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_date_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        // Reset.
+        $CFG->forcetimezone = '99';
+    }
+
+    function test_delimitedlist_datetime_in_timezone() {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook', array('extrafields' => array('timezone' => true))))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
+
+        self::assertEquals('99', $CFG->forcetimezone);
+
+        // Testing display function.
+        $CFG->forcetimezone = '	Australia/Perth';
+
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Unknown Timezone', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Unknown Timezone', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        $row->$extrafieldrow = 'Pacific/Auckland';
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        $row->$extrafieldrow = 'Australia/Perth';
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\delimitedlist_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        // Reset.
+        $CFG->forcetimezone = '99';
+    }
+
+    function test_nice_two_datetime_in_timezone() {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        //
+        // Two dates.
+        //
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook', array('extrafields' => array('timezone' => true, 'finishdate' => true))))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'finishdate');
+        $row->$extrafieldrow = 1514345115 + 86400;
+
+        self::assertEquals('99', $CFG->forcetimezone);
+
+        // Testing display function.
+        $CFG->forcetimezone = '	Australia/Perth';
+
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth to 28 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth to 28 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('Before 28 December 2017, 11:25 AM Australia/Perth', $display);
+
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
+        $row->$extrafieldrow = 'Pacific/Auckland';
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland to 28 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('Before 28 December 2017, 4:25 PM Pacific/Auckland', $display);
+
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
+        $row->$extrafieldrow = 'Australia/Perth';
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth to 28 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('Before 28 December 2017, 11:25 AM Australia/Perth', $display);
+
+        // Reset.
+        $CFG->forcetimezone = '99';
+
+        //
+        // Start date only.
+        //
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook', array('extrafields' => array('timezone' => true, 'finishdate' => true))))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'finishdate');
+        $row->$extrafieldrow = null;
+
+        self::assertEquals('99', $CFG->forcetimezone);
+
+        // Testing display function.
+        $CFG->forcetimezone = '	Australia/Perth';
+
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('After 27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('1514345115', $format, $row, $column, $report);
+        $this->assertEquals('After 27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
+        $row->$extrafieldrow = 'Pacific/Auckland';
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('After 27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
+        $row->$extrafieldrow = 'Australia/Perth';
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display(1514345115, $format, $row, $column, $report);
+        $this->assertEquals('After 27 December 2017, 11:25 AM Australia/Perth', $display);
+        $display = \totara_reportbuilder\rb\display\nice_two_datetime_in_timezone::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('', $display);
+
+        // Reset.
+        $CFG->forcetimezone = '99';
+    }
+
+    function test_round2() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\round2::display(2.02, $format, $row, $column, $report);
+        $this->assertEquals('2.02', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(2.22, $format, $row, $column, $report);
+        $this->assertEquals('2.22', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(2.2, $format, $row, $column, $report);
+        $this->assertEquals('2.20', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(0.22, $format, $row, $column, $report);
+        $this->assertEquals('0.22', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(0.2, $format, $row, $column, $report);
+        $this->assertEquals('0.20', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(0.0, $format, $row, $column, $report);
+        $this->assertEquals('0.00', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(0, $format, $row, $column, $report);
+        $this->assertEquals('0.00', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display('', $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(null, $format, $row, $column, $report);
+        $this->assertEquals('-', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('0.00', $display);
+
+        $display = \totara_reportbuilder\rb\display\round2::display(0x02, $format, $row, $column, $report);
+        $this->assertEquals('2.00', $display);
+    }
+
+    function test_percent() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\percent::display(2.02, $format, $row, $column, $report);
+        $this->assertEquals('2.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(2.22, $format, $row, $column, $report);
+        $this->assertEquals('2.2%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(2.2, $format, $row, $column, $report);
+        $this->assertEquals('2.2%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(0.22, $format, $row, $column, $report);
+        $this->assertEquals('0.2%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(0.2, $format, $row, $column, $report);
+        $this->assertEquals('0.2%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(0.00, $format, $row, $column, $report);
+        $this->assertEquals('0.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(0, $format, $row, $column, $report);
+        $this->assertEquals('0.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(2, $format, $row, $column, $report);
+        $this->assertEquals('2.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(99, $format, $row, $column, $report);
+        $this->assertEquals('99.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(99.9, $format, $row, $column, $report);
+        $this->assertEquals('99.9%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(99.99, $format, $row, $column, $report);
+        $this->assertEquals('100.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(100.01, $format, $row, $column, $report);
+        $this->assertEquals('100.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(100.1, $format, $row, $column, $report);
+        $this->assertEquals('100.1%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(100.19, $format, $row, $column, $report);
+        $this->assertEquals('100.2%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display('', $format, $row, $column, $report);
+        $this->assertEquals('0.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(null, $format, $row, $column, $report);
+        $this->assertEquals(null, $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display('blah', $format, $row, $column, $report);
+        $this->assertEquals('0.0%', $display);
+
+        $display = \totara_reportbuilder\rb\display\percent::display(0x02, $format, $row, $column, $report);
+        $this->assertEquals('2.0%', $display);
+    }
+
+    function test_delimitedlist_multi_to_newline() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        $d = $report->src->get_uniquedelimiter();
+        $object = json_encode([['option' => 'one'], ['option' => 'two']]);
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\delimitedlist_multi_to_newline::display($object, $format, $row, $column, $report);
+        $this->assertEquals('one, two', $display);
+
+        $display = \totara_reportbuilder\rb\display\delimitedlist_multi_to_newline::display($object.$d.$object, $format, $row, $column, $report);
+        $this->assertEquals("one, two\none, two", $display);
+
+        $display = \totara_reportbuilder\rb\display\delimitedlist_multi_to_newline::display($object.$d.$object.$d.$object, $format, $row, $column, $report);
+        $this->assertEquals("one, two\none, two\none, two", $display);
+
+    }
+
+    function test_delimitedlist_url_to_newline() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        $d = $report->src->get_uniquedelimiter();
+        $object = json_encode(['text' => 'One', 'url' => '#1']);
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\delimitedlist_url_to_newline::display($object, $format, $row, $column, $report);
+        $this->assertEquals("<a href=\"#1\">One</a>", $display);
+
+        $display = \totara_reportbuilder\rb\display\delimitedlist_url_to_newline::display($object.$d.$object, $format, $row, $column, $report);
+        $this->assertEquals("<a href=\"#1\">One</a>\n<a href=\"#1\">One</a>", $display);
+
+        $display = \totara_reportbuilder\rb\display\delimitedlist_url_to_newline::display($object.$d.$object.$d.$object, $format, $row, $column, $report);
+        $this->assertEquals("<a href=\"#1\">One</a>\n<a href=\"#1\">One</a>\n<a href=\"#1\">One</a>", $display);
+    }
+
+    function test_orderedlist_to_newline() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        $d = $report->src->get_uniquedelimiter();
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one{$d}two{$d}three", $format, $row, $column, $report);
+        $this->assertEquals("one\ntwo\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one{$d}{$d}three", $format, $row, $column, $report);
+        $this->assertEquals("one\n-\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one", $format, $row, $column, $report);
+        $this->assertEquals("one", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one,two,three", $format, $row, $column, $report);
+        $this->assertEquals("one,two,three", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one{$d} {$d}three", $format, $row, $column, $report);
+        $this->assertEquals("one\n-\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one{$d}    {$d}three", $format, $row, $column, $report);
+        $this->assertEquals("one\n-\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one{$d}0{$d}three", $format, $row, $column, $report);
+        $this->assertEquals("one\n-\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display("one{$d}0000{$d}three", $format, $row, $column, $report);
+        $this->assertEquals("one\n0000\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display(",", $format, $row, $column, $report);
+        $this->assertEquals(",", $display);
+
+        $display = \totara_reportbuilder\rb\display\orderedlist_to_newline::display(",{$d},,", $format, $row, $column, $report);
+        $this->assertEquals(",\n,,", $display);
+    }
+
+    function test_list_to_newline() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create report.
+        $rid = $this->create_report('facetoface_events', 'Test f2f events');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        // Testing display function.
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display("one, two, three", $format, $row, $column, $report);
+        $this->assertEquals("one\ntwo\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display("one, , three", $format, $row, $column, $report);
+        $this->assertEquals("one\n-\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display("one", $format, $row, $column, $report);
+        $this->assertEquals("one", $display);
+
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display("one\ntwo", $format, $row, $column, $report);
+        $this->assertEquals("one\ntwo", $display);
+
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display("one,two,three", $format, $row, $column, $report);
+        $this->assertEquals("one,two,three", $display);
+
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display("one, 0, three", $format, $row, $column, $report);
+        $this->assertEquals("one\n-\nthree", $display);
+
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display(",", $format, $row, $column, $report);
+        $this->assertEquals(",", $display);
+
+        $display = \totara_reportbuilder\rb\display\list_to_newline::display(",, ,,", $format, $row, $column, $report);
+        $this->assertEquals(",\n,,", $display);
+
+    }
+
 }

@@ -16,7 +16,7 @@ information provided here is intended especially for developers.
   * create_user() the second parameter is no longer used. Behaviour of the function has not changed.
   * set_sync_user_fields the third parameter is no longer used. Behaviour of the function has not changed.
   * put_custom_field_data() the third parameter is no longer used. Behaviour of the function has not changed.
-
+* rb_source_totara_sync_log::rb_display_logtype() has been deprecated, please call tool_totara_sync\rb\display\totara_sync_log_type::display instead().
 
 === 11.0 ===
 

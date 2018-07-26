@@ -54,6 +54,8 @@ class rb_source_program_membership extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program_membership');
+        $this->usedcomponents[] = 'totara_program';
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -122,7 +124,7 @@ class rb_source_program_membership extends rb_base_source {
             'prog_completion.status',
             array(
                 'joins' => 'prog_completion',
-                'displayfunc' => 'prog_status',
+                'displayfunc' => 'program_completion_status',
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -142,7 +144,7 @@ class rb_source_program_membership extends rb_base_source {
             get_string('editcompletion', 'rb_source_program_membership'),
             'base.id',
             array(
-                'displayfunc' => 'edit_completion',
+                'displayfunc' => 'program_edit_completion',
                 'extrafields' => array(
                     'userid' => 'base.userid',
                     'progid' => 'base.programid',
@@ -222,7 +224,16 @@ class rb_source_program_membership extends rb_base_source {
         return $out;
     }
 
+    /**
+     * Display the program completion status
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @return string
+     */
     public function rb_display_prog_status($status, $row) {
+        debugging('rb_source_program_membership::rb_display_prog_status has been deprecated since Totara 12.0. Use totara_program\rb\display\program_completion_status::display', DEBUG_DEVELOPER);
         switch ($status) {
             case STATUS_PROGRAM_INCOMPLETE:
                 return get_string('incomplete', 'totara_program');
@@ -234,7 +245,17 @@ class rb_source_program_membership extends rb_base_source {
         }
     }
 
+    /**
+     * Display edit completion records link.
+     *
+     * @deprecated Since Totara 12.0
+     * @param $id
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     public function rb_display_edit_completion($id, $row, $isexport) {
+        debugging('rb_source_program_membership::rb_display_edit_completion has been deprecated since Totara 12.0. Use totara_program\rb\display\program_edit_completion::display', DEBUG_DEVELOPER);
         // Ignores $id == prog_completion id, because the user might have been unassigned and only history records exist.
         if ($isexport) {
             return get_string('editcompletion', 'rb_source_program_membership');

@@ -176,7 +176,7 @@ class rb_source_comp_status_history extends rb_base_source {
                 $DB->sql_concat_join("' '", $usednamefields),
                 array('defaultheading' => get_string('compusermodifiedheading', 'rb_source_comp_status_history'),
                       'joins' => 'usermodified',
-                      'displayfunc' => 'link_user',
+                      'displayfunc' => 'user_link',
                       'extrafields' => array_merge(array('id' => 'usermodified.id'),
                                                    $allnamefields)
                 )

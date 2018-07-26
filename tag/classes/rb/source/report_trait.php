@@ -142,7 +142,7 @@ trait report_trait {
                 "CASE WHEN $join.id IS NOT NULL THEN 1 ELSE 0 END",
                 array(
                     'joins' => $join,
-                    'displayfunc' => 'yes_no',
+                    'displayfunc' => 'yes_or_no',
                 )
             );
         }

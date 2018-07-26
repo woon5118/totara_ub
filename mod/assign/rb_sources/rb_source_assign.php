@@ -44,6 +44,7 @@ class rb_source_assign extends rb_base_source {
 
         $this->base = '{assign_submission}';
         $this->usedcomponents[] = 'mod_assign';
+        $this->usedcomponents[] = 'totara_cohort';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -183,7 +184,7 @@ class rb_source_assign extends rb_base_source {
                       ELSE 'notsubmitted' END",
                 array(
                     'joins' => 'assign_grades',
-                    'displayfunc' => 'submission_status',
+                    'displayfunc' => 'assign_submission_status',
                     'dbdatatype' => 'text',
                     'outputformat' => 'text'
                 )
@@ -196,7 +197,7 @@ class rb_source_assign extends rb_base_source {
                 get_string('gradescalevalues', 'rb_source_assign'),
                 'scale.scale',
                 array(
-                    'displayfunc' => 'scalevalues',
+                    'displayfunc' => 'assign_scale_values',
                     'joins' => 'scale'
                 )
             ),
@@ -208,7 +209,7 @@ class rb_source_assign extends rb_base_source {
                 get_string('submissiongrade', 'rb_source_assign'),
                 'assign_grades.grade',
                 array(
-                    'displayfunc' => 'submissiongrade',
+                    'displayfunc' => 'assign_submission_grade',
                     'joins' => 'assign_grades',
                     'extrafields' => array(
                         'scale_values' => 'scale.scale'
@@ -259,7 +260,7 @@ class rb_source_assign extends rb_base_source {
                 get_string('maxgrade', 'rb_source_assign'),
                 'grade_grades.rawgrademax',
                 array(
-                    'displayfunc' => 'maxgrade',
+                    'displayfunc' => 'assign_max_grade',
                     'joins' => 'grade_grades',
                     'extrafields' => array(
                         'scale_values' => 'scale.scale'
@@ -274,7 +275,7 @@ class rb_source_assign extends rb_base_source {
                 get_string('mingrade', 'rb_source_assign'),
                 'grade_grades.rawgrademin',
                 array(
-                    'displayfunc' => 'mingrade',
+                    'displayfunc' => 'assign_min_grade',
                     'joins' => 'grade_grades',
                     'extrafields' => array(
                         'scale_values' => 'scale.scale'
@@ -417,21 +418,27 @@ class rb_source_assign extends rb_base_source {
 
     /**
      * display the assignment type
+     *
+     * @deprecated Since Totara 12.0
      * @param string $field
      * @param object $record
      * @param boolean $isexport
      */
     public function rb_display_assignmenttype($field, $record, $isexport) {
+        debugging('rb_source_assign::rb_display_assignmenttype has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         return get_string("type{$field}", 'assignment');
     }
 
     /**
      * display the scale values
+     *
+     * @deprecated Since Totara 12.0
      * @param string $field
      * @param object $record
      * @param boolean $isexport
      */
     public function rb_display_scalevalues($field, $record, $isexport) {
+        debugging('rb_source_assign::rb_display_scalevalues has been deprecated since Totara 12.0. Use mod_assign\rb\display\assign_scale_values::display', DEBUG_DEVELOPER);
         // If there's no scale values, return an empty string.
         if (empty($field)) {
             return '';
@@ -445,11 +452,14 @@ class rb_source_assign extends rb_base_source {
 
     /**
      * Display the submission grade
+     *
+     * @deprecated Since Totara 12.0
      * @param string $field
      * @param object $record
      * @param boolean $isexport
      */
     public function rb_display_submissiongrade($field, $record, $isexport) {
+        debugging('rb_source_assign::rb_display_submissiongrade has been deprecated since Totara 12.0. Use mod_assign\rb\display\assign_submission_grade::display', DEBUG_DEVELOPER);
         // If there's no grade (yet), then return a string saying so.
         // If $field is 0, it is may be $mingrade or $grade.
         if ((integer)$field < 0 || empty($field)) {
@@ -469,11 +479,14 @@ class rb_source_assign extends rb_base_source {
 
     /**
      * Display the max grade
+     *
+     * @deprecated Since Totara 12.0
      * @param string $field
      * @param object $record
      * @param boolean $isexport
      */
     public function rb_display_maxgrade($field, $record, $isexport) {
+        debugging('rb_source_assign::rb_display_maxgrade has been deprecated since Totara 12.0. Use mod_assign\rb\display\assign_max_grade::display', DEBUG_DEVELOPER);
         // if there's no scale values, return the raw grade.
         if (empty($record->scale_values)) {
             return (integer)$field;
@@ -487,11 +500,14 @@ class rb_source_assign extends rb_base_source {
 
     /**
      * Display the min grade
+     *
+     * @deprecated Since Totara 12.0
      * @param string $field
      * @param object $record
      * @param boolean $isexport
      */
     public function rb_display_mingrade($field, $record, $isexport) {
+        debugging('rb_source_assign::rb_display_mingrade has been deprecated since Totara 12.0. Use mod_assign\rb\display\assign_min_grade::display', DEBUG_DEVELOPER);
         // If there's no scale values, return the raw grade.
         if (empty($record->scale_values)) {
             return (integer)$field;

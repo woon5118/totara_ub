@@ -65,6 +65,8 @@ class rb_source_dp_course extends rb_base_source {
         $this->defaultfilters = array();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_course');
+        $this->usedcomponents[] = 'totara_plan';
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 
@@ -247,7 +249,7 @@ class rb_source_dp_course extends rb_base_source {
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_course'),
                     'joins' => 'dp_course',
-                    'displayfunc' => 'planlink',
+                    'displayfunc' => 'plan_link',
                     'extrafields' => array( 'plan_id' => 'dp_course.planid' )
                 )
         );
@@ -326,7 +328,7 @@ class rb_source_dp_course extends rb_base_source {
             "course_completion.status",
             array(
                 'joins' => array('course_completion', 'dp_course'),
-                'displayfunc' => 'course_completion_progress_and_approval',
+                'displayfunc' => 'plan_course_completion_progress_and_approval',
                 'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                 'extrafields' => array('approved' => 'dp_course.approved', 'userid' => 'base.userid', 'courseid' => 'base.courseid'),
             )
@@ -391,7 +393,7 @@ class rb_source_dp_course extends rb_base_source {
                 END",
                 array(
                     'joins' => array('course_completion','dp_course'),
-                    'displayfunc' => 'course_completion_progress',
+                    'displayfunc' => 'plan_course_completion_progress',
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
             );
@@ -402,7 +404,7 @@ class rb_source_dp_course extends rb_base_source {
                 "course_completion.status",
                 array(
                     'joins' => array('course_completion', 'dp_course'),
-                    'displayfunc' => 'course_completion_progresspercentage',
+                    'displayfunc' => 'plan_course_completion_progress_percentage',
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
             );
@@ -453,7 +455,7 @@ class rb_source_dp_course extends rb_base_source {
                       ELSE grade_grades.finalgrade END',
                 array(
                     'joins' => array('criteria', 'grade_grades'),
-                    'displayfunc' => 'grade_string',
+                    'displayfunc' => 'course_grade_string',
                     'extrafields' => array(
                         'gradepass' => 'criteria.gradepass',
                     ),
@@ -468,7 +470,7 @@ class rb_source_dp_course extends rb_base_source {
                 array(
                     'joins' => 'course_completion_history',
                     'defaultheading' => get_string('course_completion_previous_completion', 'rb_source_dp_course'),
-                    'displayfunc' => 'course_completion_previous_completion',
+                    'displayfunc' => 'plan_course_completion_previous_completion',
                     'extrafields' => array(
                         'courseid' => 'base.courseid',
                         'userid' => 'base.userid',
@@ -703,7 +705,17 @@ class rb_source_dp_course extends rb_base_source {
         }
     }
 
+    /**
+     * Display course completion progress
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param $isexport
+     * @return mixed|string
+     */
     function rb_display_course_completion_progress($status, $row, $isexport) {
+        debugging('rb_source_dp_course::rb_display_course_completion_progress has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_course_completion_progress::display', DEBUG_DEVELOPER);
         if ($isexport) {
             global $PAGE;
 
@@ -722,8 +734,17 @@ class rb_source_dp_course extends rb_base_source {
         return totara_display_course_progress_bar($row->userid, $row->courseid, $status);
     }
 
+    /**
+     * Display course completion progress and approval
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param $isexport
+     * @return mixed|string
+     */
     function rb_display_course_completion_progress_and_approval($status, $row, $isexport) {
-
+        debugging('rb_source_dp_course::rb_display_course_completion_progress_and_approval has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_course_completion_progress_and_approval::display', DEBUG_DEVELOPER);
         $approved = isset($row->approved) ? $row->approved : null;
 
         // get the progress bar
@@ -741,7 +762,17 @@ class rb_source_dp_course extends rb_base_source {
         return $content;
     }
 
+    /**
+     * Display course completion progress percentage
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param $isexport
+     * @return mixed|string
+     */
     function rb_display_course_completion_progresspercentage($status, $row, $isexport) {
+        debugging('rb_source_dp_course::rb_display_course_completion_progresspercentage has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_course_completion_progress_percentage::display', DEBUG_DEVELOPER);
 
         // get the progress percetage
         $content = $this->rb_display_course_completion_progress($status, $row, $isexport);
@@ -756,7 +787,16 @@ class rb_source_dp_course extends rb_base_source {
         return $content;
     }
 
+    /**
+     * Display previous completions
+     *
+     * @deprecated Since Totara 12.0
+     * @param $name
+     * @param $row
+     * @return string
+     */
     public function rb_display_course_completion_previous_completion($name, $row) {
+        debugging('rb_source_dp_course::rb_display_course_completion_previous_completion has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_course_completion_previous_completion::display', DEBUG_DEVELOPER);
         global $OUTPUT;
         if ($name !== '') {
             return $OUTPUT->action_link(new moodle_url('/totara/plan/record/courses.php',

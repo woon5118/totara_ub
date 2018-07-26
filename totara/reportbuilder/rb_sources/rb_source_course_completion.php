@@ -55,6 +55,7 @@ class rb_source_course_completion extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_course_completion');
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -168,7 +169,7 @@ class rb_source_course_completion extends rb_base_source {
                 'status',
                 get_string('completionstatus', 'rb_source_course_completion'),
                 'base.status',
-                array('displayfunc' => 'completion_status')
+                array('displayfunc' => 'course_completion_status')
             ),
             new rb_column_option(
                 'course_completion',
@@ -384,7 +385,7 @@ class rb_source_course_completion extends rb_base_source {
                       ELSE grade_grades.finalgrade END',
                 array(
                     'joins' => array('criteria', 'grade_grades'),
-                    'displayfunc' => 'grade_string',
+                    'displayfunc' => 'course_grade_string',
                     'extrafields' => array(
                         'gradepass' => 'criteria.gradepass',
                         'grademax' => 'grade_items.grademax',
@@ -780,7 +781,17 @@ class rb_source_course_completion extends rb_base_source {
     //
     //
 
+    /**
+     * Display for course completion status
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     function rb_display_completion_status($status, $row, $isexport) {
+        debugging('rb_source_course_completion::rb_display_completion_status has been deprecated since Totara 12.0. Use course_completion_status::display', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->dirroot.'/completion/completion_completion.php');
         global $COMPLETION_STATUS;
@@ -796,7 +807,17 @@ class rb_source_course_completion extends rb_base_source {
         }
     }
 
+    /**
+     * Display for course progress
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param $isexport
+     * @return mixed|string
+     */
     function rb_display_course_progress($status, $row, $isexport) {
+        debugging('rb_source_course_completion::rb_display_course_progress has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($isexport) {
             global $PAGE;
 

@@ -129,7 +129,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
                 'joins' => 'assigned',
                 'capability' => 'totara/core:modconfig',
                 'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates', 'custom' => 'base.custom'),
-                'displayfunc' => 'actions',
+                'displayfunc' => 'f2f_room_actions',
                 'hidden' => false
             )
         );
@@ -213,13 +213,33 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
     }
 
     /**
+     * Get the embeddedurl
+     *
+     * @return string
+     */
+    public function get_embeddedurl() {
+        return $this->embeddedurl;
+    }
+
+    /**
+     * Get the url params
+     *
+     * @return mixed
+     */
+    public function get_urlparams() {
+        return $this->urlparams;
+    }
+
+    /**
      * Room name
      *
+     * @deprecated Since Totara 12.0
      * @param int $roomid
      * @param stdClass $row
      * @param bool $isexport
      */
     public function rb_display_actions($roomid, $row, $isexport = false) {
+        debugging('rb_source_facetoface_rooms::rb_display_actions has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_room_actions::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($isexport) {

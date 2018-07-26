@@ -106,7 +106,7 @@ final class rb_source_userdata_export_type_items extends rb_base_source {
             get_string('itemexportdata', 'totara_userdata'),
             'base.exportdata',
             array(
-                'displayfunc' => 'yes_no',
+                'displayfunc' => 'yes_or_no',
             )
         );
 

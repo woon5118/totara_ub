@@ -64,6 +64,7 @@ class rb_source_dp_program extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_program');
         $this->sourcewhere = 'base.certifid IS NULL';
         $this->usedcomponents[] = 'totara_program';
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 
@@ -198,7 +199,7 @@ class rb_source_dp_program extends rb_base_source {
             "base.fullname",
             array(
                 'joins' => 'program_completion',
-                'displayfunc' => 'link_program_icon',
+                'displayfunc' => 'program_icon_link',
                 'defaultheading' => get_string('programname', 'totara_program'),
                 'extrafields' => array(
                     'programid' => "base.id",
@@ -231,7 +232,7 @@ class rb_source_dp_program extends rb_base_source {
             "prog_user_assignment.id",
             array(
                 'joins' => 'prog_user_assignment',
-                'displayfunc' => 'mandatory_status',
+                'displayfunc' => 'program_mandatory_status',
             )
         );
 
@@ -242,7 +243,7 @@ class rb_source_dp_program extends rb_base_source {
             "base.id",
             array(
                 'joins' => 'program_completion',
-                'displayfunc' => 'recurring_status',
+                'displayfunc' => 'program_recurring_status',
                 'extrafields' => array(
                     'userid' => "program_completion.userid"
                 )
@@ -336,7 +337,17 @@ class rb_source_dp_program extends rb_base_source {
         return $columnoptions;
     }
 
+    /**
+     * Display program progress
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param bool $export
+     * @return string
+     */
     public function rb_display_program_completion_progress($status, $row, $export=false) {
+        debugging('rb_source_dp_program::rb_display_program_completion_progress has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $progress = prog_display_progress($row->programid, $row->userid, CERTIFPATH_STD, $export);
         if ($export && !is_empty($row->stringexport) && is_numeric($progress)) {
             return get_string('xpercentcomplete', 'totara_core', $progress);
@@ -350,12 +361,14 @@ class rb_source_dp_program extends rb_base_source {
      *
      * If not -1 just call the regular date display function.
      *
+     * @deprecated Since Totara 12.0
      * @param integer $date Unix timestamp
      * @param object $row Object containing all other fields for this row
      *
      * @return string Date in a nice format
      */
     public function rb_display_prog_date($date, $row) {
+        debugging('rb_source_dp_program::rb_display_prog_date has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($date == -1) {
             return '';
         } else {
@@ -363,7 +376,15 @@ class rb_source_dp_program extends rb_base_source {
         }
     }
 
+    /**
+     * Is mandatory
+     *
+     * @deprecated Since Totara 12.0
+     * @param $id
+     * @return string
+     */
     function rb_display_mandatory_status($id) {
+        debugging('rb_source_dp_program::rb_display_mandatory_status has been deprecated since Totara 12.0. Use totara_program\rb\display\program_mandatory_status::display', DEBUG_DEVELOPER);
         global $OUTPUT;
         if (!empty($id)) {
             return $OUTPUT->pix_icon('/i/valid', get_string('yes'));
@@ -371,7 +392,16 @@ class rb_source_dp_program extends rb_base_source {
         return get_string('no');
     }
 
+    /**
+     * Is recurring
+     *
+     * @deprecated Since Totara 12.0
+     * @param $programid
+     * @param $row
+     * @return string
+     */
     function rb_display_recurring_status($programid, $row) {
+        debugging('rb_source_dp_program::rb_display_recurring_status has been deprecated since Totara 12.0. Use totara_program\rb\display\program_recurring_status::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         $userid = $row->userid;
@@ -390,7 +420,17 @@ class rb_source_dp_program extends rb_base_source {
         return get_string('no');
     }
 
+    /**
+     * Display program icon with name and link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $programname
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_program_icon($programname, $row, $isexport = false) {
+        debugging('rb_source_dp_program::rb_display_link_program_icon has been deprecated since Totara 12.0. Use totara_program\rb\display\program_icon_link::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return $programname;
         }
@@ -398,7 +438,16 @@ class rb_source_dp_program extends rb_base_source {
         return prog_display_link_icon($row->programid, $row->userid);
     }
 
+    /**
+     * Display for previous completions
+     *
+     * @deprecated Since Totara 12.0
+     * @param $count
+     * @param $row
+     * @return int
+     */
     public function rb_display_program_previous_completion($count, $row) {
+        debugging('rb_source_dp_program::rb_display_program_previous_completion has been deprecated since Totara 12.0. Use totara_program\rb\display\program_previous_completions::display', DEBUG_DEVELOPER);
         global $OUTPUT;
         if (!$count) {
             return 0;

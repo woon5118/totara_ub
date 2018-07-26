@@ -145,7 +145,7 @@ class rb_source_certification_membership extends rb_base_source {
             'base.id',
             array(
                 'joins' => array('certif_completion'),
-                'displayfunc' => 'edit_completion',
+                'displayfunc' => 'certif_edit_completion',
                 'extrafields' => array(
                     'userid' => 'base.userid',
                     'progid' => 'base.programid',
@@ -247,7 +247,17 @@ class rb_source_certification_membership extends rb_base_source {
         return $out;
     }
 
+    /**
+     * Display edit completion records link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $id
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     public function rb_display_edit_completion($id, $row, $isexport) {
+        debugging('rb_source_certification_membership::rb_display_edit_completion has been deprecated since Totara 12.0. Use totara_certification\rb\display\certif_edit_completion::display', DEBUG_DEVELOPER);
         // Ignores $id == certif_completion id, because the user might have been unassigned and only history records exist.
         if ($isexport) {
             return get_string('editcompletion', 'rb_source_certification_membership');

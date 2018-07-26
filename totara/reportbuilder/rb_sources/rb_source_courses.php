@@ -47,6 +47,7 @@ class rb_source_courses extends rb_base_source {
         $this->defaulttoolbarsearchcolumns = $this->define_defaultsearchcolumns();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_courses');
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -99,7 +100,7 @@ class rb_source_courses extends rb_base_source {
                 'mods',
                 get_string('content', 'rb_source_courses'),
                 "mods.list",
-                array('joins' => 'mods', 'displayfunc' => 'modicons')
+                array('joins' => 'mods', 'displayfunc' => 'course_mod_icons')
             ),
         );
 
@@ -254,7 +255,17 @@ class rb_source_courses extends rb_base_source {
     //
     //
 
+    /**
+     * Display course module icons
+     *
+     * @deprecated Since Totara 12.0
+     * @param $mods
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_modicons($mods, $row, $isexport = false) {
+        debugging('rb_source_courses::rb_display_modicons has been deprecated since Totara 12.0. Use course_mod_icons::display', DEBUG_DEVELOPER);
         global $OUTPUT, $CFG;
         $modules = explode('|', $mods);
         $mods = array();
@@ -274,7 +285,7 @@ class rb_source_courses extends rb_base_source {
             }
             $mods[] = $module;
         }
-        core_collator::asort_objects_by_property($mods, 'localname');
+        \core_collator::asort_objects_by_property($mods, 'localname');
 
         $out = array();
         $glue = '';

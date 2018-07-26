@@ -144,10 +144,10 @@ trait report_trait {
             "$join.fullname",
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_program_icon',
+                'displayfunc' => 'program_icon_link',
                 'defaultheading' => get_string('programname', $langfile),
                 'extrafields' => array(
-                    'program_id' => "$join.id",
+                    'programid' => "$join.id",
                     'program_icon' => "$join.icon",
                     'program_visible' => "$join.visible",
                     'program_audiencevisible' => "$join.audiencevisible",
@@ -177,7 +177,7 @@ trait report_trait {
             "$join.visible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'yes_no'
+                'displayfunc' => 'yes_or_no'
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -187,7 +187,7 @@ trait report_trait {
             "$join.audiencevisible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'audience_visibility'
+                'displayfunc' => 'cohort_visibility'
             )
         );
 

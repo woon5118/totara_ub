@@ -41,6 +41,7 @@ class rb_source_org extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_org');
+        $this->usedcomponents[] = 'totara_hierarchy';
 
         parent::__construct();
     }
@@ -161,7 +162,7 @@ class rb_source_org extends rb_base_source {
                 'fullname',
                 get_string('name', 'rb_source_org'),
                 "base.fullname",
-                array('displayfunc' => 'orgnamelink',
+                array('displayfunc' => 'org_name_link',
                       'extrafields' => array('orgid' => 'base.id'),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
@@ -243,7 +244,7 @@ class rb_source_org extends rb_base_source {
                 'visible',
                 get_string('visible', 'rb_source_org'),
                 'base.visible',
-                array('displayfunc' => 'yes_no')
+                array('displayfunc' => 'yes_or_no')
             ),
             new rb_column_option(
                 'org',
@@ -463,11 +464,13 @@ class rb_source_org extends rb_base_source {
     /**
      * Displays organisation name as html link
      *
+     * @deprecated Since Totara 12.0
      * @param string $orgname
      * @param object Report row $row
      * @return string html link
      */
     public function rb_display_orgnamelink($orgname, $row) {
+        debugging('rb_source_org::rb_display_orgnamelink has been deprecated since Totara 12.0. Use totara_hierarchy\rb\display\org_name_link::display', DEBUG_DEVELOPER);
         if (empty($orgname)) {
             return '';
         }

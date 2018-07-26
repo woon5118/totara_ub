@@ -59,6 +59,8 @@ class rb_source_course_membership extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = $this->define_sourcetitle();
+        $this->usedcomponents[] = 'totara_completioneditor';
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 
@@ -130,7 +132,7 @@ class rb_source_course_membership extends rb_base_source {
                 get_string('coursecompletionedit', 'totara_completioneditor'),
                 'base.id',
                 array(
-                    'displayfunc' => 'edit_completion',
+                    'displayfunc' => 'completioneditor_edit_completion',
                     'extrafields' => array(
                         'userid' => 'base.userid',
                         'courseid' => 'base.courseid',
@@ -230,7 +232,17 @@ class rb_source_course_membership extends rb_base_source {
         return $defaultfilters;
     }
 
+    /**
+     * Display the edit completion link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $id
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     public function rb_display_edit_completion($id, $row, $isexport) {
+        debugging('rb_source_course_membership::rb_display_edit_completion has been deprecated since Totara 12.0. Use totara_completioneditor\rb\display\completioneditor_edit_completion::display', DEBUG_DEVELOPER);
         // Ignores $id == course_completions->id, because the user might have been unassigned and only history records exist.
         $url = new moodle_url('/totara/completioneditor/edit_course_completion.php',
             array('courseid' => $row->courseid, 'userid' => $row->userid));

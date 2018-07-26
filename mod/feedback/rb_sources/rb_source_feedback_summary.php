@@ -43,6 +43,7 @@ class rb_source_feedback_summary extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_feedback_summary');
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }

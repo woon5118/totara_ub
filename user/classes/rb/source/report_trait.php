@@ -131,7 +131,7 @@ trait report_trait {
             $DB->sql_concat_join("' '", $usednamefields),
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_user',
+                'displayfunc' => 'user_link',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
                 'extrafields' => array_merge(array('id' => "$join.id"), $allnamefields),
                 'addtypetoheading' => $addtypetoheading
@@ -144,7 +144,7 @@ trait report_trait {
             $DB->sql_concat_join("' '", $usednamefields),
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_user_icon',
+                'displayfunc' => 'user_icon_link',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
                 'extrafields' => array_merge(array('id' => "$join.id",
                                                    'picture' => "$join.picture",

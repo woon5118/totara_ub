@@ -64,6 +64,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_program_recurring');
         // only consider whole programs - not courseset completion
         $this->sourcewhere = 'base.coursesetid = 0';
+        $this->usedcomponents[] = 'totara_program';
         parent::__construct();
     }
 
@@ -126,7 +127,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
             "prog.fullname",
             array(
                 'joins' => 'prog',
-                'displayfunc' => 'link_program_icon',
+                'displayfunc' => 'program_icon_link',
                 'defaultheading' => get_string('programname', 'totara_program'),
                 'extrafields' => array(
                     'programid' => "prog.id",
@@ -166,7 +167,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
             get_string('coursenamelink', 'totara_program'),
             "base.recurringcourseid",
             array(
-                'displayfunc' => 'link_course_name',
+                'displayfunc' => 'program_course_name_link',
             )
         );
 
@@ -190,7 +191,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
             get_string('completiondate', 'totara_program'),
             "base.timecompleted",
             array(
-                'displayfunc' => 'completion_date',
+                'displayfunc' => 'program_completion_date',
                 'dbdatatype' => 'timestamp',
             )
         );
@@ -201,7 +202,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
             get_string('duedate', 'totara_program'),
             "base.timedue",
             array(
-                'displayfunc' => 'completion_date',
+                'displayfunc' => 'program_completion_date',
                 'dbdatatype' => 'timestamp',
             )
         );
@@ -212,7 +213,17 @@ class rb_source_dp_program_recurring extends rb_base_source {
         return $columnoptions;
     }
 
+    /**
+     * Display program icon with name and link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $programname
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_program_icon($programname, $row, $isexport = false) {
+        debugging('rb_source_dp_program_recurring::rb_display_link_program_icon has been deprecated since Totara 12.0. Use totara_program\rb\display\program_icon_link::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return $programname;
         }
@@ -220,8 +231,16 @@ class rb_source_dp_program_recurring extends rb_base_source {
         return prog_display_link_icon($row->programid, $row->userid);
     }
 
-
+    /**
+     * Display program completion status
+     * 
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @return string
+     */
     function rb_display_program_completion_status($status,$row) {
+        debugging('rb_source_dp_program_recurring::rb_display_program_completion_status has been deprecated since Totara 12.0. Use totara_program\rb\display\program_completion_status::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($status == STATUS_PROGRAM_COMPLETE) {
@@ -234,7 +253,15 @@ class rb_source_dp_program_recurring extends rb_base_source {
 
     }
 
+    /**
+     * Display completion date
+     *
+     * @deprecated Since Totara 12.0
+     * @param $time
+     * @return string
+     */
     function rb_display_completion_date($time) {
+        debugging('rb_source_dp_program_recurring::rb_display_completion_date has been deprecated since Totara 12.0. Use totara_program\rb\display\program_completion_date::display', DEBUG_DEVELOPER);
         if ($time == 0) {
             return '';
         } else {
@@ -242,7 +269,15 @@ class rb_source_dp_program_recurring extends rb_base_source {
         }
     }
 
+    /**
+     * Display course name and link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $courseid
+     * @return string
+     */
     function rb_display_link_course_name($courseid) {
+        debugging('rb_source_dp_program_recurring::rb_display_link_course_name has been deprecated since Totara 12.0. Use totara_program\rb\display\program_course_name_link::display', DEBUG_DEVELOPER);
         global $DB, $OUTPUT;
 
         $html = '';

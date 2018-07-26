@@ -53,6 +53,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->paramoptions = $this->define_paramoptions();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_summary');
+        $this->usedcomponents[] = 'totara_cohort';
         $this->add_customfields();
 
         parent::__construct();
@@ -156,7 +157,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 '(CASE WHEN allattendees.statuscode >= ' . MDL_F2F_STATUS_APPROVED . ' THEN 1 ELSE NULL END)',
                 array('joins' => array('allattendees', 'sessions'),
                     'grouping' => 'count',
-                    'displayfunc' => 'session_spaces',
+                    'displayfunc' => 'f2f_session_spaces',
                     'extrafields' => array('overall_capacity' => 'sessions.capacity'),
                     'dbdatatype' => 'integer'
                 )
@@ -353,7 +354,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                   ELSE " . $DB->sql_concat_join("' '", $usernamefieldscreator) . " END",
                 array(
                     'joins' => 'modifiedby',
-                    'displayfunc' => 'link_user',
+                    'displayfunc' => 'f2f_user_link',
                     'extrafields' => array_merge(array('id' => 'modifiedby.id'), $usernamefieldscreator),
                 )
             );
@@ -513,7 +514,17 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         return $defaultcolumns;
     }
 
+    /**
+     * Display actions
+     *
+     * @deprecated Since Totara 12.0
+     * @param $session
+     * @param $row
+     * @param bool $isexport
+     * @return null|string
+     */
     public function rb_display_actions($session, $row, $isexport = false) {
+        debugging('rb_source_facetoface_summary::rb_display_actions has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_actions::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($isexport) {
@@ -535,21 +546,26 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     /**
      * Spaces left on session.
      *
+     * @deprecated Since Totara 12.0
      * @param string $count Number of signups
      * @param object $row Report row
      * @return string Display html
      */
     public function rb_display_session_spaces($count, $row) {
+        debugging('rb_source_facetoface_summary::rb_display_session_spaces has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_session_spaces::display', DEBUG_DEVELOPER);
         $spaces = $row->overall_capacity - $count;
         return ($spaces > 0 ? $spaces : 0);
     }
 
     /**
      * Show if manager's approval required
+     *
+     * @deprecated Since Totara 12.0
      * @param bool $required True when approval required
      * @param stdClass $row
      */
     public function rb_display_approver($required, $row) {
+        debugging('rb_source_facetoface_summary::rb_display_approver has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($required) {
             return get_string('manager', 'core_role');
         } else {
@@ -584,7 +600,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     'noexport' => true,
                     'nosort' => true,
                     'extrafields' => ['facetofaceid' => 'sessions.facetoface'],
-                    'displayfunc' => 'actions'
+                    'displayfunc' => 'f2f_actions'
                 ]
             );
         }

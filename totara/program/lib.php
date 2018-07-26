@@ -2156,11 +2156,13 @@ function prog_required_for_user($progid, $userid) {
 /**
  * Generates the HTML to display a program icon that links to a page to view the program
  *
+ * @deprecated Since Totara 12.0
  * @param int $progid               The id of a program
  * @param int $userid   optional    The id of a user, defaults to $USER if not set
  * @return html
  */
 function prog_display_link_icon($progid, $userid = null) {
+    debugging('The function prog_display_link_icon has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
     global $OUTPUT, $USER, $DB;
 
     $prog = new program($progid);

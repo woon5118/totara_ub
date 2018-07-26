@@ -58,6 +58,7 @@ class rb_source_completionimport_certification extends rb_base_source {
         $this->defaultfilters = array();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_completionimport_certification');
+        $this->usedcomponents[] = 'totara_completionimport';
         parent::__construct();
     }
 
@@ -174,7 +175,7 @@ class rb_source_completionimport_certification extends rb_base_source {
                 get_string('columnbaseimporterrormsg', 'rb_source_completionimport_certification'),
                 'base.importerrormsg',
                 array(
-                    'displayfunc' => 'importerrormsg',
+                    'displayfunc' => 'completionimport_error_message',
                 )
         );
 
@@ -184,7 +185,7 @@ class rb_source_completionimport_certification extends rb_base_source {
                 get_string('columnbaseimportevidence', 'rb_source_completionimport_certification'),
                 'base.importevidence',
                 array(
-                    'displayfunc' => 'yes_no',
+                    'displayfunc' => 'yes_or_no',
                 )
         );
 
@@ -481,8 +482,17 @@ class rb_source_completionimport_certification extends rb_base_source {
         return $defaultfilters;
     }
 
-
+    /**
+     * Display the error message
+     *
+     * @deprecated Since Totara 12.0
+     * @param $importerrormsg
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     public function rb_display_importerrormsg($importerrormsg, $row, $isexport) {
+        debugging('rb_source_completionimport_certification::rb_display_importerrormsg has been deprecated since Totara 12.0. Use totara_completionimport\rb\display\completionimport_error_message::display', DEBUG_DEVELOPER);
         $errors = array();
         $errorcodes = explode(';', $importerrormsg);
         foreach ($errorcodes as $errorcode) {

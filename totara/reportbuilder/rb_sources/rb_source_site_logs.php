@@ -55,6 +55,8 @@ class rb_source_site_logs extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_site_logs');
+        $this->usedcomponents[] = 'tool_log';
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -108,7 +110,7 @@ class rb_source_site_logs extends rb_base_source {
                 'ip',
                 get_string('ip', 'rb_source_site_logs'),
                 'base.ip',
-                array('displayfunc' => 'iplookup')
+                array('displayfunc' => 'ip_lookup_link')
             ),
             new rb_column_option(
                 'log',
@@ -138,7 +140,7 @@ class rb_source_site_logs extends rb_base_source {
                 get_string('actionlink', 'rb_source_site_logs'),
                 $DB->sql_concat('base.module', "' '", 'base.action'),
                 array(
-                    'displayfunc' => 'link_action',
+                    'displayfunc' => 'log_link_action',
                     'defaultheading' => get_string('action', 'rb_source_site_logs'),
                     'extrafields' => array('log_module' => 'base.module', 'log_url' => 'base.url')
                 )
@@ -323,8 +325,16 @@ class rb_source_site_logs extends rb_base_source {
     //
     //
 
-    // convert a site log action into a link to that page
+    /**
+     * Convert a site log action into a link to that page
+     *
+     * @deprecated Since Totara 12.0
+     * @param $action
+     * @param $row
+     * @return string
+     */
     function rb_display_link_action($action, $row) {
+        debugging('rb_source_site_logs::rb_display_link_action has been deprecated since Totara 12.0. Use tool_log\rb\display\log_link_action::display', DEBUG_DEVELOPER);
         global $CFG;
         $url = $row->log_url;
         $module = $row->log_module;
@@ -333,8 +343,16 @@ class rb_source_site_logs extends rb_base_source {
         return html_writer::link(new moodle_url($logurl), $action);
     }
 
-    // convert IP address into a link to IP lookup page
+    /**
+     * Convert IP address into a link to IP lookup page
+     *
+     * @deprecated Since Totara 12.0
+     * @param $ip
+     * @param $row
+     * @return string
+     */
     function rb_display_iplookup($ip, $row) {
+        debugging('rb_source_site_logs::rb_display_iplookup has been deprecated since Totara 12.0. Use ip_lookup_link::display', DEBUG_DEVELOPER);
         global $CFG;
         if (!isset($ip) || $ip == '') {
             return '';

@@ -202,7 +202,7 @@ class rb_source_appraisal extends rb_base_source {
                      "ELSE 'statusdraft' " .
                 "END",
                 array('joins' => array('appraisal', 'activestage'),
-                      'displayfunc' => 'status',
+                      'displayfunc' => 'appraisal_status',
                       'defaultheading' => get_string('userappraisalstatusheading', 'rb_source_appraisal'))
             ),
             new rb_column_option(
@@ -241,7 +241,7 @@ class rb_source_appraisal extends rb_base_source {
                 get_string('appraisalstatuscolumn', 'rb_source_appraisal'),
                 'appraisal.status',
                 array('joins' => 'appraisal',
-                      'displayfunc' => 'appraisalstatus',
+                      'displayfunc' => 'appraisal_appraisal_status',
                       'defaultheading' => get_string('appraisalstatusheading', 'rb_source_appraisal'))
             ),
             new rb_column_option(
@@ -362,23 +362,28 @@ class rb_source_appraisal extends rb_base_source {
     /**
      * Convert status code string to human readable string.
      *
+     * @deprecated Since Totara 12.0
      * @param string $status status code string
      * @param object $row other fields in the record (unused)
      *
      * @return string
      */
     public function rb_display_status($status, $row) {
+        debugging('rb_source_appraisal::rb_display_status has been deprecated since Totara 12.0. Use totara_appraisal\rb\display\appraisal_status::display', DEBUG_DEVELOPER);
         return get_string($status, 'rb_source_appraisal');
     }
 
     /**
      * Convert appraisal status code string to human readable string.
+     *
+     * @deprecated Since Totara 12.0
      * @param string $status status code string
      * @param object $row other fields in the record (unused)
      *
      * @return string
      */
     public function rb_display_appraisalstatus($status, $row) {
+        debugging('rb_source_appraisal::rb_display_appraisalstatus has been deprecated since Totara 12.0. Use totara_appraisal\rb\display\appraisal_appraisal_status::display', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->dirroot.'/totara/appraisal/lib.php');
 

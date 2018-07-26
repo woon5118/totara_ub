@@ -288,6 +288,7 @@ abstract class rb_base_source {
     /**
      * Create a link that when clicked will display additional information inserted in a box below the clicked row.
      *
+     * @deprecated Since Totara 12.0
      * @param string|stringable $columnvalue the value to display in the column
      * @param string $expandname the name of the function (prepended with 'rb_expand_') that will generate the contents
      * @param array $params any parameters that the content generator needs
@@ -296,6 +297,7 @@ abstract class rb_base_source {
      * @return type
      */
     protected function create_expand_link($columnvalue, $expandname, $params, $alternateurl = '', $attributes = array()) {
+        debugging('rb_base_source::create_expand_link has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         // Serialize the data so that it can be passed as a single value.
@@ -510,12 +512,14 @@ abstract class rb_base_source {
     /**
      * Reformat a timestamp into a time, showing nothing if invalid or null
      *
+     * @deprecated Since Totara 12.0
      * @param integer $date Unix timestamp
      * @param object $row Object containing all other fields for this row
      *
      * @return string Time in a nice format
      */
     function rb_display_nice_time($date, $row) {
+        debugging('rb_base_source::rb_display_nice_time has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($date && is_numeric($date)) {
             return userdate($date, get_string('strftimeshort', 'langconfig'));
         } else {
@@ -526,12 +530,14 @@ abstract class rb_base_source {
     /**
      * Reformat a timestamp and timezone into a datetime, showing nothing if invalid or null
      *
+     * @deprecated Since Totara 12.0
      * @param integer $date Unix timestamp
      * @param object $row Object containing all other fields for this row (which should include a timezone field)
      *
      * @return string Date and time in a nice format
      */
     function rb_display_nice_datetime_in_timezone($date, $row) {
+        debugging('rb_base_source::rb_display_nice_datetime_in_timezone has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
 
         if ($date && is_numeric($date)) {
             if (empty($row->timezone)) {
@@ -548,18 +554,45 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Display function for delimited date in timezone list
+     *
+     * @deprecated Since Totara 12.0
+     * @param $data
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_date_in_timezone($data, $row) {
+        debugging('rb_base_source::rb_display_delimitedlist_date_in_timezone has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $format = get_string('strftimedate', 'langconfig');
         return $this->format_delimitedlist_datetime_in_timezone($data, $row, $format);
     }
 
+    /**
+     * Display function for delimited datetime in timezone list
+     *
+     * @deprecated Since Totara 12.0
+     * @param $data
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_datetime_in_timezone($data, $row) {
+        debugging('rb_base_source::rb_display_delimitedlist_datetime_in_timezone has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $format = get_string('strftimedatetime', 'langconfig');
         return $this->format_delimitedlist_datetime_in_timezone($data, $row, $format);
     }
 
-    // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+    /**
+     * Helper function to concatenate the fields using $this->uniquedelimiter
+     *
+     * @deprecated Since Totara 12.0
+     * @param $data
+     * @param $row
+     * @param $format
+     * @return string
+     */
     function format_delimitedlist_datetime_in_timezone($data, $row, $format) {
+        debugging('rb_base_source::format_delimitedlist_datetime_in_timezone has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $delimiter = $this->uniquedelimiter;
         $items = explode($delimiter, $data);
         $output = array();
@@ -586,12 +619,14 @@ abstract class rb_base_source {
      * Reformat two timestamps and timezones into a datetime, showing only one date if only one is present and
      * nothing if invalid or null.
      *
+     * @deprecated Since Totara 12.0
      * @param integer $date Unix timestamp
      * @param object $row Object containing all other fields for this row (which should include a timezone field)
      *
      * @return string Date and time in a nice format
      */
     function rb_display_nice_two_datetime_in_timezone($startdate, $row) {
+        debugging('rb_base_source::rb_display_nice_two_datetime_in_timezone has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
 
         $finishdate = $row->finishdate;
         $startdatetext = $finishdatetext = $returntext = '';
@@ -627,12 +662,14 @@ abstract class rb_base_source {
     /**
      * Reformat a timestamp into a date and time (including seconds), showing nothing if invalid or null
      *
+     * @deprecated Since Totara 12.0
      * @param integer $date Unix timestamp
      * @param object $row Object containing all other fields for this row
      *
      * @return string Date and time (including seconds) in a nice format
      */
     function rb_display_nice_datetime_seconds($date, $row) {
+        debugging('rb_base_source::rb_display_nice_datetime_seconds has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($date && is_numeric($date)) {
             return userdate($date, get_string('strftimedateseconds', 'langconfig'));
         } else {
@@ -640,19 +677,43 @@ abstract class rb_base_source {
         }
     }
 
-    // convert floats to 2 decimal places
+    /**
+     * Display function to convert floats to 2 decimal places
+     *
+     * @deprecated Since Totara 12.0
+     * @param $item
+     * @param $row
+     * @return string
+     */
     function rb_display_round2($item, $row) {
+        debugging('rb_base_source::rb_display_round2 has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         return ($item === null or $item === '') ? '-' : sprintf('%.2f', $item);
     }
 
-    // converts number to percentage with 1 decimal place
+    /**
+     * Display function to convert numbers to percentage with 1 decimal place
+     *
+     * @deprecated Since Totara 12.0
+     * @param $item
+     * @param $row
+     * @return string
+     */
     function rb_display_percent($item, $row) {
+        debugging('rb_base_source::rb_display_percent has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         return ($item === null or $item === '') ? '-' : sprintf('%.1f%%', $item);
     }
 
-    // Displays a comma separated list of strings as one string per line.
-    // Assumes you used "'grouping' => 'comma_list'", which concatenates with ', ', to construct the string.
+    /**
+     * Displays a comma separated list of strings as one string per line.
+     * Assumes you used "'grouping' => 'comma_list'", which concatenates with ', ', to construct the string.
+     *
+     * @deprecated Since Totara 12.0
+     * @param $list
+     * @param $row
+     * @return string
+     */
     function rb_display_list_to_newline($list, $row) {
+        debugging('rb_base_source::rb_display_list_to_newline has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $items = explode(', ', $list);
         foreach ($items as $key => $item) {
             if (empty($item)) {
@@ -662,8 +723,17 @@ abstract class rb_base_source {
         return implode($items, "\n");
     }
 
-    // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+    /**
+     * Displays a list of strings as one string per line.
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+     *
+     * @deprecated Since Totara 12.0
+     * @param $list
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_to_newline($list, $row) {
+        debugging('rb_base_source::rb_display_delimitedlist_to_newline has been deprecated since Totara 12.0. Use orderedlist_to_newline::display', DEBUG_DEVELOPER);
         $delimiter = $this->uniquedelimiter;
         $items = explode($delimiter, $list);
         $output = array();
@@ -678,8 +748,17 @@ abstract class rb_base_source {
         return implode($output, "\n");
     }
 
-    // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+    /**
+     * Displays a list of saved multi select strings as one string per line
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields
+     *
+     * @deprecated Since Totara 12.0
+     * @param $list
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_multi_to_newline($list, $row) {
+        debugging('rb_base_source::rb_display_delimitedlist_multi_to_newline has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $delimiter = $this->uniquedelimiter;
         $items = explode($delimiter, $list);
         $output = array();
@@ -698,8 +777,17 @@ abstract class rb_base_source {
         return implode($output, "\n");
     }
 
-    // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+    /**
+     * Displays a list of url's as one string per line
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields
+     *
+     * @deprecated Since Totara 12.0
+     * @param $list
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_url_to_newline($list, $row) {
+        debugging('rb_base_source::display_delimitedlist_url_to_newline has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $delimiter = $this->uniquedelimiter;
         $items = explode($delimiter, $list);
         $output = array();
@@ -716,16 +804,48 @@ abstract class rb_base_source {
         return implode($output, "\n");
     }
 
+    /**
+     * Displays a list of pos files as one string per line
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields
+     *
+     * @deprecated Since Totara 12.0
+     * @param $data
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     function rb_display_delimitedlist_posfiles_to_newline($data, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_delimitedlist_posfiles_to_newline has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         return $this->delimitedlist_files_to_newline($data, $row, 'position', $isexport);
     }
 
+    /**
+     * Displays a list of org files as one string per line
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields
+     *
+     * @deprecated Since Totara 12.0
+     * @param $data
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     function rb_display_delimitedlist_orgfiles_to_newline($data, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_delimitedlist_orgfiles_to_newline has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         return $this->delimitedlist_files_to_newline($data, $row, 'organisation', $isexport);
     }
 
-    // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+    /**
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+     *
+     * @deprecated Since Totara 12.0
+     * @param $data
+     * @param $row
+     * @param $type
+     * @param $isexport
+     * @return string
+     */
     function delimitedlist_files_to_newline($data, $row, $type, $isexport) {
+        debugging('rb_base_source::delimitedlist_files_to_newline has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->dirroot . '/totara/customfield/field/file/field.class.php');
 
@@ -747,8 +867,17 @@ abstract class rb_base_source {
         return implode($output, "\n");
     }
 
-    // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+    /**
+     * Displays a list of locations as one string per line
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields
+     *
+     * @deprecated Since Totara 12.0
+     * @param $list
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_location_to_newline($list, $row) {
+        debugging('rb_base_source::rb_display_delimitedlist_location_to_newline has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $delimiter = $this->uniquedelimiter;
         $items = explode($delimiter, $list);
         $output = array();
@@ -764,9 +893,17 @@ abstract class rb_base_source {
         return implode($output, "\n");
     }
 
-    // Displays a comma separated list of ints as one nice_date per line.
-    // Assumes you used "'grouping' => 'comma_list'", which concatenates with ', ', to construct the string.
+    /**
+     * Displays a comma separated list of ints as one nice_date per line
+     * Assumes you used "'grouping' => 'comma_list'", which concatenates with ', ', to construct the string
+     *
+     * @deprecated Since Totara 12.0
+     * @param $datelist
+     * @param $row
+     * @return string
+     */
     function rb_display_list_to_newline_date($datelist, $row) {
+        debugging('rb_base_source::rb_display_list_to_newline_date has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $items = explode(', ', $datelist);
         foreach ($items as $key => $item) {
             if (empty($item) || $item === '-') {
@@ -778,9 +915,17 @@ abstract class rb_base_source {
         return implode($items, "\n");
     }
 
-    // Displays a delimited list of ints as one nice_date per line, based off nice_date_list.
-    // Assumes you used "'grouping' => 'sql_aggregate'", which concatenates with $uniquedelimiter to construct a pre-ordered string.
+    /**
+     * Displays a delimited list of ints as one nice_date per line, based off nice_date_list
+     * Assumes you used "'grouping' => 'sql_aggregate'", which concatenates with $uniquedelimiter to construct a pre-ordered string
+     *
+     * @deprecated Since Totara 12.0
+     * @param $datelist
+     * @param $row
+     * @return string
+     */
     function rb_display_orderedlist_to_newline_date($datelist, $row) {
+        debugging('rb_base_source::rb_display_orderedlist_to_newline_date has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $output = array();
         $items = explode($this->uniquedelimiter, $datelist);
         foreach ($items as $item) {
@@ -793,8 +938,16 @@ abstract class rb_base_source {
         return implode($output, "\n");
     }
 
-    // Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+    /**
+     * Assumes you used a custom grouping with the $this->uniquedelimiter to concatenate the fields.
+     *
+     * @deprecated Since Totara 12.0
+     * @param $datelist
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_to_newline_date($datelist, $row) {
+        debugging('rb_base_source::rb_display_delimitedlist_to_newline_date has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $delimiter = $this->uniquedelimiter;
         $items = explode($delimiter, $datelist);
         $output = array();
@@ -810,11 +963,15 @@ abstract class rb_base_source {
 
     /**
      * Display address from location stored as json object
+     *
+     * @deprecated Since Totara 12.0
      * @param string $location
      * @param stdClass $row
      * @param bool $isexport
+     * @return string
      */
     public function rb_display_location($location, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_location has been deprecated since Totara 12.0, please call customfield_location::display() instead.', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
         $output = array();
@@ -833,12 +990,14 @@ abstract class rb_base_source {
     /**
      * Display correct course grade via grade or RPL as a percentage string
      *
+     * @deprecated Since Totara 12.0
      * @param string $item A number to convert
      * @param object $row Object containing all other fields for this row
      *
      * @return string The percentage with 1 decimal place
      */
     function rb_display_course_grade_percent($item, $row) {
+        debugging('rb_base_source::rb_display_course_grade_percent has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($row->status == COMPLETION_STATUS_COMPLETEVIARPL && !empty($row->rplgrade)) {
             // If RPL then print the RPL grade.
             return sprintf('%.1f%%', $row->rplgrade);
@@ -875,13 +1034,14 @@ abstract class rb_base_source {
      *                  $allnamefields)
      * When exporting, only the user's full name is displayed (without link).
      *
+     * @deprecated Since Totara 12.0
      * @param string $user Unused
      * @param object $row All the data required to display a user's name
      * @param boolean $isexport If the report is being exported or viewed
      * @return string
      */
     function rb_display_link_user($user, $row, $isexport = false) {
-
+        debugging('rb_base_source::rb_display_link_user has been deprecated since Totara 12.0. Use user_link::display', DEBUG_DEVELOPER);
         // Process obsolete calls to this display function.
         if (isset($row->user_id)) {
             $fullname = $user;
@@ -922,12 +1082,14 @@ abstract class rb_base_source {
      *                  $allnamefields)
      * When exporting, only the user's full name is displayed (without icon or link).
      *
+     * @deprecated Since Totara 12.0
      * @param string $user Unused
      * @param object $row All the data required to display a user's name, icon and link
      * @param boolean $isexport If the report is being exported or viewed
      * @return string
      */
     function rb_display_link_user_icon($user, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_link_user_icon has been deprecated since Totara 12.0. Use user_icon_link::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         // Process obsolete calls to this display function.
@@ -974,12 +1136,14 @@ abstract class rb_base_source {
      *                  $allnamefields)
      * When exporting, only the user's full name is displayed (instead of picture).
      *
+     * @deprecated Since Totara 12.0
      * @param string $user Unused
      * @param object $row All the data required to display a user's name and icon
      * @param boolean $isexport If the report is being exported or viewed
      * @return string
      */
     function rb_display_user_picture($user, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_user_picture has been deprecated since Totara 12.0. Use user_icon::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         // Process obsolete calls to this display function.
@@ -1016,24 +1180,28 @@ abstract class rb_base_source {
      * to allow sorting and filtering, and finally your extrafields should be:
      *      $allnamefields
      *
+     * @deprecated Since Totara 12.0
      * @param string $user Unused
      * @param object $row All the data required to display a user's name
      * @param boolean $isexport If the report is being exported or viewed
      * @return string
      */
     function rb_display_user($user, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_user has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         return fullname($row);
     }
 
     /**
      * Convert a course name into an expanding link.
      *
+     * @deprecated Since Totara 12.0
      * @param string $course
      * @param array $row
      * @param bool $isexport
      * @return html|string
      */
     public function rb_display_course_expand($course, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_course_expand has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($isexport) {
             return format_string($course);
         }
@@ -1046,12 +1214,14 @@ abstract class rb_base_source {
     /**
      * Convert a program/certification name into an expanding link.
      *
+     * @deprecated Since Totara 12.0
      * @param string $program
      * @param array $row
      * @param bool $isexport
      * @return html|string
      */
     public function rb_display_program_expand($program, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_program_expand has been deprecated since Totara 12.0. Use totara_program\rb\display\program_expand::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return format_string($program);
         }
@@ -1065,11 +1235,13 @@ abstract class rb_base_source {
     /**
      * Certification display the certification path as string.
      *
+     * @deprecated Since Totara 12.0
      * @param string $certifpath    CERTIFPATH_X constant to describe cert or recert coursesets
      * @param array $row            The record used to generate the table row
      * @return string
      */
     function rb_display_certif_certifpath($certifpath, $row) {
+        debugging('rb_base_source::rb_display_certif_certifpath has been deprecated since Totara 12.0. Use totara_certification\rb\display\certif_certifpath::display', DEBUG_DEVELOPER);
         global $CERTIFPATH;
         if ($certifpath && isset($CERTIFPATH[$certifpath])) {
             return get_string($CERTIFPATH[$certifpath], 'totara_certification');
@@ -1386,8 +1558,17 @@ abstract class rb_base_source {
                 basesub)";
     }
 
-    // convert a course name into a link to that course
+    /**
+     * Convert a course name into a link to that course
+     *
+     * @deprecated Since Totara 12.0
+     * @param $course
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_course($course, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_link_course has been deprecated since Totara 12.0. Use course_link::display', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->dirroot . '/cohort/lib.php');
 
@@ -1401,9 +1582,17 @@ abstract class rb_base_source {
         return html_writer::link($url, $course, $attr);
     }
 
-    // convert a course name into a link to that course and shows
-    // the course icon next to it
+    /**
+     * Convert a course name into a link to that course and shows the course icon next to it
+     *
+     * @deprecated Since Totara 12.0
+     * @param $course
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_course_icon($course, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_link_course_icon has been deprecated since Totara 12.0. Use course_icon_link::display', DEBUG_DEVELOPER);
         global $CFG, $OUTPUT;
         require_once($CFG->dirroot . '/cohort/lib.php');
 
@@ -1424,7 +1613,18 @@ abstract class rb_base_source {
     }
 
     // display an icon based on the course icon field
+
+    /**
+     * Display an icon based on the course icon field
+     *
+     * @deprecated Since Totara 12.0
+     * @param $icon
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_course_icon($icon, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_course_icon has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($isexport) {
             return format_string($row->course_name);
         }
@@ -1435,8 +1635,17 @@ abstract class rb_base_source {
         return $courseicon;
     }
 
-    // display an icon for the course type
+    /**
+     * Display an icon for the course type
+     *
+     * @deprecated Since Totara 12.0
+     * @param $type
+     * @param $row
+     * @param bool $isexport
+     * @return null|string
+     */
     function rb_display_course_type_icon($type, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_course_type_icon has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($isexport) {
@@ -1473,12 +1682,15 @@ abstract class rb_base_source {
 
     /**
      * Display course type text
+     *
+     * @deprecated Since Totara 12.0
      * @param string $type
      * @param array $row
      * @param bool $isexport
      * @return string
      */
     public function rb_display_course_type($type, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_course_type has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $types = $this->rb_filter_course_types();
         if (isset($types[$type])) {
             return $types[$type];
@@ -1486,8 +1698,17 @@ abstract class rb_base_source {
         return '';
     }
 
-    // convert a course category name into a link to that category's page
+    /**
+     * Convert a course category name into a link to that category's page
+     *
+     * @deprecated Since Totara 12.0
+     * @param $category
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_course_category($category, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_link_course_category has been deprecated since Totara 12.0. Use course_category_link::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return format_string($category);
         }
@@ -1516,8 +1737,17 @@ abstract class rb_base_source {
         return html_writer::link($url, $category, $attr);
     }
 
-
+    /**
+     * Display audience visibility
+     *
+     * @deprecated Since Totara 12.0
+     * @param $visibility
+     * @param $row
+     * @param bool $isexport
+     * @return mixed
+     */
     public function rb_display_audience_visibility($visibility, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_audience_visibility has been deprecated since Totara 12.0. Use totara_cohort\rb\display\cohort_visibility::display', DEBUG_DEVELOPER);
         global $COHORT_VISIBILITY;
 
         if (!isset($COHORT_VISIBILITY[$visibility])) {
@@ -1530,12 +1760,15 @@ abstract class rb_base_source {
 
     /**
      * Generate the plan title with a link to the plan
+     *
+     * @deprecated Since Totara 12.0
      * @param string $planname
      * @param object $row
      * @param boolean $isexport If the report is being exported or viewed
      * @return string
      */
     public function rb_display_planlink($planname, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_planlink has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_link::display', DEBUG_DEVELOPER);
 
         // no text
         if (strlen($planname) == 0) {
@@ -1558,12 +1791,14 @@ abstract class rb_base_source {
     /**
      * Display the plan's status (for use as a column displayfunc)
      *
+     * @deprecated Since Totara 12.0
      * @global object $CFG
      * @param int $status
      * @param object $row
      * @return string
      */
     public function rb_display_plan_status($status, $row) {
+        debugging('rb_base_source::rb_display_plan_status has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_status::display', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
 
@@ -1588,10 +1823,12 @@ abstract class rb_base_source {
      * Column displayfunc to convert a plan item's status to a
      * human-readable string
      *
+     * @deprecated Since Totara 12.0
      * @param int $status
      * @return string
      */
     public function rb_display_plan_item_status($status) {
+        debugging('rb_base_source::rb_display_plan_item_status has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_item_status::display', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
 
@@ -1609,7 +1846,16 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Yes or no display
+     *
+     * @deprecated Since Totara 12.0
+     * @param $item
+     * @param $row
+     * @return string
+     */
     function rb_display_yes_no($item, $row) {
+        debugging('rb_base_source::rb_display_yes_no has been deprecated since Totara 12.0. Please use yes_or_no::display', DEBUG_DEVELOPER);
         if ($item === null or $item === '') {
             return '';
         } else if ($item) {
@@ -1619,7 +1865,16 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Delimited list yes or no
+     *
+     * @deprecated Since Totara 12.0
+     * @param $data
+     * @param $row
+     * @return string
+     */
     function rb_display_delimitedlist_yes_no($data, $row) {
+        debugging('rb_base_source::rb_display_delimitedlist_yes_no has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $delimiter = $this->uniquedelimiter;
         $items = explode($delimiter, $data);
         $output = array();
@@ -1637,10 +1892,14 @@ abstract class rb_base_source {
 
     /**
      * Display duration in human readable format
+     *
+     * @deprecated Since Totara 12.0
      * @param integer $seconds
      * @param stdClass $row
+     * @return string
      */
     public function rb_display_duration($seconds, $row) {
+        debugging('rb_base_source::rb_display_duration has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if (empty($seconds)) {
             return '';
         }
@@ -1648,7 +1907,17 @@ abstract class rb_base_source {
     }
 
     // convert a 2 digit country code into the country name
+
+    /**
+     * Display country code
+     *
+     * @deprecated Since Totara 12.0
+     * @param $code
+     * @param $row
+     * @return string
+     */
     function rb_display_country_code($code, $row) {
+        debugging('rb_base_source::rb_display_country_code has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $countries = get_string_manager()->get_list_of_countries();
 
         if (isset($countries[$code])) {
@@ -1681,10 +1950,14 @@ abstract class rb_base_source {
 
     /**
      * Column displayfunc to show a hierarchy path as a human-readable string
+     *
+     * @deprecated Since Totara 12.0
      * @param $path the path string of delimited ids e.g. 1/3/7
      * @param $row data row
+     * @return string
      */
     function rb_display_nice_hierarchy_path($path, $row) {
+        debugging('rb_base_source::rb_display_nice_hierarchy_path has been deprecated since Totara 12.0. Use totara_hierarchy\rb\display\hierarchy_nice_path::display', DEBUG_DEVELOPER);
         global $DB;
         if (empty($path)) {
             return '';
@@ -1715,12 +1988,26 @@ abstract class rb_base_source {
 
     /**
      * Column displayfunc to convert a language code to a human-readable string
+     *
+     * @deprecated Since Totara 12.0
      * @param $code Language code
      * @param $row data row - unused in this function
      * @return string
      */
     function rb_display_language_code($code, $row) {
-            global $CFG;
+        debugging('rb_base_source::rb_display_language_code has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
+        return $this->language_code_to_name($code);
+    }
+
+    /**
+     * Helper function to convert a language code to a human-readable string
+     *
+     * @param $code Language code
+     * @param $row data row - unused in this function
+     * @return string
+     */
+    public function language_code_to_name($code) {
+        global $CFG;
         static $languages = array();
         $strmgr = get_string_manager();
         // Populate the static variable if empty
@@ -1778,7 +2065,17 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Ordered list of emails as one per line
+     *
+     * @deprecated Since Totara 12.0
+     * @param $list
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     public function rb_display_orderedlist_to_newline_email($list, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_orderedlist_to_newline_email has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         $output = array();
         $emails = explode($this->uniquedelimiter, $list);
         foreach ($emails as $email) {
@@ -1797,7 +2094,17 @@ abstract class rb_base_source {
         return implode($output, "\n");
     }
 
+    /**
+     * Display program icon with name and link.
+     *
+     * @deprecated Since Totara 12.
+     * @param $program
+     * @param $row
+     * @param bool $isexport
+     * @return mixed
+     */
     function rb_display_link_program_icon($program, $row, $isexport = false) {
+        debugging('rb_base_source::rb_display_link_program_icon has been deprecated since Totara 12.0. Use totara_program\rb\display\program_icon_link::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($isexport) {
@@ -1817,8 +2124,16 @@ abstract class rb_base_source {
         return $link;
     }
 
-    // Display grade along with passing grade if it is known.
+    /**
+     * Display grade along with passing grade if it is known
+     *
+     * @deprecated Since Totara 12.
+     * @param $item
+     * @param $row
+     * @return string
+     */
     function rb_display_grade_string($item, $row) {
+        debugging('rb_base_source::rb_display_grade_string has been deprecated since Totara 12.0. Use course_grade_string::display', DEBUG_DEVELOPER);
         $passgrade = isset($row->gradepass) ? sprintf('%d', $row->gradepass) : null;
 
         $usergrade = (int)$item;
@@ -2010,7 +2325,7 @@ abstract class rb_base_source {
         $langs = $DB->get_records_sql("SELECT DISTINCT lang
             FROM {course} ORDER BY lang");
         foreach ($langs as $row) {
-            $out[$row->lang] = $this->rb_display_language_code($row->lang, array());
+            $out[$row->lang] = $this->language_code_to_name($row->lang);
         }
 
         return $out;
@@ -2371,7 +2686,7 @@ abstract class rb_base_source {
             $DB->sql_concat_join("' '", $usednamefields),
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_user',
+                'displayfunc' => 'user_link',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
                 'extrafields' => array_merge(array('id' => "$join.id"), $allnamefields),
                 'addtypetoheading' => $addtypetoheading
@@ -2384,7 +2699,7 @@ abstract class rb_base_source {
             $DB->sql_concat_join("' '", $usednamefields),
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_user_icon',
+                'displayfunc' => 'user_icon_link',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
                 'extrafields' => array_merge(array('id' => "$join.id",
                                                    'picture' => "$join.picture",
@@ -3141,7 +3456,7 @@ abstract class rb_base_source {
             "$join.fullname",
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_course',
+                'displayfunc' => 'course_link',
                 'defaultheading' => get_string('coursename', 'totara_reportbuilder'),
                 'extrafields' => array('course_id' => "$join.id",
                                        'course_visible' => "$join.visible",
@@ -3171,7 +3486,7 @@ abstract class rb_base_source {
             "$join.fullname",
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_course_icon',
+                'displayfunc' => 'course_icon_link',
                 'defaultheading' => get_string('coursename', 'totara_reportbuilder'),
                 'extrafields' => array(
                     'course_id' => "$join.id",
@@ -3188,7 +3503,7 @@ abstract class rb_base_source {
             "$join.visible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'yes_no'
+                'displayfunc' => 'yes_or_no'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -3198,7 +3513,7 @@ abstract class rb_base_source {
             "$join.audiencevisible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'audience_visibility'
+                'displayfunc' => 'cohort_visibility'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -3583,10 +3898,10 @@ abstract class rb_base_source {
             "$join.fullname",
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_program_icon',
+                'displayfunc' => 'program_icon_link',
                 'defaultheading' => get_string('programname', $langfile),
                 'extrafields' => array(
-                    'program_id' => "$join.id",
+                    'programid' => "$join.id",
                     'program_icon' => "$join.icon",
                     'program_visible' => "$join.visible",
                     'program_audiencevisible' => "$join.audiencevisible",
@@ -3616,7 +3931,7 @@ abstract class rb_base_source {
             "$join.visible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'yes_no'
+                'displayfunc' => 'yes_or_no'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -3626,7 +3941,7 @@ abstract class rb_base_source {
             "$join.audiencevisible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'audience_visibility'
+                'displayfunc' => 'cohort_visibility'
             )
         );
         return true;
@@ -3759,7 +4074,16 @@ abstract class rb_base_source {
         return true;
     }
 
+    /**
+     * Display function for certification recertify date type
+     *
+     * @deprecated Since Totara 12.0
+     * @param $recertifydatetype
+     * @param $row
+     * @return string
+     */
     public function rb_display_recertifydatetype($recertifydatetype, $row) {
+        debugging('rb_base_source::rb_rb_display_recertifydatetype has been deprecated since Totara 12.0. Use totara_certification\rb\display\certif_recertify_date_type::display', DEBUG_DEVELOPER);
         switch ($recertifydatetype) {
             case CERTIFRECERT_COMPLETION:
                 return get_string('editdetailsrccmpl', 'totara_certification');
@@ -3883,7 +4207,7 @@ abstract class rb_base_source {
             "$catjoin.name",
             array(
                 'joins' => $catjoin,
-                'displayfunc' => 'link_course_category',
+                'displayfunc' => 'course_category_link',
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
                 'extrafields' => array('cat_id' => "$catjoin.id",
                                         'cat_visible' => "$catjoin.visible",
@@ -5126,7 +5450,7 @@ abstract class rb_base_source {
                     $filtertype = 'select';
                     $filter_options['selectchoices'] = array(0 => get_string('no'), 1 => get_string('yes'));
                     $filter_options['simplemode'] = true;
-                    $column_options['displayfunc'] = 'yes_no';
+                    $column_options['displayfunc'] = 'yes_or_no';
                     break;
 
                 case 'datetime':
@@ -5177,7 +5501,7 @@ abstract class rb_base_source {
                     break;
 
                 case 'location':
-                    $column_options['displayfunc'] = 'location';
+                    $column_options['displayfunc'] = 'customfield_location';
                     $column_options['outputformat'] = 'text';
                     break;
 
@@ -5582,10 +5906,10 @@ abstract class rb_base_source {
                     $displayfunc = 'delimitedlist_yes_no';
                     break;
                 case 'text' :
-                    $displayfunc = 'delimitedlist_to_newline';
+                    $displayfunc = 'orderedlist_to_newline';
                     break;
                 case 'menu' :
-                    $displayfunc = 'delimitedlist_to_newline';
+                    $displayfunc = 'orderedlist_to_newline';
                     break;
                 case 'multiselect' :
                     $displayfunc = 'delimitedlist_multi_to_newline';
@@ -5928,7 +6252,7 @@ abstract class rb_base_source {
                 "CASE WHEN $join.id IS NOT NULL THEN 1 ELSE 0 END",
                 array(
                     'joins' => $join,
-                    'displayfunc' => 'yes_no',
+                    'displayfunc' => 'yes_or_no',
                 )
             );
         }

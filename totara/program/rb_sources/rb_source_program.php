@@ -53,6 +53,8 @@ class rb_source_program extends rb_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program');
         $this->sourcewhere = $this->define_sourcewhere();
+        $this->usedcomponents[] = "totara_program";
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 

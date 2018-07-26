@@ -1895,12 +1895,6 @@ class program {
         return $out;
     }
 
-    public function display_link_program_icon($programname, $program_id, $program_icon, $userid = null) {
-        // Deprecate instead of remove incase someone is using this.
-        debugging('$program->display_link_program_icon() is deprecated, use the lib function prog_display_link_icon() instead', DEBUG_DEVELOPER);
-        prog_display_link_icon($program_id, $userid);
-    }
-
     /**
      * Generates the HTML to display the current number of exceptions and a link
      * to the exceptions report for the program

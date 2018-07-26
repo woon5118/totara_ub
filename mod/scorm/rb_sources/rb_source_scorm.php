@@ -35,6 +35,7 @@ class rb_source_scorm extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_scorm');
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -430,23 +431,6 @@ class rb_source_scorm extends rb_base_source {
         );
         return $requiredcolumns;
     }
-
-    //
-    //
-    // Source specific column display methods
-    //
-    //
-
-    // add methods here with [name] matching column option displayfunc
-    /*
-    function rb_display_[name]($item, $row) {
-        // variable $item refers to the current item
-        // $row is an object containing the whole row
-        // which will include any extrafields
-        //
-        // should return a string containing what should be displayed
-    }
-    */
 
     //
     //

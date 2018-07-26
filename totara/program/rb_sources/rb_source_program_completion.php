@@ -63,6 +63,7 @@ class rb_source_program_completion extends rb_base_source {
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->get_source_joins();
         $this->usedcomponents[] = "totara_program";
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -608,9 +609,16 @@ class rb_source_program_completion extends rb_base_source {
         return $requiredcolumns;
     }
 
-    // Source specific column display methods.
-
+    /**
+     * Display the program completion status
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @return string
+     */
     function rb_display_program_completion_status($status, $row) {
+        debugging('rb_source_program_completion::rb_display_program_completion_status has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if (is_null($status)) {
             return '';
         }
@@ -620,7 +628,5 @@ class rb_source_program_completion extends rb_base_source {
             return get_string('incomplete', 'totara_program');
         }
     }
-
-    // Source specific filter display methods.
 
 }

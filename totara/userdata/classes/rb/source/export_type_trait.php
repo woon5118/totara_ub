@@ -114,7 +114,7 @@ trait export_type_trait {
                 'addtypetoheading' => ($join !== 'base'),
                 'defaultheading' => get_string('exporttype', 'totara_userdata'),
                 'dbdatatype' => 'char',
-                'displayfunc' => 'format_string',
+                'displayfunc' => 'formatstring',
                 'outputformat' => 'text',
                 'joins' => array($join),
             )
@@ -177,7 +177,7 @@ trait export_type_trait {
             get_string('exportincludefiledir', 'totara_userdata'),
             "$join.includefiledir",
             array(
-                'displayfunc' => 'yes_no',
+                'displayfunc' => 'yes_or_no',
                 'joins' => array($join),
             )
         );

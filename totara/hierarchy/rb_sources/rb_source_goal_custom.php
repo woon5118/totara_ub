@@ -66,6 +66,7 @@ class rb_source_goal_custom extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_goal_custom');
         $this->shortname = 'goal_custom';
         $this->cacheable = false;
+        $this->usedcomponents[] = 'totara_hierarchy';
 
         parent::__construct();
     }
@@ -200,7 +201,7 @@ class rb_source_goal_custom extends rb_base_source {
                 get_string('personalcompany', 'rb_source_goal_custom'),
                 'base.personalcompany',
                 array(
-                    'displayfunc' => 'personal_company'
+                    'displayfunc' => 'goal_personal_company'
                 )
             ),
             new rb_column_option(
@@ -209,7 +210,7 @@ class rb_source_goal_custom extends rb_base_source {
                 get_string('typename', 'rb_source_goal_custom'),
                 'base.typename',
                 array(
-                    'displayfunc' => 'user_type_name'
+                    'displayfunc' => 'goal_type_name'
                 )
             ),
             new rb_column_option(
@@ -353,7 +354,16 @@ class rb_source_goal_custom extends rb_base_source {
         return $embeddedparams;
     }
 
+    /**
+     * Display the user type name
+     *
+     * @deprecated Since Totara 12.0
+     * @param $type
+     * @param $row
+     * @return string
+     */
     public function rb_display_user_type_name($type, $row) {
+        debugging('rb_source_goal_custom::rb_display_user_type_name has been deprecated since Totara 12.0. Please use totara_hierarchy\rb\display\goal_type_name::display', DEBUG_DEVELOPER);
         if ($type === 'notype') {
             return get_string('notype', 'rb_source_goal_custom');
         } else {
@@ -361,7 +371,16 @@ class rb_source_goal_custom extends rb_base_source {
         }
     }
 
+    /**
+     * Display if personal or company goal
+     *
+     * @deprecated Since Totara 12.0
+     * @param $type
+     * @param $row
+     * @return string
+     */
     public function rb_display_personal_company($type, $row) {
+        debugging('rb_source_goal_custom::rb_display_personal_company has been deprecated since Totara 12.0. Please use totara_hierarchy\rb\display\goal_personal_company::display', DEBUG_DEVELOPER);
         if ($type === 'company') {
             return get_string('company', 'rb_source_goal_custom');
         } else {
@@ -458,7 +477,7 @@ class rb_source_goal_custom extends rb_base_source {
                 $displayfunc = 'customfield_url';
                 break;
             case 'location':
-                $displayfunc = 'location';
+                $displayfunc = 'customfield_location';
                 $outputformat = 'text';
                 break;
         }

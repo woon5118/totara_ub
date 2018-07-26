@@ -57,6 +57,8 @@ class rb_source_site_logstore extends rb_base_source {
 
         // No caching!!! The table is way too big and there are tons of extra fields.
         $this->cacheable = false;
+        $this->usedcomponents[] = 'tool_log';
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -124,7 +126,7 @@ class rb_source_site_logstore extends rb_base_source {
                 'ip',
                 get_string('ip', 'rb_source_site_logstore'),
                 'base.ip',
-                array('displayfunc' => 'iplookup')
+                array('displayfunc' => 'ip_lookup_link')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -139,7 +141,7 @@ class rb_source_site_logstore extends rb_base_source {
                 'other',
                 get_string('other', 'rb_source_site_logstore'),
                 'base.other',
-                array('displayfunc' => 'serialized')
+                array('displayfunc' => 'log_serialized_preformated')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -154,14 +156,14 @@ class rb_source_site_logstore extends rb_base_source {
                 'component',
                 get_string('component', 'rb_source_site_logstore'),
                 'base.component',
-                array('displayfunc' => 'component')
+                array('displayfunc' => 'log_component')
             ),
             new rb_column_option(
                 'logstore_standard_log',
                 'context',
                 get_string('context', 'rb_source_site_logstore'),
                 'base.contextid',
-                array('displayfunc' => 'context')
+                array('displayfunc' => 'log_context')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -208,7 +210,7 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('crud', 'rb_source_site_logstore'),
                 'base.crud',
                 array('dbdatatype' => 'char',
-                      'displayfunc' => 'crud')
+                      'displayfunc' => 'log_crud')
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -216,21 +218,21 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('edulevel', 'moodle'),
                 'base.edulevel',
                 array('dbdatatype' => 'char',
-                      'displayfunc' => 'edulevel')
+                      'displayfunc' => 'log_educational_level')
             ),
             new rb_column_option(
                 'logstore_standard_log',
                 'name',
                 get_string('name', 'rb_source_site_logstore'),
                 'base.eventname',
-                array('displayfunc' => 'name')
+                array('displayfunc' => 'log_event_name')
             ),
             new rb_column_option(
                 'logstore_standard_log',
                 'namelink',
                 get_string('namelink', 'rb_source_site_logstore'),
                 'base.id',
-                array('displayfunc' => 'name_link',
+                array('displayfunc' => 'log_event_name_link',
                       'extrafields' => $eventextrafields
                      )
             ),
@@ -239,7 +241,7 @@ class rb_source_site_logstore extends rb_base_source {
                 'description',
                 get_string('description', 'moodle'),
                 'base.id',
-                array('displayfunc' => 'description',
+                array('displayfunc' => 'log_description',
                       'extrafields' => $eventextrafields
                 )
             ),
@@ -422,22 +424,28 @@ class rb_source_site_logstore extends rb_base_source {
     }
 
     /**
-     * Display serialized info in preformated view.
+     * Display serialized info in preformated view
+     *
+     * @deprecated Since Totara 12.0
      * @param string $other
      * @param stdClass $row
      * @return string
      */
     public function rb_display_serialized($other, $row) {
+        debugging('rb_source_site_logstore::rb_display_serialized has been deprecated since Totara 12.0. Use tool_log\rb\display\log_serialized_preformated::display', DEBUG_DEVELOPER);
         return html_writer::tag('pre', print_r(unserialize($other), true));
     }
 
     /**
      * Convert IP address into a link to IP lookup page
+     *
+     * @deprecated Since Totara 12.0
      * @param string $ip
      * @param stdClass $row
      * @return string
      */
     public function rb_display_iplookup($ip, $row) {
+        debugging('rb_source_site_logstore::rb_display_iplookup has been deprecated since Totara 12.0. Use tool_log\rb\display\ip_lookup_link::display', DEBUG_DEVELOPER);
         if (!isset($ip) || $ip == '') {
             return '';
         }
@@ -451,11 +459,14 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Displays related educational level.
+     *
+     * @deprecated Since Totara 12.0
      * @param string $edulevel
      * @param stdClass $row
      * @return string
      */
     public function rb_display_edulevel($edulevel, $row) {
+        debugging('rb_source_site_logstore::rb_display_edulevel has been deprecated since Totara 12.0. Use tool_log\rb\display\log_educational_level::display', DEBUG_DEVELOPER);
         switch ($edulevel) {
             case \core\event\base::LEVEL_PARTICIPATING:
                 return get_string('edulevelparticipating', 'moodle');
@@ -472,11 +483,14 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Displays CRUD verbs.
+     *
+     * @deprecated Since Totara 12.0
      * @param string $edulevel
      * @param stdClass $row
      * @return string
      */
     public function rb_display_crud($crud, $row) {
+        debugging('rb_source_site_logstore::rb_display_crud has been deprecated since Totara 12.0. Use tool_log\rb\display\log_crud::display', DEBUG_DEVELOPER);
         switch ($crud) {
             case 'c':
                 return get_string('crud_c', 'rb_source_site_logstore');
@@ -496,11 +510,14 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Displays event name
+     *
+     * @deprecated Since Totara 12.0
      * @param string $eventname
      * @param stdClass $row
      * @return string
      */
     public function rb_display_name($eventname, $row) {
+        debugging('rb_source_site_logstore::rb_display_name has been deprecated since Totara 12.0. Use tool_log\rb\display\log_event_name::display', DEBUG_DEVELOPER);
         if (!class_exists($eventname) or !is_subclass_of($eventname, 'core\event\base')) {
             return s($eventname);
         }
@@ -509,11 +526,14 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Displays event name as link to event
+     *
+     * @deprecated Since Totara 12.0
      * @param string $id
      * @param stdClass $row
      * @return string
      */
     public function rb_display_name_link($id, $row) {
+        debugging('rb_source_site_logstore::rb_display_name_link has been deprecated since Totara 12.0. Use tool_log\rb\display\log_event_name_link::display', DEBUG_DEVELOPER);
         $row = (array)$row;
         $row['other'] = unserialize($row['other']);
         if ($row['other'] === false) {
@@ -529,11 +549,14 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Displays event description.
+     *
+     * @deprecated Since Totara 12.0
      * @param string $id
      * @param stdClass $row
      * @return string
      */
     public function rb_display_description($id, $row) {
+        debugging('rb_source_site_logstore::rb_display_description has been deprecated since Totara 12.0. Use tool_log\rb\display\log_description::display', DEBUG_DEVELOPER);
         $eventdata = (array)$row;
         $eventdata['other'] = unserialize($eventdata['other']);
         $event = \core\event\base::restore($eventdata, array());
@@ -542,11 +565,14 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Generate the context column.
+     *
+     * @deprecated Since Totara 12.0
      * @param string $id
      * @param stdClass $row
      * @return string
      */
     public function rb_display_context($id, $row) {
+        debugging('rb_source_site_logstore::rb_display_context has been deprecated since Totara 12.0. Use tool_log\rb\display\log_context::display', DEBUG_DEVELOPER);
         // Add context name.
         if ($id) {
             // If context name was fetched before then return, else get one.
@@ -573,10 +599,13 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Generate the component localised name.
+     *
+     * @deprecated Since Totara 12.0
      * @param string $componentname
      * @return string
      */
     protected function get_component_str($componentname) {
+        debugging('rb_source_site_logstore::get_component_str has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         // Code used from report/log/classes/table_log.php:col_component.
         if (($componentname === 'core') || ($componentname === 'legacy')) {
             return  get_string('coresystem');
@@ -589,11 +618,14 @@ class rb_source_site_logstore extends rb_base_source {
 
     /**
      * Generate the component column.
+     *
+     * @deprecated Since Totara 12.0
      * @param string $component
      * @param stdClass $row
      * @return string
      */
     public function rb_display_component($component, $row) {
+        debugging('rb_source_site_logstore::rb_display_component has been deprecated since Totara 12.0. Use tool_log\rb\display\log_component::display', DEBUG_DEVELOPER);
         return $this->get_component_str($component);
     }
 

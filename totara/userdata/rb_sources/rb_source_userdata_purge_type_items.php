@@ -106,7 +106,7 @@ final class rb_source_userdata_purge_type_items extends rb_base_source {
             get_string('itempurgedata', 'totara_userdata'),
             'base.purgedata',
             array(
-                'displayfunc' => 'yes_no',
+                'displayfunc' => 'yes_or_no',
             )
         );
 

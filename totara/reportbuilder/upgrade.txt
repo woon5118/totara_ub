@@ -59,6 +59,71 @@ information provided here is intended especially for developers.
   * add_cohort_user_fields_to_filters instead use add_totara_cohort_user_filters in \totara_cohort\rb\source\report_trait
   * add_cohort_course_fields_to_filters instead use add_totara_cohort_course_filters in \totara_cohort\rb\source\report_trait
   * add_cohort_program_fields_to_filters instead use add_totara_cohort_program_filters in \totara_cohort\rb\source\report_trait
+* Deprecated the following report builder display functions and replaced with display classes
+  * rb_base_source::create_expand_link()
+  * rb_base_source::rb_display_nice_time()
+  * rb_base_source::rb_display_nice_datetime_in_timezone()
+  * rb_base_source::rb_display_delimitedlist_date_in_timezone()
+  * rb_base_source::rb_display_delimitedlist_datetime_in_timezone()
+  * rb_base_source::format_delimitedlist_datetime_in_timezone()
+  * rb_base_source::rb_display_round2()
+  * rb_base_source::rb_display_nice_datetime_seconds()
+  * rb_base_source::rb_display_round2()
+  * rb_base_source::rb_display_percent()
+  * rb_base_source::rb_display_list_to_newline()
+  * rb_base_source::rb_display_delimitedlist_to_newline()
+  * rb_base_source::rb_display_delimitedlist_multi_to_newline()
+  * rb_base_source::display_delimitedlist_url_to_newline()
+  * rb_base_source::rb_display_delimitedlist_posfiles_to_newline()
+  * rb_base_source::rb_display_delimitedlist_orgfiles_to_newline()
+  * rb_base_source::delimitedlist_files_to_newline()
+  * rb_base_source::rb_display_delimitedlist_location_to_newline()
+  * rb_base_source::rb_display_list_to_newline_date()
+  * rb_base_source::rb_display_orderedlist_to_newline_date()
+  * rb_base_source::rb_display_delimitedlist_to_newline_date()
+  * rb_base_source::rb_display_location(), please call totara_reportbuilder\rb\display\customfield_location::display() instead.
+  * rb_base_source::rb_display_course_grade_percent()
+  * rb_base_source::rb_display_link_user()
+  * rb_base_source::rb_display_link_user_icon()
+  * rb_base_source::rb_display_user_picture()
+  * rb_base_source::rb_display_user()
+  * rb_base_source::rb_display_course_expand()
+  * rb_base_source::rb_display_program_expand(), please call totara_program\rb\display\program_expand::display() instead.
+  * rb_base_source::certif_certifpath(), please call totara_certification\rb\display\certif_certifpath::display() instead.
+  * rb_base_source::rb_display_link_course()
+  * rb_base_source::rb_display_link_course_icon()
+  * rb_base_source::rb_display_course_icon()
+  * rb_base_source::rb_display_course_type_icon()
+  * rb_base_source::rb_display_course_type()
+  * rb_base_source::rb_display_link_course_category()
+  * rb_base_source::rb_display_audience_visibility(), please call totara_cohort\rb\display\cohort_visibility::display() instead.
+  * rb_base_source::rb_display_planlink(), please call totara_plan\rb\display\plan_link::display() instead.
+  * rb_base_source::rb_display_plan_status(), please call totara_plan\rb\display\plan_status::display() instead.
+  * rb_base_source::rb_display_plan_item_status(), please call totara_plan\rb\display\plan_item_status::display() instead.
+  * rb_base_source::rb_display_yes_no()
+  * rb_base_source::rb_display_delimitedlist_yes_no()
+  * rb_base_source::rb_display_duration()
+  * rb_base_source::rb_display_country_code()
+  * rb_base_source::rb_display_nice_hierarchy_path(), please call totara_hierarchy\rb\display\hierarchy_nice_path::display() instead.
+  * rb_base_source::rb_display_language_code()
+  * rb_base_source::rb_display_orderedlist_to_newline_email()
+  * rb_base_source::rb_display_link_program_icon(), please call totara_program\rb\display\program_icon_link::display() instead.
+  * rb_base_source::rb_display_recertifydatetype(), please call totara_certification\rb\display\certif_recertify_date_type::display() instead.
+  * rb_source_user::rb_display_learning_icons()
+  * rb_source_user::rb_display_extension_link()
+  * rb_source_user::rb_display_user_with_links()
+  * rb_source_user::rb_display_count()
+  * rb_base_source::rb_display_grade_string()
+  * rb_source_competency_evidence::rb_display_status_history_link()
+  * rb_source_competency_evidence::rb_display_link_competency()
+  * rb_source_course_completion::rb_display_completion_status()
+  * rb_source_course_completion::rb_display_course_progress()
+  * rb_source_courses::rb_display_modicons()
+  * rb_source_site_logs::rb_display_link_action()
+  * rb_source_site_logs::rb_display_iplookup()
+  * rb_source_upgrade_log::rb_display_backtrace()
+  * rb_source_upgrade_log::rb_display_upgradelogtype()
+  * rb_source_user::rb_display_extension_link()
 
 === 11.0 ===
 

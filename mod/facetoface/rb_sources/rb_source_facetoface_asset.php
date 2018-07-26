@@ -38,6 +38,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
      * @var array
      */
     protected $urlparams = array();
+
     public function __construct(rb_global_restriction_set $globalrestrictionset = null) {
 
         $this->base = '{facetoface_asset}';
@@ -104,7 +105,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
                     'joins' => 'assigned',
                     'capability' => 'totara/core:modconfig',
                     'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
-                    'displayfunc' => 'actions',
+                    'displayfunc' => 'f2f_asset_actions',
                     'hidden' => false
                 )
         );
@@ -181,14 +182,35 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
             $this->filteroptions
         );
     }
+
+    /**
+     * Get the embeddedurl
+     *
+     * @return string
+     */
+    public function get_embeddedurl() {
+        return $this->embeddedurl;
+    }
+
+    /**
+     * Get the url params
+     *
+     * @return mixed
+     */
+    public function get_urlparams() {
+        return $this->urlparams;
+    }
+
     /**
      * Asset actions
      *
+     * @deprecated Since Totara 12.0
      * @param int $assetid
      * @param stdClass $row
      * @param bool $isexport
      */
     public function rb_display_actions($assetid, $row, $isexport = false) {
+        debugging('rb_source_facetoface_asset::rb_display_actions has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_asset_actions::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($isexport) {

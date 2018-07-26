@@ -68,7 +68,9 @@ class rb_source_dp_certification extends rb_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_certification');
         $this->sourcewhere = '(base.certifid > 0)';
+        $this->usedcomponents[] = 'totara_plan';
         $this->usedcomponents[] = 'totara_program';
+        $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }
 
@@ -221,7 +223,7 @@ class rb_source_dp_certification extends rb_base_source {
                 array(
                     'joins' => array('base', 'certif_completion'),
                     'defaultheading' => get_string('certificationname', 'totara_program'),
-                    'displayfunc' => 'link_program_icon',
+                    'displayfunc' => 'program_icon_link',
                     'extrafields' => array(
                         'programid' => 'base.id',
                         'userid' => 'certif_completion.userid'
@@ -372,7 +374,7 @@ class rb_source_dp_certification extends rb_base_source {
                 array(
                     'joins' => 'certif_completion_history',
                     'defaultheading' => get_string('historylink', 'rb_source_dp_certification'),
-                    'displayfunc' => 'historylink',
+                    'displayfunc' => 'plan_history_link',
                     'extrafields' => array(
                         'fullname' => 'base.fullname',
                         'certifid' => 'certif_completion.certifid',
@@ -398,7 +400,7 @@ class rb_source_dp_certification extends rb_base_source {
             "certif_completion.status",
             array(
                 'joins' => array('certif_completion'),
-                'displayfunc' => 'progress',
+                'displayfunc' => 'certif_progress',
                 'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                 'extrafields' => array(
                     'programid' => "base.id",
@@ -415,7 +417,7 @@ class rb_source_dp_certification extends rb_base_source {
             "certif_completion.status",
             array(
                 'joins' => array('certif_completion'),
-                'displayfunc' => 'progress',
+                'displayfunc' => 'certif_progress',
                 'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                 'extrafields' => array(
                     'programid' => "base.id",
@@ -712,7 +714,18 @@ class rb_source_dp_certification extends rb_base_source {
         }
     }
 
+    /**
+     * Display program icon with name and link.
+     *
+     * @deprecated Since Totara 12.0
+     * @param $certificationname
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_program_icon($certificationname, $row, $isexport = false) {
+        debugging('rb_source_dp_certification::rb_display_link_program_icon has been deprecated since Totara 12.0. Use totara_program\rb\display\program_icon_link::display', DEBUG_DEVELOPER);
+
         if ($isexport) {
             return $certificationname;
         }
@@ -720,7 +733,16 @@ class rb_source_dp_certification extends rb_base_source {
         return prog_display_link_icon($row->programid, $row->userid);
     }
 
+    /**
+     * Display history link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $count
+     * @param $row
+     * @return int
+     */
     public function rb_display_historylink($count, $row) {
+        debugging('rb_source_dp_certification::rb_display_historylink has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_history_link::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if (!$count) {
@@ -732,8 +754,17 @@ class rb_source_dp_certification extends rb_base_source {
                 array('certifid' => $row->certifid, 'userid' => $row->userid, 'history' => 1)), $count . $description);
     }
 
-
+    /**
+     * Display certification progress
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_progress($status, $row, $isexport = false) {
+        debugging('rb_source_dp_certification::rb_display_progress has been deprecated since Totara 12.0. Use totara_certification\rb\display\certif_progress::display', DEBUG_DEVELOPER);
         $progress = prog_display_progress($row->programid, $row->userid, $row->certifpath, $isexport);
         if ($isexport && is_numeric($progress) && isset($row->stringexport) && $row->stringexport) {
             return get_string('xpercentcomplete', 'totara_core', $progress);

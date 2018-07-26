@@ -59,6 +59,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_sessions');
+        $this->usedcomponents[] = 'totara_cohort';
         $this->add_customfields();
         parent::__construct();
     }
@@ -344,7 +345,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 $DB->sql_concat_join("' '", $usernamefieldscreator),
                 array(
                     'joins' => 'creator',
-                    'displayfunc' => 'link_user',
+                    'displayfunc' => 'f2f_user_link',
                     'extrafields' => array_merge(array('id' => 'creator.id'), $usernamefieldscreator),
                 )
             ),
@@ -428,7 +429,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 $DB->sql_concat_join("' '", $usernamefieldsbooked),
                 array(
                     'joins' => 'bookedby',
-                    'displayfunc' => 'link_user',
+                    'displayfunc' => 'f2f_user_link',
                     'extrafields' => array_merge(array('id' => 'bookedby.id'), $usernamefieldsbooked),
                 )
             ),
@@ -467,7 +468,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('approvername', 'mod_facetoface'),
                 'approver.approverid',
                 array('joins' => 'approver',
-                      'displayfunc' => 'approvername')
+                      'displayfunc' => 'f2f_approver_name')
             ),
             new rb_column_option(
                 'approver',
@@ -475,7 +476,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('approveremail', 'mod_facetoface'),
                 'approver.approverid',
                 array('joins' => 'approver',
-                      'displayfunc' => 'approveremail')
+                      'displayfunc' => 'f2f_approver_email')
             ),
             new rb_column_option(
                 'approver',
@@ -491,7 +492,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('cancelledstatus', 'mod_facetoface'),
                 'sessions.cancelledstatus',
                 array(
-                    'displayfunc' => 'show_cancelled_status',
+                    'displayfunc' => 'f2f_session_cancelled_status',
                     'joins' => 'sessions',
                     'dbdatatype' => 'integer'
                 )
@@ -897,11 +898,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     /**
      * Display customfield with edit action icon
      * This module requires JS already to be included
+     *
+     * @deprecated Since Totara 12.0
      * @param string $note
      * @param stdClass $row
      * @param bool $isexport
      */
     public function rb_display_allcustomfieldssignupmanage($note, $row, $isexport = false) {
+        debugging('rb_source_facetoface_sessions::rb_display_allcustomfieldssignupmanage has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_all_signup_customfields_manage::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($isexport) {
@@ -951,7 +955,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         foreach ($results as $column) {
             // First try to find simple column (displayfunc is not set) that we can use for our actions display.
             if (empty($column->displayfunc)) {
-                $column->displayfunc = 'allcustomfieldssignupmanage';
+                $column->displayfunc = 'f2f_all_signup_customfields_manage';
                 if (!is_array($column->extrafields)) {
                     if (empty($column->extrafields)) {
                         $column->extrafields = [];
@@ -988,8 +992,15 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
 
     /**
      * Position name column with edit icon
+     *
+     * @deprecated Since Totara 12.0
+     * @param $jobassignment
+     * @param $row
+     * @param bool $isexport
+     * @return null|string|\totara_job\job_assignment
      */
     public function rb_display_job_assignment_edit($jobassignment, $row, $isexport = false) {
+        debugging('rb_source_facetoface_sessions::rb_display_job_assignment_edit has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_job_assignment_edit::display', DEBUG_DEVELOPER);
         global $OUTPUT;
 
         if ($isexport) {
@@ -1043,7 +1054,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'joins' => array('selected_job_assignment','pos'),
                     'dbdatatype' => 'text',
                     'outputformat' => 'text',
-                    'displayfunc' => 'job_assignment_edit',
+                    'displayfunc' => 'f2f_job_assignment_edit',
                     'hidden' => $hidden,
                     'extrafields' => array(
                         'jobassignmentname' => 'selected_job_assignment.fullname',
@@ -1059,16 +1070,34 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $result;
     }
 
-    // Override user display function to show 'Reserved' for reserved spaces.
+    /**
+     * Override user display function to show 'Reserved' for reserved spaces.
+     *
+     * @deprecated Since Totara 12.0
+     * @param string $user
+     * @param object $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_user($user, $row, $isexport = false) {
+        debugging('rb_source_facetoface_sessions::rb_display_link_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user_link::display', DEBUG_DEVELOPER);
         if (!empty($row->id)) {
             return parent::rb_display_link_user($user, $row, $isexport);
         }
         return get_string('reserved', 'rb_source_facetoface_sessions');
     }
 
-    // Override user display function to show 'Reserved' for reserved spaces.
+    /**
+     * Override user display function to show 'Reserved' for reserved spaces.
+     *
+     * @deprecated Since Totara 12.0
+     * @param string $user
+     * @param object $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_user_icon($user, $row, $isexport = false) {
+        debugging('rb_source_facetoface_sessions::rb_display_link_user_icon has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user_icon_link::display', DEBUG_DEVELOPER);
         if (!empty($row->id)) {
             return parent::rb_display_link_user_icon($user, $row, $isexport);
         }
@@ -1078,11 +1107,13 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     /**
      * Display the email address of the approver
      *
+     * @deprecated Since Totara 12.0
      * @param int $approverid
      * @param object $row
      * @return string
      */
     function rb_display_approveremail($approverid, $row) {
+        debugging('rb_source_facetoface_sessions::rb_display_approveremail has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_approver_email::display()', DEBUG_DEVELOPER);
         if (empty($approverid)) {
             return '';
         } else {
@@ -1094,11 +1125,13 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     /**
      * Display the full name of the approver
      *
+     * @deprecated Since Totara 12.0
      * @param int $approverid
      * @param object $row
      * @return string
      */
     function rb_display_approvername($approverid, $row) {
+        debugging('rb_source_facetoface_sessions::rb_display_approvername has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_approver_name::display', DEBUG_DEVELOPER);
         if (empty($approverid)) {
             return '';
         } else {
@@ -1107,8 +1140,17 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         }
     }
 
-    // Override user display function to show 'Reserved' for reserved spaces.
+    /**
+     * Override user display function to show 'Reserved' for reserved spaces.
+     *
+     * @deprecated Since Totara 12.0
+     * @param string $user
+     * @param object $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_user($user, $row, $isexport = false) {
+        debugging('rb_source_facetoface_sessions::rb_display_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user::display', DEBUG_DEVELOPER);
         if (!empty($user)) {
             return parent::rb_display_user($user, $row, $isexport);
         }
@@ -1148,12 +1190,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     /**
      * Reformat a timestamp and timezone into a date, showing nothing if invalid or null
      *
+     * @deprecated Since Totara 12.0
      * @param integer $date Unix timestamp
      * @param object $row Object containing all other fields for this row (which should include a timezone field)
      *
      * @return string Date in a nice format
      */
     function rb_display_show_cancelled_status($status) {
+        debugging('rb_source_facetoface_sessions::rb_display_show_cancelled_status has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_session_cancelled_status::display', DEBUG_DEVELOPER);
         if ($status == 1) {
             return get_string('cancelled', 'rb_source_facetoface_sessions');
         }

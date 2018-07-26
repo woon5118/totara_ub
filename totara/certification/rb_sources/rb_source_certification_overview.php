@@ -295,7 +295,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'coursename_list',
+                'displayfunc' => 'program_course_name_list',
                 'style' => array('white-space' => 'pre'),
             )
 
@@ -314,7 +314,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'course_status_list',
+                'displayfunc' => 'program_course_status_list',
                 'style' => array('white-space' => 'pre'),
             )
 

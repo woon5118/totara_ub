@@ -56,7 +56,7 @@ trait report_trait {
             "$join.fullname",
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_course',
+                'displayfunc' => 'course_link',
                 'defaultheading' => get_string('coursename', 'totara_reportbuilder'),
                 'extrafields' => array('course_id' => "$join.id",
                                        'course_visible' => "$join.visible",
@@ -86,7 +86,7 @@ trait report_trait {
             "$join.fullname",
             array(
                 'joins' => $join,
-                'displayfunc' => 'link_course_icon',
+                'displayfunc' => 'course_icon_link',
                 'defaultheading' => get_string('coursename', 'totara_reportbuilder'),
                 'extrafields' => array(
                     'course_id' => "$join.id",
@@ -103,7 +103,7 @@ trait report_trait {
             "$join.visible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'yes_no'
+                'displayfunc' => 'yes_or_no'
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -113,7 +113,7 @@ trait report_trait {
             "$join.audiencevisible",
             array(
                 'joins' => $join,
-                'displayfunc' => 'audience_visibility'
+                'displayfunc' => 'cohort_visibility'
             )
         );
         $columnoptions[] = new \rb_column_option(
@@ -446,7 +446,7 @@ trait report_trait {
             "$catjoin.name",
             array(
                 'joins' => $catjoin,
-                'displayfunc' => 'link_course_category',
+                'displayfunc' => 'course_category_link',
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
                 'extrafields' => array('cat_id' => "$catjoin.id",
                                         'cat_visible' => "$catjoin.visible",

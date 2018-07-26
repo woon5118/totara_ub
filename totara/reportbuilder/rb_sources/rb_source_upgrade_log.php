@@ -76,7 +76,7 @@ class rb_source_upgrade_log extends rb_base_source {
                 'type',
                 get_string('coltype', 'rb_source_upgrade_log'),
                 'base.type',
-                array('displayfunc' => 'upgradelogtype')
+                array('displayfunc' => 'upgrade_log_type')
             ),
             new rb_column_option(
                 'upgrade_log',
@@ -288,7 +288,17 @@ class rb_source_upgrade_log extends rb_base_source {
         return $defaultfilters;
     }
 
+    /**
+     * Display backtrace
+     *
+     * @deprecated Since Totara 12.0
+     * @param $value
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     public function rb_display_backtrace($value, $row, $isexport = false) {
+        debugging('rb_source_upgrade_log::rb_display_backtrace has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         if ($value === '' or $value === null) {
             return '';
         }
@@ -299,7 +309,17 @@ class rb_source_upgrade_log extends rb_base_source {
         return '<pre>' . s($value) . '</pre>';
     }
 
+    /**
+     * Display upgrade log type
+     *
+     * @deprecated Since Totara 12.0
+     * @param $value
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     public function rb_display_upgradelogtype($value, $row, $isexport = false) {
+        debugging('rb_source_upgrade_log::rb_display_upgradelogtype has been deprecated since Totara 12.0. Use upgrade_log_type::display', DEBUG_DEVELOPER);
         if ($value == 0) {
             return get_string('normal');
         } else if ($value == 1) {

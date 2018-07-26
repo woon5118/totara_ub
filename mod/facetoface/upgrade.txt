@@ -1,6 +1,39 @@
 This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
+=== 12.0 ===
+* Deprecated the following report builder display functions and replaced with display classes
+  * rb_facetoface_base_source::rb_display_coded_link_user(), please call mod_facetoface\rb\display\display\f2f_coded_user_link::display() instead.
+  * rb_facetoface_base_source::rb_display_f2f_approval(), please call mod_facetoface\rb\display\display\f2f_approval::display() instead.
+  * rb_facetoface_base_source::rb_display_room_name_link(), please call mod_facetoface\rb\display\display\f2f_room_name_link::display() instead.
+  * rb_facetoface_base_source::rb_display_asset_name_link(), please call mod_facetoface\rb\display\display\f2f_asset_name_link::display() instead.
+  * rb_facetoface_base_source::rb_display_no_yes(), please call mod_facetoface\rb\display\display\f2f_no_yes::display() instead.
+  * rb_facetoface_base_source::rb_display_conflicts(), please call totara_reportbuilder\rb\display\yes_or_no::display() instead.
+  * rb_facetoface_base_source::rb_display_numattendeeslink(), please call mod_facetoface\rb\display\display\f2f_num_attendees_link::display() instead.
+  * rb_source_facetoface_asset::rb_display_actions(), please call mod_facetoface\rb\display\display\f2f_asset_actions::display() instead.
+  * rb_source_facetoface_events::rb_display_actions(), please call mod_facetoface\rb\display\display\f2f_session_actions::display() instead.
+  * rb_source_facetoface_events::rb_display_session_spaces(), please call mod_facetoface\rb\display\display\f2f_session_spaces::display() instead.
+  * rb_source_facetoface_events::rb_display_approver().
+  * rb_source_facetoface_rooms::rb_display_actions(), please call mod_facetoface\rb\display\display\f2f_actions::display() instead.
+  * rb_source_facetoface_sessions::rb_display_allcustomfieldssignupmanage(), please call mod_facetoface\rb\display\display\f2f_all_signup_customfields_manage::display() instead.
+  * rb_source_facetoface_sessions::rb_display_job_assignment_edit(), please call mod_facetoface\rb\display\display\f2f_job_assignment_edit::display() instead.
+  * rb_source_facetoface_sessions::rb_display_link_user(), please call mod_facetoface\rb\display\display\f2f_user_link::display() instead.
+  * rb_source_facetoface_sessions::rb_display_link_user_icon(), please call mod_facetoface\rb\display\display\f2f_user_icon_link::display() instead.
+  * rb_source_facetoface_sessions::rb_display_approveremail(), please call mod_facetoface\rb\display\display\f2f_approver_email::display() instead.
+  * rb_source_facetoface_sessions::rb_display_approvername(), please call mod_facetoface\rb\display\display\f2f_approver_name::display() instead.
+  * rb_source_facetoface_sessions::rb_display_user(), please call mod_facetoface\rb\display\display\f2f_user::display() instead.
+  * rb_source_facetoface_signin::rb_display_signature(), please call mod_facetoface\rb\display\display\f2f_signature::display() instead.
+  * rb_source_facetoface_signin::rb_display_position_type().
+  * rb_source_facetoface_signin::rb_display_link_f2f_bookedby(), please call mod_facetoface\rb\display\display\f2f_booked_by_link::display() instead.
+  * rb_source_facetoface_signin::rb_display_link_f2f_actionedby().
+  * rb_source_facetoface_signin::rb_display_link_user(), please call mod_facetoface\rb\display\display\f2f_user_link::display() instead.
+  * rb_source_facetoface_signin::rb_display_link_user_icon(), please call mod_facetoface\rb\display\display\f2f_user_icon_link::display() instead.
+  * rb_source_facetoface_signin::rb_display_user(), please call mod_facetoface\rb\display\display\f2f_user::display() instead.
+  * rb_source_facetoface_summary::rb_display_actions(), please call mod_facetoface\rb\display\display\f2f_actions::display() instead.
+  * rb_source_facetoface_summary::rb_display_session_spaces(), please call mod_facetoface\rb\display\display\f2f_session_spaces::display() instead.
+  * rb_source_facetoface_summary::rb_display_approver().
+  * rb_source_facetoface_sessions::rb_display_show_cancelled_status(), please call mod_facetoface\rb\display\display\f2f_session_cancelled_status::display() instead.
+
 === 11.1 ===
 
 * Deprecated function facetoface_get_ical_attachment. It was not working properly. Instead use facetoface_generate_ical(), note different arguments!

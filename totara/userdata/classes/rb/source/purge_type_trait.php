@@ -126,7 +126,7 @@ trait purge_type_trait {
                 'addtypetoheading' => ($join !== 'base'),
                 'defaultheading' => get_string('purgetype', 'totara_userdata'),
                 'dbdatatype' => 'char',
-                'displayfunc' => 'format_string',
+                'displayfunc' => 'formatstring',
                 'outputformat' => 'text',
                 'joins' => array($join),
             )

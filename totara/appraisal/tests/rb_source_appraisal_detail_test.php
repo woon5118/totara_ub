@@ -37,6 +37,16 @@ require_once($CFG->dirroot.'/totara/question/tests/question_testcase.php');
 class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
+    /**
+     * @var array Mapping for data type name to display class name
+     */
+    public $datatypetodisplay = array(
+        'fileupload'        => 'appraisal_fileupload',
+        'longtext'          => 'appraisal_longtext',
+        'multichoicemulti'  => 'appraisal_multichoice_multi',
+        'multichoicesingle' => 'appraisal_multichoice_single'
+    );
+
     public function test_report() {
         global $DB, $SESSION;
 
@@ -258,6 +268,13 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         $report2 = new reportbuilder($rid);
         unset($_GET['appraisalid']);
 
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
         $params = array('pageid' => $page2->id);
         $relevantscales = $DB->get_records_sql($relevantscalesql, $params);
         $checkcount = 0;
@@ -270,18 +287,20 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
                 }
             }
             if ($datatype) {
-                $this->assertEquals($scalevalue->name, $report2->src->{'rb_display_' . $datatype}($scalevalue->id));
+                $displayclass = '\totara_appraisal\rb\display\\' . $this->datatypetodisplay[$datatype];
+                $display = $displayclass::display($scalevalue->id, $format, $row, $column, $report2);
+                $this->assertEquals($scalevalue->name, $display);
                 $checkcount++;
             } else {
                 try {
-                    $unfoundname = $report2->src->rb_display_multichoicesingle($scalevalue->id);
+                    $unfoundname = \totara_appraisal\rb\display\appraisal_multichoice_single::display($scalevalue->id, $format, $row, $column, $report2);
                     $this->assertTrue(false, "Shouldn't reach this code, exception not triggered!");
                 } catch (exception $e) {
                     $this->assertEquals('PHPUnit_Framework_Error_Notice', get_class($e), $e->getMessage());
                     $this->assertEquals('Undefined offset: ' . $scalevalue->id, $e->getMessage());
                 }
                 try {
-                    $unfoundname = $report2->src->rb_display_multichoicemulti($scalevalue->id);
+                    $unfoundname = \totara_appraisal\rb\display\appraisal_multichoice_multi::display($scalevalue->id, $format, $row, $column, $report2);
                     $this->assertTrue(false, "Shouldn't reach this code, exception not triggered!");
                 } catch (exception $e) {
                     $this->assertEquals('PHPUnit_Framework_Error_Notice', get_class($e), $e->getMessage());
@@ -298,6 +317,13 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         $report1 = new reportbuilder($rid);
         unset($_GET['appraisalid']);
 
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
         $params = array('pageid' => $page1->id);
         $relevantscales = $DB->get_records_sql($relevantscalesql, $params);
         $checkcount = 0;
@@ -310,18 +336,20 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
                 }
             }
             if ($datatype) {
-                $this->assertEquals($scalevalue->name, $report1->src->{'rb_display_' . $datatype}($scalevalue->id));
+                $displayclass = '\totara_appraisal\rb\display\\' . $this->datatypetodisplay[$datatype];
+                $display = $displayclass::display($scalevalue->id, $format, $row, $column, $report1);
+                $this->assertEquals($scalevalue->name, $display);
                 $checkcount++;
             } else {
                 try {
-                    $unfoundname = $report1->src->rb_display_multichoicesingle($scalevalue->id);
+                    $unfoundname = \totara_appraisal\rb\display\appraisal_multichoice_single::display($scalevalue->id, $format, $row, $column, $report1);
                     $this->assertTrue(false, "Shouldn't reach this code, exception not triggered!");
                 } catch (exception $e) {
                     $this->assertEquals('PHPUnit_Framework_Error_Notice', get_class($e), $e->getMessage());
                     $this->assertEquals('Undefined offset: ' . $scalevalue->id, $e->getMessage());
                 }
                 try {
-                    $unfoundname = $report1->src->rb_display_multichoicemulti($scalevalue->id);
+                    $unfoundname = \totara_appraisal\rb\display\appraisal_multichoice_multi::display($scalevalue->id, $format, $row, $column, $report1);
                     $this->assertTrue(false, "Shouldn't reach this code, exception not triggered!");
                 } catch (exception $e) {
                     $this->assertEquals('PHPUnit_Framework_Error_Notice', get_class($e), $e->getMessage());
@@ -338,6 +366,13 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         $report2 = new reportbuilder($rid);
         unset($_GET['appraisalid']);
 
+        // Mock objects to use in the display function.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('session', 'overbookingallowed', 'overbooking', 'overbook'))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
         $params = array('pageid' => $page2->id);
         $relevantscales = $DB->get_records_sql($relevantscalesql, $params);
         $checkcount = 0;
@@ -352,7 +387,9 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
                 }
             }
             if ($datatype == 'multichoicesingle') {
-                $this->assertEquals($scalevalue->name, $report2->src->{'rb_display_' . $datatype}($scalevalue->id));
+                $displayclass = '\totara_appraisal\rb\display\\' . $this->datatypetodisplay[$datatype];
+                $display = $displayclass::display($scalevalue->id, $format, $row, $column, $report2);
+                $this->assertEquals($scalevalue->name, $display);
                 $checkcount++;
             } else if ($datatype == 'multichoicemulti') {
                 $multinames[] = $scalevalue->name;
@@ -360,14 +397,14 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
                 $checkcount++;
             } else {
                 try {
-                    $unfoundname = $report2->src->rb_display_multichoicesingle($scalevalue->id);
+                    $unfoundname = \totara_appraisal\rb\display\appraisal_multichoice_single::display($scalevalue->id, $format, $row, $column, $report2);
                     $this->assertTrue(false, "Shouldn't reach this code, exception not triggered!");
                 } catch (exception $e) {
                     $this->assertEquals('PHPUnit_Framework_Error_Notice', get_class($e), $e->getMessage());
                     $this->assertEquals('Undefined offset: ' . $scalevalue->id, $e->getMessage());
                 }
                 try {
-                    $unfoundname = $report2->src->rb_display_multichoicemulti($scalevalue->id);
+                    $unfoundname = \totara_appraisal\rb\display\appraisal_multichoice_multi::display($scalevalue->id, $format, $row, $column, $report2);
                     $this->assertTrue(false, "Shouldn't reach this code, exception not triggered!");
                 } catch (exception $e) {
                     $this->assertEquals('PHPUnit_Framework_Error_Notice', get_class($e), $e->getMessage());
@@ -377,10 +414,14 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         }
         $this->assertCount(3, $multiids);
         $this->assertEquals(6, $checkcount);
-        $this->assertEquals(implode(', ', $multinames), $report2->src->rb_display_multichoicemulti(implode(',', $multiids)));
+        $display = \totara_appraisal\rb\display\appraisal_multichoice_multi::display(implode(',', $multiids), $format, $row, $column, $report2);
+        $this->assertEquals(implode(', ', $multinames), $display);
 
         // Make sure that empty answers work ok.
-        $this->assertEmpty($report2->src->rb_display_multichoicesingle(''));
-        $this->assertEmpty($report2->src->rb_display_multichoicemulti(''));
+        $display = \totara_appraisal\rb\display\appraisal_multichoice_single::display('', $format, $row, $column, $report2);
+        $this->assertEmpty($display);
+
+        $display = \totara_appraisal\rb\display\appraisal_multichoice_multi::display('', $format, $row, $column, $report2);
+        $this->assertEmpty($display);
     }
 }

@@ -52,6 +52,8 @@ class rb_source_competency_evidence extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_competency_evidence');
+        $this->usedcomponents[] = 'totara_plan';
+        $this->usedcomponents[] = 'totara_hierarchy';
 
         parent::__construct();
     }
@@ -270,7 +272,7 @@ class rb_source_competency_evidence extends rb_base_source {
                 'competency.fullname',
                 array(
                     'joins' => 'competency',
-                    'displayfunc' => 'link_competency',
+                    'displayfunc' => 'competency_link',
                     'defaultheading' => get_string('competencyname', 'rb_source_competency_evidence'),
                     'extrafields' => array('competency_id' => 'competency.id'),
                 )
@@ -301,7 +303,7 @@ class rb_source_competency_evidence extends rb_base_source {
                 get_string('statushistorylinkcolumn', 'rb_source_competency_evidence'),
                 'base.userid',
                 array('defaultheading' => get_string('statushistorylinkheading', 'rb_source_competency_evidence'),
-                      'displayfunc' => 'status_history_link',
+                      'displayfunc' => 'plan_competency_status_history_link',
                       'extrafields' => array('competencyid' => 'base.competencyid'),
                       'noexport' => true,
                       'nosort' => true)
@@ -576,7 +578,17 @@ class rb_source_competency_evidence extends rb_base_source {
         return $defaultfilters;
     }
 
+    /**
+     * Display status history link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $userid
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     public function rb_display_status_history_link($userid, $row, $isexport = false) {
+        debugging('rb_source_competency_evidence::rb_display_status_history_link has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_competency_status_history_link::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return '';
         }
@@ -600,11 +612,13 @@ class rb_source_competency_evidence extends rb_base_source {
     /**
      * Displays link competency to competency view page requires the competency_id extra field in column definition.
      *
+     * @deprecated Since Totara 12.0
      * @param string $name
      * @param object Report row $row
      * @return string html link
      */
     public function rb_display_link_competency($comp, $row) {
+        debugging('rb_source_competency_evidence::rb_display_link_competency has been deprecated since Totara 12.0. Use totara_hierarchy\rb\display\competency_link::display', DEBUG_DEVELOPER);
         if (empty($comp)) {
             return '';
         }

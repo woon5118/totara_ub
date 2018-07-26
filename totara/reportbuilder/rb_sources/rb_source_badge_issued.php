@@ -55,6 +55,8 @@ class rb_source_badge_issued extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_badge_issued');
+        $this->usedcomponents[] = 'core_badges';
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -144,7 +146,7 @@ class rb_source_badge_issued extends rb_base_source {
                 'badgeimage',
                 get_string('badgeimage', 'rb_source_badge_issued'),
                 'badge.id',
-                array('displayfunc' => 'badgeimage',
+                array('displayfunc' => 'badge_image',
                     'extrafields' => array('userid' => 'base.userid',
                         'uniquehash' => 'base.uniquehash',
                         'badgename' => 'badge.name'),
@@ -155,7 +157,7 @@ class rb_source_badge_issued extends rb_base_source {
                 'issuername',
                 get_string('issuername', 'rb_source_badge_issued'),
                 'badge.issuername',
-                array('displayfunc' => 'issuernamelink',
+                array('displayfunc' => 'badge_issuer_name_link',
                     'extrafields' => array('issuerurl' => 'badge.issuerurl'),
                     'joins' => 'badge')
             ),
@@ -178,14 +180,14 @@ class rb_source_badge_issued extends rb_base_source {
                 'type',
                 get_string('badgetype', 'rb_source_badge_issued'),
                 'badge.type',
-                array('displayfunc' => 'badgetype', 'joins' => 'badge')
+                array('displayfunc' => 'badge_type', 'joins' => 'badge')
             ),
             new rb_column_option(
                 'badge',
                 'status',
                 get_string('badgestatus', 'rb_source_badge_issued'),
                 'badge.status',
-                array('displayfunc' => 'badgestatus', 'joins' => 'badge')
+                array('displayfunc' => 'badge_status', 'joins' => 'badge')
             ),
             new rb_column_option(
                 'badge',
@@ -193,7 +195,7 @@ class rb_source_badge_issued extends rb_base_source {
                 get_string('badgedescription', 'rb_source_badge_issued'),
                 'badge.description',
                 array(
-                    'displayfunc' => 'text',
+                    'displayfunc' => 'formatstring',
                     'joins' => 'badge',
                 )
             )
@@ -368,12 +370,14 @@ class rb_source_badge_issued extends rb_base_source {
     /**
      * Displays issuer name as html link.
      *
+     * @deprecated Since Totara 12.0
      * @param string $name
      * @param object Report row $row
      * @param bool $isexport
      * @return string html link
      */
     public function rb_display_issuernamelink($name, $row, $isexport) {
+        debugging('rb_source_badge_issued::rb_display_issuernamelink has been deprecated since Totara 12.0. Use core_badges\rb\display\badge_issuer_name_link::display', DEBUG_DEVELOPER);
         global $CFG;
         if (empty($name)) {
             return '';
@@ -386,20 +390,49 @@ class rb_source_badge_issued extends rb_base_source {
         return html_writer::tag('a', $name, array('href' => $row->issuerurl));
     }
 
+    /**
+     * Display for badge type
+     *
+     * @deprecated Since Totara 12.0
+     * @param $type
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     public function rb_display_badgetype($type, $row, $isexport) {
+        debugging('rb_source_badge_issued::rb_display_issuernamelink has been deprecated since Totara 12.0. Use core_badges\rb\display\badge_type::display', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->libdir.'/badgeslib.php');
         return get_string("badgetype_{$type}", 'badges');
     }
 
+    /**
+     * Display for badge status
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     public function rb_display_badgestatus($status, $row, $isexport) {
+        debugging('rb_source_badge_issued::rb_display_badgestatus has been deprecated since Totara 12.0. Use core_badges\rb\display\badge_status::display', DEBUG_DEVELOPER);
         global $CFG;
         require_once($CFG->libdir.'/badgeslib.php');
         return get_string("badgestatus_{$status}", 'badges');
     }
 
-
+    /**
+     * Display for badge image
+     *
+     * @deprecated Since Totara 12.0
+     * @param $badgeid
+     * @param $row
+     * @param $isexport
+     * @return string
+     */
     public function rb_display_badgeimage($badgeid, $row, $isexport) {
+        debugging('rb_source_badge_issued::rb_display_badgeimage has been deprecated since Totara 12.0. Use core_badges\rb\display\badge_image::display', DEBUG_DEVELOPER);
         global $CFG;
 
         if ($isexport) {

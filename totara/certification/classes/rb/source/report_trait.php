@@ -67,7 +67,7 @@ trait report_trait {
             "$join.recertifydatetype",
             array(
                 'joins' => $join,
-                'displayfunc' => 'recertifydatetype',
+                'displayfunc' => 'certif_recertify_date_type',
             )
         );
 

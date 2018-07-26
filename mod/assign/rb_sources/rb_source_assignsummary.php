@@ -70,6 +70,8 @@ class rb_source_assignsummary extends rb_base_source {
         $this->requiredcolumns = array();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_assignsummary');
+        $this->usedcomponents[] = 'totara_cohort';
+
         parent::__construct();
     }
 
@@ -147,7 +149,7 @@ class rb_source_assignsummary extends rb_base_source {
                 $col,
                 get_string("{$col}grade", 'rb_source_assignsummary'),
                 "base.{$col}_grade",
-                array('displayfunc' => 'roundgrade')
+                array('displayfunc' => 'round')
             );
         }
 
@@ -255,11 +257,14 @@ class rb_source_assignsummary extends rb_base_source {
 
     /**
      * Display a number rounded to the nearest integer
+     *
+     * @deprecated Since Totara 12.0
      * @param string $field
      * @param object $record
      * @param boolean $isexport
      */
     public function rb_display_roundgrade($field, $record, $isexport) {
+        debugging('rb_source_assignsummary::rb_display_roundgrade has been deprecated since Totara 12.0, Use totara_reportbuilder\rb\display\round::display', DEBUG_DEVELOPER);
         return (integer)round($field);
     }
 }

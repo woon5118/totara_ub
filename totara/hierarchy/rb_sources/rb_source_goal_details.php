@@ -59,6 +59,7 @@ class rb_source_goal_details extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_goal_details');
         $this->shortname = 'goal_details';
         $this->sourcewhere = 'base.deleted = 0';
+        $this->usedcomponents[] = 'totara_hierarchy';
 
         parent::__construct();
     }
@@ -166,7 +167,7 @@ class rb_source_goal_details extends rb_base_source {
                 get_string('goalstatushistorylinkcolumn', 'rb_source_goal_details'),
                 'base.userid',
                 array('defaultheading' => get_string('goalstatushistorylinkheading', 'rb_source_goal_details'),
-                      'displayfunc' => 'status_history_link',
+                      'displayfunc' => 'goal_status_history_link',
                       'extrafields' => array('goalid' => 'base.goalid'),
                       'noexport' => true)
             )
@@ -225,8 +226,17 @@ class rb_source_goal_details extends rb_base_source {
         return $contentoptions;
     }
 
-
+    /**
+     * Displays a link to the users goal status history
+     *
+     * @deprecated Since Totara 12.0
+     * @param $userid
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     public function rb_display_status_history_link($userid, $row, $isexport = false) {
+        debugging('rb_source_goal_details::rb_display_status_history_link has been deprecated since Totara 12.0. Please use totara_hierarchy\rb\display\goal_status_history::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return '';
         }

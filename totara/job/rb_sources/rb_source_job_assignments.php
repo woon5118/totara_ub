@@ -291,7 +291,7 @@ class rb_source_job_assignments extends rb_base_source {
             'pos.visible',
             array(
                 'addtypetoheading' => true,
-                'displayfunc' => 'yes_no',
+                'displayfunc' => 'yes_or_no',
             )
         );
 
@@ -390,7 +390,7 @@ class rb_source_job_assignments extends rb_base_source {
             'org.visible',
             array(
                 'addtypetoheading' => true,
-                'displayfunc' => 'yes_no',
+                'displayfunc' => 'yes_or_no',
             )
         );
 

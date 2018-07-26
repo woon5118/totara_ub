@@ -42,6 +42,9 @@ class rb_source_certification extends rb_source_program {
         parent::__construct();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification');
         $this->sourcewhere = $this->define_sourcewhere();
+        $this->usedcomponents[] = 'totara_certification';
+        $this->usedcomponents[] = "totara_program";
+        $this->usedcomponents[] = 'totara_cohort';
     }
 
     /**

@@ -40,6 +40,7 @@ class rb_source_totara_sync_log extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_totara_sync_log');
+        $this->usedcomponents[] = 'tool_totara_sync';
         parent::__construct();
     }
 
@@ -97,7 +98,7 @@ class rb_source_totara_sync_log extends rb_base_source {
                 'logtype',
                 get_string('logtype', 'tool_totara_sync'),
                 "base.logtype",
-                array('displayfunc' => 'logtype')
+                array('displayfunc' => 'totara_sync_log_type')
             ),
             new rb_column_option(
                 'totara_sync_log',
@@ -283,7 +284,16 @@ class rb_source_totara_sync_log extends rb_base_source {
     //
     //
 
+    /**
+     * Display log type
+     *
+     * @deprecated Since Totara 12.0
+     * @param $type
+     * @param $row
+     * @return string
+     */
     function rb_display_logtype($type, $row) {
+        debugging('rb_source_totara_sync_log::rb_display_logtype has been deprecated since Totara 12.0. Use tool_totara_sync\rb\display\totara_sync_log_type::display', DEBUG_DEVELOPER);
         switch ($type) {
             case 'error':
                 $class = 'notifyproblem';

@@ -62,6 +62,7 @@ class rb_source_dp_plan extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_plan');
+        $this->usedcomponents[] = 'totara_plan';
         parent::__construct();
     }
 
@@ -138,7 +139,7 @@ class rb_source_dp_plan extends rb_base_source {
                 'base.name',
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_plan'),
-                    'displayfunc' => 'planlink',
+                    'displayfunc' => 'plan_link',
                     'extrafields' => array( 'plan_id' => 'base.id' )
                 )
         );

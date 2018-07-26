@@ -65,6 +65,7 @@ class rb_source_goal_status_history extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_goal_status_history');
         $this->shortname = 'goal_status_history';
+        $this->usedcomponents[] = 'totara_hierarchy';
 
         parent::__construct();
     }
@@ -146,7 +147,7 @@ class rb_source_goal_status_history extends rb_base_source {
                 get_string('goalscopecolumn', 'rb_source_goal_status_history'),
                 'base.scope',
                 array('defaultheading' => get_string('goalscopeheading', 'rb_source_goal_status_history'),
-                      'displayfunc' => 'scope')
+                      'displayfunc' => 'goal_scope')
             ),
             new rb_column_option(
                 'history',
@@ -174,7 +175,7 @@ class rb_source_goal_status_history extends rb_base_source {
                 $DB->sql_concat_join("' '", $usernamefields),
                 array('defaultheading' => get_string('goalusermodifiedheading', 'rb_source_goal_status_history'),
                       'joins' => 'usermodified',
-                      'displayfunc' => 'fullname_link_user',
+                      'displayfunc' => 'user_link',
                       'extrafields' => array_merge(array('id' => 'usermodified.id'), $usernamefields),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
@@ -321,14 +322,30 @@ class rb_source_goal_status_history extends rb_base_source {
         return $scalevalues;
     }
 
-
+    /**
+     * Display goal scope
+     *
+     * @deprecated Since Totara 12.0
+     * @param $scope
+     * @return mixed
+     */
     public function rb_display_scope($scope) {
+        debugging('rb_source_goal_status_history::rb_display_scope has been deprecated since Totara 12.0. Use totara_hierarchy\rb\display\goal_scope::display', DEBUG_DEVELOPER);
         $scopes = $this->rb_filter_scope();
 
         return $scopes[$scope];
     }
 
+    /**
+     * Display users fullname with link
+     * @deprecated Since Totara 12.0
+     * @param $user
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_fullname_link_user($user, $row, $isexport = false) {
+        debugging('rb_source_goal_status_history::rb_display_fullname_link_user has been deprecated since Totara 12.0. Use totara_reportbuilder\rb\display\user_link::display', DEBUG_DEVELOPER);
         $user = fullname($row);
         return $this->rb_display_link_user($user, $row, $isexport);
     }

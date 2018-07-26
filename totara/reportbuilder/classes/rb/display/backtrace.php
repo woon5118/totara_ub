@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2017 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,36 +18,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Player <simon.player@totaralearning.com>
- * @package mod_assign
+ * @package totara_reportbuilder
  */
 
-namespace mod_assign\rb\display;
+namespace totara_reportbuilder\rb\display;
 
 /**
- * Display assign submission status.
+ * Display class intended for pre formatted string
  *
- * @package mod_assign
+ * @author Simon Player <simon.player@totaralearning.com>
+ * @package totara_reportbuilder
  */
-class submission_status extends \totara_reportbuilder\rb\display\base {
-    public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG;
-        include_once($CFG->dirroot.'/mod/assign/locallib.php');
+class backtrace extends base {
 
-        switch ($value) {
-            case 'submitted':
-                $status = get_string('status_submitted', 'rb_source_assign');
-                break;
-            case 'graded':
-                $status = get_string('status_graded', 'rb_source_assign');
-                break;
-            default:
-                $status = get_string('status_notsubmitted', 'rb_source_assign');
-                break;
+    /**
+     * Handles the display
+     *
+     * @param string $value
+     * @param string $format
+     * @param \stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
+     */
+    public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+
+        if ($value === '' or $value === null) {
+            return '';
         }
 
-        return $status;
+        $isexport = ($format !== 'html');
+        if ($isexport) {
+            return \core_text::entities_to_utf8($value);
+        }
+
+        return '<pre>' . s($value) . '</pre>';
     }
 
+    /**
+     * Is this column graphable?
+     *
+     * @param \rb_column $column
+     * @param \rb_column_option $option
+     * @param \reportbuilder $report
+     * @return bool
+     */
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
         return false;
     }

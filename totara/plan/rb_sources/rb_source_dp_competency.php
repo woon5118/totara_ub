@@ -39,6 +39,14 @@ class rb_source_dp_competency extends rb_base_source {
     public $defaultfilters, $requiredcolumns, $sourcetitle;
     public $dp_plans;
 
+    /**
+     * A hash of competency scales. The key is the framework id, and the value
+     * is an array as returned by get_records_menu() of the competency scale
+     * for that framework
+     * @var array
+     */
+    public $compscales = array();
+
 
     /**
      * Constructor
@@ -80,6 +88,7 @@ class rb_source_dp_competency extends rb_base_source {
         $this->requiredcolumns = array();
         $this->dp_plans = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_competency');
+        $this->usedcomponents[] = 'totara_plan';
         parent::__construct();
     }
 
@@ -252,7 +261,7 @@ from
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_competency'),
                     'joins' => 'dp_competency',
-                    'displayfunc' => 'planlink',
+                    'displayfunc' => 'plan_link',
                     'extrafields' => array( 'plan_id' => 'dp_competency.planid' )
                 )
         );
@@ -380,7 +389,7 @@ from
                 array(
                     'defaultheading' => 'Plan',
                     'joins' => 'dp_competency',
-                    'displayfunc' => 'competencyeditstatus',
+                    'displayfunc' => 'plan_competency_edit_status',
                     'extrafields' => array( 'planid' => 'dp_competency.planid' )
                 )
         );
@@ -463,7 +472,7 @@ from
                 END',
                 array(
                     'joins' => array('dp_competency', 'scale_value', 'evidence_scale_value', 'competency'),
-                    'displayfunc' => 'proficiency_and_approval_menu',
+                    'displayfunc' => 'plan_competency_proficiency_and_approval_menu',
                     'defaultheading' => get_string('competencyproficiency', 'rb_source_dp_competency'),
                     'extrafields' => array(
                         'approved' => 'dp_competency.approved',
@@ -497,7 +506,7 @@ from
                 get_string('statushistorylinkcolumn', 'rb_source_dp_competency'),
                 'base.userid',
                 array('defaultheading' => get_string('statushistorylinkheading', 'rb_source_dp_competency'),
-                      'displayfunc' => 'status_history_link',
+                      'displayfunc' => 'plan_competency_status_history_link',
                       'extrafields' => array('competencyid' => 'base.competencyid'),
                       'noexport' => true,
                       'nosort' => true)
@@ -630,7 +639,17 @@ from
         return $defaultcolumns;
     }
 
+    /**
+     * Display competency status history link
+     *
+     * @deprecated Since Totara 12.0
+     * @param $userid
+     * @param $row
+     * @param bool $isexport
+     * @return string
+     */
     public function rb_display_status_history_link($userid, $row, $isexport = false) {
+        debugging('rb_source_dp_competency::rb_display_status_history_link has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_competency_status_history_link::display', DEBUG_DEVELOPER);
         if ($isexport) {
             return '';
         }
@@ -645,7 +664,16 @@ from
         return html_writer::link($url, get_string('statushistorylinkheading', 'rb_source_dp_competency'));
     }
 
+    /**
+     * Display proficiency and approval
+     *
+     * @deprecated Since Totara 12.0
+     * @param $status
+     * @param $row
+     * @return string
+     */
     function rb_display_proficiency_and_approval($status, $row) {
+        debugging('rb_source_dp_competency::rb_display_proficiency_and_approval has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
         global $CFG;
         // needed for approval constants
         require_once($CFG->dirroot . '/totara/plan/lib.php');
@@ -670,11 +698,13 @@ from
 
     /**
      * Displays an icon linked to the "add competency evidence" page for this competency
+     *
+     * @deprecated Since Totara 12.0
      * @param $competencyid
      * @param $row
      */
     public function rb_display_competencyeditstatus($competencyid, $row) {
-
+        debugging('rb_source_dp_competency::rb_display_competencyeditstatus has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_competency_edit_status::display', DEBUG_DEVELOPER);
         $planid = isset($row->planid) ? $row->planid : null;
         if ($planid) {
 
@@ -694,23 +724,17 @@ from
         }
     }
 
-
-    /**
-     * A hash of competency scales. The key is the framework id, and the value
-     * is an array as returned by get_records_menu() of the competency scale
-     * for that framework
-     * @var array
-     */
-    private $compscales = array();
-
     /**
      * Displays the competency's proficiency/approval status, and if the current user would have permission
      * to change the competency's status via the competency page of the learning plan, it gives them
      * a drop-down menu to change the status, which saves changes via Javascript
+     *
+     * @deprecated Since Totara 12.0
      * @param unknown_type $status
      * @param unknown_type $row
      */
     public function rb_display_proficiency_and_approval_menu($status, $row) {
+        debugging('rb_source_dp_competency::rb_display_proficiency_and_approval_menu has been deprecated since Totara 12.0. Use totara_plan\rb\display\plan_competency_proficiency_and_approval_menu::display', DEBUG_DEVELOPER);
         global $CFG, $DB;
         // needed for approval constants
         require_once($CFG->dirroot . '/totara/plan/lib.php');
