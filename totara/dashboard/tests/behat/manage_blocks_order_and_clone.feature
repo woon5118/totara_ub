@@ -13,7 +13,7 @@ Feature: Create a dashboard with HTML blocks, re-order the blocks, clone the das
       | My dashboard   | 0      | 1         |
     # Add a block to the my dashboard
     And I log in as "admin"
-    And I navigate to "Dashboards" node in "Site administration > Appearance"
+    And I navigate to "Dashboards" node in "Site administration > Navigation"
     And I click on "My dashboard" "link"
     And I press "Blocks editing on"
     # Add HTML block 1
@@ -46,13 +46,13 @@ Feature: Create a dashboard with HTML blocks, re-order the blocks, clone the das
     And I press "Blocks editing off"
 
     # Make sure the blocks are in the right order
-    When I navigate to "Dashboards" node in "Site administration > Appearance"
+    When I navigate to "Dashboards" node in "Site administration > Navigation"
     And I click on "My dashboard" "link"
     Then "Skip HTML block 3" "link" should appear before "Skip HTML block 2" "link"
     And "Skip HTML block 2" "link" should appear before "Skip HTML block 1" "link"
 
     # Clone original dashboard
-    When I navigate to "Dashboards" node in "Site administration > Appearance"
+    When I navigate to "Dashboards" node in "Site administration > Navigation"
     And I click on "Clone dashboard" "link" in the "My dashboard" "table_row"
     Then I should see "Do you really want to clone dashboard My dashboard?"
     # Confirm the clone

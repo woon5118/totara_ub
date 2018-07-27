@@ -86,7 +86,7 @@ Feature: The activity results block displays student in visible groups scores
     And I press "Save changes"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Group 1" in the "Activity results" "block"
     And I should see "95.00/100.00" in the "Activity results" "block"
 
@@ -102,7 +102,7 @@ Feature: The activity results block displays student in visible groups scores
     And I press "Save changes"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Group 1" in the "Activity results" "block"
     And I should see "95.00" in the "Activity results" "block"
 
@@ -119,7 +119,7 @@ Feature: The activity results block displays student in visible groups scores
     And I press "Save changes"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Group 1" in the "Activity results" "block"
     And I should see "95%" in the "Activity results" "block"
     And I should see "Group 2" in the "Activity results" "block"
@@ -139,7 +139,7 @@ Feature: The activity results block displays student in visible groups scores
     And I press "Save changes"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Group 1" in the "Activity results" "block"
     And I should see "95.00/100.00" in the "Activity results" "block"
     And I should see "Group 2" in the "Activity results" "block"
@@ -159,7 +159,7 @@ Feature: The activity results block displays student in visible groups scores
     And I press "Save changes"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Group 1" in the "Activity results" "block"
     And I should see "95.00" in the "Activity results" "block"
     And I should see "Group 2" in the "Activity results" "block"
@@ -179,7 +179,7 @@ Feature: The activity results block displays student in visible groups scores
     And I press "Save changes"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Group" in the "Activity results" "block"
     And I should see "95.00%" in the "Activity results" "block"
     And I should see "85.00%" in the "Activity results" "block"
@@ -197,7 +197,7 @@ Feature: The activity results block displays student in visible groups scores
     And I press "Save changes"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Group" in the "Activity results" "block"
     And I should see "95.00%" in the "Activity results" "block"
     And I should see "85.00%" in the "Activity results" "block"

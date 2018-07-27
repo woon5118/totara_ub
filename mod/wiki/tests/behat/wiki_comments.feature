@@ -32,7 +32,7 @@ Feature: Users can comment on wiki pages
     And I press "Save"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     And I follow "Comments"
     And I follow "Add comment"
@@ -58,7 +58,7 @@ Feature: Users can comment on wiki pages
   Scenario: Student cannot edit another student's comment
     When I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     And I follow "Comments"
     Then "Edit" "link" should not exist in the "wiki-comments" "table"
@@ -68,7 +68,7 @@ Feature: Users can comment on wiki pages
   Scenario: Teacher can delete a student comment
     When I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     And I follow "Comments"
     Then "Edit" "link" should not exist in the "wiki-comments" "table"

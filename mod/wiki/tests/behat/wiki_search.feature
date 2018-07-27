@@ -36,7 +36,7 @@ Feature: Users can search wikis
     And I follow "Course 1"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Collaborative wiki name"
     And I follow "new page"
     And I press "Create page"
@@ -73,7 +73,7 @@ Feature: Users can search wikis
     And I press "Save"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Individual wiki name"
     And I press "Create page"
     And I set the following fields to these values:
@@ -85,7 +85,7 @@ Feature: Users can search wikis
     And I should not see "Individual teacher1 page"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Individual wiki name"
     And I press "Create page"
     And I set the following fields to these values:
@@ -98,7 +98,7 @@ Feature: Users can search wikis
     And I should not see "Individual teacher1 page"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Individual wiki name"
     And I set the field "searchstring" to "page"
     And I press "Search wikis"
@@ -151,7 +151,7 @@ Feature: Users can search wikis
     And I press "Save"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Group wiki name"
     And I follow "new page1"
     And I press "Create page"
@@ -166,7 +166,7 @@ Feature: Users can search wikis
     And I should not see "All participants teacher1 page"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Group wiki name"
     And I follow "new page2"
     And I press "Create page"
@@ -182,5 +182,5 @@ Feature: Users can search wikis
     And I should not see "All participants teacher1 page"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Group wiki name"

@@ -32,7 +32,7 @@ Feature: Give a grade to a student for a seminar
   Scenario: Set grade for student to complete seminar
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Grades" "link" in the "Navigation" "block"
+    And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I set the field "Sam1 Student1 Test seminar name grade" to "100"
 

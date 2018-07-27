@@ -8,7 +8,7 @@ Feature: Confirm validation works when a date profile field is added
     And I click on "Enable" "link" in the "Email-based self-registration" "table_row"
     And I set the field "Self registration" to "Email-based self-registration"
     And I click on "Save changes" "button"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the field "Create a new profile field:" to "Date (no timezone)"
     And I set the following fields to these values:
         | Name                        | Date test |

@@ -7,7 +7,7 @@ Feature: User menu profile fields handle special characters via HR Import.
   Scenario: Verify special characters can be added to user profile fields via HR Import.
 
     Given I log in as "admin"
-    When I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    When I navigate to "User profile fields" node in "Site administration > Users"
     And I set the following fields to these values:
       | datatype | menu |
     And I set the following fields to these values:
@@ -53,12 +53,12 @@ Feature: User menu profile fields handle special characters via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the custom field data is saved against the user.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Upload User 1"
     Then I should see "Health & Safety"
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Upload User 2"
     Then I should see "> 10"
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Upload User 3"
     Then I should see "< 10"

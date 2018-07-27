@@ -109,7 +109,7 @@ Feature: Set up contextual data for tests
       | user | course | role |
       | student1 | C1 | student |
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Topic 1"
 
   Scenario: Add role assigns
@@ -266,6 +266,7 @@ Feature: Set up contextual data for tests
     And I set the field "groups" to "Group 2 (1)"
     And the "members" select box should contain "Student 2"
 
+  @javascript
   Scenario: Add cohorts and cohort members with data generator
     Given the following "categories" exist:
       | name  | category | idnumber |
@@ -289,7 +290,7 @@ Feature: Set up contextual data for tests
       | student1 | CHSB   |
       | student1 | CHC    |
     When I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     Then the following should exist in the "cohort_admin" table:
       | Name            | No. of Members |
       | System cohort A | 1           |
@@ -297,7 +298,7 @@ Feature: Set up contextual data for tests
     And I should not see "Cohort in category"
     And I am on course index
     And I follow "Cat 1"
-    And I follow "Audiences"
+    And I click on "Audiences" "link" in the "Administration" "block"
     And I should not see "System cohort"
     And the following should exist in the "cohort_admin" table:
       | Name               | No. of Members |

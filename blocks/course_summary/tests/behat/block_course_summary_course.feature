@@ -23,14 +23,14 @@ Feature: Course summary block used in a course
 
   Scenario: Student can view course summary
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Course summary" "block" should exist
     And I should see "Course summary" in the "Course summary" "block"
     And I should see "Proved the course summary block works!" in the "Course summary" "block"
 
   Scenario: Teacher can not see edit icon when edit mode is off
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Proved the course summary block works!" in the "Course summary" "block"
     And I should see "Course summary" in the "Course summary" "block"
     And "Edit" "link" should not exist in the "Course summary" "block"

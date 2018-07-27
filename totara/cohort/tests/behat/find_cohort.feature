@@ -32,7 +32,7 @@ Feature: Find cohort through totara dialog window
 
   Scenario: Search audiences for program
     Given I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I click on "Edit" "link" in the "Audience TL-9074B" "table_row"
     And I set the field "id_contextid" to "Miscellaneous"
     And I click on "Save changes" "button"

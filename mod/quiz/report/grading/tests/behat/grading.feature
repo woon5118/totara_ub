@@ -41,7 +41,7 @@ Feature: Basic use of the Manual grading report
 
     # Create an attempt.
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
     And I should see "Question 1"
@@ -56,7 +56,7 @@ Feature: Basic use of the Manual grading report
 
     # Use the manual grading report.
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I navigate to "Results > Manual grading" in current page administration
     And I should see "Manual grading"

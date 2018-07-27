@@ -137,7 +137,7 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
         // TOTARA: We have 7 blocks on the page by default.
         $this->assertCount(7, $result['blocks']);
 
-        $expectedblocks = array('navigation', 'settings', 'participants', 'search_forums', 'course_list',
+        $expectedblocks = array('course_navigation', 'settings', 'participants', 'search_forums', 'course_list',
                                 'calendar_upcoming', 'recent_activity');
         foreach ($result['blocks'] as $block) {
             if (!in_array($block['name'], $expectedblocks)) {

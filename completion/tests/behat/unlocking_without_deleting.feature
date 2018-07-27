@@ -22,7 +22,7 @@ Feature: Unlocking without deleting course completion data
       | Enable restricted access   | 1 |
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And completion tracking is "Enabled" in current course
     And I turn editing mode on
     And I add the "Course completion status" block
@@ -44,16 +44,15 @@ Feature: Unlocking without deleting course completion data
     And "Student First" user has not completed "Test forum name" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I click on "Not completed: Test label. Select to mark as complete." "link"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I expand "Reports" node
     And I follow "Activity completion"
     And "Student First" user has completed "Test forum name" activity
@@ -68,7 +67,7 @@ Feature: Unlocking without deleting course completion data
     And "Student First" user has completed "Modified forum name" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
 
   @javascript
@@ -90,7 +89,7 @@ Feature: Unlocking without deleting course completion data
       | Enable restricted access   | 1 |
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And completion tracking is "Enabled" in current course
     And I turn editing mode on
     And I add the "Course completion status" block
@@ -112,16 +111,15 @@ Feature: Unlocking without deleting course completion data
     And "Student First" user has not completed "Test forum name" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I click on "Not completed: Test label. Select to mark as complete." "link"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I expand "Reports" node
     And I follow "Activity completion"
     And "Student First" user has completed "Test forum name" activity
@@ -136,13 +134,12 @@ Feature: Unlocking without deleting course completion data
       | Assignment - Test assignment name | 1 |
     And I press "Save changes"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Student First" user has completed "Test forum name" activity
     And "Student First" user has completed "Test label" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
 
   @javascript
@@ -164,7 +161,7 @@ Feature: Unlocking without deleting course completion data
       | Enable restricted access   | 1 |
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And completion tracking is "Enabled" in current course
     And I turn editing mode on
     And I add the "Course completion status" block
@@ -186,16 +183,15 @@ Feature: Unlocking without deleting course completion data
     And "Student First" user has not completed "Test forum name" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I click on "Not completed: Test label. Select to mark as complete." "link"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I expand "Reports" node
     And I follow "Activity completion"
     And "Student First" user has completed "Test forum name" activity
@@ -210,13 +206,12 @@ Feature: Unlocking without deleting course completion data
       | Assignment - Test assignment name | 1 |
     And I press "Save changes"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Student First" user has completed "Test forum name" activity
     And "Student First" user has completed "Test label" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     And I log in as "teacher1"
@@ -227,13 +222,12 @@ Feature: Unlocking without deleting course completion data
       | Assignment name | Modified assignment name |
     And I press "Save and return to course"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Student First" user has completed "Test forum name" activity
     And "Student First" user has completed "Test label" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
 
   @javascript
@@ -257,7 +251,7 @@ Feature: Unlocking without deleting course completion data
       | Enable restricted access   | 1 |
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And completion tracking is "Enabled" in current course
     And I turn editing mode on
     And I add the "Course completion status" block
@@ -277,16 +271,15 @@ Feature: Unlocking without deleting course completion data
     And I log out
     # Log in and complete the forum as student1
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     # Log in and complete the forum as student2 and view the forum
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I press "Add a new discussion topic"
     And I set the following fields to these values:
@@ -296,13 +289,12 @@ Feature: Unlocking without deleting course completion data
     And I follow "Course 1"
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     # Edit the forum, unlock deleting, and set require forum view.
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Student First" user has completed "Test forum name" activity
     And "Student Second" user has completed "Test forum name" activity
     And I follow "Course 1"
@@ -342,7 +334,7 @@ Feature: Unlocking without deleting course completion data
       | Enable restricted access   | 1 |
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And completion tracking is "Enabled" in current course
     And I turn editing mode on
     And I add the "Course completion status" block
@@ -362,16 +354,15 @@ Feature: Unlocking without deleting course completion data
     And I log out
     # Log in and complete the forum as student1
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     # Log in and complete the forum as student2 and view the forum
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I press "Add a new discussion topic"
     And I set the following fields to these values:
@@ -381,13 +372,12 @@ Feature: Unlocking without deleting course completion data
     And I follow "Course 1"
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     # Edit the forum, unlock deleting, and set require forum view.
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Student First" user has completed "Test forum name" activity
     And "Student Second" user has completed "Test forum name" activity
     And I follow "Course 1"
@@ -404,15 +394,14 @@ Feature: Unlocking without deleting course completion data
     And "Student Second" user has completed "Test forum name" activity
     # Trigger cron and make sure its still true.
     And I trigger cron
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Student First" user has completed "Test forum name" activity
     And "Student Second" user has completed "Test forum name" activity
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Complete"

@@ -24,7 +24,7 @@ Feature: Random glossary entry block is used in a course
     Then I should see "Please configure this block using the edit icon" in the "block_glossary_random" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "block_glossary_random" "block" should not exist
     And I log out
 
@@ -44,7 +44,7 @@ Feature: Random glossary entry block is used in a course
     And I press "Save changes"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "There are no entries yet in the chosen glossary" in the "AutoGlossaryblock" "block"
     And I click on "Add a new entry" "link" in the "AutoGlossaryblock" "block"
     And I set the following fields to these values:
@@ -90,7 +90,7 @@ Feature: Random glossary entry block is used in a course
     And I press "Save changes"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "There are no entries yet in the chosen glossary" in the "ManualGlossaryblock" "block"
     And I click on "Add a new entry" "link" in the "ManualGlossaryblock" "block"
     And I set the following fields to these values:
@@ -101,7 +101,7 @@ Feature: Random glossary entry block is used in a course
     And I should see "There are no entries yet in the chosen glossary" in the "ManualGlossaryblock" "block"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "There are no entries yet in the chosen glossary" in the "ManualGlossaryblock" "block"
     And I follow "GlossaryManual"
     And I follow "Waiting approval"

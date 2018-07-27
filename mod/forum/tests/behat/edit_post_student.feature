@@ -18,7 +18,7 @@ Feature: Students can edit or delete their forum posts within a set time limit
       | activity   | name                   | intro                   | course  | idnumber  |
       | forum      | Test forum name        | Test forum description  | C1      | forum     |
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Forum post subject |
       | Message | This is the body |

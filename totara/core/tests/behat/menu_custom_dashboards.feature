@@ -14,7 +14,7 @@ Feature: Test menu correctly highlights the custom dashboard menu
       | Dashboard 3 | 2         |
       | Dashboard 4 | 2         |
 
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
     And I set the following fields to these values:
       | Menu title               | My dashboards |

@@ -16,7 +16,7 @@ Feature: Certification editing tool history
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1       |
       | enableprograms                | Disable |
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Cert 1" "table_row"
     And I switch to "Assignments" tab

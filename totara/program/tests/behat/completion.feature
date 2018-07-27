@@ -31,7 +31,7 @@ Feature: Users completion of programs and coursesets
     And I set self completion for "Course 2" in the "Miscellaneous" category
     And I set self completion for "Course 3" in the "Miscellaneous" category
     # Get back the removed dashboard item for now.
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"
@@ -44,7 +44,7 @@ Feature: Users completion of programs and coursesets
   @javascript
   Scenario: Test program completion with courseset "AND"
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -103,7 +103,7 @@ Feature: Users completion of programs and coursesets
   @javascript
   Scenario: Test program completion with courseset "OR"
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -175,7 +175,7 @@ Feature: Users completion of programs and coursesets
   @javascript
   Scenario: Test program completion with courseset "XofY"
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -222,7 +222,7 @@ Feature: Users completion of programs and coursesets
   @javascript
   Scenario: Test program completion with courseset "optional"
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -261,7 +261,7 @@ Feature: Users completion of programs and coursesets
   @javascript
   Scenario: Test program completion with complex courseset containing "optional"
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -381,7 +381,7 @@ Feature: Users completion of programs and coursesets
   @javascript
   Scenario: Test program completion with courseset "some 0"
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -421,7 +421,7 @@ Feature: Users completion of programs and coursesets
   @javascript
   Scenario: Test program completion with complex courseset containing "some 0"
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -535,7 +535,7 @@ Feature: Users completion of programs and coursesets
     And I set the field "testcustomscore" to "10"
     And I press "Save and display"
 
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Completion Program Tests" "link"
     And I click on "Edit program details" "button"

@@ -37,7 +37,8 @@ Feature: Single hierarchy report filter
     And I set the field "newparent" to "Organisation 1z"
     And I click on "Move" "button"
     And I click on "Continue" "button"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | User report |
       | Source      | User        |

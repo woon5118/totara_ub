@@ -26,7 +26,7 @@ Feature: Teachers can edit or delete any forum post
       | Message | Teacher post message |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I reply "Teacher post subject" post from "Test forum name" forum with:
       | Subject | Student post subject |
       | Message | Student post message |

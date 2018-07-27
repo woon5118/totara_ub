@@ -55,7 +55,7 @@ Feature: Users assignments to a program
       | Category Permission Test | cattest      | cat1       |
     # Get back the removed dashboard item for now.
     And I log in as "admin"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"
@@ -64,7 +64,7 @@ Feature: Users assignments to a program
   @javascript
   Scenario: Test program assignments via individual assigments
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -103,7 +103,7 @@ Feature: Users assignments to a program
     And I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -114,7 +114,7 @@ Feature: Users assignments to a program
   @javascript
   Scenario: Test program assignments and updates via audience assigments
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -153,7 +153,7 @@ Feature: Users assignments to a program
     And the following "cohort members" exist:
       | user    | cohort |
       | user004 | aud1   |
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I click on "Audience1" "link"
     And I click on "Edit members" "link"
     And I click on "fn_002 ln_002 (user002@example.com)" "option" in the "#removeselect" "css_element"
@@ -181,7 +181,7 @@ Feature: Users assignments to a program
     And I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -192,7 +192,7 @@ Feature: Users assignments to a program
   @javascript
   Scenario: Test program assignments and updates via position assigments
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -254,7 +254,7 @@ Feature: Users assignments to a program
     And I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -265,7 +265,7 @@ Feature: Users assignments to a program
   @javascript
   Scenario: Test program assignments and updates via organisation assigments
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -327,7 +327,7 @@ Feature: Users assignments to a program
     And I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -338,7 +338,7 @@ Feature: Users assignments to a program
   @javascript
   Scenario: Test program assignments and updates via manager path assigments
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -403,7 +403,7 @@ Feature: Users assignments to a program
     And I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Assignment Program Tests" "link"
     And I click on "Edit program details" "button"

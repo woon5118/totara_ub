@@ -101,7 +101,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Save changes"
 
     # Create the certification and add the course.
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I press "Add new certification"
     And I press "Save changes"
     And I switch to "Certification" tab
@@ -284,7 +284,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Verify course completed with newer session date.
     And I log out
     And I log in as "user1"
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "More details" "link"
     And I should see date "-10 day" formatted "%d %B %Y"
 
@@ -308,7 +308,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Verify course still completed with newer session date.
     And I log out
     And I log in as "user1"
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "More details" "link"
     And I should see date "-10 day" formatted "%d %B %Y"
 
@@ -326,7 +326,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # The session should then be completed with the newer date.
     And I log out
     And I log in as "user1"
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "More details" "link"
     Then I should see "Not completed"
     When I run the "\core\task\completion_regular_task" task
@@ -353,7 +353,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Verify course completed with older session date.
     And I log out
     And I log in as "user1"
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "More details" "link"
     And I should see date "-40 day" formatted "%d %B %Y"
 
@@ -377,7 +377,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Verify course still completed with older session date.
     And I log out
     And I log in as "user1"
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "More details" "link"
     And I should see date "-40 day" formatted "%d %B %Y"
 
@@ -395,7 +395,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # The session should then be completed with the newer date.
     And I log out
     And I log in as "user1"
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "More details" "link"
     Then I should see "Not completed"
     When I run the "\core\task\completion_regular_task" task

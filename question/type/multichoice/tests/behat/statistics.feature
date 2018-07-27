@@ -25,7 +25,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
 
   Scenario: Test the statistics results displays correctly when an attempted single answer quiz answer has been deleted.
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test quiz 1" "link"
     And I click on "Edit quiz" "button"
     And I click on "Add" "link"
@@ -53,7 +53,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
 
     # As the learner complete the quiz with the the correct answer.
     When I log in as "user1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test quiz 1" "link"
     And I click on "Attempt quiz now" "button"
     And I set the field "q1:1_answer2" to "1"
@@ -65,7 +65,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
 
     # Now as the teacher, delete the last answer, C.
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test quiz 1" "link"
     And I navigate to "Edit quiz" node in "Quiz administration"
     And I click on "Question 1" "link"
@@ -81,7 +81,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
 
   Scenario: Test the statistics results displays correctly when an attempted multiple answer quiz answer has been deleted.
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test quiz 1" "link"
     And I click on "Edit quiz" "button"
     And I click on "Add" "link"
@@ -112,7 +112,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
 
     # As the learner complete the quiz with the the correct answer.
     When I log in as "user1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test quiz 1" "link"
     And I click on "Attempt quiz now" "button"
     And I set the field "q1:1_choice2" to "1"
@@ -125,7 +125,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
 
     # Now as the teacher, delete the last answer, C.
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test quiz 1" "link"
     And I navigate to "Edit quiz" node in "Quiz administration"
     And I click on "Question 1" "link"

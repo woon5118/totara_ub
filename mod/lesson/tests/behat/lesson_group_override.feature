@@ -109,7 +109,7 @@ Feature: Lesson group override
     And I should see "Re-takes allowed"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
@@ -122,7 +122,7 @@ Feature: Lesson group override
     And I should see "Cat is an amphibian"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
@@ -149,7 +149,7 @@ Feature: Lesson group override
     And I should see "Password protected lesson"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     Then I should see "Test lesson name is a password protected lesson"
     And I should not see "Cat is an amphibian"
@@ -167,7 +167,7 @@ Feature: Lesson group override
     And I should see "Congratulations - end of lesson reached"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Test lesson name is a password protected lesson"
     And I should not see "Cat is an amphibian"
@@ -203,13 +203,13 @@ Feature: Lesson group override
     And I should see "Lesson closes"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     Then I should see "This lesson closed on Saturday, 1 January 2000, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I should see "Cat is an amphibian"
 
@@ -238,13 +238,13 @@ Feature: Lesson group override
     And I should see "Lesson opens"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     Then  I should see "This lesson will be open on Wednesday, 1 January 2020, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I should see "Cat is an amphibian"
 
@@ -263,7 +263,7 @@ Feature: Lesson group override
     And I should see "Maximum number of attempts"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
@@ -278,7 +278,7 @@ Feature: Lesson group override
     And I should see "Congratulations - end of lesson reached"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
@@ -327,16 +327,16 @@ Feature: Lesson group override
     And I should see "Friday, 1 January 2021, 8:00"
     And I log out
     Then I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I should see "This lesson will be open on Friday, 1 January 2021, 8:00"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
     And I log out
     And I log in as "student3"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I should see "This lesson will be open on Wednesday, 1 January 2020, 8:00"

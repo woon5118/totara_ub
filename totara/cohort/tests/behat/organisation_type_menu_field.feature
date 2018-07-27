@@ -43,7 +43,7 @@ Feature: Test audience with organisation type menu field.
   @javascript
   Scenario: Test organisation with custom menu field and dynamic audience with equals rule.
     Given I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dyn1"
     And I switch to "Rule sets" tab
     Then I set the field "addrulesetmenu" to "Organisation type menu"
@@ -60,7 +60,7 @@ Feature: Test audience with organisation type menu field.
   @javascript
   Scenario: Test organisation with custom menu field and dynamic audience with not equals rule.
     Given I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dyn1"
     And I switch to "Rule sets" tab
     Then I set the field "addrulesetmenu" to "Organisation type menu"

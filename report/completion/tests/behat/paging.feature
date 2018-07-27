@@ -77,8 +77,7 @@ Feature: Paging on course completion report
       | student29 | C1     | student |
       | student30 | C1     | student |
     And I log in as "admin"
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I click on "criteria_activity_value[1]" "checkbox"

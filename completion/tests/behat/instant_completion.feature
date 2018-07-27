@@ -28,7 +28,7 @@ Feature: Instant completion
       | Enable restricted access   | 1 |
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And completion tracking is "Enabled" in current course
     And I turn editing mode on
     And I add the "Course completion status" block

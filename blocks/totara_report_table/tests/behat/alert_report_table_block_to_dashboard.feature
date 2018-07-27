@@ -60,7 +60,7 @@ Feature: Only Alerts Report table block on dashboard
     Then I should see "Sam1 Student1"
 
     # Set up the dashboard.
-    And I navigate to "Dashboards" node in "Site administration > Appearance"
+    And I navigate to "Dashboards" node in "Site administration > Navigation"
     And I press "Create dashboard"
     And I set the field "Name" to "My Dashboard"
     And I click on "Available only to the following audiences" "radio"
@@ -72,7 +72,7 @@ Feature: Only Alerts Report table block on dashboard
     And I click on "moveup" "link"
 
     # Create an audience that we can allocate to the dashboard.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I follow "Edit members"
     And I set the field "Potential users" to "Admin User (moodle@example.com)"

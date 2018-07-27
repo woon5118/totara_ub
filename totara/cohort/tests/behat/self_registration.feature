@@ -59,7 +59,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
       | Organisation - org2 | A8       | 2          |
     And I log in as "admin"
     # Set rules for the A1(Username - manual) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Username - manual"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Username"
@@ -73,7 +73,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "fname002 lname002" in the "#cohort_members" "css_element"
     And I should see "fname003 lname003" in the "#cohort_members" "css_element"
     # Set rules for the A2(Username - selfie) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Username - selfie"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Username"
@@ -84,7 +84,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I switch to "Members" tab
     Then I should see "There are no records in this report" in the "#region-main" "css_element"
     # Set rules for the A3(City - Wellington) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "City - Wellington"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "City"
@@ -96,7 +96,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "fname002 lname002" in the "#cohort_members" "css_element"
     And I should see "fname003 lname003" in the "#cohort_members" "css_element"
     # Set rules for the A4(City - Wellywood) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "City - Wellywood"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "City"
@@ -106,7 +106,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I switch to "Members" tab
     Then I should see "There are no records in this report" in the "#region-main" "css_element"
     # Set rules for the A5(Country - NZ) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Country - NZ"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Country"
@@ -118,7 +118,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "fname002 lname002" in the "#cohort_members" "css_element"
     And I should see "fname003 lname003" in the "#cohort_members" "css_element"
     # Set rules for the A6(Manager - man) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Manager - man"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Managers"
@@ -130,7 +130,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "fname002 lname002" in the "#cohort_members" "css_element"
     And I should see "fname003 lname003" in the "#cohort_members" "css_element"
     # Set rules for the A7(Position - pos2) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Position - pos2"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Positions"
@@ -140,7 +140,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I switch to "Members" tab
     Then I should see "There are no records in this report" in the "#region-main" "css_element"
     # Set rules for the A8(organisation - org2) audience.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Organisation - org2"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Organisations"
@@ -209,88 +209,88 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "An email should have been sent to your address at selfie002@example.com"
     # Check audience membership pre-confirmation.
     When I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Username - manual"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Username - selfie"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "City - Wellington"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "City - Wellywood"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Country - NZ"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Manager - man"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Position - pos2"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Organisation - org2"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
 
     # Check audience membership post-confirmation.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Username - manual"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Username - selfie"
     And I switch to "Members" tab
     Then I should see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "City - Wellington"
     And I switch to "Members" tab
     Then I should not see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "City - Wellywood"
     And I switch to "Members" tab
     Then I should see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Country - NZ"
     And I switch to "Members" tab
     Then I should see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Manager - man"
     And I switch to "Members" tab
     Then I should see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Position - pos2"
     And I switch to "Members" tab
     Then I should see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Organisation - org2"
     And I switch to "Members" tab
     Then I should see "Selfie ZeroZeroOne" in the "#region-main" "css_element"
@@ -390,11 +390,11 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
 
     # Confirm user 1 but not user 2.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
 
     # Check course enrolments for user 1 (but not user 2) as admin
     And I am on "Course 1" course homepage
@@ -435,7 +435,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     When I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program 1" "link"
     And I click on "Edit program details" "button"
@@ -451,7 +451,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "Program assignments saved successfully"
     And I should see "4 learner(s) assigned: 4 active, 0 exception(s)"
 
-    When I navigate to "Manage programs" node in "Site administration > Courses"
+    When I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program 2" "link"
     And I click on "Edit program details" "button"
@@ -466,7 +466,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "Program assignments saved successfully"
     And I should see "0 learner(s) assigned: 0 active, 0 exception(s)"
 
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program 3" "link"
     And I click on "Edit program details" "button"
@@ -539,18 +539,18 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "An email should have been sent to your address at selfie002@example.com"
     # Log in as admin and double check they aren't currently in any programs.
     When I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program 3" "link"
     And I click on "Edit program details" "button"
     And I click on "Completion" "link"
     Then I should not see "Selfie"
     # Confirm user 1 but not user 2.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program 3" "link"
     And I click on "Edit program details" "button"
@@ -574,7 +574,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     When I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification 1" "link"
     And I click on "Edit certification details" "button"
@@ -590,7 +590,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "Program assignments saved successfully"
     And I should see "4 learner(s) assigned: 4 active, 0 exception(s)"
 
-    When I navigate to "Manage certifications" node in "Site administration > Courses"
+    When I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification 2" "link"
     And I click on "Edit certification details" "button"
@@ -605,7 +605,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "Program assignments saved successfully"
     And I should see "0 learner(s) assigned: 0 active, 0 exception(s)"
 
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification 3" "link"
     And I click on "Edit certification details" "button"
@@ -678,18 +678,18 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "An email should have been sent to your address at selfie002@example.com"
     # Log in as admin and double check they aren't currently in any programs.
     When I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification 3" "link"
     And I click on "Edit certification details" "button"
     And I click on "Completion" "link"
     Then I should not see "Selfie"
     # Confirm user 1 but not user 2.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification 3" "link"
     And I click on "Edit certification details" "button"

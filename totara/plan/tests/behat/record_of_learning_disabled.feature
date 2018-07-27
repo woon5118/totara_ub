@@ -8,7 +8,7 @@ Feature: Check Record of Learning feature visibility
     Given I am on a totara site
     And I log in as "admin"
 
-    When I navigate to "Top navigation" node in "Site administration > Appearance"
+    When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Record of Learning" in the "#totaramenutable" "css_element"
     And I should see "Record of Learning" in the totara menu
 
@@ -19,7 +19,7 @@ Feature: Check Record of Learning feature visibility
     And I set the field "Enable Record of Learning" to "Disable"
     And I press "Save changes"
 
-    When I navigate to "Top navigation" node in "Site administration > Appearance"
+    When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Record of Learning" in the "#totaramenutable" "css_element"
     And I should see "Feature disabled" in the "Record of Learning" "table_row"
     And I should not see "Record of Learning" in the totara menu

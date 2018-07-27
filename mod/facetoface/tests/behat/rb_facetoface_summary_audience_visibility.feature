@@ -31,7 +31,8 @@ Feature: Test the visibility to see the seminar summary report depending on the 
     And I follow "Add a new event"
     And I press "Save changes"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "Seminar Sessions"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"

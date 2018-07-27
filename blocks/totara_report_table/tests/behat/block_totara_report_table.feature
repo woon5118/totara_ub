@@ -20,7 +20,8 @@ Feature: Report builder table block
       | learner8    | Learner   | 8        |
       | learner9    | Learner   | 9        |
     And I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | User report |
       | Source      | User        |
@@ -197,7 +198,7 @@ Feature: Report builder table block
     And I log out
     # Remove access to report
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I click on "Settings" "link" in the "User report" "table_row"
     When I switch to "Access" tab
     And I click on "Only certain users can view this report (see below)" "radio"
@@ -266,7 +267,7 @@ Feature: Report builder table block
       | Report                       | User report            |
     And I press "Save changes"
     # Remove report
-    And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I click on "Delete" "link" in the "User report" "table_row"
     And I press "Delete"
     # Confirm that report is not shown, but page still works fine

@@ -14,7 +14,7 @@ Feature: Upload users
       | Section 1 | math102 | S1 |
       | Section 3 | math102 | S3 |
     And I log in as "admin"
-    And I navigate to "Upload users" node in "Site administration > Users > Accounts"
+    And I navigate to "Upload users" node in "Site administration > Users"
     When I upload "lib/tests/fixtures/upload_users.csv" file to "File" filemanager
     And I press "Upload users"
     Then I should see "Upload users preview"
@@ -29,7 +29,7 @@ Feature: Upload users
     And I should see "Section 1"
     And I press "Upload users"
     And I press "Continue"
-    And I navigate to "Users > Accounts > Browse list of users" in site administration
+    And I navigate to "Users > Browse list of users" in site administration
     And I should see "Tom Jones"
     And I should see "Trent Reznor"
     And I should see "reznor@example.com"
@@ -48,7 +48,7 @@ Feature: Upload users
       | Section 1 | math102 | S1 |
       | Section 3 | math102 | S3 |
     And I log in as "admin"
-    And I navigate to "Upload users" node in "Site administration > Users > Accounts"
+    And I navigate to "Upload users" node in "Site administration > Users"
     When I upload "lib/tests/fixtures/upload_users.csv" file to "File" filemanager
     And I press "Upload users"
     And I set the following fields to these values:
@@ -56,7 +56,7 @@ Feature: Upload users
       | Department | Purchasing |
     And I press "Upload users"
     And I press "Continue"
-    And I navigate to "Users > Accounts > Browse list of users" in site administration
+    And I navigate to "Users > Browse list of users" in site administration
     And I should see "Tom Jones"
     And I follow "Tom Jones"
     And I follow "Edit profile"
@@ -67,7 +67,7 @@ Feature: Upload users
   Scenario: Upload users with custom profile fields
     # Create user profile field.
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the field "datatype" to "Text area"
     And I set the following fields to these values:
       | Short name | superfield  |
@@ -85,12 +85,12 @@ Feature: Upload users
       """
     And I click on "Save changes" "button"
     # Upload users.
-    When I navigate to "Upload users" node in "Site administration > Users > Accounts"
+    When I navigate to "Upload users" node in "Site administration > Users"
     And I upload "lib/tests/fixtures/upload_users_profile.csv" file to "File" filemanager
     And I press "Upload users"
     And I press "Upload users"
     # Check that users were created and the superfield is filled.
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Tom Jones"
     And I should see "Super field"
     And I should see "The big guy"

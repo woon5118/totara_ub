@@ -57,7 +57,7 @@ Feature: In a lesson activity, students can review the answers they gave to ques
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "You have answered 0 correctly out of 0 attempts."
     And I set the following fields to these values:

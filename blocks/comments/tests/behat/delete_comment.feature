@@ -23,11 +23,11 @@ Feature: Delete comment block messages
 
   Scenario: Delete comments with Javascript enabled
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add "Comment from student1" comment to comments block
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add "Comment from teacher1" comment to comments block
     When I delete "Comment from student1" comment from comments block
     Then I should not see "Comment from student1"
@@ -36,7 +36,7 @@ Feature: Delete comment block messages
 
   Scenario: Delete comments on the second page
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Super test comment 01" comment to comments block
     And I add "Super test comment 02" comment to comments block
     And I add "Super test comment 03" comment to comments block

@@ -77,7 +77,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
 
   Scenario: Enrol using seminar direct where position asked for but not required
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
       | Automatically sign users up to seminar events | 0                      |

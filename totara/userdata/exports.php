@@ -34,7 +34,7 @@ admin_externalpage_setup('userdataexports');
 
 $report = reportbuilder_get_embedded_report('userdata_exports', array(), false, $sid);
 
-$PAGE->set_button($report->edit_button());
+$PAGE->set_button($report->edit_button() . $PAGE->button);
 
 /** @var totara_reportbuilder_renderer|core_renderer $output */
 $output = $PAGE->get_renderer('totara_reportbuilder');

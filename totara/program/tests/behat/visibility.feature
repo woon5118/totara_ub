@@ -57,7 +57,7 @@ Feature: Users visibility of programs can be toggled
   @javascript
   Scenario Outline: A user can't view programs on the catalog with old visibility (hide).
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -122,7 +122,7 @@ Feature: Users visibility of programs can be toggled
     And I set the following administration settings values:
       | Enable audience-based visibility | 1              |
       | Catalogue type                   | <Catalog type> |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -158,7 +158,7 @@ Feature: Users visibility of programs can be toggled
       | Enable audience-based visibility | 1              |
       | Catalogue type                   | <Catalog type> |
     And I press "Save changes"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -194,7 +194,7 @@ Feature: Users visibility of programs can be toggled
       | Enable audience-based visibility | 1              |
       | Catalogue type                   | <Catalog type> |
     And I press "Save changes"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Program Tests" "link"
     And I click on "Edit program details" "button"

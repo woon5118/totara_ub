@@ -43,7 +43,7 @@ Feature: Backup user data
       | Feedback for the response 'False'. | So you think it is false                |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
     And I click on "True" "radio" in the "First question" "question"
@@ -62,7 +62,7 @@ Feature: Backup user data
     And I click on "Restore" "link" in the "region-main" "region"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "User report" in the course gradebook
     Then "QuizQuiz 1" row "Grade" column of "user-grade" table should contain "5"
     And "QuizQuiz 1" row "Percentage" column of "user-grade" table should contain "50"

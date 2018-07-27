@@ -11,7 +11,7 @@ Feature: Test Programs menu item
       | Catalogue type     | enhanced |
 
   Scenario: Make sure Programs is available in totara menu
-    When I navigate to "Top navigation" node in "Site administration > Appearance"
+    When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Programs" in the "#totaramenutable" "css_element"
     And I should see "Programs" in the totara menu
 
@@ -19,7 +19,7 @@ Feature: Test Programs menu item
     When I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable Programs" to "Disable"
     And I press "Save changes"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Programs" in the "#totaramenutable" "css_element"
     And I should see "Feature disabled" in the "Programs" "table_row"
     And I should not see "Programs" in the totara menu

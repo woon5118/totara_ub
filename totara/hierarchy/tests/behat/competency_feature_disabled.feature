@@ -24,7 +24,7 @@ Feature: The competencies can be disabled
     # Add a competency and a course to the plan.
     And I log in as "admin"
     And I click on "Dashboard" in the totara menu
-    And I click on "Learning Plans" "link"
+    And I click on "Learning Plans" "link" in the "My Learning" "block"
     And I click on "Learning Plan 1" "link"
     And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     And I press "Add competencies"
@@ -49,11 +49,11 @@ Feature: The competencies can be disabled
 
     # Check competency component is displayed in learning plans.
     And I click on "Dashboard" in the totara menu
-    And I click on "Learning Plans" "link"
+    And I click on "Learning Plans" "link" in the "My Learning" "block"
     Then I should see "Competencies"
     And I click on "Learning Plan 1" "link"
     Then I should see "Competencies"
-    And I click on "Competencies" "link"
+    And I switch to "Competencies" tab
     Then I should see "Competency 1"
     And I should see "Add competencies"
 
@@ -82,7 +82,7 @@ Feature: The competencies can be disabled
 
     # Check competency component is not displayed in learning plans.
     And I click on "Dashboard" in the totara menu
-    And I click on "Learning Plans" "link"
+    And I click on "Learning Plans" "link" in the "My Learning" "block"
     Then I should not see "Competencies"
     And I click on "Learning Plan 1" "link"
     Then I should not see "Competencies"

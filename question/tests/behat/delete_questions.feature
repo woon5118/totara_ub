@@ -21,7 +21,7 @@ Feature: A teacher can delete questions in the question bank
       | questioncategory | qtype | name                        | questiontext                  |
       | Test questions   | essay | Test question to be deleted | Write about whatever you want |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Questions" node in "Course administration > Question bank"
 
   @javascript

@@ -26,7 +26,7 @@ Feature: Multiple option choice response
       | option[1] | Option 2 |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I choose options "Option 1","Option 2" from "Choice name" choice activity
     Then I should see "Your selection: Option 1; Option 2"
     And I should see "Your choice has been saved"
@@ -60,13 +60,13 @@ Feature: Multiple option choice response
       | limit[2] | 1 |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I choose options "Option 1","Option 2" from "Choice name" choice activity
     Then I should see "Your selection: Option 1; Option 2"
     And I should see "Your choice has been saved"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Choice name"
     And I should see "Option 1 (Full)"
     And I should see "Option 2 (Full)"

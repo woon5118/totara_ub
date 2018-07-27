@@ -20,7 +20,7 @@ Feature: Assign visible learning to cohort
 
   @javascript
   Scenario: Assign courses as visible learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Visible learning"
     And I press "Add courses"
@@ -32,7 +32,7 @@ Feature: Assign visible learning to cohort
 
   @javascript
   Scenario: Search for courses to assign to cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Visible learning"
     And I press "Add courses"
@@ -45,8 +45,7 @@ Feature: Assign visible learning to cohort
 
   @javascript
   Scenario: Edit course visibility for a particular course
-    Given I am on homepage
-    And I am on "Course 1" course homepage
+    Given I am on "Course 1" course homepage
     And I follow "Edit settings"
     And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
     And I click on "Add visible audiences" "button"

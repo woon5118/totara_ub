@@ -218,7 +218,7 @@ Feature: Verify CSV notifications are displayed correctly.
 
   Scenario: Verify User CSV notifications.
 
-    Given I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    Given I navigate to "User profile fields" node in "Site administration > Users"
     And I set the field "Create a new profile field" to "Text input"
     And I should see "Creating a new 'Text input' profile field"
     And I set the following fields to these values:

@@ -39,7 +39,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     When I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     Then I should see "I have completed this activity"
 
@@ -47,7 +47,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
     And I am on homepage
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has completed "Multi-sco SCORM package" activity
 
 
@@ -66,7 +66,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     When I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     Then I should not see "I have completed this activity"
 
@@ -79,7 +79,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has completed "Multi-sco SCORM package" activity
 
 
@@ -105,7 +105,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     Given I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -201,7 +201,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
     And I log out
 
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has not completed "Multi-sco SCORM package" activity
 
 
@@ -238,7 +238,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     When I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -250,7 +250,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
     And I log out
 
     Given  I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has completed "Multi-sco SCORM package" activity
 
 
@@ -282,7 +282,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     Given I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -377,7 +377,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
     And I log out
 
     Given  I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has not completed "Multi-sco SCORM package" activity
 
 
@@ -424,7 +424,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     When I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -436,7 +436,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
     And I log out
 
     Given  I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has not completed "Multi-sco SCORM package" activity
 
 
@@ -457,7 +457,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     Given I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -552,7 +552,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
     And I log out
 
     Given  I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has completed "Multi-sco SCORM package" activity
 
 
@@ -583,7 +583,7 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
 
     Given I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -678,5 +678,5 @@ Feature: Activity completion status of multisco SCORM with status but no raw sco
     And I log out
 
     Given  I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then "Student 1" user has not completed "Multi-sco SCORM package" activity

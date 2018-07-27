@@ -38,7 +38,7 @@ Feature: A teacher checks the grade history report in a course
     And I press "Save changes"
     And I log out
     And I log in as "teacher2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "70.00" to the user "Student 1" for the grade item "The greatest assignment ever"

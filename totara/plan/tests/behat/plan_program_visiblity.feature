@@ -36,7 +36,7 @@ Feature: See that audience based visibility doesn't effect a program showing in 
     When I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Test Program 1" "link"
     And I click on "Edit program details" "button"
@@ -44,9 +44,9 @@ Feature: See that audience based visibility doesn't effect a program showing in 
     And I set the following fields to these values:
       | Visibility | Enrolled users and members of the selected audiences |
     And I press "Save changes"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "Learner One" "link"
-    And I click on "Learning Plans" "link"
+    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I click on "Learning Plan 1" "link"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Add programs" "button"

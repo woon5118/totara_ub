@@ -32,7 +32,7 @@ Feature: Test scorm reports
 
   Scenario: Basic usage of all scorm reports
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Awesome SCORM package"
     And I press "Enter"
     And I wait "2" seconds
@@ -66,7 +66,7 @@ Feature: Test scorm reports
     And I log out
 
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Awesome SCORM package"
     And I press "Enter"
     And I wait "2" seconds
@@ -82,7 +82,7 @@ Feature: Test scorm reports
     And I log out
 
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Awesome SCORM package"
 
     When I follow "Reports"

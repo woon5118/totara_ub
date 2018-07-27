@@ -39,7 +39,7 @@ Feature: Test audience with organisation checkbox profile field.
   Scenario: Test organisation with checked checkbox and audience with checked checkox.
     Given I log in as "admin"
     # Navigate to Audiences.
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     # Add a rule set.
@@ -57,7 +57,7 @@ Feature: Test audience with organisation checkbox profile field.
   Scenario: Test organisation with checked checkbox and audience with unchecked checkox.
     Given I log in as "admin"
     # Navigate to Audiences.
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     # Add a rule set.
@@ -79,7 +79,7 @@ Feature: Test audience with organisation checkbox profile field.
     And I click on "Organisation type checkbox" "checkbox"
     Then I click on "Save changes" "button"
     # Navigate to Audiences.
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     # Add a rule set.
@@ -103,7 +103,7 @@ Feature: Test audience with organisation checkbox profile field.
     And I click on "Organisation type checkbox" "checkbox"
     Then I click on "Save changes" "button"
     # Navigate to Audiences.
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     # Add a rule set.

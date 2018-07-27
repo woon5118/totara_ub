@@ -14,7 +14,8 @@ Feature: Verify functionality of user source report.
       | learner4 | Bob4      | Learner4 | bob4.learner4@example.com | 2           |
 
     When I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | User Report |
       | Source      | User        |
@@ -96,7 +97,7 @@ Feature: Verify functionality of user source report.
     Then I should see "An email should have been sent to your address at bob5.learner5@example.com"
 
     When I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I click on "View" "link" in the "User Report" "table_row"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email     | User Status |
@@ -135,7 +136,7 @@ Feature: Verify functionality of user source report.
     Then I should see "Invalid login, please try again"
 
     When I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I click on "View" "link" in the "User Report" "table_row"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
@@ -206,7 +207,7 @@ Feature: Verify functionality of user source report.
       | enableglobalrestrictions | 1 |
 
     When I click on "Home" in the totara menu
-    And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
+    And I navigate to "Global report restrictions" node in "Site administration > Reports"
     And I press "New restriction"
     And I set the following fields to these values:
       | Name   | User Report Restriction |
@@ -258,7 +259,8 @@ Feature: Verify functionality of user source report.
   Scenario: Verify reports extending from the user source class do not support the action column in user source report.
 
     When I click on "Home" in the totara menu
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Audiences Orphaned Users Report |
       | Source      | Audiences Orphaned Users        |

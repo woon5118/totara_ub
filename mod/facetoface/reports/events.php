@@ -44,7 +44,7 @@ if ($format != '') {
     die;
 }
 
-$PAGE->set_button($report->edit_button());
+$PAGE->set_button($report->edit_button() . $PAGE->button);
 
 /** @var totara_reportbuilder_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_reportbuilder');

@@ -422,7 +422,7 @@ class block_manager {
         }
 
         if ($requiredbythemeblocks === false) {
-            return array('navigation', 'settings');
+            return array('settings');
         } else if ($requiredbythemeblocks === '') {
             return array();
         } else if (is_string($requiredbythemeblocks)) {
@@ -712,8 +712,17 @@ class block_manager {
             list($testsql, $requiredbythemeparams) = $DB->get_in_or_equal($requiredbytheme, SQL_PARAMS_NAMED, 'requiredbytheme');
             list($testnotsql, $requiredbythemenotparams) = $DB->get_in_or_equal($requiredbytheme, SQL_PARAMS_NAMED,
                                                                                 'notrequiredbytheme', false);
-            $requiredbythemecheck = 'AND ((bi.blockname ' . $testsql . ' AND bi.requiredbytheme = 1) OR ' .
-                                ' (bi.blockname ' . $testnotsql . ' AND bi.requiredbytheme = 0))';
+            // Totara - block might be already present but not marked as required by theme in database.
+            $requiredblocks = $DB->get_records_select('block_instances', 'blockname ' . $testsql . ' AND requiredbytheme = 1', $requiredbythemeparams, 'id');
+            if (empty($requiredblocks)) {
+                // If the block is not there, check the blocks of the same type that might be not marked as required by theme.
+                $requiredbythemecheck = 'AND ((bi.blockname ' . $testsql . ' AND (bi.requiredbytheme = 1 OR bi.requiredbytheme = 0)) OR ' .
+                    ' (bi.blockname ' . $testnotsql . ' AND bi.requiredbytheme = 0))';
+            } else {
+                // If the block is already there, proceed as before.
+                $requiredbythemecheck = 'AND ((bi.blockname ' . $testsql . ' AND bi.requiredbytheme = 1) OR ' .
+                    ' (bi.blockname ' . $testnotsql . ' AND bi.requiredbytheme = 0))';
+            }
         } else {
             $requiredbythemecheck = 'AND (bi.requiredbytheme = 0)';
         }
@@ -2636,13 +2645,16 @@ function blocks_add_default_course_blocks($course) {
 
     }
 
+    // Totara: we want to add our course navigation to all new courses
+    // and propagate it into all course pages like site navigation used to.
+    $page = new moodle_page();
+    $page->set_course($course);
     if ($course->id == SITEID) {
         $pagetypepattern = 'site-index';
     } else {
         $pagetypepattern = 'course-view-*';
+        $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('course_navigation')), 'course-*', null, true);
     }
-    $page = new moodle_page();
-    $page->set_course($course);
     $page->blocks->add_blocks($blocknames, $pagetypepattern);
 }
 
@@ -2654,9 +2666,9 @@ function blocks_add_default_system_blocks() {
 
     $page = new moodle_page();
     $page->set_context(context_system::instance());
-    $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('navigation', 'settings')), '*', null, true); // Totara: we do want these!
-    $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('admin_bookmarks')), 'admin-*', null, null, 2);
-    $page->blocks->add_blocks(array(BLOCK_POS_RIGHT => array('totara_community')), 'site-index', null, null, 10);
+    $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('settings')), '*', null, true); // Totara: we do want these!
+    // Totara: removed 'admin_bookmarks' block.
+    $page->blocks->add_blocks(array(BLOCK_POS_RIGHT => array('totara_community')), 'site-index', null, null, 10); // Totara: add totara_community block to the frontpage.
 
     if ($defaultmypage = $DB->get_record('my_pages', array('userid' => null, 'name' => '__default', 'private' => 1))) {
         $subpagepattern = $defaultmypage->id;

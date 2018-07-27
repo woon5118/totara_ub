@@ -48,7 +48,7 @@ Feature: Behat generators for hierarchies work
     Then I should see "Organisation One"
     And I should see "Organisation Two"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
     And I click on "jobassignment1" "link"
     Then I should see "Position One" in the "#region-main" "css_element"
@@ -107,7 +107,7 @@ Feature: Behat generators for hierarchies work
     Then I should see "Organisation One"
     And I should see "Organisation Two"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -123,14 +123,14 @@ Feature: Behat generators for hierarchies work
     And I click on "Admin User (moodle@example.com) - create empty job assignment" "link" in the "Choose manager" "totaradialogue"
     And I click on "OK" "button" in the "manager" "totaradialogue"
     And I press "Add job assignment"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
     And I click on "jobassignment1" "link"
     Then I should see "Position One" in the "#region-main" "css_element"
     And I should see "Organisation One" in the "#region-main" "css_element"
     And I should see "Admin User (moodle@example.com) - Unnamed job assignment (ID: 1)" in the "#region-main" "css_element"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "fn_002 ln_002" "link"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -147,7 +147,7 @@ Feature: Behat generators for hierarchies work
     And I click on "jobassignment1" "link" in the "Choose manager" "totaradialogue"
     And I click on "OK" "button" in the "manager" "totaradialogue"
     And I press "Add job assignment"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "fn_002 ln_002" "link"
     And I click on "jobassignment2" "link"
     Then I should see "Position Two" in the "#region-main" "css_element"

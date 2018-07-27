@@ -518,6 +518,13 @@ $CFG->directorypermissions = 02777;
 // To ensure they are never used even when available:
 //      $CFG->svgicons = false;
 //
+// As of version 12, Totara introduces a new site administration menu available in the
+// site's top navigation.
+// For those wanting to continue displaying legacy site administration menu in the
+// 'Administration' block the following setting can be defined in your config.php.
+//
+//      $CFG->legacyadminsettingsmenu = true;
+//
 // Some administration options allow setting the path to executable files. This can
 // potentially cause a security risk. Set this option to true to disable editing
 // those config settings via the web. They will need to be set explicitly in the
@@ -766,6 +773,35 @@ $CFG->directorypermissions = 02777;
 //
 // Example:
 //   $CFG->showflavours = 'flavourname,enterprise';
+//
+//=========================================================================
+// 8c. Totara quickaccess menu
+//=========================================================================
+// Totara quick access menu allows admin users customise their administration
+// navigation based on their personal preferences.
+//
+// The $CFG->defaultquickaccessmenu variable defines the DEFAULT state of the
+// quick access administration navigation. Every node defined here still goes
+// through the access check and will be filtered out of the menu if the current
+// user does not have permissions to access it.
+//
+// Key in every item should correspond to the real key (name) of the node in the
+// administration navigation tree. Administration categories cannot be used as
+// item keys and will be ignored.
+//
+// Example:
+// $CFG->defaultquickaccessmenu = [
+//    [
+//        'key'    => 'key1',
+//        'group'  => 'platform', // optional, defaults to 'learn'
+//                                // valid options: 'learn', 'platform', 'configuration'
+//        'label'  => 'sometext', // optional
+//        'weight' => 1000        // optional
+//    ],
+//    ['key' => 'key2', 'group' => 'platform', 'label' => 'sometext', 'weight' => 2000],
+//    ['key' => 'key3', 'group' => 'learn', 'label' => 'sometext', 'weight' => 3000],
+//    ...
+//    ];
 //
 //=========================================================================
 // 9. PHPUNIT SUPPORT

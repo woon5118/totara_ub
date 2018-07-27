@@ -13,6 +13,12 @@ This files describes API changes in /admin/*.
     "France" => ["paris" => "Paris", "marseille" => "Marseille"],
   ]
 * Template setting_courselist_frontpage.mustache has been deprecated
+* Admin settings categories have been restructured:
+** 'accounts' has been removed and split into 'users' and 'roles'
+** 'language' and 'location' categories have been merged into one 'localisation' category
+** 'frontpage' category has been replaced with 'navigationcat' which now contains setting for both
+   site front page and general site navigation
+** reportbuilder related pages have been extracted into their own 'reportsmain' category
 
 === 11 ===
 

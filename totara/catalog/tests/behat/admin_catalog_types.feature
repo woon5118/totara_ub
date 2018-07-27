@@ -41,7 +41,7 @@ Feature: Admin can set catalog type in Advanced features
     And I should see the "totara" catalog page
 
   Scenario Outline: Top navigation shows catalog sub-item when custom sub-items exist
-    When I navigate to "Top navigation" node in "Site administration > Appearance"
+    When I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | <Parent Item>   |

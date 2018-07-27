@@ -18,7 +18,7 @@ Feature: Adding a new seminar's notification
       | Name        | Seminar 1             |
       | Description | This is description   |
     And I follow "Seminar 1"
-    And I follow "Notifications"
+    And I click on "Notifications" "link" in the "Administration" "block"
     And I click on "Add" "button" in the "#region-main" "css_element"
     And I should not see "Date(s) and location(s):" in the "#id_body_editoreditable" "css_element"
     And I should not see "Below is the message that was sent to the learner:" in the "#id_managerprefix_editoreditable" "css_element"

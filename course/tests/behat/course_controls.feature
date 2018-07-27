@@ -21,7 +21,7 @@ Feature: Course activity controls works as expected
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I follow <targetpage>
     And I turn editing mode on
     And I open the action menu in "Recent activity" "block"

@@ -28,7 +28,7 @@ Feature: In an assignment, students can add and edit text online
       | assignsubmission_file_enabled | 0 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I press "Add submission"
     And I set the following fields to these values:
@@ -73,7 +73,7 @@ Feature: In an assignment, students can add and edit text online
       | assignsubmission_file_enabled | 0 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I press "Add submission"
     And I set the following fields to these values:

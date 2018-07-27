@@ -35,7 +35,7 @@ Feature: Assign reset
   Scenario: Use course reset to clear all attempt data
     When I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I press "Add submission"
     And I set the following fields to these values:
@@ -46,7 +46,7 @@ Feature: Assign reset
     And I should see "Not graded"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And I should see "Submitted for grading"

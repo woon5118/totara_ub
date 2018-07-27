@@ -115,7 +115,7 @@ Feature: Verify that all form fields values can be get and set
       | Wiki name | Test this one baby |
       | Default format | HTML |
     And I press "Cancel"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     # Radio - Checking "I set the field" and "the field matches value".
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name | Test choice name |
@@ -155,7 +155,7 @@ Feature: Verify that all form fields values can be get and set
     And the "members" select box should contain "Student 2"
     And the "members" select box should not contain "Student 3"
     # Checkbox (AJAX) - Checking "I set the field" and "I set the following fields to these values".
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
       | Name | Test lesson |

@@ -14,7 +14,7 @@ Feature: Filter users by idnumber
     And I log in as "admin"
     And I set the following administration settings values:
       | uselegacybrowselistofusersreport | 1 |
-    And I navigate to "Users > Accounts > Browse list of users" in site administration
+    And I navigate to "Users > Browse list of users" in site administration
 
   @javascript
   Scenario: Filtering id numbers - with case "is empty"

@@ -6,7 +6,7 @@ Feature: Create and edit user profile custom-fields.
 
   Scenario: Can create and edit text user profile fields
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the following fields to these values:
       | datatype | text |
     #redirect
@@ -25,7 +25,7 @@ Feature: Create and edit user profile custom-fields.
 
   Scenario: Can create and edit textarea user profile fields
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the following fields to these values:
       | datatype | textarea |
     #redirect
@@ -44,7 +44,7 @@ Feature: Create and edit user profile custom-fields.
 
   Scenario: Can create and edit checkbox user profile fields
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the following fields to these values:
       | datatype | checkbox |
     #redirect
@@ -63,7 +63,7 @@ Feature: Create and edit user profile custom-fields.
 
   Scenario: Can create and edit datetime user profile fields
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the following fields to these values:
       | datatype | datetime |
     #redirect
@@ -82,7 +82,7 @@ Feature: Create and edit user profile custom-fields.
 
   Scenario: Can create and edit dropdown menu profile fields
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the following fields to these values:
         | datatype | menu     |
     And I set the following fields to these values:

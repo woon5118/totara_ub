@@ -38,7 +38,7 @@ Feature: Check that the Grade display in the Set a quiz to be marked complete wh
   @javascript
   Scenario: Check grade in Record of Learning: Courses report source
     Given I log in as "admin"
-    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I click on "Settings" "link" in the "Record of Learning: Courses (View)" "table_row"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
     And I add the "Grade" column to the report
@@ -53,7 +53,7 @@ Feature: Check that the Grade display in the Set a quiz to be marked complete wh
     And I log out
 
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz name"
     And I press "Attempt quiz now"
     And I set the field "True" to "1"

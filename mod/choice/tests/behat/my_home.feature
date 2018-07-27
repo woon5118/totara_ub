@@ -53,7 +53,7 @@ Feature: Test the display of the choice module on Dashboard
 
   Scenario: View my home as a student after answering the choice
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I choose "Option 1" from "Test choice name" choice activity
     And I should see "Your selection: Option 1"
     And I should see "Your choice has been saved"
@@ -64,7 +64,7 @@ Feature: Test the display of the choice module on Dashboard
 
   Scenario: View my home as a teacher
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I choose "Option 1" from "Test choice name" choice activity
     And I should see "Your selection: Option 1"
     And I should see "Your choice has been saved"

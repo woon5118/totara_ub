@@ -29,7 +29,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     And I log out
     # Suspend user.
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "Suspend James Second" "link" in the "James Second" "table_row"
     And I log out
     # Check if the teacher can see the suspended users.
@@ -42,7 +42,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     And I log out
     # Disable 'moodle/course:viewsuspendedusers' capability for the teacher role.
     When I log in as "admin"
-    And I navigate to "Define roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Define roles" node in "Site administration > Permissions"
     And I follow "Editing Trainer"
     And I click on "Edit" "button"
     And I set the field "Filter" to "view sus"

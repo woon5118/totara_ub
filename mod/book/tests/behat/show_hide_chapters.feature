@@ -52,8 +52,7 @@ Feature: Book activity chapter visibility management
     When I follow "Hide chapter \"2. Second chapter\""
     And I follow "Hide chapter \"2. Third chapter\""
     And I turn editing mode off
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test book"
     Then I should not see "Second chapter" in the "Table of contents" "block"
     And I should not see "Third chapter" in the "Table of contents" "block"

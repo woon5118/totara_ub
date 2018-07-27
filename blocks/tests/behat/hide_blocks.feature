@@ -10,6 +10,7 @@ Feature: Block visibility
       | Course 1 | C1 | 0 |
     And I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
+    And I add the "Navigation" block if not present
 
   @javascript
   Scenario: Hiding all blocks on the page should remove the column they're in

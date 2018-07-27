@@ -47,7 +47,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign courses as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add courses"
@@ -69,7 +69,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign programs as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add programs"
@@ -93,7 +93,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign certifications as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add certifications"
@@ -117,7 +117,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Search for courses to assign to cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add courses"
@@ -146,7 +146,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Search for programs to assign to cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add programs"
@@ -176,7 +176,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Search for certifications to assign to cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add certifications"
@@ -206,7 +206,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign multiple courses as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add courses"
@@ -234,7 +234,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign multiple programs as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add programs"
@@ -264,7 +264,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign multiple certifications as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add certifications"
@@ -294,7 +294,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign courses and remove courses as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add courses"
@@ -338,7 +338,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign programs and remove programs as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add programs"
@@ -385,7 +385,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign certifications and remove certifications as enrolled learning to a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add certifications"
@@ -432,7 +432,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Assign all types of enrolled learning and remove enrolled learning from a cohort
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     When I follow "Enrolled learning"
     Then the following should not exist in the "cohort_associations_enrolled" table:
@@ -636,8 +636,7 @@ Feature: Assign enrolled learning to cohort
 
   @javascript
   Scenario: Edit course visibility for a particular course
-    Given I am on homepage
-    And I am on "Course 1" course homepage
+    Given I am on "Course 1" course homepage
     And I follow "Edit settings"
     And I click on "Add enrolled audiences" "button"
     And I follow "Cohort 1"
@@ -666,7 +665,7 @@ Feature: Assign enrolled learning to cohort
     And I click on "Condition: Manual self completion" "link"
     And I press "Save changes"
 
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Cohort 1"
     And I follow "Enrolled learning"
     And I press "Add courses"

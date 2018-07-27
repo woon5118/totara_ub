@@ -70,7 +70,7 @@ Feature: Suspend enrolled course users
 
     # Assign audience to course
     And I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Set audience"
     And I follow "Enrolled learning"
     And I press "Add courses"
@@ -87,7 +87,7 @@ Feature: Suspend enrolled course users
     And I log out
 
     When I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Set audience"
     And I follow "Edit members"
     And I click on "Learner One (learner1@example.com)" "option" in the "#removeselect" "css_element"
@@ -106,7 +106,7 @@ Feature: Suspend enrolled course users
       | name             | idnumber | cohorttype |
       | Dynamic audience | D2       | 2          |
     And I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dynamic audience"
     And I switch to "Rule sets" tab
     And I set the field "id_addrulesetmenu" to "First name"
@@ -119,7 +119,7 @@ Feature: Suspend enrolled course users
     Then I should see "User's first name starts with \"learner\""
 
     # Assign audience to course
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dynamic audience"
     And I follow "Enrolled learning"
     And I press "Add courses"
@@ -137,7 +137,7 @@ Feature: Suspend enrolled course users
 
     # Remove learner1 from the audience
     When I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dynamic audience"
     And I switch to "Rule sets" tab
     And I set the field "id_addrulemenu2" to "Username"
@@ -162,7 +162,7 @@ Feature: Suspend enrolled course users
       | name             | idnumber | cohorttype |
       | Dynamic audience | D2       | 2          |
     And I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dynamic audience"
     And I switch to "Rule sets" tab
     And I set the field "id_addrulesetmenu" to "First name"
@@ -175,7 +175,7 @@ Feature: Suspend enrolled course users
     Then I should see "User's first name starts with \"learner\""
 
     # Assign audience to course
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dynamic audience"
     And I follow "Enrolled learning"
     And I press "Add courses"
@@ -193,7 +193,7 @@ Feature: Suspend enrolled course users
 
     # Remove learner1 from the audience
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "Edit profile"
     And I set the following fields to these values:

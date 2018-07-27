@@ -23,7 +23,7 @@ Feature: In an assignment, the administrator can edit students' submissions
       | groupmode | No groups |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:

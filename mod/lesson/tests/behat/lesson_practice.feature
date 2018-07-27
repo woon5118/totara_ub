@@ -43,7 +43,7 @@ Feature: Practice mode in a lesson activity
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Non-practice lesson"
     And I set the following fields to these values:
       | True | 1 |
@@ -63,7 +63,7 @@ Feature: Practice mode in a lesson activity
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Practice lesson"
     And I set the following fields to these values:
       | True | 1 |
@@ -84,7 +84,7 @@ Feature: Practice mode in a lesson activity
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Practice lesson with scale"
     And I set the following fields to these values:
       | True | 1 |

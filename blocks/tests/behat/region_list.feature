@@ -10,6 +10,7 @@ Feature: Ensure page layouts are listed correctly
 
   Scenario: Ensure editing a block on the home page lists the home page layout options
     When I navigate to "Turn editing on" node in "Front page settings"
+    And I add the "Navigation" block if not present
     And I configure the "Navigation" block
     And I expand all fieldsets
     Then the "Default region" select box should contain "Left"
@@ -26,6 +27,7 @@ Feature: Ensure page layouts are listed correctly
   Scenario: Ensure editing a block on the dashboard lists the dashboard layout options
     Given I click on "Dashboard" in the totara menu
     And I click on "Customise this page" "button"
+    And I add the "Navigation" block if not present
     And I configure the "Navigation" block
     And I expand all fieldsets
     Then the "Default region" select box should contain "Left"
@@ -44,6 +46,7 @@ Feature: Ensure page layouts are listed correctly
       | fullname | shortname |
       | course 1 | c1        |
     And I am on "course 1" course homepage with editing mode on
+    And I add the "Navigation" block if not present
     And I configure the "Navigation" block
     And I expand all fieldsets
     Then the "Default region" select box should contain "Left"
@@ -65,6 +68,7 @@ Feature: Ensure page layouts are listed correctly
     And I add a "Forum" to section "1" and I fill the form with:
       | name | My forum |
     And I click on "My forum" "link"
+    And I add the "Navigation" block if not present
     And I configure the "Navigation" block
     And I expand all fieldsets
     Then the "Default region" select box should contain "Left"
@@ -81,6 +85,7 @@ Feature: Ensure page layouts are listed correctly
   Scenario: Ensure editing a block on an admin page lists the admin layout options
     When I navigate to "Notifications" node in "Site administration"
     And I click on "Blocks editing on" "button"
+    And I add the "Navigation" block if not present
     And I configure the "Navigation" block
     And I expand all fieldsets
     Then the "Default region" select box should contain "Left"

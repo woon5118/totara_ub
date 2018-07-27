@@ -30,7 +30,7 @@ Feature: Add a quiz
       | Feedback for the response 'False'. | So you think it is false                |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz name"
     And I press "Attempt quiz now"
     Then I should see "Question 1"

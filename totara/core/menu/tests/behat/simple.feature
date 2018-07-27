@@ -7,7 +7,7 @@ Feature: A basic test of the Totara custom menu
   Background:
     Given I am on a totara site
     And I log in as "admin"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top       |
@@ -18,14 +18,14 @@ Feature: A basic test of the Totara custom menu
     And I should see "Test item" in the totara menu
 
   Scenario: Reset to default
-    Given I navigate to "Top navigation" node in "Site administration > Appearance"
+    Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Reset menu to default configuration" "button"
     And I click on "Continue" "button"
     Then I should see "Top navigation reset to default configuration"
     And I should not see "Test item" in the totara menu
 
   Scenario: Change parent
-    Given I navigate to "Top navigation" node in "Site administration > Appearance"
+    Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Edit" "link" in the "Performance" "table_row"
     And I set the field "Parent item" to "Courses"
     And I click on "Save changes" "button"
@@ -54,7 +54,7 @@ Feature: A basic test of the Totara custom menu
 
   @javascript
   Scenario: Move menu items
-    Given I navigate to "Top navigation" node in "Site administration > Appearance"
+    Given I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top          |
@@ -65,12 +65,12 @@ Feature: A basic test of the Totara custom menu
     And I should see "Another item" in the totara menu
     When I click on "Move up" "link" in the "Another item" "table_row"
     Then "Another item" "link" should appear before "Test item" "link"
-    When I navigate to "Top navigation" node in "Site administration > Appearance"
+    When I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Move down" "link" in the "Another item" "table_row"
     Then "Test item" "link" should appear before "Another item" "link"
 
   Scenario: Delete menu items
-    Given I navigate to "Top navigation" node in "Site administration > Appearance"
+    Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Delete" "link" in the "Test item" "table_row"
     And I click on "Continue" "button"
     Then I should not see "Test item" in the totara menu

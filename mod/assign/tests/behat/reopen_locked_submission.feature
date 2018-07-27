@@ -29,7 +29,7 @@ Feature: Submissions are unlocked when a new attempt is given
       | Grade to pass | 50 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -62,7 +62,7 @@ Feature: Submissions are unlocked when a new attempt is given
       | Attempts reopened | Manually |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:

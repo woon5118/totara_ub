@@ -7,7 +7,7 @@ Feature: Test Required Learning menu item
   Scenario: Make sure Required learning is available in totara menu
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Top navigation" node in "Site administration > Appearance"
+    When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Required Learning" in the "#totaramenutable" "css_element"
     And I should not see "Required Learning" in the totara menu
 
@@ -18,7 +18,7 @@ Feature: Test Required Learning menu item
     And I set the field "Enable Programs" to "Disable"
     And I set the field "Enable Certifications" to "Disable"
     And I press "Save changes"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Required Learning" in the "#totaramenutable" "css_element"
     And I should see "Feature disabled" in the "Required Learning" "table_row"
 
@@ -26,6 +26,6 @@ Feature: Test Required Learning menu item
     And I set the field "Enable Programs" to "Show"
     And I set the field "Enable Certifications" to "Disable"
     And I press "Save changes"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Required Learning" in the "#totaramenutable" "css_element"
     And I should not see "Feature disabled" in the "Required Learning" "table_row"

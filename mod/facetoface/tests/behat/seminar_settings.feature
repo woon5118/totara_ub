@@ -13,7 +13,7 @@ Feature: Disabling approval options in global settings would
   @javascript
   Scenario: Disabled approval options in global settings are not affect to seminars module's settings
     Given I log in as "admin"
-    And I navigate to "Users > Permissions > Define roles" in site administration
+    And I navigate to "Permissions > Define roles" in site administration
     And I click on "Add a new role" "button"
     And I set the following fields to these values:
       | resettype | 3 |

@@ -213,7 +213,8 @@ Feature: Test use of images in goals and goal custom fields
     # Also check reports
     When I log out
     And I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Name   | Test Goal Custom Fields |
       | Source | Goal Custom Fields      |
@@ -236,7 +237,8 @@ Feature: Test use of images in goals and goal custom fields
     And I should see the "logo6 on personal goal customfield text area" image in the "My personal goal 1" "table_row"
 
     When I am on site homepage
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Name   | Test Goal Summary |
       | Source | Goal Summary      |
@@ -257,7 +259,8 @@ Feature: Test use of images in goals and goal custom fields
     Then I should see the "logo4 on custom My goal 1 customfield text area" image in the "My goal 1" "table_row"
 
     When I am on site homepage
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Name   | Test Goal Status |
       | Source | Goal Status      |
@@ -277,7 +280,8 @@ Feature: Test use of images in goals and goal custom fields
     Then I should see the "logo4 on custom My goal 1 customfield text area" image in the "Learner One" "table_row"
 
     When I am on site homepage
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Name   | Test Goal Status History |
       | Source | Goal Status History      |

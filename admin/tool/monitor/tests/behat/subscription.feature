@@ -20,7 +20,7 @@ Feature: tool_monitor_subscriptions
       | teacher2 | C1 | teacher |
       | teacher2 | C2 | editingteacher |
     And I log in as "admin"
-    And I navigate to "Event monitoring rules" node in "Site administration > Reports"
+    And I navigate to "Event monitoring rules" node in "Site administration > System reports"
     And I click on "Enable" "link"
     And I am on "Course 1" course homepage
     And I navigate to "Event monitoring rules" node in "Course administration > Reports"
@@ -34,7 +34,7 @@ Feature: tool_monitor_subscriptions
       | minutes              | 1                                                 |
       | Notification message | The course was viewed. {modulelink}               |
     And I press "Save changes"
-    And I navigate to "Event monitoring rules" node in "Site administration > Reports"
+    And I navigate to "Event monitoring rules" node in "Site administration > System reports"
     And I press "Add a new rule"
     And I set the following fields to these values:
       | name                 | New rule site level                               |
@@ -45,7 +45,7 @@ Feature: tool_monitor_subscriptions
       | minutes              | 1                                                 |
       | Notification message | The course was viewed. {modulelink}               |
     And I press "Save changes"
-    And I navigate to "Define roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Define roles" node in "Site administration > Permissions"
     And I follow "Non-editing teacher"
     And I press "Edit"
     And I click on "tool/monitor:managerules" "checkbox"

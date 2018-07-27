@@ -38,7 +38,7 @@ Feature: Restore course completion report rpl
   Scenario: Restore the course with course completions and all completion results via Recycle bin
     # As a student, complete one activity
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I click on "Not completed: label1. Select to mark as complete." "link"
     And I click on "Not completed: label2. Select to mark as complete." "link"
     And I log out

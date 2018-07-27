@@ -234,8 +234,7 @@ Feature: Test new custom field capabilities
     And I navigate to "Custom fields" node in "Site administration > Courses"
     And I should see "Create a new custom field"
     # Program: prevented
-    And I follow "Programs / Certifications"
-    And I should not see "Create a new custom field"
+    And I should not see "Programs / Certifications"
     # Competency: prevented
     And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
     And I should see "Competency Test Type"

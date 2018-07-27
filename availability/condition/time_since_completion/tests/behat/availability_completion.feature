@@ -18,8 +18,7 @@ Feature: availability_time_since_completion
       | learner1 | C1     | student        |
 
     And I log in as "trainer1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
 
   Scenario: Test time since activity completion condition, must, is marked complete
@@ -48,8 +47,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should not be available yet.
     Then I should not see "Page 1" in the "region-main" "region"
@@ -94,8 +92,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should be available.
     Then I should see "Page 1" in the "region-main" "region"
@@ -144,8 +141,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should not be available yet.
     Then I should not see "Page 1" in the "region-main" "region"
@@ -161,8 +157,7 @@ Feature: availability_time_since_completion
     # Log in as Trainer 1 to give a pass grade.
     When I log out
     And I log in as "trainer1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Assignment 1"
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Learner 1" "table_row"
@@ -178,8 +173,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should not be available yet.
     Then I should not see "Page 1" in the "region-main" "region"
@@ -219,8 +213,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should not be available yet.
     Then I should see "Page 1" in the "region-main" "region"
@@ -236,8 +229,7 @@ Feature: availability_time_since_completion
     # Log in as Trainer 1 to give a pass grade.
     When I log out
     And I log in as "trainer1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Assignment 1"
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Learner 1" "table_row"
@@ -253,8 +245,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should still be available.
     Then I should see "Page 1" in the "region-main" "region"
@@ -294,8 +285,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should not be available yet.
     Then I should not see "Page 1" in the "region-main" "region"
@@ -311,8 +301,7 @@ Feature: availability_time_since_completion
     # Log in as Trainer 1 to give a pass grade.
     When I log out
     And I log in as "trainer1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Assignment 1"
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Learner 1" "table_row"
@@ -328,8 +317,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should not be available yet.
     Then I should not see "Page 1" in the "region-main" "region"
@@ -369,8 +357,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should not be available yet.
     Then I should see "Page 1" in the "region-main" "region"
@@ -386,8 +373,7 @@ Feature: availability_time_since_completion
     # Log in as Trainer 1 to give a pass grade.
     When I log out
     And I log in as "trainer1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Assignment 1"
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Learner 1" "table_row"
@@ -403,8 +389,7 @@ Feature: availability_time_since_completion
     # Log in as learner1.
     When I log out
     And I log in as "learner1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Page 1 should still be available.
     Then I should see "Page 1" in the "region-main" "region"

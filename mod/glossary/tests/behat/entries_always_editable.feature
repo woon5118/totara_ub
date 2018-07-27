@@ -27,7 +27,7 @@ Feature: A teacher can set whether glossary entries are always editable or not
       | Always allow editing | No |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test glossary name"
     When I add a glossary entry with the following data:
       | Concept | Test concept name |

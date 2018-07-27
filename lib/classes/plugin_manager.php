@@ -1243,14 +1243,14 @@ class core_plugin_manager {
                 'selfcompletion', 'settings', 'site_main_menu',
                 'social_activities', 'tag_flickr', 'tag_youtube', 'tags'
                 // Totara
-                ,'totara_addtoplan', 'totara_alerts',
+                ,'totara_addtoplan', 'totara_alerts', 'totara_community',
                 'totara_my_learning_nav', 'totara_my_team_nav', 'totara_quicklinks',
                 'totara_recent_learning', 'totara_report_graph', 'totara_report_manager', 'totara_stats',
                 'totara_tasks', 'totara_certifications', 'gaccess', 'totara_program_completion',
                 'totara_dashboard', 'totara_report_table', 'last_course_accessed',
                 'current_learning', 'totara_featured_links',
                 'course_search', 'course_progress_report', 'frontpage_combolist',
-                'totara_community'
+                'admin_subnav', 'admin_related_pages', 'course_navigation',
             ),
 
             'booktool' => array(

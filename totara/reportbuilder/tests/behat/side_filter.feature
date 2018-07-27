@@ -91,7 +91,8 @@ Feature: Filter reportbuilder results by multicheck filters on sidebar
     And I press "Save changes"
 
     # Create reportbuilder for seminar events with sidebar multi-check filter
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     Given I set the field "Report Name" to "Seminar Sessions"
     And I set the field "Source" to "facetoface_summary"
     And I press "Create report"
@@ -142,7 +143,8 @@ Feature: Filter reportbuilder results by multicheck filters on sidebar
   @_alert
   Scenario: Report with only sidefilter works correctly
     Given I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "User report"
     And I set the field "Source" to "user"
     And I press "Create report"

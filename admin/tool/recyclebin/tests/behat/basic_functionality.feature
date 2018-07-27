@@ -54,8 +54,7 @@ Feature: Basic recycle bin functionality
     And I click on "Restore" "link" in the "region-main" "region"
     And I should see "'Test assign' has been restored"
     And I wait to be redirected
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Test assign" in the "Topic 1" "section"
 
   Scenario: Restore a deleted course

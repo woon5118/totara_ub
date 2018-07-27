@@ -89,7 +89,7 @@ Feature: In a lesson activity, teacher can edit a cluster page
     And I should see "Modified end"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Lesson with cluster"
     And I should see "First page contents"
     And I press "Next page"

@@ -7947,6 +7947,9 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
         $PAGE->set_button($OUTPUT->single_button($url, $caption, 'get'));
     }
 
+    // TOTARA: Add the button to add/remove current page to the quick access menu.
+    \totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, $extpage->name);
+
     $PAGE->set_title("$SITE->shortname: " . implode(": ", $visiblepathtosection));
     $PAGE->set_heading($SITE->fullname);
 

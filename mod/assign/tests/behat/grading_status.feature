@@ -54,7 +54,7 @@ Feature: View the grading status of an assignment
     And I log out
     # Mark the submission.
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And I should see "Not marked" in the "Student 1" "table_row"
@@ -72,7 +72,7 @@ Feature: View the grading status of an assignment
     And I log out
     # View the grading status as a student.
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I should see "In review" in the "Grading status" "table_row"
     And I should not see "Great job! Lol, not really."
@@ -82,7 +82,7 @@ Feature: View the grading status of an assignment
     And I log out
     # Mark the submission again but set the marking workflow to 'Released'.
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And I should see "In review" in the "Student 1" "table_row"
@@ -97,7 +97,7 @@ Feature: View the grading status of an assignment
     And I log out
     # View the grading status as a student.
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I should see "Released" in the "Grading status" "table_row"
     And I should see "Great job! Lol, not really."
@@ -107,7 +107,7 @@ Feature: View the grading status of an assignment
     And I log out
     # Now, change the status from 'Released' to 'In marking' (this will remove the grade from the gradebook).
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And I should see "Released" in the "Student 1" "table_row"
@@ -150,7 +150,7 @@ Feature: View the grading status of an assignment
     And I log out
     # Mark the submission.
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And I should not see "Graded" in the "Student 1" "table_row"
@@ -166,7 +166,7 @@ Feature: View the grading status of an assignment
     And I log out
     # View the grading status as a student.
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I should see "Graded" in the "Grading status" "table_row"
     And I should see "Great job! Lol, not really."

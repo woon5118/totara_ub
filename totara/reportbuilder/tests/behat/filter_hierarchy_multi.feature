@@ -34,7 +34,8 @@ Feature: Use the multi-item hierarchy filter
       | user3 | pos2     | org1         |
       | user4 | pos2     | org2         |
     And I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
 
   Scenario: Use position filter with User report source
     Given I set the field "Report Name" to "Users"

@@ -14,7 +14,7 @@ Feature: Test appraisal objective selection
 
     # Make audience.
     And I am on site homepage
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Add new audience"
     And I set the following fields to these values:
       | Name         | Test_cohort_name        |

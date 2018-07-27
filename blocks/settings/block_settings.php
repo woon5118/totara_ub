@@ -86,8 +86,13 @@ class block_settings extends block_base {
     }
 
     function get_required_javascript() {
-        global $PAGE;
-        $adminnode = $PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN);
+        global $PAGE, $CFG;
+
+        // Totara - take into account config setting that hides admin menu from the settings block.
+        $adminnode = null;
+        if (!empty($CFG->legacyadminsettingsmenu)) {
+            $adminnode = $PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN);
+        }
         parent::get_required_javascript();
         $arguments = array(
             'instanceid' => $this->instance->id,
@@ -133,7 +138,7 @@ class block_settings extends block_base {
 
         // only do search if you have moodle/site:config
         if (!empty($this->content->text)) {
-            if (has_capability('moodle/site:config',context_system::instance()) ) {
+            if (has_capability('moodle/site:config',context_system::instance()) && !empty($CFG->legacyadminsettingsmenu)) {
                 $this->content->footer = $renderer->search_form(new moodle_url("$CFG->wwwroot/$CFG->admin/search.php"), optional_param('query', '', PARAM_RAW));
             } else {
                 $this->content->footer = '';

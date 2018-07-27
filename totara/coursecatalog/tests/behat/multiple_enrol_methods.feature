@@ -31,8 +31,7 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
     And I log out
 
     Given I log in as "teacher1"
-
-    Given I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I add "Self enrolment" enrolment method with:
       | Enrolment key            | moodle_rules |
       | Use group enrolment keys | Yes          |
@@ -105,8 +104,8 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
     And I log out
 
     When I log in as "student3"
-    And I should see "Courses" in the "Navigation" "block"
-    And I click on "Courses" "link_or_button" in the "Navigation" "block"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Sign-up"

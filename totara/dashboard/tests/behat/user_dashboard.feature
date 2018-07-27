@@ -65,6 +65,7 @@ Feature: Perform basic dashboard user changes
     And I click on "Dashboard unlocked published" "link"
     And I press "Blocks editing on"
     And I add the "Latest announcements" block
+    And I add the "Navigation" block if not present
 
     # Move blocks around
     And I click on "span.moodle-core-dragdrop-draghandle" "css_element" in the "Latest announcements" "block"

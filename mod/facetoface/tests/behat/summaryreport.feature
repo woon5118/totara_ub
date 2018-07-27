@@ -40,7 +40,8 @@ Feature: Seminar sessions report overview
     And I press "Save changes"
 
     # Prepare report
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Seminar Summary          |
       | Source      | Seminar Sessions |

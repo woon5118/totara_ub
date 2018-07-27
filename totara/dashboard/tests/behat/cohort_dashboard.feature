@@ -21,7 +21,7 @@ Feature: Test Dashboard for cohort users
     And I set the following fields to these values:
       | summary | I'm a label on the frontpage |
     And I press "Save changes"
-    And I navigate to "Dashboards" node in "Site administration > Appearance"
+    And I navigate to "Dashboards" node in "Site administration > Navigation"
       # Add a dashboard.
     And I press "Create dashboard"
     And I set the following fields to these values:
@@ -52,7 +52,7 @@ Feature: Test Dashboard for cohort users
       | Content                      | First dashboard block content |
     And I press "Save changes"
       # Add content to the second dashboard.
-    And I navigate to "Dashboards" node in "Site administration > Appearance"
+    And I navigate to "Dashboards" node in "Site administration > Navigation"
     And I click on "My second dashboard" "link"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block

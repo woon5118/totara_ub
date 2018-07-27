@@ -93,6 +93,11 @@
         </ul>
 
         <div class="totaraNav_prim--side">
+            {{! Admin mega menu }}
+            {{#masthead_quickaccessmenu}}{{> totara_core/quickaccessmenu }}{{/masthead_quickaccessmenu}}
+
+            <div class="totaraNav_prim--side__separator"></div>
+
             {{! Language button here }}
             {{#masthead_lang}}{{> totara_core/masthead_lang }}{{/masthead_lang}}
 

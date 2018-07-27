@@ -40,7 +40,7 @@ if ($button = $report->edit_button()) {
     $buttons[] = $button;
 }
 if ($buttons) {
-    $PAGE->set_button(implode(' ', $buttons));
+    $PAGE->set_button(implode(' ', $buttons) . $PAGE->button);
 }
 
 /** @var totara_reportbuilder_renderer|core_renderer $output */

@@ -115,7 +115,8 @@ Feature: Seminar timezones in reports
     And I press "Confirm"
     And I wait until "Second User" "text" exists
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "F2F sessions"
     And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"
@@ -206,7 +207,8 @@ Feature: Seminar timezones in reports
     And I press "OK"
     And I press "Save changes"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "F2F summary"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"

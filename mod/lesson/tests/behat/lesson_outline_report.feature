@@ -84,13 +84,13 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 1"
     And I follow "Outline report"
@@ -128,7 +128,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -142,7 +142,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I should see "Congratulations - end of lesson reached"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 1"
     And I follow "Outline report"
@@ -167,7 +167,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -175,7 +175,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I press "End of lesson"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 1"
     And I follow "Outline report"

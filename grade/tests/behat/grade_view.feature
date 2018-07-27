@@ -33,7 +33,7 @@ Feature: We can enter in grades and view reports from the gradebook
       | assignsubmission_onlinetext_enabled | 1 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name 1"
     When I press "Add submission"
     And I set the following fields to these values:
@@ -49,7 +49,7 @@ Feature: We can enter in grades and view reports from the gradebook
     Then I should see "Submitted for grading"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "80.00" to the user "Student 1" for the grade item "Test assignment name 1"

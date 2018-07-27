@@ -63,7 +63,7 @@ Feature: Test Quick Links block
 
   Scenario: Teacher can add the Quick Links block onto a course
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Turn editing on" "button"
     And I add the "Quick Links" block
     And I configure the "Quick Links" block
@@ -89,7 +89,7 @@ Feature: Test Quick Links block
 
     # Check the learner can view the block.
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Course Links"
     And I should see "Home" in the "Course Links" "block"
     And I should see "Reports" in the "Course Links" "block"
@@ -99,7 +99,7 @@ Feature: Test Quick Links block
 
     # Check the teacher can remove links.
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Turn editing on" "button"
     And I open the "Course Links" blocks action menu
     And I follow "Configure Course Links block"
@@ -119,7 +119,7 @@ Feature: Test Quick Links block
 
     # Check the learner can see the correct block content.
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Course Links"
     And I should not see "Home" in the "Course Links" "block"
     And I should not see "Reports" in the "Course Links" "block"
@@ -133,6 +133,7 @@ Feature: Test Quick Links block
     Given I log in as "admin"
     And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
+    And I add the "Navigation" block if not present
     And I navigate to "Calendar" node in "Site pages"
     And I add the "Quick Links" block
     And I configure the "Quick Links" block
@@ -150,6 +151,7 @@ Feature: Test Quick Links block
     And I set the field "linktitle" to "My calendar link"
     And I set the field "linkurl" to "view.php?view=month&time=151934400"
     And I click on "Add link" "button"
+    And I add the "Navigation" block if not present
     And I navigate to "Calendar" node in "Site pages"
     Then I should see "My Links"
     And I should see "My calendar link" in the "My Links" "block"

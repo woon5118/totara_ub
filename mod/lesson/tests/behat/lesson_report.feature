@@ -80,7 +80,7 @@ Feature: In a lesson activity, teachers can review student attempts
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -101,7 +101,7 @@ Feature: In a lesson activity, teachers can review student attempts
     And I should see "Congratulations - end of lesson reached"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I follow "Reports"
     And I should see "Student 1"
@@ -147,7 +147,7 @@ Feature: In a lesson activity, teachers can review student attempts
     And I press "Save page"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -159,7 +159,7 @@ Feature: In a lesson activity, teachers can review student attempts
     And I press "End of lesson"
     And I log out
     Then I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I follow "Reports"
     And I should see "Student 1"

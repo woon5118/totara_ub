@@ -101,7 +101,7 @@ Feature: Group assignment submissions
       | Require group to make submission | No |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -109,7 +109,7 @@ Feature: Group assignment submissions
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I navigate to "View all submissions" in current page administration
     Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
@@ -118,7 +118,7 @@ Feature: Group assignment submissions
     And "Student 4" row "Status" column of "generaltable" table should not contain "Submitted for grading"
     And I log out
     And I log in as "student3"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -126,7 +126,7 @@ Feature: Group assignment submissions
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
@@ -187,7 +187,7 @@ Feature: Group assignment submissions
       | Require group to make submission | No |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -195,7 +195,7 @@ Feature: Group assignment submissions
     And I press "Save changes"
     And I log out
     And I log in as "student3"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -203,7 +203,7 @@ Feature: Group assignment submissions
     And I press "Save changes"
     And I log out
     And I log in as "student5"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:

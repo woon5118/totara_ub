@@ -99,7 +99,8 @@ Feature: Test use of images in positions and position custom fields
 
     # Also check reports
     When I am on site homepage
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Name   | Test Positions |
       | Source | Positions      |

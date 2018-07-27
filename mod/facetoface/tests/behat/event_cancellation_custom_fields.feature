@@ -196,7 +196,8 @@ Feature: Seminar event cancellation custom fields
   Scenario: mod_facetoface_cancel_501: create seminar events custom report with custom cancellation fields
     Given I log out
     And I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | fullname | Custom test event report |
       | source   | Seminar Sessions         |

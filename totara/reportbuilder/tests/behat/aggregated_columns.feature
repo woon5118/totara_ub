@@ -30,7 +30,7 @@ Feature: Test aggregated user columns can be added and viewed by the admin
     And I set self completion for "CourseFullname-C" in the "Miscellaneous" category
     And I set self completion for "CourseFullname-D" in the "Miscellaneous" category
     And I set self completion for "CourseFullname-E" in the "Miscellaneous" category
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Tests" "link"
     And I click on "Edit program details" "button"
@@ -55,7 +55,8 @@ Feature: Test aggregated user columns can be added and viewed by the admin
     And I press "Save changes"
     And I click on "Save all changes" "button"
     And I wait "1" seconds
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
 
   Scenario: View aggregated fields in the program overview report
     Given I set the field "Report Name" to "Overview Report"

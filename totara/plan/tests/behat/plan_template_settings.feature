@@ -88,9 +88,9 @@ Feature: Test plan teamplate settings
     # The admin is a superuser so they can always see
     # add buttons (ignoring permissions)
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "firstname1 lastname1" "link"
-    And I click on "Learning Plans" "link"
+    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I should see "You are viewing firstname1 lastname1's plans."
     And I click on "template 1" "link"
     And I switch to "Courses" tab

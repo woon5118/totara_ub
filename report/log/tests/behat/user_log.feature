@@ -25,7 +25,7 @@ Feature: User can view activity log.
       | assignsubmission_file_enabled | 0 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I press "Add submission"
     And I set the following fields to these values:
@@ -36,7 +36,7 @@ Feature: User can view activity log.
   @javascript
   Scenario: View Todays' and all log report for user
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 1"
     When I follow "Today's logs"
@@ -52,7 +52,7 @@ Feature: User can view activity log.
     And I click on "Disable" "link" in the "Standard log" "table_row"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 1"
     When I follow "Today's logs"

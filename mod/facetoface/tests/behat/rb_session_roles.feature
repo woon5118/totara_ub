@@ -57,7 +57,8 @@ Feature: Use facetoface session roles content restriction in facetoface session 
 
   @javascript
   Scenario: Setup session roles through report builder content restriction and the teachers can view only their attendees according to session role
-    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "Seminar Sign-ups"
     And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"
@@ -75,7 +76,8 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the field "All users can view this report" to "1"
     And I press "Save changes"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "Seminar Events"
     And I set the field "Source" to "Seminar Events"
     And I press "Create report"
@@ -93,7 +95,8 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the field "All users can view this report" to "1"
     And I press "Save changes"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "Seminar Sessions"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"
@@ -205,7 +208,8 @@ Feature: Use facetoface session roles content restriction in facetoface session 
 
   @javascript
   Scenario: Setup multiple session roles through report builder content restriction and the teachers can view only their attendees according to mulitple session roles
-    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "Seminar Sign-ups"
     And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"

@@ -26,7 +26,7 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
   @javascript
   Scenario: Self-enrolment through course catalog requiring a group enrolment key
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Self enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
       | Enrolment key | moodle_rules |

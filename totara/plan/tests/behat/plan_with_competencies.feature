@@ -96,7 +96,7 @@ Feature: Learner creates learning plan with competencies.
 
     # Test Record of Learning: Competencies report with Global report restriction.
     And I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I click on "Edit members" "link" in the ".tabtree" "css_element"
     And I click on "Bob1 Learner1 (learner1@example.com)" "option"
@@ -110,7 +110,7 @@ Feature: Learner creates learning plan with competencies.
       | Enable report restrictions | 1 |
     And I press "Save changes"
 
-    And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
+    And I navigate to "Global report restrictions" node in "Site administration > Reports"
     And I press "New restriction"
     And I set the following fields to these values:
       | Name   | 14064 restriction |
@@ -127,7 +127,8 @@ Feature: Learner creates learning plan with competencies.
     And I click on "Audience 1" "link" in the "Assign a group to restriction" "totaradialogue"
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Record of Learning: Competencies report |
       | Source      | Record of Learning: Competencies        |
@@ -150,7 +151,7 @@ Feature: Learner creates learning plan with competencies.
     And I switch to "Workflow" tab
     And I click on "Custom workflow" "radio"
     And I press "Advanced workflow settings"
-    And I follow "Competencies"
+    And I switch to "Competencies" tab
     And I click on "Automatically assign by position" "checkbox"
     And I press "Save changes"
     Then I should see "Competency settings successfully updated"
@@ -172,7 +173,7 @@ Feature: Learner creates learning plan with competencies.
       | Unclassified | Competency 3 |
 
     # Create a learning plan, Competency 1 should be added to the learning plan.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I press "Create new learning plan"
@@ -192,7 +193,7 @@ Feature: Learner creates learning plan with competencies.
     And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
     And I follow "Competency Framework 1"
     And I click on "Hide" "link" in the "Competency 1" "table_row"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I follow "Learning Plan 2"
@@ -209,7 +210,7 @@ Feature: Learner creates learning plan with competencies.
     When I am on homepage
     And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
     And I click on "Hide" "link" in the "Competency Framework 1" "table_row"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I press "Create new learning plan"

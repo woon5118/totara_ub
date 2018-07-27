@@ -75,7 +75,7 @@ Feature: availability_grouping
     # Log back in as student.
     When I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # No pages should appear yet.
     Then I should not see "P1" in the "region-main" "region"

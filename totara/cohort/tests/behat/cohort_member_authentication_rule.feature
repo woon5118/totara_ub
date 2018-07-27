@@ -16,7 +16,7 @@ Feature: Cohort with members that match with the authentication type rule
       | ch1  | ch1      | System       | 0         | 2          |
     And I am on a totara site
     And I log in as "admin"
-    And I navigate to "Users>Accounts>Audiences" in site administration
+    And I navigate to "Audiences > Audiences" in site administration
 
   Scenario: User creates a rule with an authentication type that user is equal to
     Given I follow "ch1"

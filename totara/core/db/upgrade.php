@@ -454,5 +454,31 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018100101, 'totara', 'core');
     }
 
+    if ($oldversion < 2018102600) {
+        // Define table quickaccess_preferences to be created.
+        $table = new xmldb_table('quickaccess_preferences');
+
+        // Adding fields to table quickaccess_preferences.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('value', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table quickaccess_preferences.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table quickaccess_preferences.
+        $table->add_index('quickaccesspref_user_uix', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        $table->add_index('quickaccesspref_usenam_uix', XMLDB_INDEX_UNIQUE, array('userid', 'name'));
+
+        // Conditionally launch create table for quickaccess_preferences.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018102600, 'totara', 'core');
+    }
+
     return true;
 }

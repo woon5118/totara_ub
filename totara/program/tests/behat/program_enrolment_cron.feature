@@ -85,7 +85,7 @@ Feature: Enrolment plugin cron tasks
 
     # Change learner1's organisation
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#organisationtitle" "css_element"
@@ -114,7 +114,7 @@ Feature: Enrolment plugin cron tasks
 
     # Change learner1's organisation again to re-assign him to the program
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Choose organisation" "button"
@@ -146,7 +146,7 @@ Feature: Enrolment plugin cron tasks
 
     # Change learner1's organisation
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#organisationtitle" "css_element"
@@ -175,7 +175,7 @@ Feature: Enrolment plugin cron tasks
 
     # Change learner1's organisation again to re-assign him to the program
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Choose organisation" "button"
@@ -207,7 +207,7 @@ Feature: Enrolment plugin cron tasks
 
     # Change learner1's organisation
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#organisationtitle" "css_element"
@@ -236,7 +236,7 @@ Feature: Enrolment plugin cron tasks
 
     # Change learner1's organisation again to re-assign him to the program
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Choose organisation" "button"

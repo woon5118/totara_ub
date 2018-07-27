@@ -43,7 +43,7 @@ Feature: Verify badge issue based on program completion criterion.
     Then I should see "Course completion criteria changes have been saved"
 
     # Add the Course 1 to Program 1.
-    When I navigate to "Manage programs" node in "Site administration > Courses"
+    When I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Program 1" "table_row"
     And I follow "Content"
@@ -57,7 +57,7 @@ Feature: Verify badge issue based on program completion criterion.
     Then I should see "Caution: Program is live"
 
     # Add the Course 2 to Program 2.
-    When I navigate to "Manage programs" node in "Site administration > Courses"
+    When I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Program 2" "table_row"
     And I follow "Content"
@@ -71,8 +71,8 @@ Feature: Verify badge issue based on program completion criterion.
     Then I should see "Caution: Program is live"
 
     # Add site level badge.
-    When I navigate to "Add a new badge" node in "Site administration > Badges"
-    And I follow "Add a new badge"
+    When I navigate to "Manage badges" node in "Site administration > Badges"
+    And I click on "Add a new badge" "button"
     And I set the following fields to these values:
       | Name        | Program Badge             |
       | Description | Program badge description |
@@ -109,7 +109,7 @@ Feature: Verify badge issue based on program completion criterion.
   Scenario: Verify program badge can still be enabled and issued when multiple criteria is only partially available.
 
     Given I log in as "admin"
-    When I navigate to "Manage programs" node in "Site administration > Courses"
+    When I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Delete" "link" in the "Program 1" "table_row"
     And I press "Continue"
@@ -144,13 +144,13 @@ Feature: Verify badge issue based on program completion criterion.
 
     # Delete the programs so that badge has no available criteria.
     Given I log in as "admin"
-    When I navigate to "Manage programs" node in "Site administration > Courses"
+    When I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Delete" "link" in the "Program 1" "table_row"
     And I press "Continue"
     Then I should see "Successfully deleted program \"Program 1\""
 
-    When I navigate to "Manage programs" node in "Site administration > Courses"
+    When I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Delete" "link" in the "Program 2" "table_row"
     And I press "Continue"

@@ -27,7 +27,7 @@ Feature: Access programs content as a learner
 
   Scenario: Access a new course added to a completed program via program assignments without duedates
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Access Tests" "link"
     And I click on "Edit program details" "button"
@@ -54,7 +54,7 @@ Feature: Access programs content as a learner
     And I log out
 
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Access Tests" "link"
     And I click on "Edit program details" "button"
@@ -90,7 +90,7 @@ Feature: Access programs content as a learner
 
   Scenario: Access a new course added to a completed program via program assignments with duedates
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Access Tests" "link"
     And I click on "Edit program details" "button"
@@ -125,7 +125,7 @@ Feature: Access programs content as a learner
     And I log out
 
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Access Tests" "link"
     And I click on "Edit program details" "button"
@@ -161,9 +161,9 @@ Feature: Access programs content as a learner
 
   Scenario: Access a new course added to a completed program via learning plans
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "fn_002 ln_002" "link"
-    And I click on "Learning Plans" "link"
+    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I press "Create new learning plan"
     And I press "Create plan"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -173,7 +173,7 @@ Feature: Access programs content as a learner
     And I click on "Save" "button" in the "assignprograms" "totaradialogue"
     And I wait "1" seconds
     And I press "Approve"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Access Tests" "link"
     And I click on "Edit program details" "button"
@@ -208,7 +208,7 @@ Feature: Access programs content as a learner
     And I log out
 
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Access Tests" "link"
     And I click on "Edit program details" "button"

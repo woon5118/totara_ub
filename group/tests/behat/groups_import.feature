@@ -20,7 +20,7 @@ Feature: Importing of groups and groupings
   @javascript
   Scenario: Import groups and groupings as teacher
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Users > Groups" in current page administration
     And I press "Import groups"
     When I upload "group/tests/fixtures/groups_import.csv" file to "Import" filemanager
@@ -44,7 +44,7 @@ Feature: Importing of groups and groupings
   @javascript
   Scenario: Import groups with idnumber when the user has proper permissions for the idnumber field
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Users > Groups" in current page administration
     And I press "Import groups"
     When I upload "group/tests/fixtures/groups_import.csv" file to "Import" filemanager
@@ -86,7 +86,7 @@ Feature: Importing of groups and groupings
       | moodle/course:changeidnumber | Prevent |
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Users > Groups" in current page administration
     And I press "Import groups"
     When I upload "group/tests/fixtures/groups_import.csv" file to "Import" filemanager

@@ -21,7 +21,7 @@ Feature: Add a comment to the comments block
     And I add the "Comments" block
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
   Scenario: Add a comment
     When I add "I'm a comment from student1" comment to comments block

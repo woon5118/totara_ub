@@ -21,7 +21,7 @@ Feature: Test restricting Totara custom menu access by audience
     Given the following "cohort members" exist:
       | user  | cohort |
       | user1 | aud1   |
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top                     |
@@ -53,7 +53,7 @@ Feature: Test restricting Totara custom menu access by audience
       | user  | cohort |
       | user1 | aud1   |
       | user3 | aud2   |
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top                     |
@@ -91,7 +91,7 @@ Feature: Test restricting Totara custom menu access by audience
       | user1 | aud1   |
       | user1 | aud2   |
       | user2 | aud2   |
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top                     |
@@ -125,7 +125,7 @@ Feature: Test restricting Totara custom menu access by audience
       | user1 | aud1   |
       | user1 | aud2   |
       | user2 | aud2   |
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top                     |
@@ -152,7 +152,7 @@ Feature: Test restricting Totara custom menu access by audience
       | user1 | aud1   |
       | user1 | aud2   |
       | user2 | aud2   |
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
       | Parent item              | Top                     |

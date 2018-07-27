@@ -30,7 +30,8 @@ Feature: Test the capability to see and use audience filter for report builder
 
   Scenario: create user report with audience filter, test moodle/cohort:view capability
     Given I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | User Report |
       | Source      | User        |
@@ -73,7 +74,8 @@ Feature: Test the capability to see and use audience filter for report builder
 
   Scenario: create course report with audience filter, test moodle/cohort:view capability
     Given I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Course Report |
       | Source      | Courses       |
@@ -127,7 +129,8 @@ Feature: Test the capability to see and use audience filter for report builder
     And I press "Save all changes"
     Then I should see "4 learner(s) assigned: 4 active, 0 exception(s)"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Program Report |
       | Source      | Programs       |

@@ -36,7 +36,7 @@ Feature: Allow choice preview
       | Show preview | 1 |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Choice name"
     Then I should see "This is just a preview of the available options for this activity"
     And the "choice_1" "radio" should be disabled

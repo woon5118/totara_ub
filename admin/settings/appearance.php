@@ -139,8 +139,12 @@ preferences,moodle|/user/preferences.php|preferences',
     $temp->add(new admin_setting_configcheckbox('blogshowcommentscount', new lang_string('showcommentscount', 'admin'), new lang_string('configshowcommentscount', 'admin'), 1));
     $ADMIN->add('appearance', $temp);
 
+     // Totara navigation.
+    $ADMIN->add('navigationcat', new admin_externalpage('totaranavigation', new lang_string('menuitem:mainmenu', 'totara_core'),
+            new moodle_url('/totara/core/menu/index.php'), array('totara/core:editmainmenu')));
+
     // Navigation settings
-    $temp = new admin_settingpage('navigation', new lang_string('navigation'), array('totara/core:appearance'));
+    $temp = new admin_settingpage('navigation', new lang_string('menuitem:navigationsettings', 'totara_core'), array('totara/core:appearance'));
     if (!totara_feature_disabled('totaradashboard')) {
         $choices = array(
             HOMEPAGE_SITE => new lang_string('site'),
@@ -171,11 +175,7 @@ preferences,moodle|/user/preferences.php|preferences',
     $temp->add(new admin_setting_configcheckbox('navshowfrontpagemods', new lang_string('navshowfrontpagemods', 'admin'), new lang_string('navshowfrontpagemods_help', 'admin'), 1));
     $temp->add(new admin_setting_configcheckbox('navadduserpostslinks', new lang_string('navadduserpostslinks', 'admin'), new lang_string('navadduserpostslinks_help', 'admin'), 1));
 
-    $ADMIN->add('appearance', $temp);
-
-     // Totara navigation.
-    $ADMIN->add('appearance', new admin_externalpage('totaranavigation', new lang_string('menuitem:topnavigation', 'totara_core'),
-            new moodle_url('/totara/core/menu/index.php'), array('totara/core:editmainmenu')));
+    $ADMIN->add('navigationcat', $temp);
 
     // "htmlsettings" settingpage
     $temp = new admin_settingpage('htmlsettings', new lang_string('htmlsettings', 'admin'), array('totara/core:appearance'));
@@ -194,17 +194,13 @@ preferences,moodle|/user/preferences.php|preferences',
     $temp->add(new admin_setting_configcheckbox('doctonewwindow', new lang_string('doctonewwindow', 'admin'), new lang_string('configdoctonewwindow', 'admin'), 0));
     $ADMIN->add('appearance', $temp);
 
-    $temp = new admin_externalpage('profilepage', new lang_string('myprofile', 'admin'), $CFG->wwwroot . '/user/profilesys.php',
-            array('totara/core:appearance'));
-    $ADMIN->add('appearance', $temp);
-
     // Dashboard settings.
     $temp = new admin_externalpage('totaradashboard', new lang_string('dashboards', 'totara_dashboard'),
         $CFG->wwwroot . '/totara/dashboard/manage.php', array('totara/dashboard:manage'), totara_feature_disabled('totaradashboard'));
-    $ADMIN->add('appearance', $temp);
+    $ADMIN->add('navigationcat', $temp, 'navigation');
 
     // coursecontact is the person responsible for course - usually manages enrolments, receives notification, etc.
-    $temp = new admin_settingpage('coursecontact', new lang_string('courses'), array('totara/core:appearance'));
+    $temp = new admin_settingpage('coursecontact', new lang_string('coursesettings', 'admin'), array('totara/core:appearance'));
     $temp->add(new admin_setting_special_coursecontact());
     $temp->add(new admin_setting_configcheckbox('courselistshortnames',
             new lang_string('courselistshortnames', 'admin'),
@@ -251,7 +247,7 @@ preferences,moodle|/user/preferences.php|preferences',
     );
     $temp->add(new admin_setting_configtext('courseoverviewfilesext', new lang_string('courseoverviewfilesext'),
             new lang_string('configcourseoverviewfilesext', 'admin'), '.jpg,.gif,.png'));
-    $ADMIN->add('appearance', $temp);
+    $ADMIN->add('courses', $temp);
 
     $temp = new admin_settingpage('ajax', new lang_string('ajaxuse'), array('totara/core:appearance'));
     $temp->add(new admin_setting_configcheckbox('useexternalyui', new lang_string('useexternalyui', 'admin'), new lang_string('configuseexternalyui', 'admin'), 0));

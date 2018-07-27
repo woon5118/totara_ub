@@ -36,7 +36,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
       | Learners submit in groups         | Yes |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I upload "mod/assign/feedback/editpdf/tests/fixtures/submission.pdf" file to "File submissions" filemanager
@@ -46,7 +46,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
     And I should see "Not graded"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Submitted for grading" "table_row"
@@ -66,7 +66,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
     And I click on "Edit settings" "link"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I follow "View annotated PDF..."
     Then I should see "Annotate PDF"
@@ -74,7 +74,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
     And I click on "Close" "button"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I should not see "View annotated PDF..."
 
@@ -85,7 +85,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
     And I follow "Course 1"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I follow "View annotated PDF..."
     And I change window size to "large"
@@ -95,6 +95,6 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
     And I click on "Close" "button"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I should see "View annotated PDF..."

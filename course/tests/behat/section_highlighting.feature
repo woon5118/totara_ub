@@ -24,8 +24,7 @@ Feature: Topic's course sections highlighting
     And I turn section "2" highlighting on
     And section "2" should be highlighted
     And section "1" should not be highlighted
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And section "2" should be highlighted
     And section "1" should not be highlighted
     #Totara disables editing when you visit default Dashboard
@@ -34,12 +33,11 @@ Feature: Topic's course sections highlighting
     And section "2" should not be highlighted
     And I reload the page
     And section "2" should not be highlighted
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And section "2" should not be highlighted
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And section "1" should not be highlighted
     And section "2" should not be highlighted
 

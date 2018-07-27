@@ -36,7 +36,7 @@ Feature: Toggle activities visibility from the course page
     And "Test forum name" activity should be hidden
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Test forum name" activity should be hidden
 
   @javascript

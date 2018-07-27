@@ -35,7 +35,7 @@ Feature: Adding competencies to program content
 
   @javascript
   Scenario: Test program completion with courseset "AND"
-    Given I navigate to "Manage programs" node in "Site administration > Courses"
+    Given I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Content Tests" "link"
     And I click on "Edit program details" "button"
@@ -61,7 +61,7 @@ Feature: Adding competencies to program content
     And I click on "Miscellaneous" "link" in the "evidence" "totaradialogue"
     And I click on "Course 3" "link" in the "evidence" "totaradialogue"
     And I click on "Save" "button" in the "evidence" "totaradialogue"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Content Tests" "link"
     And I click on "Edit program details" "button"

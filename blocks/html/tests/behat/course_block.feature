@@ -34,6 +34,6 @@ Feature: HTML blocks in a course
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "First block content" in the "First block header" "block"
     And I should see "Second block content" in the "Second block header" "block"

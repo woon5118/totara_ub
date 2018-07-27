@@ -20,7 +20,7 @@ Feature: Generation of program assignment exceptions
       | Program Exception Tests  | exctest   |
     # Get back the removed dashboard item for now.
     And I log in as "admin"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"
@@ -29,7 +29,7 @@ Feature: Generation of program assignment exceptions
   @javascript
   Scenario: Time allowance exceptions are generated and set to a realistic time
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"
@@ -86,7 +86,7 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"
@@ -130,7 +130,7 @@ Feature: Generation of program assignment exceptions
   @javascript
   Scenario: Already assigned exceptions are generated and overridden
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
     And I click on "Learning Plans" "link" in the "#region-main" "css_element"
     And I press "Create new learning plan"
@@ -143,7 +143,7 @@ Feature: Generation of program assignment exceptions
     And I wait "1" seconds
     And I click on "Manage plans" "link" in the "#dp-plans-menu" "css_element"
     And I click on "Approve" "link" in the "#dp-plans-list-unapproved-plans" "css_element"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"
@@ -177,7 +177,7 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"
@@ -211,14 +211,14 @@ Feature: Generation of program assignment exceptions
   @javascript
   Scenario: Completion time unknown Exceptions are generated and dismissed
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
-    And I click on "Date/Time" "option" in the ".singleselect" "css_element"
+    And I navigate to "User profile fields" node in "Site administration > Users"
+    And I select "Date/Time" from the "Create a new profile field:" singleselect
     And I set the following fields to these values:
         | Short name | datetime    |
         | Name       | Date & Time |
     And I click on "param3" "checkbox"
     And I click on "Save changes" "button"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"
@@ -258,7 +258,7 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"
@@ -292,7 +292,7 @@ Feature: Generation of program assignment exceptions
   @javascript
   Scenario: Time allowance exceptions are generated and completion dates are changed
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"
@@ -480,7 +480,7 @@ Feature: Generation of program assignment exceptions
   @javascript
   Scenario: Time allowance exceptions are not generated when moving the due date backwards (because due dates done't move backwards)
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Program Exception Tests" "link"
     And I click on "Edit program details" "button"

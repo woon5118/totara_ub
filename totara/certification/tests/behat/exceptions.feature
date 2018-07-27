@@ -24,14 +24,14 @@ Feature: Generation of certification assignment exceptions
       | menulifetime   | 0       |
       | enableprograms | Disable |
     # Get back the removed dashboard item for now.
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"
 
   @javascript
   Scenario: Assigned to course via multiple certifications exceptions are generated and dismissed
-    Given I navigate to "Manage certifications" node in "Site administration > Courses"
+    Given I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification Filler" "link"
     And I click on "Edit certification details" "button"
@@ -60,7 +60,7 @@ Feature: Generation of certification assignment exceptions
     And I click on "Save all changes" "button"
     Then I should see "1 learner(s) assigned: 1 active, 0 exception(s)"
 
-    When I navigate to "Manage certifications" node in "Site administration > Courses"
+    When I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification Exception Tests" "link"
     And I click on "Edit certification details" "button"
@@ -102,7 +102,7 @@ Feature: Generation of certification assignment exceptions
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
     And I click on "Certification Exception Tests" "link"
     And I click on "Edit certification details" "button"

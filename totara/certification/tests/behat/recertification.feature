@@ -19,7 +19,7 @@ Feature: User recertification and expiry of certification
       | enableprograms | Disable |
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I press "Add new certification"
     And I set the following fields to these values:
         | Full name  | Test Certification |
@@ -46,7 +46,7 @@ Feature: User recertification and expiry of certification
     And I press "Save changes"
     And I click on "Save all changes" "button"
     # Get back the removed dashboard item for now.
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"

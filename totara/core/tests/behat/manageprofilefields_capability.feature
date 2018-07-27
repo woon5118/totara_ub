@@ -16,13 +16,13 @@ Feature: Test manageprofilefields capability
     And I set the following system permissions of "Site Manager" role:
       | capability | permission |
       | totara/core:manageprofilefields | Allow |
-    And I navigate to "Assign system roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Assign system roles" node in "Site administration > Permissions"
     And I follow "Site Manager"
     And I set the field "Potential users" to "Manager 1 (manager1@example.com)"
     And I press "Add"
     And I log out
     Then I log in as "manager1"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     # Field doesn't have a label
     And I set the field "datatype" to "Text input"
     And I set the following fields to these values:

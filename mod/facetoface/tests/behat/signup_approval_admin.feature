@@ -263,7 +263,7 @@ Feature: Seminar Signup Admin Approval
     Given I log in as "admin"
 
     # Add approver column to the embedded report
-    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the following fields to these values:
       | Report Name value  | Seminar |
     And I click on "#id_submitgroupstandard_addfilter" "css_element"

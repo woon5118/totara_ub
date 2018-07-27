@@ -43,7 +43,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -72,7 +72,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Attendees"
     And I follow "Approval required"
@@ -88,7 +88,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Attendees"
     And I follow "Cancellations"
@@ -102,7 +102,7 @@ Feature: Users are forced to get manager approval where required
     Then I should see "Your request was sent to your manager for approval."
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Attendees"
     And I follow "Approval required"

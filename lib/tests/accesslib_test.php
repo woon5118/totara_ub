@@ -2426,7 +2426,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $children = $context->get_child_contexts();
         // Totara: MDL-55074 removed defaults for new navigation in theme_boost.
         // Replace them for time being as we do not include that theme.
-        $this->assertCount(7, $children); // Depends on number of default blocks.
+        $this->assertCount(8, $children); // Depends on number of default blocks.
 
         $context = context_module::instance($testpages[3]);
         $children = $context->get_child_contexts();

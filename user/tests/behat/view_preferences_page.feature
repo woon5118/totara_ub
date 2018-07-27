@@ -27,13 +27,13 @@ Feature: Access to preferences page
 
   Scenario: A student and teacher with normal permissions can not view another user's permissions page.
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 2"
     And I should not see "Preferences" in the "region-main" "region"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to course participants
     And I follow "Student 2"
     Then I should not see "Preferences" in the "region-main" "region"
@@ -57,7 +57,7 @@ Feature: Access to preferences page
     And I am on site homepage
     And I follow "Turn editing on"
     And I add the "Mentees" block
-    And I navigate to "Define roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Define roles" node in "Site administration > Permissions"
     And I click on "Add a new role" "button"
     And I click on "Continue" "button"
     And I set the following fields to these values:
@@ -69,7 +69,7 @@ Feature: Access to preferences page
     | moodle/user:viewuseractivitiesreport | 1 |
     | moodle/user:viewdetails | 1 |
     And I click on "Create this role" "button"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Student 1"
     And I click on "Preferences" "link" in the ".profile_tree" "css_element"
     And I follow "Assign roles relative to this user"

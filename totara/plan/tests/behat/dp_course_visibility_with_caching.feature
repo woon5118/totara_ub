@@ -29,7 +29,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
   @javascript
   Scenario: Normal visibility (default), visible (default).
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -67,7 +67,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Topic 1"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -107,7 +107,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Topic 1"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -147,7 +147,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Topic 1"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -203,7 +203,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Changes saved"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -246,7 +246,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Topic 1"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -289,7 +289,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Topic 1"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -332,7 +332,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Topic 1"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -377,7 +377,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     Then I should see "Topic 1"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:
@@ -434,7 +434,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I should see "fn_001 ln_001"
 
     # Set up report caching, after configuring the course.
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I follow "Record of Learning: Courses"
     And I switch to "Performance" tab
     And I set the following fields to these values:

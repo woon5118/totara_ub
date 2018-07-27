@@ -60,7 +60,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
@@ -112,7 +112,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
@@ -148,7 +148,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -183,7 +183,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -222,7 +222,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
@@ -254,7 +254,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -379,7 +379,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "D035 M00d13 r0x0rz j00 b0x0rs?"
     And I set the following fields to these values:

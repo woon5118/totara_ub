@@ -29,6 +29,10 @@
     margin: auto 0 auto auto;
     padding: 0 0 0 @totaranav-spacing_small;
 
+    &__separator {
+        display: none;
+    }
+
     .langmenu {
         padding: 0;
 
@@ -174,13 +178,21 @@
     .totaraNav_prim--side {
         position: relative;
 
-        &::before {
-            border-left: 1px solid @totaranav_prim-color_background_expanded;
-            content: '';
-            height: 50%;
-            left: 0;
-            position: absolute;
-            top: 25%;
+        &__separator {
+            display: block;
+            flex: 0 0 0;
+            position: relative;
+
+            padding: 0 0 0 @totaranav-spacing_small;
+
+            &::before {
+                border-left: 1px solid @totaranav_prim-color_background_expanded;
+                content: '';
+                height: 50%;
+                left: 0;
+                position: absolute;
+                top: 25%;
+            }
         }
 
         .usermenu {

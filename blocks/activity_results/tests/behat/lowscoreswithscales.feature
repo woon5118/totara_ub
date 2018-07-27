@@ -25,7 +25,7 @@ Feature: The activity results block displays student low scores as scales
       | student4 | C1 | student |
       | student5 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Scales" in the course gradebook
     And I press "Add a new scale"
     And I set the following fields to these values:

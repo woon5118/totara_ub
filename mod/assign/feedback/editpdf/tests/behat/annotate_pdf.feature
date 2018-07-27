@@ -37,7 +37,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
       | Maximum number of uploaded files | 2 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I upload "mod/assign/feedback/editpdf/tests/fixtures/submission.pdf" file to "File submissions" filemanager
@@ -48,10 +48,9 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I should see "Not graded"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
-    And I click on "Edit" "link" in the "Submitted for grading" "table_row"
     And I click on "Grade" "link" in the "Submitted for grading" "table_row"
     And I should see "Page 1 of 3"
     And I click on ".navigate-next-button" "css_element"
@@ -113,7 +112,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
       | Grouping for learner groups | G1 |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I upload "mod/assign/feedback/editpdf/tests/fixtures/submission.pdf" file to "File submissions" filemanager
@@ -123,7 +122,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I should see "Not graded"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     And I click on "Edit" "link" in the "Student 2" "table_row"

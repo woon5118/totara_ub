@@ -145,7 +145,8 @@ Feature: Test use of images in competencies and competency custom fields
     And I log in as "admin"
     And I run the "\totara_hierarchy\task\update_competencies_task" task
 
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Name   | Test Competency Status |
       | Source | Competency Status      |
@@ -166,7 +167,8 @@ Feature: Test use of images in competencies and competency custom fields
     Then I should see the "logo2 in competency description" image in the "//dd[preceding-sibling::dt[1][. = 'Description']]" "xpath_element"
     And I should see the "logo3 on customfield text area" image in the "//dd[preceding-sibling::dt[1][. = 'Custom text area 1']]" "xpath_element"
 
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Name   | Test Competency Status History |
       | Source | Competency Status History      |

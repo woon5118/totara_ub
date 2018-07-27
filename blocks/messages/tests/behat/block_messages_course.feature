@@ -50,5 +50,5 @@ Feature: The messages block allows users to list new messages an a course
     And I send "This is message 1" message to "Student 1" user
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Teacher 1" in the "Messages" "block"

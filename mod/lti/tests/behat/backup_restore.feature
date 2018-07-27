@@ -28,7 +28,7 @@ Feature: Restoring Moodle 2 backup restores LTI configuration
     And I navigate to "Manage tools" node in "Site administration > Plugins > Activity modules > External tool"
     And "This tool has not yet been used" "text" should exist in the "//div[contains(@id,'tool-card-container') and contains(., 'My site tool')]" "xpath_element"
     And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "External tool" to section "1" and I fill the form with:
         | Activity name | My LTI module |

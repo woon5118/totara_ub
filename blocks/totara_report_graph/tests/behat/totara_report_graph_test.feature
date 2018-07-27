@@ -16,7 +16,8 @@ Feature: Test the basic functionality of the Totara report graph block
       | learner6 | Learner6  | CZ      |
 
     When I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | My user report |
       | Source      | User           |

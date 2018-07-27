@@ -30,7 +30,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Message | Test post message |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should not see "1 unread post"
     And I follow "Test forum name"
     And I should not see "Track unread posts"
@@ -46,7 +46,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Message | Test post message |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "1 unread post"
     And I follow "Test forum name"
     And I follow "Don't track unread posts"
@@ -71,7 +71,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Message | Test post message |
     And I log out
     When I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should not see "1 unread post"
     And I follow "Test forum name"
     And I should not see "Track unread posts"
@@ -90,12 +90,12 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Message | Test post message |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "1 unread post"
     And I follow "1 unread post"
     And I should not see "Don't track unread posts"
     And I follow "Test post subject"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should not see "1 unread post"
 
   Scenario: Tracking forum posts forced with user tracking off
@@ -112,7 +112,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Message | Test post message |
     And I log out
     When I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "1 unread post"
     And I follow "1 unread post"
     And I should not see "Don't track unread posts"
@@ -136,7 +136,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | forum_allowforcedreadtracking | 0 |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "1 unread post"
     And I follow "Test forum name"
     And I follow "Don't track unread posts"
@@ -166,7 +166,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | forum_allowforcedreadtracking | 0 |
     And I log out
     When I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should not see "1 unread post"
     And I follow "Test forum name"
     And I should not see "Track unread posts"
@@ -187,7 +187,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Message | Test post message. Simply dummy text to mark post as read if they are displayed in full |
     And I log out
     When I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "1 unread post"
     And I follow "Test forum name"
     And I should see "1" in the "//table[@class='forumheaderlist']/tbody/tr[1]/td[count(//thead//tr/th[text()='Unread']/preceding-sibling::*)+2]" "xpath_element"

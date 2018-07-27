@@ -34,7 +34,7 @@ Feature: Scorm multi-sco review mode.
     And I should see "Basic Multi-sco SCORM package"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Basic Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -45,7 +45,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Basic Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -73,7 +73,7 @@ Feature: Scorm multi-sco review mode.
     And I should see "ADV Multi-sco SCORM package"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "ADV Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"
@@ -168,8 +168,7 @@ Feature: Scorm multi-sco review mode.
     And I follow "Exit activity"
     And I wait until the page is ready
     And I should see "ADV Multi-sco SCORM package"
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "ADV Multi-sco SCORM package"
     And I should see "Normal"
     And I press "Enter"

@@ -94,7 +94,8 @@ Feature: Seminar Event Registration Closure
     And I log in as "admin"
 
   Scenario: Session registration closure denies all pending requests and stops updates
-    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Global Session Status |
       | Source      | Seminar Sign-ups      |

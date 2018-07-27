@@ -48,7 +48,7 @@ Feature: Random glossary entry block linking to global glossary
     And I log out
     # Student who can't see the module is still able to view entries in this block (because the glossary was marked as global)
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Never come late" in the "Tip of the day" "block"
     And I should not see "Add a new entry" in the "Tip of the day" "block"
     And I should see "View all entries" in the "Tip of the day" "block"
@@ -76,6 +76,6 @@ Feature: Random glossary entry block linking to global glossary
     Then I should see "Please configure this block using the edit icon." in the "Tip of the day" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Tip of the day" "block" should not exist
     And I log out

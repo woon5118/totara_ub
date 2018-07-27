@@ -13,7 +13,7 @@ Feature: Add a bookmarks to an admin pages
   # Test bookmark functionality using the "User profile fields" page as our bookmark.
   Scenario: Admin page can be bookmarked
     Given I log in as "admin"
-    And I navigate to "User profile fields" node in "Site administration > Users > Accounts"
+    And I navigate to "User profile fields" node in "Site administration > Users"
     When I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
     Then I should see "User profile fields" in the "Admin bookmarks" "block"
     # See the existing bookmark is there too.
@@ -40,7 +40,7 @@ Feature: Add a bookmarks to an admin pages
     Given I log in as "admin"
 
     # Sessions report
-    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Seminars:"
     And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: View and manage sessions"
@@ -49,7 +49,7 @@ Feature: Add a bookmarks to an admin pages
     Then I should see "Sessions report" in the "Admin bookmarks" "block"
 
     # Events report
-    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Seminars:"
     And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: View and manage events"
@@ -58,7 +58,7 @@ Feature: Add a bookmarks to an admin pages
     Then I should see "Events report" in the "Admin bookmarks" "block"
 
     # Rooms report
-    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Seminars:"
     And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: Manage rooms"
@@ -67,7 +67,7 @@ Feature: Add a bookmarks to an admin pages
     Then I should see "Rooms" in the "Admin bookmarks" "block"
 
     # Assets report
-    And I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Seminars:"
     And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: Manage assets"

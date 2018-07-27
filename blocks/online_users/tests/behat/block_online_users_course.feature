@@ -33,7 +33,7 @@ Feature: The online users block allow you to see who is currently online
     And I log in as "student2"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Teacher 1" in the "Online users" "block"
     And I should see "Student 1" in the "Online users" "block"
     And I should not see "Student 2" in the "Online users" "block"

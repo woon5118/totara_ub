@@ -10,7 +10,7 @@ Feature: Test visibility control of menu items
     And I log in as "admin"
     And I set the following administration settings values:
       | Guest login button | Show |
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
     And I set the following fields to these values:
      | Menu title | Test one |
@@ -24,7 +24,7 @@ Feature: Test visibility control of menu items
   Scenario: access controls can be set on always items set to use custom access rules
     Given I am on a totara site
     And I log in as "admin"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
     And I set the following fields to these values:
       | Menu title | Test one |
@@ -46,7 +46,7 @@ Feature: Test visibility control of menu items
   Scenario: role aggregation works as expected for menu item visibility
     Given I am on a totara site
     And I log in as "admin"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
     And I set the following fields to these values:
       | Menu title | Test one |
@@ -143,7 +143,7 @@ Feature: Test visibility control of menu items
       | Menu title          | Visibility              | Menu default url address | Restrict access by audience |
       | CH1 members only    | Use custom access rules | http://totaralms.com     | 1                           |
       | CH2 members only    | Use custom access rules | http://totaralms.com     | 1                           |
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I edit "CH1 members only" totara menu item
     And I click on "Access" "link"
     And I expand all fieldsets
@@ -153,7 +153,7 @@ Feature: Test visibility control of menu items
     And I press "OK"
     And I wait "1" seconds
     And I press "Save changes"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I edit "CH2 members only" totara menu item
     And I click on "Access" "link"
     And I expand all fieldsets

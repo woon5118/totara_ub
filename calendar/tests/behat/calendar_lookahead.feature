@@ -17,7 +17,7 @@ Feature: Limit displayed upcoming events
     And I log in as "teacher1"
 
   Scenario: I view calendar details for a future event
-    Given I follow "C1"
+    Given I am on "Course 1" course homepage
     And I turn editing mode on
     And I add the "Calendar" block
     And I follow "This month"

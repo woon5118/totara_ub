@@ -30,7 +30,8 @@ Feature: Use facetoface session roles
     And I set the field "id_s__facetoface_session_roles_5" to "1"
     And I press "Save changes"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "F2F sessions"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"

@@ -34,7 +34,7 @@ Feature: View the user page for the outline report
       | loglegacy | 1 | logstore_legacy |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     # We want to view this multiple times, to make sure the count is working.
     And I follow "Folder name"
     And I follow "Folder name"
@@ -62,7 +62,7 @@ Feature: View the user page for the outline report
     And "Disable" "link" should exist in the "Standard log" "table_row"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     # We want to view this multiple times, to make sure the count is working.
     And I follow "Folder name"
     And I follow "Folder name"
@@ -92,7 +92,7 @@ Feature: View the user page for the outline report
       | loglegacy | 1 | logstore_legacy |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     # We want to view this multiple times, to make sure the count is working.
     And I follow "Folder name"
     And I follow "Folder name"

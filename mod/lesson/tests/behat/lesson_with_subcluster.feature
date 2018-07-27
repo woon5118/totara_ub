@@ -141,7 +141,7 @@ Feature: In a lesson activity, students can see questions in random order and a 
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I follow "Lesson with subcluster"
     Then I should see "First page contents"
     And I press "Next page"

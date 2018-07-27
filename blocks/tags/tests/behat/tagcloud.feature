@@ -39,7 +39,7 @@ Feature: Block tags displaying tag cloud
     And I add the "Tags" block
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Dogs" in the "Tags" "block"
     And I should see "Cats" in the "Tags" "block"
     And I should not see "Neverusedtag" in the "Tags" "block"

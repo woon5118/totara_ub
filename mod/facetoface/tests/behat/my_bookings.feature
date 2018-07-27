@@ -193,7 +193,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
     # Login as admin and add past booking for student2.
     When I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "seminar2" "link"
     And I click on "Attendees" "link" in the "Event over" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"

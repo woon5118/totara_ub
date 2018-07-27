@@ -31,7 +31,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
 
   Scenario: Students use the recent blog entries block to view blogs
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment 1"
     And I follow "Add an entry about this Assignment"
     When I set the following fields to these values:
@@ -47,7 +47,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
 
   Scenario: Students only see a few entries in the recent blog entries block
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment 1"
     And I follow "Add an entry about this Assignment"
     # Blog 1 of 5

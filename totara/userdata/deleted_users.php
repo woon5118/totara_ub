@@ -34,7 +34,7 @@ admin_externalpage_setup('userdatadeletedusers');
 
 $report = reportbuilder_get_embedded_report('userdata_deleted_users', array(), false, $sid);
 
-$PAGE->set_button($report->edit_button());
+$PAGE->set_button($report->edit_button() . $PAGE->button);
 
 /** @var totara_reportbuilder_renderer|core_renderer $output */
 $output = $PAGE->get_renderer('totara_reportbuilder');

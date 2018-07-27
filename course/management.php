@@ -105,6 +105,9 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title($strmanagement);
 $PAGE->set_heading($pageheading);
 
+//TOTARA: Set this as an admin page
+$PAGE->set_pagetype('admin-' . $PAGE->pagetype);
+
 // This is a system level page that operates on other contexts.
 require_login();
 
@@ -481,6 +484,9 @@ $renderer->enhance_management_interface();
 $displaycategorylisting = ($viewmode === 'default' || $viewmode === 'combined' || $viewmode === 'categories');
 $displaycourselisting = ($viewmode === 'default' || $viewmode === 'combined' || $viewmode === 'courses');
 $displaycoursedetail = (isset($courseid));
+
+// TOTARA: Add button to add/remove for quickaccess menu
+\totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, 'coursemgmt');
 
 echo $renderer->header();
 

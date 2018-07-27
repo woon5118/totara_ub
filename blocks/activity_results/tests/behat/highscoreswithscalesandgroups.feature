@@ -42,7 +42,7 @@ Feature: The activity results block displays student in group high scores as sca
       | student5 | G3 |
       | student6 | G3 |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Scales" in the course gradebook
     And I press "Add a new scale"
     And I set the following fields to these values:
@@ -82,7 +82,7 @@ Feature: The activity results block displays student in group high scores as sca
     And I should see "Excellent!" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 1" in the "Activity results" "block"
     And I should see "Excellent!" in the "Activity results" "block"
 
@@ -103,7 +103,7 @@ Feature: The activity results block displays student in group high scores as sca
     And I should see "Good" in the "Activity results" "block"
     And I log out
     And I log in as "student3"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 3" in the "Activity results" "block"
     And I should see "Very good" in the "Activity results" "block"
     And I should see "Student 4" in the "Activity results" "block"
@@ -124,7 +124,7 @@ Feature: The activity results block displays student in group high scores as sca
     And I should see "Good" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "User S1" in the "Activity results" "block"
     And I should see "Excellent!" in the "Activity results" "block"
     And I should see "User S2" in the "Activity results" "block"

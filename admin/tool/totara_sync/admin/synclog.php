@@ -25,17 +25,16 @@
 require_once('../../../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/totara_sync/lib.php');
+require_once($CFG->libdir . '/adminlib.php');
 
 $debug  = optional_param('debug', 0, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // export format
 $delete = optional_param('del', 'none', PARAM_ALPHANUM);
 
-$context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_url('/' . $CFG->admin . '/tool/totara_sync/admin/synclog.php');
+admin_externalpage_setup('totarasynclog');
 
-require_login();
+$context = context_system::instance();
 
 /** @var totara_reportbuilder_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
@@ -89,10 +88,9 @@ $report->include_js();
 $fullname = format_string($report->fullname);
 $pagetitle = format_string(get_string('report', 'totara_core') . ': ' . $fullname);
 
-$PAGE->set_pagelayout('admin');
 $PAGE->navbar->add(get_string('view'));
 $PAGE->set_title($pagetitle);
-$PAGE->set_button($report->edit_button());
+$PAGE->set_button($report->edit_button() . $PAGE->button);
 $PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 

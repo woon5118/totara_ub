@@ -37,7 +37,7 @@ Feature: Test HR Import user database suspended field import.
     Then I should see "Running HR Import cron...Done!"
     And I should not see "However, there have been some problems"
     # Check the user has the correct suspended setting.
-    Then I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    Then I navigate to "Browse list of users" node in "Site administration > Users"
     And I set the field "user-deleted" to "any value"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And the following should exist in the "system_browse_users" table:

@@ -11,7 +11,7 @@ Feature: Test menu correctly highlights the course catalog page when enhanced ca
     And I navigate to "Advanced features" node in "Site administration"
     And I set the field "Catalogue type" to "moodle"
     And I press "Save changes"
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
     And I set the following fields to these values:
       | Menu title | Enhanced catalog |

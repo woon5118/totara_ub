@@ -47,7 +47,7 @@ Feature: Test HR Import user csv suspended field import.
     And I should not see "However, there have been some problems"
 
     # Check the user has the correct suspended setting.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I set the field "user-deleted" to "any value"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then the following should exist in the "system_browse_users" table:

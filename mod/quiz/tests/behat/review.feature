@@ -37,7 +37,7 @@ Feature: Review quiz attempts
       | Multi-choice-004 | 1 |
 
     And I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz"
     And I follow "Edit quiz"
     And I set the field "Maximum grade" to "4"
@@ -67,7 +67,7 @@ Feature: Review quiz attempts
 
     # Now set the decimal places in grades to 0
     When I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz"
     And I follow "Edit settings"
     And I follow "Expand all"

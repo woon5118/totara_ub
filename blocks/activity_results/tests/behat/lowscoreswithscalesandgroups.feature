@@ -42,7 +42,7 @@ Feature: The activity results block displays students in groups low scores as sc
       | student5 | G3 |
       | student6 | G3 |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Scales" in the course gradebook
     And I press "Add a new scale"
     And I set the following fields to these values:
@@ -82,7 +82,7 @@ Feature: The activity results block displays students in groups low scores as sc
     And I should see "Good" in the "Activity results" "block"
     And I log out
     And I log in as "student5"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 6" in the "Activity results" "block"
     And I should see "Average" in the "Activity results" "block"
 
@@ -101,7 +101,7 @@ Feature: The activity results block displays students in groups low scores as sc
     And I should see "Good" in the "Activity results" "block"
     And I log out
     And I log in as "student3"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 3" in the "Activity results" "block"
     And I should see "Very good" in the "Activity results" "block"
     And I should see "Student 4" in the "Activity results" "block"
@@ -121,7 +121,7 @@ Feature: The activity results block displays students in groups low scores as sc
     And I should see "Good" in the "Activity results" "block"
     And I log out
     And I log in as "student5"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "User S5" in the "Activity results" "block"
     And I should see "Good" in the "Activity results" "block"
     And I should see "User S6" in the "Activity results" "block"
@@ -141,7 +141,7 @@ Feature: The activity results block displays students in groups low scores as sc
     And I should see "Good" in the "Activity results" "block"
     And I log out
     And I log in as "student5"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "User" in the "Activity results" "block"
     And I should see "Good" in the "Activity results" "block"
     And I should see "Average" in the "Activity results" "block"

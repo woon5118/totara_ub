@@ -25,7 +25,7 @@ Feature: Managers can create courses
     And "Subscription mode > Forced subscription" "text" should exist in current page administration
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Announcements"
     And "Add a new topic" "button" should not exist
     And "Forced subscription" "text" should exist in current page administration
@@ -78,7 +78,8 @@ Feature: Managers can create courses
     And I create a course with:
       | Course full name | Course 1 |
       | Course short name | This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long shortname |
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Courses Report |
       | Source      | Courses        |

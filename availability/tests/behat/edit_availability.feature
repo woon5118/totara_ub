@@ -55,7 +55,7 @@ Feature: edit_availability
   Scenario: Edit availability using settings in activity form
     # Set up.
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # Add a Page and check it has None in so far.
     And I turn editing mode on

@@ -12,7 +12,7 @@ Feature: Set the site home page and dashboard as the default home page
   @javascript
   Scenario: Admin sets the site page and then the dashboard as the default home page
     Given I log in as "admin"
-    And I navigate to "Appearance > Navigation" in site administration
+    And I navigate to "Navigation > Navigation settings" in site administration
     And I set the field "Allow default page selection" to "1"
     And I press "Save changes"
     And I am on site homepage

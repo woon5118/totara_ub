@@ -20,7 +20,8 @@ Feature: Open the edit menu when a block is docked
     And I add a "Glossary" to section "1" and I fill the form with:
       | Name | Test glossary name |
       | Description | Test glossary description |
-    And I dock "Navigation" block
+    # "Course 1" is the course navigation block for this course
+    And I dock "Course 1" block
     When I open "Test glossary name" actions menu
     Then "Test glossary name" actions menu should be open
     And I reload the page

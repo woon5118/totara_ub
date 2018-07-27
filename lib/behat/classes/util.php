@@ -158,6 +158,9 @@ class behat_util extends testing_util {
         $DB->delete_records('log_display');
         $DB->delete_records('upgrade_log');
 
+        // Totara: Renable site legacy site administration menu
+        set_config('legacyadminsettingsmenu', 1);
+
         // Totara: there is no need to save filedir files, we do not delete them in tests!
 
         // Keeps the current version of database and dataroot.

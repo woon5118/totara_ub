@@ -177,12 +177,12 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     Then I should not see "Add job assignment"
     And I click on "fullx" "link"
@@ -204,7 +204,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -223,7 +223,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 9 - Had two existing job assignments. First one should have been updated with new id number.
     # Empty strings don't erase, so Full Name should still be there.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -244,7 +244,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -260,7 +260,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
     # Empty strings don't erase, so Full Name should still be there.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -281,7 +281,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -296,7 +296,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:
@@ -360,12 +360,12 @@ Feature: Use user source to import job assignments data in HR sync
 
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     Then I should not see "Add job assignment"
     And I click on "fullx" "link"
@@ -387,7 +387,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -406,7 +406,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 9 - Had two existing job assignments. First one should have been updated with new id number.
     # Empty strings erased any existing values.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "Unnamed job assignment (ID: newjaid)" "link"
     Then the following fields match these values:
@@ -424,7 +424,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -440,7 +440,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
     # Empty strings erase any existing values.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "Unnamed job assignment (ID: jaidx)" "link"
     Then the following fields match these values:
@@ -458,7 +458,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -473,7 +473,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:
@@ -539,12 +539,12 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -565,7 +565,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -583,7 +583,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates here.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -604,7 +604,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -620,7 +620,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
     # Empty strings don't erase, so Full Name should still be there.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -641,7 +641,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -656,7 +656,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:
@@ -722,12 +722,12 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -748,7 +748,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -766,7 +766,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates here.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -787,7 +787,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -803,7 +803,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
     # Empty strings erase.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "Unnamed job assignment (ID: jaidx)" "link"
     Then the following fields match these values:
@@ -821,7 +821,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -836,7 +836,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:
@@ -899,12 +899,12 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -925,7 +925,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -944,7 +944,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 9 - Had two existing job assignments. First one should have been updated with new id number.
     # Empty strings don't erase, so Full Name should still be there.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -965,7 +965,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -981,7 +981,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
     # Empty strings don't erase, so Full Name should still be there.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -1002,7 +1002,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -1017,7 +1017,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:
@@ -1080,13 +1080,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -1107,7 +1107,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -1126,7 +1126,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 9 - Had two existing job assignments. First one should have been updated with new id number.
     # Empty strings erased any existing values.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "Unnamed job assignment (ID: newjaid)" "link"
     Then the following fields match these values:
@@ -1144,7 +1144,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -1160,7 +1160,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
     # Empty strings erase any existing values.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "Unnamed job assignment (ID: jaidx)" "link"
     Then the following fields match these values:
@@ -1178,7 +1178,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -1193,7 +1193,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:
@@ -1256,13 +1256,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -1283,7 +1283,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -1301,7 +1301,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates for the existing two.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -1322,7 +1322,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -1337,7 +1337,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # User 9 - but they do now have a third job assignment.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "Unnamed job assignment (ID: newjaid)" "link"
     Then the following fields match these values:
@@ -1356,7 +1356,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated given the id numbers matched.
     # Empty strings don't erase, so Full Name should still be there.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -1377,7 +1377,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -1392,7 +1392,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:
@@ -1455,13 +1455,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first5 last5" "link"
     Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first7 last7" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -1482,7 +1482,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 8 - Had no existing job assignment. One should have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first8 last8" "link"
     And I click on "Valid and uses most fields" "link"
     Then the following fields match these values:
@@ -1500,7 +1500,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates for the existing two.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -1521,7 +1521,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 9 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -1536,7 +1536,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # User 9 - but they do now have a third job assignment.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first9 last9" "link"
     And I click on "Unnamed job assignment (ID: newjaid)" "link"
     Then the following fields match these values:
@@ -1555,7 +1555,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 10 - Had two existing job assignments. First one should have been updated given the id numbers matched.
     # Empty strings erase.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "Unnamed job assignment (ID: jaidx)" "link"
     Then the following fields match these values:
@@ -1573,7 +1573,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "appx appx"
 
     # User 10 - and their second job assignment should have not changed.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "first10 last10" "link"
     And I click on "fully" "link"
     Then the following fields match these values:
@@ -1588,7 +1588,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "appx appx"
 
     # Manager 3 had a job assignment created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "man3 man3" "link"
     And I click on "New Job Assignment" "link"
     Then the following fields match these values:

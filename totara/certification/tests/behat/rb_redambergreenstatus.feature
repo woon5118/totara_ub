@@ -14,7 +14,7 @@ Feature: The Certification Completion report displays correctly for a learner.
     And I log in as "admin"
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I press "Add new certification"
     And I set the following fields to these values:
       | Full name  | Test Certification |
@@ -46,7 +46,8 @@ Feature: The Certification Completion report displays correctly for a learner.
       | tstcert | user002 |
 
     # Add Certification Completion report so we can check the status.
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "Certification Completion Report"
     And I set the field "Source" to "Certification Completion"
     And I press "Create report"

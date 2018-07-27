@@ -68,7 +68,7 @@ Feature: Verify changing user element settings for CSV import.
       | user    | Error    | checksanity | Duplicate users with email duplicate@example.com. Skipped user imp002 |
 
     # Confirm that no user records have been created.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     Then I should not see "Import User001"
     And I should not see "Import User002"
 
@@ -94,7 +94,7 @@ Feature: Verify changing user element settings for CSV import.
       | user    | Info     | createuser | created user imp001 |
       | user    | Info     | createuser | created user imp001 |
 
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I press "Edit this report"
     Then I should see "Edit Report 'Browse list of users'"
 

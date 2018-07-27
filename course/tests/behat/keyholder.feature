@@ -9,7 +9,7 @@ Feature: Keyholder role is listed as course contact
     And the following "categories" exist:
       | name | category | idnumber |
       | Cat 1 | 0 | CAT1 |
-    And I navigate to "Define roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Define roles" node in "Site administration > Permissions"
     And I click on "Add a new role" "button"
     And I click on "Continue" "button"
     And I set the following fields to these values:
@@ -19,7 +19,7 @@ Feature: Keyholder role is listed as course contact
     | contextlevel50 | 1 |
     | enrol/self:holdkey | 1 |
     And I click on "Create this role" "button"
-    And I navigate to "Courses" node in "Site administration > Appearance"
+    And I navigate to "Course settings" node in "Site administration > Courses"
     And I click on "Keyholder" "checkbox"
     And I press "Save changes"
     And the following "users" exist:
@@ -44,8 +44,7 @@ Feature: Keyholder role is listed as course contact
       | keyholder1 | C1 | keyholder |
     And I log out
     And I log in as "student1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Keyholder 1"
 
   Scenario: Keyholder assigned to a category
@@ -58,6 +57,5 @@ Feature: Keyholder role is listed as course contact
       | teacher1 | C1 | editingteacher |
     And I log out
     And I log in as "student1"
-    And I am on site homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Keyholder 1"

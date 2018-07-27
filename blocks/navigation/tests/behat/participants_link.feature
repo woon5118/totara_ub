@@ -1,4 +1,4 @@
-@block @block_navigation
+@block @block_navigation @javascript
 Feature: Displaying the link to the Participants page
   In order to see the course / site participants
   As a student / admin respectively
@@ -37,6 +37,7 @@ Feature: Displaying the link to the Participants page
 
   Scenario: Site participants link is displayed to admins
     When I log in as "admin"
+    And I expand "Site pages" node
     Then "Participants" "link" should exist in the "Navigation" "block"
     And I click on "Participants" "link" in the "Navigation" "block"
     And I should see "Participants"

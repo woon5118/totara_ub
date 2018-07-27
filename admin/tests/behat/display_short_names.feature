@@ -17,7 +17,7 @@ Feature: Display extended course names
     And I should not see "C_shortname Course fullname"
 
   Scenario: Courses list with extended course names
-    Given I navigate to "Appearance > Courses" in site administration
+    Given I navigate to "Courses > Course settings" in site administration
     And I set the field "Display extended course names" to "1"
     When I press "Save changes"
     And I am on site homepage

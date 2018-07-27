@@ -29,14 +29,14 @@ Feature: We can change what we are viewing on the grader report
       | assignsubmission_onlinetext_enabled | 1 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name 1"
     When I press "Add submission"
     And I set the following fields to these values:
       | Online text | This is a submission for assignment 1 |
     And I press "Save changes"
     Then I should see "Submitted for grading"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name 2"
     When I press "Add submission"
     And I set the following fields to these values:
@@ -45,7 +45,7 @@ Feature: We can change what we are viewing on the grader report
     Then I should see "Submitted for grading"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "80.00" to the user "Student 1" for the grade item "Test assignment name 1"
@@ -96,7 +96,7 @@ Feature: We can change what we are viewing on the grader report
       | user | course | role |
       | student2 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     And I should see "Test assignment name 1"
     And I should see "Test assignment name 2"

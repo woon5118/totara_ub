@@ -32,7 +32,7 @@ Feature: A teacher can password protect a lesson
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I follow "Test lesson"
     Then I should see "Test lesson is a password protected lesson"
     And I should not see "First page contents"

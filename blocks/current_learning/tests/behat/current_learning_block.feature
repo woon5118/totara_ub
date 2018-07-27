@@ -41,7 +41,7 @@ Feature: Test Current Learning block
     And I click on "Save changes" "button"
 
     # Edit the program.
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Test Program 1" "link"
     And I click on "Edit program details" "button"
@@ -103,7 +103,7 @@ Feature: Test Current Learning block
       | user     | course | role           |
       | learner1 | course1| student        |
     And I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Test Program 1" "link"
     And I click on "Edit program details" "button"

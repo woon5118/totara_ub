@@ -14,7 +14,7 @@ Feature: Learners can submit assignments again when certification is expired
       | student1 | Student | 1 | student1@example.com |
 
     And I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set self completion for "Course 1" in the "Miscellaneous" category
     And I turn editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
@@ -23,7 +23,7 @@ Feature: Learners can submit assignments again when certification is expired
       | assignsubmission_onlinetext_enabled | 1 |
       | assignsubmission_file_enabled | 0 |
 
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I press "Add new certification"
     And I set the following fields to these values:
         | Full name  | Test Certification |

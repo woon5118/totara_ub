@@ -30,7 +30,7 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
 
-admin_externalpage_setup('rbcreatereport');
+admin_externalpage_setup('rbmanagereports');
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 

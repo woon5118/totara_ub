@@ -53,6 +53,6 @@ if (!during_initial_install() && $ADMIN->fulltree) {
         $temp->add(new admin_setting_configselect('defaultfrontpageroleid', new lang_string('frontpagedefaultrole', 'admin'), '', $defaultfrontpageroleid, $options));
         $temp->add(new admin_setting_configcheckbox('frontpageaddcoursebutton', new lang_string('frontpageaddcoursebutton', 'admin'), '', 0));
 
-        $ADMIN->add('frontpage', $temp);
+        $ADMIN->add('navigationcat', $temp);
     }
 }

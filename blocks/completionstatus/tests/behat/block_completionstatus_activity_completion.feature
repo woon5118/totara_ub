@@ -37,7 +37,7 @@ Feature: Enable Block Completion in a course using activity completion
     And I press "Save changes"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Status: Not yet started" in the "Course completion status" "block"
     And I should see "0 of 1" in the "Activity completion" "table_row"
 
@@ -58,7 +58,7 @@ Feature: Enable Block Completion in a course using activity completion
     And I press "Save changes"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test page name"
     And I follow "C1"
     # Totara has instant completion.

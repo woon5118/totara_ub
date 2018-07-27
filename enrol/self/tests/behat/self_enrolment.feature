@@ -21,7 +21,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
   @javascript
   Scenario: Self-enrolment enabled as guest
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add "Self enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -33,7 +33,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
 
   Scenario: Self-enrolment enabled
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Self enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -45,7 +45,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
 
   Scenario: Self-enrolment enabled requiring an enrolment key
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Self enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
       | Enrolment key | moodle_rules |
@@ -66,7 +66,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
 
   Scenario: Self-enrolment enabled requiring a group enrolment key
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Self enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
       | Enrolment key | moodle_rules |

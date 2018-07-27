@@ -42,7 +42,7 @@ Feature: link to gradebook on the end of lesson page
   Scenario: Link to gradebook for non practice lesson
     Given I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I press "Next page"
     And I press "Next page"
@@ -60,7 +60,7 @@ Feature: link to gradebook on the end of lesson page
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I press "Next page"
     And I press "Next page"
@@ -75,7 +75,7 @@ Feature: link to gradebook on the end of lesson page
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I press "Next page"
     And I press "Next page"
@@ -90,7 +90,7 @@ Feature: link to gradebook on the end of lesson page
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I press "Next page"
     And I press "Next page"
@@ -105,7 +105,7 @@ Feature: link to gradebook on the end of lesson page
       | gradereport/user:view | Prevent |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson"
     And I press "Next page"
     And I press "Next page"

@@ -35,7 +35,8 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I press "Save and display"
     And I run the scheduled task "\enrol_cohort\task\sync_members"
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Course Completion Report |
       | Source      | Course Completion        |
@@ -49,14 +50,15 @@ Feature: Check that course completion reports don't show multiple enrolment type
 
   Scenario: User is enrolled in the same course using a different method
     Given I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I press "Add enrolled audiences"
     And I click on "Audience 1" "link"
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I press "Save and display"
     And I run the scheduled task "\enrol_cohort\task\sync_members"
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Course Completion Report |
       | Source      | Course Completion        |
@@ -70,7 +72,7 @@ Feature: Check that course completion reports don't show multiple enrolment type
 
   Scenario: User with RPL completion is reported correctly
     Given I log in as "trainer1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     # Set up completion
     And I follow "Course completion"
     And I expand all fieldsets
@@ -83,7 +85,8 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I log out
     # Create the report
     And I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Course Completion Report |
       | Source      | Course Completion        |

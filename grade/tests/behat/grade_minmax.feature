@@ -65,7 +65,7 @@ Feature: We can choose what min or max grade to use when aggregating grades.
       | Aggregation          | Natural |
     And I log out
     And I log in as "teacher1"
-    And I follow "C1"
+    And I am on "C1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "75.00" to the user "Student 1" for the grade item "MI 1"

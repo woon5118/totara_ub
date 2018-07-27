@@ -34,7 +34,7 @@ Feature: A teacher can set a time limit for a lesson
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I follow "Test lesson"
     Then I should see "You have 1 min to finish the lesson."
     And I wait "3" seconds

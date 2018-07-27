@@ -30,7 +30,7 @@ Feature: Set a certain number of discussions as a completion condition for a for
       | completiondiscussions | 2 |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then the "Test forum name" "forum" activity with "auto" completion should be marked as not complete
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Post 1 subject |
@@ -42,5 +42,5 @@ Feature: Set a certain number of discussions as a completion condition for a for
     Then the "Test forum name" "forum" activity with "auto" completion should be marked as complete
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Student 1" user has completed "Test forum name" activity

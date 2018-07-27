@@ -96,7 +96,7 @@ Scale 1
     And I set the field "linktype" to "Mandatory"
 
     # Create a learning plan using the new template for the learner.
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
     And I press "Create new learning plan"

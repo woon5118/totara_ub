@@ -29,7 +29,8 @@ Feature: Users that are in waitlist of seminar's event should be displayed in th
     And I click on "Add" "button"
     And I click on "Continue" "button"
     And I click on "Confirm" "button"
-    And I navigate to "Reports >  Report builder > Create report" in site administration
+    And I navigate to "Reports > Manage user reports" in site administration
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Report 1            |
       | Source      | facetoface_sessions |

@@ -93,7 +93,7 @@ Feature: Seminar availability based on activity completion
 
   Scenario: Signup link is only available for users that meets the user's profile restriction
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
@@ -122,7 +122,7 @@ Feature: Seminar availability based on activity completion
 
   Scenario: Join Waitlist link is only available for users that meets the user's profile restriction
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets

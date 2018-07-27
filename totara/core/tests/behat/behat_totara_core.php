@@ -269,7 +269,7 @@ class behat_totara_core extends behat_base {
             $menutable = new TableNode($menurows);
             $ruletable = new TableNode($rulerows);
 
-            $this->execute("behat_navigation::i_navigate_to_node_in", array("Top navigation", "Site administration > Appearance"));
+            $this->execute("behat_navigation::i_navigate_to_node_in", array("Main menu", "Site administration > Navigation"));
             $this->execute("behat_forms::press_button", "Add new menu item");
             $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $menutable);
             $this->execute("behat_forms::press_button", "Add new menu item");
@@ -307,7 +307,8 @@ class behat_totara_core extends behat_base {
      */
     public function i_set_self_completion_for($course, $category) {
         \behat_hooks::set_step_readonly(false);
-        $this->execute("behat_navigation::i_navigate_to_node_in", array("Manage courses and categories", "Site administration > Courses"));
+        // TOTARA: Use this step instead of admin menu
+        $this->execute("behat_course::i_go_to_the_courses_management_page");
         $this->execute("behat_general::i_click_on_in_the", array($this->escape($category), 'link', ".category-listing", "css_element"));
         $this->execute("behat_general::i_click_on_in_the", array($this->escape($course), 'link', ".course-listing", "css_element"));
         $this->execute("behat_general::i_click_on_in_the", array('View', 'link', ".course-detail-listing-actions", "css_element"));

@@ -27,7 +27,7 @@ Feature: Enable Block Completion in a course using manual self completion
     And I press "Save changes"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Status: Not yet started" in the "Course completion status" "block"
     And I should see "No" in the "Self completion" "table_row"
     And I follow "Complete course"

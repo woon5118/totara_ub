@@ -187,7 +187,7 @@ Feature: Verify different delimiters can be handled in Totara Sync
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     Then I should see "Learner1 User1"
     And I should see "Learner2 User2"
     And I should see "Learner3 User3"

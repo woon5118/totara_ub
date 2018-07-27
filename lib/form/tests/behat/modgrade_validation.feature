@@ -90,7 +90,7 @@ Feature: Using the activity grade form element
       | Group mode | No groups |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I press "Add a new discussion topic"
     And I set the following fields to these values:
@@ -99,7 +99,7 @@ Feature: Using the activity grade form element
     And I press "Post to forum"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I follow "Discussion subject"
     And I set the field "rating" to "D"
@@ -168,7 +168,7 @@ Feature: Using the activity grade form element
       | Group mode | No groups |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I press "Add a new discussion topic"
     And I set the following fields to these values:
@@ -177,7 +177,7 @@ Feature: Using the activity grade form element
     And I press "Post to forum"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test forum name"
     And I follow "Discussion subject"
     And I set the field "rating" to "100"

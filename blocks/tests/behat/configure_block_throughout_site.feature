@@ -20,7 +20,7 @@ Feature: Add and configure blocks throughout the site
       | manager1 | Acceptance test site | manager |
     # Allow at least one role assignment in the block context:
     And I log in as "admin"
-    And I navigate to "Define roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Define roles" node in "Site administration > Permissions"
     And I follow "Edit Non-editing teacher role"
     And I set the following fields to these values:
       | Block | 1 |
@@ -51,11 +51,11 @@ Feature: Add and configure blocks throughout the site
   Scenario: Blocks on the dashboard page can have roles assigned to them
     Given I log in as "manager1"
     When I press "Customise this page"
-    Then I should see "Assign roles in Navigation block"
+    Then I should see "Assign roles in Dashboards block"
 
   Scenario: Blocks on courses can have roles assigned to them
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Turn editing on"
     Then I should see "Assign roles in Search forums block"
 

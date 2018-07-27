@@ -344,7 +344,8 @@ Feature: Correct results are shown in the recent activity screen
     Then I should see "newAnswer"
 
     # Check Folder
-    When I click on "Folder name" "link"
+    When I click on "C1" "link"
+    And I click on "Folder name" "link"
     And I click on "Edit" "button"
     And I upload "course/tests/fixtures/example.txt" file to "Files" filemanager
     And I click on "Save changes" "button"

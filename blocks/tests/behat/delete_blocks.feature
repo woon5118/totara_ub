@@ -7,7 +7,7 @@ Feature: Block deletion
   Scenario: Block can be added and deleted from an admin settings page
     Given I log in as "admin"
     And I am on site homepage
-    When I navigate to "Language > Language settings" in site administration
+    When I navigate to "Localisation > Language settings" in site administration
     And I press "Blocks editing on"
     And I should not see "Testing block deletion"
     And I add the "HTML" block

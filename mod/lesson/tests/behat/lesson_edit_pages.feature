@@ -69,7 +69,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I should not see "Second page name"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"
@@ -108,7 +108,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I should not see "Hardest question ever"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test lesson name"
     And I should see "First page contents"
     And I press "Next page"

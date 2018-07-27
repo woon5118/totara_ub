@@ -39,7 +39,8 @@ Feature: Ability to view the seminar's asset, even though the asset is being use
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Save changes" "button"
     And I should see "Event in progress"
-    And I navigate to "Reports > Report builder >  Create report" in site administration
+    And I navigate to "Reports > Manage user reports" in site administration
+    And I click on "Create report" "button"
     And I set the following fields to these values:
       | fullname | Asset Session    |
       | source   | Seminar Sessions |

@@ -305,11 +305,21 @@ class behat_grade extends behat_base {
     public function i_navigate_to_in_the_course_gradebook($gradepath) {
         \behat_hooks::set_step_readonly(false);
 
+        // TOTARA: we check the one of the 2 navigation blocks
         // If we are not on one of the gradebook pages already, follow "Grades" link in the navigation block.
         $xpath = '//div[contains(@class,\'grade-navigation\')]';
         if (!$this->getSession()->getPage()->findAll('xpath', $xpath)) {
-            $this->execute("behat_general::i_click_on_in_the", array(get_string('grades'), 'link',
-                get_string('pluginname', 'block_navigation'), 'block'));
+            $settings_xpath = '//div[contains(@class,\'block_settings\')]';
+            if ($this->getSession()->getPage()->findAll('xpath', $settings_xpath)) {
+                $this->execute("behat_general::i_click_on_in_the", array(get_string('grades'), 'link',
+                    '.block_settings', 'css_element'));
+            }
+            // If we have the course nav block use that
+            $coursenav_xpath = '//div[contains(@class,\'block_course_navigation\')]';
+            if ($this->getSession()->getPage()->findAll('xpath', $coursenav_xpath)) {
+                $this->execute("behat_general::i_click_on_in_the", array(get_string('grades'), 'link',
+                    '.block_course_navigation', 'css_element'));
+            }
         }
 
         $this->select_in_gradebook_tabs($gradepath);

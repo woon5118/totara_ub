@@ -64,7 +64,7 @@ Feature: Show/hide course sections
     And all activities in section "1" should be hidden
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And section "1" should be hidden
     And all activities in section "1" should be hidden
     And section "2" should be visible

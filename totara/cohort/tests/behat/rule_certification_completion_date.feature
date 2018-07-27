@@ -46,7 +46,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     And I click on "Save all changes" "button"
 
   Scenario: Ensure certification completion date rule form validation is correct
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification completion date"
@@ -90,7 +90,7 @@ Feature: Test the certification completion date rule in dynamic audiences
 
   Scenario: Use certification completion date rule, user completed before date
     # User not certified, check date before, date in past.
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     When I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification completion date"

@@ -58,8 +58,8 @@ if ($hassiteconfig or has_any_capability(array('totara/contentmarketplace:config
     ));
 
     $beforesibling = null;
-    if (has_capability('moodle/category:manage', $systemcontext)) {
-        $beforesibling = 'addcategory';
+    if (has_any_capability(['moodle/restore:restorefile', 'moodle/backup:downloadfile'], $systemcontext)) {
+        $beforesibling = 'restorecourse';
     }
     $wm = new \totara_contentmarketplace\workflow_manager\exploremarketplace();
     $ADMIN->add(

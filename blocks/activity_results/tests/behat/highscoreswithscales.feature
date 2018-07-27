@@ -25,7 +25,7 @@ Feature: The activity results block displays students high scores in group as sc
       | student4 | C1 | student |
       | student5 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Scales" in the course gradebook
     And I press "Add a new scale"
     And I set the following fields to these values:
@@ -39,7 +39,7 @@ Feature: The activity results block displays students high scores in group as sc
       | assignsubmission_file_enabled | 0 |
       | id_grade_modgrade_type | Scale |
       | id_grade_modgrade_scale | My Scale |
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "Excellent!" to the user "Student 1" for the grade item "Test assignment"

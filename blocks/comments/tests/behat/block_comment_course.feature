@@ -22,5 +22,5 @@ Feature: Enable Block comments on a course page and view comments
     And I add "I'm a comment from the teacher" comment to comments block
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "I'm a comment from the teacher"

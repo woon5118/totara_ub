@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/core/db" VERSION="20180304" COMMENT="XMLDB file for Moodle totara/core"
+<XMLDB PATH="totara/core/db" VERSION="20181101" COMMENT="XMLDB file for Moodle totara/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -258,6 +258,21 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="contenthash" UNIQUE="true" FIELDS="contenthash"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="quickaccess_preferences" COMMENT="Stores user preferences for the quick access menu">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quickaccesspref_user_uix" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="quickaccesspref_usenam_uix" UNIQUE="true" FIELDS="userid, name"/>
       </INDEXES>
     </TABLE>
   </TABLES>

@@ -35,7 +35,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
 
   Scenario: Unenrolled learner can see in-progress course in rol when course visibility is set to Show
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Page One" "link"
     And I log out
     And I log in as "admin"
@@ -57,7 +57,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
 
   Scenario: Unenrolled learner can see in-progress course in rol when course visibility is set to Hide
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Page One" "link"
     And I log out
     And I log in as "admin"
@@ -79,7 +79,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
 
   Scenario: Unenrolled learner can see in-progress course in rol when audience visibility is set to All users
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Page One" "link"
     And I log out
     And I log in as "admin"
@@ -101,7 +101,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
 
   Scenario: Unenrolled learner can see in-progress course in rol when audience visibility is set to Enrolled users only
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Page One" "link"
     And I log out
     And I log in as "admin"
@@ -123,7 +123,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
 
   Scenario: Unenrolled learner can see in-progress course in rol when audience visibility is set to No users
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Page One" "link"
     And I log out
     And I log in as "admin"
@@ -217,7 +217,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
 
   Scenario: Unenrolled learner can see complete course in rol when course visibility is set to Hide
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Page One" "link"
     And I follow "Course 1"
     And I click on "Page Two" "link"
@@ -241,7 +241,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
 
   Scenario: Unenrolled learner can see complete course in rol when audience visibility is set to No users
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Page One" "link"
     And I follow "Course 1"
     And I click on "Page Two" "link"

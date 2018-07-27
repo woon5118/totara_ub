@@ -36,7 +36,7 @@ Feature: Adding blog tag block
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to course participants
     And I click on "Course blogs" "link" in the "Navigation" "block"
     And I follow "Blog about this Course"

@@ -30,12 +30,12 @@ Feature: Test we can manually archive course completion.
     And I press "Save changes"
     And I log out
     And I log in as "learner1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Complete course" "link"
     And I press "Yes"
     And I log out
     And I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Completions archive" node in "Course administration"
     And I should see "The course completion data that will be archived is limited to: id; courseid; userid; timecompleted; grade."
     And I should see "1 users will be affected"
@@ -77,7 +77,7 @@ Feature: Test we can manually archive course completion.
     And I press "Yes"
     And I log out
     And I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Completions archive" node in "Course administration"
     Then I should see "Courses which are a part of a Program or Certification can not be manually archived."
     And I should see "Completion archive test"
@@ -122,15 +122,15 @@ Feature: Test we can manually archive course completion.
     And I should see "15.00" in the "//table[@id='user-grades']//th[contains(text(), 'Overall average')]/ancestor::tr/td[contains(@class, 'lastcol')]" "xpath_element"
 
     When I run the scheduled task "core\task\completion_regular_task"
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration > Reports"
     Then "//table[@id='completion-progress']//th/a[text()='Learner One']/ancestor::tr//span[contains(@title, 'Not completed')]" "xpath_element" should exist
     And "//table[@id='completion-progress']//th/a[text()='Learner Two']/ancestor::tr//span[contains(@title, 'Not completed')]" "xpath_element" should exist
     And "//table[@id='completion-progress']//th/a[text()='Learner Three']/ancestor::tr//span[contains(@title, 'Completed')]" "xpath_element" should exist
     And "//table[@id='completion-progress']//th/a[text()='Learner Four']/ancestor::tr//span[contains(@title, 'Completed')]" "xpath_element" should exist
 
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Test course completion report |
       | Source      | Course Completion             |
@@ -168,7 +168,8 @@ Feature: Test we can manually archive course completion.
     And "Learner Four" row "Required grade" column of "report_test_course_completion_report" table should contain "85.7% (42.9% to complete)"
 
     When I am on homepage
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Test course completion including history report |
       | Source      | Course Completion Including History |

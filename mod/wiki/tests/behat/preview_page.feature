@@ -25,7 +25,7 @@ Feature: Edited wiki pages may be previewed before saving
       | Wiki mode | Collaborative wiki |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     When I press "Create page"
     And I set the following fields to these values:

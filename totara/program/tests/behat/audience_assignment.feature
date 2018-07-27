@@ -52,7 +52,7 @@ Feature: Check user view capability for audiences in the assignments tab
 
 #    Assign audiencewatcher role to catmgr in the system level, so he can now see Audiences in the sys context.
     And I log in as "admin"
-    And I navigate to "Define roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Define roles" node in "Site administration > Permissions"
     And I click on "Add a new role" "button"
     And I click on "Continue" "button"
     And I set the following fields to these values:
@@ -95,7 +95,7 @@ Feature: Check user view capability for audiences in the assignments tab
 #    Remove audiencewatcher role from catmgr and make sure the audience is still visible and assigned
 #    but not reachable through the search.
     And I log in as "admin"
-    And I navigate to "Assign system roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Assign system roles" node in "Site administration > Permissions"
     And I click on "Audience watcher" "link"
     And I set the field "Existing users" to "Category Manager (catmgr@example.com)"
     And I press "Remove"

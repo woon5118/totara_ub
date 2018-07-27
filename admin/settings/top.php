@@ -27,6 +27,9 @@ if ($hassiteconfig) {
 }
 
 $ADMIN->add('root', new admin_category('users', new lang_string('users','admin')));
+$ADMIN->add('root', new admin_category('audiences', new lang_string('cohorts', 'totara_cohort')));
+$ADMIN->add('root', new admin_category('roles', new lang_string('permissions', 'role')));
+$ADMIN->add('root', new admin_category('userdata', new lang_string('pluginname', 'totara_userdata')));
 $ADMIN->add('root', new admin_category('hierarchies', new lang_string('hierarchies','totara_hierarchy')));
 $ADMIN->add('root', new admin_category('totara_plan', new lang_string('learningplans', 'totara_plan'),
     totara_feature_disabled('learningplans')
@@ -35,19 +38,26 @@ $ADMIN->add('root', new admin_category('appraisals', new lang_string('appraisals
     (totara_feature_disabled('appraisals') && totara_feature_disabled('feedback360'))
 ));
 $ADMIN->add('root', new admin_category('courses', new lang_string('courses','admin')));
+$ADMIN->add('root', new admin_category('programs', new lang_string('programs','totara_program')));
+$ADMIN->add('root', new admin_category('certifications', new lang_string('certifications','totara_certification')));
 $ADMIN->add('root', new admin_category('grades', new lang_string('grades')));
 // TOTARA: We removed Moodles competency code as we've had competencies for years.
 // $ADMIN->add('root', new admin_category('competencies', new lang_string('competencies', 'core_competency')));
 $ADMIN->add('root', new admin_category('badges', new lang_string('badges'), empty($CFG->enablebadges)));
-$ADMIN->add('root', new admin_category('location', new lang_string('location','admin')));
-$ADMIN->add('root', new admin_category('language', new lang_string('language')));
+$ADMIN->add('root', new admin_category('localisation', new lang_string('localisation','admin')));
+// TOTARA: Removed these categories and moved contents to localisation
+//$ADMIN->add('root', new admin_category('location', new lang_string('location','admin')));
+//$ADMIN->add('root', new admin_category('language', new lang_string('language')));
 $ADMIN->add('root', new admin_category('modules', new lang_string('plugins', 'admin')));
 $ADMIN->add('root', new admin_category('security', new lang_string('security','admin')));
 $ADMIN->add('root', new admin_category('appearance', new lang_string('appearance','admin')));
-$ADMIN->add('root', new admin_category('frontpage', new lang_string('frontpage','admin')));
+$ADMIN->add('root', new admin_category('navigationcat', new lang_string('navigation')));
+// TOTARA: Removed the frontpage category
+//$ADMIN->add('root', new admin_category('frontpage', new lang_string('frontpage','admin')));
 $ADMIN->add('root', new admin_category('server', new lang_string('server','admin')));
 $ADMIN->add('root', new admin_category('mnet', new lang_string('net','mnet'), (isset($CFG->mnet_dispatcher_mode) and $CFG->mnet_dispatcher_mode === 'off')));
-$ADMIN->add('root', new admin_category('reports', new lang_string('reports')));
+$ADMIN->add('root', new admin_category('reportsmain', new lang_string('reports')));
+$ADMIN->add('root', new admin_category('reports', new lang_string('systemreports', 'admin')));
 $ADMIN->add('root', new admin_category('development', new lang_string('development', 'admin')));
 
 // hidden unsupported category

@@ -33,7 +33,7 @@ Feature: A history of each wiki page is available
     And I press "Save"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     And I follow "Edit"
     And I set the following fields to these values:
@@ -41,7 +41,7 @@ Feature: A history of each wiki page is available
     And I press "Save"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     And I follow "Edit"
     And I set the following fields to these values:

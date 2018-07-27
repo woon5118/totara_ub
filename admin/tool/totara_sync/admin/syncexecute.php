@@ -22,17 +22,15 @@
  * @subpackage totara_sync
  */
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
+require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 
-require_login();
+admin_externalpage_setup('totarasyncexecute');
 
 $systemcontext = context_system::instance();
 require_capability('tool/totara_sync:manage', $systemcontext);
 
 $pagetitle = get_string('syncexecute', 'tool_totara_sync');
-$PAGE->set_context($systemcontext);
-$PAGE->set_url('/admin/tool/totara_sync/admin/syncexecute.php');
-$PAGE->set_pagelayout('admin');
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
 $execute = optional_param('execute', null, PARAM_BOOL);

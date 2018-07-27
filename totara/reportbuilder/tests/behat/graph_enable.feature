@@ -17,7 +17,8 @@ Feature: Graphs in Report builder
       | learner4 | Learner4  | US      |
       | learner5 | Learner5  | AU      |
       | learner6 | Learner6  | CZ      |
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | My user report |
       | Source      | User           |

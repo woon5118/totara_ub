@@ -14,7 +14,7 @@ Feature: User is not able to create a notification with a booked recipients chec
       | Description | seminar 1 |
     And I turn editing mode off
     And I follow "Seminar 1"
-    And I follow "Notifications"
+    And I click on "Notifications" "link" in the "Administration" "block"
     When I click on "Add" "button"
     Then "select[name='booked_type']" "css_element" should exist
     And I set the following fields to these values:

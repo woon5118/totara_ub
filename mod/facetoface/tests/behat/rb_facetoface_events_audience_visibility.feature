@@ -31,7 +31,8 @@ Feature: Test the visibility to see the seminar events report depending on the c
     And I follow "Add a new event"
     And I press "Save changes"
 
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the field "Report Name" to "Seminar Events"
     And I set the field "Source" to "Seminar Events"
     And I press "Create report"

@@ -59,7 +59,8 @@ Feature: Statistics columns in user reports should show data correctly
     And I navigate to "Course completion" node in "Course administration > Reports"
     And I complete the course via rpl for "Learner1 One" with text "RPL"
     And I complete the course via rpl for "Learner2 Two" with text "RPL"
-    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | User Report |
       | Source      | User        |

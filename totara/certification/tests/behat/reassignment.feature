@@ -23,7 +23,7 @@ Feature: User reassignment to a certification
       | menulifetime                  | 0       |
       | enableprogramcompletioneditor | 1       |
       | enableprograms                | Disable |
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Content" tab
@@ -65,7 +65,7 @@ Feature: User reassignment to a certification
     And I log in as "admin"
 
     # And I reassign jimmy.
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -147,7 +147,7 @@ Feature: User reassignment to a certification
     # And I reassign jimmy.
     And I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -310,7 +310,7 @@ Feature: User reassignment to a certification
     # And I reassign jimmy.
     And I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -376,7 +376,7 @@ Feature: User reassignment to a certification
     # And I reassign jimmy.
     And I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -443,7 +443,7 @@ Feature: User reassignment to a certification
     # And I reassign.
     And I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -496,7 +496,7 @@ Feature: User reassignment to a certification
     # And I reassign jimmy.
     And I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -535,7 +535,7 @@ Feature: User reassignment to a certification
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
 
     # Get back the removed dashboard item for now.
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"
@@ -559,7 +559,7 @@ Feature: User reassignment to a certification
     # And I unassign jimmy.
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -580,7 +580,7 @@ Feature: User reassignment to a certification
     And I wind back certification dates by 5 months
 
     # Reassign & Run certification update task.
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -602,7 +602,7 @@ Feature: User reassignment to a certification
     # And I unassign jimmy.
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -623,7 +623,7 @@ Feature: User reassignment to a certification
     And I wind back certification dates by 5 months
 
     # Reassign & Run certification update task.
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -640,7 +640,7 @@ Feature: User reassignment to a certification
     Then I should see "Expired" in the "Jimmy Jim" "table_row"
 
     # And I unassign jimmy.
-    When I navigate to "Manage certifications" node in "Site administration > Courses"
+    When I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
@@ -669,7 +669,7 @@ Feature: User reassignment to a certification
     # Reassign & Run certification update task.
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab

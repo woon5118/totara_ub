@@ -125,6 +125,9 @@ if ($mform && ($mform->is_cancelled() || !empty($CFG->preventscheduledtaskchange
     }
 
 } else {
+    // TOTARA: add a button to add/remove the scheduledtasks externalpage to the users quick access menu.
+    \totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, 'scheduledtasks');
+
     echo $OUTPUT->header();
 
     // Check if the cron has run recently, if not notify the admin about configuration recommendations.

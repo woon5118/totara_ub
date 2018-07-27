@@ -15,7 +15,7 @@ Feature: Program editing tool
     And I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Prog 1" "table_row"
     And I switch to "Assignments" tab

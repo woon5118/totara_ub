@@ -91,7 +91,7 @@ Feature: View the quiz being due
     And I follow "Finish attempt"
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Quiz 1E Future deadline"
     And I press "Attempt quiz now"
     When I am on homepage

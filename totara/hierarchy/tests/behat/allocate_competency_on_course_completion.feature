@@ -90,7 +90,7 @@ Feature: Verify completion of a course triggers assigning a competency.
 
     # Create a learning plan using the new template for the learner.
     Given I log in as "admin"
-    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    When I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
     And I press "Create new learning plan"
@@ -131,7 +131,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     Then I log out
 
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
     And I follow "Bob's Learning Plan"
@@ -143,7 +143,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I press "Set all enabled tasks to run on next cron"
     And I trigger cron
     And I am on homepage
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
     And I follow "Bob's Learning Plan"
@@ -156,7 +156,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I press "Set all enabled tasks to run on next cron"
     And I trigger cron
     And I am on homepage
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
     And I follow "Bob's Learning Plan"

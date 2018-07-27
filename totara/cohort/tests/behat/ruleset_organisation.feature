@@ -40,7 +40,7 @@ Feature: Test organisation and position rulesets within framework display
   @javascript
   Scenario: Test organisations within the framewortk in dynamic audience with equals rule.
     Given I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 12966O"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Organisations"
@@ -72,7 +72,7 @@ Feature: Test organisation and position rulesets within framework display
   @javascript
   Scenario: Test positions within the framewortk in dynamic audience with equals rule.
     Given I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 12966P"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Positions"
@@ -104,7 +104,7 @@ Feature: Test organisation and position rulesets within framework display
   @javascript
   Scenario: Test organisations and positions within the framewortk in dynamic audience with equals rule.
     Given I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 12966OP"
     And I switch to "Rule sets" tab
 

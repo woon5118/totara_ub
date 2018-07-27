@@ -118,7 +118,7 @@ Feature: Request extensions in programs
 
   Scenario: Program extension request enable in site and program level, no manager assigned and program about to expire
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Sam Student"
     And I click on "jobassignment1" "link"
     And I click on "Delete" "link" in the "#managertitle" "css_element"
@@ -187,7 +187,7 @@ Feature: Request extensions in programs
 
   Scenario: Extension request setting is saved when adding a program
     Given I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I press "Add a new program"
     And I set the following fields to these values:
       | Allow extension requests | 0 |
@@ -196,7 +196,7 @@ Feature: Request extensions in programs
     And the following fields match these values:
       | Allow extension requests | 0 |
 
-    When I navigate to "Manage programs" node in "Site administration > Courses"
+    When I navigate to "Manage programs" node in "Site administration > Programs"
     And I press "Add a new program"
     And I set the following fields to these values:
       | Allow extension requests | 1 |
@@ -207,7 +207,7 @@ Feature: Request extensions in programs
 
     When I set the following administration settings values:
       | Enable program extension requests | 0 |
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I press "Add a new program"
     Then I should not see "Allow extension requests"
     When I press "Save changes"

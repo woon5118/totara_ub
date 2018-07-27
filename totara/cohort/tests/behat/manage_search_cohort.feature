@@ -18,7 +18,7 @@ Feature: Manage searches in audiences
 
   Scenario: Manage searches in audience
     Given I log in as "admin"
-    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "All audiences"
     And I set the field "cohort-name" to "Cat"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"

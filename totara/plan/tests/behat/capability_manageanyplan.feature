@@ -44,7 +44,7 @@ Feature: Verify capability manageanyplan.
 
     # Login as admin and give the site manager the manageanyplan capability.
     When I log in as "admin"
-    And I navigate to "Define roles" node in "Site administration > Users > Permissions"
+    And I navigate to "Define roles" node in "Site administration > Permissions"
     And I follow "Site Manager"
     And I press "Edit"
     And I set the field "Filter" to "manageanyplan"
@@ -110,7 +110,7 @@ Feature: Verify capability manageanyplan.
 
     # As the manager, access the learners plans.
     When I log in as "manager2"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     # Access the learners plans and verify it hasn't been approved.
@@ -129,7 +129,7 @@ Feature: Verify capability manageanyplan.
 
     # As the manager, access the learners plans.
     Given I log in as "manager2"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     # Access the learners plan.
@@ -207,7 +207,7 @@ Feature: Verify capability manageanyplan.
 
     # As the manager, access the learners plans.
     Given I log in as "manager2"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     # Access the learners plan.
@@ -281,7 +281,7 @@ Feature: Verify capability manageanyplan.
 
     # As the manager, access the learners plans.
     Given I log in as "manager2"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     # Access the learners plan.
@@ -349,7 +349,7 @@ Feature: Verify capability manageanyplan.
 
     # As the manager, access the learners plans.
     Given I log in as "manager2"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     # Access the learners plan.

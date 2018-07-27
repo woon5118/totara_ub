@@ -64,7 +64,8 @@ Feature: Test progress bar percentange is displayed according to criteria comple
     And I log out
     # See a Record of learning report for all users.
     And I log in as "admin"
-    And I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | Report Name | Record of Learning          |
       | Source      | Record of Learning: Courses |

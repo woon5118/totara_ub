@@ -47,7 +47,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
 
   Scenario: Enrol using seminar direct enrolment
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -61,7 +61,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log out
     # Check signup note
     And I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     When I click on "Attendees" "link"
     Then I should see "Lorem ipsum dolor sit amet" in the "Student 1" "table_row"
@@ -83,9 +83,9 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"
-    And I should see "Courses" in the "Navigation" "block"
-    And I click on "Courses" "link_or_button" in the "Navigation" "block"
-    And I click on "Course 1" "link"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
+    And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Sign-up"
     Then I should see "Topic 1"
@@ -110,7 +110,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log out
 
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -125,7 +125,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log out
   # Check signup note
     And I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     When I click on "Attendees" "link"
     Then I should see "Lorem ipsum dolor sit amet" in the "Student 1" "table_row"

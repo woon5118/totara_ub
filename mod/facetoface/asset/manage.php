@@ -91,7 +91,7 @@ if ($action === 'delete') {
     totara_set_notification(get_string('assethidden', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
 
-$PAGE->set_button($report->edit_button());
+$PAGE->set_button($report->edit_button() . $PAGE->button);
 /** @var totara_reportbuilder_renderer $reportrenderer */
 $reportrenderer = $PAGE->get_renderer('totara_reportbuilder');
 

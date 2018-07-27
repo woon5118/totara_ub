@@ -45,7 +45,7 @@ if (!$report = reportbuilder_get_embedded_report($shortname, $pageparams, false,
 $url = new moodle_url('/totara/reportbuilder/index.php', $pageparams);
 admin_externalpage_setup('rbmanagereports', '', null, $url);
 
-$PAGE->set_button($PAGE->button . $report->edit_button());
+$PAGE->set_button($report->edit_button() . $PAGE->button);
 
 /** @var totara_reportbuilder_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_reportbuilder');

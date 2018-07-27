@@ -77,7 +77,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
   Scenario: Admin logged in as student and watching enrolment methods for courses
     Given I log in as "admin"
     And I click on "Dashboard" in the totara menu
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Student 1"
     And I click on "Log in as" "link"
     And I press "Continue"

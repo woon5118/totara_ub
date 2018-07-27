@@ -88,7 +88,7 @@ Feature: The activity results block displays student in separate groups scores
     And I should see "95.00/100.00" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 1" in the "Activity results" "block"
     And I should see "100.00/100.00" in the "Activity results" "block"
 
@@ -106,7 +106,7 @@ Feature: The activity results block displays student in separate groups scores
     And I should see "95.00" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 1" in the "Activity results" "block"
     And I should see "100.00" in the "Activity results" "block"
 
@@ -129,7 +129,7 @@ Feature: The activity results block displays student in separate groups scores
     And I should see "75%" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 1" in the "Activity results" "block"
     And I should see "100%" in the "Activity results" "block"
     And I should see "Student 2" in the "Activity results" "block"
@@ -153,7 +153,7 @@ Feature: The activity results block displays student in separate groups scores
     And I should see "75.00/100.00" in the "Activity results" "block"
     And I log out
     And I log in as "student3"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 3" in the "Activity results" "block"
     And I should see "90.00/100.00" in the "Activity results" "block"
     And I should see "Student 4" in the "Activity results" "block"
@@ -177,7 +177,7 @@ Feature: The activity results block displays student in separate groups scores
     And I should see "75.00" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Student 1" in the "Activity results" "block"
     And I should see "100.00" in the "Activity results" "block"
     And I should see "Student 2" in the "Activity results" "block"
@@ -199,7 +199,7 @@ Feature: The activity results block displays student in separate groups scores
     And I should see "75.00%" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "User S1" in the "Activity results" "block"
     And I should see "100.00%" in the "Activity results" "block"
     And I should see "User S2" in the "Activity results" "block"
@@ -221,7 +221,7 @@ Feature: The activity results block displays student in separate groups scores
     And I should see "75.00%" in the "Activity results" "block"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "User" in the "Activity results" "block"
     And I should see "100.00%" in the "Activity results" "block"
     And I should see "90.00%" in the "Activity results" "block"

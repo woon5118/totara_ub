@@ -34,7 +34,7 @@ Feature: Test program settings available for the user
     And I log out
 
     When I log in as "user1"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Settings" "link" in the "Test Program 1" "table_row"
     Then I should see "Users" in the "Administration" "block"
@@ -46,7 +46,7 @@ Feature: Test program settings available for the user
 
     When I log out
     And I log in as "user2"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Settings" "link" in the "Test Program 1" "table_row"
     Then I should see "Users" in the "Administration" "block"
@@ -59,7 +59,7 @@ Feature: Test program settings available for the user
 
     When I log out
     And I log in as "user3"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Settings" "link" in the "Test Program 1" "table_row"
     Then I should not see "Users" in the "Administration" "block"
@@ -69,7 +69,7 @@ Feature: Test program settings available for the user
 
     When I log out
     And I log in as "user4"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Settings" "link" in the "Test Program 1" "table_row"
     Then I should see "Users" in the "Administration" "block"
@@ -82,7 +82,7 @@ Feature: Test program settings available for the user
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Settings" "link" in the "Test Program 1" "table_row"
     Then I should see "Users" in the "Administration" "block"

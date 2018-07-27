@@ -91,7 +91,7 @@ Feature: Seminar event cancellation reporting
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_700: viewing “seminars: event attendees report”
-    When I navigate to "Manage embedded reports" node in "Site administration > Reports > Report builder"
+    When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Seminars: Event attendees"
     And I press "id_submitgroupstandard_addfilter"
     And I follow "Seminars: Event attendees"
@@ -110,7 +110,8 @@ Feature: Seminar event cancellation reporting
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_701: using "seminar sign ups" source in custom report
-    Given I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    Given I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
     And I set the following fields to these values:
       | fullname | Custom test event report |
       | source   | Seminar Sign-ups         |

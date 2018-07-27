@@ -442,6 +442,8 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return string the html output
      */
     public function masthead(bool $hasguestlangmenu = true, bool $nocustommenu = false) {
+        global $USER;
+
         $menudata = totara_build_menu();
         $mastheadmenu = new totara_core\output\masthead_menu($menudata);
         $mastheadlogo = new totara_core\output\masthead_logo();
@@ -454,6 +456,16 @@ class totara_core_renderer extends plugin_renderer_base {
         $mastheaddata->masthead_search = $this->output->search_box();
         $mastheaddata->masthead_toggle = $this->output->navbar_button();
         $mastheaddata->masthead_usermenu = $this->output->user_menu();
+
+        if (totara_core\quickaccessmenu\factory::can_current_user_have_quickaccessmenu()) {
+            $menuinstance = totara_core\quickaccessmenu\factory::instance($USER->id);
+
+            if (!empty($menuinstance->get_possible_items())) {
+                $adminmenu = $menuinstance->get_menu();
+                $quickaccessmenu = totara_core\output\quickaccessmenu::create_from_menu($adminmenu);
+                $mastheaddata->masthead_quickaccessmenu = $quickaccessmenu->get_template_data();
+            }
+        }
 
         return $this->render_from_template('totara_core/masthead', $mastheaddata);
     }

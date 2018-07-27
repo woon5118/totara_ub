@@ -23,7 +23,7 @@ Feature: Test the certification status rule in dynamic audiences
 
   Scenario: Ensure defaults are set correctly in the certification status rule
     Given I log in as "admin"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification status"
@@ -40,7 +40,7 @@ Feature: Test the certification status rule in dynamic audiences
 
   Scenario: Ensure rules are not created when certifications are not selected
     Given I log in as "admin"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification status"
@@ -55,7 +55,7 @@ Feature: Test the certification status rule in dynamic audiences
 
   Scenario: Ensure certification status rule form validation is correct
     Given I log in as "admin"
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification status"
@@ -85,7 +85,7 @@ Feature: Test the certification status rule in dynamic audiences
     Given I log in as "admin"
 
     # Assign learner1 and 2, leaving the others unassigned.
-    When I navigate to "Manage certifications" node in "Site administration > Courses"
+    When I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Certification 1" "table_row"
     And I switch to "Assignments" tab
@@ -100,7 +100,7 @@ Feature: Test the certification status rule in dynamic audiences
     And I click on "Save all changes" "button"
 
     # Create the rule.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification status"
@@ -129,7 +129,7 @@ Feature: Test the certification status rule in dynamic audiences
     Given I log in as "admin"
 
     # Assign learner1 and 2, leaving the others unassigned.
-    When I navigate to "Manage certifications" node in "Site administration > Courses"
+    When I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Certification 1" "table_row"
     And I switch to "Assignments" tab
@@ -144,7 +144,7 @@ Feature: Test the certification status rule in dynamic audiences
     And I click on "Save all changes" "button"
 
     # Create the rule.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification status"

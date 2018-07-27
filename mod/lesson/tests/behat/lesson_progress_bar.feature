@@ -57,7 +57,7 @@ Feature: In a lesson activity, students can see their progress viewing a progres
     And I press "Save page"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I follow "Test lesson name"
     Then I should see "First page contents"
     And I should see "You have completed 0% of the lesson"

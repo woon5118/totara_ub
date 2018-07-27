@@ -18,7 +18,7 @@ Feature: Javascript template rendering
 
   Scenario: Javascript pix/flex rendering works
     Given I set the field "Component" to "Subsystem (core)"
-    Given I set the field "Search" to "test"
+    And I set the field with xpath "//*[@data-region='list-templates']//*[@id='search']" to "test"
     And I follow "core/test"
 
     # Old style pix

@@ -41,15 +41,15 @@ Feature: Set due date for program assignments
     # Unfortunately new custom fields are popping up in auth plugin settings.
     And I confirm new default admin settings
     # Get back the removed dashboard item for now.
-    And I navigate to "Top navigation" node in "Site administration > Appearance"
+    And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I navigate to "Browse list of users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "Admin User" "table_row"
     And I select "Europe/Rome" from the "Timezone" singleselect
     And I press "Update profile"
-    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Set Due Date Tests" "link"
     And I click on "Edit program details" "button"
