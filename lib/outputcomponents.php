@@ -1024,6 +1024,7 @@ class single_select implements renderable, templatable {
         if (is_string($this->nothing) && $this->nothing !== '') {
             $nothing = ['' => $this->nothing];
             $hasnothing = true;
+            $nothingkey = '';
         } else if (is_array($this->nothing)) {
             $nothingvalue = reset($this->nothing);
             if ($nothingvalue === 'choose' || $nothingvalue === 'choosedots') {
@@ -1032,6 +1033,7 @@ class single_select implements renderable, templatable {
                 $nothing = $this->nothing;
             }
             $hasnothing = true;
+            $nothingkey = key($this->nothing);
         }
         if ($hasnothing) {
             $options = $nothing + $this->options;
@@ -1044,11 +1046,17 @@ class single_select implements renderable, templatable {
                 foreach ($options[$value] as $optgroupname => $optgroupvalues) {
                     $sublist = [];
                     foreach ($optgroupvalues as $optvalue => $optname) {
-                        $sublist[] = [
+                        $option = [
                             'value' => $optvalue,
                             'name' => $optname,
                             'selected' => strval($this->selected) === strval($optvalue),
                         ];
+
+                        if ($hasnothing && $nothingkey === $optvalue) {
+                            $option['ignore'] = 'data-ignore';
+                        }
+
+                        $sublist[] = $option;
                     }
                     $data->options[] = [
                         'name' => $optgroupname,
@@ -1057,12 +1065,18 @@ class single_select implements renderable, templatable {
                     ];
                 }
             } else {
-                $data->options[] = [
+                $option = [
                     'value' => $value,
                     'name' => $options[$value],
                     'selected' => strval($this->selected) === strval($value),
                     'optgroup' => false
                 ];
+
+                if ($hasnothing && $nothingkey === $value) {
+                    $option['ignore'] = 'data-ignore';
+                }
+
+                $data->options[] = $option;
             }
         }
 
