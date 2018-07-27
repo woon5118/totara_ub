@@ -74,18 +74,6 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->addElement('selectyesno', 'sourceallrecords', get_string('sourceallrecords', 'tool_totara_sync'));
         $mform->addElement('static', 'sourceallrecordsdesc', '', get_string('sourceallrecordsdesc', 'tool_totara_sync'));
 
-        // Empty CSV field setting.
-        $emptyfieldopt = array(
-            false => get_string('emptyfieldskeepdata', 'tool_totara_sync'),
-            true => get_string('emptyfieldsremovedata', 'tool_totara_sync')
-        );
-        $mform->addElement('select', 'csvsaveemptyfields', get_string('emptyfieldsbehaviouruser', 'tool_totara_sync'), $emptyfieldopt);
-        $mform->disabledIf('csvsaveemptyfields', 'source_user', 'eq', '');
-        $mform->disabledIf('csvsaveemptyfields', 'source_user', 'eq', 'totara_sync_source_user_database');
-        $default = !empty($this->config->csvsaveemptyfields);
-        $mform->setDefault('csvsaveemptyfields', $default);
-        $mform->addHelpButton('csvsaveemptyfields', 'emptyfieldsbehaviouruser', 'tool_totara_sync');
-
         // User email settings.
         $mform->addElement('selectyesno', 'allowduplicatedemails', get_string('allowduplicatedemails', 'tool_totara_sync'));
         $mform->addElement('text', 'defaultsyncemail', get_string('defaultemailaddress', 'tool_totara_sync'), array('size' => 50));

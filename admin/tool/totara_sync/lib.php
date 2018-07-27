@@ -72,49 +72,20 @@ function latest_run_has_errors() {
 /**
  * Sync Totara elements with external sources
  *
- * @access public
+ * @param bool $isscheduledtask Set to true if this is being run by a scheduled task that would run all elements,
+ *      except for those that have their own schedule configuration.
  * @return bool success
  */
-function tool_totara_sync_run() {
-    global $CFG;
-
-    // First run through the sanity checks.
-    $configured = true;
-    $problemstext = array();
+function tool_totara_sync_run($isscheduledtask = false) {
 
     // Check enabled sync element objects
     $elements = totara_sync_get_elements(true);
     if (empty($elements)) {
-        $configured = false;
-        $problemstext[] = get_string('noenabledelements', 'tool_totara_sync');
-    } else {
-        foreach ($elements as $element) {
-            $elname = $element->get_name();
-            $elnametext = get_string('displayname:'.$elname, 'tool_totara_sync');
-            //check a source is enabled
-            if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
-                $configured = false;
-                $problemstext[] = get_string('sourcenotfound', 'tool_totara_sync', $elnametext);
-            }
-            if (strstr($sourceclass, 'csv') && get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY && !get_config('totara_sync', 'filesdir')) {
-                $configured = false;
-                $problemstext[] = get_string('nofilesdir', 'tool_totara_sync');
-            }
-            //check source has configs - note get_config returns an object
-            if ($sourceclass) {
-                $configs = get_config($sourceclass);
-                $props = get_object_vars($configs);
-                if(empty($props)) {
-                    $configured = false;
-                    $problemstext[] = get_string('nosourceconfig', 'tool_totara_sync', $elnametext);
-                }
-            }
-        }
-    }
-
-    if (!$configured) {
-        $problems = implode(", ", $problemstext);
-        mtrace(get_string('syncnotconfiguredsummary', 'tool_totara_sync', $problems));
+        mtrace(get_string(
+            'syncnotconfiguredsummary',
+            'tool_totara_sync',
+            get_string('noenabledelements', 'tool_totara_sync')
+        ));
         return false;
     }
 
@@ -126,33 +97,17 @@ function tool_totara_sync_run() {
     });
 
     foreach ($elements as $element) {
-        try {
-            if (!method_exists($element, 'sync')) {
-                // Skip if no sync() method exists
+
+        if ($isscheduledtask) {
+            if (empty($element->config->scheduleusedefaults)) {
+                // This element should not be run via the default scheduled task.
                 continue;
             }
-
-            // Finally, start element syncing
-            $success = $element->sync();
-            $status = $status && $success;
-        } catch (totara_sync_exception $e) {
-            $msg = $e->getMessage();
-            $msg .= !empty($e->debuginfo) ? " - {$e->debuginfo}" : '';
-            totara_sync_log($e->tsync_element, $msg, $e->tsync_logtype, $e->tsync_action);
-            $element->get_source()->drop_table();
-            continue;
-        } catch (Exception $e) {
-            totara_sync_log($element->get_name(), $e->getMessage(), 'error', 'unknown');
-            $element->get_source()->drop_table();
-            continue;
         }
 
-        $element->get_source()->drop_table();
+        $success = $element->run_sync();
+        $status = $status && $success;
     }
-
-    \tool_totara_sync\event\sync_completed::create()->trigger();
-
-    totara_sync_notify();
 
     return $status;
 }
@@ -221,7 +176,7 @@ function totara_sync_get_element_files() {
  *
  * @param boolean $onlyenabled only return enabled elements
  *
- * @return array of element objects
+ * @return totara_sync_element[]
  */
 function totara_sync_get_elements($onlyenabled=false) {
     global $CFG;
@@ -264,7 +219,7 @@ function totara_sync_get_elements($onlyenabled=false) {
  *
  * @param string $element the element name
  *
- * @return stdClass the element object
+ * @return totara_sync_element|bool An instance of the requested element or false if not found.
  */
 function totara_sync_get_element($element) {
     $elements = totara_sync_get_elements();
@@ -393,9 +348,12 @@ function totara_sync_bulk_insert($table, $datarows) {
  * Note that this function must be only executed from the cron script
  *
  * @return bool true if executed, false if not
+ * @deprecated since Totara 12
  */
 function totara_sync_notify() {
     global $CFG, $DB;
+
+    debugging('totara_sync_notify has been deprecated. Running elements via their run_sync() method will notify users following the run.');
 
     $now = time();
     $dateformat = get_string('strftimedateseconds', 'langconfig');

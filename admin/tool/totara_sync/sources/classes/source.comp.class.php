@@ -38,17 +38,13 @@ abstract class totara_sync_source_comp extends totara_sync_source {
      */
     protected $fields;
 
-    /**
-     * @var totara_sync_element_comp
-     */
-    protected $element;
-
     public function __construct() {
         global $CFG;
         require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/comp.php');
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 
         $this->temptablename = 'totara_sync_comp';
+        $this->element = new totara_sync_element_comp();
         parent::__construct();
 
         $this->fields = [
@@ -65,8 +61,6 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         ];
 
         $this->hierarchy_customfields = customfield::get_all(new competency());
-
-        $this->element = new totara_sync_element_comp();
     }
 
     /**

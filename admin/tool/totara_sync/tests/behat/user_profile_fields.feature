@@ -81,18 +81,18 @@ Feature: User profile fields set as unique can be used via HR Import.
     Then I should see "Unique textinput test"
 
     # Configure HR Import for csv.
-    When I navigate to "General settings" node in "Site administration > HR Import"
+    When I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
-      | File Access | Upload Files |
+      | File access | Upload Files |
     And I press "Save changes"
     And I navigate to "Manage elements" node in "Site administration > HR Import > Elements"
     And I "Enable" the "User" HR Import element
     And I navigate to "User" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                               |
+      | CSV                           | 1                                 |
       | Empty string behaviour in CSV | Empty strings erase existing data |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > User"
     And I click on "Unique checkbox test" "checkbox"
     And I click on "Unique date (no timezone) test" "checkbox"

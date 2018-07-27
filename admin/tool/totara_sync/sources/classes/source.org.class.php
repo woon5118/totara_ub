@@ -33,16 +33,12 @@ abstract class totara_sync_source_org extends totara_sync_source {
 
     protected $fields;
 
-    /**
-     * @var totara_sync_element_org
-     */
-    protected $element;
-
     function __construct() {
         global $CFG;
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 
         $this->temptablename = 'totara_sync_org';
+        $this->element = new totara_sync_element_org();
         parent::__construct();
 
         $this->fields = array(
@@ -58,8 +54,6 @@ abstract class totara_sync_source_org extends totara_sync_source {
         );
 
         $this->hierarchy_customfields = customfield::get_all(new organisation());
-
-        $this->element = new totara_sync_element_org();
     }
 
     /**

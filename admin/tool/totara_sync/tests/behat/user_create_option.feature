@@ -4,17 +4,17 @@ Feature: Verify changing user element settings for CSV import.
   Background:
     Given I am on a totara site
     When I log in as "admin"
-    And I navigate to "General settings" node in "Site administration > HR Import"
+    And I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
-      | File Access | Upload Files |
+      | File access | Upload Files |
     And I press "Save changes"
     And I navigate to "Manage elements" node in "Site administration > HR Import > Elements"
     And I "Enable" the "User" HR Import element
     And I navigate to "User" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source | CSV |
+      | CSV | 1 |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
   Scenario: Check the effect of changing the create option for the user element.
 
@@ -29,7 +29,7 @@ Feature: Verify changing user element settings for CSV import.
     When I navigate to "User" node in "Site administration > HR Import > Elements"
     And I click on "Create" "checkbox"
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > User"
     Then I should see "\"firstname\",\"lastname\""
@@ -76,7 +76,7 @@ Feature: Verify changing user element settings for CSV import.
     Given I navigate to "User" node in "Site administration > HR Import > Elements"
     When I set the field "Allow duplicate emails" to "Yes"
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
     And I upload "admin/tool/totara_sync/tests/fixtures/user_duplicate_email_1.csv" file to "CSV" filemanager

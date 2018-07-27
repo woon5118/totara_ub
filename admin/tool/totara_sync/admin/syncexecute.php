@@ -96,13 +96,26 @@ foreach ($elements as $element) {
                 // If the encoding config key doesn't exist then the configuration settings have not been saved.
                 $configured = false;
                 $cells[] = new html_table_cell($nosourceconfiglink);
-            } else if (get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY && !get_config('totara_sync', 'filesdir')) {
-                $configured = false;
-                $url = new moodle_url('/admin/tool/totara_sync/admin/settings.php');
-                $link = html_writer::link($url, get_string('nofilesdir', 'tool_totara_sync'));
-                $cells[] = new html_table_cell($link);
             } else {
-                $cells[] = new html_table_cell(get_string('sourceconfigured', 'tool_totara_sync'));
+                try {
+                    if (($element->get_fileaccess() == FILE_ACCESS_DIRECTORY) && !$element->get_filesdir()) {
+                        $configured = false;
+                        if ($element->config->fileaccessusedefaults) {
+                            $url = new moodle_url('/admin/tool/totara_sync/admin/settings.php');
+                        } else {
+                            $url = new moodle_url('/admin/tool/totara_sync/admin/elementsettings.php', ['element' => $element->get_name()]);
+                        }
+                        $link = html_writer::link($url, get_string('nofilesdir', 'tool_totara_sync'));
+                        $cells[] = new html_table_cell($link);
+                    } else {
+                        $cells[] = new html_table_cell(get_string('sourceconfigured', 'tool_totara_sync'));
+                    }
+                } catch (totara_sync_exception $exception) {
+                    $configured = false;
+                    $url = new moodle_url('/admin/tool/totara_sync/admin/settings.php');
+                    $link = html_writer::link($url, get_string('nofilesdir', 'tool_totara_sync'));
+                    $cells[] = new html_table_cell($link);
+                }
             }
         } else {
             $dbtype = get_config('totara_sync_source_' . $elname . '_database', 'database_dbtype');

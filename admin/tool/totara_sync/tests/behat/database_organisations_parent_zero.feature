@@ -17,9 +17,9 @@ Feature: Verify that parentid is set correctly for organisation database import.
       | 21       | NZ Support       | OF1               | 2              | 0            |
       | 22       | UK Support       | OF1               | 2              | 0            |
 
-    When I navigate to "General settings" node in "Site administration > HR Import"
+    When I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
-      | File Access | Upload Files |
+      | File access | Upload Files |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -29,10 +29,10 @@ Feature: Verify that parentid is set correctly for organisation database import.
 
     When I navigate to "Organisation" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                      | External Database |
+      | External Database           | 1                 |
       | Source contains all records | Yes               |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "External Database" node in "Site administration > HR Import > Sources > Organisation"
     And I press "Save changes"

@@ -31,7 +31,6 @@ abstract class totara_sync_source_user extends totara_sync_source {
     protected $fields;
     protected $required_fields;
     protected $customfields, $customfieldtitles;
-    protected $element;
 
     /**
      * Implement in child classes
@@ -47,9 +46,8 @@ abstract class totara_sync_source_user extends totara_sync_source {
         global $DB;
 
         $this->temptablename = 'totara_sync_user';
-        parent::__construct();
-
         $this->element = new totara_sync_element_user();
+        parent::__construct();
 
         $this->fields = array(
             'idnumber',

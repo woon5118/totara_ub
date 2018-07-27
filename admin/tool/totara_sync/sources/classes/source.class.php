@@ -41,6 +41,11 @@ abstract class totara_sync_source {
      */
     public $filesdir;
 
+    /**
+     * @var totara_sync_element
+     */
+    protected $element;
+
     abstract function has_config();
 
     /**
@@ -94,7 +99,13 @@ abstract class totara_sync_source {
         if (empty($this->config->delimiter)) {
             $this->config->delimiter = ',';
         }
-        $this->filesdir = rtrim(get_config('totara_sync', 'filesdir'), '/');
+
+        try {
+            $this->filesdir = rtrim($this->get_element()->get_filesdir(), '/');
+        } catch (totara_sync_exception $e) {
+            // Third party code may be assigning an element after the parent::construct().
+            $this->filesdir = rtrim(get_config('totara_sync', 'filesdir'), '/');
+        }
 
         // Ensure child class specified temptablename
         if (!isset($this->temptablename)) {
@@ -368,5 +379,16 @@ abstract class totara_sync_source {
      */
     public function validate_settings($data, $files = []) {
         return [];
+    }
+
+    /**
+     * @return totara_sync_element
+     */
+    public function get_element() {
+        if (isset($this->element)) {
+            return $this->element;
+        }
+
+        throw new totara_sync_exception($this->get_element_name(), 'settings', 'noassociatedelement');
     }
 }

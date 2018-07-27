@@ -35,9 +35,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
     }
 
     function config_form(&$mform) {
-        global $CFG, $OUTPUT;
+        global $CFG;
 
-        $filepath = $this->get_filepath();
         $this->config->import_idnumber = "1";
         $this->config->import_username = "1";
         $this->config->import_timemodified = "1";
@@ -50,20 +49,20 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         }
         $this->config->import_deleted = empty($this->element->config->sourceallrecords) ? "1" : "0";
 
-        if (empty($filepath) && get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY) {
-            $mform->addElement('html', html_writer::tag('p', get_string('nofilesdir', 'tool_totara_sync')));
-            return false;
-        }
-
         // Add some source file details
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
         $mform->setExpanded('fileheader');
-        if (get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY) {
-            $mform->addElement('static', 'nameandloc', get_string('nameandloc', 'tool_totara_sync'),
-                html_writer::tag('strong', $filepath));
-        } else {
-            $link = "{$CFG->wwwroot}/admin/tool/totara_sync/admin/uploadsourcefiles.php";
-            $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
+
+        try {
+            if ($this->get_element()->get_fileaccess() == FILE_ACCESS_DIRECTORY) {
+                $mform->addElement('static', 'nameandloc', get_string('nameandloc', 'tool_totara_sync'),
+                    \html_writer::tag('strong', $this->get_filepath()));
+            } else {
+                $link = "{$CFG->wwwroot}/admin/tool/totara_sync/admin/uploadsourcefiles.php";
+                $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
+            }
+        } catch (\totara_sync_exception $e) {
+            $mform->addElement('static', 'configurefileaccess', '', get_string('configurefileaccess', 'tool_totara_sync'));
         }
 
         $encodings = core_text::get_encodings();
@@ -102,7 +101,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
     function import_data($temptable) {
         global $CFG, $DB, $OUTPUT;
 
-        $fileaccess = get_config('totara_sync', 'fileaccess');
+        $fileaccess = $this->get_element()->get_fileaccess();
         if ($fileaccess == FILE_ACCESS_DIRECTORY) {
             if (!$this->filesdir) {
                 throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'nofilesdir');

@@ -4,9 +4,9 @@ Feature: Verify CSV notifications are displayed correctly.
   Background:
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "General settings" node in "Site administration > HR Import"
+    When I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
-      | File Access | Upload Files |
+      | File access | Upload Files |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -18,10 +18,10 @@ Feature: Verify CSV notifications are displayed correctly.
     # Check the empty fields are ignored notification.
     When I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Job assignment"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."
@@ -29,10 +29,10 @@ Feature: Verify CSV notifications are displayed correctly.
     # Check the empty fields are deleted notification.
     When I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Job assignment"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."
@@ -94,10 +94,10 @@ Feature: Verify CSV notifications are displayed correctly.
     And I "Enable" the "Organisation" HR Import element
     And I navigate to "Organisation" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Organisation"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."
@@ -105,10 +105,10 @@ Feature: Verify CSV notifications are displayed correctly.
     # Check the empty fields are deleted notification.
     When I navigate to "Organisation" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Organisation"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."
@@ -167,10 +167,10 @@ Feature: Verify CSV notifications are displayed correctly.
     And I "Enable" the "Position" HR Import element
     And I navigate to "Position" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Position"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."
@@ -178,10 +178,10 @@ Feature: Verify CSV notifications are displayed correctly.
     # Check the empty fields are deleted notification.
     When I navigate to "Position" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Position"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."
@@ -232,10 +232,10 @@ Feature: Verify CSV notifications are displayed correctly.
     And I "Enable" the "User" HR Import element
     And I navigate to "User" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > User"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."
@@ -243,10 +243,10 @@ Feature: Verify CSV notifications are displayed correctly.
     # Check the empty fields are deleted notification.
     When I navigate to "User" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                        | CSV                       |
+      | CSV                           | 1                         |
       | Empty string behaviour in CSV | Empty strings are ignored |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > User"
     Then I should see "The use of empty fields in your CSV file will leave the field's current value in your site."

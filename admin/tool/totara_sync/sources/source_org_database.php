@@ -265,4 +265,10 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         return $this->get_common_db_notifications();
     }
 
+    /**
+     * @return bool False as database sources do not use files.
+     */
+    function uses_files() {
+        return false;
+    }
 }

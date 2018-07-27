@@ -50,20 +50,13 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
         return true;
     }
 
+    /**
+     * @param MoodleQuickForm $mform
+     */
     function config_form(&$mform) {
+
         $mform->addElement('selectyesno', 'sourceallrecords', get_string('sourceallrecords', 'tool_totara_sync'));
         $mform->setDefault('sourceallrecords', 0);
-        $mform->addElement('static', 'sourceallrecordsdesc', '', get_string('sourceallrecordsdesc', 'tool_totara_sync'));
-
-        // Empty CSV field setting.
-        $emptyfieldopt = array(
-            false => get_string('emptyfieldskeepdata', 'tool_totara_sync'),
-            true => get_string('emptyfieldsremovedata', 'tool_totara_sync')
-        );
-        $mform->addElement('select', 'csvsaveemptyfields', get_string('emptyfieldsbehaviourhierarchy', 'tool_totara_sync'), $emptyfieldopt);
-        $default = !empty($this->config->csvsaveemptyfields);
-        $mform->setDefault('csvsaveemptyfields', $default);
-        $mform->addHelpButton('csvsaveemptyfields', 'emptyfieldsbehaviourhierarchy', 'tool_totara_sync');
 
         $mform->addElement('header', 'crud', get_string('allowedactions', 'tool_totara_sync'));
         $mform->addElement('checkbox', 'allow_create', get_string('create', 'tool_totara_sync'));
@@ -72,6 +65,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
         $mform->setDefault('allow_update', 1);
         $mform->addElement('checkbox', 'allow_delete', get_string('delete', 'tool_totara_sync'));
         $mform->setDefault('allow_delete', 1);
+        $mform->setExpanded('crud');
     }
 
     function config_save($data) {

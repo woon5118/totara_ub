@@ -17,6 +17,22 @@ information provided here is intended especially for developers.
   * set_sync_user_fields the third parameter is no longer used. Behaviour of the function has not changed.
   * put_custom_field_data() the third parameter is no longer used. Behaviour of the function has not changed.
 * rb_source_totara_sync_log::rb_display_logtype() has been deprecated, please call tool_totara_sync\rb\display\totara_sync_log_type::display instead().
+* Syncing of elements is now iterates through each element and runs the whole sync process, including checking for configuration
+    errors, the import of data, triggering the event and notifying users, before going to the next element and repeating
+    this process
+* tool_totara_sync\event\sync_completed now contains a parameter within its 'other' data entry called 'element'. This contains
+    the name of the element as returned by the get_name() method.
+* When notifying users after completion of element syncing. The users will be notified only of log messages relating to that
+  given run of that element, rather than all log messages since the last time users were notified.
+* Tasks were added in the tool_totara_sync\task\ namespace which correspond to each element. These will run their individual elements.
+* totara_core\task\tool_totara_sync_task is still in place, but this will run any elements that are set to run
+    with the default scheduling.
+* tool_totara_sync_run has had the first argument added to it, $isscheduledtask, which should be set to true so that only
+    elements set to run on the default scheduled task are run.
+* save_scheduled_task_from_form has had an optional second argument added to it, $task. This is to be set if you wish to save
+    data against a task other than the default.
+* totara_sync_notify has been deprecated. Elements should be run via totara_sync_element::run_sync(), which will notify users following the run.
+    Alternatively, the protected method totara_sync_element::notify_user can perform this operation.
 
 === 11.0 ===
 

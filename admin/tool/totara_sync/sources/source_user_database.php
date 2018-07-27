@@ -368,4 +368,11 @@ class totara_sync_source_user_database extends totara_sync_source_user {
 
         return $notifications;
     }
+
+    /**
+     * @return bool False as database sources do not use files.
+     */
+    function uses_files() {
+        return false;
+    }
 }

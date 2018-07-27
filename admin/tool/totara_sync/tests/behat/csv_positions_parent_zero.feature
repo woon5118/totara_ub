@@ -8,9 +8,9 @@ Feature: Verify that parentid is set correctly for position CSV uploads.
       | fullname             | idnumber |
       | Position Framework 1 | PF1      |
 
-    When I navigate to "General settings" node in "Site administration > HR Import"
+    When I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
-      | File Access | Upload Files |
+      | File access | Upload Files |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -20,10 +20,10 @@ Feature: Verify that parentid is set correctly for position CSV uploads.
 
     When I navigate to "Position" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Source                      | CSV |
+      | CSV                         | 1   |
       | Source contains all records | Yes |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Position"
     And I set the following fields to these values:
@@ -95,7 +95,7 @@ Feature: Verify that parentid is set correctly for position CSV uploads.
     And I set the following fields to these values:
       | Empty string behaviour in CSV  | Empty strings erase existing data |
     When I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
     And I upload "admin/tool/totara_sync/tests/fixtures/positions_parent_zero_1.csv" file to "CSV" filemanager
@@ -135,7 +135,7 @@ Feature: Verify that parentid is set correctly for position CSV uploads.
     And I set the following fields to these values:
       | Source contains all records | No  |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
     And I upload "admin/tool/totara_sync/tests/fixtures/positions_parent_sanity_check_1.csv" file to "CSV" filemanager

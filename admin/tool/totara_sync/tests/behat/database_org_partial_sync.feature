@@ -17,9 +17,9 @@ Feature: Verify that partial organisation sync works correctly for database impo
       | 666      | Organisation 6 | ORGF1             |                | 0            |
       | 777      | Organisation 7 | ORGF1             |                | 0            |
 
-    When I navigate to "General settings" node in "Site administration > HR Import"
+    When I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
-        | File Access | Upload Files |
+        | File access | Upload Files |
     And I press "Save changes"
     Then I should see "Settings saved"
 
@@ -29,10 +29,10 @@ Feature: Verify that partial organisation sync works correctly for database impo
 
     When I navigate to "Organisation" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-        | Source                      | External Database |
+        | External Database           | 1                 |
         | Source contains all records | Yes               |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When I navigate to "External Database" node in "Site administration > HR Import > Sources > Organisation"
     And I press "Save changes"
@@ -68,7 +68,7 @@ Feature: Verify that partial organisation sync works correctly for database impo
     And I set the following fields to these values:
       | Source contains all records | Yes |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When the following "organisation" HR Import database source exists:
       | idnumber | fullname       | frameworkidnumber | parentidnumber | timemodified |
@@ -106,7 +106,7 @@ Feature: Verify that partial organisation sync works correctly for database impo
     And I set the following fields to these values:
         | Source contains all records | No |
     And I press "Save changes"
-    Then I should see "Settings saved"
+    Then I should see "Settings updated. The source settings for this element can be configured here."
 
     When the following "organisation" HR Import database source exists:
       | idnumber | fullname       | deleted | frameworkidnumber | parentidnumber | timemodified |

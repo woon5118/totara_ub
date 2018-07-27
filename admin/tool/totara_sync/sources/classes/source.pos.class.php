@@ -33,16 +33,12 @@ abstract class totara_sync_source_pos extends totara_sync_source {
 
     protected $fields;
 
-    /**
-     * @var totara_sync_element_pos
-     */
-    protected $element;
-
     function __construct() {
         global $CFG;
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
         $this->temptablename = 'totara_sync_pos';
+        $this->element = new totara_sync_element_pos();
         parent::__construct();
 
         $this->fields = array(
@@ -58,8 +54,6 @@ abstract class totara_sync_source_pos extends totara_sync_source {
         );
 
         $this->hierarchy_customfields = customfield::get_all(new position());
-
-        $this->element = new totara_sync_element_pos();
     }
 
     /**
