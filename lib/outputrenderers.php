@@ -81,6 +81,12 @@ class plugin_renderer_base extends renderer_base {
      * @return string
      */
     public function render(renderable $widget) {
+        // Totara: there is no need for renderers when templates are used because template is the renderer
+        //         and templates can be overridden in themes.
+        if ($widget instanceof \core\output\template) {
+            return $this->render_from_template($widget::get_template_name(), $widget->get_template_data());
+        }
+
         $classname = get_class($widget);
         // Strip namespaces.
         $classname = preg_replace('/^.*\\\/', '', $classname);
