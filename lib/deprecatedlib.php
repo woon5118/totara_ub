@@ -6444,3 +6444,32 @@ function get_user_access_sitewide($userid) {
 
     return $accessdata;
 }
+
+/**
+ * This function finds the roles assigned directly to this context only
+ * i.e. no roles in parent contexts
+ *
+ * @deprecated since Moodle 3.6. Please use the get_roles_used_in_context().
+ * @param context $context
+ * @return array
+ */
+function get_roles_on_exact_context(context $context) {
+    debugging('get_roles_on_exact_context() is deprecated, please use get_roles_used_in_context() instead.',
+        DEBUG_DEVELOPER);
+
+    return get_roles_used_in_context($context, false);
+}
+
+/**
+ * Find out which roles has assignment on this context
+ *
+ * @deprecated since Moodle 3.6. Please use the get_roles_used_in_context().
+ * @param context $context
+ * @return array
+ */
+function get_roles_with_assignment_on_context(context $context) {
+    debugging('get_roles_with_assignment_on_context() is deprecated, please use get_roles_used_in_context() instead.',
+        DEBUG_DEVELOPER);
+
+    return get_roles_used_in_context($context, false);
+}

@@ -3,6 +3,9 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Following functions have been deprecated, please use get_roles_used_in_context.
+    - get_roles_on_exact_context()
+    - get_roles_with_assignment_on_context()
 * user_can_view_profile() now also checks that target user is actually enrolled in course, use user_get_profile_url()
   if you need fallback to system profiles when users not enrolled.
 * Deprecated all no longer used classes in lib/googleapi.php file:
