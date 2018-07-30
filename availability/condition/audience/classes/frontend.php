@@ -100,6 +100,15 @@ class frontend extends \core_availability\frontend {
                     $audience_names[$id] = $value;
                 }
             }
+        } else if (!empty($section->availability)) {
+            $util = new section_util($section);
+            $cohorts = $util->load_cohort_availabilities();
+            if (!empty($cohorts)) {
+                foreach ($cohorts as $cohort) {
+                    $name = format_string($cohort->name);
+                    $audience_names[$cohort->id] = array('name' => $name);
+                }
+            }
         }
 
         $data = new \stdClass();
