@@ -52,7 +52,7 @@ foreach ($recipients as $key => $recipient) {
 if ($frm = data_submitted()) {
     // Add button
     if ($add and !empty($frm->addselect) and confirm_sesskey()) {
-        require_capability('mod/facetoface:addattendees', $context);
+        require_capability('mod/facetoface:addrecipients', $context);
 
         foreach ($frm->addselect as $adduser) {
             if (!$adduser = clean_param($adduser, PARAM_INT)) {
@@ -64,7 +64,7 @@ if ($frm = data_submitted()) {
     }
     // Remove button
     else if ($remove and !empty($frm->removeselect) and confirm_sesskey()) {
-        require_capability('mod/facetoface:removeattendees', $context);
+        require_capability('mod/facetoface:removerecipients', $context);
 
         foreach ($frm->removeselect as $removeuser) {
             if (!$removeuser = clean_param($removeuser, PARAM_INT)) {
@@ -76,6 +76,8 @@ if ($frm = data_submitted()) {
     }
 }
 
+$usernamefields = get_all_user_name_fields(true);
+
 // Main page
 // Get the list of currently selected recipients
 $existingusers = array();
@@ -83,8 +85,8 @@ if ($recipients) {
     list($insql, $params) = $DB->get_in_or_equal($recipients);
 
     $existingusers = $DB->get_records_sql('
-        SELECT id, firstname, lastname, email
-        FROM {user}
+        SELECT id, email, ' . $usernamefields . ' ' .
+        'FROM {user}
         WHERE id ' . $insql, $params);
 }
 
@@ -102,7 +104,7 @@ $sql  = "
 ";
 
 // Get all available attendees
-$availableusers = $DB->get_records_sql('SELECT id, firstname, lastname, email ' . $sql, array($session->id));
+$availableusers = $DB->get_records_sql('SELECT id, email, ' . $usernamefields . ' ' . $sql, array($session->id));
 $availableusers = array_diff_key($availableusers, $existingusers);
 
 $usercount = count($availableusers);

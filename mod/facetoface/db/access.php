@@ -312,4 +312,29 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
     ),
+
+    // Ability to add the message's recipients
+    'mod/facetoface:addrecipients' => array(
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'mod/facetoface:addattendees'
+    ),
+
+    // Ability to remove the message's recipients
+    'mod/facetoface:removerecipients' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'mod/facetoface:removeattendees'
+    )
 );
