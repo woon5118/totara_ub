@@ -89,7 +89,7 @@ class section_util
 
             $cohort = $DB->get_record("cohort", [
                 'id' => (int)$item['cohort']
-            ], "id, name");
+            ], "id, name", MUST_EXIST);
 
             $finaldata[] = $cohort;
         }
