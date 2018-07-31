@@ -672,7 +672,9 @@ Feature: Assign enrolled learning to cohort
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    # Check that access to the courses has been immediately given.
+    # Check that access to the courses has been immediately given after running the cron.
+    And I trigger cron
+    And I am on site homepage
     When I log out
     And I log in as "learner1"
     And I click on "Dashboard" in the totara menu
