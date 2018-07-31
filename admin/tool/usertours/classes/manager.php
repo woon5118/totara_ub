@@ -563,6 +563,11 @@ class manager {
 
         static $tour = false;
 
+        if (!$PAGE->has_set_url()) {
+            //Page URL has not been set, so we can't run check tours
+            return null;
+        }
+
         if ($tour === false || $reset) {
             $tour = self::get_matching_tours($PAGE->url);
         }
