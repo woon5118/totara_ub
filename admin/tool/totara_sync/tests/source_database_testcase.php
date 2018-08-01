@@ -43,6 +43,11 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
     protected $sourcetable = '';
 
     public function setUp() {
+        $this->set_up_database_connection();
+        parent::setup();
+    }
+
+    protected function set_up_database_connection() {
         global $CFG;
 
         if (defined('TEST_SYNC_DB_TYPE') ||
@@ -87,8 +92,6 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
         set_config('database_dbpass', $this->dbpass, 'totara_sync_source_' . $this->elementname . '_database');
         set_config('database_dbport', $this->dbport, 'totara_sync_source_' . $this->elementname . '_database');
         set_config('database_dbtable', $this->dbtable, 'totara_sync_source_' . $this->elementname . '_database');
-
-        parent::setup();
     }
 
     /**
@@ -104,6 +107,9 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
         $this->dbpass = null;
 
         $this->dbtable = null;
+        if (isset($this->ext_dbconnection)) {
+            $this->ext_dbconnection->dispose();
+        }
         $this->ext_dbconnection = null;
         $this->elementname = null;
         $this->sourcetable = null;

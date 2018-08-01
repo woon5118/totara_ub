@@ -27,6 +27,7 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.pos.c
 require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 
 class totara_sync_source_pos_csv extends totara_sync_source_pos {
+    use \tool_totara_sync\internal\source\csv_trait;
 
     function get_filepath() {
         $path = '/csv/ready/pos.csv';
@@ -35,7 +36,6 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
     }
 
     function config_form(&$mform) {
-        global $CFG, $OUTPUT;
 
         $filepath = $this->get_filepath();
 
@@ -50,45 +50,12 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
             return false;
         }
 
-        // Add some source file details
-        $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
-        $mform->setExpanded('fileheader');
-        if (get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY) {
-            $mform->addElement('static', 'nameandloc', get_string('nameandloc', 'tool_totara_sync'), html_writer::tag('strong', $filepath));
-        } else {
-            $link = "{$CFG->wwwroot}/admin/tool/totara_sync/admin/uploadsourcefiles.php";
-            $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
-        }
-
-        $encodings = core_text::get_encodings();
-        $mform->addElement('select', 'csvposencoding', get_string('csvencoding', 'tool_totara_sync'), $encodings);
-        $mform->setType('csvposencoding', PARAM_ALPHANUMEXT);
-        $default = $this->get_config('csvposencoding');
-        $default = (!empty($default) ? $default : 'UTF-8');
-        $mform->setDefault('csvposencoding', $default);
-
-        $delimiteroptions = array(
-            ',' => get_string('comma', 'tool_totara_sync'),
-            ';' => get_string('semicolon', 'tool_totara_sync'),
-            ':' => get_string('colon', 'tool_totara_sync'),
-            '\t' => get_string('tab', 'tool_totara_sync'),
-            '|' => get_string('pipe', 'tool_totara_sync')
-        );
-
-        $mform->addElement('select', 'delimiter', get_string('delimiter', 'tool_totara_sync'), $delimiteroptions);
-        $default = $this->config->delimiter;
-        if (empty($default)) {
-            $default = ',';
-        }
-        $mform->setDefault('delimiter', $default);
-
+        $this->config_form_add_csv_details($mform);
         parent::config_form($mform);
     }
 
     function config_save($data) {
-        // Make sure we use a tab character for the delimiter, if a tab is selected.
-        $this->set_config('delimiter', $data->{'delimiter'} == '\t' ? "\t" : $data->{'delimiter'});
-        $this->set_config('csvposencoding', $data->{'csvposencoding'});
+        $this->config_save_csv_file_details($data);
 
         parent::config_save($data);
     }
@@ -96,72 +63,7 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
     function import_data($temptable) {
         global $CFG, $DB;
 
-        $fileaccess = get_config('totara_sync', 'fileaccess');
-
-        if ($fileaccess == FILE_ACCESS_DIRECTORY) {
-            if (!$this->filesdir) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'nofilesdir');
-            }
-            $filepath = $this->get_filepath();
-            if (!file_exists($filepath)) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'nofiletosync', $filepath, null, 'warn');
-            }
-            $filemd5 = md5_file($filepath);
-            while (true) {
-                // Ensure file is not currently being written to
-                sleep(2);
-                $newmd5 = md5_file($filepath);
-                if ($filemd5 != $newmd5) {
-                    $filemd5 = $newmd5;
-                } else {
-                    break;
-                }
-            }
-            // Check that file is readable
-            if (!$file = is_readable($filepath)) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotreadx', $filepath);
-            }
-
-            // Move file to store folders
-            $storedir = $this->filesdir . '/csv/store';
-            if (!totara_sync_make_dirs($storedir)) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotcreatedirx', $storedir);
-            }
-            $storefilepath = $storedir . '/' . time() . '.' . basename($filepath);
-            rename($filepath, $storefilepath);
-
-        } else if ($fileaccess == FILE_ACCESS_UPLOAD) {
-            $fs = get_file_storage();
-            $systemcontext = context_system::instance();
-            $fieldid = get_config('totara_sync', 'sync_pos_itemid');
-
-            // Check the file exists
-            if (!$fs->file_exists($systemcontext->id, 'totara_sync', 'pos', $fieldid, '/', '')) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'nofileuploaded', $this->get_element_name(), null, 'warn');
-            }
-
-            // Get the file
-            $fsfiles = $fs->get_area_files($systemcontext->id, 'totara_sync', 'pos', $fieldid, 'id DESC', false);
-            $fsfile = reset($fsfiles);
-
-            // Set up the temp dir
-            $tempdir = $CFG->tempdir . '/totarasync/csv';
-            check_dir_exists($tempdir, true, true);
-
-            // Create temporary file (so we know the filepath)
-            $fsfile->copy_content_to($tempdir.'/pos.php');
-            $itemid = $fsfile->get_itemid();
-            $fs->delete_area_files($systemcontext->id, 'totara_sync', 'pos', $itemid);
-            $storefilepath = $tempdir.'/pos.php';
-        }
-
-        $encoding = $this->get_config('csvposencoding');
-        $storefilepath = totara_sync_clean_csvfile($storefilepath, $encoding, $fileaccess, $this->get_element_name());
-
-        // Open file from store for processing
-        if (!$file = fopen($storefilepath, 'r')) {
-            throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotopenx', $storefilepath);
-        }
+        $file = $this->open_csv_file();
 
         // Map CSV fields with db fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
@@ -177,27 +79,18 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
             }
         }
 
-        foreach (array_keys($this->customfields) as $f) {
-            if (empty($this->config->{'import_'.$f})) {
-                continue;
-            }
-            if (empty($this->config->{'fieldmapping_'.$f})) {
-                $fieldmappings[$f] = $f;
-            } else {
-                $fieldmappings[$this->config->{'fieldmapping_'.$f}] = $f;
+        $customfields = $this->get_mapped_customfields();
+
+        // Check field integrity for custom fields.
+        if ($missingcustomfields = array_diff($customfields, $fields)) {
+            foreach($missingcustomfields as $missingcustomfield) {
+                // This will stop iterating on the first one,
+                // but it's a start if we want to log all missing fields in the future.
+                throw new \totara_sync_exception($this->get_element_name(), 'importdata', 'csvnotvalidmissingfieldx', $missingcustomfield);
             }
         }
 
-        // Check field integrity for custom fields.
-        foreach ($this->customfields as $cf => $name) {
-            if (empty($this->config->{'import_'. $cf}) || in_array($cf, $fieldmappings)) {
-                // Disabled or mapped fields can be ignored.
-                continue;
-            }
-            if (!in_array($cf, $fields)) {
-                throw new totara_sync_exception($this->get_element_name(), 'importdata', 'csvnotvalidmissingfieldx', $cf);
-            }
-        }
+        $fieldmappings = array_merge($fieldmappings, $customfields);
 
         // Throw an exception if fields contain invalid characters
         foreach ($fields as $field) {
@@ -211,26 +104,15 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         }
 
         // Ensure necessary fields are present
-        foreach ($fieldmappings as $field => $map) {
-            if (!in_array($field, $fields)) {
-                if ($map == 'typeidnumber') {
-                    // typeidnumber field can be optional if no custom fields specified
-                    $customfieldspresent = false;
-                    foreach ($fields as $ff) {
-                        if (preg_match('/^customfield_/', $ff)) {
-                            $customfieldspresent = true;
-                            break;
-                        }
+        foreach ($fieldmappings as $f => $m) {
+            if (!in_array($f, $fields)) {
+                // typeidnumber field can be optional if no custom fields specified
+                if (($m == 'typeidnumber') && !empty($customfields)) {
+                    if ($f == $m) {
+                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldx', $f);
+                    } else {
+                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldxmappingx', (object)array('field' => $f, 'mapping' => $m));
                     }
-                    if (!$customfieldspresent) {
-                        // No typeidnumber and no customfields; this is not a problem then ;)
-                        continue;
-                    }
-                }
-                if ($field == $map) {
-                    throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldx', $field);
-                } else {
-                    throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldxmappingx', (object)array('field' => $field, 'mapping' => $map));
                 }
             }
         }
@@ -251,7 +133,6 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         $fieldcount = new stdClass();
         $fieldcount->headercount = count($fields);
         $fieldcount->rownum = 0;
-        $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
 
         // Convert setting into a boolean.
         $csvsaveemptyfields = isset($this->element->config->csvsaveemptyfields) && $this->element->config->csvsaveemptyfields == 1;
@@ -318,7 +199,11 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                 $row['timemodified'] = $now; // This should probably be 0, but it causes repeated sync_item calls to parents.
             } else {
                 // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($row['timemodified']), true);
+                $parsed_date = totara_date_parse_from_format(
+                    $this->get_csv_date_format(),
+                    trim($csvrow['timemodified']),
+                    true
+                );
                 if ($parsed_date) {
                     $row['timemodified'] = $parsed_date;
                 }
@@ -333,43 +218,13 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                 }
             }
 
-            // Custom fields - need to handle custom field formats like dates here
-            $customfieldkeys = preg_grep('/^customfield_.*/', $fields);
-            if (!empty($customfieldkeys)) {
-                $customfields = array();
-                foreach ($customfieldkeys as $key) {
-                    // Get shortname and check if we need to do field type processing
-                    $value = trim($csvrow[$key]);
-                    // Deal with empty strings first
-                    if ($value === '') {
-                        if (!$csvsaveemptyfields) {
-                            // If we are not saving empty fields then set null
-                            $value = null;
-                        }
-                    } else if (isset($value)) {
-                        $shortname = str_replace('customfield_', '', $key);
-                        $datatype = $DB->get_field('pos_type_info_field', 'datatype', array('shortname' => $shortname));
-                        switch ($datatype) {
-                            case 'datetime':
-                                // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true);
-                                if ($parsed_date) {
-                                    $value = $parsed_date;
-                                }
-                                break;
-                            case 'checkbox':
-                                $value = $value == '0' ? 0 : 1;
-                                break;
-                            default:
-                                break;
-                        }
+            if (!empty($this->hierarchy_customfields)) {
+                $row['customfields'] = $this->get_customfield_json($csvrow, $csvsaveemptyfields);
+                foreach($this->hierarchy_customfields as $hierarchy_customfield) {
+                    if ($this->is_importing_customfield($hierarchy_customfield)) {
+                        unset($row[$hierarchy_customfield->get_default_fieldname()]);
                     }
-
-                    $customfields[$key] = $value;
-                    unset($csvrow[$key]);
                 }
-
-                $row['customfields'] = json_encode($customfields);
             }
 
             $datarows[] = $row;
@@ -401,11 +256,7 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         }
         unset($fieldmappings);
 
-        fclose($file);
-        // Done, clean up the file(s)
-        if ($fileaccess == FILE_ACCESS_UPLOAD) {
-            unlink($storefilepath); // don't store this file in temp
-        }
+        $this->close_csv_file($file);
 
         return true;
     }

@@ -263,38 +263,24 @@ abstract class totara_sync_source {
 
         // Display file example
         $fieldmappings = array();
-
         foreach ($this->fields as $field) {
             if (!empty($this->config->{'fieldmapping_' . $field})) {
                 $fieldmappings[$field] = $this->config->{'fieldmapping_' . $field};
             }
         }
 
-        // If we've got a set of customfields for this element, process these too
-        // - not all elements have them.
-        if (isset($this->customfields)) {
-            foreach ($this->customfields as $key => $field) {
-                if (!empty($this->config->{'fieldmapping_' . $key})) {
-                    $fieldmappings[$key] = $this->config->{'fieldmapping_' . $key};
-                }
-            }
-        }
-
         $filestruct = array();
-
         foreach ($this->fields as $field) {
             if (!empty($this->config->{'import_' . $field})) {
-                $filestruct[] = !empty($fieldmappings[$field]) ? '"' . $fieldmappings[$field] . '"' : '"' . $field . '"';
+                $filestruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;
             }
         }
+        $filestruct = array_merge($filestruct, array_unique($this->get_mapped_customfields()));
 
-        if (isset($this->customfields)) {
-            foreach (array_keys($this->customfields) as $field) {
-                if (!empty($this->config->{'import_' . $field})) {
-                    $filestruct[] = !empty($fieldmappings[$field]) ? '"' . $fieldmappings[$field] . '"' : '"' . $field . '"';
-                }
-            }
-        }
+        // Each value is surrounded by quotes when displaying the structure for a file.
+        array_walk($filestruct, function(&$value) {
+            $value = '"' . $value . '"';
+        });
 
         $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($this->config->delimiter, $filestruct));
         $notifications = html_writer::tag('div', $info, ['class' => 'informationbox']);
@@ -314,42 +300,22 @@ abstract class totara_sync_source {
     protected function get_common_db_notifications() {
         global $OUTPUT;
 
-        $notifications = '';
-
         // Display required db table columns
         $fieldmappings = array();
-
         foreach ($this->fields as $field) {
             if (!empty($this->config->{'fieldmapping_' . $field})) {
                 $fieldmappings[$field] = $this->config->{'fieldmapping_' . $field};
             }
         }
 
-        // If we've got a set of customfields for this element, process these too
-        // - not all elements have them.
-        if (isset($this->customfields)) {
-            foreach ($this->customfields as $key => $field) {
-                if (!empty($this->config->{'fieldmapping_' . $key})) {
-                    $fieldmappings[$key] = $this->config->{'fieldmapping_'.$key};
-                }
-            }
-        }
-
         $dbstruct = array();
-
         foreach ($this->fields as $field) {
             if (!empty($this->config->{'import_' . $field})) {
                 $dbstruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;
             }
         }
 
-        if (isset($this->customfields)) {
-            foreach (array_keys($this->customfields) as $field) {
-                if (!empty($this->config->{'import_' . $field})) {
-                    $dbstruct[] = !empty($fieldmappings[$field]) ? $fieldmappings[$field] : $field;;
-                }
-            }
-        }
+        $dbstruct = array_merge($dbstruct, array_unique($this->get_mapped_customfields()));
 
         $dbstruct = implode(', ', $dbstruct);
         $description = get_string('tablemustincludexdb', 'tool_totara_sync') . \html_writer::empty_tag('br') . $dbstruct;
@@ -360,6 +326,41 @@ abstract class totara_sync_source {
         $notifications .= $OUTPUT->notification($info, \core\output\notification::NOTIFY_WARNING);
 
         return $notifications;
+    }
+
+    /**
+     * @return array of customfields with structure ['identifier' => 'mapped field name']
+     */
+    protected function get_mapped_customfields() {
+        $mappedfields = [];
+
+        if (isset($this->customfields)) {
+            foreach ($this->customfields as $key => $field) {
+                if (empty($this->config->{'import_' . $key})) {
+                    continue;
+                }
+                if (empty($this->config->{'fieldmapping_' . $key})) {
+                    $mappedfields[$key] = 'customfield_' . $field;
+                } else {
+                    $mappedfields[$key] = $this->config->{'fieldmapping_' . $key};
+                }
+            }
+        }
+
+        return $mappedfields;
+    }
+
+    /**
+     * @return string with the intended format for dates in csv files on this site.
+     */
+    protected function get_csv_date_format() {
+        global $CFG;
+
+        if (isset($CFG->csvdateformat)) {
+            return $CFG->csvdateformat;
+        } else {
+            return get_string('csvdateformatdefault', 'totara_core');
+        }
     }
 
 }

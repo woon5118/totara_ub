@@ -122,6 +122,8 @@ $string['sourceconfigured'] = 'Source has configuration';
 $string['uploadfilelink'] = 'Files can be uploaded <a href=\'{$a}\'>here</a>';
 
 // Hierarchy items
+$string['customfieldfullnamewithtype'] = '{$a->customfield_fullname} ({$a->type_fullname})';
+$string['customfieldshortnamewithtype'] = '{$a->customfield_shortname} ({$a->type_idnumber})';
 $string['displayname:totara_sync_source_org_csv'] = 'CSV';
 $string['displayname:totara_sync_source_org_database'] = 'External Database';
 $string['displayname:totara_sync_source_pos_csv'] = 'CSV';
@@ -275,6 +277,7 @@ $string['circularreferror'] = 'circular reference error between items {$a->naugh
 $string['customfieldsnotype'] = 'custom fields specified, but no type {$a}';
 $string['typexnotfound'] = 'type {$a} not found...';
 $string['customfieldnotexist'] = 'custom field {$a->shortname} does not exist (type:{$a->typeidnumber})';
+$string['customfieldinvalidmaptype'] = 'The custom field column, {$a->columnname}, is not valid for type: {$a->typeidnumber}';
 $string['cannotdeleteuseradmin'] = 'Local administrator accounts can not be deleted: {$a}';
 $string['cannotdeleteuserguest'] = 'Guest user account can not be deleted: {$a}';
 $string['cannotdeleteuserx'] = 'cannot delete user {$a}';

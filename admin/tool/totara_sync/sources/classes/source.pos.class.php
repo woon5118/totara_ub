@@ -27,7 +27,9 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.class
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/pos.php'); // Needed for totara_sync_element_pos.
 
 abstract class totara_sync_source_pos extends totara_sync_source {
-    protected $fields, $customfields, $customfieldtitles;
+    use \tool_totara_sync\internal\hierarchy\customfield_processor_trait;
+
+    protected $fields;
 
     /**
      * @var totara_sync_element_pos
@@ -35,7 +37,6 @@ abstract class totara_sync_source_pos extends totara_sync_source {
     protected $element;
 
     function __construct() {
-        global $DB;
 
         $this->temptablename = 'totara_sync_pos';
         parent::__construct();
@@ -52,19 +53,7 @@ abstract class totara_sync_source_pos extends totara_sync_source {
             'timemodified'
         );
 
-        // Custom fields
-        $this->customfields = array();
-        $this->customfieldtitles = array();
-        $cfields = $DB->get_records('pos_type_info_field');
-        foreach ($cfields as $cf) {
-            // TODO - Implement sync for file custom fields.
-            if ($cf->datatype == 'file') {
-                continue;
-            }
-
-            $this->customfields['customfield_'.$cf->shortname] = $cf->shortname;
-            $this->customfieldtitles['customfield_'.$cf->shortname] = $cf->fullname;
-        }
+        $this->hierarchy_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
 
         $this->element = new totara_sync_element_pos();
     }
@@ -124,8 +113,8 @@ abstract class totara_sync_source_pos extends totara_sync_source {
             }
         }
 
-        foreach ($this->customfieldtitles as $field => $name) {
-            $mform->addElement('checkbox', 'import_'.$field, $name);
+        foreach ($this->hierarchy_customfields as $customfield) {
+            $mform->addElement('checkbox', $customfield->get_import_setting_name(), $customfield->get_title());
         }
 
         $mform->addElement('header', 'dbfieldmappings', get_string('fieldmappings', 'tool_totara_sync'));
@@ -136,9 +125,9 @@ abstract class totara_sync_source_pos extends totara_sync_source {
             $mform->setType("fieldmapping_{$f}", PARAM_TEXT);
         }
 
-        foreach ($this->customfields as $key => $f) {
-            $mform->addElement('text', 'fieldmapping_'.$key, $f);
-            $mform->setType('fieldmapping_'.$key, PARAM_TEXT);
+        foreach ($this->hierarchy_customfields as $customfield) {
+            $mform->addElement('text', $customfield->get_fieldmapping_setting_name(), $customfield->get_shortname_with_type());
+            $mform->setType($customfield->get_fieldmapping_setting_name(), PARAM_TEXT);
         }
     }
 
@@ -149,15 +138,15 @@ abstract class totara_sync_source_pos extends totara_sync_source {
         foreach ($this->fields as $f) {
             $this->set_config('import_'.$f, !empty($data->{'import_'.$f}));
         }
-        foreach (array_keys($this->customfields) as $f) {
-            $this->set_config('import_'.$f, !empty($data->{'import_'.$f}));
+        foreach ($this->hierarchy_customfields as $customfield) {
+            $this->set_config($customfield->get_import_setting_name(), !empty($data->{$customfield->get_import_setting_name()}));
         }
 
         foreach ($this->fields as $f) {
             $this->set_config("fieldmapping_{$f}", trim($data->{'fieldmapping_'.$f}));
         }
-        foreach (array_keys($this->customfields) as $f) {
-            $this->set_config('fieldmapping_'.$f, $data->{'fieldmapping_'.$f});
+        foreach ($this->hierarchy_customfields as $customfield) {
+            $this->set_config($customfield->get_fieldmapping_setting_name(), $data->{$customfield->get_fieldmapping_setting_name()});
         }
     }
 

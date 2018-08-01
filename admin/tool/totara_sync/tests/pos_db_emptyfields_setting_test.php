@@ -397,10 +397,10 @@ class tool_totara_sync_pos_database_testcase extends totara_sync_database_testca
 
         // We need field mappings here because the customfield names are
         // stupid, we can fix this after TL-16723 is fixed
-        $source->set_config('import_customfield_text'.$postype->id, '1');
-        $source->set_config('import_customfield_menu'.$postype->id, '1');
-        $source->set_config('fieldmapping_customfield_text'.$postype->id, 'textcf1');
-        $source->set_config('fieldmapping_customfield_menu'.$postype->id, 'menucf1');
+        $source->set_config('import_customfield_' . $postype->id . '_text'.$postype->id, '1');
+        $source->set_config('import_customfield_' . $postype->id . '_menu'.$postype->id, '1');
+        $source->set_config('fieldmapping_customfield_' . $postype->id . '_text'.$postype->id, 'textcf1');
+        $source->set_config('fieldmapping_customfield_' . $postype->id . '_menu'.$postype->id, 'menucf1');
 
         $entry = new stdClass();
         $entry->idnumber = 'pos1';
