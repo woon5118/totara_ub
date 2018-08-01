@@ -251,10 +251,14 @@ $string['coursesetcompletedmessage'] = 'Course set completed message';
 $string['coursesetcompletedmessage_help'] = 'This message will be sent whenever a course set is completed.';
 $string['coursesetdue'] = 'Course set due';
 $string['coursesetduemessage'] = 'Course set due message';
-$string['coursesetduemessage_help'] = 'This message will be sent at the specified time before a course set is due.';
+$string['coursesetduemessage_help'] = 'This message will be sent at the specified time before a course set is due.
+
+The \'Minimum time required\' field within the course set is used to calculate when a course set is due.';
 $string['coursesetoverdue'] = 'Course set overdue';
 $string['coursesetoverduemessage'] = 'Course set overdue message';
-$string['coursesetoverduemessage_help'] = 'This message will be sent at the specified time after a course set becomes due.';
+$string['coursesetoverduemessage_help'] = 'This message will be sent at the specified time after a course set becomes due.
+
+The \'Minimum time required\' field within the course set is used to calculate when a course set is due.';
 $string['coursescorefield'] = 'Course score field';
 $string['coursescorefield_help'] = 'Specify a course custom field which is used to allocate a score to each course in the set. This is used in conjunction with **Minimum score** below to determine the course set\'s completion criteria.
 The selected field should have numeric values.';
@@ -694,7 +698,9 @@ When multiple course sets exist in a program the overall minimum time required f
 
 Course set1 [10 days] THEN Course set2 [5 days] OR Course set3 [7 days]
 
-then the overall time allowance would be 17 days.';
+then the overall time allowance would be 17 days.
+
+This minimum time value is also used to determine when the \'Course set due message\' and \'Course set overdue message\' should be sent.';
 $string['minprogramtimerequired'] = 'Programs total minimum time required: ';
 $string['missingshortname'] = 'Missing short name';
 $string['months'] = 'Month(s)';
