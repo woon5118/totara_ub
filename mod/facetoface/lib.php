@@ -3183,16 +3183,25 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         // Otherwise it doesn't make sense to do so because the user has already signedup for the instance.
         if ($facetoface->multiplesessions) {
             $allsessions = facetoface_get_sessions($facetoface->id);
+            $numberofeventstodisplay = isset($facetoface->display) ? (int)$facetoface->display : 0;
+            $index = 0;
             foreach ($allsessions as $id => $session) {
                 if (array_key_exists($id, $sessions)) {
-                    $allsessions[$id] = $sessions[$id];
+                    continue;
                 }
                 // Don't show events that are over.
                 if (facetoface_is_session_over($session, $timenow)) {
-                    unset($allsessions[$id]);
+                    continue;
                 }
+
+                // Displaying the seminar's event base on the config ($facetoface->display) within seminar setting.
+                // Break the loop, if the number of events ($index) reaches to the number from config ($numberofeventstodisplay)
+                if ($index == $numberofeventstodisplay) {
+                    break;
+                }
+                $sessions[$session->id] = $session;
+                $index++;
             }
-            $sessions = $allsessions;
         }
 
         if (!empty($facetoface->managerreserve)) {
