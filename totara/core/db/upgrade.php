@@ -395,5 +395,35 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018091100, 'totara', 'core');
     }
 
+    if ($oldversion < 2018092100) {
+        // Increase course_request fullname column to match the fullname column in the "course" table.
+        $table = new xmldb_table('course_request');
+
+        $field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null);
+        $dbman->change_field_precision($table, $field);
+
+        upgrade_plugin_savepoint(true, 2018092100, 'totara', 'core');
+    }
+
+    if ($oldversion < 2018092101) {
+        // Increase course_request shortname column to match the shortname column in the "course" table.
+        $table = new xmldb_table('course_request');
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $index = new xmldb_index('shortname', XMLDB_INDEX_NOTUNIQUE, array('shortname'));
+
+        // Conditionally launch drop index name to amend the field precision.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        // Change the field precision.
+        $dbman->change_field_precision($table, $field);
+        // Add back our 'shortname' index after the table has been amended.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2018092101, 'totara', 'core');
+    }
+
     return true;
 }

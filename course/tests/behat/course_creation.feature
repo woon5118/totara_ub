@@ -67,3 +67,34 @@ Feature: Managers can create courses
       | id_enddate_day | 24 |
       | id_enddate_month | October |
       | id_enddate_year | 2016 |
+
+  @javascript
+  Scenario: Course shortname can be 255 characters
+    Given the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | 1 | teacher1@example.com |
+      | student1 | Student | 1 | student1@example.com |
+    When I log in as "admin"
+    And I create a course with:
+      | Course full name | Course 1 |
+      | Course short name | This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long shortname |
+    When I navigate to "Create report" node in "Site administration > Reports > Report builder"
+    And I set the following fields to these values:
+      | Report Name | Courses Report |
+      | Source      | Courses        |
+    And I press "Create report"
+    And I switch to "Columns" tab
+    And I add the "Course Shortname" column to the report
+    And I follow "View This Report"
+    Then I should see "This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long shortname"
+    And I should see "Course 1"
+
+    When I follow "Course 1"
+    And I follow "Edit settings"
+    And I set the following fields to these values:
+      | Course short name | This is still a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long shortname |
+    And I press "Save and display"
+    And I follow "Reports"
+    And I follow "Courses Report"
+    Then I should see "This is still a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long shortname"
+    And I should see "Course 1"
