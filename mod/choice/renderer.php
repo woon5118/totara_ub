@@ -86,14 +86,14 @@ class mod_choice_renderer extends plugin_renderer_base {
                     $html .= html_writer::empty_tag('input', array(
                         'type' => 'submit',
                         'value' => get_string('savemychoice', 'choice'),
-                        'class' => 'btn btn-primary'
+                        'class' => 'btn btn-primary form-submit'
                     ));
                 }
 
                 if (!empty($options['allowupdate']) && ($options['allowupdate'])) {
                     $url = new moodle_url('view.php',
                             array('id' => $coursemoduleid, 'action' => 'delchoice', 'sesskey' => sesskey()));
-                    $html .= html_writer::link($url, get_string('removemychoice', 'choice'));
+                    $html .= html_writer::link($url, get_string('removemychoice', 'choice'), ['class' => 'mod_choice__remove-choice-link']);
                 }
             } else {
                 $html .= html_writer::tag('label', get_string('havetologin', 'choice'));
