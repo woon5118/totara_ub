@@ -408,7 +408,7 @@ $string['debugnormal'] = 'NORMAL: Show errors, warnings and notices';
 $string['debugpageinfo'] = 'Show page information';
 $string['debugsmtp'] = 'Debug email sending';
 $string['debugstringids'] = 'Show origin of languages strings';
-$string['debugstringids_desc'] = 'This option is designed to help translators. When this option is enabled, if you add the parameter strings=1 to a request URL, it will show the language file and string id beside each string that is output.';
+$string['debugstringids_desc'] = 'If enabled, language string components and identifiers are displayed when ?strings=1 or &strings=1 is appended to the page URL.';
 $string['debugvalidators'] = 'Show validator links';
 $string['defaultcity'] = 'Default city';
 $string['defaultcity_help'] = 'A city entered here will be the default city when creating new user accounts.';
@@ -824,7 +824,7 @@ $string['passwordresettime'] = 'Maximum time to validate password reset request'
 $string['passwordreuselimit'] = 'Password rotation limit';
 $string['passwordreuselimit_desc'] = 'Number of times a user must change their password before they are allowed to reuse a password. Hashes of previously used passwords are stored in local database table. This feature might not be compatible with some external authentication plugins.';
 $string['pathtodot'] = 'Path to dot';
-$string['pathtodot_help'] = 'Path to dot. Probably something like /usr/bin/dot. To be able to generate graphics from DOT files, you must have installed the dot executable and point to it here. Note that, for now, this only used by the profiling features (Development->Profiling) built into Totara.';
+$string['pathtodot_help'] = 'Path to dot. On Linux it is something like /usr/bin/dot. On Windows it is something like C:\Program Files (x86)\Graphviz2.38\bin\dot.exe. On Mac it is something like /opt/local/bin/dot. To be able to generate graphics from DOT files, you must have installed the dot executable and point to it here.';
 $string['pathtodu'] = 'Path to du';
 $string['pathtogs'] = 'Path to ghostscript';
 $string['pathtogs_help'] = 'On most Linux installs, this can be left as \'/usr/bin/gs\'. On Windows it will be something like \'c:\gs\bin\gswin32c.exe\' (make sure there are no spaces in the path - if necessary copy the files \'gswin32c.exe\' and \'gsdll32.dll\' to a new folder without a space in the path).';
@@ -1033,7 +1033,7 @@ $string['sitemaintenancewarning'] = 'Your site is currently in maintenance mode 
 $string['sitemaintenancewarning2'] = 'Your site is currently in maintenance mode (only admins can log in).  To return this site to normal operation, <a href="{$a}">disable maintenance mode</a>.';
 $string['sitepolicies'] = 'Site policies';
 $string['sitepolicy'] = 'Site policy URL';
-$string['sitepolicy_help'] = 'If you have a site policy that all registered users must see and agree to before using this site, then specify the URL to it here, otherwise leave this field blank. This setting can contain any public URL.';
+$string['sitepolicy_help'] = 'If you have a site policy that all registered users must see and agree to before accessing the site, then specify the URL to it here, otherwise leave this field blank. This setting can contain any public URL.';
 $string['sitepolicyguest'] = 'Site policy URL for guests';
 $string['sitepolicyguest_help'] = 'If you have a site policy that all guests must see and agree to before using this site, then specify the URL to it here, otherwise leave this field blank. This setting can contain any public URL. Note that access of not-logged-in users may be prevented with **force login** setting.';
 $string['sitesectionhelp'] = 'If selected, a topic section will be displayed on the site\'s front page.';
