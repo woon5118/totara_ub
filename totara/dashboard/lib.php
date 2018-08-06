@@ -448,6 +448,7 @@ class totara_dashboard {
                 $block->defaultregion = $bi->defaultregion;
                 $block->defaultweight = $bi->defaultweight;
                 $block->configdata = $bi->configdata;
+                $block->common_config = $bi->common_config;
                 // Create the new block record.
                 $block->id = $DB->insert_record('block_instances', $block);
 

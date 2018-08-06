@@ -13,8 +13,9 @@ Feature: Block deletion
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
     And I set the following fields to these values:
-      | Block title | Testing block deletion                  |
-      | Content     | <p>This is some test block content </p> |
+      | Override default block title | Yes                                     |
+      | Block title                  | Testing block deletion                  |
+      | Content                      | <p>This is some test block content </p> |
     And I press "Save changes"
     Then I should see "Testing block deletion"
     And I open the "Testing block deletion" blocks action menu

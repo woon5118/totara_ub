@@ -14,7 +14,8 @@ Feature: Random glossary entry block can be added to the frontpage
     And I add the "Random glossary entry" block
     And I configure the "block_glossary_random" block
     And I set the following fields to these values:
-      | Block title (no title if blank) | Tip of the day  |
+      | Override default block title    | Yes             |
+      | Block title                     | Tip of the day  |
       | Take entries from this glossary | Tips and Tricks |
     And I press "Save changes"
     And I click on "Add a new entry" "link" in the "Tip of the day" "block"

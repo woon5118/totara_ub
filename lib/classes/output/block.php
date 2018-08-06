@@ -124,10 +124,9 @@ class block implements renderable {
             $block->header['controls'] = $controls;
         }
 
-        $block->header['collapsable'] = true;
-        if (isset($bc->headercollapsable)) {
-            $block->header['collapsable'] = $bc->headercollapsable;
-        }
+        $block->header['collapsible'] = $bc->header_collapsible ?? true;
+
+        $block->dock_title = $bc->dock_title;
 
         $block->header['display'] = true;
         if (isset($bc->displayheader) && !$bc->displayheader) {

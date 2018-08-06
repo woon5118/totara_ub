@@ -600,3 +600,51 @@ function totara_core_migrate_frontpage_display() {
         }
     }
 }
+
+/**
+ * Migrate block title to the new way of storing it
+ */
+function totara_core_migrate_old_block_titles() {
+    global $DB;
+
+    [$sql_block_names, $sql_block_params] = $DB->get_in_or_equal([
+        'html',
+        'totara_featured_links',
+        'totara_report_graph',
+        'totara_report_table',
+        'totara_quick_links',
+        'totara_program_completion',
+        'tags',
+        'tag_youtube',
+        'tag_flickr',
+        'rss_client',
+        'mentees',
+        'glossary_random',
+        'blog_tags',
+        ]);
+
+    $instances = $DB->get_records_sql_menu("SELECT id, configdata FROM {block_instances} WHERE
+                                      blockname {$sql_block_names} AND configdata <> ''", $sql_block_params);
+
+    foreach ($instances as $id => $config_data) {
+        try {
+            $config = (array) unserialize(base64_decode($config_data));
+
+            // Explicitly converting $title to string below to avoid any confusions down the road as we
+            // expect title to be a string.
+
+            if (isset($config['title'])) {
+                $DB->update_record('block_instances', (object) [
+                    'common_config' => json_encode([
+                        'id' => $id,
+                        'title' => (string) $config['title'],
+                        'override_title' => 1,
+                    ]),
+                ]);
+            }
+
+        } catch (\Exception $exception) {
+            // We'll just skip a broken record, no reason to fail site upgrade because of this.
+        }
+    }
+}

@@ -282,26 +282,18 @@ class block_edit_form extends moodleform {
      * Please DO NOT override this method. It is considered final.
      * If you want to add configuration please override specific_definition().
      */
-    public function definition() {
+    final public function definition() {
         $mform =& $this->_form;
 
-        // First show fields specific to this type of block.
+        // First show fields common for all blocks.
+        $this->common_definition($mform);
+
+        // Specific definitions for blocks
         $this->specific_definition($mform);
 
         // TOTARA: This is a little hacky, we are going to force this as a config option for all blocks.
         // Because its prefixed with "config_" it will be collected from and stored in the block_instance.configdata field
         // automatically for us.
-
-        // block appearance heading
-        $mform->addElement('header', 'displayconfig', get_string('displayconfig', 'block'));
-        // header element
-        $mform->addElement('radio', 'config_display_with_header', get_string('config_display_with_header', 'block'), get_string('show'), 1);
-        $mform->addElement('radio', 'config_display_with_header', '', get_string('hide'), 0, array('id' => 'display_with_header_hide'));
-        $mform->setDefault('config_display_with_header', $this->block->display_with_header());
-        // border element
-        $mform->addElement('radio', 'config_display_with_border', get_string('config_display_with_border', 'block'), get_string('show'), 1);
-        $mform->addElement('radio', 'config_display_with_border', '', get_string('hide'), 0, array('id' => 'display_with_border_hide'));
-        $mform->setDefault('config_display_with_border', $this->block->display_with_border());
 
         // Then show the fields about where this block appears.
         $mform->addElement('header', 'whereheader', get_string('wherethisblockappears', 'block'));
@@ -478,47 +470,144 @@ class block_edit_form extends moodleform {
     /**
      * Override this to create any form fields specific to this type of block.
      *
-     * @param object $mform the form being built.
+     * @param \MoodleQuickForm $form
      */
-    protected function specific_definition($mform) {
-
-        if ($this->has_general_settings()) {
-            $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
-            // add title element
-            $mform->addElement('text', 'config_title', get_string('config_settings_block_title', 'block'));
-            $mform->setDefault('config_title', $this->block->get_title());
-            $mform->setType('config_title', PARAM_TEXT);
-            // add hiding element
-            $mform->addElement('radio', 'config_allow_hiding', get_string('config_settings_block_hiding', 'block'), get_string('yes'), 'yes');
-            $mform->addElement('radio', 'config_allow_hiding', '', get_string('no'), 'no', array('id' => 'config_allow_hiding_hide'));
-            if (empty($this->block->config->allow_hiding) || $this->block->config->allow_hiding == 'yes') {
-                $mform->setDefault('config_allow_hiding', 'yes');
-            }
-            else {
-                $mform->setDefault('config_allow_hiding', 'no');
-            }
-            // add dock element
-            $mform->addElement('radio', 'config_enabledock', get_string('config_settings_block_docking', 'block'), get_string('yes'), 'yes');
-            $mform->addElement('radio', 'config_enabledock', '', get_string('no'), 'no');
-            if (empty($this->block->config->enabledock) || $this->block->config->enabledock == 'yes') {
-                $mform->setDefault('config_enabledock', 'yes');
-            }
-            else {
-                $mform->setDefault('config_enabledock', 'no');
-            }
-        }
+    protected function specific_definition($form) {
+        // Hi. Please override me if you want to add your own specific definitions to the block.
     }
 
     /**
-     * Override this function when your block has been updated to allow the base class block_edit_form to manage the hiding and docking settings.
-     * In a future version of Totara, this function will be deprecated and all blocks will be assumed to have handed over management of hiding and docking to the base class.
+     * Override this to create any form fields specific to this type of block.
+     *
+     * @param \MoodleQuickForm $form the form being built.
+     */
+    final protected function common_definition(\MoodleQuickForm $form) {
+
+        if (!$this->has_common_settings()) {
+            return;
+        }
+
+        $form->addElement('header', 'config_header', get_string('common_settings', 'block'));
+
+        // Title
+        $form->addElement('text', 'cs_title', get_string('cs_title', 'block'), [
+            'placeholder' => $this->block->get_title(),
+        ]);
+        $form->setDefault('cs_title', $this->block->get_common_config_value('title', $this->block->get_title()));
+        $form->setType('cs_title', PARAM_TEXT);
+        $form->disabledIf('cs_title', 'cs_override_title', 'notchecked');
+
+        // Override title
+        $form->addElement(
+            'advcheckbox',
+            'cs_override_title',
+            get_string('cs_override_title', 'block'),
+            '',
+            [],
+            [
+                false,
+                true,
+            ]
+        );
+        $form->setDefault('cs_override_title',
+            $this->block->get_common_config_value('override_title', false));
+
+        // Enable hiding
+        $form->addElement(
+            'advcheckbox',
+            'cs_enable_hiding',
+            get_string('cs_enable_hiding', 'block'),
+            '',
+            [],
+            [
+                false,
+                true,
+            ]
+        );
+        $form->setDefault('cs_enable_hiding',
+            $this->block->get_common_config_value('enable_hiding', true));
+
+        // Enable docking
+        $form->addElement(
+            'advcheckbox',
+            'cs_enable_docking',
+            get_string('cs_enable_docking', 'block'),
+            '',
+            [],
+            [
+                false,
+                true,
+            ]
+        );
+        $form->setDefault('cs_enable_docking',
+            $this->block->get_common_config_value('enable_docking', true));
+
+        // Block appearance heading
+        $form->addElement('header', 'displayconfig', get_string('displayconfig', 'block'));
+
+        // Show header
+        $form->addElement(
+            'advcheckbox',
+            'cs_show_header',
+            get_string('cs_show_header', 'block'),
+            '',
+            [],
+            [
+                false,
+                true,
+            ]
+        );
+        $form->setDefault('cs_show_header',
+            $this->block->get_common_config_value('show_header', $this->block->display_with_header()));
+
+        // Show border
+        $form->addElement(
+            'advcheckbox',
+            'cs_show_border',
+            get_string('cs_show_border', 'block'),
+            '',
+            [],
+            [
+                false,
+                true,
+            ]
+        );
+
+        $form->setDefault('cs_show_border',
+            $this->block->get_common_config_value('show_border', $this->block->display_with_border()));
+    }
+
+    /**
+     * Split common settings data from the form data
+     *
+     * @param stdClass $data Given form data
+     * @param bool $unset Unset common settings from given data
+     * @return array
+     */
+    final public function split_common_settings_data(\stdClass $data, bool $unset = false) {
+        $cs = [];
+
+        foreach ($data as $key => $datum) {
+            if (strpos($key, 'cs_') === 0) {
+                $cs[substr($key, 3)] = $datum;
+
+                if ($unset) {
+                    unset($data[$key]);
+                }
+            }
+        }
+
+        return $cs;
+    }
+
+
+
+    /**
+     * Override this if your block as configurable as rock.
      *
      * @return bool
      */
-    protected function has_general_settings() {
-        if (class_exists('block_' . $this->block->name() . '_edit_form')) {
-            return false;
-        }
+    protected function has_common_settings() {
         return true;
     }
 }

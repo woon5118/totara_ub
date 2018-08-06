@@ -27,18 +27,8 @@ require_once($CFG->libdir . '/formslib.php');
 
 class block_totara_alerts_edit_form extends block_edit_form {
 
-    /**
-     * Enable general settings
-     *
-     * @return bool
-     */
-    protected function has_general_settings() {
-        return true;
-    }
-
     protected function specific_definition($mform) {
         global $CFG;
-        parent::specific_definition($mform);
 
         $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 

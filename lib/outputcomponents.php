@@ -3556,6 +3556,20 @@ class block_contents {
     public $title = '';
 
     /**
+     * Title which is never empty
+     *
+     * @var string
+     */
+    public $dock_title = '';
+
+    /**
+     * Flag to indicate whether this block instance is hideable (could be reduced to header only)
+     *
+     * @var bool
+     */
+    public $is_hideable = true;
+
+    /**
      * @var string The label to use when the block does not, or will not have a visible title.
      * You should never set this as well as title... it will just be ignored.
      */

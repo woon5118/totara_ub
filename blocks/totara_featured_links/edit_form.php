@@ -30,20 +30,10 @@ defined('MOODLE_INTERNAL') || die();
 class block_totara_featured_links_edit_form extends block_edit_form{
 
     /**
-     * Enable general settings
-     *
-     * @return bool
-     */
-    protected function has_general_settings() {
-        return true;
-    }
-
-    /**
      * defines the form for the custom block options
      * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
-        parent::specific_definition($mform);
 
         $mform->addElement('header', 'config_header', get_string('customblocksettings', 'block'));
 

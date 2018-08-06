@@ -13,13 +13,17 @@ Feature: Duplicate block
     And I am on "Course 1" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     When I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
@@ -40,19 +44,25 @@ Feature: Duplicate block
     And I am on "Course 2" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I am on "Course 1" course homepage
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     When I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
@@ -73,29 +83,39 @@ Feature: Duplicate block
     And I am on "Course 2" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I am on "Course 1" course homepage
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     When I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
@@ -115,13 +135,17 @@ Feature: Duplicate block
     And I am on "Course 1" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title (no title if blank)" to "htitle"
-    And I set the field "Content" to "hcontent"
+    And I set the following fields to these values:
+      | Override default block title | Yes      |
+      | Block title                  | htitle   |
+      | Content                      | hcontent |
     And I press "Save changes"
     When I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |

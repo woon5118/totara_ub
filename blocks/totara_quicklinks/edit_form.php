@@ -26,19 +26,9 @@
 
 class block_totara_quicklinks_edit_form extends block_edit_form {
 
-    /**
-     * Enable general settings
-     *
-     * @return bool
-     */
-    protected function has_general_settings() {
-        return true;
-    }
-
     protected function specific_definition($mform) {
         global $DB;
 
-        parent::specific_definition($mform);
         $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         $quicklinks = $DB->get_records('block_quicklinks', array('block_instance_id' => $this->block->instance->id), 'displaypos');

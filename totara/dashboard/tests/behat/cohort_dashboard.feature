@@ -46,16 +46,19 @@ Feature: Test Dashboard for cohort users
     And I click on "My first dashboard" "link"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title" to "First dashboard block header"
-    And I set the field "Content" to "First dashboard block content"
+    And I set the following fields to these values:
+      | Override default block title | Yes                           |
+      | Block title                  | First dashboard block header  |
+      | Content                      | First dashboard block content |
     And I press "Save changes"
       # Add content to the second dashboard.
     And I navigate to "Dashboards" node in "Site administration > Appearance"
     And I click on "My second dashboard" "link"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Block title" to "Second dashboard block header"
-    And I set the field "Content" to "Second dashboard block content"
+      | Override default block title | Yes                            |
+      | Block title                  | Second dashboard block header  |
+      | Content                      | Second dashboard block content |
     And I press "Save changes"
 
       # Dasboard shows in the Totara menu

@@ -246,11 +246,6 @@ class block_totara_featured_links extends block_base {
      */
     public function specialization() {
         if (isset($this->config)) {
-            if (empty($this->config->title)) {
-                $this->title = get_string('pluginname', 'block_totara_featured_links');
-            } else {
-                $this->title = $this->config->title;
-            }
 
             if (!empty($this->config->data)) {
                 if (!isset($this->content)) {

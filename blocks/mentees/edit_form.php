@@ -32,10 +32,6 @@
  */
 class block_mentees_edit_form extends block_edit_form {
 
-    protected function has_general_settings() {
-        return true;
-    }
-
     /**
      * This function has been deprecated and will be removed in the future.
      * Please call block_edit_form.specific_definition() instead.
@@ -43,6 +39,6 @@ class block_mentees_edit_form extends block_edit_form {
      * @deprecated
      */
     protected function specific_definition($mform) {
-        parent::specific_definition($mform);
+
     }
 }

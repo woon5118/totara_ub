@@ -33,16 +33,11 @@
  */
 class block_navigation_edit_form extends block_edit_form {
 
-    protected function has_general_settings() {
-        return true;
-    }
-
     /**
      * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
         global $CFG;
-        parent::specific_definition($mform);
         $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         $mods = array('linkcategories'=>'no');

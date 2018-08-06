@@ -14,9 +14,10 @@ Feature: The content of the featured links blocks should be carried over when ba
 
     And I add the "Featured Links" block
     And I configure the "Featured Links" block
-    And I set the field "Block title (no title if blank)" to "Featured Links1"
+      | Override default block title | Yes             |
+      | Block title                  | Featured Links1 |
     And I click on "Save changes" "button"
-    And I click on "Add Tile" "link" in the "Featured Links1" "block"
+    And I click on "Add Tile" "link" in the "Featured Links" "block"
     And I set the following fields to these values:
       | URL         | www.example.com                |
       | Description | The featured links tile exists |
@@ -42,5 +43,5 @@ Feature: The content of the featured links blocks should be carried over when ba
     And I click on "Continue" "button"
 
     Then I should see "C1_1"
-    And I should see "The featured links tile exists" in the "Featured Links1" "block"
+    And I should see "The featured links tile exists" in the "Featured Links" "block"
     And I should see "Second FLB" in the "Featured Links" "block"

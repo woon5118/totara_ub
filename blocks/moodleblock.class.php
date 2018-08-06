@@ -106,6 +106,13 @@ class block_base {
 
     var $cron          = NULL;
 
+    /**
+     * Array of common configuration values for all the blocks
+     *
+     * @var array
+     */
+    private $common_config = null;
+
 /// Class Functions
 
     /**
@@ -162,7 +169,31 @@ class block_base {
      */
     function get_title() {
         // Intentionally doesn't check if a title is set. This is already done in _self_test()
-        return $this->title;
+        $title = $this->get_common_config_value('title');
+
+        if (!is_null($title)) {
+            $title = format_string($title);
+        }
+
+        // Explicitly converting {$this->title} to string here as it might be an object if block authors
+        // have set it as new lang_string(bla-bla-bla); and since this gets serialized later, that will lead to
+        // not expected outcome!
+
+        return (string) $this->get_common_config_value('override_title') ?
+            ($title ?? $this->title) : $this->title;
+    }
+
+    /**
+     * Return block title to display in dock
+     *
+     * @return string
+     */
+    public function get_dock_title() {
+        if (empty($title = $this->get_title())) {
+            $title = $this->title;
+        }
+
+        return s($title);
     }
 
     /**
@@ -236,11 +267,10 @@ class block_base {
         }
 
         if (!$this->hide_header()) {
-            $bc->title = $this->title;
-            if (isset($this->config->title)) {
-                $bc->title = $this->config->title;
-            }
+            $bc->title = $this->get_title();
         }
+
+        $bc->dock_title = $this->get_dock_title();
 
         if (empty($bc->title)) {
             $bc->arialabel = new lang_string('pluginname', get_class($this));
@@ -256,15 +286,7 @@ class block_base {
             }
         }
 
-        if (empty($CFG->allowuserblockhiding)
-                || (empty($bc->content) && empty($bc->footer))
-                || !$this->instance_can_be_collapsed()) {
-            $bc->collapsible = block_contents::NOT_HIDEABLE;
-        } else if (get_user_preferences('block' . $bc->blockinstanceid . 'hidden', false)) {
-            $bc->collapsible = block_contents::HIDDEN;
-        } else {
-            $bc->collapsible = block_contents::VISIBLE;
-        }
+        $this->is_content_hidden($bc);
 
         if ($this->instance_can_be_docked() && !$this->hide_header()) {
             $bc->dockable = true;
@@ -277,10 +299,24 @@ class block_base {
             $bc->displayheader = $this->display_with_header();
         }
 
-        $bc->headercollapsable = $this->allow_block_hiding();
+        $bc->header_collapsible = $this->allow_block_hiding();
         $bc->annotation = ''; // TODO MDL-19398 need to work out what to say here.
 
         return $bc;
+    }
+
+    public function is_content_hidden(\block_contents $bc) {
+        global $CFG;
+
+        if (empty($CFG->allowuserblockhiding)
+            || (empty($bc->content) && empty($bc->footer))
+            || !$this->instance_can_be_collapsed()) {
+            $bc->collapsible = block_contents::NOT_HIDEABLE;
+        } else if (get_user_preferences('block' . $bc->blockinstanceid . 'hidden', false)) {
+            $bc->collapsible = block_contents::HIDDEN;
+        } else {
+            $bc->collapsible = block_contents::VISIBLE;
+        }
     }
 
     /**
@@ -430,7 +466,15 @@ class block_base {
         if (!empty($instance->configdata)) {
             $this->config = unserialize(base64_decode($instance->configdata));
         }
+
         $this->instance = $instance;
+
+        // Last resort, if the it wasn't called when the block supposed to be instantiated
+        // Why not just leave it here, as it's overridable.
+        if (!empty($instance->common_config)) {
+            $this->load_common_config(false);
+        }
+
         $this->context = context_block::instance($instance->id);
         $this->page = $page;
         $this->specialization();
@@ -623,10 +667,11 @@ class block_base {
      */
     public function instance_can_be_docked() {
         global $CFG;
-        return (
-            (!empty($CFG->allowblockstodock) && $this->page->theme->enable_dock) &&
-            (empty($this->config->enabledock) || $this->config->enabledock=='yes')
-        );
+
+        // First line checks global settings
+        // Second line checks local override (per instance)
+        return !empty($CFG->allowblockstodock) && $this->page->theme->enable_dock &&
+                $this->get_common_config_value('enable_docking');
     }
 
     /**
@@ -636,7 +681,7 @@ class block_base {
      * @return bool
      */
     public function instance_can_be_hidden() {
-        return true;
+        return $this->get_common_config_value('enable_hiding');
     }
 
     /**
@@ -710,11 +755,8 @@ EOD;
      *
      * @return bool
      */
-    public function display_with_border() {
-        if (isset($this->config->display_with_border)) {
-            return (bool)$this->config->display_with_border;
-        }
-        return $this->display_with_border_by_default();
+    public function display_with_border(): bool {
+        return $this->get_common_config_value('show_border');
     }
 
     /**
@@ -722,12 +764,8 @@ EOD;
      *
      * @return bool
      */
-    public function display_with_header() {
-        if (isset($this->config->display_with_header)) {
-            return (bool)$this->config->display_with_header;
-        }
-
-        return true;
+    public function display_with_header(): bool {
+        return $this->get_common_config_value('show_header');
     }
 
     /**
@@ -736,12 +774,7 @@ EOD;
      * @return bool
      */
     public function allow_block_hiding() {
-
-        if ($this->page->theme->enable_hide && !empty($this->config->allow_hiding) && $this->config->allow_hiding == 'no') {
-            return false;
-        }
-
-        return true;
+        return $this->page->theme->enable_hide && $this->get_common_config_value('enable_hiding');
     }
 
     /**
@@ -751,6 +784,123 @@ EOD;
      */
     public function has_configdata_in_other_table(): bool {
         return false;
+    }
+
+    /**
+     * Load common block configuration from the table
+     *
+     * @param bool $override Override with data from the table if already loaded
+     * @param null|stdClass $instance Block instance, in case it's not loaded yet
+     */
+    private function load_common_config(bool $override = false, ?\stdClass $instance = null) {
+
+        // Attempt to load instance from the class property if omitted
+        $instance = $instance ?? $this->instance;
+
+        if (is_null($this->common_config) || $override) {
+            $this->common_config = json_decode($instance->common_config ?? '', true)
+                                        ?? $this->get_default_common_config_values();
+        }
+    }
+
+    /**
+     * Get common config value by key
+     *
+     * @param string $key Setting key
+     * @param null $default Setting default value if not set
+     * @return mixed|null
+     */
+    final public function get_common_config_value(string $key, $default = null) {
+        if (!$this->common_config) {
+            $this->load_common_config();
+        }
+
+        return $this->common_config[$key] ?? $default;
+    }
+
+    /**
+     * Set common config value
+     * This method is a part of user-available API and it performs a check
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    final public function set_common_config_value(string $key, $value) {
+        if (in_array($key, array_keys($this->get_default_common_config_values()))) {
+            debugging('Trying to set default config option by user-overridable API. Please choose another key');
+            return;
+        }
+
+        // Restrict options to scalars or array of scalars
+        if (!$this->validate_common_config_value($value)) {
+            throw new coding_exception('Only scalar values or arrays with scalar values can be saved as common settings');
+        }
+
+        $this->common_config[$key] = $value;
+    }
+
+    /**
+     * Serialize and save common config options from $this->common_config property.
+     * The block instance must be loaded prior to saving the config.
+     */
+    final public function save_common_config() {
+        global $DB;
+
+        $config = $this->serialize_common_config();
+
+        $DB->set_field('block_instances', 'common_config', $config, ['id' => $this->instance->id]);
+    }
+
+    /**
+     * Validate common config attribute, it must be either a scalar type or a hierarchy of scalar types.
+     *
+     * @param array|float|int|string|boolean $value
+     * @return bool
+     */
+    final public function validate_common_config_value($value) {
+        if (is_array($value)) {
+            $result = true;
+
+            foreach ($value as $item) {
+                if (!($result &= $this->validate_common_config_value($item))) {
+                    return false;
+                }
+            }
+
+            return $result;
+        }
+
+        return is_scalar($value);
+    }
+
+    /**
+     * Get default common configuration values,
+     * These will be used as initial values for all the new blocks.
+     *
+     * @return array
+     */
+    private function get_default_common_config_values() {
+        return [
+            'title' => null,
+            'override_title' => false,
+            'enable_hiding' => true,
+            'enable_docking' => true,
+            'show_header' => true,
+            'show_border' => $this->display_with_border_by_default(),
+        ];
+    }
+
+    /**
+     * Serialize common settings.
+     *
+     * P.S. Serialization is a general term, the function does JSON ENCODE
+     * However this is an abstraction to give a room for change in the future.
+     *
+     * @param array $data Data to serialize or to get from class
+     * @return string
+     */
+    final public function serialize_common_config(array $data = null) {
+        return json_encode($data ?? $this->common_config);
     }
 }
 

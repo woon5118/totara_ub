@@ -69,7 +69,7 @@ class block_current_learning extends block_base {
      * Initialises a new block instance.
      */
     public function init() {
-        $this->title = new lang_string('pluginname', 'block_current_learning');
+        $this->title = get_string('pluginname', 'block_current_learning');
 
         if (empty($this->config)) {
             $this->config = new stdClass();

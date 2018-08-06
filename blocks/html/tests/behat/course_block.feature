@@ -20,13 +20,17 @@ Feature: HTML blocks in a course
     And I am on "Course 1" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Content" to "First block content"
-    And I set the field "Block title" to "First block header"
+    And I set the following fields to these values:
+      | Override default block title | Yes                 |
+      | Block title                  | First block header  |
+      | Content                      | First block content |
     And I press "Save changes"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
-    And I set the field "Content" to "Second block content"
-    And I set the field "Block title" to "Second block header"
+    And I set the following fields to these values:
+      | Override default block title | Yes                  |
+      | Block title                  | Second block header  |
+      | Content                      | Second block content |
     And I press "Save changes"
     And I log out
     And I log in as "student1"

@@ -24,6 +24,7 @@ Feature: The activity results block doesn't displays student scores for unconfig
   Scenario: Try to configure the block on the course page in a course without activities
     Given I add the "Activity results" block
     When I configure the "Activity results" block
+    And I expand all fieldsets
     And I should see "There are not yet any activities in this course."
     And I press "Save changes"
     Then I should see "Please configure this block and select which activity it should display results from." in the "Activity results" "block"
@@ -37,6 +38,7 @@ Feature: The activity results block doesn't displays student scores for unconfig
     And I press "Save and display"
     When I add the "Activity results" block
     And I configure the "Activity results" block
+    And I expand all fieldsets
     And I should see "There are not yet any activities in this course."
     And I press "Save changes"
     Then I should see "Please configure this block and select which activity it should display results from." in the "Activity results" "block"

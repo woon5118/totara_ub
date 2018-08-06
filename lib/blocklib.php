@@ -776,7 +776,8 @@ class block_manager {
                     COALESCE(bp.visible, bs.visible, 1) AS visible,
                     COALESCE(bp.region, bs.region, bi.defaultregion) AS region,
                     COALESCE(bp.weight, bs.weight, bi.defaultweight) AS weight,
-                    bi.configdata
+                    bi.configdata,
+                    bi.common_config
                     $ccselect
 
                 FROM {block_instances} bi
@@ -1317,7 +1318,7 @@ class block_manager {
 
         $controls = array();
         $actionurl = $this->page->url->out(false, array('sesskey'=> sesskey()));
-        $blocktitle = $block->title;
+        $blocktitle = $block->get_title();
         if (empty($blocktitle)) {
             $blocktitle = $block->arialabel;
         }
@@ -1772,6 +1773,18 @@ class block_manager {
 
             $bi->defaultregion = $data->bui_defaultregion;
             $bi->defaultweight = $data->bui_defaultweight;
+
+            // Getting common configuration settings
+
+            // Validate common settings.
+            // In this case even though the function is designed to validate a single value
+            // It will not make a difference as $data will be array of values which must follow the same rules.
+            $mform->block->validate_common_config_value($data);
+
+            // This is not ideal as it duplicates the functionality of saving common config, however it allows
+            // to save an extra database call.
+            $bi->common_config = $mform->block->serialize_common_config($mform->split_common_settings_data($data));
+
             $DB->update_record('block_instances', $bi);
 
             if (!empty($block->config)) {

@@ -12,21 +12,21 @@ Feature: Configure block header visibility
 
   Scenario: configure that block has no header
     When I configure the "(new HTML block)" block
-    And I expand all fieldsets
-    Then I should see "Header"
-    And I set the field "Block title (no title if blank)" to "New Title"
-    And I set the field "Content" to "some content"
-    And I set the field with xpath "//*[@id='display_with_header_hide']" to "0"
+    And I set the following fields to these values:
+      | Override default block title    | Yes                       |
+      | Block title                     | New Title                 |
+      | Content                         | some content              |
+      | Show header                     | 0                         |
     And I click on "Save changes" "button"
     When I press "Stop customising this page"
     Then I should not see "New Title" in the ".block_html" "css_element"
 
   Scenario: configure that block has header
     When I configure the "(new HTML block)" block
-    And I expand all fieldsets
-    Then I should see "Header"
-    And I set the field "Block title (no title if blank)" to "New Title"
-    And I set the field "Content" to "some content"
+    And I set the following fields to these values:
+      | Override default block title    | Yes                       |
+      | Block title                     | New Title                 |
+      | Content                         | some content              |
     And I click on "Save changes" "button"
     When I press "Stop customising this page"
     Then I should see "New Title" in the ".block_html" "css_element"

@@ -36,23 +36,12 @@ require_once($CFG->dirroot . '/lib/grade/constants.php');
 class block_activity_results_edit_form extends block_edit_form {
 
     /**
-     * Enable general settings
-     *
-     * @return bool
-     */
-    protected function has_general_settings() {
-        return true;
-    }
-
-    /**
      * The definition of the fields to use.
      *
      * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
         global $DB;
-
-        parent::specific_definition($mform);
 
         // Load defaults.
         $blockconfig = get_config('block_activity_results');

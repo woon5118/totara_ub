@@ -94,8 +94,9 @@ Feature: Only Alerts Report table block on dashboard
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | MyAlerts block |
-      | Report | Alerts |
+      | Override default block title | Yes            |
+      | Block title                  | MyAlerts block |
+      | Report                       | Alerts         |
 
     And I press "Save changes"
     And I press "Stop customising this page"
@@ -111,8 +112,9 @@ Feature: Only Alerts Report table block on dashboard
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | MyAlerts block |
-      | Report | Alerts |
+      | Override default block title | Yes            |
+      | Block title                  | MyAlerts block |
+      | Report                       | Alerts         |
 
     And I press "Save changes"
     And I press "Stop customising this page"

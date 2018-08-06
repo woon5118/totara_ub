@@ -36,8 +36,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Report wo sid |
-      | Report | User report |
+      | Override default block title | Yes           |
+      | Block title                  | Report wo sid |
+      | Report                       | User report   |
     And I press "Save changes"
     And I press "Stop customising this page"
 
@@ -80,8 +81,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Report sid |
-      | Report | User report |
+      | Override default block title | Yes         |
+      | Block title                  | Report sid  |
+      | Report                       | User report |
     And I press "Save changes"
     And I configure the "Report sid" block
     And I set the following fields to these values:
@@ -144,8 +146,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Report sid |
-      | Report | User report |
+      | Override default block title | Yes         |
+      | Block title                  | Report sid  |
+      | Report                       | User report |
     And I press "Save changes"
     And I configure the "Report sid" block
     And I set the following fields to these values:
@@ -185,8 +188,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Report access test |
-      | Report | User report |
+      | Override default block title | Yes                |
+      | Block title                  | Report access test |
+      | Report                       | User report        |
     And I press "Save changes"
     And I press "Stop customising this page"
     And I should see "Admin" in the "Report access test" "block"
@@ -205,6 +209,7 @@ Feature: Report builder table block
     And I press "Customise this page"
     Then I should not see "Admin" in the "Report access test" "block"
     And I configure the "Report access test" block
+    And I expand all fieldsets
     And I should see "Current report (inaccessible)"
 
   Scenario: Test block settings when report saved search became not public
@@ -225,9 +230,10 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Report sid access test |
-      | Report | User report |
-      | Saved search | LearnerSearch |
+      | Override default block title | Yes                    |
+      | Block title                  | Report sid access test |
+      | Report                       | User report            |
+      | Saved search                 | LearnerSearch          |
     And I press "Save changes"
     And I should see "learner2" in the "Report sid access test" "block"
     # Make this saved search non-public
@@ -244,6 +250,7 @@ Feature: Report builder table block
     Then I should not see "learner2" in the "Report sid access test" "block"
     # Confirm that name of saved search is not shown
     And I configure the "Report sid access test" block
+    And I expand all fieldsets
     And I should see "Current saved search (inaccessible)"
     And I should not see "LearnerSearch"
 
@@ -254,8 +261,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Report not exists test |
-      | Report | User report |
+      | Override default block title | Yes                    |
+      | Block title                  | Report not exists test |
+      | Report                       | User report            |
     And I press "Save changes"
     # Remove report
     And I navigate to "Manage user reports" node in "Site administration > Reports > Report builder"
@@ -271,8 +279,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Report wo sid |
-      | Report | User report |
+      | Override default block title | Yes           |
+      | Block title                  | Report wo sid |
+      | Report                       | User report   |
     And I press "Save changes"
     And I press "Stop customising this page"
     And I click on "View full report" "link" in the "Report wo sid" "block"
@@ -290,8 +299,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Block title | Course Catalog            |
-      | Report      | Enhanced catalog: courses |
+      | Override default block title | Yes                       |
+      | Block title                  | Course Catalog            |
+      | Report                       | Enhanced catalog: courses |
     And I press "Save changes"
     And I press "Stop customising this page"
     And I click on "View full report" "link" in the "Course Catalog" "block"

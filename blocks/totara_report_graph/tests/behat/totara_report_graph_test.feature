@@ -55,10 +55,11 @@ Feature: Test the basic functionality of the Totara report graph block
     And I add the "Report graph" block
     And I configure the "Report graph" block
     And I set the following fields to these values:
-     | Block title | My user report graph block |
-     | Report      | My user report             |
-     | Max height  | 400px                      |
-     | Max width   | 800px                      |
+     | Override default block title | Yes                        |
+     | Block title                  | My user report graph block |
+     | Report                       | My user report             |
+     | Max height                   | 400px                      |
+     | Max width                    | 800px                      |
     And I press "Save changes"
     Then I should see "My user report graph block"
     And I should see "Report" in the "My user report graph block" "block"

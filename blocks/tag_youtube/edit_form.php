@@ -30,17 +30,7 @@
  */
 class block_tag_youtube_edit_form extends block_edit_form {
 
-    /**
-     * Enable general settings
-     *
-     * @return bool
-     */
-    protected function has_general_settings() {
-        return true;
-    }
-
     protected function specific_definition($mform) {
-        parent::specific_definition($mform);
 
         $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 

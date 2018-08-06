@@ -21,9 +21,9 @@ Feature: Test Quick Links block
     And I press "Customise this page"
     And I add the "Quick Links" block
     And I configure the "Quick Links" block
-    And I expand all fieldsets
     And I set the following fields to these values:
-      | config_title | My Links |
+      | Override default block title | Yes      |
+      | Block title                  | My Links |
     And I press "Save changes"
     Then I should see "My Links"
     And I should see "Home" in the "My Links" "block"
@@ -33,6 +33,7 @@ Feature: Test Quick Links block
     # Check the learner can add new links.
     When I open the "My Links" blocks action menu
     And I follow "Configure My Links block"
+    And I expand all fieldsets
     And I click on "Manage links" "link"
     And I set the field "linktitle" to "Totara"
     And I set the field "linkurl" to "https://www.totaralms.com/"
@@ -47,6 +48,7 @@ Feature: Test Quick Links block
     # Check the learner can remove links.
     When I open the "My Links" blocks action menu
     And I follow "Configure My Links block"
+    And I expand all fieldsets
     And I click on "Manage links" "link"
     And I click on "Delete" "link" in the "Home" "table_row"
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
@@ -65,9 +67,9 @@ Feature: Test Quick Links block
     And I click on "Turn editing on" "button"
     And I add the "Quick Links" block
     And I configure the "Quick Links" block
-    And I expand all fieldsets
     And I set the following fields to these values:
-      | config_title | Course Links |
+      | Override default block title | Yes          |
+      | Block title                  | Course Links |
     And I press "Save changes"
     Then I should see "Course Links"
     And I should see "Home" in the "Course Links" "block"
@@ -75,6 +77,7 @@ Feature: Test Quick Links block
     And I should see "Courses" in the "Course Links" "block"
 
     And I configure the "Course Links" block
+    And I expand all fieldsets
     And I click on "Manage links" "link"
     And I set the field "linktitle" to "Totara"
     And I set the field "linkurl" to "https://www.totaralms.com/"
@@ -100,6 +103,7 @@ Feature: Test Quick Links block
     And I click on "Turn editing on" "button"
     And I open the "Course Links" blocks action menu
     And I follow "Configure Course Links block"
+    And I expand all fieldsets
     And I click on "Manage links" "link"
     And I click on "Delete" "link" in the "Home" "table_row"
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
@@ -132,15 +136,16 @@ Feature: Test Quick Links block
     And I navigate to "Calendar" node in "Site pages"
     And I add the "Quick Links" block
     And I configure the "Quick Links" block
-    And I expand all fieldsets
     And I set the following fields to these values:
-      | config_title | My Links |
+      | Override default block title | Yes      |
+      | Block title                  | My Links |
     When I press "Save changes"
     Then I should see "My Links"
 
     # Now, to test this we are going to use the url of the calendar.
     When I open the "My Links" blocks action menu
     And I follow "Configure My Links block"
+    And I expand all fieldsets
     And I click on "Manage links" "link"
     And I set the field "linktitle" to "My calendar link"
     And I set the field "linkurl" to "view.php?view=month&time=151934400"

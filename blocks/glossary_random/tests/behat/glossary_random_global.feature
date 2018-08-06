@@ -37,7 +37,8 @@ Feature: Random glossary entry block linking to global glossary
     And I add the "Random glossary entry" block
     And I configure the "block_glossary_random" block
     And I set the following fields to these values:
-      | Block title (no title if blank) | Tip of the day      |
+      | Override default block title    | Yes                 |
+      | Block title                     | Tip of the day      |
       | Take entries from this glossary | Tips and Tricks     |
       | How a new entry is chosen       | Last modified entry |
     And I press "Save changes"
@@ -59,7 +60,8 @@ Feature: Random glossary entry block linking to global glossary
     And I add the "Random glossary entry" block
     And I configure the "block_glossary_random" block
     And I set the following fields to these values:
-      | Block title (no title if blank) | Tip of the day      |
+      | Override default block title    | Yes                 |
+      | Block title                     | Tip of the day      |
       | Take entries from this glossary | Tips and Tricks     |
       | How a new entry is chosen       | Last modified entry |
     And I press "Save changes"
