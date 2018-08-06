@@ -134,15 +134,24 @@ class core_badges_renderer extends plugin_renderer_base {
     // Prints a badge overview infomation.
     public function print_badge_overview($badge, $context) {
         $display = "";
+        $languages = get_string_manager()->get_list_of_languages();
 
         // Badge details.
-
         $display .= $this->heading(get_string('badgedetails', 'badges'), 3);
         $dl = array();
         $dl[get_string('name')] = $badge->name;
+        $dl[get_string('version', 'badges')] = $badge->version;
+        $dl[get_string('language')] = $languages[$badge->language];
         $dl[get_string('description', 'badges')] = $badge->description;
         $dl[get_string('createdon', 'search')] = userdate($badge->timecreated);
         $dl[get_string('badgeimage', 'badges')] = print_badge_image($badge, $context, 'large');
+        $dl[get_string('imageauthorname', 'badges')] =
+            html_writer::link($badge->imageauthorname, $badge->imageauthorname, array('target' => '_blank'));
+        $dl[get_string('imageauthoremail', 'badges')] =
+            html_writer::tag('a', $badge->imageauthoremail, array('href' => 'mailto:' . $badge->imageauthoremail));
+        $dl[get_string('imageauthorurl', 'badges')] =
+            html_writer::link($badge->imageauthorurl, $badge->imageauthorurl, array('target' => '_blank'));
+        $dl[get_string('imagecaption', 'badges')] = $badge->imagecaption;
         $display .= $this->definition_list($dl);
 
         // Issuer details.
@@ -206,6 +215,9 @@ class core_badges_renderer extends plugin_renderer_base {
                         get_string('award', 'badges'), 'POST', array('class' => 'activatebadge'));
             }
         }
+
+        $display .= self::print_badge_endorsement($badge);
+        $display .= self::print_badge_related($badge);
 
         return html_writer::div($display, null, array('id' => 'badge-overview'));
     }
@@ -272,11 +284,13 @@ class core_badges_renderer extends plugin_renderer_base {
         $badge = new badge($ibadge->badgeid);
         $now = time();
         $expiration = isset($issued['expires']) ? $issued['expires'] : $now + 86400;
+        $badgeimage = is_array($badgeclass['image']) ? $badgeclass['image']['id'] : $badgeclass['image'];
+        $languages = get_string_manager()->get_list_of_languages();
 
         $output = '';
         $output .= html_writer::start_tag('div', array('id' => 'badge'));
         $output .= html_writer::start_tag('div', array('id' => 'badge-image'));
-        $output .= html_writer::empty_tag('img', array('src' => $badgeclass['image'], 'alt' => $badge->name));
+        $output .= html_writer::empty_tag('img', array('src' => $badgeimage, 'alt' => $badge->name));
         if ($expiration < $now) {
             $output .= $this->output->pix_icon('i/expired',
             get_string('expireddate', 'badges', userdate($issued['expires'])),
@@ -329,7 +343,16 @@ class core_badges_renderer extends plugin_renderer_base {
         $output .= $this->output->heading(get_string('badgedetails', 'badges'), 3);
         $dl = array();
         $dl[get_string('name')] = $badge->name;
+        $dl[get_string('version', 'badges')] = $badge->version;
+        $dl[get_string('language')] = $languages[$badge->language];
         $dl[get_string('description', 'badges')] = $badge->description;
+        $dl[get_string('imageauthorname', 'badges')] =
+            html_writer::link($badge->imageauthorname, $badge->imageauthorname, array('target' => '_blank'));
+        $dl[get_string('imageauthoremail', 'badges')] =
+            html_writer::tag('a', $badge->imageauthoremail, array('href' => 'mailto:' . $badge->imageauthoremail));
+        $dl[get_string('imageauthorurl', 'badges')] =
+            html_writer::link($badge->imageauthorurl, $badge->imageauthorurl, array('target' => '_blank'));
+        $dl[get_string('imagecaption', 'badges')] = $badge->imagecaption;
 
         if ($badge->type == BADGE_TYPE_COURSE && isset($badge->courseid)) {
             $coursename = $DB->get_field('course', 'fullname', array('id' => $badge->courseid));
@@ -340,8 +363,12 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $output .= $this->output->heading(get_string('issuancedetails', 'badges'), 3);
         $dl = array();
+        $issued['issuedOn'] = !preg_match( '~^[1-9][0-9]*$~', $issued['issuedOn'] ) ?
+            strtotime($issued['issuedOn']) : $issued['issuedOn'];
         $dl[get_string('dateawarded', 'badges')] = userdate($issued['issuedOn']);
         if (isset($issued['expires'])) {
+            $issued['expires'] = !preg_match( '~^[1-9][0-9]*$~', $issued['expires'] ) ?
+                strtotime($issued['expires']) : $issued['expires'];
             if ($issued['expires'] < $now) {
                 $dl[get_string('expirydate', 'badges')] = userdate($issued['expires']) . get_string('warnexpired', 'badges');
 
@@ -370,6 +397,29 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $dl[get_string('evidence', 'badges')] = get_string('completioninfo', 'badges') . html_writer::alist($items, array(), 'ul');
         $output .= $this->definition_list($dl);
+        $output .= self::print_badge_endorsement($badge);
+        $relatedbadges = $badge->get_related_badges();
+        $output .= $this->heading(get_string('relatedbages', 'badges'), 3);
+        if (!empty($relatedbadges)) {
+            $items = array();
+            foreach ($relatedbadges as $related) {
+                $items[] = $related->name;
+            }
+            $output .= html_writer::alist($items, array(), 'ul');
+        } else {
+            $output .= get_string('norelated', 'badges');
+        }
+        $output .= $this->heading(get_string('alignment', 'badges'), 3);
+        $competencies = $badge->get_alignment();
+        if (!empty($competencies)) {
+            $items = array();
+            foreach ($competencies as $competency) {
+                $items[] = html_writer::link($competency->targeturl, $competency->targetname, array('target' => '_blank'));
+            }
+            $output .= html_writer::alist($items, array(), 'ul');
+        } else {
+            $output .= get_string('noalignment', 'badges');
+        }
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
@@ -622,7 +672,6 @@ class core_badges_renderer extends plugin_renderer_base {
         global $DB;
 
         $row = array();
-        $tabs = $row = array();
 
         $row[] = new tabobject('overview',
                     new moodle_url('/badges/overview.php', array('id' => $badgeid)),
@@ -660,15 +709,29 @@ class core_badges_renderer extends plugin_renderer_base {
                     );
         }
 
-        $tabs[] = $row;
+        if (has_capability('moodle/badges:configuredetails', $context)) {
+            $row[] = new tabobject('bendorsement',
+                new moodle_url('/badges/endorsement.php', array('id' => $badgeid)),
+                get_string('bendorsement', 'badges')
+            );
+        }
 
-        print_tabs($tabs, $current);
+        if (has_capability('moodle/badges:configuredetails', $context)) {
+            $related = $DB->count_records_sql("SELECT COUNT(br.badgeid)
+                      FROM {badge_related} br WHERE br.badgeid = :badgeid", array('badgeid' => $badgeid));
+            $row[] = new tabobject('brelated',
+                new moodle_url('/badges/related.php', array('id' => $badgeid)),
+                get_string('brelated', 'badges', $related)
+            );
+        }
+
+        echo $this->tabtree($row, $current);
     }
 
-   /**
-    * Prints badge status box.
-    * @return Either the status box html as a string or null
-    */
+    /**
+     * Prints badge status box.
+     * @return Either the status box html as a string or null
+     */
     public function print_badge_status_box(badge $badge) {
         if (has_capability('moodle/badges:configurecriteria', $badge->get_context())) {
 
@@ -955,6 +1018,116 @@ class core_badges_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('dl');
         return $output;
     }
+
+    /**
+     * Outputs list en badges.
+     *
+     * @param badge $badge Badge object.
+     * @return string $output content endorsement to output.
+     */
+    protected function print_badge_endorsement(badge $badge) {
+        $output = '';
+        $endorsement = $badge->get_endorsement();
+        $dl = array();
+        $output .= $this->heading(get_string('endorsement', 'badges'), 3);
+        if (!empty($endorsement)) {
+            $dl[get_string('issuername', 'badges')] = $endorsement->issuername;
+            $dl[get_string('issueremail', 'badges')] = $endorsement->issueremail;
+            $dl[get_string('issuerurl', 'badges')] = html_writer::link($endorsement->issuerurl, $endorsement->issuerurl,
+                array('target' => '_blank'));
+            $dl[get_string('dateawarded', 'badges')] = date('c', $endorsement->dateissued);
+            $dl[get_string('claimid', 'badges')] = html_writer::link($endorsement->claimid, $endorsement->claimid,
+            array('target' => '_blank'));
+            $dl[get_string('claimcomment', 'badges')] = $endorsement->claimcomment;
+            $output .= $this->definition_list($dl);
+        } else {
+            $output .= get_string('noendorsement', 'badges');
+        }
+        return $output;
+    }
+
+    /**
+     * Print list badges related.
+     *
+     * @param badge $badge Badge objects.
+     * @return string $output List related badges to output.
+     */
+    protected function print_badge_related(badge $badge) {
+        $output = '';
+        $relatedbadges = $badge->get_related_badges();
+        $output .= $this->heading(get_string('relatedbages', 'badges'), 3);
+        if (!empty($relatedbadges)) {
+            $items = array();
+            foreach ($relatedbadges as $related) {
+                $relatedurl = new moodle_url('/badges/overview.php', array('id' => $related->id));
+                $items[] = html_writer::link($relatedurl->out(), $related->name, array('target' => '_blank'));
+            }
+            $output .= html_writer::alist($items, array(), 'ul');
+        } else {
+            $output .= get_string('norelated', 'badges');
+        }
+        return $output;
+    }
+
+    /**
+     * Renders a table for related badges.
+     *
+     * @param badge_related $related list related badges.
+     * @return string list related badges to output.
+     */
+    protected function render_badge_related(badge_related $related) {
+        $currentbadge = new badge($related->currentbadgeid);
+        $languages = get_string_manager()->get_list_of_languages();
+        $paging = new paging_bar($related->totalcount, $related->page, $related->perpage, $this->page->url, 'page');
+        $htmlpagingbar = $this->render($paging);
+        $table = new html_table();
+        $table->attributes['class'] = 'generaltable boxaligncenter boxwidthwide';
+        $table->head = array(
+            get_string('name'),
+            get_string('version', 'badges'),
+            get_string('language', 'badges'),
+            get_string('type', 'badges')
+        );
+        if (!$currentbadge->is_active() && !$currentbadge->is_locked()) {
+            array_push($table->head, '');
+        }
+
+        foreach ($related->badges as $badge) {
+            $badgeobject = new badge($badge->id);
+            $style = array('title' => $badgeobject->name);
+            if (!$badgeobject->is_active()) {
+                $style['class'] = 'dimmed';
+            }
+            $context = ($badgeobject->type == BADGE_TYPE_SITE) ?
+                context_system::instance() : context_course::instance($badgeobject->courseid);
+            $forlink = print_badge_image($badgeobject, $context) . ' ' .
+                html_writer::start_tag('span') . $badgeobject->name . html_writer::end_tag('span');
+            $name = html_writer::link(new moodle_url('/badges/overview.php', array('id' => $badgeobject->id)), $forlink, $style);
+
+            $row = array(
+                $name,
+                $badge->version,
+                $badge->language ? $languages[$badge->language] : '',
+                $badge->type == BADGE_TYPE_COURSE ? get_string('badgesview', 'badges') : get_string('sitebadges', 'badges')
+            );
+            if (!$currentbadge->is_active() && !$currentbadge->is_locked()) {
+                $action = $this->output->action_icon(
+                    new moodle_url('related_action.php',
+                        array(
+                            'badgeid' => $related->currentbadgeid,
+                            'relatedid' => $badge->id,
+                            'action' => 'remove'
+                        )
+                    ), new pix_icon('t/delete', get_string('delete')));
+                $actions = html_writer::tag('div', $action, array('class' => 'badge-actions'));
+                array_push($row, $actions);
+            }
+            $table->data[] = $row;
+        }
+        $htmltable = html_writer::table($table);
+
+        return $htmlpagingbar . $htmltable . $htmlpagingbar;
+    }
 }
 
 /**
@@ -1153,5 +1326,47 @@ class badge_user_collection extends badge_collection implements renderable {
         if (!empty($CFG->badges_allowexternalbackpack)) {
             $this->backpack = get_backpack_settings($userid, true);
         }
+    }
+}
+
+/**
+ * Collection of all related badges.
+ *
+ * @copyright  2018 Tung Thai
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Tung Thai <Tung.ThaiDuc@nashtechglobal.com>
+ */
+class badge_related implements renderable {
+
+    /** @var string how are the data sorted. */
+    public $sort = 'name';
+
+    /** @var string how are the data sorted. */
+    public $dir = 'ASC';
+
+    /** @var int page number to display. */
+    public $page = 0;
+
+    /** @var int number of badges to display per page. */
+    public $perpage = BADGE_PERPAGE;
+
+    /** @var int the total number of badges to display. */
+    public $totalcount = null;
+
+    /** @var int the current badge. */
+    public $currentbadgeid = 0;
+
+    /** @var array list of badges. */
+    public $badges = array();
+
+    /**
+     * Initializes the list of badges to display.
+     *
+     * @param array $badges related badges to render.
+     * @param int $currentbadgeid ID current badge.
+     */
+    public function __construct($badges, $currentbadgeid) {
+        $this->badges = $badges;
+        $this->currentbadgeid = $currentbadgeid;
     }
 }

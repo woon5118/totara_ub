@@ -52,11 +52,17 @@ class core_badges_generator extends component_generator_base {
         $record->expiredate = null;
         $record->expireperiod = null;
         $record->type = BADGE_TYPE_SITE;
+        $record->version = 1;
+        $record->language = 'en';
         $record->courseid = null;
         $record->messagesubject = "Test message subject";
         $record->message = "Test message body";
         $record->attachment = 1;
         $record->notification = 0;
+        $record->imageauthorname = "Image Author 1";
+        $record->imageauthoremail = "author@example.com";
+        $record->imageauthorurl = "http://author-url.example.com";
+        $record->imagecaption = "Test caption image";
         $record->status = BADGE_STATUS_ACTIVE;
 
         foreach ($properties as $key => $value) {
