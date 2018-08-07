@@ -3685,6 +3685,11 @@ abstract class lesson_page extends lesson_base {
     const TYPE_STRUCTURE = 1;
 
     /**
+     * Constant used as a delimiter when parsing multianswer questions
+     */
+    const MULTIANSWER_DELIMITER = '@^#|';
+
+    /**
      * This method should return the integer used to identify the page type within
      * the database and throughout code. This maps back to the defines used in 1.x
      * @abstract
@@ -4109,24 +4114,78 @@ abstract class lesson_page extends lesson_base {
                 $options->context = $context;
 
                 $result->feedback .= $OUTPUT->box(format_text($this->get_contents(), $this->properties->contentsformat, $options),
-                        'generalbox boxaligncenter');
-                $studentanswer = format_text($result->studentanswer, $result->studentanswerformat,
-                        array('context' => $context, 'para' => true));
-                $result->feedback .= '<div class="correctanswer generalbox"><em>'
-                        . get_string("youranswer", "lesson").'</em> : ' . $studentanswer;
-                if (isset($result->responseformat)) {
-                    $result->response = file_rewrite_pluginfile_urls($result->response, 'pluginfile.php', $context->id,
-                            'mod_lesson', 'page_responses', $result->answerid);
-                    $result->feedback .= $OUTPUT->box(format_text($result->response, $result->responseformat, $options)
-                            , $class);
+                        'generalbox boxaligncenter p-y-1');
+                // TL-18121 A table container will not be created on my watch (brianb)
+                $result->feedback .= '<div class="correctanswer">';
+                $result->feedback .= '<div class="mod_lesson__answer-string">' . get_string("youranswer", "lesson") . ':</div>';
+
+                // Create a table containing the answers and responses.
+                // Multianswer allowed.
+                if ($this->properties->qoption) {
+                    $studentanswerarray = explode(self::MULTIANSWER_DELIMITER, $result->studentanswer);
+                    $responsearr = explode(self::MULTIANSWER_DELIMITER, $result->response);
+                    $studentanswerresponse = array_combine($studentanswerarray, $responsearr);
+
+                    foreach ($studentanswerresponse as $answer => $response) {
+                        // Add a datalist entry containing the answer.
+                        $studentanswer = $this->format_answer($answer, $context, $result->studentanswerformat);
+                        $result->feedback .= '<div class="mod_lesson__student-answer">' . $studentanswer . '</div>';
+                        // If the response exists, add a table row containing the response. If not, add en empty row.
+                        if (!empty(trim($response))) {
+                            $studentresponse = isset($result->responseformat) ?
+                                $this->format_response($response, $context, $result->responseformat, $options) : $response;
+
+                            $result->feedback .= '<div class="mod_lesson__student-response ' . $class . '">' . $studentresponse .'</div>';
+                        }
+                    }
                 } else {
-                    $result->feedback .= $OUTPUT->box($result->response, $class);
+                    // Add a datalist entry containing the answer.
+                    $studentanswer = $this->format_answer($result->studentanswer, $context, $result->studentanswerformat);
+                    $result->feedback .= '<div class="mod_lesson__student-answer">' . $studentanswer . '</div>';
+                    // If the response exists, add a table row containing the response. If not, add en empty row.
+                    if (!empty(trim($result->response))) {
+                        $studentresponse = isset($result->responseformat) ?
+                            $this->format_response($result->response, $context, $result->responseformat,
+                                $result->answerid, $options) : $result->response;
+                            $result->feedback .= '<div class="mod_lesson__student-response ' . $class . '">' . $studentresponse . '</div>';
+                    }
                 }
+
                 $result->feedback .= '</div>';
             }
         }
-
         return $result;
+    }
+
+    /**
+     * Formats the answer
+     *
+     * @param string $answer
+     * @param context $context
+     * @param int $answerformat
+     * @return string Returns formatted string
+     */
+    private function format_answer($answer, $context, $answerformat) {
+
+        return format_text($answer, $answerformat, array('context' => $context, 'para' => true));
+    }
+
+    /**
+     * Formats the response
+     *
+     * @param string $response
+     * @param context $context
+     * @param int $responseformat
+     * @param int $answerid
+     * @param stdClass $options
+     * @return string Returns formatted string
+     */
+    private function format_response($response, $context, $responseformat, $answerid, $options) {
+
+        $convertstudentresponse = file_rewrite_pluginfile_urls($response, 'pluginfile.php',
+            $context->id, 'mod_lesson', 'page_responses', $answerid);
+
+        return format_text($convertstudentresponse, $responseformat, $options);
     }
 
     /**
