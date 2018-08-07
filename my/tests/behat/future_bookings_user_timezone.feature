@@ -21,7 +21,7 @@ Feature: My Future Bookings seminar sessions report overview
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Seminar TL-9395"
 

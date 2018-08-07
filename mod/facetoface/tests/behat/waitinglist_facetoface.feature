@@ -60,7 +60,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Sign-up"
     And I press "Sign-up"
@@ -69,7 +69,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
@@ -80,7 +80,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student3"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
@@ -91,7 +91,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"

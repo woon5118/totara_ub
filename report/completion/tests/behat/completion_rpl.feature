@@ -16,7 +16,7 @@ Feature: Completion report rpl
       | label      | label2            | label2        | C1                   | label2      | 1            |
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -58,7 +58,7 @@ Feature: Completion report rpl
     # Set course completion via RPL
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Course completion" node in "Course administration > Reports"
     Then I complete the course via rpl for "Student 1" with text "Test 1"

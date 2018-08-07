@@ -69,7 +69,7 @@ Feature: Sign up status
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "Booking full"
@@ -78,7 +78,7 @@ Feature: Sign up status
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "1 / 1" "table_row"
@@ -89,7 +89,7 @@ Feature: Sign up status
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "Event cancelled"
@@ -118,7 +118,7 @@ Feature: Sign up status
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should see "<signupavailable>"
 
@@ -130,7 +130,7 @@ Feature: Sign up status
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "<signupperiod>" "table_row"
@@ -141,7 +141,7 @@ Feature: Sign up status
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see "Event cancelled"

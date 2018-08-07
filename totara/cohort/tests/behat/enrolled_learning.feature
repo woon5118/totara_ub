@@ -58,14 +58,14 @@ Feature: Assign enrolled learning to cohort
     And I should not see "Course 2" in the "td.associations_nameiconlink" "css_element"
 
     When I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
     When I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should not see "Audience sync (Cohort 1 - Learner)"

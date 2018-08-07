@@ -142,7 +142,7 @@ Feature: Take attendance for a seminar with multiple sessions
   Scenario: Complete older session, archive cert, complete newer session, see newer completion date on cert
     # Complete older session.
     Then I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
@@ -174,7 +174,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
@@ -208,7 +208,7 @@ Feature: Take attendance for a seminar with multiple sessions
   Scenario: Complete newer session, archive cert, complete older session, still see newer completion date on cert
     # Complete newer session.
     Then I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
@@ -243,7 +243,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
@@ -276,7 +276,7 @@ Feature: Take attendance for a seminar with multiple sessions
   Scenario: Complete newer, complete older, see newer completion date, reset activity completion, see newer completion date
     # Complete newer session.
     Then I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
@@ -302,7 +302,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
@@ -328,7 +328,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "seminar1" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -351,7 +351,7 @@ Feature: Take attendance for a seminar with multiple sessions
   Scenario: Complete older, complete newer, see older completion date, reset activity completion, see newer completion date
     # Complete older session.
     Then I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
@@ -377,7 +377,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
@@ -403,7 +403,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "seminar1" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
@@ -438,7 +438,7 @@ Feature: Take attendance for a seminar with multiple sessions
       | user  | course  | role    |
       | taker | course1 | teacher |
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
@@ -451,7 +451,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     When I log in as "taker"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "course1"
     And I click on "seminar1" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"

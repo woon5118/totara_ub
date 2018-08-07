@@ -52,7 +52,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -98,7 +98,7 @@ Feature: Add a seminar with select position
     And I log out
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -111,7 +111,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Attendees"
@@ -119,7 +119,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Attendees"
@@ -159,7 +159,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -204,7 +204,7 @@ Feature: Add a seminar with select position
     And I log out
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
@@ -214,7 +214,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Attendees"

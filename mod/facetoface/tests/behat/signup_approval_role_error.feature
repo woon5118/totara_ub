@@ -31,7 +31,7 @@ Feature: Seminar Signup Role Approval after creating an event
   Scenario: Learner is trying to sing-up when there is approval role and no trainer appointed.
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     And I follow "Add a new event"

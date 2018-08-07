@@ -59,7 +59,7 @@ Feature: Play waiting list lottery
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     And I should see "You will be added to the waiting list for this event"
@@ -70,7 +70,7 @@ Feature: Play waiting list lottery
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     And I should see "You will be added to the waiting list for this event"
@@ -81,7 +81,7 @@ Feature: Play waiting list lottery
 
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"

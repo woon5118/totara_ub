@@ -72,7 +72,7 @@ Feature: Seminar event cancellation reporting
     Given I log out
     And I log in as "learner3"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Sign-up"
     And I press "Sign-up"
@@ -80,7 +80,7 @@ Feature: Seminar event cancellation reporting
     Given I log out
     And I log in as "learner1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Cancel booking"
     And I press "Yes"
@@ -88,7 +88,7 @@ Feature: Seminar event cancellation reporting
     Given I log out
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"

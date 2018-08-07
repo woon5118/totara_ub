@@ -53,7 +53,7 @@ Feature: mod_scorm: check view SCORM page permissions
     When I log out
     And I log in as "jr"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "SCORM viewing page permission test"
     # All users who can access the SCORM see the info tab. We also never redirect to reports by default.
@@ -70,7 +70,7 @@ Feature: mod_scorm: check view SCORM page permissions
     When I log out
     And I log in as "ji"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "SCORM viewing page permission test"
     Then I should see "Info"
@@ -80,7 +80,7 @@ Feature: mod_scorm: check view SCORM page permissions
     When I log out
     And I log in as "bo"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "SCORM viewing page permission test"
     Then I should see "Info"
@@ -106,7 +106,7 @@ Feature: mod_scorm: check view SCORM page permissions
     When I log out
     And I log in as "guest"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "SCORM viewing page permission test"
     Then I should see "Info"

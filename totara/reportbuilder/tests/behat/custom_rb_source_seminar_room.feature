@@ -30,7 +30,7 @@ Feature: I am able to edit the custom room
   Scenario: I add a custom room into the course and I should be able to see it
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course101"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

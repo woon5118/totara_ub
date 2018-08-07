@@ -72,7 +72,7 @@ Feature: Sign up to a seminar
     # Signing up for an event as a student.
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     When I follow "Sign-up"
@@ -87,7 +87,7 @@ Feature: Sign up to a seminar
     # As the trainer confirm I can see the details of the signup.
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"
@@ -102,7 +102,7 @@ Feature: Sign up to a seminar
   Scenario: Sign up to a session and unable to sign up to a full session from the course page
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -114,14 +114,14 @@ Feature: Sign up to a seminar
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should not see "Sign-up"
 
   Scenario: Sign up to a session and unable to sign up to a full session for within the activity
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Test seminar name"
     And I follow "Test seminar name"
@@ -135,14 +135,14 @@ Feature: Sign up to a seminar
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should not see "Sign-up"
 
   Scenario: Sign up with note and manage it by Editing Teacher
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -154,7 +154,7 @@ Feature: Sign up to a seminar
 
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Attendees"
     When I click on "Edit" "link" in the "Sam1" "table_row"
@@ -164,7 +164,7 @@ Feature: Sign up to a seminar
   Scenario: Sign up with note and ensure that other reports do not have manage button
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -387,7 +387,7 @@ Feature: Sign up to a seminar
 
     # As the user signup.
     When I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -422,7 +422,7 @@ Feature: Sign up to a seminar
     When I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"
@@ -438,7 +438,7 @@ Feature: Sign up to a seminar
     When I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Cancel booking"
@@ -470,7 +470,7 @@ Feature: Sign up to a seminar
     When I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"
@@ -525,7 +525,7 @@ Feature: Sign up to a seminar
     When I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"

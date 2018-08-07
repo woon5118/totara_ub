@@ -55,7 +55,7 @@ Feature: Seminar Manager signup approval changes
   Scenario: The waitlisted report should be correct when the approval type changes
     When I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "Sign-up"
     Then I should not see "Manager Approval"
@@ -66,7 +66,7 @@ Feature: Seminar Manager signup approval changes
     When I log out
     And I log in as "timmy"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "Join waitlist"
     Then I should not see "Manager Approval"
@@ -76,7 +76,7 @@ Feature: Seminar Manager signup approval changes
     And I log out
     And I log in as "teacher"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "Test seminar name"
     And I navigate to "Edit settings" in current page administration
@@ -87,7 +87,7 @@ Feature: Seminar Manager signup approval changes
 
     When I log in as "sammy"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "Join waitlist"
     Then I should see "Manager Approval"
@@ -110,7 +110,7 @@ Feature: Seminar Manager signup approval changes
 
     When I log in as "teacher"
     And I click on "Find Learning" in the totara menu
-	And I click on "Courses" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "Test seminar name"
     And I follow "Attendees"
