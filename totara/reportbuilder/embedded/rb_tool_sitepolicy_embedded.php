@@ -28,6 +28,10 @@ class rb_tool_sitepolicy_embedded extends rb_base_embedded
 
     public function __construct()
     {
+        global $CFG;
+
+        require_once("{$CFG->dirroot}/admin/tool/sitepolicy/rb_sources/rb_source_tool_sitepolicy.php");
+
         $this->url = '/admin/tool/sitepolicy/sitepolicyreport.php';
         $this->source = 'tool_sitepolicy';
         $this->shortname = 'tool_sitepolicy';
@@ -49,64 +53,12 @@ class rb_tool_sitepolicy_embedded extends rb_base_embedded
 
     protected function define_columns()
     {
-        $columns = array(
-            array(
-                'type' => 'user',
-                'value' => 'namelink',
-                'heading' => get_string('userfullname', 'totara_reportbuilder'),
-            ),
-            array(
-
-                'type' => 'primarypolicy',
-                'value' => 'primarytitle',
-                'heading' => get_string('embeddedprimarytitle', 'rb_source_tool_sitepolicy')
-            ),
-            array(
-                'type' => 'primarypolicy',
-                'value' => 'versionnumber',
-                'heading' => get_string('embeddedversionnumber', 'rb_source_tool_sitepolicy')
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'statement',
-                'heading' => get_string('embeddeduserstatement', 'rb_source_tool_sitepolicy')
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'response',
-                'heading' => get_string('embeddeduserresponse', 'rb_source_tool_sitepolicy')
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'consented',
-                'heading' => get_string('embeddeduserconsented', 'rb_source_tool_sitepolicy')
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'language',
-                'heading' => get_string('embeddeduserlanguage', 'rb_source_tool_sitepolicy')
-            ),
-	    array(
-                'type' => 'userpolicy',
-                'value' => 'timeconsented',
-                'heading' => get_string('embeddedusertimeconsented', 'rb_source_tool_sitepolicy')
-            )
-        );
-
-        return $columns;
+        return rb_source_tool_sitepolicy::get_default_columns();
     }
 
     protected function define_filters()
     {
-        $filters = array(
-            array(
-                'type' => 'primarypolicy',
-                'value' => 'currentversion',
-                'advanced' => 0
-            )
-        );
-
-        return $filters;
+        return rb_source_tool_sitepolicy::get_default_filters();
     }
 
     public function is_capable($reportfor, $report)

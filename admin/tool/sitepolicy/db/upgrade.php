@@ -70,5 +70,62 @@ function xmldb_tool_sitepolicy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018050800, 'tool', 'sitepolicy');
     }
 
+    if ($oldversion < 2018082800) {
+        global $DB;
+
+        // Update report filter type currentversion => policytitle and reset default value.
+        $DB->execute("UPDATE {report_builder_filters} SET
+                value = 'policytitle',
+                defaultvalue = NULL
+            WHERE type = 'primarypolicy' AND value = 'currentversion'");
+
+        // Select all reports with 'policytitle' filter present and then check whether the version filter is present.
+        $reports = $DB->get_records_sql("SELECT DISTINCT(reportid) FROM {report_builder_filters}
+            WHERE type = 'primarypolicy' AND value = 'policytitle'");
+
+        foreach (array_keys($reports) as $report) {
+            // Check whether a report has 'primarypolicy' 'versionnumber' filter
+            if (!$DB->get_record('report_builder_filters', [
+                'type' => 'primarypolicy',
+                'value' => 'versionnumber',
+                'reportid' => $report,
+            ], 'id')) {
+                // It does, need to add version filter.
+
+                // 1. Get primary policy sort order.
+                $order = $DB->get_field('report_builder_filters', 'sortorder', [
+                    'type' => 'primarypolicy',
+                    'value' => 'policytitle',
+                    'reportid' => $report,
+                ], '*');
+
+                // 2. Bump all the sort order order.
+                // Both $report and $order are coming from the database a few lines above and safe to use in
+                // the query as is.
+                $DB->execute("UPDATE {report_builder_filters}
+                                   SET sortorder = sortorder + 1
+                                   WHERE reportid = {$report} AND sortorder > {$order}");
+
+                // Insert new filter after the old filter.
+                $filter = (object) [
+                    'reportid' => $report,
+                    'type' => 'primarypolicy',
+                    'value' => 'versionnumber',
+                    'sortorder' => $order + 1,
+                    'advanced' => 0,
+                    'filtername' => '',
+                    'customname' => 0,
+                    'region' => '0',
+                    'defaultvalue' => null,
+                ];
+
+                $DB->insert_record('report_builder_filters', $filter);
+            }
+        }
+
+        // Point of noreturn.
+        upgrade_plugin_savepoint(true, 2018082800, 'tool', 'sitepolicy');
+    }
+
     return true;
 }

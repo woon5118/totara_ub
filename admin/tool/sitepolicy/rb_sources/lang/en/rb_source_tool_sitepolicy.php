@@ -22,7 +22,12 @@
  * @package tool_sitepolicy
  */
 
+$string['filter_version'] = 'Version number filter';
+$string['filter_version_help'] = 'All possible version numbers across all policies are displayed in this list. If the combination of version number and policy selected as filters does not exist, then no results will be displayed.';
+$string['filter_consent_statement'] = 'Consent statement (primary) filter';
+$string['filter_consent_statement_help'] = 'All consent statements across all policies are displayed in this list, in the language of the primary policy. All responses to a particular statement will be displayed, regardless of the language in which consent was given.';
 $string['currentversionstring'] = '{$a->title}';
+$string['policy'] = 'Policy';
 $string['policycreatedby'] = 'Created by';
 $string['policycurrentversion'] = 'Current Version';
 $string['policydatecreated'] = 'Date Created';

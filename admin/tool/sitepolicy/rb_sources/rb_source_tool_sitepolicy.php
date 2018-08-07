@@ -22,7 +22,12 @@
  * @package tool_sitepolicy
  */
 
+use tool_sitepolicy\policyversion;
+
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/admin/tool/sitepolicy/rb_sources/rb_filter_policy_select_version.php');
 
 class rb_source_tool_sitepolicy extends rb_base_source {
     use \core_user\rb\source\report_trait;
@@ -129,9 +134,9 @@ class rb_source_tool_sitepolicy extends rb_base_source {
     }
 
     protected function define_columnoptions() {
-        $statusdraft = \tool_sitepolicy\policyversion::STATUS_DRAFT;
-        $statuspublished = \tool_sitepolicy\policyversion::STATUS_PUBLISHED;
-        $statusarchived = \tool_sitepolicy\policyversion::STATUS_ARCHIVED;
+        $statusdraft = policyversion::STATUS_DRAFT;
+        $statuspublished = policyversion::STATUS_PUBLISHED;
+        $statusarchived = policyversion::STATUS_ARCHIVED;
 
         $columnoptions = array(
             new rb_column_option(
@@ -261,43 +266,72 @@ class rb_source_tool_sitepolicy extends rb_base_source {
                 'primarypolicy',
                 'versionnumber',
                 get_string('policyversion', 'rb_source_tool_sitepolicy'),
-                'number'),
+                'policy_select_version', [
+                    'selectchoices' => [],
+                ]
+            ),
 
             new rb_filter_option(
                 'userpolicy',
                 'consented',
                 get_string('userconsentoptions','rb_source_tool_sitepolicy'),
-                'multicheck',
-                array('selectfunc' => 'user_consent')),
-
-            new rb_filter_option(
-                'primarypolicy',
-                'currentversion',
-                get_string('policycurrentversion','rb_source_tool_sitepolicy'),
-                'multicheck',
-                array(
-                    'addtypetoheading' => true,
-                    'selectfunc' => 'current_version',
-                    'attributes' => rb_filter_option::select_width_limiter(),
-                ),
-                'policyversion.id',
-                'policyversion'
+                'select', [
+                    'selectchoices' => [
+                        get_string('no','rb_source_tool_sitepolicy'),
+                        get_string('yes','rb_source_tool_sitepolicy'),
+                    ],
+                    'simplemode' => true,
+                ]
             ),
 
             new rb_filter_option(
                 'primarypolicy',
                 'status',
                 get_string('policystatus','rb_source_tool_sitepolicy'),
-                'multicheck',
-                array('selectfunc' => 'versionstatus')
+                'multicheck', [
+                    'selectchoices' => [
+                        $status = policyversion::STATUS_PUBLISHED => get_string("versionstatus{$status}", 'tool_sitepolicy'),
+                        $status = policyversion::STATUS_ARCHIVED => get_string("versionstatus{$status}", 'tool_sitepolicy'),
+                    ],
+                    'simplemode' => true,
+                ]
+            ),
+
+            new rb_filter_option(
+                'userpolicy',
+                'policystatement',
+                get_string('policystatement','rb_source_tool_sitepolicy'),
+                'select', [
+                    'selectfunc' => 'consent_statements',
+                    'simplemode' => true,
+                    'help' => [
+                        'filter_consent_statement',
+                        'rb_source_tool_sitepolicy',
+                    ],
+                ],
+                'base.consentoptionid'
+            ),
+
+            new rb_filter_option(
+                'primarypolicy',
+                'policytitle',
+                get_string('policy','rb_source_tool_sitepolicy'),
+                'multicheck', [
+                    'selectfunc' => 'policies',
+                    'simplemode' => true,
+                ],
+                'policyversion.sitepolicyid',
+                'policyversion'
             ),
 
             new rb_filter_option(
                 'userpolicy',
                 'language',
                 get_string('userreponselanguage','rb_source_tool_sitepolicy'),
-                'select',
-                array('selectfunc' => 'userlanguage')),
+                'select', [
+                    'selectfunc' => 'userlanguage',
+                    'simplemode' => true,
+                ]),
 
         );
         $this->add_core_user_filters($filteroptions);
@@ -315,88 +349,142 @@ class rb_source_tool_sitepolicy extends rb_base_source {
     }
 
     protected function define_defaultcolumns() {
-        $defaultcolumns = array(
-            array(
-                'type' => 'primarypolicy',
-                'value' => 'primarytitle'
-            ),
-            array(
-                'type' => 'primarypolicy',
-                'value' => 'versionnumber'
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'statement'
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'response'
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'consented'
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'language'
-            ),
-            array(
-                'type' => 'userpolicy',
-                'value' => 'timeconsented'
-            )
-        );
-
-        return $defaultcolumns;
+        return self::get_default_columns();
     }
 
-    protected function define_defaultfilters() {
-        $defaultfilters = array(
-            array(
+    /**
+     * Return default columns for the report source
+     *
+     * @return array[]
+     */
+    public static function get_default_columns() {
+        return [
+            [
+                'type' => 'user',
+                'value' => 'namelink',
+                'heading' => get_string('userfullname', 'totara_reportbuilder'),
+            ],
+            [
                 'type' => 'primarypolicy',
-                'value' => 'currentversion'
-            )
-        );
-
-        return $defaultfilters;
+                'value' => 'primarytitle',
+                'heading' => get_string('embeddedprimarytitle', 'rb_source_tool_sitepolicy'),
+            ],
+            [
+                'type' => 'primarypolicy',
+                'value' => 'versionnumber',
+                'heading' => get_string('embeddedversionnumber', 'rb_source_tool_sitepolicy'),
+            ],
+            [
+                'type' => 'userpolicy',
+                'value' => 'statement',
+                'heading' => get_string('embeddeduserstatement', 'rb_source_tool_sitepolicy'),
+            ],
+            [
+                'type' => 'userpolicy',
+                'value' => 'response',
+                'heading' => get_string('embeddeduserresponse', 'rb_source_tool_sitepolicy'),
+            ],
+            [
+                'type' => 'userpolicy',
+                'value' => 'consented',
+                'heading' => get_string('embeddeduserconsented', 'rb_source_tool_sitepolicy'),
+            ],
+            [
+                'type' => 'userpolicy',
+                'value' => 'language',
+                'heading' => get_string('embeddeduserlanguage', 'rb_source_tool_sitepolicy'),
+            ],
+            [
+                'type' => 'userpolicy',
+                'value' => 'timeconsented',
+                'heading' => get_string('embeddedusertimeconsented', 'rb_source_tool_sitepolicy'),
+            ],
+        ];
     }
 
-
-    public function rb_filter_user_consent() {
-        $consentoptions = array();
-        $consentoptions['1'] = get_string('yes','rb_source_tool_sitepolicy');
-        $consentoptions['0'] =  get_string('no','rb_source_tool_sitepolicy');
-        return $consentoptions;
+    protected function define_defaultfilters()
+    {
+        return self::get_default_filters();
     }
 
-    public function rb_filter_current_version() {
+    /**
+     * Return default filter set for the report
+     *
+     * @return array[]
+     */
+    public static function get_default_filters()
+    {
+        return [
+            [
+                'type' => 'primarypolicy',
+                'value' => 'policytitle',
+            ],
+            [
+                'type' => 'primarypolicy',
+                'value' => 'versionnumber',
+            ],
+            [
+                'type' => 'userpolicy',
+                'value' => 'policystatement',
+            ]
+        ];
+    }
+
+    /**
+     * Retrieve the list of all possible consent statements for the filter
+     * It retrieves unique consent statements and all matching ids for them.
+     *
+     * @return array
+     */
+    public function rb_filter_consent_statements() {
         global $DB;
-        $sql = "SELECT policyversion.id, localisedpolicy.title, policyversion.versionnumber
-                FROM {tool_sitepolicy_localised_policy} localisedpolicy
-                JOIN {tool_sitepolicy_policy_version} policyversion
-                ON localisedpolicy.policyversionid = policyversion.id
-                WHERE policyversion.timepublished IS NOT NULL AND policyversion.timearchived IS NULL
-                AND localisedpolicy.isprimary = 1";
-        $versions = $DB->get_records_sql($sql);
-        $currentversion = array();
-        foreach ($versions as $version) {
-            $currentversion[$version->id] = get_string('currentversionstring','rb_source_tool_sitepolicy',
-                ['title'=>$version->title]);
+
+        $statements = $DB->get_records_sql("SELECT DISTINCT statements.statement as statement
+                                                 FROM {tool_sitepolicy_localised_consent} statements
+                                                  JOIN {tool_sitepolicy_localised_policy} policies
+                                                   ON statements.localisedpolicyid = policies.id
+                                                  JOIN {tool_sitepolicy_policy_version} versions
+                                                   ON versions.id = policies.policyversionid
+                                                   AND versions.timepublished IS NOT NULL
+                                                 WHERE policies.isprimary = 1
+                                                 ORDER BY statement");
+
+        // Unfortunately we can't make it in one query due to group concat not working with sub-queries.
+        foreach ($statements as $statement) {
+            // Another unnecessary complication.
+            $statementsql = $DB->sql_compare_text('statement', 500);
+
+            $ids = $DB->get_records_sql(
+                "SELECT DISTINCT consentoptionid as option_id FROM {tool_sitepolicy_localised_consent}
+                      WHERE {$statementsql} = ?", [$statement->statement]);
+
+            // It should never be empty though, just a precaution.
+            $statement->ids = !empty($ids) ? implode(',', array_column($ids, 'option_id')) : '-1';
         }
-        return $currentversion;
+
+        return array_combine(array_column($statements, 'ids'), array_column($statements, 'statement'));
     }
 
-    public function rb_filter_versionstatus() {
-        $consentoptions = array();
+    /**
+     * Retrieve a list of all possible policies for the filter
+     * It will display the latest policy title in the primary language
+     *
+     * @return array
+     */
+    public function rb_filter_policies() {
+        global $DB;
 
-        $statusarr = [
-            \tool_sitepolicy\policyversion::STATUS_PUBLISHED,
-            \tool_sitepolicy\policyversion::STATUS_ARCHIVED];
-
-        foreach ($statusarr as $status) {
-            $consentoptions[$status] = get_string("versionstatus{$status}", 'tool_sitepolicy');
-        }
-
-        return $consentoptions;
+        return $DB->get_records_sql_menu(
+            "SELECT policies.id as id, titles.title as title
+                  FROM {tool_sitepolicy_site_policy} policies
+                INNER JOIN {tool_sitepolicy_policy_version} versions
+                  ON policies.id = versions.sitepolicyid
+                  AND versions.timepublished = 
+                      (SELECT max(vs.timepublished) FROM {tool_sitepolicy_policy_version} vs
+                       WHERE vs.timepublished IS NOT NULL AND vs.sitepolicyid = policies.id)
+                JOIN {tool_sitepolicy_localised_policy} titles
+                  ON titles.policyversionid = versions.id AND titles.isprimary = 1
+                ORDER BY title");
     }
 
     public function rb_filter_userlanguage() {
@@ -421,30 +509,87 @@ class rb_source_tool_sitepolicy extends rb_base_source {
             throw new coding_exception('phpunit_column_test_add_data() cannot be used outside of unit tests');
         }
 
-        $totara_report_builder_data = array('id' => 1, 'fullname' => 'Site Policy Report', 'shortname' => 'tool_sitepolicy', 'source' => 'tool_sitepolicy',
-            'hidden' => 0, 'cache' => 0, 'accessmode' => 0, 'contentmode' => 0, 'description' => 'Report description', 'recordsperpage' => 10,
-            'defaultsortcolumn' => null, 'defaultsortorder' => 0, 'embedded' => 0, 'initialdisplay' => 0, 'toolbarsearch' => 1,
-            'globalrestriction' => 0, 'timemodified' => 0, 'showtotalcount' => 0, 'useclonedb' => 0);
+        // Create report
+        $totara_report_builder_data = [
+            'id' => 1,
+            'fullname' => 'Site Policy Report',
+            'shortname' => 'tool_sitepolicy',
+            'source' => 'tool_sitepolicy',
+            'hidden' => 0,
+            'cache' => 0,
+            'accessmode' => 0,
+            'contentmode' => 0,
+            'description' => 'Report description',
+            'recordsperpage' => 10,
+            'defaultsortcolumn' => null,
+            'defaultsortorder' => 0,
+            'embedded' => 0,
+            'initialdisplay' => 0,
+            'toolbarsearch' => 1,
+            'globalrestriction' => 0,
+            'timemodified' => 0,
+            'showtotalcount' => 0,
+            'useclonedb' => 0,
+        ];
 
         $DB->insert_record('report_builder', $totara_report_builder_data);
 
-
-        $sitepolicy_data= ['timecreated'=> 1515529244];
+        // Create policy
+        $sitepolicy_data = ['timecreated' => 1515529244];
         $sitepolicy_data['id'] = $DB->insert_record('tool_sitepolicy_site_policy', $sitepolicy_data);
 
-        $policyversion_data = ['versionnumber'=>1515529244, 'timecreated'=>1515461888, 'timepublished'=>1515462800, 'sitepolicyid'=>$sitepolicy_data['id'], 'publisherid'=>2];
+        // Create policy version
+        $policyversion_data = [
+            'versionnumber' => 5,
+            'timecreated' => 1515461888,
+            'timepublished' => 1515462800,
+            'sitepolicyid' => $sitepolicy_data['id'],
+            'publisherid' => 2,
+        ];
+
         $policyversion_data['id'] = $DB->insert_record('tool_sitepolicy_policy_version', $policyversion_data);
 
-        $localisedpolicy_data = ['language'=>'en','title'=>'Terms and Conditions', 'policytext'=>'statment','timecreated'=>1515461888, 'isprimary'=>1, 'authorid'=>2, 'policyversionid'=>$policyversion_data['id']];
+        // Create localised policy
+        $localisedpolicy_data = [
+            'language' => 'en',
+            'title' => 'Terms and Conditions',
+            'policytext' => 'statment',
+            'timecreated' => 1515461888,
+            'isprimary' => 1,
+            'authorid' => 2,
+            'policyversionid' => $policyversion_data['id'],
+        ];
+
         $localisedpolicy_data['id'] = $DB->insert_record('tool_sitepolicy_localised_policy', $localisedpolicy_data);
 
-        $consentoption_data = ['mandatory'=>1, 'policyversionid'=>$policyversion_data['id']];
+        // Create consent option
+        $consentoption_data = [
+            'mandatory' => 1,
+            'policyversionid' => $policyversion_data['id'],
+        ];
+
         $consentoption_data['id'] = $DB->insert_record('tool_sitepolicy_consent_options', $consentoption_data);
 
-        $localisedconsent_data = ['statement'=>'Consent','consentoption'=>'yes','nonconsentoption'=>'no','localisedpolicyid'=>$localisedpolicy_data['id'],'consentoptionid'=>$consentoption_data['id']];
+        // Create localised consent option
+        $localisedconsent_data = [
+            'statement' => 'Consent',
+            'consentoption' => 'yes',
+            'nonconsentoption' => 'no',
+            'localisedpolicyid' => $localisedpolicy_data['id'],
+            'consentoptionid' => $consentoption_data['id'],
+        ];
+
         $localisedconsent_data['id'] = $DB->insert_record('tool_sitepolicy_localised_consent', $localisedconsent_data);
 
-        $userconsent_data = ['userid'=>2,'timeconsented'=>1515617791, 'hasconsented'=>1, 'consentoptionid'=>$consentoption_data['id'], 'language' => 'en'];
+        // Create user consent
+        $userconsent_data = [
+            'userid' => 2,
+            'timeconsented' => 1515617791,
+            'hasconsented' => 1,
+            'consentoptionid' => $consentoption_data['id'],
+            'language' => 'en',
+        ];
+
         $userconsent_data['id'] = $DB->insert_record('tool_sitepolicy_user_consent', $userconsent_data);
     }
 
