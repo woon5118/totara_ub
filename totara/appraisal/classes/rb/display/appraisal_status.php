@@ -25,7 +25,7 @@ namespace totara_appraisal\rb\display;
 use totara_reportbuilder\rb\display\base;
 
 /**
- * Display class intended to display the appraisal user status
+ * Display class intended to display the appraisal status
  *
  * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_appraisal
@@ -43,7 +43,10 @@ class appraisal_status extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return get_string($value, 'rb_source_appraisal');
+        global $CFG;
+        require_once($CFG->dirroot.'/totara/appraisal/lib.php');
+
+        return \appraisal::display_status($value);
     }
 
     /**

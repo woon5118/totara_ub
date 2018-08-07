@@ -12,8 +12,8 @@ Removed deprecated methods:
 * The dynamically created appraisal question data table columns have been changed from char to text. Any use of
 these columns in the where clause of sql queries will need to be changed to use $DB->sql_compare_text.
 * Deprecated the following report builder display functions and replaced with display classes
-  * rb_source_appraisal::rb_display_status(), please call totara_appraisal\rb\display\appraisal_status::display() instead.
-  * rb_source_appraisal::rb_display_appraisalstatus(), please call totara_appraisal\rb\display\appraisal_appraisal_status::display() instead.
+  * rb_source_appraisal::rb_display_status(), please call totara_appraisal\rb\display\appraisal_user_status::display() instead.
+  * rb_source_appraisal::rb_display_appraisalstatus(), please call totara_appraisal\rb\display\appraisal_status::display() instead.
   * rb_source_appraisal_detail::rb_display_longtext(), please call totara_appraisal\rb\display\appraisal_longtext::display() instead.
   * rb_source_appraisal_detail::rb_display_fileupload(), please call totara_appraisal\rb\display\appraisal_longtext::display() instead.
   * rb_source_appraisal_detail::rb_display_multichoicesingle(), please call totara_appraisal\rb\display\appraisal_multichoice_single::display() instead.
