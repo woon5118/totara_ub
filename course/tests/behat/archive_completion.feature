@@ -109,7 +109,8 @@ Feature: Test we can manually archive course completion.
     And I should see "5–35"
     And I should see "0–35"
 
-    When I am on "Grader report" course homepage with editing mode on
+    When I follow "Grader report"
+    And I turn editing mode on
     And I give the grade "0" to the user "Learner One" for the grade item "Course total"
     And I give the grade "10" to the user "Learner Two" for the grade item "Course total"
     And I give the grade "20" to the user "Learner Three" for the grade item "Course total"
