@@ -2443,7 +2443,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $numfrontpagemodules = $DB->count_records('course_modules', array('course' => $SITE->id));
         // Totara: MDL-55074 removed defaults for new navigation in theme_boost.
         // Replace them for time being as we do not include that theme.
-        $this->assertEquals(6 + $numfrontpagemodules, context_inspection::test_context_cache_size()); // Depends on number of default blocks.
+        $this->assertEquals(5 + $numfrontpagemodules, context_inspection::test_context_cache_size()); // Depends on number of default blocks.
 
         // Test assign_capability(), unassign_capability() functions.
 
