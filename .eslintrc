@@ -1,6 +1,7 @@
 {
   'env': {
     'browser': true,
+    // Totara: some ES6 globals are emulated in IE11 via polyfill - see lib/javascript_polyfill/
     'es6': true,
     'amd': true
   },

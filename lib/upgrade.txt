@@ -42,6 +42,8 @@ information provided here is intended especially for developers.
 ** lib/templates/add_block_popover_content.mustache
 * core/login mustache template has changed, fixing an issue with a skip link
 * core_renderer::render_single_button has been updated to set a primary button
+* Limited subset of ES6 globals is now allowed in all supported browsers,
+  see https://help.totaralearning.com/display/DEV/ES+6+functionality for more details.
 
 === 11.0 ===
 

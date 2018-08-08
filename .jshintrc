@@ -12,6 +12,7 @@
     "eqnull":       false,
     "es5":          false,
     "esnext":       false,
+    // Totara: ES6 is emulated in IE11 via polyfill - see lib/javascript_polyfill/
     "esversion":    6,
     "evil":         false,
     "expr":         false,

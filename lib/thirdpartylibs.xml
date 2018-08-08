@@ -291,4 +291,23 @@
     <version>3.0.2</version>
     <licenseversion>2.0</licenseversion>
   </library>
+  <library>
+    <location>javascript_polyfill/src/es6-promise.auto.js</location>
+    <name>ES6-Promise (subset of rsvp.js)</name>
+    <license>MIT</license>
+    <version>v4.2.4+314e4831</version>
+  </library>
+  <library>
+    <location>lib/javascript_polyfill/src/fetch.js</location>
+    <name>window.fetch polyfill</name>
+    <license>MIT</license>
+    <version>2.0.4</version>
+  </library>
+  <library>
+    <location>javascript_polyfill/src/other_ie11.js</location>
+    <name>Other polyfills for IE11</name>
+    <license>CC0</license>
+    <version></version>
+    <licenseversion>1.0</licenseversion>
+  </library>
 </libraries>

@@ -1583,12 +1583,16 @@ class page_requirements_manager {
         // Add hacked jQuery support, it is not intended for standard Moodle distribution!
         $output .= $this->get_jquery_headcode();
 
-        // IE11 Polyfill, includes a polyfill for events, promises & fetch to allow us to use native es6 JS
+        // Totara: add IE11 Polyfill, includes a polyfill for events, promises & fetch to allow us to use native es6 JS
         if (core_useragent::is_ie()) {
             if ($CFG->debugdeveloper) {
-                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/src/polyfill_ie11.js'));
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/src/es6-promise.auto.js'));
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/src/fetch.js'));
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/src/other_ie11.js'));
             } else {
-                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/build/polyfill_ie11.min.js'));
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/build/es6-promise.auto.min.js'));
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/build/fetch.min.js'));
+                $output .= html_writer::script('', $this->js_fix_url('/lib/javascript_polyfill/build/other_ie11.min.js'));
             }
         }
 
