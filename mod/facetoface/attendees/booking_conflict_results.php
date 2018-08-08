@@ -69,14 +69,14 @@ for ($i = 0; $i < $cntdates; $i++) {
 }
 $conflictresults = facetoface_get_booking_conflicts($dates, $attendees, $extrawhere, $extraparams);
 $table = new html_table();
-$table->head = array(get_string('bulkaddsourceuserid', 'facetoface'), get_string('name'), get_string('result', 'facetoface'));
+$table->head = array(get_string('bulkaddsourceidnumber', 'facetoface'), get_string('name'), get_string('result', 'facetoface'));
 $table->data = array();
 
 foreach($conflictresults as $key => $result) {
-    $id = new html_table_cell($result['id']);
+    $idnumber = new html_table_cell($result['idnumber']);
     $name = new html_table_cell($result['name']);
     $message = new html_table_cell($result['result']);
-    $row = new html_table_row(array($id, $name, $message));
+    $row = new html_table_row(array($idnumber, $name, $message));
     $table->data[] = $row;
 }
 
