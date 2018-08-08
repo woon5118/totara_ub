@@ -94,32 +94,4 @@ Feature: Restore Moodle 2 course backups with different user data settings
     When I follow "Test database name"
     Then I should not see "Student entry"
 
-  @javascript
-  Scenario: Restore a backup with user data with site config for including users set to 0
-    Given I navigate to "General restore defaults" node in "Site administration > Courses > Backups"
-    And I set the field "s_restore_restore_general_users" to ""
-    And I press "Save changes"
-    And I am on "Course 1" course homepage
-    And I navigate to "Restore" node in "Course administration"
-    # "User data" marks the user data field for the section
-    # "-" marks the user data field for the data activity
-    And I restore "test_backup.mbz" backup into a new course using this options:
-      | Settings |  Include enrolled users | 1 |
-      | Schema | User data | 1 |
-      | Schema | - | 1 |
-    Then I should see "Test database name"
-    When I follow "Test database name"
-    Then I should see "Student entry"
-
-  @javascript
-  Scenario: Restore a backup with user data with local and site config config for including users set to 0
-    Given I navigate to "General restore defaults" node in "Site administration > Courses > Backups"
-    And I set the field "s_restore_restore_general_users" to ""
-    And I press "Save changes"
-    And I am on "Course 1" course homepage
-    And I navigate to "Restore" node in "Course administration"
-    When I restore "test_backup.mbz" backup into a new course using this options:
-      | Settings |  Include enrolled users | 0 |
-    Then I should see "Test database name"
-    When I follow "Test database name"
-    Then I should not see "Student entry"
+  # Totara: Removed scenarios testing "General restore defaults" as we don't have these settings
