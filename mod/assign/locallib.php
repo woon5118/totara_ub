@@ -3014,7 +3014,7 @@ class assign {
      * @return string
      */
     public function render_editor_content($filearea, $submissionid, $plugintype, $editor, $component, $shortentext = false) {
-        global $CFG;
+        global $CFG, $DB, $USER;
 
         $result = '';
 
@@ -3035,7 +3035,21 @@ class assign {
         $params = array('overflowdiv' => true, 'context' => $this->get_context());
         $result .= format_text($finaltext, $format, $params);
 
-        if ($CFG->enableportfolios && has_capability('mod/assign:exportownsubmission', $this->context)) {
+        $submission = $DB->get_record('assign_submission', array('id' => $submissionid));
+        $canexportportfolio = false;
+
+        if (!empty($submission)) {
+            if ($submission->userid == 0)  {
+                // This must be a group submission.
+                if (groups_is_member($submission->groupid, $USER->id)) {
+                    $canexportportfolio = true;
+                }
+            } else if ($USER->id == $submission->userid) {
+                $canexportportfolio = true;
+            }
+        }
+
+        if ($CFG->enableportfolios && has_capability('mod/assign:exportownsubmission', $this->context) && $canexportportfolio) {
             require_once($CFG->libdir . '/portfoliolib.php');
 
             $button = new portfolio_add_button();
