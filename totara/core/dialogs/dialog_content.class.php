@@ -493,7 +493,7 @@ class totara_dialog_content {
             define('TOTARA_DIALOG_SEARCH', true);
         }
         ob_start();
-        require_once("{$CFG->dirroot}{$this->search_code}");
+        require("{$CFG->dirroot}{$this->search_code}");
         return ob_get_clean();
     }
 

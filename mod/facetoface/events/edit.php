@@ -37,6 +37,15 @@ $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 $s = $session->id;
+// Setting the count dates ($cntdates) here for a scenario: when the user is only viewing editing page for seminar's
+// events (as there are multiple session dates for the events), and the ($cntdates) is empty from HTTP FORM data.
+// Therefore, the $cntdates should fall back to event's session dates, otherwise, the renderer will not render attribute
+// offset for html element and it will cause javascript issues.
+// Update TL-18729: The count dates ($cntdates) is no longer set to default 1, if there is none specified, and it should
+// only reflect to the number of session dates that the event ($session) has.
+if ($cntdates === 0 && !empty($session->sessiondates)) {
+    $cntdates = count($session->sessiondates);
+}
 
 $context = context_module::instance($cm->id);
 $f  = $facetoface->id;
@@ -59,10 +68,6 @@ $PAGE->set_heading($course->fullname);
 
 $jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $facetoface->id);
 
-// Offer one date for new sessions by default.
-if ($cntdates < 1) {
-    $cntdates = 1;
-}
 for ($offset = 0; $offset < $cntdates; $offset++) {
     $display_selected = dialog_display_currently_selected(get_string('selected', 'facetoface'), "selectroom{$offset}-dialog");
     $jsconfig['display_selected_item' . $offset] = $display_selected;
