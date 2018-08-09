@@ -37,13 +37,13 @@ class sitepolicy_versionstatus extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         switch ($value) {
             case policyversion::STATUS_PUBLISHED:
-                $key = 'statuspublished';
+                $key = 'versionstatuspublished';
                 break;
             case policyversion::STATUS_ARCHIVED:
-                $key = 'satusarchived';
+                $key = 'versionstatusarchived';
                 break;
             default:
-                $key = 'statusdraft';
+                $key = 'versionstatusdraft';
                 break;
         }
         return get_string($key, 'tool_sitepolicy');
