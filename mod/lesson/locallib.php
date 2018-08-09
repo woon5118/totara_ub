@@ -4637,7 +4637,7 @@ abstract class lesson_page extends lesson_base {
         $i = 1;
         foreach ($answers as $answer) {
             $cells = array();
-            $cells[] = "<span class=\"label\">".get_string("jump", "lesson")." $i<span>: ";
+            $cells[] = "<span class=\"mod_lesson__label\">".get_string("jump", "lesson")." $i<span>: ";
             $cells[] = $this->get_jump_name($answer->jumpto);
             $table->data[] = new html_table_row($cells);
             if ($i === 1){
