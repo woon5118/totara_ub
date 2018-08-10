@@ -464,7 +464,7 @@ define(['jquery'], function ($) {
      * @returns {string}
      */
     Location.prototype.url_encode_address = function(address) {
-        return address.replace(/\s+/g, '+');
+        return encodeURI(address.replace(/\s+/g, '+'));
     };
 
     return {
