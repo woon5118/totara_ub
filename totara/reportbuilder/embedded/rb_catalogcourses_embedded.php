@@ -122,19 +122,31 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
 
         $buttons = "";
 
+
+        $buttons .= html_writer::start_div('breadcrumb-button');
+
         // Show the course request button, if it is enabled (returns empty string if not).
         ob_start();
         print_course_request_buttons(context_system::instance());
         $buttons .= ob_get_contents();
         ob_end_clean();
 
+        $wm = new \totara_contentmarketplace\workflow_manager\exploremarketplace();
+        if ($wm->workflows_available()) {
+            $exploreurl = $wm->get_url();
+            $explorebutton = new single_button($exploreurl, get_string('explore_totara_content', 'totara_contentmarketplace'), 'get');
+            $buttons .= $OUTPUT->render($explorebutton);
+        }
+
         $wm = new \core_course\workflow_manager\coursecreate();
         $wm->set_params(['category' => $categoryid]);
         if ($wm->workflows_available()) {
             $createurl = $wm->get_url();
-            $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get');
+            $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get', true);
             $buttons .= $OUTPUT->render($createbutton);
         }
+
+        $buttons .= html_writer::end_div();
 
         return $buttons;
     }

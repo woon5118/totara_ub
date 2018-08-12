@@ -36,7 +36,7 @@ class totara_core_access_testcase extends advanced_testcase {
             'moodle/restore:rolldates', 'moodle/category:viewhiddencategories', 'moodle/course:create',
             'moodle/course:viewhiddencourses', 'repository/coursefiles:view', 'repository/filesystem:view',
             'repository/local:view', 'repository/webdav:view', 'totara/certification:viewhiddencertifications',
-            'totara/program:viewhiddenprograms', 'tool/uploadcourse:uploadcourses');
+            'totara/program:viewhiddenprograms', 'tool/uploadcourse:uploadcourses', 'totara/contentmarketplace:add');
 
         $files['core'] = "$CFG->dirroot/lib/db/access.php";
 

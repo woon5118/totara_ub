@@ -129,7 +129,7 @@ abstract class base {
     public function get_workflow(string $classname): ?\totara_workflow\workflow\base {
 
         if (!class_exists($classname)) {
-            throw new \coding_exception("Attempt to instansiate class '{$classname}' which does not exist.");
+            throw new \coding_exception("Attempt to instantiate class '{$classname}' which does not exist.");
         }
         $workflow = new $classname($this);
 

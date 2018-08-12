@@ -1267,6 +1267,11 @@ class core_plugin_manager {
                 'gregorian'
             ),
 
+            // Totara
+            'contentmarketplace' => array(
+                'goone'
+            ),
+
             'coursereport' => array(
                 // Deprecated!
             ),
@@ -1459,7 +1464,7 @@ class core_plugin_manager {
                 'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360', 'flavour',
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
-                'gap', 'job', 'completioneditor', 'userdata', 'workflow'
+                'gap', 'job', 'completioneditor', 'userdata', 'workflow', 'contentmarketplace'
             ),
             'tabexport' => array(
                 'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',

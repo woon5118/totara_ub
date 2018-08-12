@@ -101,7 +101,7 @@ define([
 
                 var equal = (function(initial, newValue) {
                     var index;
-                    // Array compairison
+                    // Array comparison
                     if (Array.isArray(initial) && Array.isArray(newValue)) {
                         if (initial.length !== newValue.length) {
                             return false;
@@ -114,7 +114,7 @@ define([
                         return true;
                     }
 
-                    // traditional string compairson
+                    // traditional string comparison
                     if (initial === newValue) {
                         return true;
                     } else {

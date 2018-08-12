@@ -1,0 +1,60 @@
+{{!
+   This file is part of Totara Learn
+
+   Copyright (C) 2018 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Michael Dunstan <michael.dunstan@androgogic.com>
+   @package totara_contentmarketplace
+}}
+{{!
+    @template totara_contentmarketplace/filters
+
+    Content Marketplace explorer filters
+
+    Example context (json):
+    {
+        "filters": [
+            {
+                "name": "tags",
+                "label": "Tags",
+                "template": "totara_contentmarketplace/filter_radios",
+                "options": [
+                    {
+                        "name": "Food",
+                        "count": "12,345",
+                        "checked": true,
+                    },
+                    {
+                        "name": "Drink",
+                        "count": "123",
+                        "checked": false,
+                    }
+                ]
+            }
+        ]
+    }
+
+}}
+<div class="content block-content tcm-search_filters">
+    {{#filters}}
+        <fieldset class="tcm-search_filter tcm-search_filter-{{name}}" data-filter-name="{{name}}">
+            <legend class="tf_element_title"><span class="legend" data-element-label>{{ label }}</span></legend>
+            <div class="tf_element_input">
+                {{> &&template }}
+            </div>
+        </fieldset>
+    {{/filters}}
+</div>
