@@ -589,7 +589,7 @@ class step {
         }
 
         $options = array_reverse($options, true);
-        $options[configuration::TOURDEFAULT] = get_string('defaultvalue', 'tool_usertours', $options[$default]);
+        $options[$default] = get_string('defaultvalue', 'tool_usertours', $options[$default]);
         $options = array_reverse($options, true);
 
         $mform->addElement('select', $key, get_string($key, 'tool_usertours'), $options);
@@ -607,7 +607,14 @@ class step {
     public function prepare_data_for_form() {
         $data = $this->to_record();
         foreach (self::get_config_keys() as $key) {
-            $data->$key = $this->get_config($key, configuration::get_step_default_value($key));
+            // At this point, the step should be retrieving the cofiguration from itself, if its config value is empty
+            // then it will retrieve from it's parent as tour where it should be inherit from, however, if the tour is
+            // is empty, then the config value would fallback to the basic defualt configuration
+            $value = $this->get_config($key);
+            if (empty($value)) {
+                $value = configuration::get_step_default_value($key);
+            }
+            $data->$key = $value;
         }
 
         if ($this->get_targettype() !== null) {
