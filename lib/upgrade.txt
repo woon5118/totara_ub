@@ -102,6 +102,7 @@ information provided here is intended especially for developers.
 * Added renderPix method to templates JavaScript library
 * Update pix_icon template, adding an "icon" class
 * The cron runner now sets up a fresh PAGE and OUTPUT between each task.
+* Added a lock to prevent 'coursemodinfo' cache to be built multiple times in parallel
 
 === 11.0 ===
 
