@@ -135,6 +135,9 @@ information provided here is intended especially for developers.
   * add_custom_goal_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
   * add_custom_personal_goal_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
   * add_custom_competency_fields instead use add_totara_customfield_component in totara_customfield\rb\source\report_trait
+* Added a new filter option 'help' which accepts array of ['string', 'component'] to override default filter help popup
+  language string, note it follows rules of addHelpButton, so if you supply string named 'myhelpstring' the system
+  would look for 'myhelpstring' and 'myhelpstring_help'.
 
 === 11.0 ===
 

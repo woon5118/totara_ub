@@ -118,7 +118,7 @@ class rb_filter_multicheck extends rb_filter_type {
             $mform->disabledIf($this->name . '[' . $id . ']', $this->name . '_op', 'eq', 0);
         }
         $mform->addGroup($objs, $this->name . '_grp', $grplabel, '', false);
-        $mform->addHelpButton($this->name . '_grp', 'filtercheckbox', 'filters');
+        $this->add_help_button($mform, $this->name . '_grp', 'filtercheckbox', 'filters');
 
         if ($advanced) {
             $mform->setAdvanced($this->name . '_op');

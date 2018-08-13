@@ -194,7 +194,7 @@ class rb_filter_grpconcat_jobassignment extends rb_filter_hierarchy_multi {
         }
 
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
-        $mform->addHelpButton($grp->_name, 'reportbuilderjobassignmentfilter', 'totara_reportbuilder');
+        $this->add_help_button($mform, $grp->_name, 'reportbuilderjobassignmentfilter', 'totara_reportbuilder');
         $mform->disabledIf($this->name . '_child', $this->name . '_op', 'eq', 0);
 
         if ($advanced) {

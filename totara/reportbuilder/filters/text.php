@@ -60,7 +60,7 @@ class rb_filter_text extends rb_filter_type {
         $mform->setType($this->name . '_op', PARAM_INT);
         $mform->setType($this->name, PARAM_TEXT);
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
-        $mform->addHelpButton($grp->_name, 'filtertext', 'filters');
+        $this->add_help_button($mform, $grp->_name, 'filtertext', 'filters');
         $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISEMPTY);
         $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISNOTEMPTY);
         if ($advanced) {

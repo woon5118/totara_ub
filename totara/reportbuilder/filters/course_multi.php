@@ -108,7 +108,7 @@ class rb_filter_course_multi extends rb_filter_type {
 
         // Create a group for the elements.
         $grp =& $mform->addElement('group', $this->name.'_grp', $label, $objs, '', false);
-        $mform->addHelpButton($grp->_name, 'reportbuilderdialogfilter', 'totara_reportbuilder');
+        $this->add_help_button($mform, $grp->_name, 'reportbuilderdialogfilter', 'totara_reportbuilder');
 
         if ($advanced) {
             $mform->setAdvanced($this->name.'_grp');

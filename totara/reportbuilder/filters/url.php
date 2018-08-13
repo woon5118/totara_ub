@@ -52,7 +52,7 @@ class rb_filter_url extends rb_filter_type {
 
         $mform->setType($this->name . '_op', PARAM_INT);
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
-        $mform->addHelpButton($grp->_name, 'filterurl', 'filters');
+        $this->add_help_button($mform, $grp->_name, 'filterurl', 'filters');
 
         // Set default values.
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {

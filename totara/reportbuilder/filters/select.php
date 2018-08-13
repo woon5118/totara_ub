@@ -106,7 +106,8 @@ class rb_filter_select extends rb_filter_type {
             $choices = array('' => get_string('anyvalue', 'filters')) + $options;
             $mform->addElement('select', $this->name, $label, $choices, $attr);
             $mform->setType($this->name, PARAM_TEXT);
-            $mform->addHelpButton($this->name, 'filtersimpleselect', 'filters');
+
+            $this->add_help_button($mform, $this->name, 'filtersimpleselect', 'filters');
             if ($advanced) {
                 $mform->setAdvanced($this->name);
             }
@@ -120,7 +121,7 @@ class rb_filter_select extends rb_filter_type {
             $mform->setType($this->name . '_op', PARAM_INT);
             $mform->setType($this->name, PARAM_TEXT);
             $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
-            $mform->addHelpButton($grp->_name, 'filterselect', 'filters');
+            $this->add_help_button($mform, $grp->_name, 'filterselect', 'filters');
             $mform->disabledIf($this->name, $this->name . '_op', 'eq', 0);
             if ($advanced) {
                 $mform->setAdvanced($this->name . '_grp');

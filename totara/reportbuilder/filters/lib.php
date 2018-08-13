@@ -478,6 +478,36 @@ class rb_filter_type {
         $regions[self::RB_FILTER_REGION_SIDEBAR] = 'sidebar';
         return $regions;
     }
+
+    /**
+     * Add a help button to the element of the given form
+     *
+     * @param \MoodleQuickForm $form Moodle form object
+     * @param string $element Element name
+     * @param string $name Default language string name
+     * @param string $component Default language component name
+     * @param array|null $custom Custom help language string (['name', component]), if not supplied the one supplied in options['help'] is used
+     */
+    protected function add_help_button(\MoodleQuickForm $form, string $element, string $name, ?string $component, array $custom = null): void {
+        // Get supplied string or string from filter options or empty array.
+        $string = $custom ?? $this->options['help'] ?? [];
+
+        if (is_array($string) && !empty($string) && count($string) <= 2) {
+            $name = $string[0];
+            $component = $string[1] ?? null;
+        }
+
+        $args = [
+            $element,
+            $name,
+        ];
+
+        if (!is_null($component)) {
+            $args[] = $component;
+        }
+
+        $form->addHelpButton(...$args);
+    }
 }
 
 

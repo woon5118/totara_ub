@@ -129,7 +129,7 @@ class rb_filter_date extends rb_filter_type {
         }
 
         $grp =& $mform->addElement('group', $this->name.'_grp', $label, $objs, '', false);
-        $mform->addHelpButton($grp->_name, 'filterdate', 'filters');
+        $this->add_help_button($mform, $grp->_name, 'filterdate', 'filters');
 
         if ($advanced) {
             $mform->setAdvanced($this->name.'_grp');

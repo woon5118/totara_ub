@@ -102,7 +102,7 @@ class rb_filter_hierarchy extends rb_filter_type {
         $mform->setType($this->name . '_rec', PARAM_TEXT);
 
         $grp =& $mform->addElement('group', $this->name.'_grp', $label, $objs, '', false);
-        $mform->addHelpButton($grp->_name, 'reportbuilderdialogfilter', 'totara_reportbuilder');
+        $this->add_help_button($mform, $grp->_name, 'reportbuilderdialogfilter', 'totara_reportbuilder');
         if ($advanced) {
             $mform->setAdvanced($this->name.'_grp');
         }

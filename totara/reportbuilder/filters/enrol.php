@@ -60,7 +60,7 @@ class rb_filter_enrol extends rb_filter_type {
         $choices = array('' => get_string('anyvalue', 'filters')) + $options;
         $mform->addElement('select', $this->name, $label, $choices);
         $mform->setType($this->name, PARAM_TEXT);
-        $mform->addHelpButton($this->name, 'filterenrol', 'filters');
+        $this->add_help_button($mform, $this->name, 'filterenrol', 'filters');
         if ($advanced) {
             $mform->setAdvanced($this->name);
         }
