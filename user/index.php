@@ -112,7 +112,7 @@ user_list_view($course, $context);
 
 $bulkoperations = has_capability('moodle/course:bulkmessaging', $context);
 
-$countries = get_string_manager()->get_list_of_countries();
+$countries = get_string_manager()->get_list_of_countries(true);
 
 $strnever = get_string('never');
 
