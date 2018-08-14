@@ -24,7 +24,7 @@
 $string['activity'] = 'Activity';
 $string['aftercompletion'] = 'since';
 $string['applies'] = 'Applies';
-$string['description'] = 'Require students have completed (or not completed) another activity within a specified time.';
+$string['description'] = 'Require learners have completed (or not completed) another activity within a specified time.';
 $string['error_selectcmid'] = 'You must select an activity for the completion condition.';
 $string['error_selectcmidpassfail'] = 'You must select an activity with "Require grade" completion condition set.';
 $string['error_selecttimeamountfail'] = 'You must select a time duration for the completion condition set.';

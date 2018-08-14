@@ -695,7 +695,7 @@ $string['updatetemporarymanagerstask'] = 'Update temporary managers';
 $string['mysqlneedsbarracuda'] = 'Advanced Totara features require InnoDB Barracuda storage format';
 $string['mysqlneedsfilepertable'] = 'Advanced Totara features require InnoDB File-Per-Table mode to be enabled';
 $string['timecompleted'] = 'Time completed';
-$string['poweredby'] = 'Powered by Totara LMS';
+$string['poweredby'] = 'Powered by Totara';
 
 // Deprecated in Platform.
 
