@@ -127,7 +127,7 @@ class rb_source_dp_certification extends rb_base_source {
                         cc.timemodified,
                         0 as unassigned
                     FROM {certif_completion} cc
-                    UNION
+                    UNION ALL
                     SELECT ' . $DB->sql_concat("'history'", 'cch.id') . ' AS uniqueid,
                         cch.id,
                         cch.certifid,
