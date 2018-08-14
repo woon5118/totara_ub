@@ -23,6 +23,9 @@ clitypevaluedefault,admin
 cliunknowoption,admin
 cliyesnoprompt,admin
 componentisuptodate,error
+configfilenotwritten,install
+configfilewritten,install
+configurationcompletesub,install
 databasehost,install
 databasename,install
 databasetypehead,install
@@ -41,6 +44,7 @@ installation,install
 invalidmd5,error
 langdownloaderror,install
 language,moodle
+maturitycorewarning,admin
 memorylimithelp,install
 missingrequiredfield,error
 moodlelogo,moodle
@@ -62,6 +66,7 @@ phpversionhelp,install
 phpversion,install
 poweredbyx,totara_core
 previous,moodle
+releasenoteslink,admin
 reload,moodle
 remotedownloaderror,error
 thisdirection,langconfig
