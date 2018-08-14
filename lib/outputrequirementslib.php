@@ -1364,35 +1364,30 @@ require(['core/autoinitialise'], function(ai) {
         $output = '';
         $jsrev = $this->get_jsrev();
 
-        $jsloader = new moodle_url('/lib/javascript.php');
-        $jsloader->set_slashargument('/' . $jsrev . '/');
-        $requirejsloader = new moodle_url('/lib/requirejs.php');
-        $requirejsloader->set_slashargument('/' . $jsrev . '/');
+        // Totara: no need to use 'core/first' here, we define bundle in requirejs configuration instead.
 
-        $requirejsconfig = file_get_contents($CFG->dirroot . '/lib/requirejs/moodle-config.js');
+        $configurl = "{$CFG->wwwroot}/lib/requirejs/config.php/{$jsrev}/config.js";
+        $output .= html_writer::script('', $configurl);
 
-        // No extension required unless slash args is disabled.
-        $jsextension = '.js';
-        if (!empty($CFG->slasharguments)) {
-            $jsextension = '';
-        }
-
-        $requirejsconfig = str_replace('[BASEURL]', $requirejsloader, $requirejsconfig);
-        $requirejsconfig = str_replace('[JSURL]', $jsloader, $requirejsconfig);
-        $requirejsconfig = str_replace('[JSEXT]', $jsextension, $requirejsconfig);
-
-        $output .= html_writer::script($requirejsconfig);
         if ($CFG->debugdeveloper) {
             $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.js'));
         } else {
             $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.min.js'));
         }
 
-        // First include must be to a module with no dependencies, this prevents multiple requests.
-        // Totara: allow AMD modules to force behat to wait for their load and initialisation.
-        $prefix = "M.util.js_pending('core-first');\nrequire(['core/first'], function() {\n";
-        $suffix = "\nM.util.js_complete('core-first');});";
-        $output .= html_writer::script($prefix . implode(";\n", $this->amdjscode) . $suffix);
+        // Totara: add ajax activity tracking for behat, this must be done once per page only,
+        //         we do not want it in dialogs or fragments. This was in 'core/first' module before.
+        $ajaxpending = "require(['jquery'], function($) {
+    $(document).on('ajaxStart', function() {
+        M.util.js_pending('jq');
+    }).on('ajaxStop', function() {
+        M.util.js_complete('jq');
+    });
+})";
+        $amdjscode = $this->amdjscode;
+        array_unshift($amdjscode, $ajaxpending);
+
+        $output .= html_writer::script(implode(";\n", $amdjscode));
         return $output;
     }
 
