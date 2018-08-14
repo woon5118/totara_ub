@@ -1,4 +1,4 @@
-@core @core_course
+@core @core_course @javascript @_cross_browser
 Feature: Course activity controls works as expected
   In order to manage my course's activities
   As a teacher
@@ -10,14 +10,13 @@ Feature: Course activity controls works as expected
   # * Course controls with paged mode in the course home page
   # * Course controls with paged mode in a section's page
 
-  @javascript @_cross_browser
   Scenario Outline: General activities course controls using topics and weeks formats, and paged mode and not paged mode works as expected
     Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
     And the following "courses" exist:
-      | fullname | shortname | format | coursedisplay | numsections |
-      | Course 1 | C1 | <courseformat> | <coursedisplay> | 5 |
+      | fullname | shortname | format | coursedisplay | numsections | startdate |
+      | Course 1 | C1 | <courseformat> | <coursedisplay> | 5 | 0 |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
