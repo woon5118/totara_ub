@@ -82,7 +82,7 @@ class page_requirements_manager {
     /**
      * @var array Inline scripts using RequireJS module loading.
      */
-    protected $amdjscode = array('');
+    protected $amdjscode = array(); // Totara: no need for empty string here
 
     /**
      * @var array List of needed function calls
@@ -173,6 +173,16 @@ class page_requirements_manager {
      */
     public function __construct() {
         global $CFG;
+
+        // Totara: Initialise all amd modules via data-core-autoinitialise,
+        //         make sure behat waits for all to complete.
+        $autoinitialisejs = "M.util.js_pending('core-autoinitialise');
+require(['core/autoinitialise'], function(ai) {
+    ai.scan().then(function() {
+        M.util.js_complete('core-autoinitialise');
+    });
+})";
+        $this->js_amd_inline($autoinitialisejs);
 
         // You may need to set up URL rewrite rule because oversized URLs might not be allowed by web server.
         $sep = empty($CFG->yuislasharguments) ? '?' : '/';
@@ -1367,8 +1377,9 @@ class page_requirements_manager {
         }
 
         // First include must be to a module with no dependencies, this prevents multiple requests.
-        $prefix = "require(['core/first'], function() {\n";
-        $suffix = "\n});";
+        // Totara: allow AMD modules to force behat to wait for their load and initialisation.
+        $prefix = "M.util.js_pending('core-first');\nrequire(['core/first'], function() {\n";
+        $suffix = "\nM.util.js_complete('core-first');});";
         $output .= html_writer::script($prefix . implode(";\n", $this->amdjscode) . $suffix);
         return $output;
     }

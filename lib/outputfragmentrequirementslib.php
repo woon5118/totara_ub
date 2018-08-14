@@ -57,8 +57,9 @@ class fragment_requirements_manager extends page_requirements_manager {
         $output = '';
 
         // First include must be to a module with no dependencies, this prevents multiple requests.
-        $prefix = "require(['core/first'], function() {\n";
-        $suffix = "\n});";
+        // Totara: allow AMD modules to force behat to wait for their load and initialisation.
+        $prefix = "M.util.js_pending('core-first');\nrequire(['core/first'], function() {\n";
+        $suffix = "\nM.util.js_complete('core-first');});";
         $output .= html_writer::script($prefix . implode(";\n", $this->amdjscode) . $suffix);
         return $output;
     }
