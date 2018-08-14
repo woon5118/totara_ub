@@ -32,7 +32,16 @@ $sid = optional_param('sid', 0, PARAM_INT); // Report: saved search.
 $format = optional_param('format', false, PARAM_TEXT); // Report: export.
 $debug = optional_param('debug', 0, PARAM_INT); // Report: debug turned on/off.
 
-admin_externalpage_setup('tool_sitepolicy-userconsentreport');
+if (!empty($CFG->enablesitepolicies)) {
+    admin_externalpage_setup('tool_sitepolicy-userconsentreport');
+} else {
+    // If not enabled, the left menu is not initialised.
+    // Set context and url manually
+    $PAGE->set_context(null); // set context to system context
+    require_login();
+    $url = new moodle_url('/admin/toot/sitepolicy/sitepolicyreport.php');
+    $PAGE->set_url($url);
+}
 
 // Verify global restrictions.
 $reportrecord = $DB->get_record('report_builder', array('shortname' => 'tool_sitepolicy'));
@@ -55,4 +64,5 @@ if ($format) {
 
 /** @var \tool_sitepolicy\output\page_renderer $renderer */
 $renderer = $PAGE->get_renderer('tool_sitepolicy', 'page');
+$PAGE->set_button($report->edit_button());
 echo $renderer->consent_report($report, $debug, $sid);

@@ -222,6 +222,8 @@ function is_https() {
  * @return string The local referer or default url if invalid or not present.
  */
 function get_local_referer($stripquery = true, $defaulturl = '') {
+    global $CFG;
+
     if ($defaulturl instanceof moodle_url) {
         $defaulturl = $defaulturl->out(false);
     }
@@ -235,7 +237,13 @@ function get_local_referer($stripquery = true, $defaulturl = '') {
     if ($stripquery) {
         $referer = strip_querystring($referer);
     }
-    return $referer;
+
+    // Never return /tool/sitepolicy urls here to prevent possible circular workflow
+    if (empty(preg_match('/tool\/sitepolicy\//', $referer))) {
+        return $referer;
+    } else {
+        return $CFG->wwwroot . '/index.php';
+    }
 }
 
 /**

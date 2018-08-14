@@ -49,14 +49,18 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php"));
 $PAGE->set_popup_notification_allowed(false);
 
-$home = $CFG->wwwroot . '/';
+if (isset($SESSION->wantsurl)) {
+    $wantsurl = $SESSION->wantsurl;
+} else {
+    $wantsurl = $CFG->wwwroot . '/';
+}
 $userid = $USER->id;
 
 if (empty($policyversionid)) {
     $unanswered = \tool_sitepolicy\userconsent::get_unansweredpolicies($userid);
     if (count($unanswered) == 0) {
         $SESSION->tool_sitepolicy_consented = true;
-        redirect($home);
+        redirect($wantsurl);
     }
 
     if ($totalcount == 0 && count($unanswered) != 0) {
@@ -70,7 +74,7 @@ if (empty($policyversionid)) {
     // This shouldn't happen, but just in case
     if ($totalcount == 0) {
         $SESSION->tool_sitepolicy_consented = true;
-        redirect($home);
+        redirect($wantsurl);
     }
 
     if (isguestuser()) {
@@ -203,7 +207,7 @@ if ($form->is_cancelled()) {
     // avoid uneccessary db queries
     if ($currentcount == $totalcount) {
         $SESSION->tool_sitepolicy_consented = true;
-        redirect($home);
+        redirect($wantsurl);
     } else {
         redirect(url_helper::user_sitepolicy_consent($currentcount + 1, $totalcount));
     }
