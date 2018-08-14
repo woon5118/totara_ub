@@ -77,13 +77,22 @@ define(['core/templates'], function(templates) {
                 }
             });
 
-            this.widget.addEventListener('focusout', function(e) {
-                if (!e.target || 'ontouchstart' in document.documentElement) {
-                    return;
-                }
+            var topLevelItemList = this.widget.querySelectorAll('[data-tw-totaranav-toplevelitem]');
+            for (var s = 0; s < topLevelItemList.length; s++) {
+                topLevelItemList[s].addEventListener('mouseenter', function() {
+                    var activeNode = document.activeElement;
+                    // If focus is on a navigation item and not in a expanded list
+                    if (activeNode.classList.contains('totaraNav_prim--list_item_link')
+                    && !activeNode.parentNode.classList.contains(that.itemExpandedClass)) {
+                        activeNode.blur();
+                    }
+                });
+            }
 
-                // If no target, we have lost focus so close
-                if (!e.relatedTarget || !e.relatedTarget.closest('.totaraNav')) {
+            this.widget.addEventListener('mouseleave', function() {
+                var activeNode = document.activeElement;
+                // If focus is on a navigation item
+                if (activeNode.closest('[data-tw-totaranav-item]')) {
                     that.closeAllExpandedLists();
                 }
             });
