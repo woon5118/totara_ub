@@ -13,10 +13,7 @@ Feature: Ability to edit or delete the course's section audience availability af
   Scenario: Admin is able to edit the audience availability within course section after added
     Given I am on a totara site
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I follow "Course"
-    And I follow "Course101"
-    And I turn editing mode on
+    And I am on "Course101" course homepage with editing mode on
     And I edit the section "1"
     And I follow "Restrict access"
     And I click on "Add restriction..." "button"
@@ -38,10 +35,7 @@ Feature: Ability to edit or delete the course's section audience availability af
   Scenario: Admin is able to delete the audience availability within course's section
     Given I am on a totara site
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I follow "Course"
-    And I follow "Course101"
-    And I turn editing mode on
+    And I am on "Course101" course homepage with editing mode on
     And I edit the section "1"
     And I follow "Restrict access"
     And I click on "Add restriction..." "button"
