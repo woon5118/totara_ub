@@ -7799,7 +7799,10 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
     $PAGE->set_context(null); // hack - set context to something, by default to system context
 
     $site = get_site();
-    require_login();
+
+    // TOTARA: Do not automatically log guest users in. If guests are allowed to access the page they will need to choose to log in
+    // as a guest, or of course log in with a valid account.
+    require_login(null, false);
 
     if (!empty($options['pagelayout'])) {
         // A specific page layout has been requested.
