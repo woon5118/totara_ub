@@ -122,7 +122,7 @@ class mod_chat_userdata_messages_test extends chat_testcase {
             'human_time' => $date->format('F j, Y, g:i a T'),
         ];
 
-        if ($expected->system) {
+        if ($expected->issystem) {
             switch ($expected->message) {
                 case 'enter':
                     $message['message'] = get_string('messageenter', 'chat', fullname($user));
