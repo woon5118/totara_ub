@@ -1,4 +1,4 @@
-@mod @mod_forum
+@mod @mod_forum @javascript
 Feature: A teacher can set one of 3 possible options for tracking read forum posts
   In order to ease the forum posts follow up
   As a user
@@ -20,8 +20,9 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | student2 | C1 | student |
     And I log in as "admin"
     And I am on site homepage
-    And I follow "Course 1"
     And I turn editing mode on
+    And I add the "Main menu" block
+    And I follow "Course 1"
 
   Scenario: Tracking forum posts off
     Given I add a "Forum" to section "1" and I fill the form with:
@@ -194,7 +195,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
     And I am on site homepage
     And I reload the page
     And "Site announcements" "link" should exist in the "Main menu" "block"
-    And I click on "Site announcements" "link"
+    And I click on "Site announcements" "link" in the "Main menu" "block"
     And I navigate to "Edit settings" node in "Forum administration"
     And I set the following fields to these values:
       | Read tracking | Forced |
@@ -210,7 +211,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
     Then I should see "Test post message...Read the rest of this topic" in the "div .unread" "css_element"
     And I reload the page
     And I should see "Test post message...Read the rest of this topic" in the "div .unread" "css_element"
-    And I click on "Site announcements" "link"
+    And I click on "Site announcements" "link" in the "Main menu" "block"
     And I should see "1" in the "//table[@class='forumheaderlist']/tbody/tr[1]/td[count(//thead//tr/th[text()='Unread']/preceding-sibling::*)+2]" "xpath_element"
     And I am on site homepage
     When I click on "Read the rest of this topic" "link"
