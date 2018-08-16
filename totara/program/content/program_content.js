@@ -530,9 +530,15 @@ M.totara_programcontent = M.totara_programcontent || {
         $('input[name=cancel]').css('display', 'none');
         $('input[name=update]').css('display', 'none');
         $('input.deletebutton').css('display', 'none');
-        $('div.courseadder select').css('display', 'none');
-        $('div.courseadder input:submit').val(M.util.get_string('addcourses', 'totara_program'));
         $('div.setbuttons .updatebutton').css('display', 'none');
+
+        $('div.courseadder input:button').each(function() {
+            var e = $(this);
+            var prefix = e.data('program-courseset-prefix');
+            e.off('click').on('click', function() { // Prevent event being added multiple times due initCoursesets() calls.
+                M.totara_programcontent.amendCourses(prefix);
+            });
+        });
 
         var setprefixes_ce = $('input:hidden[name=setprefixes_ce]').val();
         var setprefixesarray = [];

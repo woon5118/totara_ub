@@ -1591,24 +1591,14 @@ class multi_course_set extends course_set {
         $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
         $templatehtml .= html_writer::tag('div', '', array('class' => 'fitemtitle'));
         $templatehtml .= html_writer::start_tag('div', array('class' => 'courseadder felement'));
-        $coursenames = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
-        $courseoptions = array();
-        foreach ($coursenames as $coursename) {
-            $courseoptions[] = format_string($coursename);
+
+        if ($updateform) {
+            $mform->addElement('button', $prefix . 'addcourse', get_string('addcourses', 'totara_program'),
+                               array('data-program-courseset-prefix' => $prefix));
+            $template_values['%' . $prefix . 'addcourse%'] = array('name' => $prefix . 'addcourse', 'value' => null);
+            $templatehtml .= '%' . $prefix . 'addcourse%' . "\n";
         }
-        if (count($courseoptions) > 0) {
-            if ($updateform) {
-                $mform->addElement('select',  $prefix.'courseid', '', $courseoptions);
-                $mform->addElement('submit', $prefix.'addcourse', get_string('addcourse', 'totara_program'),
-                                 array('onclick' => "return M.totara_programcontent.amendCourses('$prefix')"));
-                $template_values['%'.$prefix.'courseid%'] = array('name' => $prefix.'courseid', 'value' => null);
-                $template_values['%'.$prefix.'addcourse%'] = array('name' => $prefix.'addcourse', 'value' => null);
-            }
-            $templatehtml .= '%'.$prefix.'courseid%'."\n";
-            $templatehtml .= '%'.$prefix.'addcourse%'."\n";
-        } else {
-            $templatehtml .= html_writer::tag('p', get_string('nocoursestoadd', 'totara_program'));
-        }
+
         $templatehtml .= html_writer::end_tag('div'); // End felement.
         $templatehtml .= html_writer::end_tag('div'); // End fitem.
 
