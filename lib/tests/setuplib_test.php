@@ -40,7 +40,7 @@ class core_setuplib_testcase extends advanced_testcase {
     public function test_get_docs_url_standard() {
         global $CFG;
         if (empty($CFG->docroot)) {
-            $docroot = 'http://docs.moodle.org';
+            $docroot = 'https://docs.moodle.org';
         } else {
             $docroot = $CFG->docroot;
         }
