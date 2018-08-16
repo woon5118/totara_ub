@@ -354,5 +354,16 @@ function xmldb_totara_core_upgrade($oldversion) {
         // Core savepoint reached.
         upgrade_plugin_savepoint(true, 2018071000, 'totara', 'core');
     }
+
+    if ($oldversion < 2018082000) {
+        // Moodle changed their default from http to https so we replace that as well
+        if (get_config('core', 'docroot') == 'https://docs.moodle.org') {
+            set_config('docroot', '');
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018082000, 'totara', 'core');
+    }
+
     return true;
 }
