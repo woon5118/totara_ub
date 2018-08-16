@@ -433,6 +433,9 @@ EOD;
             $record['tags'] = preg_split('/\s*,\s*/', trim($record['tags']), -1, PREG_SPLIT_NO_EMPTY);
         }
 
+        // This column is always 1 as it is not used but we need to so the event snapshots don't fail
+        $record['visibleoncoursepage'] = 1;
+
         $course = create_course((object)$record);
         context_course::instance($course->id);
         if (!empty($options['createsections'])) {

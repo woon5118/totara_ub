@@ -752,6 +752,8 @@ class course_modinfo {
  * @property-read int $added Time that this course-module was added (unix time) - from course_modules table
  * @property-read int $visible Visible setting (0 or 1; if this is 0, students cannot see/access the activity) - from
  *    course_modules table
+ * @property-read int $visibleoncoursepage Visible on course page setting - from course_modules table, adjusted to
+ *    whether course format allows this module to have the "stealth" mode
  * @property-read int $visibleold Old visible setting (if the entire section is hidden, the previous value for
  *    visible is stored in this field) - from course_modules table
  * @property-read int $groupmode Group mode (one of the constants NOGROUPS, SEPARATEGROUPS, or VISIBLEGROUPS) - from
@@ -894,6 +896,12 @@ class cm_info implements IteratorAggregate {
      * @var int
      */
     private $visible;
+
+    /**
+     * Visible on course page setting - from course_modules table
+     * @var int
+     */
+    private $visibleoncoursepage;
 
     /**
      * Old visible setting (if the entire section is hidden, the previous value for
@@ -1061,6 +1069,12 @@ class cm_info implements IteratorAggregate {
     private $uservisible;
 
     /**
+     * True if this course-module is visible to the CURRENT user on the course page
+     * @var bool
+     */
+    private $uservisibleoncoursepage;
+
+    /**
      * @var moodle_url
      */
     private $url;
@@ -1155,6 +1169,7 @@ class cm_info implements IteratorAggregate {
         'showdescription' => false,
         'uservisible' => 'get_user_visible',
         'visible' => false,
+        'visibleoncoursepage' => false,
         'visibleold' => false,
         'deletioninprogress' => false
     );
@@ -1608,7 +1623,7 @@ class cm_info implements IteratorAggregate {
 
         // Standard fields from table course_modules.
         static $cmfields = array('id', 'course', 'module', 'instance', 'section', 'idnumber', 'added',
-            'score', 'indent', 'visible', 'visibleold', 'groupmode', 'groupingid',
+            'score', 'indent', 'visible', 'visibleoncoursepage', 'visibleold', 'groupmode', 'groupingid',
             'completion', 'completiongradeitemnumber', 'completionview', 'completionexpected',
             'showdescription', 'availability', 'deletioninprogress');
         foreach ($cmfields as $key) {
@@ -1784,6 +1799,8 @@ class cm_info implements IteratorAggregate {
         $this->idnumber         = isset($mod->idnumber) ? $mod->idnumber : '';
         $this->name             = $mod->name;
         $this->visible          = $mod->visible;
+        // Totara: We don't use the column so we make it optional
+        $this->visibleoncoursepage = isset($mod->visibleoncoursepage) ? $mod->visibleoncoursepage : 1;
         $this->sectionnum       = $mod->section; // Note weirdness with name here
         $this->groupmode        = isset($mod->groupmode) ? $mod->groupmode : 0;
         $this->groupingid       = isset($mod->groupingid) ? $mod->groupingid : 0;

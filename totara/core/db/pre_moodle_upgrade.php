@@ -39,3 +39,31 @@ $field = new xmldb_field('invalidatecache', XMLDB_TYPE_INTEGER, '1', null, null,
 if (!$dbman->field_exists($table, $field)) {
     $dbman->add_field($table, $field);
 }
+
+// Dealing with oauth2 plugins which we didn't take as of Totara 12.
+// If the plugin is taken at some stage, the code below as well as this comment may be removed.
+
+$plugin_exists = file_exists("{$CFG->dirroot}/auth/oauth2/version.php");
+$users_exist = $DB->count_records_sql("SELECT count(id) from {user} WHERE auth = 'oauth2'") > 0;
+
+if (!($plugin_exists && $users_exist)) {
+    uninstall_plugin('auth', 'oauth2');
+    if ($dbman->table_exists($table = 'auth_oauth2_linked_login')) {
+        $xmldb_table = new xmldb_table($table);
+        $DB->get_manager()->drop_table($xmldb_table);
+    }
+}
+
+// Dealing with repository onedrive plugin which we didn't take as of Totara 12. (Requires oauth see above)
+// If the plugin is taken at some stage, the code below as well as this comment may be removed.
+
+$plugin_exists = file_exists("{$CFG->dirroot}/repository/onedrive/version.php");
+$instances = $DB->count_records_sql("SELECT count(id) from {repository_onedrive_access}") > 0;
+
+if (!($plugin_exists && $instances)) {
+    uninstall_plugin('repository', 'onedrive');
+    if ($dbman->table_exists($table = 'repository_onedrive_access')) {
+        $xmldb_table = new xmldb_table($table);
+        $DB->get_manager()->drop_table($xmldb_table);
+    }
+}
