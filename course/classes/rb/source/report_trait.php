@@ -96,10 +96,18 @@ trait report_trait {
                 )
             )
         );
+        $audvisibility = get_config(null, 'audiencevisibility');
+        if (empty($audvisibility)) {
+            $coursevisiblestring = get_string('coursevisible', 'totara_reportbuilder');
+            $audvisibilitystring = get_string('audiencevisibilitydisabled', 'totara_reportbuilder');
+        } else {
+            $coursevisiblestring = get_string('coursevisibledisabled', 'totara_reportbuilder');
+            $audvisibilitystring = get_string('audiencevisibility', 'totara_reportbuilder');
+        }
         $columnoptions[] = new \rb_column_option(
             'course',
             'visible',
-            get_string('coursevisible', 'totara_reportbuilder'),
+            $coursevisiblestring,
             "$join.visible",
             array(
                 'joins' => $join,
@@ -109,7 +117,7 @@ trait report_trait {
         $columnoptions[] = new \rb_column_option(
             'course',
             'audvis',
-            get_string('audiencevisibility', 'totara_reportbuilder'),
+            $audvisibilitystring,
             "$join.audiencevisible",
             array(
                 'joins' => $join,

@@ -170,10 +170,18 @@ trait report_trait {
                     'prog_certifid' => "$join.certifid")
             )
         );
+        $audvisibility = get_config(null, 'audiencevisibility');
+        if (empty($audvisibility)) {
+            $programvisiblestring = get_string('programvisible', $langfile);
+            $audvisibilitystring = get_string('audiencevisibilitydisabled', 'totara_reportbuilder');
+        } else {
+            $programvisiblestring = get_string('programvisibledisabled', $langfile);
+            $audvisibilitystring = get_string('audiencevisibility', 'totara_reportbuilder');
+        }
         $columnoptions[] = new \rb_column_option(
             'prog',
             'visible',
-            get_string('programvisible', $langfile),
+            $programvisiblestring,
             "$join.visible",
             array(
                 'joins' => $join,
@@ -183,7 +191,7 @@ trait report_trait {
         $columnoptions[] = new \rb_column_option(
             'prog',
             'audvis',
-            get_string('audiencevisibility', 'totara_reportbuilder'),
+            $audvisibilitystring,
             "$join.audiencevisible",
             array(
                 'joins' => $join,
