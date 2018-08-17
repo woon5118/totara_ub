@@ -474,8 +474,8 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         // Test where some posts have been marked as deleted.
         $posts = mod_forum_external::get_forum_discussion_posts($discussion->id, 'modified', 'DESC');
         $posts = external_api::clean_returnvalue(mod_forum_external::get_forum_discussion_posts_returns(), $posts);
-        $deletedsubject = get_string('privacy:request:delete:post:subject', 'mod_forum');
-        $deletedmessage = get_string('privacy:request:delete:post:message', 'mod_forum');
+        $deletedsubject = get_string('forumsubjectdeleted', 'mod_forum');
+        $deletedmessage = get_string('forumbodydeleted', 'mod_forum');
 
         foreach ($posts['posts'] as $post) {
             if ($post['id'] == $discussionreply2->id) {

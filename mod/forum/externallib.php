@@ -281,8 +281,8 @@ class mod_forum_external extends external_api {
                 $post->userfullname = null;
                 $post->userpictureurl = null;
 
-                $post->subject = get_string('privacy:request:delete:post:subject', 'mod_forum');
-                $post->message = get_string('privacy:request:delete:post:message', 'mod_forum');
+                $post->subject = get_string('forumsubjectdeleted', 'mod_forum');
+                $post->message = get_string('forumbodydeleted', 'mod_forum');
 
                 $post->deleted = true;
                 $posts[] = $post;

@@ -1681,6 +1681,13 @@ function forum_print_recent_activity($course, $viewfullnames, $timestart) {
         $subjectclass = empty($post->parent) ? ' bold' : '';
         $authorhidden = forum_is_author_hidden($post, (object) ['type' => $post->forumtype]);
 
+        if (!empty($post->deleted)) {
+            $authorhidden = true;
+            $subject = get_string('forumsubjectdeleted', 'forum');
+        } else {
+            $subject = $post->subject;
+        }
+
         $list .= html_writer::start_tag('li');
         $list .= html_writer::start_div('head');
         $list .= html_writer::div(userdate($post->modified, $strftimerecent), 'date');
@@ -1695,8 +1702,8 @@ function forum_print_recent_activity($course, $viewfullnames, $timestart) {
             $discussionurl->param('parent', $post->parent);
             $discussionurl->set_anchor('p'. $post->id);
         }
-        $post->subject = break_up_long_words(format_string($post->subject, true));
-        $list .= html_writer::link($discussionurl, $post->subject);
+        $subject = break_up_long_words(format_string($subject, true));
+        $list .= html_writer::link($discussionurl, $subject);
         $list .= html_writer::end_div(); // Info.
         $list .= html_writer::end_tag('li');
     }
@@ -2698,7 +2705,7 @@ function forum_get_discussions($cm, $forumsort="", $fullpost=true, $unused=-1, $
         $forumsort = forum_get_default_sort_order();
     }
     if (empty($fullpost)) {
-        $postdata = "p.id,p.subject,p.modified,p.discussion,p.userid";
+        $postdata = "p.id,p.subject,p.modified,p.discussion,p.userid,p.deleted";
     } else {
         $postdata = "p.*";
     }
@@ -2811,7 +2818,7 @@ function forum_get_discussion_neighbours($cm, $discussion, $forum) {
     $params['pinnedstate3'] = (int) $discussion->pinned;
     $params['pinnedstate4'] = (int) $discussion->pinned;
 
-    $sql = "SELECT d.id, d.name, d.timemodified, d.groupid, d.timestart, d.timeend
+    $sql = "SELECT d.id, d.name, d.timemodified, d.groupid, d.timestart, d.timeend, p.deleted
               FROM {forum_discussions} d
               JOIN {forum_posts} p ON d.firstpost = p.id
              WHERE d.forum = :forumid
@@ -3260,62 +3267,6 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         return;
     }
 
-    if (!empty($post->deleted)) {
-        // Note: Posts marked as deleted are still returned by the above forum_user_can_post because it is required for
-        // nesting of posts.
-        $output = '';
-        if (!$dummyifcantsee) {
-            if ($return) {
-                return $output;
-            }
-            echo $output;
-            return;
-        }
-        $output .= html_writer::tag('a', '', [
-                'id' => "p{$post->id}",
-            ]);
-        $output .= html_writer::start_tag('div', [
-                'class' => 'forumpost clearfix',
-                'role' => 'region',
-                'aria-label' => get_string('forumbodydeleted', 'forum'),
-            ]);
-
-        $output .= html_writer::start_tag('div', array('class' => 'row header'));
-        $output .= html_writer::tag('div', '', array('class' => 'left picture'));
-
-        $classes = ['topic'];
-        if (!empty($post->parent)) {
-            $classes[] = 'starter';
-        }
-        $output .= html_writer::start_tag('div', ['class' => implode(' ', $classes)]);
-
-        // Subject.
-        $output .= html_writer::tag('div', get_string('forumsubjectdeleted', 'forum'), [
-                'class' => 'subject',
-                'role' => 'header',
-            ]);
-
-        // Author.
-        $output .= html_writer::tag('div', '', [
-                'class' => 'author',
-                'role' => 'header',
-            ]);
-
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div'); // End row.
-        $output .= html_writer::start_tag('div', ['class' => 'row']);
-        $output .= html_writer::tag('div', '&nbsp;', ['class' => 'left side']); // Groups.
-        $output .= html_writer::tag('div', get_string('forumbodydeleted', 'forum'), ['class' => 'content']); // Content.
-        $output .= html_writer::end_tag('div'); // End row.
-        $output .= html_writer::end_tag('div'); // End forumpost.
-
-        if ($return) {
-            return $output;
-        }
-        echo $output;
-        return;
-    }
-
     if (empty($str)) {
         $str = new stdClass;
         $str->edit         = get_string('edit', 'forum');
@@ -3401,15 +3352,15 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     }
 
     if ($forum->type == 'single' and $discussion->firstpost == $post->id) {
-        if (has_capability('moodle/course:manageactivities', $modcontext)) {
+        if (!$post->deleted && has_capability('moodle/course:manageactivities', $modcontext)) {
             // The first post in single simple is the forum description.
             $commands[] = array('url'=>new moodle_url('/course/modedit.php', array('update'=>$cm->id, 'sesskey'=>sesskey(), 'return'=>1)), 'text'=>$str->edit);
         }
-    } else if (($ownpost && $age < $CFG->maxeditingtime) || $cm->cache->caps['mod/forum:editanypost']) {
+    } else if (!$post->deleted && (($ownpost && $age < $CFG->maxeditingtime) || $cm->cache->caps['mod/forum:editanypost'])) {
         $commands[] = array('url'=>new moodle_url('/mod/forum/post.php', array('edit'=>$post->id)), 'text'=>$str->edit);
     }
 
-    if ($cm->cache->caps['mod/forum:splitdiscussions'] && $post->parent && $forum->type != 'single') {
+    if (!$post->deleted && $cm->cache->caps['mod/forum:splitdiscussions'] && $post->parent && $forum->type != 'single') {
         $commands[] = array('url'=>new moodle_url('/mod/forum/post.php', array('prune'=>$post->id)), 'text'=>$str->prune, 'title'=>$str->pruneheading);
     }
 
@@ -3472,7 +3423,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     }
 
     // Flag to indicate whether we should hide the author or not.
-    $authorhidden = forum_is_author_hidden($post, $forum);
+    $authorhidden = !empty($post->deleted) || forum_is_author_hidden($post, $forum);
     $postbyuser = new stdClass;
     $postbyuser->post = $post->subject;
     $postbyuser->user = $postuser->fullname;
@@ -3493,9 +3444,13 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
 
     // Begin topic column.
     $output .= html_writer::start_div($topicclass);
-    $postsubject = $post->subject;
-    if (empty($post->subjectnoformat)) {
-        $postsubject = format_string($postsubject);
+    if (!empty($post->deleted)) {
+        $postsubject = get_string('forumsubjectdeleted', 'forum');
+    } else {
+        $postsubject = $post->subject;
+        if (empty($post->subjectnoformat)) {
+            $postsubject = format_string($postsubject);
+        }
     }
     $output .= html_writer::div($postsubject, 'subject', ['role' => 'heading', 'aria-level' => '2']);
 
@@ -3561,6 +3516,10 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
                 array('class'=>'post-word-count'));
         }
         $postcontent .= html_writer::tag('div', $attachedimages, array('class'=>'attachedimages'));
+    }
+
+    if (!empty($post->deleted)) {
+        $postcontent = get_string('forumbodydeleted', 'forum');
     }
 
     // Output the post content
@@ -3874,7 +3833,13 @@ function forum_print_discussion_header(&$post, $forum, $group = -1, $datestring 
         echo $PAGE->get_renderer('mod_forum')->timed_discussion_tooltip($post, empty($timedoutsidewindow));
     }
 
-    echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'">'.$post->subject.'</a>';
+    if ($post->deleted) {
+        $subject = get_string('forumdiscussiondeleted', 'mod_forum');
+    } else {
+        $subject = $post->subject;
+    }
+    
+    echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'">'.$subject.'</a>';
     if (forum_discussion_is_locked($forum, $post)) {
         echo $OUTPUT->flex_icon('lock', array('alt' => get_string('discussionlocked', 'mod_forum')));
     }
@@ -5293,9 +5258,10 @@ function forum_user_can_see_group_discussion($discussion, $cm, $context) {
  * @param object $discussion
  * @param object $context
  * @param object $user
+ * @param   bool      $checkdeleted Whether to check the deleted flag on the post.
  * @return bool
  */
-function forum_user_can_see_discussion($forum, $discussion, $context, $user=NULL) {
+function forum_user_can_see_discussion($forum, $discussion, $context, $user=NULL, $checkdeleted = true) {
     global $USER, $DB;
 
     if (empty($user) || empty($user->id)) {
@@ -5317,6 +5283,10 @@ function forum_user_can_see_discussion($forum, $discussion, $context, $user=NULL
     }
     if (!$cm = get_coursemodule_from_instance('forum', $forum->id, $forum->course)) {
         print_error('invalidcoursemodule');
+    }
+
+    if ($checkdeleted && !empty($discussion->deleted)) {
+        return false;
     }
 
     if (!has_capability('mod/forum:viewdiscussion', $context)) {
@@ -5909,7 +5879,7 @@ function forum_print_posts_threaded($course, &$cm, $forum, $discussion, $parent,
                 if (!forum_user_can_see_post($forum, $discussion, $post, null, $cm, true)) {
                     if (forum_user_can_see_post($forum, $discussion, $post, null, $cm, false)) {
                         // This post has been deleted but still exists and may have children.
-                        $subject = get_string('privacy:request:delete:post:subject', 'mod_forum');
+                        $subject = get_string('forumsubjectdeleted', 'mod_forum');
                         $byline = '';
                     } else {
                         // The user can't see this post at all.
@@ -6078,11 +6048,18 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
     foreach ($printposts as $post) {
         $authorhidden = forum_is_author_hidden((object)['parent' => $post->parent], (object)['type' => $post->forumtype]);
 
+        if (!empty($post->deleted)) {
+            $authorhidden = true;
+            $subject = get_string('forumsubjectdeleted', 'forum');
+        } else {
+            $subject = $post->subject;
+        }
+
         $tmpactivity = new stdClass();
 
         // Fields required for display.
         $tmpactivity->timestamp    = $post->modified;
-        $tmpactivity->text         = format_string($post->subject);
+        $tmpactivity->text         = format_string($subject);
         $tmpactivity->link         = (new moodle_url('/mod/forum/discuss.php', ['d' => $post->discussion]))->out();
 
         if (!$authorhidden) {
@@ -6104,7 +6081,7 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
         $tmpactivity->content = new stdClass();
         $tmpactivity->content->id         = $post->id;
         $tmpactivity->content->discussion = $post->discussion;
-        $tmpactivity->content->subject    = format_string($post->subject);
+        $tmpactivity->content->subject    = format_string($subject);
         $tmpactivity->content->parent     = $post->parent;
         $tmpactivity->content->forumtype  = $post->forumtype;
 
@@ -6148,6 +6125,13 @@ function forum_print_recent_mod_activity($activity, $courseid, $detail, $modname
     $forum = (object) ['type' => $content->forumtype];
     $authorhidden = forum_is_author_hidden($post, $forum);
 
+    if (!empty($content->deleted)) {
+        $authorhidden = true;
+        $subject = get_string('forumsubjectdeleted', 'forum');
+    } else {
+        $subject = $content->subject;
+    }
+
     // Show user picture if author should not be hidden.
     if (!$authorhidden) {
         $pictureoptions = [
@@ -6175,7 +6159,7 @@ function forum_print_recent_mod_activity($activity, $courseid, $detail, $modname
     }
     $discussionurl = new moodle_url('/mod/forum/discuss.php', ['d' => $content->discussion]);
     $discussionurl->set_anchor('p' . $activity->content->id);
-    $output .= html_writer::link($discussionurl, $content->subject);
+    $output .= html_writer::link($discussionurl, $subject);
     $output .= html_writer::end_div();
 
     $timestamp = userdate($activity->timestamp);

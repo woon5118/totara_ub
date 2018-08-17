@@ -222,7 +222,11 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
     $post->forum       = $forum->id;
     $post->discussion  = $parent->discussion;
     $post->parent      = $parent->id;
-    $post->subject     = $parent->subject;
+    if (!empty($parent->deleted)) {
+        $post->subject = get_string('forumsubjectdeleted', 'forum');
+    } else {
+        $post->subject = $parent->subject;
+    }
     $post->userid      = $USER->id;
     $post->message     = '';
 
@@ -275,6 +279,9 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
         print_error('cannoteditposts', 'forum');
     }
 
+    if (!empty($post->deleted)) {
+        print_error('forumsubjectdeleted', 'forum');
+    }
 
     // Load up the $post variable.
     $post->edit   = $edit;
@@ -436,6 +443,10 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
     }
     if (!has_capability('mod/forum:splitdiscussions', $modcontext)) {
         print_error('cannotsplit', 'forum');
+    }
+
+    if (!empty($post->deleted)) {
+        print_error('forumsubjectdeleted', 'forum');
     }
 
     $PAGE->set_cm($cm);
