@@ -1493,8 +1493,12 @@ function facetoface_notify_under_capacity() {
 
         // And send them the notification.
         foreach ($recipients as $recipient) {
-            $eventdata->userto = $recipient;
-            tm_alert_send($eventdata);
+            // At this point, to prevent the object $eventdata added up data, it needed to be cloned and reset after sent
+            /** @var stdClass $shadowcopy */
+            $shadowcopy = clone $eventdata;
+            $shadowcopy->userto = $recipient;
+            tm_alert_send($shadowcopy);
+            unset($shadowcopy);
         }
     }
 }
