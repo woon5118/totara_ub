@@ -50,6 +50,10 @@ class event extends \moodleform {
     /** @var context_module */
     protected $returnurl;
 
+    protected $users_roles_in_conflict;
+    
+    Protected $has_date_changed;
+
     function definition() {
         global $CFG;
 
@@ -231,14 +235,6 @@ class event extends \moodleform {
             }
         }
 
-        // If conflicts are disabled
-        if (!empty($CFG->facetoface_allowschedulingconflicts)) {
-            $mform->addElement('selectyesno', 'allowconflicts', get_string('allowschedulingconflicts', 'facetoface'));
-            $mform->setDefault('allowconflicts', 0); // defaults to 'no'
-            $mform->addHelpButton('allowconflicts', 'allowschedulingconflicts', 'facetoface');
-            $mform->setType('allowconflicts', PARAM_BOOL);
-        }
-
         // Show all custom fields. Customfield support.
         if (!$this->session) {
             $this->session = new \stdClass();
@@ -396,11 +392,13 @@ class event extends \moodleform {
 
         $errors = parent::validation($data, $files);
         $facetofaceid = $this->_customdata['f'];
+        $session = $this->session;
         $dates = array();
         $dateids = isset($data['sessiondateid']) ? $data['sessiondateid'] : array();
         $datecount = count($dateids);
         $deletecount = 0;
         $errdates = array();
+        $users_in_conflict = array();
         for ($i=0; $i < $datecount; $i++) {
             if (!empty($data['datedelete'][$i])) {
                 // Ignore dates marked for deletion.
@@ -498,6 +496,7 @@ class event extends \moodleform {
             // Because of this we treat the dates as having changed.
             $dateschanged = true;
         }
+        $this->has_date_changed = $dateschanged;
 
         if(!empty($data['registrationtimestart']) && !empty($data['registrationtimefinish'])) {
             $start = $data['registrationtimestart'];
@@ -509,53 +508,36 @@ class event extends \moodleform {
             }
         }
 
-        // Check the availabilty of trainers if scheduling not allowed
+        // Check approval by role.
         $trainerdata = !empty($data['trainerrole']) ? $data['trainerrole'] : array();
-        $allowconflicts = !empty($data['allowconflicts']);
-
-        if ($dates && !$allowconflicts && is_array($trainerdata)) {
+        if ($dates && is_array($trainerdata)) {
+            // Seminar approval by role is set, required at least one role selected.
+            $selectedroleids = array();
+            // Query to load users with roles the seminar context.
             $wheresql = '';
             $whereparams = array();
-            if (!empty($this->_customdata['s'])) {
-                $wheresql = ' AND s.id != ?';
-                $whereparams[] = $this->_customdata['s'];
-            }
-
-            // Seminar approval by role is set, required at least one role selected.
-            $hasconflicts = 0;
-            $selectedroleids = array();
             $usernamefields = get_all_user_name_fields(true, 'u');
+            if (!empty($session)) {
+                $wheresql = ' AND s.id != ?';
+                $whereparams[] = $session->id;
+            }
             // Loop through roles.
             foreach ($trainerdata as $roleid => $trainers) {
                 // Attempt to load users with this role in this context.
                 $trainerlist = get_role_users($roleid, $this->context, true, "u.id, {$usernamefields}", 'u.id ASC');
-
-                // Initialize error variable.
-                $trainererrors = '';
-                // Loop through trainers in this role.
                 foreach ($trainers as $trainer) {
-
+                    // Skip not selected trainers.
                     if (!$trainer) {
                         continue;
-                    } else {
-                        $selectedroleids[] = $roleid;
                     }
+
+                    $selectedroleids[] = $roleid;
 
                     // Check their availability.
                     $availability = facetoface_get_sessions_within($dates, $trainer, $wheresql, $whereparams);
                     if (!empty($availability)) {
-                        // Verify if trainers come in form of checkboxes or dropdown list to properly place the errors.
-                        if (isset($this->_form->_types["trainerrole[{$roleid}][{$trainer}]"])) {
-                            $errors["trainerrole[{$roleid}][{$trainer}]"] = facetoface_get_session_involvement($trainerlist[$trainer], $availability);
-                        } else if (isset($this->_form->_types["trainerrole[{$roleid}]"])) {
-                            $trainererrors .= \html_writer::tag('div', facetoface_get_session_involvement($trainerlist[$trainer], $availability));
-                        }
-                        ++$hasconflicts;
+                        $users_in_conflict[] = $trainerlist[$trainer];
                     }
-                }
-
-                if (isset($this->_form->_types["trainerrole[{$roleid}]"]) && $trainererrors != '') {
-                    $errors["trainerrole[{$roleid}]"] = $trainererrors;
                 }
             }
             $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
@@ -563,14 +545,6 @@ class event extends \moodleform {
             if ($facetoface->approvaltype == APPROVAL_ROLE && !in_array($facetoface->approvalrole, $selectedroleids)) {
                 $rolenames = role_get_names($this->context);
                 $errors['roleapprovalerror'] = get_string('error:rolerequired', 'facetoface', $rolenames[$facetoface->approvalrole]->localname);
-            }
-            // If there are conflicts, add a help message to checkbox
-            if ($hasconflicts) {
-                if ($hasconflicts > 1) {
-                    $errors['allowconflicts'] = get_string('error:therearexconflicts', 'facetoface', $hasconflicts);
-                } else {
-                    $errors['allowconflicts'] = get_string('error:thereisaconflict', 'facetoface');
-                }
             }
         }
 
@@ -639,7 +613,27 @@ class event extends \moodleform {
         if (!empty($errdates)) {
             $errors['errors'] = implode(\html_writer::empty_tag('br'), $errdates);
         }
+        $this->users_roles_in_conflict = $users_in_conflict;
+
         return $errors;
+    }
+
+    function get_users_in_conflict() {
+        if (!($data = $this->get_data())) { // Form submitted
+            return array();
+        }
+
+        // Check for conflicts only if it's a new session or there was a change in dates or user with roles were added.
+        if ($this->session != false && $this->has_date_changed == false && $this->new_user_roles_added($data) == false) {
+            return array();
+        }
+
+        // If save with conflict passed then we don't need to return the users with conflicts.
+        if ($this->_customdata['savewithconflicts']) {
+            return array() ;
+        }
+
+        return $this->users_roles_in_conflict;
     }
 
     /**
@@ -733,6 +727,41 @@ class event extends \moodleform {
             }
         }
         return array($sessiondata, $editoroptions, $defaulttimezone, $nbdays);
+    }
+
+    public function new_user_roles_added($data) {
+        global $DB;
+        $trainersindb = array();
+        $newusersadded = false;
+
+        // Get data trainers from the form.
+        $trainerdatafromform = !empty($data->trainerrole) ? $data->trainerrole : array();
+        // Get user roles from database.
+        $userroles = $DB->get_records('facetoface_session_roles', array('sessionid' => $data->s));
+        foreach ($userroles as $userrole) {
+            $trainersindb[$userrole->roleid][$userrole->userid] = 0;
+        }
+
+        foreach ($trainerdatafromform as $roleid => $trainers) {
+            foreach ($trainers as $trainerid => $selected) {
+                // Exclude not selected trainers.
+                if (!$selected) {
+                    continue;
+                }
+                // Check if the selected user is not already assigned.
+                if (!isset($trainersindb[$roleid])) {
+                    // No records in DB for this role. New users added to the role.
+                    $newusersadded = true;
+                    break;
+                } else if (!array_key_exists($trainerid, $trainersindb[$roleid])) {
+                    // The selected user cannot be found for the current role in DB.
+                    $newusersadded = true;
+                    break;
+                }
+            }
+        }
+
+        return $newusersadded;
     }
 
     public function process_data() {

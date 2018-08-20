@@ -34,6 +34,7 @@ $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $c = optional_param('c', 0, PARAM_INT); // copy session
 $cntdates = optional_param('cntdates', 0, PARAM_INT); // Number of events to set.
 $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
+$savewithconflicts = optional_param('savewithconflicts', 0, PARAM_BOOL); // Save with conflicts.
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 $s = $session->id;
@@ -87,14 +88,21 @@ if ($backtoallsessions) {
 
 list($sessiondata, $editoroptions, $defaulttimezone, $nbdays) = \mod_facetoface\form\event::prepare_data($session, $facetoface, $course, $context, $cntdates, $c);
 
-$mform = new \mod_facetoface\form\event(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata', 'backtoallsessions'));
+$mform = new \mod_facetoface\form\event(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata', 'backtoallsessions', 'savewithconflicts'), 'post', '', array('id' => 'mform_seminar_event'));
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 if ($todb = $mform->process_data()) { // Form submitted
-    $mform->save($todb);
-    redirect($returnurl);
+    // Gets user scheduling conflicts for roles in the event.
+    $users_in_conflict = $mform->get_users_in_conflict();
+    if (empty($users_in_conflict)) {
+        $mform->save($todb);
+        redirect($returnurl);
+    } else {
+        $text = facetoface_build_user_roles_in_conflict_message($users_in_conflict);
+        $PAGE->requires->js_call_amd('mod_facetoface/user_conflicts_confirm', 'init', array('note' => $text));
+    }
 }
 $actionheading = 'editingsession';
 if ($c) {

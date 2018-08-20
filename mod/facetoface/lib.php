@@ -5206,6 +5206,27 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
 }
 
 /**
+ * Build user roles in conflict message, used when saving an event.
+ *
+ * @param array $users_in_conflict Array of users in conflict.
+ * @return string Message
+ */
+function facetoface_build_user_roles_in_conflict_message($users_in_conflict) {
+    if (empty($users_in_conflict)) {
+        return '';
+    }
+
+    foreach ($users_in_conflict as $user) {
+        $users[] = fullname($user);
+    }
+    $details = new stdClass();
+    $details->users = implode('; ', $users);
+    $details->userscount = count($users_in_conflict);
+
+    return format_text(get_string('userschedulingconflictdetected_body', 'facetoface', $details));
+}
+
+/**
  * Sets totara_set_notification message describing bulk import results
  * @param array $results
  * @param string $type

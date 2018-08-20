@@ -77,7 +77,8 @@ Feature: Seminar event cancellation trainer can be reassigned
     And I press "OK"
     And I click on "Teacher One" "checkbox"
     When I press "Save changes"
-    Then I should see "Teacher One is already assigned as a 'Trainer'"
+    Then I should see "Saving this event as it is will cause a scheduling conflict"
+    And I click on "Cancel" "button" in the ".modal" "css_element"
     And I log out
 
   # Check that the when an event was cancelled the trainer can be reassigned to a new event with the same dates.

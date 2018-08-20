@@ -2369,6 +2369,8 @@ $string['nositenotices'] = '<p>No site notices are defined.</p>';
 $string['noticedeleteconfirm'] = 'Delete site notice \'{$a->name}\'?<br/><blockquote>{$a->text}</blockquote>';
 $string['noticetext'] = 'Notice text';
 $string['position'] = 'Position';
+$string['savewithuserconflicts'] = 'Save with user conflict';
+$string['savewithuserconflicts_header'] = 'User scheduling conflict detected';
 $string['selectedpositionassignment'] = 'Position Assignment on sign up';
 $string['selectedpositionname'] = 'Position Name on sign up';
 $string['selectedpositiontype'] = 'Position Type on sign up';
@@ -2392,6 +2394,11 @@ $string['setting:sitenoticeshere'] = 'here';
 $string['sitenoticesheading'] = 'Site Notices';
 $string['updateposition'] = 'Update position';
 $string['userpositionheading'] = '{$a} - update selected position';
+$string['userschedulingconflictdetected_body'] = 'Saving this event as it is will cause a scheduling conflict for {$a->userscount} individual/s:
+{$a->users}
+
+Please cancel and go back to change the settings (recommended), or save with conflict.';
+$string['userschedulingconflictdetected_title'] = 'User scheduling conflict detected';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following session';
 
 # Deprecated

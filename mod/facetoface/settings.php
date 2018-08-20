@@ -75,9 +75,6 @@ if ($ADMIN->fulltree) { // Improve performance.
         new lang_string('setting:managerselect_caption', 'facetoface'),
         new lang_string('setting:managerselect_format', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'),
-        new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
-
     $settings->add(new admin_setting_configtext('facetoface_export_userprofilefields', new lang_string('exportuserprofilefields', 'facetoface'), new lang_string('exportuserprofilefields_desc', 'facetoface'), 'firstname,lastname,idnumber,institution,department,email', PARAM_TEXT));
 
     $settings->add(new admin_setting_configtext('facetoface_export_customprofilefields', new lang_string('exportcustomprofilefields', 'facetoface'), new lang_string('exportcustomprofilefields_desc', 'facetoface'), '', PARAM_TEXT));
