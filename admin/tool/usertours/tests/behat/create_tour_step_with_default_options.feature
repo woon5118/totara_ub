@@ -1,14 +1,14 @@
 @tool @tool_usertours
 Feature: Adding a step to a tour with the default set of options
-Background:
-  Given I am on a totara site
-  And I log in as "admin"
-  And I add a new user tour with:
-    | Name                     | Tour 1   |
-    | Description              | Tour 101 |
-    | Show with backdrop       | 1        |
-    | Show if target not found | 1        |
-    | Proceed on click         | 1        |
+  Background:
+    Given I am on a totara site
+    And I log in as "admin"
+    And I add a new user tour with:
+      | Name                     | Tour 1   |
+      | Description              | Tour 101 |
+      | Show with backdrop       | 1        |
+      | Show if target not found | 1        |
+      | Proceed on click         | 1        |
 
   @javascript
   Scenario: I add a step to a user's tour
