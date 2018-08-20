@@ -321,9 +321,9 @@ class feedback_item_multichoice extends feedback_item_base {
         if ($info->subtype === 'd' || ($info->subtype === 'r' && $form->is_frozen())) {
             // Display as a dropdown in the complete form or a single value in the response view.
             $element = $form->add_form_element($item,
-                    ['select', $inputname.'[0]', $name, array(0 => '') + $options, array('class' => $class)],
+                    ['select', $inputname, $name, array(0 => '') + $options, array('class' => $class)],
                     false, false);
-            $form->set_element_default($inputname.'[0]', $tmpvalue);
+            $form->set_element_default($inputname, $tmpvalue);
         } else if ($info->subtype === 'c' && $form->is_frozen()) {
             // Display list of checkbox values in the response view.
             $objs = [];
@@ -355,16 +355,16 @@ class feedback_item_multichoice extends feedback_item_base {
                 // Radio.
                 if (!array_key_exists(0, $options)) {
                     // Always add '0' as hidden element, otherwise form submit data may not have this element.
-                    $objs[] = ['hidden', $inputname.'[0]'];
+                    $objs[] = ['hidden', $inputname];
                 }
                 foreach ($options as $idx => $label) {
-                    $objs[] = ['radio', $inputname.'[0]', '', $label, $idx];
+                    $objs[] = ['radio', $inputname, '', $label, $idx];
                 }
                 // Span to hold the element id. The id is used for drag and drop reordering.
                 $objs[] = ['static', '', '', html_writer::span('', '', ['id' => 'feedback_item_' . $item->id])];
                 $element = $form->add_form_group_element($item, 'group_'.$inputname, $name, $objs, $separator, $class);
-                $form->set_element_default($inputname.'[0]', $tmpvalue);
-                $form->set_element_type($inputname.'[0]', PARAM_INT);
+                $form->set_element_default($inputname, $tmpvalue);
+                $form->set_element_type($inputname, PARAM_INT);
             }
         }
 
@@ -373,7 +373,7 @@ class feedback_item_multichoice extends feedback_item_base {
             $elementname = $element->getName();
             $form->add_validation_rule(function($values, $files) use ($elementname, $item) {
                 $inputname = $item->typ . '_' . $item->id;
-                return empty($values[$inputname]) || !array_filter($values[$inputname]) ?
+                return empty($values[$inputname]) || (is_array($values[$inputname]) && !array_filter($values[$inputname])) ?
                     array($elementname => get_string('required')) : true;
             });
         }
@@ -385,8 +385,11 @@ class feedback_item_multichoice extends feedback_item_base {
      * @return string
      */
     public function create_value($value) {
-        $value = array_unique(array_filter($value));
-        return join(FEEDBACK_MULTICHOICE_LINE_SEP, $value);
+        if (is_array($value)) {
+            $value = array_unique(array_filter($value));
+            return join(FEEDBACK_MULTICHOICE_LINE_SEP, $value);
+        }
+        return parent::create_value($value);
     }
 
     /**
