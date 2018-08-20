@@ -46,7 +46,7 @@ if (!$dbman->field_exists($table, $field)) {
 $plugin_exists = file_exists("{$CFG->dirroot}/auth/oauth2/version.php");
 $users_exist = $DB->count_records_sql("SELECT count(id) from {user} WHERE auth = 'oauth2'") > 0;
 
-if (!($plugin_exists && $users_exist)) {
+if (!($plugin_exists || $users_exist)) {
     uninstall_plugin('auth', 'oauth2');
     if ($dbman->table_exists($table = 'auth_oauth2_linked_login')) {
         $xmldb_table = new xmldb_table($table);
@@ -60,7 +60,7 @@ if (!($plugin_exists && $users_exist)) {
 $plugin_exists = file_exists("{$CFG->dirroot}/repository/onedrive/version.php");
 $instances = $DB->count_records_sql("SELECT count(id) from {repository_onedrive_access}") > 0;
 
-if (!($plugin_exists && $instances)) {
+if (!($plugin_exists || $instances)) {
     uninstall_plugin('repository', 'onedrive');
     if ($dbman->table_exists($table = 'repository_onedrive_access')) {
         $xmldb_table = new xmldb_table($table);
