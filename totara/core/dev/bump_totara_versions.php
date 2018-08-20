@@ -86,6 +86,8 @@ list($moodleplugins, $totaraplugins) = dev_get_totara_and_moodle_plugins();
 if ($options['diffupstream']) {
     cli_heading('List of changed upstream plugin versions');
 
+    $exitcode = 0;
+
     foreach ($moodleplugins as $component => $fulldir) {
 
         $tag = dev_get_plugin_backported($fulldir);
@@ -97,23 +99,27 @@ if ($options['diffupstream']) {
         $ourversion = (string)dev_get_plugin_version($fulldir);
 
         if ($upstreamversion === $ourversion) {
-            continue;
-        }
+            if (!file_exists("$fulldir/db/totara_postupgrade.php")) {
+                continue;
+            }
+            $error = 'error, missing .01 bump (postupgrade present)';
+            $exitcode = 1;
 
-        $error = 'error';
-        if ($ourversion > $upstreamversion and $ourversion < floor($upstreamversion) + 1) {
-            $error = 'looks ok';
-        }
-        if ($component === 'tool_uploadcourse' and $upstreamversion === '2016120500' and $ourversion === '2016120501') {
-            $error = '   warning (potential problem from TL-15012)';
-        }
-        if (file_exists("$fulldir/db/totara_postupgrade.php")) {
-            $error .= ' (postupgrade present)';
+        } else {
+            $error = 'error';
+            if ($ourversion > $upstreamversion and $ourversion < floor($upstreamversion) + 1) {
+                $error = 'looks ok';
+            } else {
+                $exitcode = 1;
+            }
+            if (file_exists("$fulldir/db/totara_postupgrade.php")) {
+                $error .= ' (postupgrade present)';
+            }
         }
 
         cli_writeln(str_pad($component, 40, ' ', STR_PAD_RIGHT) . ' ' . $upstreamversion . ' ==> ' . $ourversion . ' ' . $error);
     }
-    die;
+    exit($exitcode);
 }
 
 cli_heading('List of ' . count($totaraplugins) . ' Totara plugins');
