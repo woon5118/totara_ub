@@ -3,6 +3,916 @@
 
 Totara Learn Changelog
 
+Release Evergreen (24th August 2018):
+=====================================
+
+Key:           + Evergreen only
+
+Security issues:
+
+    TL-18491       Added upstream security hardening patch for Quickforms library
+
+                   A remote code execution vulnerability was reported in the Quickforms
+                   library. This applied to other software but no such vulnerability was found
+                   in Totara. The changes made to fix this vulnerability have been taken to
+                   reduce risks associated with this code.
+
+Performance improvements:
+
+    TL-17598       Enrolments for courses added to an audience's enrolled learning are now processed by an adhoc task in the background
+
+                   Prior to this change course enrolments that were required when a course was
+                   added to an audiences enrolled learning were being processed immediately.
+                   This could lead to the user performing the action having to wait
+                   exceptionally long times on the page while this was processed. The fix for
+                   this issue was to shift this processing to a background task. Enrolments
+                   will now be processed exclusively by cron when adding courses to an
+                   audience's enrolled learning.
+
+Improvements:
+
+    TL-13987       Improved approval request messages sent to managers for Learning Plans
+
+                   Prior to this fix if a user requested approval for a learning plan then a
+                   message was sent to the user's manager with a link to approve the request,
+                   regardless of whether the manager actually had permission to view or
+                   approve the request. This fix sends more appropriate messages depending on
+                   the view and approve settings in the learning plan template.
+
+    TL-17124   +   The main menu block is no longer added to the home page by default for new installations
+    TL-17143   +   AMD modules can now be initialised using data attributes in HTML markup
+
+                   It is now possible to initialise AMD modules using data attributes in HTML
+                   markup. This is intended primarily for templates.
+
+    TL-17495   +   Redesigned top navigation, for a more compact style with added support for a third level of links
+
+                   Reworked the existing navigation, improving the user journey and added
+                   support for third-level links which will allow us to tie all of the Totara
+                   products together.
+                    * Redesigned navigation
+                    * Added third-level navigation
+                    * Moved logo into navigation bar
+                    * Moved messages and alerts into navigation
+                    * Moved language selector into navigation
+                    * Moved user menu into navigation
+
+                   The old navigation menu is now deprecated, but still available with some
+                   changes in code. See the following page for details
+                   https://help.totaralearning.com/display/DES/Totara+v12+navigation+revert
+
+    TL-17780       Added a warning message about certification changes not affecting users until they re-certify
+    TL-17910   +   The single button output component now supports a "primary" state
+    TL-17920       Added support for the 'coursetype' field in the 'upload courses' tool
+
+                   The 'coursetype' field will now accept either a string or an integer value
+                   from the map below:
+                    * 0 => elearning
+                    * 1 => blended
+                    * 2 => facetoface
+
+                   Within the 'upload courses' CSV file, the value for the 'coursetype' field
+                   can be either an integer value or a string value. If the value of
+                   'coursetype' was not within the expected range of values (as above), then
+                   the system will throw an error message when attempting to upload the
+                   course(s) or while previewing the course(s).
+
+                   If the field is missing from the CSV file or the value is empty, then the
+                   'coursetype' will be set to 'E-learning' by default. This is consistent
+                   with previous behaviour.
+
+    TL-18481       Improved the help strings for the 'Minimum time required' field within a program or certification course set
+
+                   Program and certification 'Course set due' and 'Course set overdue' message
+                   help strings have also been updated to convey that the 'Minimum time
+                   required' field is used to determine when a course set is due.
+
+    TL-18557   +   Added new base class for output elements that are using templates
+
+                   Output widgets can now extend \core\output\template. Once extended they can
+                   be given directly to a renderer's render method, and that renderer will
+                   render them from the template. With this approach there is no need to
+                   define any render methods at all, or to implement renderers for output
+                   widgets.
+
+    TL-18597       Improved the help text for the 'Notification recipients' global seminar setting
+
+                   The setting is located under the notifications header on the site
+                   administration > seminars > global settings page, the string changed
+                   was 'setting:sessionrolesnotify' within the EN language pack.
+                   Full updated text is: This setting affects *minimum
+                   booking* and *minimum booking cut-off* notifications. Make sure you
+                   select roles that can manage seminar events. Automated warnings will be
+                   sent to all users with selected role(s) in seminar activity, course,
+                   category, or system level.
+
+    TL-18640       Updated certif_completion join to use 'UNION ALL'
+
+                   The 'certif_completion' join in the 'rb_source_dp_certification' report
+                   source now uses 'UNION ALL', previously 'UNION', which will aid
+                   performance.
+
+    TL-18675       Added 'not applicable' text to visibility column names when audience visibility is enabled
+
+                   When audience based visibility is enabled it takes priority over other
+                   types of visibility. Having multiple visibility columns added to a report
+                   may cause confusion as to which type of visibility is being used. '(not
+                   applicable)' is now suffixed to the visibility column to clarify which type
+                   of visibility is inactive, e.g. 'Program Visible (not applicable)'.
+
+Bug fixes:
+
+    TL-17734       Fixed OpenSesame registration
+    TL-17755       Fixed user tours not working when administration block is missing on dashboard
+    TL-17767       Fixed multiple blocks of the same type not being restored upon course restore
+    TL-17824       Improved the reliability of Totara Connect SSO
+
+                   There is also a new login page parameter '?nosso=1' which may be used to
+                   temporarily disable Totara Connect SSO to allow logging in via local
+                   authentication method.
+
+    TL-17846       Content restrictions are now applied correctly for Report Builder filters utilising dialogs
+
+                   Before Totara Learn 9 the organisation and position content restriction
+                   rules were applied when displaying organisation and position filters in
+                   reports.
+
+                   With the introduction of multiple job assignments in Totara Learn 9,
+                   organisation and position report filters now use the generic totara dialog
+                   to display available organisation and position filter values.
+
+                   This patch added the application of the missing report content restriction
+                   rules when retrieving the data to display in totara dialogs used in report
+                   filters.
+
+    TL-17857       Deleting a 'featured links' block no longer leaves orphaned cohort visibility records
+    TL-17882       Recipient notification preferences are now checked before sending learning plan messages
+
+                   Previously when a new comment was added to a user's learning plan overview,
+                   the system would send an email to the target user notifying them about the
+                   comment. Now the user's preferences determine whether the email is sent to
+                   the user or not, specifically the
+                   "message_provider_moodle_competencyplancomment_loggedoff" and
+                   "message_provider_moodle_competencyplancomment_loggedin" preferences.
+
+    TL-17934       Fixed waitlisted users not being displayed in seminar reports that included session date columns
+
+                   Previously waitlisted users would be displayed in seminar reports that did
+                   not contain session dates, but would disappear if a column related to
+                   session dates was added (specifically the session start, session finish,
+                   event start time, event finish time columns). Now the waitlisted users will
+                   always be displayed regardless of these columns, however the columns will
+                   be blank or 'not specified' for these users.
+
+    TL-17936       Report builder graphs now use the sort order from the underlying report
+
+                   When scheduled reports were sent, the report data was correctly ordered,
+                   but the graph (if included) was not being ordered correctly. The ordering
+                   of the graph now matches the order in the graph table.
+
+    TL-17938       Fixed encoding issues using Scandinavian characters in a Location custom field address
+
+                   This issue only affected Internet Explorer 11. All other browsers handled
+                   the UTF8 character natively.
+
+    TL-17955       Progress bar and tooltips in the Current Learning block now work properly with pagination
+    TL-17970       Backported MDL-62239 to fix broken drag-drop of question types on iOS 11.3
+    TL-17973       Searching a report configured to use custom fields no longer fails after referenced fields have been deleted
+
+                   Previously if a custom field was included in searchable fields for a
+                   toolbar search within report builder, and that custom field was then
+                   deleted, when a user attempted to search the report using the toolbar
+                   search they would get an error. The toolbar search now checks that fields
+                   still exists before attempting to perform a search on them.
+
+    TL-17977       Users editing Program assignments are now only shown the option to assign audiences if they have the required capability
+
+                   Previously if a user did not have moodle/cohort:view capability and tried
+                   to assign an audience to a program an error would be thrown. The option to
+                   add audiences is now hidden from users who do not have this capability.
+
+    TL-18482       Fixed the formatting of Custom profile field data when exporting via 'Bulk user actions'
+
+                   Some values (specifically the Dropdown Menu) were being exported as the
+                   index (number) instead of the text name of the option. This is now exported
+                   correctly.
+
+    TL-18488       Fixed a regression in DB->get_in_or_equal() when searching only integer values within a character field
+
+                   This is a regression from TL-16700, introduced in 2.6.52, 2.7.35, 2.9.27,
+                   9.15, 10.4, and 11.0. A fatal error would be encountered in PostgreSQL if
+                   you attempted to call get_in_or_equal() with an array of integers, and then
+                   used the output to search a character field.
+                   The solution is ensure that all values are handled as strings.
+
+    TL-18498       Fixed the ability to search for custom rooms inside the room selection dialog
+
+                   Previously when custom rooms were created within a seminar session via the
+                   room selection dialog, the custom room would not be searchable on the
+                   'search' tab of the dialog. Now custom rooms that are visible on the
+                   'browse' tab will also be searchable on the 'search'  tab.
+
+    TL-18499       Fixed an issue where searching in glossary definitions longer than 255 characters would return no results on MSSQL database
+
+                   The issue manifested itself in the definitions where the search term
+                   appeared in the text only after the 255th character due to incorrectly used
+                   concatenation in an SQL query.
+
+    TL-18545       Fixed the management interface for 'audience membership' access restrictions in course sections
+
+                   Prior to this change it was possible to add audience membership as a
+                   conditional access restriction on course sections. However it was not
+                   possible after adding the restriction to then edit or delete it. This has
+                   now been fixed and the audience membership conditional access restriction
+                   for sections behaves like all other conditional access restrictions.
+
+    TL-18546       Fixed missing string parameter when exporting report with job assignment filters
+    TL-18548       Introduced new permissions for adding and removing recipients to a seminar message
+
+                   The two new permissions were added:
+                     1) "mod/facetoface:addrecipients" : This permission allows the role to
+                   add any recipients to the seminar message
+                     2) "mod/facetoface:removerecipients" : This permission allows the role
+                   to remove any recipients from the seminar message
+
+                   Adding or removing seminar's message recipients action would not check for
+                   the permission "mod/facetoface:addattendees" or
+                   "mod/facetoface:removeattendees" but checking for the new permissions added
+                   instead
+
+    TL-18566       Backported MDL-61281 to make Solr function get_response_counts compatible() with PHP 7.2
+    TL-18569   +   Removed 'export to portfolio' links from assignment grading interfaces
+
+                   The 'export to portfolio' functionality is designed for a user to export
+                   their own assignment submissions to their portfolio. The link was being
+                   shown to trainers in the grading interface but displayed an error if it was
+                   clicked.
+
+    TL-18573       Added a check for the 'Events displayed on course page' setting when viewing seminar events on the course page
+
+                   Now both settings are taken into account: when the 'Users can sign-up to
+                   multiple events setting' is enabled, the number of events displayed for
+                   which a user can sign up will be restricted to the number in the ‘Events
+                   displayed on course page' setting. Events to which a user is already signed
+                   up will always be displayed, and do not form part of the event count.
+
+    TL-18574       Fixed a return type issue within the Redis session management code responsible for checking if a session exists
+    TL-18583       Fixed missing status string on Site Policies Report
+    TL-18590       Made sure that multiple jobs are not created via search dialogs if multiple jobs are disabled sitewide
+    TL-18599       Fixed minor issues with site policies
+
+                   The following minor issues with site policies were fixed:
+                    * Viewing the 'Site Policy Records' embedded report while site policies
+                   are not enabled now shows the report without throwing an exception.
+                    * An 'Edit this report' link is now available to administrators and users
+                   with the necessary capabilities when the 'Site Policy Records' embedded
+                   report is viewed.
+                    * After giving consent to the necessary site policies, the user is now
+                   redirected back to the original url. E.g. A user receives an email with a
+                   forum link. They click the link which requires them to log in and give
+                   consent to the policies. Once they have given the necessary consent, they
+                   are now redirected directly to the forum page which was originally
+                   requested.
+
+    TL-18615   +   Removed duplicated options in the 'Show with backdrop' selector on the add new step form in user tours
+    TL-18618       Restoring a course now correctly ignores links to external or deleted forum discussions
+    TL-18649       Improved the Auto login guest setting description and ensured admin pages no longer automatically log guests in
+
+                   The auto login guest setting incorrectly sets the expectation that
+                   automatic login only happens when a non-logged in user attempts to access a
+                   course. In fact it happens as soon as the user is required to login,
+                   regardless of what they are trying to access. The description has been
+                   improved to reflect the actual behaviour.
+                   Additionally in Totara 12 we have set it so that the user is not
+                   automatically logged in if they attempt to access administration pages.
+
+    TL-18676       Improved the performance of 'set of courses' in program content editing
+
+API changes:
+
+    TL-13960   +   Moved all report builder customfield-related functions that added columns, filters, and joins from base source into traits
+
+                   All function that added columns, filters, and joins for custom fields have
+                   been deprecated and moved into traits within the report sources associated
+                   'customfield' component.
+
+    TL-16729   +   Converted all Report Builder display functions into classes
+
+                   All the Report Builder display functions have been deprecated and converted
+                   into display classes for better control over how data is displayed and for
+                   improved performance.
+
+                   This patch however does not introduce any changes in the current display of
+                   data within the reports.
+
+Miscellaneous Moodle fixes:
+
+    TL-18298   +   MDL-61309: Implemented a new deleted flag for forum posts and adapted userdata purging to use it
+    TL-18301   +   MDL-61905: Removed unsused Workshop tables from database
+
+                   A number of tables that were used by the Workshop module in versions 1.1
+                   and earlier have been kept but unused since upgrading to version 2.0. Those
+                   tables were suffixed with '_old'.
+
+                   If your installation was originally a Moodle or Totara version 1.x, we
+                   recommend confirming whether these tables may contain data that should be
+                   kept before upgrading as these tables will be dropped.
+
+    TL-15325   +   MDL-57572: Added support for the igbinary serializer in the Redis Cache Store
+
+                   Added setting to switch the serializer to either the builtin php or the
+                   igbinary serialiser. The igbinary serialiser stores data structures in
+                   compact binary form and savings can be significant for storing cached data
+                   in Redis.
+
+    TL-15335   +   MDL-57570: Added support for the igbinary serializer in the Static Cache Store
+
+                   If igbinary is installed the static cache store automatically makes use of
+                   it.
+
+    TL-15345   +   MDL-57655: Added support for the igbinary serializer in the Redis Session Handler
+
+                   If igbinary is installed and $CFG->session_redis_serializer_use_igbinary is
+                   set to true the Redis session handler uses igbinary for serializing the
+                   data.
+
+    TL-15355   +   MDL-55476: Removed loginpasswordautocomplete option
+
+                   The a loginpasswordautocomplete option simply appends autocomplete="off" to
+                   the password field in the form. As most of the browsers dropped support for
+                   this attribute it is removed.
+
+    TL-15567   +   MDL-58311: Added support for password-protected Redis Session and Cache Store connections
+
+                   Support for setting a password for the Redis Cache and Session Store was
+                   added. Password for the cache store can be set when adding or editing the
+                   cache store instance settings.
+
+                   The password for the Redis session store can be set with the config
+                   $CFG->session_redis_auth.
+
+    TL-15326   +   MDL-56519: Added linting for behat .feature files
+
+                   The linting enforces the following rules on .feature files:
+                    * Indentation (in spaces):
+                    ** Feature: 0
+                    *** Background: 2
+                    *** Scenario: 2
+                    **** Step: 4
+                    **** Given: 4
+                    **** And: 4
+                    **** Examples: 4
+                    **** Example: 6
+                    * Other rules:
+                    ** Feature names must be unique
+                    ** Empty feature files are not allowed anymore
+                    ** Feature files w/o scenarios are not allowed anymore
+                    ** Partially commented tag lines are not allowed
+                    ** Trailing spaces are not allowed
+                    ** Unnamed features are not allowed
+                    ** Unnamed scenarios are not allowed
+                    ** Scenario outlines w/o examples are not allowed
+
+    TL-15356   +   MDL-57896: Added command line tool to read and change configuration settings in the database
+    TL-15371   +   MDL-57887: Support nginx and other webservers for logging of username in access logs
+
+                   Support for logging usernames to webserver access logs has been extended to
+                   allow sending the username as a custom header which can be logged and
+                   stripped out if needed.
+
+    TL-15385   +   MDL-58109: Added check for preventexecpath in the Security Report
+
+                   If the config value $CFG->preventexecpath is set to 'false' this will show
+                   up in the Security Report as a warning.
+
+    TL-15397   +   MDL-40759: Added additional Font Awesome support
+
+                   A small number of icons have been converted to Font Awesome icons, and a
+                   number of remaining locations where image icons were used have been
+                   replaced with font icons.
+
+    TL-18469   +   MDL-60793: Fixed compatibility issue with MySQL 8
+
+                   The chat module used a database field where the name is a reserved word in
+                   MySQL 8. This could have caused errors during some database operations. The
+                   field has been renamed.
+
+    TL-18047   +   MDL-61658: Fixed display of user's country in course participant list and 'Logged in user' block
+
+                   If a country was excluded from the setting 'allcountrycodes', the country
+                   code was not translated to the country name in the 'Logged in user' block
+                   and on the course participants list.
+
+    TL-18049   +   MDL-60241: Fixed visible value of general section in course
+
+                   On upgrade to Moodle 3.3 it was possible that the general section of a
+                   course was set to visible = 0. Even if this has no effect in Totara this
+                   patch reverts this and sets all general sections back to visible = 1.
+
+    TL-18080   +   MDL-61305: Added a lock to prevent 'coursemodinfo' cache to be built multiple times in parallel
+
+                   To reduce impact on the performance, the building of the coursemodinfo
+                   cache cannot happen in parallel anymore. There's now a database lock in
+                   place to prevent that.
+
+    TL-18210   +   MDL-27886: Fixed handling of course backup settings and dependencies
+
+                   The dependency of backup settings was not working properly. If a default
+                   setting was disabled (not locked) then the dependent settings in the backup
+                   were locked and could not be changed as expected. The check for locked
+                   dependencies has been changed to fix this.
+
+    TL-15306   +   MDL-53814: Show question type icons when manually grading a quiz
+    TL-15309   +   MDL-57143: Removed check for Windows when using SQL Server (sqlsrv) drivers
+
+                   When using the SQL driver for Linux there was an error message during
+                   initialisation stating that the driver is only available for Windows. This
+                   is not true anymore as there is a Linux driver, thus the message got
+                   removed.
+
+    TL-15311   +   MDL-56320: Allow uninstall of unused web service plugins
+    TL-15312   +   MDL-56640: Converted single selects and URL selects to mustache templates
+
+                   This has also deprecated the YUI auto submit JavaScript.
+
+    TL-15314   +   MDL-56581: Highlighted row when permission is overriden in a course
+
+                   This will require LESS to be re-compiled when using LESS inheritance.
+
+    TL-15315   +   MDL-57472: Removed fix_column_widths Internet Explorer 6 hack
+
+                   Removed old Internet Explorer 6 hack and added deprecated warnings.
+
+    TL-15316   +   MDL-57471: Deprecated init_javascript_enhancement() and smartselect code
+    TL-15317   +   MDL-57395: Added new Web Service core_course_get_updates_since
+    TL-15319   +   MDL-44172: Removed example htaccess file
+    TL-15321   +   MDL-55461: Fixed placement of cursor in Atto equation editor on repeated insertions from predefined buttons
+    TL-15322   +   MDL-57392: Modified external function core_course_external::get_courses_by_field to return the course filters list and status
+    TL-15323   +   MDL-57149: Made the language import administration page compatible with Bootstrap
+    TL-15324   +   MDL-57282: Deprecated the behat step "I go to X in the course gradebook"
+    TL-15328   +   MDL-57627: Added new field to forum Web Service to get tracking status of the user
+    TL-15329   +   MDL-50549: Added new Web Service to retrieve a list of URLs from several courses
+    TL-15330   +   MDL-50542: Added new Web Service to retrieve a list of labels from several courses
+    TL-15333   +   MDL-57488: Replaced and deprecated M.util.focus_login_form and M.util.focus_login_error
+    TL-15336   +   MDL-57490: Converted Select all/none functionality to use JavaScript
+
+                   In the quiz, SCORM and lesson modules, there was some inline JavaScript
+                   handlers. These have been converted to pure JavaScript event listeners.
+
+    TL-15338   +   MDL-50547: Added new Web Service to retrieve a list of resources from several courses
+
+                   Added a new Web Service which returns a list of files in a provided list of
+                   courses. If no list is provided all files that the user can view will be
+                   returned.
+
+    TL-15339   +   MDL-57550: Updated advanced forum search to use AMD modules
+    TL-15340   +   MDL-56449: Provided a more detailed description of group submission problems
+    TL-15341   +   MDL-50545: Added new Web Service to retrieve a list of pages from several courses
+    TL-15342   +   MDL-50539: Added new Web Service to retrieve a list of folders from several courses
+    TL-15343   +   MDL-49423: Added support for optiongroups inside admin selects
+    TL-15344   +   MDL-57690: Stopped loading mcore YUI rollup on each page
+
+                   This may expose areas in custom JavaScript that use YUI modules without
+                   loading them correctly.
+
+    TL-15346   +   MDL-57273: Added generic exporter, persistent and persistent form classes
+
+                   This patch adds new model classes following an active record pattern to
+                   represent, fetch and store data in the database. The persistent class also
+                   provides basic validation.
+
+                   Exporters convert objects to stdClasses. The exporter contains the
+                   definition of all properties and optionally related objects.
+
+    TL-15348   +   MDL-56808: Removed use of eval in SCORM JavaScript files
+    TL-15349   +   MDL-57638: Improved the handling of failed RSS feeds in the RSS block
+
+                   Previously if the cron could not read the RSS feed configured in a block
+                   this failure was not visible to the administrator in the interface.
+                   Additionally every time the block displayed it tried to fetch the feeds
+                   regardless of its status.
+                   With this patch the RSS blocks do not try to request the feeds if the
+                   'skiptime' and 'skipuntil' values are set. If there are failed feeds then
+                   an error message will be shown to the administrator but not to a learner.
+
+    TL-15350   +   MDL-57586: Changed $workshop variable from protected to public in class
+
+                   Changed $workshop from protected to public in class
+                   workshop_example_submission to make it easier for renderers in themes to
+                   access data instead of retrieving it from the database.
+
+    TL-15354   +   MDL-57697: Converted survey validation JavaScript from YUI2 to AMD
+    TL-15357   +   MDL-57890: Improved all get_by_courses Web Services to include the coursemodule (cmid) in the results
+    TL-15358   +   MDL-57687: Removed unnecessary init_toggle_class_on_click JavaScript functionality
+    TL-15362   +   MDL-57619: Removed behat steps deprecated in Moodle 2.9 or earlier
+    TL-15363   +   MDL-57602: Added 'Granted extension' filter for grading table
+    TL-15365   +   MDL-57633: Added new Web Service mod_lesson_get_lessons_by_courses
+    TL-15366   +   MDL-57527: Changed course reports to use CSS instead of SVG rotation
+    TL-15368   +   MDL-53978: Added extra plugin callbacks for every major stage of page render + swap user tours to use them
+    TL-15374   +   MDL-57972: Added shortentext mustache helper
+    TL-15375   +   MDL-45584: Made cache identifiers part of loaded caches
+    TL-15376   +   MDL-57280: Added the ability to create modal types via a registry
+
+                   More information can be found
+                   at https://help.totaralearning.com/display/DEV/Modal+registry
+
+    TL-15377   +   MDL-57999: Add itemname to gradereport_user_get_grade_items  Web Service
+    TL-15379   +   MDL-57975: Added HTML5 session storage.
+
+                   This can be used by developers using the core/sessionstorage AMD module in
+                   much the same way developers can use core/localstorage
+
+                   This also adds a core_get_user_dates and userdate mustache helper.
+
+    TL-15380   +   MDL-57914: Refactored get_databases_by_courses
+    TL-15382   +   MDL-57915: Added Web Service mod_data_view_database
+    TL-15383   +   MDL-58217: Added data generators for feedback items
+    TL-15386   +   MDL-57631: Implemented scheduled task for LDAP Enrolments Sync
+
+                   The previous CLI script has been deprecated in favour of the new scheduled
+                   task. The new task is disabled by default.
+
+    TL-15388   +   MDL-50538: Added new Web Service mod_feedback_get_feedbacks_by_courses
+    TL-15392   +   MDL-57643: Added new Web Service mod_lesson_get_lesson_access_information
+    TL-15393   +   MDL-57645: Added new web service mod_lesson_view_lesson
+    TL-15394   +   MDL-57648: Added new web service mod_lesson_get_questions_attempts
+    TL-15396   +   MDL-57390: Added capabilities/permission information to Web Service forum_can_add_discussion response
+    TL-15398   +   MDL-57657: Added new Web Service mod_lesson_get_user_grade
+    TL-15401   +   MDL-57664: Added new lesson Web Service get_content_pages_viewed
+    TL-15402   +   MDL-57665: Added new Web Service mod_lesson_get_user_timers
+    TL-15404   +   MDL-57812: Added new Web Service get_feedback_access_information
+    TL-15406   +   MDL-57811: Added new Web Service mod_feedback_view_feedback
+    TL-15407   +   MDL-57916: Added new Web Service mod_data_get_access_information
+    TL-15408   +   MDL-57814: Added new Web Service mod_feedback_get_current_completed_tmp
+    TL-15409   +   MDL-57823: Implemented the check_updates callback in the feedback module
+    TL-15410   +   MDL-57815: Added new Web Service mod_feedback_get_items
+    TL-15411   +   MDL-55267: Removed deprecated field datasourceaggregate
+    TL-15412   +   MDL-57685: Added new Web Service mod_lesson_get_pages
+    TL-15413   +   MDL-57816: Added new Web Service mod_feedback_launch_feedback
+    TL-15414   +   MDL-57817: Added new Web Service mod_feedback_get_page_items
+    TL-15415   +   MDL-57818: Added new Web Service mod_feedback_process_page
+    TL-15417   +   MDL-57820: Added new Web Service mod_feedback_get_analysis
+    TL-15418   +   MDL-58229: Added new Web Service get_unfinished_responses
+    TL-15419   +   MDL-57688: Added new Web Service mod_lesson_launch_attempt
+    TL-15420   +   MDL-57693: Added new Web Service mod_lesson_get_page_data
+    TL-15421   +   MDL-57696: Added new Web Service mod_lesson_process_page
+    TL-15422   +   MDL-57724: Added new Web Service mod_lesson_finish_attempt
+    TL-15423   +   MDL-57754: Added new Web Service mod_lesson_get_attempts_overview
+    TL-15424   +   MDL-57757: Added new Web Service mod_lesson_get_user_attempt
+    TL-15426   +   MDL-57762: Added check updates functionality to the lesson module
+    TL-15427   +   MDL-57760: Added new Web Service mod_lesson_get_pages_possible_jumps
+    TL-15428   +   MDL-58329: Added new Web Service mod_lesson_get_lesson
+    TL-15430   +   MDL-57965: Enabled gzip compression for SVG files
+    TL-15431   +   MDL-58070: Reworded "visible" core string used in course visibility
+
+                   Additionally we aligned the name and value strings of the course visibility
+                   default settings. Previously the value strings were different to the actual
+                   course settings.
+
+    TL-15432   +   MDL-55139: Added code coverage filter in component phpunit.xml files
+    TL-15433   +   MDL-58230: Added new Web Service mod_feedback_get_finished_responses
+    TL-15434   +   MDL-57822: Added new Web Service mod_feedback_get_non_respondents
+    TL-15436   +   MDL-49409: Added new Web Service mod_data_get_entries
+    TL-15437   +   MDL-57918: Added new Web Service mod_data_get_entry
+    TL-15438   +   MDL-57919: Added new Web Service mod_data_get_fields
+    TL-15439   +   MDL-57920: Added new Web Service mod_data_search_entrie
+    TL-15440   +   MDL-57921: Added new Web Service mod_data_approve_entry
+    TL-15441   +   MDL-57922: Added new Web Service mod_data_delete_entry
+    TL-15442   +   MDL-57923: Added new Web Service mod_data_add_entry
+    TL-15443   +   MDL-57924: Added new Web Service mod_data_update_entry
+    TL-15444   +   MDL-57925: Implemented check_updates_since callback
+    TL-15445   +   MDL-50970: Added new Web Service core_block_get_course_blocks
+    TL-15461   +   MDL-57411: mod_check_updates now returns information based on user capabilities
+    TL-15464   +   MDL-48771: Improved quiz question editing interface
+
+                   The quiz editing interface has been improved to allow selection of multiple
+                   questions to be deleted.
+
+    TL-15466   +   MDL-55941: Improved UX of alpha chooser / initialbar in tablelib and made it responsive
+    TL-15496   +   MDL-57503: Allow course ids for enrol_get_my_courses
+
+                   This adds a new parameter for enrol_get_my_courses() to filter the list
+                   returned to specific courses.
+
+    TL-15514   +   MDL-58265: Refactored behat to use a new step "I am on the course homepage"
+
+                   The new step directly accesses the course page without following the path
+                   from the homepage to the course. A shortcut step "I am on course homepage
+                   with editing mode on" was also added to allow accessing a course and turn
+                   editing mode on.
+
+    TL-15553   +   MDL-53343: Migrated scorm_cron into new tasks API
+    TL-15555   +   MDL-57821: Added Web Service mod_feedback_get_responses_analysis
+    TL-15556   +   MDL-51998: Improved manage forum subscribers button
+    TL-15557   +   MDL-58444: Added number of unread posts to get_forums_by_courses  Web Services
+    TL-15558   +   MDL-58399: Return additional file fields in Web Services to be able to handle external repositories files
+
+                   See mod/upgrade.txt and course/upgrade.txt for details.
+
+    TL-15559   +   MDL-58361: Made core_media_manager final to prevent from being subclassed
+    TL-15564   +   MDL-57813: Added Web Service mod_feedback_get_last_completed
+    TL-15565   +   MDL-58453: Refactored get_non_respondents Web Service
+    TL-15569   +   MDL-56632: Moved the "Turn editing on\off" link to the top of the book administration menu
+    TL-15575   +   MDL-57553: Fixed user tour steps so that they do not inherit attributes from CSS selector 
+
+                   Updated the flexitour component to v0.10.0 and the popper.js library to
+                   v1.0.8 in the process.
+
+    TL-15579   +   MDL-58552: Fixed alignment of quiz icon
+    TL-15583   +   MDL-57573: Updated PHPmailer library to v5.2.23
+    TL-15589   +   MDL-58493: Converted the delete enrolment icon to a font icon
+
+                   When managing enrolments in a course, if a role was added, the delete icon
+                   was an image (instead of a font icon) before the page was reloaded. This
+                   has been corrected.
+
+    TL-15594   +   MDL-58549: Added version of jabber/XMPP libraries to thirdpartylibraries.xml
+    TL-15598   +   MDL-58574: Removed an unnecessary check for delete icon when working with permissions in an activity module
+    TL-15604   +   MDL-58502: Fixed error when cancelling feedback
+    TL-15619   +   MDL-58530: Updated the video.js library to v5.18.4
+    TL-15620   +   MDL-58412: Fixed several bugs in the new feedback web services
+    TL-15630   +   MDL-58415: Multiple bug fixes in the new lesson web services
+
+                   * Avoid inappropriate http redirections
+                   * Added missing answer fields
+                   * Various code fixes, including ensuring correct variable types are used
+                   where necessary
+
+    TL-15635   +   MDL-51932: Improved UX when setting up a workshop
+
+                   When setting up a workshop activity, the stage switch has been updated to
+                   state which stage they will take you to.
+
+    TL-15636   +   MDL-58681: Split the checkbox and advcheckbox behat tests
+
+                   Advanced checkboxes cannot be tested without a real browser because Goutte
+                   does not support the hidden+checkbox duality.
+
+    TL-15639   +   MDL-58659: Added enddate parameter to Web Services returning course information
+    TL-15682   +   MDL-58860: Fixed Web Service mod_lesson_get_attempts_overview when no attempts made
+    TL-15684   +   MDL-58857: User session is now terminated when a major upgrade is required
+    TL-15708   +   MDL-59132: Fixed anonymous response numbering in feedback Web Service
+    TL-17981   +   MDL-62588: Added missing instanceid database field to the Paypal enrolment plugin
+    TL-17983   +   MDL-62408: Fixed profile_guided_allocate() function to help split behat scenarios better for parallel runs never being executed in behat_config_util
+    TL-17985   +   MDL-62500: Fixed an issue where a checkbox label wasn't updated after updating a tag
+    TL-17989   +   MDL-61521: Fixed missing text formatting for category name in get_categories Web Service
+    TL-17990   +   MDL-61800: Reset the OUTPUT and PAGE for each task on cron execution
+    TL-17993   +   MDL-61012: Allow module name to be guessed only if not set by subclass of the moodleform_mod class
+    TL-17995   +   MDL-60882:  Prevent deletion of all responses if the external function delete_choice_responses() is called without responses specified
+
+                   The external function mod_choice_external::delete_choice_responses has
+                   changed behaviour - if this function is called by a user who has the
+                   'mod/choice:deleteresponses' capability with no responses specified then
+                   only the users responses will be deleted, rather than all responses for all
+                   users within the choice. To delete all responses from all users, all
+                   response IDs must be specified.
+
+    TL-17996   +   MDL-61715: Fixed Question type chooser displaying headings for empty sections under certain conditions
+    TL-17997   +   MDL-62011: Fixed an issue where approval of a course request fails if a new course with the same name has been created prior to request approval
+    TL-17999   +   MDL-62042: Filtered out some unicode non-characters when building index for Solr
+    TL-18001   +   MDL-59857: Increased the length of the 'completionscorerequired' field in SCORM database table
+    TL-18002   +   MDL-61348: Fixed incorrect group grade averages in quiz reports
+    TL-18003   +   MDL-61520: Fixed references to xhtml in Quiz statistics report
+    TL-18006   +   MDL-61928: Made frozen form sections collapsible an expandable
+    TL-18008   +   MDL-61708: Fixed LTI to respect fullnamedispaly settings for fullname field in the requests
+    TL-18009   +   MDL-61741: Fixed the IPN verification endpoint URL of the Paypal Enrolment plugin
+    TL-18010   +   MDL-58697: Fixed issue with assignment submission when toggling group submission
+
+                   When assignment submission was set to group submission and then turned off,
+                   the status was not showing an assignment as submitted even if there was a
+                   file submitted. The group assignment status is now only considered if group
+                   assignment submission is enabled.
+
+    TL-18012   +   MDL-60196: Fixed the display of custom LTI icons
+    TL-18013   +   MDL-61033: Fixed an error when editing a quiz while a preview is open in another browser window
+    TL-18014   +   MDL-61129: Added 'colgroup' attribute to the survey question tables
+    TL-18016   +   MDL-61581: Added styling to the 'returning to lesson' navigation buttons
+    TL-18017   +   MDL-61860: Fixed require path for config.php on authentication test settings page
+    TL-18019   +   MDL-60115: Fixed a silently failing redirect when creating a new book resource
+    TL-18020   +   MDL-60726: Fixed alignment of assignment submission confirmation message
+    TL-18021   +   MDL-61020: Fixed Video.js media player timeline progress bar being flipped in RTL mode
+    TL-18022   +   MDL-61127: Added improved keyboard navigation when using the file picker
+    TL-18023   +   MDL-61163: Fixed a bug preventing guest users from viewing Wiki pages belonging to Wiki activities added to the page
+    TL-18025   +   MDL-61502: Added a test for multi-lingual "Select missing words" questions
+    TL-18026   +   MDL-61522: Made sure glossary paging bar links do not use relative URLs
+    TL-18027   +   MDL-61689: Unexpected and unhandled output during unit tests will now result in the tests being marked as Risky
+    TL-18033   +   MDL-55532: Fixed a hard-coded reference to the admin directory within the User tours tool
+    TL-18034   +   MDL-60762: tool_usertours blocks upgrade if admin directory renamed
+    TL-18036   +   MDL-61257: Fixed the 'Course module completion updated' link in the course log report
+
+                   The link was previously pointing to the course completion report instead of
+                   the activity completion report, this has been fixed.
+
+    TL-18037   +   MDL-61321: Fixed a bug in mod_feedback_get_responses_analysis Web Services preventing return of more than first 10 feedback responses
+    TL-18038   +   MDL-61328: Fixed the sorting of User tours steps when moving steps up or down
+    TL-18039   +   MDL-61576: Ensured the lti_build_custom_parameters function contains all necessary parameters
+    TL-18040   +   MDL-61656: Fixed missing role name on the security report for incorrectly defined front page role
+    TL-18041   +   MDL-61733: Fixed creation of tables in Atto editor for Database activity templates
+    TL-18043   +   MDL-52989: Fixed question clusters occasionally displaying a blank page when a student restarts half way through
+    TL-18044   +   MDL-58179: Converted uses of "label" CSS class to "mod_lesson_label"
+
+                   Bootstrap causes HTML elements with the CSS class to have white text. As a
+                   result text was not being displayed correctly. This change only affects the
+                   lesson activity module.
+
+    TL-18048   +   MDL-59070: Fixed enrol database plugin bug where the 'enablecompletion' value was not loaded
+    TL-18050   +   MDL-60398: Fixed an issue with downloading resource of type "Folder" with name of 200+ bytes
+    TL-18051   +   MDL-61261: Added validation for requests to 'Open badges' backpack to prevent possible self-XSS
+    TL-18057   +   MDL-36157: Fixed HTML entities in RSS feeds that were not displayed correctly
+    TL-18058   +   MDL-55153: Fixed an issue with customised language strings that have been removed still showing up in language customisation interface
+    TL-18060   +   MDL-60658: Fixed validation of the 'grade to pass' activity setting to ensure that localisations are correctly handled
+    TL-18061   +   MDL-61196: Ensured activity titles are correctly formatted when included in the subject for notifications
+    TL-18064   +   MDL-61322: The time column within the log and live log reports now displays the year as part of the date
+    TL-18065   +   MDL-61453: Fixed accepted file type when uploading user pictures
+
+                   When uploading multiple user pictures, the list of accepted file types for
+                   the file picker was not limited to ZIP only. This has been fixed. Attempts
+                   to upload non-ZIP files led to an error message.
+
+    TL-18069   +   MDL-61480: Added a check to ensure plugins are installed within get_plugins_with_function()
+    TL-18070   +   MDL-58845: The Choice activity report for reviewing answers now respects the 'Display unanswered questions' setting
+    TL-18071   +   MDL-61005: Fixed an issue in which system level audiences were potentially excluded when searching audiences in some interfaces
+    TL-18072   +   MDL-61289: Fixed choice activity didn't include extra user profile fields on export
+    TL-18073   +   MDL-61324: Fixed detection of changed grades during LTI sync
+
+                   Improved the detection of changed grades during LTI sync so that unchanged
+                   grades are not synced every time the grade sync task is run anymore.
+
+    TL-18074   +   MDL-61408: Added default button class when checking quiz results
+    TL-18076   +   MDL-56688: Fixed the order of grade items in single view and export of the Gradebook
+
+                   All views of grade items now show in the order set in the Gradebook setup.
+
+    TL-18077   +   MDL-61150: Corrected wrong "path" attribute in some core install.xml files
+    TL-18078   +   MDL-61153: Made lesson detailed statistics report column widths consistent
+    TL-18079   +   MDL-61236: Fixed bug where course welcome message email was not sent from the course contact who was first assigned the role of trainer
+    TL-18081   +   MDL-61344: Added display of additional files when adding submissions in assignment module
+    TL-18086   +   MDL-42764: Added missing error message for user accounts without email address
+    TL-18087   +   MDL-51189: Fixed an issue in the quiz module where trainers were unable to edit override if quiz was not available to student
+    TL-18088   +   MDL-52832: Fixed an issue where quiz page did not take user/group overrides into account when displaying the quiz close date
+    TL-18090   +   MDL-61027: Fix an issue with datetime profile fields when using non-Gregorian calendars
+    TL-18091   +   MDL-61168: Prevented the 'Export to portfolio' buttonfrom getting truncated by collapsed online text submissions
+
+                   When a long 'Online Text' submission is made the entry is truncated and is
+                   expandable. The 'Export to portfolio' button, if enabled, was also being
+                   truncated. Only the submitted text is truncated now.
+
+    TL-18092   +   MDL-61251: Corrected a message to 'Enable RSS feeds' to point to the proper settings section
+    TL-18096   +   MDL-60077: Fixed the display of the pop-up triangle next to rounded corners in User Tours
+    TL-18097   +   MDL-60646: Fixed undefined string when managing a user's portfolio
+    TL-18098   +   MDL-60997: Added replytoname property to the core_message class allowing to specify "Reply to" field on outgoing emails
+    TL-18101   +   MDL-61250: Omitted leading space in question preview link
+    TL-18102   +   MDL-61253: Fixed referenced files were not added to archive when trying to download a folder
+    TL-18105   +   MDL-58006: Fixed blind marking status not being reset by course reset in assignment module
+    TL-18107   +   MDL-60181: Glossary ratings are now displayed in their entry
+
+                   Previously the entry appeared to be in the following glossary entry.
+
+    TL-18108   +   MDL-60918: Made sure current user is used in message preference update
+    TL-18109   +   MDL-61077: Made quiz statistics calculations more robust
+    TL-18111   +   MDL-61224: Added length validation for short name when creating a role
+    TL-18112   +   MDL-61234: Fixed race condition in user tours while resolving the fetchTour promise
+    TL-18113   +   MDL-37390: Set course start date when a course is approved to the user's midnight
+    TL-18114   +   MDL-55382: Changed quicklist order to be alphabetical when annotating File submission assignments
+    TL-18115   +   MDL-60549: Ensured LTI return link works when content is outside of an iframe
+    TL-18116   +   MDL-60776: Fixed error in enrolled users listing when custom fullnamedisplay format contains a comma
+    TL-18117   +   MDL-61010: Added unread posts link for the counter in "Blog-like" forum which takes a user to the first unread post in the discussion
+    TL-18121   +   MDL-43042: Improved layout of multichoice question response in a lesson
+    TL-18122   +   MDL-53985: Prevented assignment PDF annotations being removed when a submission is revert back to draft
+    TL-18123   +   MDL-57786: Fixed word count for online text submission in assignment module
+    TL-18124   +   MDL-60079: Fixed 'User tours' leaving unnecessary aria tags in the page
+    TL-18125   +   MDL-60415: Fixed error messages in LTI launch.php when custom parameters are used
+    TL-18126   +   MDL-60742: Allow customisation of 12/24h time format strings
+    TL-18127   +   MDL-60943: Improved error message for preg_replace errors during global search indexing
+    TL-18129   +   MDL-61068: Changed rounding for timed forum posts to the nearest 60 seconds to ensure all neighbouring posts are correctly selected
+    TL-18130   +   MDL-61098: Fixed trainers ability to edit or delete WebDav repositories that they have created at a course level
+    TL-18132   +   MDL-23887: Replaced deprecated System Tables calls to System Views calls in sql generator for MSSQL
+    TL-18134   +   MDL-57727: Fixed Activity completion report to have a default sort order
+    TL-18135   +   MDL-61107: Made sure invalid maximum grade input is handled correctly in quiz activity
+    TL-18136   +   MDL-33886: Added graceful error handling when backup filename is too long
+    TL-18137   +   MDL-43827: Improved accessibility when editing uploaded files on the server
+    TL-18138   +   MDL-51089: Improved accessibility when accessing the 'add question' action menu
+    TL-18139   +   MDL-58983: Fixed display of grade button in assignments when user doesn't have capability
+
+                   The "grade" button is now hidden if a user doesn't have the capability to
+                   grade assignments.
+
+    TL-18142       MDL-60439: Enabled multi-language filter on Tags block title
+    TL-18143   +   MDL-60942: Fixed format_string doesn't account for filter in static cache key
+    TL-18144   +   MDL-31521: Fixed calculated questions were displaying a warning when more than one unit with multiplier equal to 1
+    TL-18145   +   MDL-34389: Fixed users with capability 'moodle/course:changecategory' were able to only select current course category and not its subcategories
+    TL-18146   +   MDL-42676: Fixed issue that prevented assignment submissions when grade override was used
+    TL-18147   +   MDL-49995: Fixed overwriting of files to not leave orphaned files in the system
+    TL-18148   +   MDL-52100: Fixed filearea to not delete files uploaded by users without file size restrictions
+    TL-18149   +   MDL-54967: Fixed IMS Common Cartridge import incorrectly decoded html entities in URLs
+    TL-18150   +   MDL-57431: Shuffle question help icon in Quiz is now outside the HTML label
+    TL-18152   +   MDL-58888: Added sort-order for choice_get_my_response() results by optionid
+    TL-18153   +   MDL-59200: Fixed an issue where a user is unable to enter assignment feedback after grade override
+
+                   Fixes an issue where a user would be unable to enter assignment feedback
+                   after grade override and if there was no original assignment grade set.
+
+    TL-18154   +   MDL-59709: Fixed export to portfolio button in assignment grading interface for Online Text submissions
+    TL-18155   +   MDL-59999: Added a status column to the Essay question grading interface within Lesson
+    TL-18156   +   MDL-60161: Ensured that OAuth curl headers are only ever sent once
+    TL-18159   +   MDL-60653: Fixed the incorrect indentation of navigation nodes when their identifier happened to be an integer
+    TL-18160   +   MDL-60767: Fixed a visual bug causing validation errors to not be shown when saving changes to several admin settings in a single action
+    TL-18161   +   MDL-60938: Fixed the rendering of users in the choice activity responses table
+    TL-18162   +   MDL-61022: Added acceptance test for user groups restore functionality
+    TL-18163   +   MDL-61040: Improved spacing around the "Remove my choice" link within a choice activity
+    TL-18164   +   MDL-61042: Fixed undefined variable error when viewing detailed statistics report on empty lesson
+    TL-18165   +   MDL-61045: Made sure the 'After the quiz is closed' review option is disabled if the quiz does not have a close date
+    TL-18166   +   MDL-40790: Fixed Lesson content button to no longer run off the edge of the page
+    TL-18168   +   MDL-44667: Fixed minor field existence checks in three plugins
+
+                   The following three plugins each had one call to a database function that
+                   was attempting to validate the existince of the field incorrectly. The
+                   affected plugins were:
+                   * Assignment file submission
+                   * Assignment online text submission
+                   * Multi-answer question type
+
+    TL-18169   +   MDL-45500: Enabled ability to uninstall grading plugins
+    TL-18171   +   MDL-54021: Fixed an issue where "Course completion status" block didn't show activity name in correct language
+    TL-18174   +   MDL-56864: Fixed removal of tags if usage of standard tags is set to force
+    TL-18178   +   MDL-59866: Added retries for connecting to Redis in the session handler before failing
+    TL-18181   +   MDL-60945: Stopped unneeded completion data being retrieved in Web Service function
+    TL-18187   +   MDL-34161: Fixed LTI backup and restore to support course and site tools and submissions
+    TL-18188   +   MDL-37757: Added missing clean up external files on removal of a repository
+    TL-18190   +   MDL-60219: The 'no blocks' setting in an LTI activity now uses the 'incourse' page layout with blocks disabled
+    TL-18191   +   MDL-60443: Improved validation error message when a requested data format does not exist
+    TL-18192   +   MDL-60801: User defaults are now applied when uploading new users
+    TL-18196   +   MDL-24678: Fixed a race condition in the chat activities leading to multiple messages being returned as the latest message
+    TL-18197   +   MDL-27230: Ensured that changes to Quiz group overrides are reflected in the calendar
+    TL-18198   +   MDL-45068: Improved group import code, prevented PHP displaying notices and warning for certain CSV files
+    TL-18199   +   MDL-46768: Loosened the restriction on the badge name filter to allow quotes
+    TL-18201   +   MDL-57569: Fixed a large badge image being unaccessible for the future use
+    TL-18203   +   MDL-60188: Implemented cache for user's groups and groupings
+    TL-18204   +   MDL-60249: Ensured feedback comments text area is resizeable
+    TL-18205   +   MDL-60591: Fixed forum inbound processor discarding the inline images if a message contains quoted text
+    TL-18206   +   MDL-60669: Fixed duplicate entry issue when restoring forum subscriptions
+    TL-18207   +   MDL-60738: Fixed Web Service theme and language parameters not being cleaned properly
+    TL-18208   +   MDL-60838: Fixed Solr files upload to honour timeout restrictions
+    TL-18211   +   MDL-55808: Fixed glossary entries search not working with ratings enabled
+    TL-18212   +   MDL-56253: Added multilang support to course module name in grades interface
+    TL-18213   +   MDL-58817: Ensured LTI icons are not overwritten by cartridge params
+    TL-18215   +   MDL-60187: Ensured grade items are not created when grades are disabled
+
+                   When editing LTI titles inline, it makes it appear in the Gradebook even if
+                   the privacy option 'Accept grades from the tool' is disabled.
+
+    TL-18216   +   MDL-60253: Ensured both LTI ToolURL and SecureToolURL are used for automatic matching
+    TL-18219   +   MDL-60637: Removed unnecessary group id number validation on Web Services
+    TL-18220   +   MDL-60773: Added pendingJS checks for autocomplete interactions
+    TL-18221   +   MDL-60809: Fixed missing filelib include in XML-RPC function
+    TL-18222   +   MDL-60810: Removed string referencing PostNuke from auth/db
+    TL-18224   +   MDL-59876: Fixed the Web Service user preference name field type
+    TL-18226   +   MDL-60675: Fixed an exception in single selects without a default value
+    TL-18227   +   MDL-60693: Added multilang filter to activity titles in course backup and restore
+    TL-18228   +   MDL-60741: Refactored admin purge caches page to call admin_externalpage_setup first
+    TL-18229   +   MDL-60789: Added length validation rule for a workshop title submission
+    TL-18231   +   MDL-60433: Fixed users being able to view all groups even if they were not allowed to
+    TL-18233   +   MDL-60104: Fixed SCORM description text to no longer extend outside the page
+    TL-18240   +   MDL-60485: Fixed being able to change grade types when grades already exist
+    TL-18252   +   MDL-59820: Removed unnecessary CSS class on calendar
+
+                   The course selector now uses the standard HTML/CSS as used by other single
+                   selects.
+
+    TL-18260   +   MDL-59532: Fixed check_update callback failing when the activity uses separated groups
+    TL-18265   +   MDL-59619: Fixed get_fields Web Services not working properly if database has no fields
+    TL-18266   +   MDL-59627: Fixed data_search_entries function in the database module wasn't calculating total count correctly
+    TL-18267   +   MDL-59649: Fixed type of content exporter field to the correct value
+    TL-18270   +   MDL-59453: Fixed filtering of lesson content in external functions
+
+                   A new 'deleted' column for forum posts was introduced. Now deleted posts
+                   and discussions display a placeholder instead of the original text. Purging
+                   of user data was modified to set the new deleted flag and empty the title,
+                   and body, of the forum posts and discussions. Previously the title and body
+                   were replaced by a placeholder instead of dynamically showing it.
+
+    TL-18539   +   MDL-62200: Prevented modals from adding another backdrop when being loaded in from another modal
+    TL-18655   +   MDL-62820: Made sure questions text is properly encoded before display after question bank import
+    TL-18656   +   MDL-62790: Added capability check in core_course_get_categories for Web Service
+    TL-18660   +   MDL-62233: Added validation on callback class when exporting to portfolio
+
+                   Validation had been applied to the callback class in a previous Totara
+                   patch. This adds the Moodle solution for compatibility.
+
+    TL-18661   +   MDL-62232: Improved validation when exporting forum attachments to portfolio
+
+                   Validation has been added in a previous Totara patch. This aligns it with
+                   Moodle's solution for compatibility.
+
+    TL-18662   +   MDL-62210: Improved validation when exporting assignments to portfolio
+
+Contributions:
+
+    * Jo Jones, Kineo UK - TL-18640
+    * Michael Geering, Kineo UK - TL-17973
+    * Russell England, Kineo USA - TL-17977
+
+
 Release Evergreen (18th July 2018):
 ===================================
 
