@@ -60,7 +60,7 @@ function xmldb_block_totara_featured_links_upgrade($oldversion, $block) {
 
         // Define field parentid to be added to block_totara_featured_links_tiles.
         $table = new xmldb_table('block_totara_featured_links_tiles');
-        $field = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10', null, null, null, 0, 'tilerulesshowing');
+        $field = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'tilerulesshowing');
 
         // Conditionally launch add field parentid.
         if (!$dbman->field_exists($table, $field)) {
@@ -98,6 +98,31 @@ function xmldb_block_totara_featured_links_upgrade($oldversion, $block) {
         }
 
         upgrade_block_savepoint(true, 2018061200, 'totara_featured_links');
+    }
+
+    // Change parentid field to Not Null in case someone is having Null values in there (MSSQl).
+    if ($oldversion < 2018091400) {
+
+        $sql = "UPDATE {block_totara_featured_links_tiles} SET parentid = 0 WHERE parentid IS NULL";
+        $DB->execute($sql);
+
+        // Define field parentid to be added to block_totara_featured_links_tiles.
+        $table = new xmldb_table('block_totara_featured_links_tiles');
+        $field = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'tilerulesshowing');
+
+        if ($dbman->field_exists($table, $field)) {
+            // Drop key parentid.
+            $key = new xmldb_key('parentid', XMLDB_KEY_FOREIGN, array('parentid'), 'block_totara_featured_links', array('id'));
+            $dbman->drop_key($table, $key);
+
+            // Change field to not null.
+            $dbman->change_field_notnull($table, $field);
+
+            // Define key parentid (foreign) to be added to block_totara_featured_links_tiles.
+            $dbman->add_key($table, $key);
+        }
+
+        upgrade_block_savepoint(true, 2018091400, 'totara_featured_links');
     }
 
     return true;

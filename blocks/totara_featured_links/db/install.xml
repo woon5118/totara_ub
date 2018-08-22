@@ -23,7 +23,7 @@
         <FIELD NAME="audienceshowing" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="This field holds whether the audience rules are to be applied"/>
         <FIELD NAME="presetshowing" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="This field holds whether the preset rules are to be applied"/>
         <FIELD NAME="tilerulesshowing" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="This field holds whether the tile defined rules are to be applied"/>
-        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The tile that is the parent of this tile"/>
+        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The tile that is the parent of this tile"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="id" TYPE="primary" FIELDS="id" COMMENT="The tile id"/>

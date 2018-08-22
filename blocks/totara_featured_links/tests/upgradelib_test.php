@@ -46,6 +46,7 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
         $blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
         $data->block = $blockgenerator->create_instance();
 
+        // First old gallery tile.
         $data->oldgallerytile = $blockgenerator->create_gallery_tile($data->block->id);
 
         $fs = get_file_storage();
@@ -83,6 +84,44 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
         $this->assertContains('text', $datastring);
         $this->assertContains('/', $datastring);
 
+        // Second old gallery tile.
+        $data->oldgallerytile2 = $blockgenerator->create_gallery_tile($data->block->id);
+
+        $fs = get_file_storage();
+        $file_record = [
+            'contextid' => context_block::instance($data->block->id)->id,
+            'component' => 'block_totara_featured_links',
+            'filearea' => 'tile_backgrounds',
+            'itemid' => $data->oldgallerytile2->id,
+            'filepath' => '/',
+            'filename' => 'image3.png'
+        ];
+        $fs->create_file_from_string($file_record, 'test file');
+
+        $file_record = [
+            'contextid' => context_block::instance($data->block->id)->id,
+            'component' => 'block_totara_featured_links',
+            'filearea' => 'tile_backgrounds',
+            'itemid' => $data->oldgallerytile2->id,
+            'filepath' => '/',
+            'filename' => 'image4.png'
+        ];
+        $fs->create_file_from_string($file_record, 'test file');
+
+        $databaserow = $DB->get_record('block_totara_featured_links_tiles', ['id' => $data->oldgallerytile2->id]);
+        $tiledata = json_decode($databaserow->dataraw);
+        $tiledata->url = '/';
+        $tiledata->heading = 'heading';
+        $tiledata->textbody = 'text';
+        $tiledata->background_imgs = ['image3.png', 'image4.png'];
+        $databaserow->dataraw = json_encode($tiledata);
+        $DB->update_record('block_totara_featured_links_tiles', $databaserow);
+
+        $datastring = $DB->get_field('block_totara_featured_links_tiles', 'dataraw', ['id' => $data->oldgallerytile2->id]);
+        $this->assertContains('heading', $datastring);
+        $this->assertContains('text', $datastring);
+        $this->assertContains('/', $datastring);
+
         return $data;
     }
 
@@ -98,8 +137,38 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
 
         split_gallery_tiles_into_subtiles();
         $fs = get_file_storage();
+
+        // Test the first gallery was reestablish correctly.
         $newtiles = $DB->get_records('block_totara_featured_links_tiles', ['parentid' => $data->oldgallerytile->id]);
         $expectedimages = ['image1.png', 'image2.png'];
+        foreach ($newtiles as $newtile) {
+            /** @var default_tile $newtileinstance */
+            $newtileinstance = base::get_tile_instance($newtile);
+            $this->assertInstanceOf(default_tile::class, $newtileinstance);
+            $this->assertEquals('heading', $newtileinstance->data->heading);
+            $this->assertEquals('text', $newtileinstance->data->textbody);
+
+            $key = array_search($newtileinstance->data->background_img, $expectedimages);
+            if ($key !== false) {
+                unset($expectedimages[$key]);
+            } else {
+                $this->fail('The image was not an expected value');
+            }
+
+            $this->assertNotFalse($fs->get_file(
+                context_block::instance($data->block->id)->id,
+                'block_totara_featured_links',
+                'tile_background',
+                $newtileinstance->id,
+                '/',
+                $newtileinstance->data->background_img
+            ));
+        }
+        $this->assertEmpty($expectedimages);
+
+        // Test the second gallery was reestablish correctly.
+        $newtiles = $DB->get_records('block_totara_featured_links_tiles', ['parentid' => $data->oldgallerytile2->id]);
+        $expectedimages = ['image3.png', 'image4.png'];
         foreach ($newtiles as $newtile) {
             /** @var default_tile $newtileinstance */
             $newtileinstance = base::get_tile_instance($newtile);

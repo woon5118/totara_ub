@@ -49,12 +49,10 @@ function split_gallery_tiles_into_subtiles() {
             $newtile->id = block_totara_featured_links\tile\default_tile::add($newtile->blockid, $gallerytile->id)->id;
             unset($newtile->data->background_imgs);
             unset($newtile->type);
-            $newtile->parentid = $gallerytile->id;
+            $newtile->parentid = (int) $gallerytile->id;
             $newtile->data->background_img = $background_img;
 
-
-
-            $files = $fs->get_area_files($context->id, 'block_totara_featured_links', 'tile_backgrounds');
+            $files = $fs->get_area_files($context->id, 'block_totara_featured_links', 'tile_backgrounds', $gallerytile->id);
             $oldfile = null;
             foreach ($files as $file) {
                 if ($file->get_filename() == $newtile->data->background_img) {
@@ -84,7 +82,8 @@ function split_gallery_tiles_into_subtiles() {
         $fs->delete_area_files(
             context_block::instance($gallerytile->blockid)->id,
             'block_totara_featured_links',
-            'tile_backgrounds'
+            'tile_backgrounds',
+            $gallerytile->id
         );
     }
 }
