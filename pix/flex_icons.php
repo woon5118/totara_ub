@@ -895,6 +895,13 @@ $icons = array(
                     'classes' => 'fa-expand',
                 ),
         ),
+    'expandable' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-down'
+                ),
+        ),
     'expanded' =>
         array(
             'data' =>
@@ -1960,6 +1967,20 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-trash',
+                ),
+        ),
+    'tree-list-collapsed' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-angle-right',
+                ),
+        ),
+    'tree-list-expanded' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-angle-down',
                 ),
         ),
     'undo' =>

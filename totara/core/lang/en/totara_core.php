@@ -65,6 +65,7 @@ $string['cachedef_hookwatchers'] = 'Hook watchers';
 $string['calendar'] = 'Calendar';
 $string['cannotdownloadtotaralanguageupdatelist'] = 'Cannot download list of language updates from download.totaralms.com';
 $string['cannotundeleteuser'] = 'Cannot undelete user';
+$string['clearall'] = 'Clear all';
 $string['cloudconfigoverride'] = 'This setting is not available on Totara cloud.';
 $string['column'] = 'Column';
 $string['competency_typeicon'] = 'Competency type icon';

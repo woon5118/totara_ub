@@ -609,4 +609,21 @@ class behat_totara_core extends behat_base {
         // Visit login page.
         $this->getSession()->visit($this->locate_path('totara/core/tests/fixtures/purge_cookies.php'));
     }
+
+    /**
+     * Navigates directly to the specified fixture.
+     *
+     * These pages are only used for acceptance testing and do not appear in the navigation.
+     * For that reason we must navigate directly to them.
+     *
+     * @Given /^I navigate to the "([^"]*)" fixture in the "([^"]*)" plugin$/
+     * @param string $name
+     * @param string $path
+     */
+    public function i_navigate_to_the_fixture_in_the_plugin($name, $path) {
+        \behat_hooks::set_step_readonly(false);
+        $url = new moodle_url("/{$path}/tests/fixtures/{$name}.php");
+        $this->getSession()->visit($url->out(false));
+        $this->wait_for_pending_js();
+    }
 }
