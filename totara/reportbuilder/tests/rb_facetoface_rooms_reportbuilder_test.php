@@ -117,8 +117,8 @@ class rb_facetoface_rooms_reportbuilder_test extends advanced_testcase
             $id,
             "facetoface_rooms",
             false,
-            $user->id,
             null,
+            $user->id,
             false,
             [],
             null
