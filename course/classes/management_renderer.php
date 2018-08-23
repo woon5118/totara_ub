@@ -1196,13 +1196,19 @@ class core_course_management_renderer extends plugin_renderer_base {
      * @return string
      */
     public function search_listitem(course_in_list $course, $selectedcourse) {
-
+        global $CFG;
         $text = $course->get_formatted_name();
+        $visible = 1;
+        if (empty($CFG->audiencevisibility)) {
+            $visible = $course->visible;
+        } else if ($course->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+            $visible = 0;
+        }
         $attributes = array(
             'class' => 'listitem listitem-course',
             'data-id' => $course->id,
             'data-selected' => ($selectedcourse == $course->id) ? '1' : '0',
-            'data-visible' => $course->visible ? '1' : '0'
+            'data-visible' => $visible
         );
         $bulkcourseinput = '';
         if (coursecat::get($course->category)->can_move_courses_out_of()) {
