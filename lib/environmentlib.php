@@ -1681,7 +1681,7 @@ function check_full_text_search(environment_results $result) {
     $dbfamily = $DB->get_dbfamily();
     $ftslanguage = $DB->get_ftslanguage();
 
-    $result->setInfo("Full text search support ({$ftslanguage})");
+    $result->setInfo(get_string('fulltestsearchsupportwarning', 'admin', $ftslanguage));
     $result->setCurrentVersion($ftslanguage);
 
     if ($dbfamily === 'mssql') {
@@ -1706,7 +1706,7 @@ function check_full_text_search(environment_results $result) {
  * @return environment_results|null updated results object, or null
  */
 function check_icu_version(environment_results $result) {
-    $result->setInfo('International Components for Unicode (ICU) - 57.1 or later is recommended');
+    $result->setInfo(get_string('icuminimumversionwarning', 'admin'));
 
     if (!defined('INTL_ICU_VERSION') or version_compare('57', INTL_ICU_VERSION, '>')) {
         $result->setStatus(false);

@@ -2185,7 +2185,7 @@ function check_database_storage_engine(environment_results $result) {
         $engine = $DB->get_dbengine();
         // Check if MyISAM is the storage engine that will be used, if so, do not proceed and display an error.
         if ($engine == 'MyISAM') {
-            $result->setInfo('unsupported_db_storage_engine');
+            $result->setInfo(get_string('unsupporteddbstorageenginecheck', 'admin'));
             $result->setStatus(false);
             return $result;
         }
@@ -2217,13 +2217,13 @@ function check_database_tables_row_format(environment_results $result) {
 
             } else if ($format === 'Dynamic') {
                 if ($size > $generator::ANTELOPE_MAX_ROW_SIZE) {
-                    $result->setInfo('unsupported_db_table_row_format');
+                    $result->setInfo(get_string('unsupporteddbtablerowformatcheck', 'admin'));
                     $result->setStatus(false);
                     return $result;
                 }
 
             } else {
-                $result->setInfo('unsupported_db_table_row_format');
+                $result->setInfo(get_string('unsupporteddbtablerowformatcheck', 'admin'));
                 $result->setStatus(false);
                 return $result;
             }
@@ -2437,7 +2437,7 @@ function check_unoconv_version(environment_results $result) {
         }
 
         if ($currentversion < $supportedversion) {
-            $result->setInfo('unoconv version not supported');
+            $result->setInfo(get_string('unsupportedunoconvversion', 'admin'));
             $result->setStatus(false);
             return $result;
         }
@@ -2455,19 +2455,19 @@ function check_tls_libraries(environment_results $result) {
     global $CFG;
 
     if (!function_exists('curl_version')) {
-        $result->setInfo('cURL PHP extension is not installed');
+        $result->setInfo(get_string('curlphpextensionnotinstalled', 'admin'));
         $result->setStatus(false);
         return $result;
     }
 
     if (!\core\upgrade\util::validate_php_curl_tls(curl_version(), PHP_ZTS)) {
-        $result->setInfo('invalid ssl/tls configuration');
+        $result->setInfo(get_string('invalidssltlsconfiguration', 'admin'));
         $result->setStatus(false);
         return $result;
     }
 
     if (!\core\upgrade\util::can_use_tls12(curl_version(), php_uname('r'))) {
-        $result->setInfo('ssl/tls configuration not supported');
+        $result->setInfo(get_string('unsupportedssltlsconfiguration', 'admin'));
         $result->setStatus(false);
         return $result;
     }
@@ -2484,7 +2484,7 @@ function check_tls_libraries(environment_results $result) {
 function check_libcurl_version(environment_results $result) {
 
     if (!function_exists('curl_version')) {
-        $result->setInfo('cURL PHP extension is not installed');
+        $result->setInfo(get_string('curlphpextensionnotinstalled', 'admin'));
         $result->setStatus(false);
         return $result;
     }

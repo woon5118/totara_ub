@@ -115,7 +115,7 @@ function totara_core_xml_external_entities_check(environment_results $result) {
         // They should have libxml installed to have loaded the environment.xml, but perhaps this particular class
         // is not enabled somehow. It's unlikely and this is the class referenced in security discussions
         // so is the best to test against.
-        $result->setInfo('DOMDocument class not found. Cannot perform security check regarding XML loading external entities by default.');
+        $result->setInfo(get_string('domdocumentnotfound', 'admin'));
         $result->setStatus(false);
         return $result;
     }
@@ -124,7 +124,7 @@ function totara_core_xml_external_entities_check(environment_results $result) {
     $dom->load($CFG->dirroot . "/totara/core/tests/fixtures/extentities.xml");
 
     if (totara_core_xml_external_entities_check_searchdom($dom, 'filetext')) {
-        $result->setInfo('An XML library loaded an external entity by default. This represents a security risk. Consider upgrading versions of PHP and/or libxml to resolve this.');
+        $result->setInfo(get_string('xmllibraryentitycheckerror', 'admin'));
         $result->setStatus(false);
         return $result;
     }
