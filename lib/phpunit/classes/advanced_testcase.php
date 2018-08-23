@@ -100,6 +100,11 @@ abstract class advanced_testcase extends base_testcase {
             self::resetAllData(true);
         }
 
+        if (!defined('PHPUNIT_DISABLE_UNRESET_PROPERTIES_CHECK') || !PHPUNIT_DISABLE_UNRESET_PROPERTIES_CHECK) {
+            // Check for properties which are not reset on tearDown.
+            $this->checkForUnresetProperties();
+        }
+
         // make sure test did not forget to close transaction
         if ($DB->is_transaction_started()) {
             self::resetAllData();
@@ -486,6 +491,36 @@ abstract class advanced_testcase extends base_testcase {
      */
     public static function resetAllData($detectchanges = false) {
         phpunit_util::reset_all_data($detectchanges);
+    }
+
+    /**
+     * Check for properties which are not reset on tearDown.
+     *
+     * @return void
+     */
+    public function checkForUnresetProperties() {
+        $reflectionclass = new ReflectionClass($this);
+        $defaultproperties = $reflectionclass->getDefaultProperties();
+        foreach ($reflectionclass->getProperties() as $property) {
+            if ($property->isStatic()
+                || $property->getDeclaringClass()->getName() != get_class($this)
+            ) {
+                continue;
+            }
+            $property->setAccessible(true);
+            // If property was defined with a value and value did not change don't complain.
+            if (isset($defaultproperties[$property->getName()])
+                && $defaultproperties[$property->getName()] == $property->getValue($this)){
+                continue;
+            }
+            // Otherwise if property was not set to null fail the build
+            if ($property->getValue($this) !== null) {
+                $message = sprintf("Property '%s' defined in '%s' was not reset after the test!\n".
+                    "Please either find a way to avoid using a class variable or make sure it get's unset ".
+                    "in the tearDown method to avoid creating memory leaks.", $property->getName(), get_class($this));
+                $this->fail($message);
+            }
+        }
     }
 
     /**

@@ -20,6 +20,7 @@
 
     <php>
         <!--<const name="PHPUNIT_LONGTEST" value="1"/> uncomment to execute also slow or otherwise expensive tests-->
+        <!--<const name="PHPUNIT_DISABLE_UNRESET_PROPERTIES_CHECK" value="1"/> uncomment to disable check which protects against creating memory leaks-->
         <!--Following constants instruct tests to fetch external test files from alternative location or skip tests if empty, clone https://github.com/totara/exttests to local web server-->
         <!--<const name="TEST_EXTERNAL_FILES_HTTP_URL" value="http://test.totaralms.com/exttests"/> uncomment and alter to fetch external test files from alternative location-->
         <!--<const name="TEST_EXTERNAL_FILES_HTTPS_URL" value="https://test.totaralms.com/exttests"/> uncomment and alter to fetch external test files from alternative location-->
