@@ -510,7 +510,7 @@ class help_icon implements renderable, templatable {
 
         $data = get_formatted_help_string($this->identifier, $this->component, false);
 
-        $helpflex = \core\output\flex_icon::get_icon('help', [
+        $helpflex = \core\output\flex_icon::get_icon('help', 'core', [
             'alt'=> $alt,
             'classes'=> 'iconhelp'
         ]);
