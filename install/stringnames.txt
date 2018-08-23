@@ -42,6 +42,7 @@ environmentsub2,install
 errorsinenvironment,install
 installation,install
 invalidmd5,error
+ishttpswarning,admin
 langdownloaderror,install
 language,moodle
 maturitycorewarning,admin
@@ -69,6 +70,7 @@ previous,moodle
 releasenoteslink,admin
 reload,moodle
 remotedownloaderror,error
+sitenothttps,admin
 thisdirection,langconfig
 thislanguage,langconfig
 totaralearn,totara_core

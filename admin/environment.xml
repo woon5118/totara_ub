@@ -485,6 +485,11 @@
       </CUSTOM_CHECK>
       <CUSTOM_CHECK file="lib/environmentlib.php" function="check_icu_version" level="optional">
       </CUSTOM_CHECK>
+      <CUSTOM_CHECK file="lib/upgradelib.php" function="check_is_https" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="ishttpswarning" />
+        </FEEDBACK>
+      </CUSTOM_CHECK>
     </CUSTOM_CHECKS>
   </TOTARA>
 </COMPATIBILITY_MATRIX>

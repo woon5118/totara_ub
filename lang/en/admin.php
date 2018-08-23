@@ -71,6 +71,7 @@ $string['authsettings'] = 'Manage authentication';
 $string['autolang'] = 'Language autodetect';
 $string['autologinguests'] = 'Auto-login guests';
 $string['searchareas'] = 'Search areas';
+$string['sitenothttps'] = 'Site not https';
 $string['availableto'] = 'Available to';
 $string['availablelicenses'] = 'Available licences';
 $string['backgroundcolour'] = 'Transparent colour';
@@ -629,6 +630,7 @@ $string['iplookupinfo'] = 'By default Totara uses the free online NetGeo (The In
 It is recommended to install local copy of free GeoLite2 City database from MaxMind.<br />
 IP address location is displayed on simple map or using Google Maps. Please note that you need to have a Google account and apply for free Google Maps API key to enable interactive maps.';
 $string['iplookupmaxmindnote'] = 'This product includes GeoLite2 data created by MaxMind, available from <a href="http://www.maxmind.com">http://www.maxmind.com</a>.';
+$string['ishttpswarning'] = 'It has been detected that your site is not secured using HTTPS. For increased security and improved integration with other systems, it is highly recommended that you migrate your site to HTTPS.';
 $string['keeptagnamecase'] = 'Keep tag name casing';
 $string['lang'] = 'Default language';
 $string['language'] = 'Language';
