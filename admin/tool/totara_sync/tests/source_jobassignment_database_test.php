@@ -42,9 +42,15 @@ class tool_totara_sync_source_jobassignment_database_testcase extends advanced_t
     private $dbuser = '';
     private $dbpass = '';
     private $dbtable = '';
+    
+    protected function tearDown() {
+        $this->ext_dbconnection = null;
+        $this->dbtype = $this->dbhost = $this->dbport = $this->dbname = $this->dbuser = $this->dbpass = $this->dbtable = '';
 
-    public function setUp()
-    {
+        parent::tearDown(); 
+    }
+
+    protected function setUp() {
         global $CFG;
 
         if (defined('TEST_SYNC_DB_TYPE') ||

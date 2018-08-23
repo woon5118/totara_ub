@@ -44,6 +44,14 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
     protected function tearDown() {
         $this->rb = null;
+        $this->user = null;
+        $this->shortname = null;
+        $this->filter1 = null;
+        $this->filter4 = null;
+        $this->column1 = null;
+        $this->column4 = null;
+        $this->savedsearch = null;
+
         parent::tearDown();
     }
 

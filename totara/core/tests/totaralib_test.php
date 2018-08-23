@@ -35,6 +35,10 @@ class totaralib_test extends advanced_testcase {
 
     protected function tearDown() {
         $this->user = null;
+        $this->manager = null;
+        $this->teamleader = null;
+        $this->appraiser = null;
+
         parent::tearDown();
     }
 

@@ -39,6 +39,15 @@ class core_exporter_testcase extends advanced_testcase {
     protected $validdata = null;
     protected $invaliddata = null;
 
+    protected function tearDown() {
+        $this->validrelated = null;
+        $this->invalidrelated = null;
+        $this->validdata = null;
+        $this->invaliddata = null;
+
+        parent::tearDown();
+    }
+
     public function setUp() {
         $s = new stdClass();
         $this->validrelated = array(

@@ -35,7 +35,14 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
     private $users, $positions, $organisations, $hierarchy, $reportid, $report, $wrapper;
 
     protected function tearDown() {
-        $this->rb = null;
+        $this->users = null;
+        $this->positions = null;
+        $this->organisations = null;
+        $this->hierarchy = null;
+        $this->reportid = null;
+        $this->report = null;
+        $this->wrapper = null;
+
         parent::tearDown();
     }
 

@@ -77,14 +77,11 @@ class mod_facetoface_userdata_interest_test extends advanced_testcase {
      * Unset properties to avoid PHPUnit memory problems.
      */
     protected function tearDown() {
+        $this->user1 = $this->user2 = null;
+        $this->course1 = $this->course2 = null;
+        $this->facetoface1 = $this->facetoface2 = $this->facetoface3 = null;
+
         parent::tearDown();
-        unset($this->user1);
-        unset($this->user2);
-        unset($this->course1);
-        unset($this->course2);
-        unset($this->facetoface1);
-        unset($this->facetoface2);
-        unset($this->facetoface3);
     }
 
     /**

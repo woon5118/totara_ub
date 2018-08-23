@@ -80,10 +80,24 @@ class mod_data_external_testcase extends externallib_advanced_testcase {
     /** @var stdClass Teacher role. */
     protected $teacherrole;
 
+    protected function tearDown() {
+        $this->database = null;
+        $this->context = null;
+        $this->course = null;
+        $this->cm = null;
+        $this->group1 = $this->group2 = null;
+        $this->student1 = $this->student2 = $this->student3 = $this->student4 = null;
+        $this->studentrole = null;
+        $this->teacher = null;
+        $this->teacherrole = null;
+
+        parent::tearDown();
+    }
+
     /**
      * Set up for every test
      */
-    public function setUp() {
+    protected function setUp() {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();

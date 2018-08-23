@@ -109,6 +109,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     protected function tearDown() {
         $this->messagesink->clear();
         $this->messagesink->close();
+
         $this->messagesink = null;
         $this->data_generator = null;
         $this->program_generator = null;
@@ -116,7 +117,14 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->cohort_generator = null;
         $this->plan_generator = null;
         $this->orgframe = null;
-        $this->users = null;
+        $this->posframe = null;
+        $this->users = array();
+        $this->organisations = array();
+        $this->positions = array();
+        $this->audiences = array();
+        $this->managers = array();
+        $this->managerjas = array();
+
         parent::tearDown();
     }
 

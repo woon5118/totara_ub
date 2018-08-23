@@ -44,8 +44,16 @@ class totara_program_prog_assignment_completion_type_testcase extends reportcach
 
     protected function tearDown() {
         $this->users = null;
+        $this->dates = null;
+        $this->userfields = null;
         $this->programgenerator = null;
+        $this->programs = null;
+        $this->positiongenerator = null;
+        $this->positions = null;
+        $this->courses = null;
         $this->beforesetuptime = null;
+        $this->aftersetuptime = null;
+
         parent::tearDown();
     }
 

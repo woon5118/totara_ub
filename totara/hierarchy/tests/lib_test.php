@@ -49,11 +49,22 @@ class hierarchylib_test extends advanced_testcase {
 
     protected function tearDown() {
         $this->competency = null;
-        $this->frame1 = null;
-        $this->type1 = null;
-        $this->comp1 = null;
+        $this->nofwid = null;
+        $this->frame1 = $this->frame2 = null;
+        $this->type1 = $this->type2 = $this->type3 = null;
+        $this->comp1 = $this->comp2 = $this->comp3 = $this->comp4 = $this->comp5 = null;
         $this->type_field_data = null;
+        $this->type_data_data = null;
+        $this->competency_data = null;
+        $this->template_data = null;
+        $this->template_assignment_data = null;
+        $this->org_pos_data = null;
         $this->relations_data = null;
+        $this->scale_assignments_data = null;
+        $this->plan_competency_assign_data = null;
+        $this->plan_course_assign_data = null;
+        $this->events_handlers_data = null;
+
         parent::tearDown();
     }
 

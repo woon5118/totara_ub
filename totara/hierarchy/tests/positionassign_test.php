@@ -50,9 +50,10 @@ class positionassign_test extends advanced_testcase {
     );
 
     protected function tearDown() {
-        $this->user1 = null;
+        $this->user1 = $this->user2 = $this->user3 = $this->user4 = $this->user5 = null;
         $this->pos_framework_data = null;
         $this->pos_data = null;
+
         parent::tearDown();
     }
 

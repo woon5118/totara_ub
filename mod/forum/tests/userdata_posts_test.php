@@ -121,12 +121,12 @@ class mod_forum_userdata_posts_testcase extends advanced_testcase {
         \mod_forum\subscriptions::reset_forum_cache();
 
         // Clean up properties to avoid memory leaks.
-        unset($this->forum1, $this->forum2, $this->forum3);
-        unset($this->course1, $this->course2);
-        unset($this->cat1, $this->cat2);
-        unset($this->user1, $this->user2);
-        unset($this->generator);
-        unset($this->fs);
+        $this->forum1 = $this->forum2 = $this->forum3 = null;
+        $this->course1 = $this->course2 = null;
+        $this->cat1 = $this->cat2 = null;
+        $this->user1 = $this->user2 = null;
+        $this->generator = null;
+        $this->fs = null;
 
         parent::tearDown();
     }

@@ -39,9 +39,10 @@ class updatehierarchyitem_test extends advanced_testcase {
     private $org;
 
     protected function tearDown() {
-        $this->frame1 = null;
-        $this->org1 = null;
+        $this->frame1 = $this->frame2 = null;
+        $this->org1 = $this->org2 = $this->org3 = $this->org4 = null;
         $this->org = null;
+
         parent::tearDown();
     }
 
