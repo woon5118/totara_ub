@@ -29,7 +29,10 @@ require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_sour
 class rb_source_facetoface_summary extends rb_facetoface_base_source {
     use \core_course\rb\source\report_trait;
     use \core_user\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
+    use \mod_facetoface\rb\traits\required_columns;
+    use \mod_facetoface\rb\traits\post_config;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -112,6 +115,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_core_user_tables($joinlist, 'sessions', 'usermodified', 'modifiedby');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
         $this->add_facetoface_currentuserstatus_to_joinlist($joinlist);
+        $this->add_context_tables($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
 
         return $joinlist;
     }
@@ -600,6 +604,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             )
         );
 
+        $this->add_audiencevisibility_columns($requiredcolumns);
+
         $context = context_system::instance();
         if (has_any_capability(['mod/facetoface:viewattendees'], $context)) {
             $requiredcolumns[] = new rb_column(
@@ -641,5 +647,14 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         );
 
         return $paramoptions;
+    }
+
+    /**
+     * Report post config operations.
+     *
+     * @param reportbuilder $report
+     */
+    public function post_config(reportbuilder $report) {
+        $this->add_audiencevisibility_config($report);
     }
 }

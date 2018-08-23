@@ -38,6 +38,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     use \core_user\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
+    use \mod_facetoface\rb\traits\required_columns;
+    use \mod_facetoface\rb\traits\post_config;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
@@ -583,54 +585,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      */
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'id',
-            '',
-            "course.id",
-            array(
-                'joins' => 'course',
-                'required' => 'true',
-                'hidden' => 'true'
-            )
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'visible',
-            '',
-            "course.visible",
-            array(
-                'joins' => 'course',
-                'required' => 'true',
-                'hidden' => 'true'
-            )
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'audiencevisible',
-            '',
-            "course.audiencevisible",
-            array(
-                'joins' => 'course',
-                'required' => 'true',
-                'hidden' => 'true')
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'ctx',
-            'id',
-            '',
-            "ctx.id",
-            array(
-                'joins' => 'ctx',
-                'required' => 'true',
-                'hidden' => 'true'
-            )
-        );
-
+        $this->add_audiencevisibility_columns($requiredcolumns);
         return $requiredcolumns;
     }
 
@@ -839,11 +794,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      * @param reportbuilder $report
      */
     public function post_config(reportbuilder $report) {
-        $userid = $report->reportfor;
-        if (isset($report->embedobj->embeddedparams['userid'])) {
-            $userid = $report->embedobj->embeddedparams['userid'];
-        }
-        $report->set_post_config_restrictions($report->post_config_visibility_where('course', 'course', $userid));
+        $this->add_audiencevisibility_config($report);
     }
 
     /**
