@@ -365,5 +365,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018082000, 'totara', 'core');
     }
 
+    if ($oldversion < 2018082500) {
+        // Moodle introduced the settings 'test_password' and 'test_serializer' for the redis cache store.
+        // We set it to an empty string if the setting it not yet set
+        if (get_config('cachestore_redis', 'test_password') === false) {
+            set_config('test_password', '', 'cachestore_redis');
+        }
+        // We set it to the default php serializer if the setting it not yet set.
+        if (get_config('cachestore_redis', 'test_serializer') === false) {
+            set_config('test_serializer', 1, 'cachestore_redis');
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018082500, 'totara', 'core');
+    }
+
     return true;
 }
