@@ -37,7 +37,7 @@ Feature: Add and configure blocks throughout the site
     And I set the following fields to these values:
       | Page contexts | Display throughout the entire site |
     And I press "Save changes"
-    When I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "Comments" in the "Comments" "block"
     And I should see "Save comment" in the "Comments" "block"
     And I am on site homepage
@@ -45,7 +45,7 @@ Feature: Add and configure blocks throughout the site
     And I set the following fields to these values:
       | Default weight | -10 (first) |
     And I press "Save changes"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Comments" in the "//*[@id='region-top' or @id='block-region-top']/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' block ')]" "xpath_element"
 
   Scenario: Blocks on the dashboard page can have roles assigned to them

@@ -1248,7 +1248,8 @@ class core_plugin_manager {
                 'totara_recent_learning', 'totara_report_graph', 'totara_report_manager', 'totara_stats',
                 'totara_tasks', 'totara_certifications', 'gaccess', 'totara_program_completion',
                 'totara_dashboard', 'totara_report_table', 'last_course_accessed',
-                'current_learning', 'totara_featured_links'
+                'current_learning', 'totara_featured_links',
+                'course_search', 'course_progress_report', 'frontpage_combolist',
             ),
 
             'booktool' => array(

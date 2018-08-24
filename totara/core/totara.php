@@ -1077,7 +1077,11 @@ function get_my_scheduled_reports_list($sqlclause=array()) {
     return $scheduledreports;
 }
 
+/**
+ * @deprecated since Totara 12, use the new structure block instead.
+ */
 function totara_print_my_courses() {
+    debugging(__FUNCTION__ . ' is deprecated, please use the new structure block instance', DEBUG_DEVELOPER);
     global $CFG, $OUTPUT, $PAGE;
 
     // Report builder lib is required for the embedded report.

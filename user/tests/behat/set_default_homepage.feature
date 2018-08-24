@@ -24,5 +24,5 @@ Feature: Set the site home page and dashboard as the default home page
     And I click on "Home" in the totara menu
     And I follow "Make Home my default page"
     And I should not see "Make Home my default page"
-    When I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then "//*[@class='breadcrumb-nav']//li/span/a/span[text()='Home']" "xpath_element" should exist

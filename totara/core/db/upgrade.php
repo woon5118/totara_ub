@@ -435,5 +435,24 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018092600, 'totara', 'core');
     }
 
+    if ($oldversion < 2018100100) {
+        // Upgrade the old frontpage block bits.
+        totara_core_migrate_frontpage_display();
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018100100, 'totara', 'core');
+    }
+
+    if ($oldversion < 2018100101) {
+        // Clean up the frontpage settings.
+        unset_config('frontpage', 'core');
+        unset_config('frontpageloggedin', 'core');
+        unset_config('courseprogress', 'core');
+        unset_config('maxcategorydepth', 'core');
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018100101, 'totara', 'core');
+    }
+
     return true;
 }

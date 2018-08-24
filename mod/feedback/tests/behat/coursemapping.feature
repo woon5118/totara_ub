@@ -235,6 +235,6 @@ Feature: Mapping courses in a feedback
     And I follow "Turn editing off"
     And I am on site homepage
     Then "Feedback" "block" should not exist
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And "Feedback" "block" should not exist
     And I log out

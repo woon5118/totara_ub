@@ -3,7 +3,8 @@ Feature: Keyholder role is listed as course contact
   As a student I need to know who the keyholder is to enrol in a course
 
   Background:
-    Given I log in as "admin"
+    Given I am on a totara site
+    And I log in as "admin"
     And I am on site homepage
     And the following "categories" exist:
       | name | category | idnumber |

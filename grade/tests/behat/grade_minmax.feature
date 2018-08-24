@@ -24,8 +24,7 @@ Feature: We can choose what min or max grade to use when aggregating grades.
     And I log in as "admin"
     And I set the following administration settings values:
       | grade_minmaxtouse | Min and max grades as specified in grade item settings |
-    And I am on site homepage
-    And I follow "C1"
+    And I am on "C1" course homepage
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And I press "Add grade item"
     And I set the following fields to these values:

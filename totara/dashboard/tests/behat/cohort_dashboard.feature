@@ -15,7 +15,8 @@ Feature: Test Dashboard for cohort users
       | student1 | CH1    |
 
     And I log in as "admin"
-    And I navigate to "Front page settings" node in "Site administration > Front page"
+    And I am on site homepage
+    And I navigate to "Edit settings" node in "Front page settings"
       # Behat does not recognize field name in this case "Front page summary"
     And I set the following fields to these values:
       | summary | I'm a label on the frontpage |

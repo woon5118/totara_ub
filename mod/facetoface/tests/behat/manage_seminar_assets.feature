@@ -14,9 +14,7 @@ Feature: Ability to view the seminar's asset, even though the asset is being use
     even though the asset is being used
     by an on-going seminar's event
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I follow "course101"
-    And I turn editing mode on
+    And I am on "course101" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Seminar 1             |
       | Description | This is description 1 |

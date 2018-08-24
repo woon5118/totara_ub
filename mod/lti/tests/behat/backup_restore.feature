@@ -2,7 +2,8 @@
 Feature: Restoring Moodle 2 backup restores LTI configuration
 
   Background:
-    Given the following "users" exist:
+    Given I am on a totara site
+    And the following "users" exist:
       | username | firstname | lastname | email                |
       | teacher1 | Terry1    | Teacher1 | teacher1@example.com |
     And the following "courses" exist:

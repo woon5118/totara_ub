@@ -22,7 +22,7 @@ Feature: Event Name Site Logs report filter
   @javascript
   Scenario: Test site logs event name filter
     Given I log in as "admin"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Self enrolment" enrolment method with:
       | Custom instance name | Self enrolment |
 

@@ -1733,8 +1733,7 @@ class core_course_external extends external_api {
             }
 
             // Check category depth is <= maxdepth (do not check for user who can manage categories).
-            if ((!empty($CFG->maxcategorydepth) && count($parents) > $CFG->maxcategorydepth)
-                    and !has_capability('moodle/category:manage', $context)) {
+            if (count($parents) > 2 and !has_capability('moodle/category:manage', $context)) {
                 $excludedcats[$category->id] = 'depth';
             }
 

@@ -80,7 +80,14 @@ class behat_totara_core extends behat_base {
         $DB->set_field('role', 'name', 'Editing Trainer', array('shortname' => 'editingteacher'));
         $DB->set_field('role', 'name', 'Trainer',array('shortname' => 'teacher'));
         $DB->set_field('role', 'name', 'Learner', array('shortname' => 'student'));
-        $DB->set_field('modules', 'visible', 0, array('name'=>'workshop'));
+        $DB->set_field('modules', 'visible', 0, array('name' => 'workshop'));
+        $DB->set_field('block', 'visible', 1, array('name' => 'frontpage_combolist')); // Enable "My current courses" block by default.
+
+        // Add "Available courses" block to the index page.
+        $course = $DB->get_record('course', ['id' => SITEID]);
+        $page = new moodle_page();
+        $page->set_course($course);
+        $page->blocks->add_blocks(['main' => ['frontpage_combolist']], 'site-index');
     }
 
     /**

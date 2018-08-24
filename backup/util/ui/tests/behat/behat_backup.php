@@ -60,8 +60,8 @@ class behat_backup extends behat_base {
         $this->getSession()->visit($this->locate_path('/?redirect=0'));
         $this->execute("behat_general::wait_until_the_page_is_ready");
 
-        // Click the course link.
-        $this->execute("behat_general::click_link", $backupcourse);
+        // Totara: Go to the course homepage.
+        $this->execute("behat_navigation::i_am_on_course_homepage", $backupcourse);
 
         // Click the backup link.
         $this->execute("behat_navigation::i_navigate_to_in_current_page_administration", get_string('backup'));
@@ -103,8 +103,8 @@ class behat_backup extends behat_base {
         $this->getSession()->visit($this->locate_path('/?redirect=0'));
         $this->execute("behat_general::wait_until_the_page_is_ready");
 
-        // Click the course link.
-        $this->execute("behat_general::click_link", $backupcourse);
+        // Totara: Go to the course homepage.
+        $this->execute("behat_navigation::i_am_on_course_homepage", $backupcourse);
 
         // Click the backup link.
         $this->execute("behat_navigation::i_navigate_to_in_current_page_administration", get_string('backup'));

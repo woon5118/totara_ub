@@ -10,9 +10,7 @@ Feature: The content of the featured links blocks should be carried over when ba
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
     And I log in as "admin"
-    And I click on "Find Learning" "link"
-    And I click on "Course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "Course 1" course homepage with editing mode on
 
     And I add the "Featured Links" block
     And I configure the "Featured Links" block

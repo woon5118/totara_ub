@@ -351,6 +351,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I trigger cron
     And I am on site homepage
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should see "fnameman lnameman" in the "userenrolment" "table"
@@ -384,6 +385,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I trigger cron
     And I am on site homepage
     And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should not see "fnameman lnameman" in the "userenrolment" "table"

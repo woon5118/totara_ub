@@ -44,8 +44,13 @@ Feature: Test course visibility
       | user     | cohort |
       | learner2 | AUD1   |
     And I log in as "admin"
-    And the following config values are set as admin:
-      | frontpageloggedin | 4 |
+    And I am on site homepage
+    And I navigate to "Turn editing on" node in "Front page settings"
+    And I configure the "Available courses" block
+    And I set the following fields to these values:
+      | Display | Courses nested in categories |
+    And I press "Save changes"
+    And I navigate to "Turn editing off" node in "Front page settings"
     And I navigate to "Dashboards" node in "Site administration > Appearance"
     And I click on "My Learning" "link"
     And I press "Blocks editing on"

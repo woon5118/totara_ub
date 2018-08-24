@@ -95,10 +95,6 @@ function xmldb_totara_core_install() {
 
     $systemcontext->mark_dirty();
 
-    // Set up frontpage.
-    set_config('frontpage', '');
-    set_config('frontpageloggedin', '');
-
     // Turn completion on in Totara when upgrading from Moodle.
     set_config('enablecompletion', 1);
     set_config('enablecompletion', 1, 'moodlecourse');
@@ -358,6 +354,8 @@ function xmldb_totara_core_install() {
         $dbman->add_index($table, $index);
     }
 
+    // Upgrade the old frontpage block bits when upgrading from Moodle.
+    totara_core_migrate_frontpage_display();
 
     return true;
 }

@@ -4304,6 +4304,7 @@ class admin_setting_bloglevel extends admin_setting_configselect {
 /**
  * Special select - lists on the frontpage - hacky
  *
+ * @deprecated since Totara 12
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_setting_courselist_frontpage extends admin_setting {
@@ -4317,6 +4318,7 @@ class admin_setting_courselist_frontpage extends admin_setting {
      */
     public function __construct($loggedin) {
         global $CFG;
+        debugging(__CLASS__ . 'has been deprecated as it is no longer used.', DEBUG_DEVELOPER);
         require_once($CFG->dirroot.'/course/lib.php');
         $name        = 'frontpage'.($loggedin ? 'loggedin' : '');
         $visiblename = get_string('frontpage'.($loggedin ? 'loggedin' : ''),'admin');

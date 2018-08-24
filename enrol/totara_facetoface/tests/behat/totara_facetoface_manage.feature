@@ -19,14 +19,12 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
-    And I click on "Home" in the totara menu
-    And I follow "Course 10782"
+    And I am on "Course 10782" course homepage
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
 
   Scenario: Check Seminar direct enrolment when no users enrolled
-    Given I click on "Home" in the totara menu
-    And I follow "Course 10782"
+    Given I am on "Course 10782" course homepage
     When I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Test student enrolment"
     And I should see "Delete" in the "Test student enrolment" "table_row"
@@ -64,8 +62,7 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     Then I should not see "Seminar enrolment 10782"
 
   Scenario: Check Seminar direct enrolment with users enrolled
-    Given I click on "Home" in the totara menu
-    And I follow "Course 10782"
+    Given I am on "Course 10782" course homepage
     And I follow "Seminar 10782"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -84,14 +81,16 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     And I press "Save changes"
     And I log out
     And I log in as "alice"
-    And I am on "Course 10782" course homepage
+    And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
+    And I follow "Course 10782"
     And I follow "Sign-up"
     When I press "Sign-up"
     Then I should see "Seminar 10782: Your request was accepted"
     And I log out
 
     And I log in as "admin"
-    And I follow "Course 10782"
+    And I am on "Course 10782" course homepage
     When I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should see "Alice Smith" in the "Learner" "table_row"
     When I navigate to "Enrolment methods" node in "Course administration > Users"

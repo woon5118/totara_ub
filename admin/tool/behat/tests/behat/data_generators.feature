@@ -18,7 +18,8 @@ Feature: Set up contextual data for tests
 
   @javascript
   Scenario: Add a bunch of courses and categories
-    Given the following "categories" exist:
+    Given I am on a totara site
+    And the following "categories" exist:
       | name | category | idnumber |
       | Cat 1 | 0 | CAT1 |
       | Cat 2 | CAT1 | CAT2 |

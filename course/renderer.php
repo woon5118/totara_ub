@@ -1904,11 +1904,13 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Returns HTML to display one remote course
      *
+     * @deprecated since Totara 12, use the new structure block instead.
      * @param stdClass $course remote course information, contains properties:
            id, remoteid, shortname, fullname, hostid, summary, summaryformat, cat_name, hostname
      * @return string
      */
     protected function frontpage_remote_course(stdClass $course) {
+        debugging(__FUNCTION__ . ' is deprecated, please use the new structure block instance', DEBUG_DEVELOPER);
         $url = new moodle_url('/auth/mnet/jump.php', array(
             'hostid' => $course->hostid,
             'wantsurl' => '/course/view.php?id='. $course->remoteid
@@ -1942,10 +1944,12 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Returns HTML to display one remote host
      *
+     * @deprecated since Totara 12, use the new structure block instead.
      * @param array $host host information, contains properties: name, url, count
      * @return string
      */
     protected function frontpage_remote_host($host) {
+        debugging(__FUNCTION__ . ' is deprecated, please use the new structure block instance', DEBUG_DEVELOPER);
         $output = '';
         $output .= html_writer::start_tag('div', array('class' => 'coursebox remotehost clearfix'));
         $output .= html_writer::start_tag('div', array('class' => 'info'));
@@ -1967,10 +1971,12 @@ class core_course_renderer extends plugin_renderer_base {
      *
      * Also lists remote courses or remote hosts if MNET authorisation is used
      *
+     * @deprecated since Totara 12, use the new structure block instead.
      * @return string
      */
     public function frontpage_my_courses() {
         global $USER, $CFG, $DB;
+        debugging(__FUNCTION__ . ' is deprecated, please use the new structure block instance', DEBUG_DEVELOPER);
 
         if (!isloggedin() or isguestuser()) {
             return '';
@@ -1994,10 +2000,10 @@ class core_course_renderer extends plugin_renderer_base {
         if (!empty($courses) || !empty($rcourses) || !empty($rhosts)) {
 
             $chelper = new coursecat_helper();
-            if (count($courses) > $CFG->frontpagecourselimit) {
+            if (count($courses) > 200) {
                 // There are more enrolled courses than we can display, display link to 'My courses'.
                 $totalcount = count($courses);
-                $courses = array_slice($courses, 0, $CFG->frontpagecourselimit, true);
+                $courses = array_slice($courses, 0, 200, true);
                 $chelper->set_courses_display_options(array(
                         'viewmoreurl' => new moodle_url('/totara/dashboard/'),
                         'viewmoretext' => new lang_string('mycourses')
@@ -2037,17 +2043,19 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Returns HTML to print list of available courses for the frontpage
      *
+     * @deprecated since Totara 12, use the structure block instead.
      * @return string
      */
     public function frontpage_available_courses() {
         global $CFG;
+        debugging(__FUNCTION__ . ' is deprecated, please use the new structure block instance', DEBUG_DEVELOPER);
         require_once($CFG->libdir. '/coursecatlib.php');
 
         $chelper = new coursecat_helper();
         $chelper->set_show_courses(self::COURSECAT_SHOW_COURSES_EXPANDED)->
                 set_courses_display_options(array(
                     'recursive' => true,
-                    'limit' => $CFG->frontpagecourselimit,
+                    'limit' => 200,
                     'viewmoreurl' => new moodle_url('/course/index.php'),
                     'viewmoretext' => new lang_string('fulllistofcourses')));
 
@@ -2088,13 +2096,15 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Returns HTML to print tree with course categories and courses for the frontpage
      *
+     * @deprecated since Totara 12, use the structure block instead.
      * @return string
      */
     public function frontpage_combo_list() {
         global $CFG;
+        debugging(__FUNCTION__.' is deprecated, please use the new structure block instance', DEBUG_DEVELOPER);
         require_once($CFG->libdir. '/coursecatlib.php');
         $chelper = new coursecat_helper();
-        $chelper->set_subcat_depth($CFG->maxcategorydepth)->
+        $chelper->set_subcat_depth(2)->
             set_categories_display_options(array(
                 'limit' => $CFG->coursesperpage,
                 'viewmoreurl' => new moodle_url('/course/index.php',
@@ -2112,13 +2122,15 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Returns HTML to print tree of course categories (with number of courses) for the frontpage
      *
+     * @deprecated since Totara 12, use the structure block instead.
      * @return string
      */
     public function frontpage_categories_list() {
         global $CFG;
+        debugging(__FUNCTION__.' is deprecated, please use the new structure block instance', DEBUG_DEVELOPER);
         require_once($CFG->libdir. '/coursecatlib.php');
         $chelper = new coursecat_helper();
-        $chelper->set_subcat_depth($CFG->maxcategorydepth)->
+        $chelper->set_subcat_depth(2)->
                 set_show_courses(self::COURSECAT_SHOW_COURSES_COUNT)->
                 set_categories_display_options(array(
                     'limit' => $CFG->coursesperpage,

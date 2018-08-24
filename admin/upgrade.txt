@@ -12,6 +12,7 @@ This files describes API changes in /admin/*.
     "Spain" =>  ["madrid" => "Madrid", "barcelona" => "Barcelona"],
     "France" => ["paris" => "Paris", "marseille" => "Marseille"],
   ]
+* Template setting_courselist_frontpage.mustache has been deprecated
 
 === 11 ===
 

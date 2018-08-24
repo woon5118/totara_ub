@@ -33,14 +33,14 @@ class theme_roots_renderer extends plugin_renderer_base {
      * The grid used by this renderer.
      * @var \theme_roots\output\bootstrap_grid
      */
-    private $layoutgrid;
+    private $grid;
 
     /**
      * Ensures that a grid has been created for this renderer.
      */
     private function ensure_grid_loaded() {
-        if ($this->layoutgrid === null) {
-            $this->layoutgrid = grid::initialise($this->page, $this);
+        if ($this->grid === null) {
+            $this->grid = grid::initialise($this->page, $this);
         }
     }
 
@@ -66,16 +66,16 @@ class theme_roots_renderer extends plugin_renderer_base {
      */
     public function blocks($region) {
         $this->ensure_grid_loaded();
-        if (!$this->layoutgrid->show($region)) {
+        if (!$this->grid->show($region)) {
             return '';
         }
-        $classes = $this->layoutgrid->classes($region);
+        $classes = $this->grid->classes($region);
         $tag = 'aside';
         $html = $this->output->blocks($region, $classes, $tag);
 
-        if ($region === $this->layoutgrid::REGION_TOP) {
+        if ($region === $this->grid::REGION_TOP) {
             $html = '<div id="region-top" class="row">' . $html . '</div>';
-        } else if ($region === $this->layoutgrid::REGION_BOTTOM) {
+        } else if ($region === $this->grid::REGION_BOTTOM) {
             $html = '<div id="region-top" class="row">' . $html . '</div>';
         }
 
@@ -128,7 +128,9 @@ class theme_roots_renderer extends plugin_renderer_base {
      */
     public function main_content_classes(): string {
         $this->ensure_grid_loaded();
-        $classes = $this->layoutgrid->classes($this->layoutgrid::CONTENT);
+
+        $classes = $this->grid->classes($this->grid::CONTENT);
+
         return $classes;
     }
 }

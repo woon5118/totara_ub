@@ -19,11 +19,11 @@ Feature: Add seminar attendees in bulk and see results
       | activity   | name    | course | idnumber |
       | facetoface | Seminar | C1     | seminar  |
     And I log in as "admin"
+    And I am on "Course 1" course homepage
 
   @_file_upload
   Scenario: Conflict result when choosing Add users via file upload option
-    Given I am on "Course 1" course homepage
-    And I follow "View all events"
+    Given I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"
 
@@ -45,8 +45,7 @@ Feature: Add seminar attendees in bulk and see results
       | I2        | John2 Smith2  | This user is already signed-up for this seminar activity |
 
   Scenario: Conflict result when choosing Add users via list of IDs option
-    Given I am on "Course 1" course homepage
-    And I follow "View all events"
+    Given I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"
 
@@ -68,8 +67,7 @@ Feature: Add seminar attendees in bulk and see results
 
   @_file_upload
   Scenario: Success result when choosing Add users via file upload option
-    Given I am on "Course 1" course homepage
-    And I follow "View all events"
+    Given I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"
 
@@ -87,8 +85,7 @@ Feature: Add seminar attendees in bulk and see results
       | I2        | John2 Smith2  | Added successfully |
 
   Scenario: Success result when choosing Add users via list of IDs option
-    Given I am on "Course 1" course homepage
-    And I follow "View all events"
+    Given I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"
 
@@ -104,8 +101,7 @@ Feature: Add seminar attendees in bulk and see results
       | I3        | John3 Smith3  | Added successfully |
 
   Scenario: Success result when choosing Add users and Remove users options
-    Given I am on "Course 1" course homepage
-    And I follow "View all events"
+    Given I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"
 

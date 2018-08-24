@@ -21,7 +21,7 @@ Feature: Ensure page layouts are listed correctly
     And the "Region" select box should contain "Right"
     And the "Region" select box should contain "Top"
     And the "Region" select box should contain "Bottom"
-    And the "Region" select box should not contain "Main"
+    And the "Region" select box should contain "Main"
 
   Scenario: Ensure editing a block on the dashboard lists the dashboard layout options
     Given I click on "Dashboard" in the totara menu
@@ -96,7 +96,7 @@ Feature: Ensure page layouts are listed correctly
 
   Scenario: Ensure regions get a special css class in editing mode only
     When I navigate to "Turn editing on" node in "Front page settings"
-    Then "#region-main.editing-region-border" "css_element" should not exist
+    Then "#block-region-main.editing-region-border" "css_element" should exist
     And "#block-region-top.editing-region-border" "css_element" should exist
     And "#block-region-bottom.editing-region-border" "css_element" should exist
     And "#block-region-side-pre.editing-region-border" "css_element" should exist
@@ -107,16 +107,16 @@ Feature: Ensure page layouts are listed correctly
 
     When I click on "Dashboard" in the totara menu
     And I click on "Customise this page" "button"
-    Then "#region-main .editing-region-border" "css_element" should exist
+    Then "#block-region-main.editing-region-border" "css_element" should exist
     And "#block-region-top.editing-region-border" "css_element" should exist
     And "#block-region-bottom.editing-region-border" "css_element" should exist
     And "#block-region-side-pre.editing-region-border" "css_element" should exist
     And "#block-region-side-post.editing-region-border" "css_element" should exist
     When I click on "Stop customising this page" "button"
-    Then "#region-main .editing-region-border" "css_element" should not exist
+    Then "#block-region-main.editing-region-border" "css_element" should not exist
 
     # On "Advanced features" page only the left region should have the region border displayed.
     When I navigate to "Advanced features" node in "Site administration"
     And I click on "Blocks editing on" "button"
     Then "#block-region-side-pre.editing-region-border" "css_element" should exist
-    And "#region-main .editing-region-border" "css_element" should not exist
+    And "#block-region-main.editing-region-border" "css_element" should not exist

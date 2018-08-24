@@ -12,6 +12,11 @@ information provided here is intended especially for developers.
    Those fields are VALUE_OPTIONAL for backwards compatibility.
  * core_course_renderer::course_section_cm_completion() has changed
  * core_course_management_renderer::detail_pair has changed
+ * core_course_renderer::frontpage_remote_course() has been deprecated
+ * core_course_renderer::frontpage_remote_host() has been deprecated
+ * core_course_renderer::frontpage_my_courses() has been deprecated
+ * core_course_renderer::frontpage_available_courses() has been deprecated
+ * core_course_renderer::frontpage_combo_list() has been deprecated
 
 === 11 ===
 

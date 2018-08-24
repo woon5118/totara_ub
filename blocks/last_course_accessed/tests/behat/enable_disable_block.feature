@@ -7,9 +7,7 @@ Feature: Site Administrator can enable and disable the LCA block.
       | fullname | shortname | enablecompletion |
       | Course 1 | C1        | 1                |
     When I log in as "admin"
-    And I follow "Find Learning"
-    And I follow "Course 1"
-    And I press "Turn editing on"
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "Last Course Accessed" block
     Then I should see "Last Course Accessed"
     And I log out

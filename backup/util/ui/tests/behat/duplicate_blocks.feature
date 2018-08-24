@@ -10,8 +10,7 @@ Feature: Duplicate block
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
     And I log in as "admin"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
     And I set the field "Block title (no title if blank)" to "htitle"
@@ -38,8 +37,7 @@ Feature: Duplicate block
       | Course 1 | C1 | 0 |
       | Course 2 | C2 | 0 |
     And I log in as "admin"
-    And I follow "Course 2"
-    And I turn editing mode on
+    And I am on "Course 2" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
     And I set the field "Block title (no title if blank)" to "htitle"
@@ -72,8 +70,7 @@ Feature: Duplicate block
       | Course 1 | C1 | 0 |
       | Course 2 | C2 | 0 |
     And I log in as "admin"
-    And I follow "Course 2"
-    And I turn editing mode on
+    And I am on "Course 2" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
     And I set the field "Block title (no title if blank)" to "htitle"
@@ -115,8 +112,7 @@ Feature: Duplicate block
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
     And I log in as "admin"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
     And I set the field "Block title (no title if blank)" to "htitle"

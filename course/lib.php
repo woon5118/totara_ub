@@ -43,13 +43,18 @@ define('COURSE_MAX_SUMMARIES_PER_PAGE', 10);
 define('COURSE_MAX_COURSES_PER_DROPDOWN', 1000);
 // Max users in log dropdown before switching to optional.
 define('COURSE_MAX_USERS_PER_DROPDOWN', 1000);
+
+/**
+ * The following FRONTPAGE* constants are deprecated, there is no replacement.
+ * @deprecated since Totara 12
+ */
 define('FRONTPAGENEWS', '0');
 define('FRONTPAGECATEGORYNAMES', '2');
 define('FRONTPAGECATEGORYCOMBO', '4');
 define('FRONTPAGEENROLLEDCOURSELIST', '5');
 define('FRONTPAGEALLCOURSELIST', '6');
 define('FRONTPAGECOURSESEARCH', '7');
-// Important! Replaced with $CFG->frontpagecourselimit - maximum number of courses displayed on the frontpage.
+
 define('EXCELROWS', 65535);
 define('FIRSTUSEDEXCELROW', 3);
 

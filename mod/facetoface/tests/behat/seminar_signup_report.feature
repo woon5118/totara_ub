@@ -15,9 +15,7 @@ Feature: Users that are in waitlist of seminar's event should be displayed in th
   Scenario: I should be able to see the waitlist user within the report
     Given I am on a totara site
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name | Seminar1 |
     And I turn editing mode off

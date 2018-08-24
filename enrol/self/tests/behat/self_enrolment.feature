@@ -25,7 +25,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
     And I add "Self enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
-    When I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I press "Log in as a guest"
     Then I should see "Guests cannot access this course."
     And I click on "Log in" "link"

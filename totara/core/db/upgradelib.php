@@ -517,3 +517,90 @@ function totara_core_upgrade_context_tables() {
         \context_helper::build_all_paths(true, false);
     }
 }
+
+/**
+ * The logic here is copied from blocks_add_default_course_blocks which is used during install.
+ * The block API must be functioning, but to be safe only use the structures used there.
+ *
+ * @see blocks_add_default_course_blocks()
+ */
+function totara_core_migrate_frontpage_display() {
+    global $CFG, $DB;
+
+    $tryupgrade = true;
+
+    if ($tryupgrade && !class_exists('moodle_page')) {
+        // We need to be able to use moodle_page.
+        $tryupgrade = false;
+    }
+
+    if ($tryupgrade && !defined('SITEID')) {
+        // We don't know the siteid.
+        $tryupgrade = false;
+    }
+
+    $course = $DB->get_record('course', ['id' => SITEID]);
+    if ($tryupgrade && !$course) {
+        // We don't have the site course.
+        $tryupgrade = false;
+    }
+
+    if ($tryupgrade) {
+        $blocks = [];
+
+        if (!empty(get_config('core', 'courseprogress'))) {
+            // Add an instance of block_course_progress_report
+            $blocks[] = 'course_progress_report';
+        }
+
+        $frontpage = get_config('core', 'frontpageloggedin');
+        $frontpagelayout = explode(',', $frontpage);
+
+        foreach ($frontpagelayout as $widget) {
+            switch ($widget) {
+                // Display the main part of the front page.
+                case '0': // FRONTPAGENEWS
+                    // Add an instance of the news items block.
+                    $blocks[] = 'news_items';
+                    break;
+
+                case '5': // FRONTPAGEENROLLEDCOURSELIST
+                    // Add course_list
+                    $blocks[] = 'course_list';
+                    break;
+
+                case '6': // FRONTPAGEALLCOURSELIST
+                case '2': // FRONTPAGECATEGORYNAMES
+                case '4': // FRONTPAGECATEGORYCOMBO
+                    // Add frontpage_combolist block.
+                    $blocks[] = 'frontpage_combolist';
+                    break;
+                case '7': // FRONTPAGECOURSESEARCH
+                    // Add course_search block
+                    $blocks[] = 'course_search';
+                    break;
+            }
+        }
+
+        if (!empty($blocks)) {
+            $blocks = array_unique($blocks);
+
+            foreach ($blocks as $key => $name) {
+                // Ensure the block is visible, it needs to be so that we can add it.
+                if (!$DB->record_exists('block', ['name' => $name])) {
+                    // Likely the block is not installed yet.
+                    $file = $CFG->dirroot . '/blocks/' . $name . '/version.php';
+                    if (file_exists($file)) {
+                        // OK, it's going to be installed later on.
+                        set_config('frontpage_migration', 1, 'block_' . $name);
+                    }
+                    unset($blocks[$key]); // Remove it, we can't add it yet.
+                }
+            }
+
+            $page = new moodle_page();
+            $page->set_course($course);
+            $page->blocks->add_blocks(['main' => $blocks], 'site-index');
+        }
+    }
+}
