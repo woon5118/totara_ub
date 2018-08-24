@@ -33,6 +33,7 @@ information provided here is intended especially for developers.
   * rb_source_facetoface_summary::rb_display_session_spaces(), please call mod_facetoface\rb\display\display\f2f_session_spaces::display() instead.
   * rb_source_facetoface_summary::rb_display_approver().
   * rb_source_facetoface_sessions::rb_display_show_cancelled_status(), please call mod_facetoface\rb\display\display\f2f_session_cancelled_status::display() instead.
+* facetoface_eventhandler_role_unassigned() function has been deprecated as unused.
 
 === 11.1 ===
 

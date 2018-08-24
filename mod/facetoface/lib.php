@@ -5276,12 +5276,16 @@ function facetoface_generate_bulk_result_notice($results, $type = 'bulkadd') {
 /**
  * Kohl's KW - WP06A - Google calendar integration
  *
+ * @deprecated since Totara 12.0
+ 
  * If the unassigned user belongs to a course with an upcoming
  * face-to-face session and they are signed-up to attend, cancel
  * the sign-up (and trigger notification).
  */
 function facetoface_eventhandler_role_unassigned($ra) {
     global $CFG, $USER, $DB;
+
+    debugging('facetoface_eventhandler_role_unassigned() function has been deprecated as unused', DEBUG_DEVELOPER);
 
     $now = time();
 
