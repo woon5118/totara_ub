@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package totara
- * @subpackage reportbuilder
+ * @author Mark Ward <mark.ward@learningpool.com>
+ * @package totara_program
  */
 
-// lang strings for report builder 'program completion' source
-$string['sourcetitle'] = 'Program Exception';
-
-$string['type_exceptioninfo'] = 'Exception Information';
 $string['exceptiontype'] = 'Type of exception';
+$string['sourcelabel'] = 'Program';
+$string['sourcesummary'] = 'Program exceptions information and program details.';
+$string['sourcetitle'] = 'Program Exceptions';
 $string['timeraised'] = 'Time logged';
-
+$string['type_exceptioninfo'] = 'Exception Information';

@@ -1,9 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
- * Copyright (C) 1999 onwards Martin Dougiamas
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @author Ben Lobo <ben.lobo@kineo.com>
- * @package totara
- * @subpackage reportbuilder
+ * @author Mark Ward <mark.ward@learningpool.com>
+ * @package totara_program
  */
+
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,11 +30,11 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 class rb_source_program_exception extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
-    protected $instancetype = 'program';
+    use \core_course\rb\source\report_trait;
+    use \core_user\rb\source\report_trait;
+    use \totara_cohort\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+    use \totara_program\rb\source\program_trait;
 
     public function __construct() {
         $this->base = '{prog_exception}';
@@ -48,7 +47,13 @@ class rb_source_program_exception extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program_exception');
+        $this->sourcejoins = $this->get_source_joins();
         $this->sourcewhere = $this->define_sourcewhere();
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_program_exception');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_program_exception');
+        $this->usedcomponents[] = 'totara_program';
+        $this->usedcomponents[] = 'totara_cohort'; // Needed for visibility.
+
         parent::__construct();
     }
 
@@ -56,8 +61,8 @@ class rb_source_program_exception extends rb_base_source {
      * Hide this source if feature disabled or hidden.
      * @return bool
      */
-    public function is_ignored() {
-        return !totara_feature_visible('programs');
+    public static function is_source_ignored() {
+        return !advanced_feature::is_enabled('programs');
     }
 
     /**
@@ -68,94 +73,89 @@ class rb_source_program_exception extends rb_base_source {
         return false;
     }
 
-    //
-    //
-    // Methods for defining contents of source
-    //
-    //
+    protected function get_source_joins() {
+        return array('program');
+    }
 
     protected function define_joinlist() {
-        global $CFG;
-
-        $joinlist = array(
-            new rb_join(
-                'prog',
-                'INNER',
-                '{prog}',
-                "prog.id = base.programid",
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'base'
-            ),
-        );
-
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_category_table_to_joinlist($joinlist, 'prog', 'category');
-        $this->add_cohort_program_tables_to_joinlist($joinlist, 'prog', 'id');
+        $joinlist = [];
+        $this->add_totara_program_tables($joinlist, 'base', 'programid', 'INNER');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_core_course_category_tables($joinlist, 'program', 'category');
+        $this->add_totara_cohort_program_tables($joinlist, 'program', 'id');
 
         return $joinlist;
     }
 
     protected function define_columnoptions() {
-
         $columnoptions[] = new rb_column_option(
             'exceptioninfo',
             'exceptiontype',
             get_string('exceptiontype','rb_source_program_exception'),
-            "base.exceptiontype",
-            array(
+            'base.exceptiontype',
+            [
                 'displayfunc' => 'program_exception_type'
-            )
+            ]
         );
         $columnoptions[] = new rb_column_option(
             'exceptioninfo',
             'timeraised',
             get_string('timeraised', 'rb_source_program_exception'),
             'base.timeraised',
-            array('displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
+            [
+                'displayfunc' => 'nice_datetime',
+                'dbdatatype' => 'timestamp',
+            ]
         );
 
         // include some standard columns
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_program_fields_to_columns($columnoptions, 'prog', "totara_{$this->instancetype}");
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'prog', 'programcount');
+        $this->add_core_user_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_totara_program_columns($columnoptions, 'program');
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'program', 'programcount');
+        $this->add_totara_cohort_program_columns($columnoptions);
 
         return $columnoptions;
     }
 
-
     protected function define_filteroptions() {
-        $filteroptions = array();
+        $filteroptions = [
 
+            new rb_filter_option(
+                'exceptioninfo',
+                'exceptiontype',
+                get_string('exceptiontype', 'rb_source_program_exception'),
+                'select',
+                [
+                    'selectchoices' => self::get_exception_options(),
+                    'attributes' => rb_filter_option::select_width_limiter(),
+                    'simplemode' => true,
+                ]
+            ),
 
-        $filteroptions[] = new rb_filter_option(
-            'exceptioninfo',
-            'exceptiontype',
-            get_string('exceptiontype', 'rb_source_program_exception'),
-            'select',
-            array (
-                'selectchoices' => $this->get_exception_options(),
-                'attributes' => rb_filter_option::select_width_limiter(),
-                'simplemode' => true,
-            )
-        );
+            new rb_filter_option(
+                'exceptioninfo',
+                'timeraised',
+                get_string('timeraised', 'rb_source_program_exception'),
+                'date'
+            ),
 
-        $filteroptions[] = new rb_filter_option(
-            'exceptioninfo',
-            'timeraised',
-            get_string('timeraised', 'rb_source_program_exception'),
-            'date'
-        );
+        ];
 
         // include some standard filters
-        $this->add_program_fields_to_filters($filteroptions);
-        $this->add_course_category_fields_to_filters($filteroptions, 'prog', 'category');
+        $this->add_core_user_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_totara_program_filters($filteroptions);
+        $this->add_totara_cohort_program_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions);
 
         return $filteroptions;
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array();
+
+        $contentoptions = [];
 
         // Add the manager/position/organisation content options.
         $this->add_basic_user_content_options($contentoptions);
@@ -163,114 +163,104 @@ class rb_source_program_exception extends rb_base_source {
         $contentoptions[] = new rb_content_option(
             'date',
             get_string('completeddate', 'rb_source_program_completion'),
-            'base.timeraised'
+            ['date' => 'base.timeraised']
         );
 
         return $contentoptions;
     }
 
     protected function define_paramoptions() {
-        $paramoptions = array(
+        $paramoptions = [
             new rb_param_option(
                 'programid',
-                'prog.id'
+                'program.id'
             ),
+
             new rb_param_option(
                 'category',
-                'prog.category'
+                'program.category'
             ),
-        );
+        ];
+
         return $paramoptions;
     }
 
     protected function define_defaultcolumns() {
-        $defaultcolumns = array(
-            array(
+        $defaultcolumns = [
+            [
                 'type' => 'prog',
                 'value' => 'proglinkicon',
-            ),
-            array(
+            ],
+            [
                 'type' => 'user',
                 'value' => 'fullname',
-            ),
-            array(
+            ],
+            [
                 'type' => 'exceptioninfo',
                 'value' => 'exceptiontype',
-            ),
-            array(
+            ],
+            [
                 'type' => 'exceptioninfo',
                 'value' => 'timeraised',
-            ),
-        );
+            ],
+        ];
+
         return $defaultcolumns;
     }
 
     protected function define_defaultfilters() {
-        $defaultfilters = array(
-            array(
-                'type' => 'prog',
+        $defaultfilters = [
+            [
+                'type' => 'program',
                 'value' => 'fullname',
                 'advanced' => 0,
-            ),
-            array(
+            ],
+            [
                 'type' => 'exceptioninfo',
                 'value' => 'exceptiontype',
                 'advanced' => 0,
-            ),
-            array(
+            ],
+            [
                 'type' => 'exceptioninfo',
                 'value' => 'timeraised',
                 'advanced' => 1,
-            ),
-        );
+            ],
+        ];
+
         return $defaultfilters;
     }
 
-    protected function define_requiredcolumns() {
-        $requiredcolumns = array();
-
-        return $requiredcolumns;
-    }
-
     protected function define_sourcewhere() {
-        $sourcewhere = '(prog.certifid IS NULL)';
-
-        return $sourcewhere;
-    }
-
-    public function post_config(reportbuilder $report) {
-        $reportfor = $report->reportfor; // ID of the user the report is for.
+        return '(program.certifid IS NULL)';
     }
 
     /**
      * returns array with exception code as key and text label as value
      * @return array
      */
-    private function get_exception_options(){
-        $options = array();
-
-        $options[EXCEPTIONTYPE_TIME_ALLOWANCE] = get_string('timeallowance', 'totara_program');
-        $options[EXCEPTIONTYPE_ALREADY_ASSIGNED] = get_string('exceptiontypealreadyassigned', 'totara_program');
-        $options[EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN] = get_string('completiontimeunknown', 'totara_program');
-        $options[EXCEPTIONTYPE_UNKNOWN] = get_string('unknown', 'totara_program');
-        $options[EXCEPTIONTYPE_DUPLICATE_COURSE] = get_string('exceptiontypeduplicatecourse', 'totara_program');
+    public static function get_exception_options() {
+        $options = [
+            \totara_program\exception\manager::EXCEPTIONTYPE_TIME_ALLOWANCE          => get_string('timeallowance', 'totara_program'),
+            \totara_program\exception\manager::EXCEPTIONTYPE_ALREADY_ASSIGNED        => get_string('exceptiontypealreadyassigned', 'totara_program'),
+            \totara_program\exception\manager::EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN => get_string('completiontimeunknown', 'totara_program'),
+            \totara_program\exception\manager::EXCEPTIONTYPE_UNKNOWN                 => get_string('unknown', 'totara_program'),
+            \totara_program\exception\manager::EXCEPTIONTYPE_DUPLICATE_COURSE        => get_string('exceptiontypeduplicatecourse', 'totara_program'),
+        ];
 
         return $options;
     }
 
-    // Source specific column display methods.
+    /**
+     * Inject column_test data into database.
+     * @param totara_reportbuilder_column_testcase $testcase
+     */
+    public function phpunit_column_test_add_data(totara_reportbuilder_column_testcase $testcase) {
+        global $DB;
 
-    function rb_display_program_exception_type($type, $row) {
-        $exceptions = $this->get_exception_options();
-
-        if (!isset($exceptions[$type])) {
-            return '';
+        if (!PHPUNIT_TEST) {
+            throw new coding_exception('phpunit_column_test_add_data() cannot be used outside of unit tests');
         }
 
-        return $exceptions[$type];
+        $DB->insert_record('prog_exception', ['id' => 1, 'programid' => 1, 'userid' => 2, 'exceptiontype' => 2]);
     }
-
-    // Source specific filter display methods.
-
-} // End of rb_source_courses class.
-
+}

@@ -40,14 +40,15 @@ trait program_trait {
      * @param string $join Name of the join that provides the
      *                     'program id' field
      * @param string $field Name of table containing program id field to join on
+     * @param string $jointype Type of join (INNER, LEFT, RIGHT)
      *
      * @return bool always true
      */
-    protected function add_totara_program_tables(&$joinlist, $join, $field) {
+    protected function add_totara_program_tables(&$joinlist, $join, $field, $jointype = 'LEFT') {
 
         $joinlist[] = new \rb_join(
             'program',
-            'LEFT',
+            $jointype,
             '{prog}',
             "program.id = $join.$field",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
