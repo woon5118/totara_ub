@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author  Simon Coggins <simon.coggins@totaralearning.com>
+ * @package totara_core
  */
 
 namespace totara_core;
@@ -29,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * NOTE: this is not public API, use get_has_capability_sql() function instead.
  */
-class access {
+final class access {
 
     /**
      * This function allows you to restrict rows in an existing SQL statement by including the return value as
@@ -49,12 +50,8 @@ class access {
     public static function get_has_capability_sql($capability, $contextidfield, $user = null, $doanything = true) {
         global $USER, $CFG;
 
-        if (!preg_match('/^(\{?[a-z][a-z0-9_]*\}?)\.[a-z][a-z0-9_]*$/', $contextidfield, $matches)) {
-            throw new \coding_exception('Invalid context field specified');
-        }
-        if ($matches[1] === 'maincontext') {
-            throw new \coding_exception('Invalid context field specified, maincontext alias is used internally');
-        }
+        // First, validate that we can work with the $contextidfield supplied.
+        self::validate_contextidfield($contextidfield);
 
         // Make sure there is a user id specified.
         if ($user === null) {
@@ -65,7 +62,7 @@ class access {
 
         // Capability must exist.
         if (!$capinfo = get_capability_info($capability)) {
-            debugging('Capability "'.$capability.'" was not found! This has to be fixed in code.');
+            debugging('Capability "'.$capability.'" was not found! This has to be fixed in code.', DEBUG_DEVELOPER);
             return array("1=0", array());
         }
 
@@ -92,15 +89,15 @@ class access {
             return array("1=1", array());
         }
 
-        list($prohibitsql, $prohibitparams) = self::get_prohibit_check_sql($capability, $userid, 'maincontext.id');
-        list($allowpreventsql, $allowpreventparams) = self::get_allow_prevent_check_sql($capability, $userid, 'maincontext.id');
+        list($prohibitsql, $prohibitparams) = self::get_prohibit_check_sql($capability, $userid, 'hascapabilitycontext.id');
+        list($allowpreventsql, $allowpreventparams) = self::get_allow_prevent_check_sql($capability, $userid, 'hascapabilitycontext.id');
 
         // They must have ALLOW in at least one role, and no prohibits in any role.
         $hascapsql = "
 EXISTS (
     SELECT 'x'
-      FROM {context} maincontext
-     WHERE maincontext.id = {$contextidfield}
+      FROM {context} hascapabilitycontext
+     WHERE hascapabilitycontext.id = {$contextidfield}
 
        AND EXISTS (
 {$allowpreventsql}
@@ -117,9 +114,27 @@ EXISTS (
     }
 
     /**
+     * Validates contextidfield parameter to make sure it works well
+     * in the generic queries and in the queries for the cached reports.
+     *
+     * @param string $contextidfield
+     *
+     * @return void
+     */
+    private static function validate_contextidfield($contextidfield) {
+        if (!preg_match('/^(\{?[a-z][a-z0-9_]*\}?\.)?[a-z][a-z0-9_]*$/', $contextidfield, $matches)) {
+            throw new \coding_exception('Invalid context id field specified');
+        }
+        if (isset($matches[1])) {
+            if ($matches[1] === 'hascapabilitycontext.' or $matches[1] === '{context}.') {
+                throw new \coding_exception('Invalid context id field specified, table name used internally');
+            }
+        }
+    }
+
+    /**
      * Use get_has_capability_sql() to emulate has_capability(),
      * this is intended mainly for testing purposes.
-     *
      *
      * Note this still doesn't do all the other checks that the existing has_capability() function does,
      * for example role switching is completely ignored.

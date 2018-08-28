@@ -284,6 +284,68 @@ class totara_core_access_testcase extends advanced_testcase {
     }
 
     /**
+     * Verify the contextidfield parameter is validated properly.
+     */
+    public function test_validate_contextidfield() {
+        $this->resetAfterTest(true);
+
+        $method = new \ReflectionMethod('totara_core\access', 'validate_contextidfield');
+        $method->setAccessible(true);
+
+        try {
+            $method->invoke(null, '10');
+            $this->fail('Exception expected when integer given');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        try {
+            $method->invoke(null, ':param');
+            $this->fail('Exception expected when parameter given');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        try {
+            $method->invoke(null, '?');
+            $this->fail('Exception expected when parameter given');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        try {
+            $method->invoke(null, '{context}.id');
+            $this->fail('Exception expected when {context} table given');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        try {
+            $method->invoke(null, 'hascapabilitycontext.id');
+            $this->fail('Exception expected when hascapabilitycontext table alias given');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        try {
+            $method->invoke(null, 'pa ram');
+            $this->fail('Exception expected when non-sql given');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
+
+        $user = $this->getDataGenerator()->create_user();
+        list($hascapsql, $params) = totara_core\access::get_has_capability_sql('moodle/site:config', '{something}.contextid', $user->id);
+        $this->assertContains('{something}.contextid', $hascapsql);
+
+        list($hascapsql, $params) = totara_core\access::get_has_capability_sql('moodle/site:config', 'some_thing3.xyz_3ed', $user->id);
+        $this->assertContains('some_thing3.xyz_3ed', $hascapsql);
+
+        list($hascapsql, $params) = totara_core\access::get_has_capability_sql('moodle/site:config', 'xyz_3ed', $user->id);
+        $this->assertContains('xyz_3ed', $hascapsql);
+    }
+
+    /**
      * Detect common problems in all db/access.php files
      */
     public function test_access_files() {
