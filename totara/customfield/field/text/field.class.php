@@ -47,4 +47,15 @@ class customfield_text extends customfield_base {
         }
     }
 
+    public function sync_data_preprocess($syncitem) {
+        $fieldname = $this->inputname;
+
+        if (!isset($syncitem->$fieldname)) {
+            return $syncitem;
+        }
+
+        $syncitem->{$fieldname} = clean_param($syncitem->{$fieldname}, PARAM_TEXT);
+
+        return $syncitem;
+    }
 }

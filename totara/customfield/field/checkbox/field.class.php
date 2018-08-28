@@ -92,4 +92,16 @@ class customfield_checkbox extends customfield_base {
         return $syncitem;
 
     }
+
+    public function sync_data_preprocess($syncitem) {
+        $fieldname = $this->inputname;
+
+        if (!isset($syncitem->$fieldname)) {
+            return $syncitem;
+        }
+
+        $syncitem->{$fieldname} = clean_param($syncitem->{$fieldname}, PARAM_INT);
+
+        return $syncitem;
+    }
 }

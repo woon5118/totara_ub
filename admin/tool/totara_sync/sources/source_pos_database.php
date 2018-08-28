@@ -131,10 +131,6 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
         // Sort out field mappings
         $fieldmappings = array();
         foreach ($fields as $i => $f) {
-            if (preg_match('/^customfield_/', $f)) {
-                // Custom fields to be dealt with separately.
-                continue;
-            }
             if (empty($this->config->{'fieldmapping_'.$f})) {
                 $fieldmappings[$f] = $f;
             } else {

@@ -48,20 +48,7 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
     public function import_data($temptable) {
         global $CFG, $DB;
 
-        $fileaccess = get_config('totara_sync', 'fileaccess');
-        if ($fileaccess == FILE_ACCESS_DIRECTORY) {
-            $storefilepath = $this->copy_csv_file_from_directory();
-        } else if ($fileaccess == FILE_ACCESS_UPLOAD) {
-            $storefilepath = $this->copy_csv_file_from_upload();
-        }
-
-        $encoding = $this->get_config('csvjobassignmentencoding');
-        $storefilepath = totara_sync_clean_csvfile($storefilepath, $encoding, $fileaccess, $this->get_element_name());
-
-        // Open file from store for processing.
-        if (!$file = fopen($storefilepath, 'r')) {
-            throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotopenx', $storefilepath);
-        }
+        $file = $this->open_csv_file();
 
         // Map CSV fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
@@ -144,9 +131,7 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
             }
 
             $csvrow = array_combine($fields, $csvrow);
-
-            // Encode and clean the data.
-            $csvrow = totara_sync_clean_fields($csvrow);
+            $csvrow = $this->clean_fields($csvrow);
 
             // Set up a db row.
             $dbrow = array();
@@ -226,12 +211,7 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
         }
         unset($fieldmappings);
 
-        fclose($file);
-
-        // Done, clean up the file(s).
-        if ($fileaccess == FILE_ACCESS_UPLOAD) {
-            unlink($storefilepath); // Don't store this file in temp.
-        }
+        $this->close_csv_file($file);
 
         return true;
     }
@@ -245,4 +225,31 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
         return $this->get_common_csv_notifications();
     }
 
+    private function clean_fields($row) {
+        $cleaned = [];
+        foreach($row as $key => $value) {
+            switch($key) {
+                case 'idnumber':
+                case 'useridnumber':
+                case 'timemodified':
+                case 'fullname':
+                case 'startdate':
+                case 'enddate':
+                case 'orgidnumber':
+                case 'posidnumber':
+                case 'manageridnumber':
+                case 'appraiseridnumber':
+                case 'managerjobassignmentidnumber':
+                    $cleaned[$key] = clean_param(trim($value), PARAM_TEXT);
+                    break;
+                case 'deleted':
+                    $cleaned[$key] = clean_param(trim($value), PARAM_INT);
+                    break;
+                default:
+                    throw new totara_sync_exception($this->get_element_name(), 'importdata', 'nocleaninginstruction');
+            }
+        }
+
+        return $cleaned;
+    }
 }

@@ -175,4 +175,16 @@ class customfield_datetime extends customfield_base {
         // Return only needed for unit testing.
         return $itemnew;
     }
+
+    public function sync_data_preprocess($syncitem) {
+        $fieldname = $this->inputname;
+
+        if (!isset($syncitem->$fieldname)) {
+            return $syncitem;
+        }
+
+        $syncitem->{$fieldname} = clean_param($syncitem->{$fieldname}, PARAM_TEXT);
+
+        return $syncitem;
+    }
 }

@@ -282,9 +282,6 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
             $csvrow = array_combine($fields, $csvrow);  // nice associative array ;)
 
-            // Encode and clean the data.
-            $csvrow = totara_sync_clean_fields($csvrow);
-
             // Set up a db row
             $dbrow = array();
 

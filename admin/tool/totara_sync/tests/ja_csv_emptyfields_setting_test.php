@@ -64,7 +64,7 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
 
         set_config('element_jobassignment_enabled', 1, 'totara_sync');
         set_config('source_jobassignment', 'totara_sync_source_jobassignment_csv', 'totara_sync');
-        set_config('fileaccess', FILE_ACCESS_DIRECTORY, 'totara_sync');
+        set_config('fileaccess', TOTARA_SYNC_FILE_ACCESS_MEMORY, 'totara_sync');
         set_config('filesdir', $this->filedir, 'totara_sync');
 
         //Data for creating mocked db tables.
@@ -190,10 +190,13 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
         $config = array_merge($this->config, $extraconfig);
         $this->set_element_config($config);
 
-        // Create the CSV file and run the sync.
-        $this->add_csv('jobassignment_empty_fields_1.csv', 'jobassignment');
+        $element = $this->get_element();
 
-        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+        $csv = "idnumber,useridnumber,timemodified,deleted,fullname,orgidnumber,posidnumber,manageridnumber,appraiseridnumber,startdate,enddate\n";
+        $csv .= "1, 11235, 1510154500, 0, \"my job\", ORG1, POS1, mgr1, aprs1,1510154510,1510554500";
+        $element->get_source()->set_csv_in_memory($csv);
+
+        $this->assertTrue($element->sync()); // Run the sync.
         $jas = $DB->get_records('job_assignment');
         $this->assertCount(2, $jas); // Check the correct number of Job assignments.
 
@@ -225,10 +228,13 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
         $config = array_merge($this->config, $extraconfig);
         $this->set_element_config($config);
 
-        // Add Job assignment for the user.
-        $this->add_csv('jobassignment_empty_fields_1.csv', 'jobassignment');
+        $element = $this->get_element();
 
-        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+        $csv = "idnumber,useridnumber,timemodified,deleted,fullname,orgidnumber,posidnumber,manageridnumber,appraiseridnumber,startdate,enddate\n";
+        $csv .= "1, 11235, 1510154500, 0, \"my job\", ORG1, POS1, mgr1, aprs1,1510154510,1510554500";
+        $element->get_source()->set_csv_in_memory($csv);
+
+        $this->assertTrue($element->sync()); // Run the sync.
         $jas = $DB->get_records('job_assignment');
         $this->assertCount(2, $jas); // Check the correct number of Job assignments.
 
@@ -287,10 +293,13 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
         $config = array_merge($this->config, $extraconfig);
         $this->set_element_config($config);
 
-        // Add Job assignment for the user.
-        $this->add_csv('jobassignment_empty_fields_2.csv', 'jobassignment');
+        $element = $this->get_element();
 
-        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+        $csv = "idnumber,useridnumber,timemodified,deleted,fullname,orgidnumber,posidnumber,manageridnumber,appraiseridnumber,startdate,enddate\n";
+        $csv .= "2, 11235, 1510154500, 0, \"my awesome job\", ORG1, POS1, mgr1, aprs1,1510154510,1510554500";
+        $element->get_source()->set_csv_in_memory($csv);
+
+        $this->assertTrue($element->sync()); // Run the sync.
         $this->assertCount(2, $DB->get_records('job_assignment')); // Check the correct number of Job assignments.
 
         $record = $DB->get_record('job_assignment', array('id' => 2));
@@ -341,10 +350,13 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
         $config = array_merge($this->config, $extraconfig);
         $this->set_element_config($config);
 
-        // Add Job assignment for the user.
-        $this->add_csv('jobassignment_empty_fields_2.csv', 'jobassignment');
+        $element = $this->get_element();
 
-        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+        $csv = "idnumber,useridnumber,timemodified,deleted,fullname,orgidnumber,posidnumber,manageridnumber,appraiseridnumber,startdate,enddate\n";
+        $csv .= "2, 11235, 1510154500, 0, \"my awesome job\", ORG1, POS1, mgr1, aprs1,1510154510,1510554500";
+        $element->get_source()->set_csv_in_memory($csv);
+
+        $this->assertTrue($element->sync()); // Run the sync.
         $this->assertCount(2, $DB->get_records('job_assignment')); // Check the correct number of Job assignments.
 
         $record = $DB->get_record('job_assignment', array('id' => 2));
@@ -394,9 +406,13 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
         $config = array_merge($this->config, $extraconfig);
         $this->set_element_config($config);
 
-        $this->add_csv('jobassignment_empty_fields_3.csv', 'jobassignment');
+        $element = $this->get_element();
 
-        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+        $csv = "idnumber,useridnumber,timemodified,deleted,fullname,orgidnumber,posidnumber,manageridnumber,appraiseridnumber,startdate,enddate\n";
+        $csv .= "2,11235,0,0,,,,,,,";
+        $element->get_source()->set_csv_in_memory($csv);
+
+        $this->assertTrue($element->sync()); // Run the sync.
         $this->assertCount(2, $DB->get_records('job_assignment')); // Check the correct number of Job assignments.
 
         $record = $DB->get_record('job_assignment', array('id' => 2));
@@ -449,9 +465,13 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
         $config = array_merge($this->config, $extraconfig);
         $this->set_element_config($config);
 
-        $this->add_csv('jobassignment_empty_fields_3.csv', 'jobassignment');
+        $element = $this->get_element();
 
-        $this->assertTrue($this->get_element()->sync()); // Run the sync.
+        $csv = "idnumber,useridnumber,timemodified,deleted,fullname,orgidnumber,posidnumber,manageridnumber,appraiseridnumber,startdate,enddate\n";
+        $csv .= "2,11235,0,0,,,,,,,";
+        $element->get_source()->set_csv_in_memory($csv);
+
+        $this->assertTrue($element->sync()); // Run the sync.
         $this->assertCount(2, $DB->get_records('job_assignment')); // Check the correct number of Job assignments.
 
         // We are saving empty fields so all these should be empty.

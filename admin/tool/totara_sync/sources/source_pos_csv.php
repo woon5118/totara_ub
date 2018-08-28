@@ -118,10 +118,8 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         }
         // Finally, perform CSV to db field mapping
         foreach ($fields as $index => $field) {
-            if (!preg_match('/^customfield_/', $field)) {
-                if (in_array($field, array_keys($fieldmappings))) {
-                    $fields[$index] = $fieldmappings[$field];
-                }
+            if (in_array($field, array_keys($fieldmappings))) {
+                $fields[$index] = $fieldmappings[$field];
             }
         }
 
@@ -156,9 +154,6 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
             }
             $csvrow = array_combine($fields, $csvrow);  // nice associative array
 
-            // Encode and clean the data.
-            $csvrow = totara_sync_clean_fields($csvrow);
-
             // Set up a db row
             $row = array();
 
@@ -168,6 +163,8 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                     $row[$field] = $csvrow[$field];
                 }
             }
+
+            $row = $this->clean_fields($row);
 
             // Empty string from file and save empty string = erase
             if (isset($row['parentidnumber']) && $row['parentidnumber'] === '') {
@@ -270,4 +267,30 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         return $this->get_common_csv_notifications();
     }
 
+    private function clean_fields($row) {
+        $cleaned = [];
+        foreach($row as $key => $value) {
+            switch($key) {
+                case 'idnumber':
+                case 'fullname':
+                case 'shortname':
+                case 'parentidnumber':
+                case 'typeidnumber':
+                case 'frameworkidnumber':
+                case 'timemodified':
+                    $cleaned[$key] = clean_param(trim($value), PARAM_TEXT);
+                    break;
+                case 'deleted':
+                    $cleaned[$key] = clean_param(trim($value), PARAM_INT);
+                    break;
+                case 'description':
+                    $cleaned[$key] = clean_param(trim($value), PARAM_RAW);
+                    break;
+                default:
+                    throw new totara_sync_exception($this->get_element_name(), 'importdata', 'nocleaninginstruction');
+            }
+        }
+
+        return $cleaned;
+    }
 }

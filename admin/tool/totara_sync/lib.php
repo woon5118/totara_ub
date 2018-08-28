@@ -297,8 +297,17 @@ function totara_sync_make_dirs($dirpath) {
  * @param array $fields
  * @param string $encoding the encoding type that string is being converted from to utf-8 (deprecated, use totara_sync_clean_csvfile)
  * @return array $fields
+ * @deprecated since Totara 12
  */
 function totara_sync_clean_fields($fields, $encoding = 'UTF-8') {
+
+    // We only want to show this once, not every time for a file that might have lots of rows.
+    static $debugged = false;
+    if (!$debugged) {
+        debugging('totara_sync_clean_fields has been deprecated. It is recommended that you do cleaning specific to your import source.');
+        $debugged = true;
+    }
+
     foreach ($fields as $key => $value) {
         $format = ($key == 'password') ? PARAM_RAW : PARAM_TEXT;
         if ($encoding !== 'UTF-8') {
