@@ -215,6 +215,17 @@ class rb_source_course_completion extends rb_base_source {
                     'defaultheading' => get_string('iscomplete', 'rb_source_course_completion'),
                 )
             ),
+            // RPL note column, will contain the note provided when manually awarding RPL completion,
+            // or will be empty if not an RPL completion or if no note was provided.
+            new rb_column_option(
+                'course_completion',
+                'rplnote',
+                get_string('rplnote', 'rb_source_course_completion'),
+                'rpl',
+                array(
+                    'displayfunc' => 'plaintext',
+                )
+            ),
             new rb_column_option(
                 'course_completion',
                 'isinprogress',
