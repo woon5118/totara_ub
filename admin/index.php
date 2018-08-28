@@ -542,14 +542,10 @@ if (is_dir($CFG->dirroot.'/vendor') || is_dir($CFG->dirroot.'/node_modules')) {
 admin_externalpage_setup('adminnotifications');
 
 //get Totara specific info
-$oneyearago = time() - 60*60*24*365;
-// See MDL-22481 for why currentlogin is used instead of lastlogin
-$sql = "SELECT COUNT(id)
-          FROM {user}
-         WHERE currentlogin > ?";
-$activeusers = $DB->count_records_sql($sql, array($oneyearago));
-
 require_once("$CFG->dirroot/$CFG->admin/registerlib.php");
+$regdata = get_registration_data();
+$activeusers = $regdata['activeusercount'];
+$activeusers3mth = $regdata['activeusercount3mth'];
 if (is_registration_required()) {
     redirect("$CFG->wwwroot/$CFG->admin/register.php?return=admin");
 }
@@ -562,4 +558,4 @@ $output = $PAGE->get_renderer('core', 'admin');
 
 echo $output->admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed, $cronoverdue, $dbproblems,
                                        $maintenancemode, null, null, $buggyiconvnomb,
-                                       $registered, $cachewarnings, $eventshandlers, $themedesignermode, $devlibdir, null, $activeusers, $TOTARA->release);
+                                       $registered, $cachewarnings, $eventshandlers, $themedesignermode, $devlibdir, null, $activeusers, $TOTARA->release, $activeusers3mth);

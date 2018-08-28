@@ -437,7 +437,7 @@ $string['notavailable'] = 'Not available';
 $string['notenrolled'] = '<em>You are not currently enrolled in any courses.</em>';
 $string['notfound'] = 'Not found';
 $string['notimplementedtotara'] = 'Sorry, this feature is only implemented on MySQL, MSSQL and PostgreSQL databases.';
-$string['numberofactiveusers'] = '{$a} users have logged in to this site in the last year';
+$string['activeusercountstr'] = '{$a->activeusers} users have logged in to this site in the last year ({$a->activeusers3mth} in the last 3 months)';
 $string['numberofstaff'] = '({$a} staff)';
 $string['old_release_security_text_plural'] = ' (including [[SECURITY_COUNT]] new security releases)';
 $string['old_release_security_text_singular'] = ' (including 1 new security release)';
@@ -702,3 +702,7 @@ $string['poweredby'] = 'Powered by Totara';
 $string['error:itemhaschildren'] = 'You cannot change the parent of this item while it has children. Please move this items children first.';
 $string['error:menuitemurlrequired'] = 'Menu url address required';
 $string['totaranavigation'] = 'Main menu';
+
+// Deprecated in 12
+
+$string['numberofactiveusers'] = '{$a} users have logged in to this site in the last year';

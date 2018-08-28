@@ -37,10 +37,13 @@ class totara_core_renderer extends plugin_renderer_base {
     * @param integer $activeusers Number of active users in the last year
     * @return string HTML to output.
     */
-    public function active_users($activeusers) {
+    public function active_users($activeusers, $activeusers3mth) {
         $data = new stdClass();
 
-        return $this->notification(get_string('numberofactiveusers', 'totara_core', $activeusers), \core\output\notification::NOTIFY_INFO);
+        $a = new \stdClass();
+        $a->activeusers = $activeusers;
+        $a->activeusers3mth = $activeusers3mth;
+        return $this->notification(get_string('activeusercountstr', 'totara_core', $a), \core\output\notification::NOTIFY_INFO);
     }
 
     /**

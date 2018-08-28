@@ -265,7 +265,7 @@ class core_admin_renderer extends plugin_renderer_base {
     public function admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed,
             $cronoverdue, $dbproblems, $maintenancemode, $availableupdates, $availableupdatesfetch,
             $buggyiconvnomb, $registered, array $cachewarnings = array(), $eventshandlers = 0,
-            $themedesignermode = false, $devlibdir = false, $unused_latesterror = null, $activeusers, $totara_release) {
+            $themedesignermode = false, $devlibdir = false, $unused_latesterror = null, $activeusers, $totara_release, $activeusers3mth) {
         global $CFG, $PAGE;
         $output = '';
         /** @var totara_core_renderer $totara_renderer */
@@ -287,7 +287,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $totara_renderer->is_registered();
 
         // list count of active users
-        $output .= $totara_renderer->active_users($activeusers);
+        $output .= $totara_renderer->active_users($activeusers, $activeusers3mth);
         /// Display Totara version information
         $output .= $totara_renderer->totara_print_copyright($totara_release);
 
