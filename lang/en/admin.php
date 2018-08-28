@@ -636,6 +636,7 @@ $string['iplookupmaxmindnote'] = 'This product includes GeoLite2 data created by
 $string['ishttpswarning'] = 'It has been detected that your site is not secured using HTTPS. For increased security and improved integration with other systems, it is highly recommended that you migrate your site to HTTPS.';
 $string['keeptagnamecase'] = 'Keep tag name casing';
 $string['lang'] = 'Default language';
+$string['installedlangs'] = 'Installed language packs';
 $string['language'] = 'Language';
 $string['language_help'] = 'Set the language of the new user. Selecting this when creating a user ensures the login page or an email greets the user in the given language.';
 $string['langcache'] = 'Cache language menu';
