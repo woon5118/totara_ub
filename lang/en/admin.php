@@ -1305,6 +1305,7 @@ $string['dbtype'] = 'Database type';
 
 $string['usercount'] = 'Number of site users';
 $string['activeusercount'] = 'Number of active users';
+$string['activeusercount3mth'] = 'Number of active users in last three months';
 $string['webserversoftware'] = 'Web server software identifier';
 $string['wwwroot'] = 'Site www root';
 
