@@ -70,7 +70,7 @@ class totara_reportbuilder_post_config_visibility_where_testcase extends advance
         list($wheresql, $params) = $report->post_config_visibility_where('program', 'base', $user->id); // No exception.
         $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisible'));
         $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisiblenone'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'ra.contextid = ctx.id'));
+        $this->assertGreaterThan(0, strpos($wheresql, 'hascapabilitycontext.id = ctx.id'));
         $this->assertGreaterThan(0, strpos($wheresql, 'base.availablefrom = 0 OR base.availablefrom < :timefrom'));
         $this->assertGreaterThan(0, strpos($wheresql, 'base.availableuntil = 0 OR base.availableuntil > :timeuntil'));
 
@@ -78,7 +78,7 @@ class totara_reportbuilder_post_config_visibility_where_testcase extends advance
         list($wheresql, $params) = $report->post_config_visibility_where('certification', 'base', $user->id);
         $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisible'));
         $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisiblenone'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'ra.contextid = ctx.id'));
+        $this->assertGreaterThan(0, strpos($wheresql, 'hascapabilitycontext.id = ctx.id'));
         $this->assertGreaterThan(0, strpos($wheresql, 'base.availablefrom = 0 OR base.availablefrom < :timefrom'));
         $this->assertGreaterThan(0, strpos($wheresql, 'base.availableuntil = 0 OR base.availableuntil > :timeuntil'));
 
