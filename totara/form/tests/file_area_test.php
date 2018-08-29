@@ -114,7 +114,7 @@ class totara_form_file_area_testcase extends advanced_testcase {
         $usercontextid = \context_user::instance($user->id)->id;
 
         $text = "xxx @@PLUGINFILE@@/somefile.txt <br /> @@PLUGINFILE@@/otherfile.doc\nzzzz";
-        $expected = "xxx http://www.example.com/moodle/draftfile.php/$usercontextid/user/draft/666/somefile.txt <br /> http://www.example.com/moodle/draftfile.php/$usercontextid/user/draft/666/otherfile.doc\nzzzz";
+        $expected = "xxx https://www.example.com/moodle/draftfile.php/$usercontextid/user/draft/666/somefile.txt <br /> https://www.example.com/moodle/draftfile.php/$usercontextid/user/draft/666/otherfile.doc\nzzzz";
 
         $this->assertSame($expected, file_area::rewrite_links_to_draftarea($text, 666));
     }

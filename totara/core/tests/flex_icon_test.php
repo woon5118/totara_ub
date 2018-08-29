@@ -337,7 +337,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
 
         $url = $PAGE->theme->image_url('i/edit', 'core');
         $this->assertInstanceOf('moodle_url', $url);
-        $this->assertSame("http://www.example.com/moodle/theme/image.php/_s/{$CFG->theme}/core/1/i/edit", $url->out());
+        $this->assertSame("https://www.example.com/moodle/theme/image.php/_s/{$CFG->theme}/core/1/i/edit", $url->out());
     }
 
     /**

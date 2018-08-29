@@ -98,7 +98,7 @@ class block_totara_featured_links_tile_default_tile_testcase extends test_helper
         $this->assertSame('#123abc', $this->get_protected_property($tile_real, 'data')->background_color);
         $this->assertSame('This is some alternative text', $this->get_protected_property($tile_real, 'data')->alt_text);
         // Checks urls with out wwwroot, /, http:// or https:// get http:// appended to them.
-        $this->assertSame('http://www.example.com', $this->get_protected_property($tile_real, 'data')->url);
+        $this->assertSame('https://www.example.com', $this->get_protected_property($tile_real, 'data')->url);
         // Check wwwroot identification.
         $data->url = $CFG->wwwroot . '/';
         $tile1->save_content($data);

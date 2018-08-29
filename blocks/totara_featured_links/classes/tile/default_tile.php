@@ -254,7 +254,7 @@ class default_tile extends base{
         if (\core_text::substr($data->url, 0, 7) != 'http://'
             && \core_text::substr($data->url, 0, 8) != 'https://'
             && \core_text::substr($data->url, 0, 1) != '/') {
-            $data->url = 'http://'.$data->url;
+            $data->url = 'https://'.$data->url;
         }
         $wwwroot_chopped = preg_replace('/^(https:\/\/)|(http:\/\/)/', '', $CFG->wwwroot);
         if (\core_text::substr($data->url, 0, strlen($wwwroot_chopped)) == $wwwroot_chopped) {

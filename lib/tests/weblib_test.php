@@ -395,14 +395,14 @@ class core_weblib_testcase extends advanced_testcase {
 
     public function test_out_as_local_url() {
         global $CFG;
-        $this->assertSame('http://www.example.com/moodle', $CFG->wwwroot);
+        $this->assertSame('https://www.example.com/moodle', $CFG->wwwroot);
 
-        // Test http url.
+        // Test https url.
         $url1 = new moodle_url('/lib/tests/weblib_test.php');
         $this->assertSame('/lib/tests/weblib_test.php', $url1->out_as_local_url());
 
-        // Test https url are not acceptable.
-        $url2 = new moodle_url('https://www.example.com/moodle/login/index.php');
+        // Test http url are not acceptable.
+        $url2 = new moodle_url('http://www.example.com/moodle/login/index.php');
         try {
             $url2->out_as_local_url();
             $this->fail('coding_exception expected');

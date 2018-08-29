@@ -198,7 +198,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $fs = get_file_storage();
         $file = array('contextid' => $syscontext->id, 'component' => 'totara_customfield', 'filearea' => 'course_filemgr',
                         'itemid' => $f->data, 'filepath' => '/', 'filename' => 'readme.txt');
-        $fileurl = 'http://www.example.com/moodle/pluginfile.php/'.$syscontext->id.'/totara_customfield/course_filemgr/'.
+        $fileurl = 'https://www.example.com/moodle/pluginfile.php/'.$syscontext->id.'/totara_customfield/course_filemgr/'.
                         $f->data.'/readme.txt';
         $fs->create_file_from_string($file, 'hi!');
 
@@ -276,7 +276,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertContains($fileicon, $processed[1]);
 
         $this->assertSame('volba1', $processed[2]);
-        $this->assertSame('<img src="http://www.example.com/moodle/theme/image.php/_s/' . $theme . '/totara_core/1/courseicons/business-modelling" id="icon_preview" class="course_icon" alt="volba1" title="volba1" />', $processed[3]);
+        $this->assertSame('<img src="https://www.example.com/moodle/theme/image.php/_s/' . $theme . '/totara_core/1/courseicons/business-modelling" id="icon_preview" class="course_icon" alt="volba1" title="volba1" />', $processed[3]);
         $this->assertSame('Some html <strong>text</strong><script></script>', $processed[4]);
 
         $processed = $report->src->process_data_row($row, 'pdf', $report);
