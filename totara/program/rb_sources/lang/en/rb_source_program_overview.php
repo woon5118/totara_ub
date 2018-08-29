@@ -55,3 +55,4 @@ $string['type_program_completion'] = 'Program Completion';
 $string['completionpositiontype'] = 'Completion Position Type';
 $string['completionpositionidnumber'] = 'Completion Position ID';
 $string['completionorganisationtype'] = 'Completion Organisation Type';
+$string['completeddate'] = 'Date completed';

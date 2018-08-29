@@ -678,6 +678,13 @@ class rb_source_program_overview extends rb_base_source {
             'date'
         );
 
+        $filteroptions[] = new rb_filter_option(
+            'program_completion',
+            'timecompleted',
+            get_string('completeddate', 'rb_source_program_overview'),
+            'date'
+        );
+
         if ($this->instancetype == 'program') {
             $filteroptions[] = new rb_filter_option(
                 'program_completion',
