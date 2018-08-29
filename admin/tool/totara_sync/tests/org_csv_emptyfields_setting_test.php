@@ -187,28 +187,6 @@ class tool_totara_sync_org_csv_emptyfields_setting_testcase extends totara_sync_
         return $importfields;
     }
 
-    function sync_add_organisations() {
-        global $DB;
-
-        // Create the CSV file and run the sync.
-        $this->create_csv('newdata'); // Create and upload our CSV data file
-        $this->assertTrue($this->get_element()->sync()); // Run the sync.
-        $this->assertCount(2, $DB->get_records('org')); // Check the correct count of organisations.
-
-        // Now check each field is populated for organisation idnumber 1.
-        $org = $this->get_organisation(1);
-        foreach ($this->importdata as $field => $fielddata) {
-            if ($fielddata["required"]) {
-                // For required fields we just want to check they are not empty/null.
-                $this->assertNotEquals('', $org->{$fielddata['tablefieldname']});
-                $this->assertNotNull($org->{$fielddata['tablefieldname']});
-            } else {
-                // Check the data matches the value in the CSV.
-                $this->assertEquals($fielddata["newdata"][0], $org->{$fielddata['tablefieldname']}, 'Failed for field ' . $field);
-            }
-        }
-    }
-
     public function get_organisation($idnumber) {
         global $DB;
 

@@ -77,6 +77,20 @@ abstract class totara_sync_csv_testcase extends advanced_testcase {
     }
 
     /**
+     * Run the check_sanity
+     *
+     * @return bool
+     */
+    public function check_sanity() {
+        $synctable = $this->get_element()->get_source_sync_table();
+        $synctable_clone = $this->get_element()->get_source_sync_table_clone($synctable);
+        $result = $this->get_element()->check_sanity($synctable, $synctable_clone);
+        $this->source->drop_table($synctable_clone);
+
+        return $result;
+    }
+
+    /**
      * Run the sync
      *
      * @return bool

@@ -457,7 +457,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                   FROM {{$synctable}} s
        LEFT OUTER JOIN {{$elname}} i
                     ON s.parentidnumber = i.idnumber
-                 WHERE s.parentidnumber IS NOT NULL AND s.parentidnumber != '' AND s.parentidnumber != '0'" .
+                 WHERE s.parentidnumber IS NOT NULL AND s.parentidnumber != '' " .
             $parentssql;
 
         $rs = $DB->get_recordset_sql($sql);
