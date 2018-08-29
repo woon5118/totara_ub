@@ -153,29 +153,37 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
             requiredstrings.push({key: 'bulkaddattendeesresults', component: 'facetoface'});
             requiredstrings.push({key: 'closebuttontitle', component: 'moodle'});
 
-            mdlstrings.get_strings(requiredstrings).done(function (strings) {
+            mdlstrings.get_strings(requiredstrings).done(function(strings) {
+                var initialiseDialog = function() {
+                    var handler = new totaraDialog_handler();
 
-                var handler = new totaraDialog_handler();
-
-                var tstr = [];
-                for (var i = 0; i < requiredstrings.length; i++) {
-                    tstr[requiredstrings[i].key] = strings[i];
-                }
-                var name = 'bulkaddvalidation';
-                var buttons = {};
-                buttons[tstr.closebuttontitle] = function () {
-                    handler._cancel();
+                    var tstr = [];
+                    for (var i = 0; i < requiredstrings.length; i++) {
+                        tstr[requiredstrings[i].key] = strings[i];
+                    }
+                    var name = 'bulkaddvalidation';
+                    var buttons = {};
+                    buttons[tstr.closebuttontitle] = function () {
+                        handler._cancel();
+                    };
+                    totaraDialogs[name] = new totaraDialog(
+                        name,
+                        'viewbulkresults',
+                        {
+                            title: '<h2>' + tstr.bulkaddattendeesresults + '</h2>',
+                            buttons: buttons
+                        },
+                        mdlcfg.wwwroot + '/mod/facetoface/attendees/bulkadd_results.php?s=' + sessionid + '&listid=' + listid,
+                        handler
+                    );
                 };
-                totaraDialogs[name] = new totaraDialog(
-                    name,
-                    'viewbulkresults',
-                    {
-                        title: '<h2>' + tstr.bulkaddattendeesresults + '</h2>',
-                        buttons: buttons
-                    },
-                    mdlcfg.wwwroot + '/mod/facetoface/attendees/bulkadd_results.php?s=' + sessionid + '&listid=' + listid,
-                    handler
-                );
+
+                if (window.dialogsInited) {
+                    initialiseDialog();
+                } else {
+                    window.dialoginits = window.dialoginits || [];
+                    window.dialoginits.push(initialiseDialog);
+                }
             });
         }
     };
