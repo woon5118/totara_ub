@@ -32,6 +32,12 @@ information provided here is intended especially for developers.
 use hierarchy::download_xls_legacy, which is public.
 * The method hierarchy::download_csv has had its scope changed from public to protected. To continue using the previous behaviour,
   use hierarchy::download_csv_legacy, which is public.
+* The scheduled task update_competency_task did not scale so it had to be refactored. The refactoring breaks backwards compatibility
+  for the method competency_cron_aggregate_evidence(). This method was replaced by a new method called aggregate_competency_evidence_items() which behaviour
+  is different to the previous one. Previously there was one big query and loop which went through all competency/user combinations.
+  Now all evidence items for a particular user and framework/depth combination are loaded and then passed to this method for aggregation.
+  Additionally the method competency_cron_evidence_items() was replaced with a private method run_evidence_type_aggregation_methods(). The old method was deprecated
+  in favour of the new one.
 
 === 10 ===
 
