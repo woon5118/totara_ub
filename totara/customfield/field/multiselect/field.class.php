@@ -285,7 +285,7 @@ class customfield_multiselect extends customfield_base {
             $return[] = self::get_item_string(format_string($item['option']), $item['icon'], $extradata['display']);
         }
 
-        if (isset($extradata['display']) && $extradata['display'] == 'list-text') {
+        if (!empty($extradata['isexport']) || (isset($extradata['display']) && $extradata['display'] == 'list-text')) {
             $glue = ', ';
         } else {
             $glue = ' ';

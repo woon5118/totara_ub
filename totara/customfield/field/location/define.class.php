@@ -480,6 +480,11 @@ class customfield_define_location extends customfield_define_base {
             $fielddata = json_decode($fielddata);
         }
 
+        // Export address only
+        if (!empty($extradata['isexport'])) {
+            return $fielddata->address;
+        }
+
         // Ensure zoom level is set.
         if (!isset($fielddata->zoom)) {
             $fielddata->zoom = $CFG->gmapsdefaultzoomlevel;

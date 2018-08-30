@@ -61,6 +61,12 @@ class customfield_checkbox extends customfield_base {
      * Display the data for this field
      */
     static function display_item_data($data, $extradata=array()) {
+
+        // Exporting 0 or 1
+        if (!empty($extradata['isexport'])) {
+            return (string)intval($data);
+        }
+
         if (intval($data) === 1) {
             return get_string('yes');
         } else {

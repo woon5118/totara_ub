@@ -91,6 +91,12 @@ class customfield_location extends customfield_base {
      * @return array|string
      */
     public static function display_item_data($data, $extradata = array()) {
-        return customfield_define_location::render($data, $extradata);
+
+        $data = customfield_define_location::render($data, $extradata);
+        if (!empty($extradata['isexport'])) {
+            return $data;
+        }
+
+        return $data;
     }
 }

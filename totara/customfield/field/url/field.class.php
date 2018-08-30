@@ -159,6 +159,11 @@ class customfield_url extends customfield_base {
                 return '';
             }
 
+            // Exporting just the url
+            if (!empty($extradata['isexport'])) {
+                return $urldata->url;
+            }
+
             $text = s(empty($urldata->text) ? $urldata->url : format_string($urldata->text));
             $target = !empty($urldata->target) ? array('target' => '_blank', 'rel' => 'noreferrer') : null;
 

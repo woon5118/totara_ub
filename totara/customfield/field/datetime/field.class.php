@@ -66,6 +66,11 @@ class customfield_datetime extends customfield_base {
         $new_data = ctype_digit($data) ? intval($data) : strtotime($data);
         $data = $new_data ? $new_data : $data;
 
+        // Export unix time
+        if (!empty($extradata['isexport'])) {
+            return $data;
+        }
+
         // Only display the time if its been set.
         if (date('G:i', $data) !== '0:00') { // 12:00 am - assume no time was saved
             $format = get_string('strftimedaydatetime', 'langconfig');

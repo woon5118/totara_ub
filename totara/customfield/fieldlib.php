@@ -87,6 +87,12 @@ class customfield_base {
 /***** The following methods may be overwritten by child classes *****/
 
     static function display_item_data($data, $extradata=array()) {
+
+        // Export return raw value
+        if (!empty($extradata['isexport'])) {
+            return $data;
+        }
+
         $options = new stdClass();
         $options->para = false;
         return format_text($data, FORMAT_MOODLE, $options);
@@ -357,7 +363,7 @@ class customfield_base {
     }
 
     /**
-     * Check if the field data is hidden to the current item 
+     * Check if the field data is hidden to the current item
      * @return  boolean
      */
     function is_hidden() {
