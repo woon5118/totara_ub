@@ -319,13 +319,13 @@ class completion_completion extends data_object {
         global $DB;
 
         $timenow = time();
+        $markinprogress = true;
 
         if (!$this->timestarted) {
-
+            $markinprogress = false;
             if (!$timestarted) {
                 $timestarted = $timenow;
             }
-
             $this->timestarted = $timestarted;
         }
 
@@ -335,24 +335,26 @@ class completion_completion extends data_object {
             return false;
         }
 
-        if (!$wasenrolled) {
-            $data = array();
-            $data['userid'] = $this->userid;
-            $data['eventtype'] = STATS_EVENT_COURSE_STARTED;
-            $data['data2'] = $this->course;
-            if (!$DB->record_exists('block_totara_stats', $data)) {
-                totara_stats_add_event($timenow, $this->userid, STATS_EVENT_COURSE_STARTED, '', $this->course);
+        if (!$markinprogress) {
+            if (!$wasenrolled) {
+                $data = array();
+                $data['userid'] = $this->userid;
+                $data['eventtype'] = STATS_EVENT_COURSE_STARTED;
+                $data['data2'] = $this->course;
+                if (!$DB->record_exists('block_totara_stats', $data)) {
+                    totara_stats_add_event($timenow, $this->userid, STATS_EVENT_COURSE_STARTED, '', $this->course);
+                }
             }
-        }
 
-        // Trigger event to indicate that a user has been marked as in progress in a course.
-        $context = context_course::instance($this->course);
-        $data = array(
-            'relateduserid' => $this->userid,
-            'objectid' => $this->course,
-            'context' => $context,
-        );
-        \core\event\course_in_progress::create($data)->trigger();
+            // Trigger event to indicate that a user has been marked as in progress in a course.
+            $context = context_course::instance($this->course);
+            $data = array(
+                'relateduserid' => $this->userid,
+                'objectid' => $this->course,
+                'context' => $context,
+            );
+            \core\event\course_in_progress::create($data)->trigger();
+        }
     }
 
     /**
