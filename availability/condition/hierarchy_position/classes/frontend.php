@@ -25,6 +25,9 @@
 namespace availability_hierarchy_position;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+
+require_once("{$CFG->dirroot}/totara/hierarchy/prefix/position/lib.php");
 
 /**
  * Front-end class.
@@ -96,6 +99,28 @@ class frontend extends \core_availability\frontend {
                 foreach ($pos_names as $id => $value) {
                     $value->fullname = format_string($value->fullname);
                     $pos_names[$id] = $value;
+                }
+            }
+        } else if (!empty($section->availability)) {
+            // A fallback for section_info if cm_info is null
+            $availability = json_decode($section->availability, true);
+            $position = new \position();
+            if (!is_bool($availability)) {
+                $items = isset($availability['c']) ? $availability['c'] : array();
+                foreach ($items as $item) {
+                    if (!isset($item['type']) || !isset($item['position'])) {
+                        continue;
+                    }
+
+                    /** @var \stdClass|bool $record */
+                    $record = $position->get_item((int)$item['position']);
+                    if (is_bool($record)) {
+                        continue;
+                    }
+
+                    $single = new \stdClass();
+                    $single->fullname = format_string($record->fullname);
+                    $pos_names[$record->id] = $single;
                 }
             }
         }
