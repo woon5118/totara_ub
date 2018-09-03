@@ -87,6 +87,7 @@ if ($form->is_cancelled()) {
             throw new coding_exception('Cannot edit published version.');
         }
 
+        $primarypolicy->set_language($formdata->language);
         $primarypolicy->set_authorid($USER->id);
         $primarypolicy->set_title($formdata->title);
         $primarypolicy->set_policytext($formdata->policytext, $formdata->policytextformat);
