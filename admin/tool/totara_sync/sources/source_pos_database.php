@@ -149,7 +149,7 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
         // with the same shortname for example (possible if each field has a different type).
         $fields = array_merge(
             $fields,
-            array_unique($this->get_mapped_customfields())
+            $this->get_unique_mapped_customfields()
         );
 
         // Check the table exists in the database.
@@ -220,7 +220,7 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
             // Custom fields are special - needs to be json-encoded
             if (!empty($this->hierarchy_customfields)) {
                 $dbrow['customfields'] = $this->get_customfield_json($extdbrow);
-                foreach($this->hierarchy_customfields as $hierarchy_customfield) {
+                foreach ($this->hierarchy_customfields as $hierarchy_customfield) {
                     if ($this->is_importing_customfield($hierarchy_customfield)) {
                         unset($dbrow[$hierarchy_customfield->get_default_fieldname()]);
                     }

@@ -22,6 +22,8 @@
  * @subpackage totara_sync
  */
 
+use tool_totara_sync\internal\hierarchy\customfield;
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.class.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/org.php'); // Needed for totara_sync_element_org.
@@ -29,7 +31,7 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/org.php'); // Neede
 abstract class totara_sync_source_org extends totara_sync_source {
     use \tool_totara_sync\internal\hierarchy\customfield_processor_trait;
 
-    protected $fields, $customfields, $customfieldtitles;
+    protected $fields;
 
     /**
      * @var totara_sync_element_org
@@ -37,6 +39,8 @@ abstract class totara_sync_source_org extends totara_sync_source {
     protected $element;
 
     function __construct() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 
         $this->temptablename = 'totara_sync_org';
         parent::__construct();
@@ -53,7 +57,7 @@ abstract class totara_sync_source_org extends totara_sync_source {
             'timemodified'
         );
 
-        $this->hierarchy_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('org_type');
+        $this->hierarchy_customfields = customfield::get_all(new organisation());
 
         $this->element = new totara_sync_element_org();
     }

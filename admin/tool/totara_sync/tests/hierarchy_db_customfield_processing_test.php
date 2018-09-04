@@ -21,6 +21,8 @@
  * @package tool_totara_sync
  */
 
+use tool_totara_sync\internal\hierarchy\customfield;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -257,7 +259,7 @@ class tool_totara_sync_hierarchy_db_customfield_processing_testcase extends tota
         $this->set_up_importing($hierarchyshortname);
         $this->create_data_for_multiple_customfields($hierarchyshortname, $hierarchyfullname);
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all($hierarchyshortname . '_type');
+        $sync_customfields = customfield::get_all(new $hierarchyfullname());
         foreach($sync_customfields as $sync_customfield) {
             // We're only testing with one custom field set to import. Other tests cover multiple.
             if ($sync_customfield->get_shortname_with_type() === 'customfielda (typeidnumber1)') {
@@ -299,7 +301,7 @@ class tool_totara_sync_hierarchy_db_customfield_processing_testcase extends tota
         $this->set_up_importing($hierarchyshortname);
         $this->create_data_for_multiple_customfields($hierarchyshortname, $hierarchyfullname);
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all($hierarchyshortname . '_type');
+        $sync_customfields = customfield::get_all(new $hierarchyfullname());
         foreach($sync_customfields as $sync_customfield) {
             // We're only testing with one custom field set to import. Other tests cover multiple.
             if ($sync_customfield->get_shortname_with_type() === 'customfielda (typeidnumber1)') {
@@ -340,7 +342,7 @@ class tool_totara_sync_hierarchy_db_customfield_processing_testcase extends tota
         $this->set_up_importing($hierarchyshortname);
         $this->create_data_for_multiple_customfields($hierarchyshortname, $hierarchyfullname);
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all($hierarchyshortname . '_type');
+        $sync_customfields = customfield::get_all(new $hierarchyfullname());
         foreach($sync_customfields as $sync_customfield) {
                 set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_' . $hierarchyshortname . '_database');
         }
@@ -380,7 +382,7 @@ class tool_totara_sync_hierarchy_db_customfield_processing_testcase extends tota
         $this->set_up_importing($hierarchyshortname);
         $this->create_data_for_multiple_customfields($hierarchyshortname, $hierarchyfullname);
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all($hierarchyshortname . '_type');
+        $sync_customfields = customfield::get_all(new $hierarchyfullname());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_' . $hierarchyshortname . '_database');
         }
@@ -445,7 +447,7 @@ class tool_totara_sync_hierarchy_db_customfield_processing_testcase extends tota
         $this->set_up_importing($hierarchyshortname);
         $this->create_data_for_multiple_customfields($hierarchyshortname, $hierarchyfullname);
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all($hierarchyshortname . '_type');
+        $sync_customfields = customfield::get_all(new $hierarchyfullname());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_' . $hierarchyshortname . '_database');
             if ($sync_customfield->get_shortname_with_type() === 'customfielda (typeidnumber2)') {
@@ -517,7 +519,7 @@ class tool_totara_sync_hierarchy_db_customfield_processing_testcase extends tota
         $this->set_up_importing($hierarchyshortname);
         $this->create_data_for_multiple_customfields($hierarchyshortname, $hierarchyfullname);
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all($hierarchyshortname . '_type');
+        $sync_customfields = customfield::get_all(new $hierarchyfullname());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_' . $hierarchyshortname . '_database');
             if ($sync_customfield->get_shortname_with_type() === 'customfielda (typeidnumber2)') {

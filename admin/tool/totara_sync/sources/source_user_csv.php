@@ -463,4 +463,13 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         return $notifications;
     }
 
+    /**
+     * Cleans values for import. Excludes custom fields, which should not be part of the input array.
+     *
+     * @param string[] $row with field name as key (after mapping) and value provided for the given field.
+     * @return string[] Same structure as input but with cleaned values.
+     */
+    private function clean_fields($row) {
+        // TODO
+    }
 }

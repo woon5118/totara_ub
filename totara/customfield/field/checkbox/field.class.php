@@ -99,6 +99,12 @@ class customfield_checkbox extends customfield_base {
 
     }
 
+    /**
+     * Does some extra pre-processing for totara sync uploads.
+     *
+     * @param  object $itemnew The item being saved
+     * @return object          The same item after processing
+     */
     public function sync_data_preprocess($syncitem) {
         $fieldname = $this->inputname;
 

@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 trait csv_trait {
 
     /**
-     * Holds data in csv string that can be access from memory, rather than reading from a file.
+     * Holds data in csv string that can be accessed from memory, rather than reading from a file.
      *
      * Intended for testing.
      *
@@ -224,17 +224,22 @@ trait csv_trait {
      */
     protected function open_csv_file() {
         $fileaccess = get_config('totara_sync', 'fileaccess');
-        if ($fileaccess == FILE_ACCESS_DIRECTORY) {
-            $storefilepath = $this->copy_csv_file_from_directory();
-        } else if ($fileaccess == FILE_ACCESS_UPLOAD) {
-            $storefilepath = $this->copy_csv_file_from_upload();
-        } else if ($fileaccess == TOTARA_SYNC_FILE_ACCESS_MEMORY) {
-            // We support just having the file contents in memory for unit tests.
-            // Be aware that we miss out of totara_sync_clean_csvfile by returning here. If you are
-            // testing that code, you'll need to the full file operations in your test.
-            return $this->get_csv_from_memory();
-        } else {
-            throw new \totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'invalidfileaccess', $fileaccess);
+
+        switch($fileaccess) {
+            case FILE_ACCESS_DIRECTORY:
+                $storefilepath = $this->copy_csv_file_from_directory();
+                break;
+            case FILE_ACCESS_UPLOAD:
+                $storefilepath = $this->copy_csv_file_from_upload();
+                break;
+            case TOTARA_SYNC_FILE_ACCESS_MEMORY:
+                // We support just having the file contents in memory for unit tests.
+                // Be aware that we miss out of totara_sync_clean_csvfile by returning here. If you are
+                // testing that code, you'll need to the full file operations in your test.
+                return $this->get_csv_from_memory();
+                break;
+            default:
+                throw new \totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'invalidfileaccess', $fileaccess);
         }
 
         $encodingconfig = 'csv' . $this->get_element_name() . 'encoding';

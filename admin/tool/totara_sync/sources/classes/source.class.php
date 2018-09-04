@@ -356,11 +356,7 @@ abstract class totara_sync_source {
     protected function get_csv_date_format() {
         global $CFG;
 
-        if (isset($CFG->csvdateformat)) {
-            return $CFG->csvdateformat;
-        } else {
-            return get_string('csvdateformatdefault', 'totara_core');
-        }
+        return $CFG->csvdateformat ?? get_string('csvdateformatdefault', 'totara_core');
     }
 
 }

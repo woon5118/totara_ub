@@ -26,16 +26,33 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.comp.class.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 
+/**
+ * Class totara_sync_source_comp_csv
+ *
+ * Manages importing of data from a csv file in order to create competencies.
+ *
+ * This will handle saving the data to a temporary table. Updating of competencies is done by the competency element.
+ */
 class totara_sync_source_comp_csv extends totara_sync_source_comp {
     use \tool_totara_sync\internal\source\csv_trait;
 
-    function get_filepath() {
+    /**
+     * Get the path to the csv file that has been uploaded for import.
+     *
+     * @return string
+     */
+    public function get_filepath() {
         $path = '/csv/ready/comp.csv';
         $pathos = $this->get_canonical_filesdir($path);
         return $pathos;
     }
 
-    function config_form(&$mform) {
+    /**
+     * Add form elements specific to competencies.
+     *
+     * @param $mform
+     */
+    public function config_form(&$mform) {
 
         $this->config->import_idnumber = "1";
         $this->config->import_fullname = "1";
@@ -47,19 +64,30 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
         parent::config_form($mform);
     }
 
-    function config_save($data) {
+    /**
+     * Save data from the form elements added by config_form.
+     *
+     * @param $data
+     */
+    public function config_save($data) {
         $this->config_save_csv_file_details($data);
         parent::config_save($data);
     }
 
-    function import_data($temptable) {
-        global $CFG, $DB;
+    /**
+     * Import data from the csv file and store in the temporary table.
+     *
+     * @param $temptable
+     * @return bool
+     */
+    public function import_data($temptable) {
+        global $DB;
 
         $file = $this->open_csv_file();
 
         // Map CSV fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
-        $fieldmappings = array();
+        $fieldmappings = [];
         foreach ($this->fields as $f) {
             if (empty($this->config->{'import_'.$f})) {
                 continue;
@@ -96,14 +124,14 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
         }
 
         // Ensure necessary fields are present
-        foreach ($fieldmappings as $f => $m) {
-            if (!in_array($f, $fields)) {
+        foreach ($fieldmappings as $field => $mapping) {
+            if (!in_array($field, $fields)) {
                 // typeidnumber field can be optional if no custom fields specified
-                if (($m == 'typeidnumber') && !empty($customfields)) {
-                    if ($f == $m) {
-                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldx', $f);
+                if (($mapping == 'typeidnumber') && !empty($customfields)) {
+                    if ($field == $mapping) {
+                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldx', $field);
                     } else {
-                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldxmappingx', (object)array('field' => $f, 'mapping' => $m));
+                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldxmappingx', (object)['field' => $field, 'mapping' => $mapping]);
                     }
                 }
             }
@@ -117,7 +145,7 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
 
         // Populate temp sync table from CSV
         $now = time();
-        $datarows = array();    // holds csv row data
+        $datarows = [];    // holds csv row data
         $dbpersist = TOTARA_SYNC_DBROWS;  // # of rows to insert into db at a time
         $rowcount = 0;
         $fieldcount = new stdClass();
@@ -147,7 +175,7 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
             $csvrow = array_combine($fields, $csvrow);  // nice associative array
 
             // Set up a db row
-            $row = array();
+            $row = [];
 
             // General fields
             foreach ($this->fields as $field) {
@@ -226,7 +254,7 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
 
             if (!empty($this->hierarchy_customfields)) {
                 $row['customfields'] = $this->get_customfield_json($csvrow, $csvsaveemptyfields);
-                foreach($this->hierarchy_customfields as $hierarchy_customfield) {
+                foreach ($this->hierarchy_customfields as $hierarchy_customfield) {
                     if ($this->is_importing_customfield($hierarchy_customfield)) {
                         unset($row[$hierarchy_customfield->get_default_fieldname()]);
                     }
@@ -247,7 +275,7 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
 
                 $rowcount = 0;
                 unset($datarows);
-                $datarows = array();
+                $datarows = [];
 
                 gc_collect_cycles();
             }
@@ -276,6 +304,12 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
         return $this->get_common_csv_notifications();
     }
 
+    /**
+     * Cleans values for import. Excludes custom fields, which should not be part of the input array.
+     *
+     * @param string[] $row with field name as key (after mapping) and value provided for the given field.
+     * @return string[] Same structure as input but with cleaned values.
+     */
     private function clean_fields($row) {
         $cleaned = [];
         foreach($row as $key => $value) {

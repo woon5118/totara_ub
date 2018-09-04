@@ -24,7 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/classes/hierarchy.element.class.php');
-require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 
 /**
  * Class totara_sync_element_comp
@@ -34,7 +33,11 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  */
 class totara_sync_element_comp extends totara_sync_hierarchy {
 
-
+    /**
+     * Add form elements specific to competencies.
+     *
+     * @param $mform
+     */
     public function config_form(&$mform) {
         parent::config_form($mform);
         // Disable the field when nothing is selected, and when database is selected.
@@ -42,10 +45,27 @@ class totara_sync_element_comp extends totara_sync_hierarchy {
         $mform->disabledIf('csvsaveemptyfields', 'source_org', 'eq', 'totara_sync_source_org_database');
     }
 
-    function get_hierarchy() {
+    /**
+     * @return competency
+     */
+    public function get_hierarchy() {
+        global $CFG;
+        require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
+
         return new competency();
     }
 
+    /**
+     * Checks the temporary table for data integrity.
+     *
+     * Calls the parent method to do general hierarchy related checks,
+     * then does additional competency specific checks if no issues are found.
+     *
+     * @global object $DB
+     * @param string $synctable
+     * @param string $synctable_clone name of the clone table
+     * @return boolean
+     */
     public function check_sanity($synctable, $synctable_clone) {
         global $DB;
 

@@ -181,6 +181,12 @@ class customfield_datetime extends customfield_base {
         return $itemnew;
     }
 
+    /**
+     * Does some extra pre-processing for totara sync uploads.
+     *
+     * @param  object $itemnew The item being saved
+     * @return object          The same item after processing
+     */
     public function sync_data_preprocess($syncitem) {
         $fieldname = $this->inputname;
 

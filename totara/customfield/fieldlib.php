@@ -216,8 +216,11 @@ class customfield_base {
 
     /**
      * Does some extra pre-processing for totara sync uploads.
-     * Only required for custom fields with several options
+     *
+     * Required for custom fields with several options
      * like menu of choices, and multi-select.
+     *
+     * Also suggested for other types to perform cleaning specific to that data type.
      *
      * @param  object $itemnew The item being saved
      * @return object          The same item after processing

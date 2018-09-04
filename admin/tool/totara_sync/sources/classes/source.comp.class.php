@@ -21,29 +21,37 @@
  * @package tool_totara_sync
  */
 
+use tool_totara_sync\internal\hierarchy\customfield;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.class.php');
-require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/comp.php'); // Needed for totara_sync_element_org.
 
 abstract class totara_sync_source_comp extends totara_sync_source {
     use \tool_totara_sync\internal\hierarchy\customfield_processor_trait;
 
-    protected $fields, $customfields, $customfieldtitles;
+    /**
+     * Fields to be imported.
+     *
+     * @var string[]
+     */
+    protected $fields;
 
     /**
      * @var totara_sync_element_comp
      */
     protected $element;
 
-    function __construct() {
-        global $DB;
+    public function __construct() {
+        global $CFG;
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/comp.php');
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 
         $this->temptablename = 'totara_sync_comp';
         parent::__construct();
 
-        $this->fields = array(
+        $this->fields = [
             'idnumber',
             'fullname',
             'shortname',
@@ -54,9 +62,9 @@ abstract class totara_sync_source_comp extends totara_sync_source {
             'typeidnumber',
             'timemodified',
             'aggregationmethod',
-        );
+        ];
 
-        $this->hierarchy_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('comp_type');
+        $this->hierarchy_customfields = customfield::get_all(new competency());
 
         $this->element = new totara_sync_element_comp();
     }
@@ -69,37 +77,47 @@ abstract class totara_sync_source_comp extends totara_sync_source {
      * @return boolean true on success
      * @throws totara_sync_exception
      */
-    abstract function import_data($temptable);
+    abstract public function import_data($temptable);
 
-    function get_element_name() {
+    /**
+     * @return string
+     */
+    public function get_element_name() {
         return 'comp';
     }
 
-    function has_config() {
+    /**
+     * @return bool True if configuration is required.
+     */
+    public function has_config() {
         return true;
     }
 
     /**
      * Override in child classes
      */
-    function uses_files() {
+    public function uses_files() {
         return true;
     }
 
     /**
      * Override in child classes
      */
-    function get_filepath() {}
+    public function get_filepath() {}
 
-
-    function config_form(&$mform) {
+    /**
+     * Add relevant form elements to the config form.
+     *
+     * @param $mform
+     */
+    public function config_form(&$mform) {
         // Fields to import.
         $mform->addElement('header', 'importheader', get_string('importfields', 'tool_totara_sync'));
         $mform->setExpanded('importheader');
 
         foreach ($this->fields as $f) {
             $name = 'import_'.$f;
-            if (in_array($f, array('idnumber', 'fullname', 'frameworkidnumber', 'timemodified', 'aggregationmethod'))) {
+            if (in_array($f, ['idnumber', 'fullname', 'frameworkidnumber', 'timemodified', 'aggregationmethod'])) {
                 $mform->addElement('hidden', $name, '1');
                 $mform->setType($name, PARAM_INT);
             } else if ($f == 'deleted') {
@@ -128,7 +146,12 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         }
     }
 
-    function config_save($data) {
+    /**
+     * Save data from the config form.
+     *
+     * @param $data
+     */
+    public function config_save($data) {
         foreach ($this->fields as $f) {
             $this->set_config('import_'.$f, !empty($data->{'import_'.$f}));
         }
@@ -144,7 +167,12 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         }
     }
 
-    function get_sync_table() {
+    /**
+     * Prepares the temporary table for storing data in and performs import.
+     *
+     * @return string
+     */
+    public function get_sync_table() {
 
         try {
             $temptable = $this->prepare_temp_table();
@@ -162,7 +190,7 @@ abstract class totara_sync_source_comp extends totara_sync_source {
      * Define and create the temporary table necessary for element syncing
      * @param boolean $clone add _clone to the table name?
      */
-    function prepare_temp_table($clone = false) {
+    public function prepare_temp_table($clone = false) {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/lib/ddllib.php');
@@ -197,13 +225,13 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         }
         
         /// Add keys
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
         /// Add indexes
-        $table->add_index('idnumber', XMLDB_INDEX_NOTUNIQUE, array('idnumber'));
-        $table->add_index('frameworkidnumber', XMLDB_INDEX_NOTUNIQUE, array('frameworkidnumber'));
-        $table->add_index('parentidnumber', XMLDB_INDEX_NOTUNIQUE, array('parentidnumber'));
-        $table->add_index('typeidnumber', XMLDB_INDEX_NOTUNIQUE, array('typeidnumber'));
+        $table->add_index('idnumber', XMLDB_INDEX_NOTUNIQUE, ['idnumber']);
+        $table->add_index('frameworkidnumber', XMLDB_INDEX_NOTUNIQUE, ['frameworkidnumber']);
+        $table->add_index('parentidnumber', XMLDB_INDEX_NOTUNIQUE, ['parentidnumber']);
+        $table->add_index('typeidnumber', XMLDB_INDEX_NOTUNIQUE, ['typeidnumber']);
 
         /// Create and truncate the table
         $dbman->create_temp_table($table, false, false);
@@ -212,6 +240,13 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         return $table;
     }
 
+    /**
+     * Takes import data and convers to the relevant constant for competency aggregation.
+     *
+     * @param string $fromsource Value given in import data.
+     * @return int|null Int would be the constant. Null if there was no value or if it couldn't be linked to
+     * a constant.
+     */
     protected function parse_aggregationmethod($fromsource) {
         global $COMP_AGGREGATION;
 

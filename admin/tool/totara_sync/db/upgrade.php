@@ -169,15 +169,16 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         // by either looping through or querying the database each time later.
         $poscustomfields = $DB->get_records('pos_type_info_field');
         $posbyshortname = [];
-        foreach($poscustomfields as $poscustomfield) {
+        foreach ($poscustomfields as $poscustomfield) {
             if ($poscustomfield->datatype === 'file') {
                 continue;
             }
+
             if (!isset($posbyshortname[$poscustomfield->shortname])) {
-                $posbyshortname[$poscustomfield->shortname] = [$poscustomfield->typeid];
-            } else {
-                $posbyshortname[$poscustomfield->shortname][] = $poscustomfield->typeid;
+                $posbyshortname[$poscustomfield->shortname] = [];
             }
+
+            $posbyshortname[$poscustomfield->shortname][] = $poscustomfield->typeid;
         }
 
 
@@ -187,10 +188,10 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             $sql,
             ['plugin' => 'totara_sync_source_pos_%', 'name' => 'import_customfield_%']
         );
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $shortname = explode('_', $record->name)[2];
             if (isset($posbyshortname[$shortname]) && is_array($posbyshortname[$shortname])) {
-                foreach($posbyshortname[$shortname] as $typeid) {
+                foreach ($posbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'import_customfield_' . $typeid . '_' . $shortname;
                     set_config($newsettingname, $record->value, $record->plugin);
                 }
@@ -208,10 +209,10 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             $sql,
             ['plugin' => 'totara_sync_source_pos_%', 'name' => 'fieldmapping_customfield_%']
         );
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $shortname = explode('_', $record->name)[2];
             if (isset($posbyshortname[$shortname]) && is_array($posbyshortname[$shortname])) {
-                foreach($posbyshortname[$shortname] as $typeid) {
+                foreach ($posbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'fieldmapping_customfield_' . $typeid . '_' . $shortname;
                     set_config($newsettingname, $record->value, $record->plugin);
                 }
@@ -229,15 +230,16 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
 
         $orgcustomfields = $DB->get_records('org_type_info_field');
         $orgbyshortname = [];
-        foreach($orgcustomfields as $orgcustomfield) {
+        foreach ($orgcustomfields as $orgcustomfield) {
             if ($orgcustomfield->datatype === 'file') {
                 continue;
             }
+
             if (!isset($orgbyshortname[$orgcustomfield->shortname])) {
-                $orgbyshortname[$orgcustomfield->shortname] = [$orgcustomfield->typeid];
-            } else {
-                $orgbyshortname[$orgcustomfield->shortname][] = $orgcustomfield->typeid;
+                $orgbyshortname[$orgcustomfield->shortname] = [];
             }
+
+            $orgbyshortname[$orgcustomfield->shortname][] = $orgcustomfield->typeid;
         }
 
 
@@ -247,10 +249,10 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             $sql,
             ['plugin' => 'totara_sync_source_org_%', 'name' => 'import_customfield_%']
         );
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $shortname = explode('_', $record->name)[2];
             if (isset($orgbyshortname[$shortname]) && is_array($orgbyshortname[$shortname])) {
-                foreach($orgbyshortname[$shortname] as $typeid) {
+                foreach ($orgbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'import_customfield_' . $typeid . '_' . $shortname;
                     set_config($newsettingname, $record->value, $record->plugin);
                 }
@@ -268,10 +270,10 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             $sql,
             ['plugin' => 'totara_sync_source_org_%', 'name' => 'fieldmapping_customfield_%']
         );
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $shortname = explode('_', $record->name)[2];
             if (isset($orgbyshortname[$shortname]) && is_array($orgbyshortname[$shortname])) {
-                foreach($orgbyshortname[$shortname] as $typeid) {
+                foreach ($orgbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'fieldmapping_customfield_' . $typeid . '_' . $shortname;
                     set_config($newsettingname, $record->value, $record->plugin);
                 }

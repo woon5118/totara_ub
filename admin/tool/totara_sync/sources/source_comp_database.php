@@ -28,10 +28,22 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
 
+/**
+ * Class totara_sync_source_comp_database
+ *
+ * Manages importing of data from an external database in order to create competencies.
+ *
+ * This will handle saving the data to a temporary table. Updating of competencies is done by the competency element.
+ */
 class totara_sync_source_comp_database extends totara_sync_source_comp {
 
+    /**
+     * Add form elements specific to competencies.
+     *
+     * @param $mform
+     */
     function config_form(&$mform) {
-        global $PAGE, $OUTPUT;
+        global $PAGE;
 
         $this->config->import_idnumber = "1";
         $this->config->import_fullname = "1";
@@ -70,25 +82,31 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         $mform->addElement('button', 'database_dbtest', get_string('dbtestconnection', 'tool_totara_sync'));
 
         //Javascript include
-        local_js(array(TOTARA_JS_DIALOG));
+        local_js([TOTARA_JS_DIALOG]);
 
-        $PAGE->requires->strings_for_js(array('dbtestconnectsuccess', 'dbtestconnectfail'), 'tool_totara_sync');
+        $PAGE->requires->strings_for_js(['dbtestconnectsuccess', 'dbtestconnectfail'], 'tool_totara_sync');
 
-        $jsmodule = array(
+        $jsmodule = [
                 'name' => 'totara_syncdatabaseconnect',
                 'fullpath' => '/admin/tool/totara_sync/sources/sync_database.js',
-                'requires' => array('json', 'totara_core'));
+                'requires' => ['json', 'totara_core']
+        ];
 
         $PAGE->requires->js_init_call('M.totara_syncdatabaseconnect.init', null, false, $jsmodule);
 
         parent::config_form($mform);
     }
 
-    function config_save($data) {
+    /**
+     * Save data from the form elements added by config_form.
+     *
+     * @param $data
+     */
+    public function config_save($data) {
         //Check database connection when saving
         try {
             setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'},
-                $data->{'database_dbuser'}, $data->{'database_dbpass'}, array('dbport' => $data->{'database_dbport'}));
+                $data->{'database_dbuser'}, $data->{'database_dbpass'}, ['dbport' => $data->{'database_dbport'}]);
         } catch (Exception $e) {
             totara_set_notification(get_string('cannotconnectdbsettings', 'tool_totara_sync'), qualified_me());
         }
@@ -104,8 +122,13 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         parent::config_save($data);
     }
 
-    function import_data($temptable) {
-        global $CFG, $DB; // Careful using this in here as we have 2 database connections
+    /**
+     * Import data from the external database and store in the temporary table.
+     *
+     * @param $temptable
+     * @return bool
+     */
+    public function import_data($temptable) {
 
         // Get database config
         $dbtype = $this->config->{'database_dbtype'};
@@ -117,13 +140,13 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         $db_table = $this->config->{'database_dbtable'};
 
         try {
-            $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array('dbport' => $dbport));
+            $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, ['dbport' => $dbport]);
         } catch (Exception $e) {
             $this->addlog(get_string('databaseconnectfail', 'tool_totara_sync'), 'error', 'importdata');
         }
 
         // Get list of fields to be imported
-        $fields = array();
+        $fields = [];
         foreach ($this->fields as $f) {
             if (!empty($this->config->{'import_'.$f})) {
                 $fields[] = $f;
@@ -131,7 +154,7 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         }
 
         // Sort out field mappings
-        $fieldmappings = array();
+        $fieldmappings = [];
         foreach ($fields as $i => $f) {
             if (empty($this->config->{'fieldmapping_'.$f})) {
                 $fieldmappings[$f] = $f;
@@ -151,7 +174,7 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         // with the same shortname for example (possible if each field has a different type).
         $fields = array_merge(
             $fields,
-            array_unique($this->get_mapped_customfields())
+            $this->get_unique_mapped_customfields()
         );
 
         // Check the table exists in the database.
@@ -162,10 +185,10 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         }
 
         // Check that all fields exists in database.
-        $missingcolumns = array();
+        $missingcolumns = [];
         foreach ($fields as $f) {
             try {
-                $database_connection->get_field_sql("SELECT $f from $db_table", array(), IGNORE_MULTIPLE);
+                $database_connection->get_field_sql("SELECT $f from $db_table", [], IGNORE_MULTIPLE);
             } catch (Exception $e) {
                 $missingcolumns[] = $f;
             }
@@ -182,7 +205,7 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         /// Populate temp sync table from remote database
         ///
         $now = time();
-        $datarows = array();  // holds rows of data
+        $datarows = [];  // holds rows of data
         $rowcount = 0;
 
         $columns = implode(', ', $fields);
@@ -192,7 +215,7 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         foreach ($data as $row) {
             // Setup a db row
             $extdbrow = array_combine($fields, (array)$row);
-            $dbrow = array();
+            $dbrow = [];
 
             foreach ($this->fields as $field) {
                 if (!empty($this->config->{'import_'.$field})) {
@@ -239,7 +262,7 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
             // Custom fields are special - needs to be json-encoded
             if (!empty($this->hierarchy_customfields)) {
                 $dbrow['customfields'] = $this->get_customfield_json($extdbrow);
-                foreach($this->hierarchy_customfields as $hierarchy_customfield) {
+                foreach ($this->hierarchy_customfields as $hierarchy_customfield) {
                     if ($this->is_importing_customfield($hierarchy_customfield)) {
                         unset($dbrow[$hierarchy_customfield->get_default_fieldname()]);
                     }
@@ -258,7 +281,7 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
 
                 $rowcount = 0;
                 unset($datarows);
-                $datarows = array();
+                $datarows = [];
 
                 gc_collect_cycles();
             }

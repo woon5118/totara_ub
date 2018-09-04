@@ -38,7 +38,7 @@ trait customfield_processor_trait {
      *
      * This will include those that are being imported and those that are not.
      *
-     * @var \tool_totara_sync\internal\hierarchy\customfield[]
+     * @var customfield[]
      */
     protected $hierarchy_customfields;
 
@@ -48,7 +48,7 @@ trait customfield_processor_trait {
      *
      * This will only include custom fields that have been set to be imported.
      *
-     * @return array of form ['key' => 'mapped_field_name']
+     * @return string[] of form ['key' => 'mapped_field_name']
      */
     protected function get_mapped_customfields() {
         $mappedfields = [];
@@ -61,6 +61,18 @@ trait customfield_processor_trait {
         }
 
         return $mappedfields;
+    }
+
+    /**
+     * Returns the array of mapped field names as given by get_mapped_customfields, but made unique.
+     *
+     * Keys are stripped and replaced with integers because if there were duplicate field name values,
+     * the keys are not meaningful.
+     *
+     * @return string[] of form ['mapped_field_name'] - keys are arbitrary integers.
+     */
+    protected function get_unique_mapped_customfields() {
+        return array_values(array_unique($this->get_mapped_customfields()));
     }
 
     /**
@@ -86,7 +98,7 @@ trait customfield_processor_trait {
      * @return string containing json encoded custom field data.
      */
     protected function get_customfield_json($sourcerow, $saveemptyfields = true) {
-        $cfield_data = array();
+        $cfield_data = [];
 
         $invalidtypes = [];
 
@@ -126,7 +138,7 @@ trait customfield_processor_trait {
                 if (isset($value)) {
                     switch ($customfield->get_datatype()) {
                         case 'datetime':
-                            //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
+                            // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
                             $parsed_date = totara_date_parse_from_format(
                                 $this->get_csv_date_format(),
                                 $value,
@@ -137,7 +149,7 @@ trait customfield_processor_trait {
                             }
                             break;
                         case 'date':
-                            //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
+                            // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
                             $parsed_date = totara_date_parse_from_format(
                                 $this->get_csv_date_format(),
                                 $value,

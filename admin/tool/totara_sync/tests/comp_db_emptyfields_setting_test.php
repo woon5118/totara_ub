@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Alastair Munro <alastair.munro@totaralearning.com>
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @package tool_totara_sync
  */
 

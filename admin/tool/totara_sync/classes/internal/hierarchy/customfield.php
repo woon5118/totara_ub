@@ -22,8 +22,12 @@
  */
 
 namespace tool_totara_sync\internal\hierarchy;
+use hierarchy;
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
 /**
  * Class customfield
@@ -118,14 +122,18 @@ class customfield {
     /**
      * Get an array of customfield instances that will relate to all custom fields for the given type.
      *
-     * @param string $prefix name of the hierarchy type and prefix for the related custom field tables.
-     *   e.g. 'pos_type', 'org_type'.
+     * @param hierarchy $hierarchy Instance of the relevant hierarchy to retrieve custom field definitions for.
+     *   The hierarchy instance can be empty as such, i.e. nothing needs to be loaded from the database for it.
+     *   We simply take this object to confirm we are dealing with a genuine hierarchy and so that we can retrieve
+     *   info such as its shortprefix value.
      * @return customfield[]
      */
-    public static function get_all($prefix) {
+    public static function get_all(hierarchy $hierarchy) {
         global $DB;
 
         $customfields = [];
+
+        $prefix = $hierarchy->shortprefix . '_type';
 
         $types = $DB->get_records($prefix);
 
@@ -169,7 +177,7 @@ class customfield {
         $a->customfield_fullname = $this->fullname;
         $a->type_fullname = $this->typefullname;
 
-        return \get_string('customfieldfullnamewithtype', 'tool_totara_sync', $a);
+        return get_string('customfieldfullnamewithtype', 'tool_totara_sync', $a);
     }
 
     /**
@@ -184,7 +192,7 @@ class customfield {
         $a->customfield_shortname = $this->shortname;
         $a->type_idnumber = $this->typeidnumber;
 
-        return \get_string('customfieldshortnamewithtype', 'tool_totara_sync', $a);
+        return get_string('customfieldshortnamewithtype', 'tool_totara_sync', $a);
     }
 
     /**

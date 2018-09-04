@@ -22,6 +22,8 @@
  * @subpackage totara_sync
  */
 
+use tool_totara_sync\internal\hierarchy\customfield;
+
 global $CFG;
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.class.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/pos.php'); // Needed for totara_sync_element_pos.
@@ -37,6 +39,8 @@ abstract class totara_sync_source_pos extends totara_sync_source {
     protected $element;
 
     function __construct() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
         $this->temptablename = 'totara_sync_pos';
         parent::__construct();
@@ -53,7 +57,7 @@ abstract class totara_sync_source_pos extends totara_sync_source {
             'timemodified'
         );
 
-        $this->hierarchy_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $this->hierarchy_customfields = customfield::get_all(new position());
 
         $this->element = new totara_sync_element_pos();
     }

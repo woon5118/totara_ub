@@ -217,7 +217,7 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
 
             if (!empty($this->hierarchy_customfields)) {
                 $row['customfields'] = $this->get_customfield_json($csvrow, $csvsaveemptyfields);
-                foreach($this->hierarchy_customfields as $hierarchy_customfield) {
+                foreach ($this->hierarchy_customfields as $hierarchy_customfield) {
                     if ($this->is_importing_customfield($hierarchy_customfield)) {
                         unset($row[$hierarchy_customfield->get_default_fieldname()]);
                     }
@@ -267,6 +267,12 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         return $this->get_common_csv_notifications();
     }
 
+    /**
+     * Cleans values for import. Excludes custom fields, which should not be part of the input array.
+     *
+     * @param string[] $row with field name as key (after mapping) and value provided for the given field.
+     * @return string[] Same structure as input but with cleaned values.
+     */
     private function clean_fields($row) {
         $cleaned = [];
         foreach($row as $key => $value) {

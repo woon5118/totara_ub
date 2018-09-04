@@ -114,7 +114,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_checkbox();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_pos_csv');
         }
@@ -163,7 +163,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_datetime();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_pos_csv');
         }
@@ -226,7 +226,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_file();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         // We don't get the option to enable the file custom field.
         $this->assertCount(0, $sync_customfields);
         // Still, we'll push on anyway...
@@ -275,7 +275,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_location();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_pos_csv');
         }
@@ -328,7 +328,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_menu();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_pos_csv');
         }
@@ -385,7 +385,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_multiselect();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_pos_csv');
         }
@@ -434,7 +434,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_text();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_pos_csv');
         }
@@ -485,7 +485,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $formfield = new customfield_define_textarea();
         $formfield->define_save($data, 'pos_type');
 
-        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all('pos_type');
+        $sync_customfields = \tool_totara_sync\internal\hierarchy\customfield::get_all(new position());
         foreach($sync_customfields as $sync_customfield) {
             set_config($sync_customfield->get_import_setting_name(), 1, 'totara_sync_source_pos_csv');
         }

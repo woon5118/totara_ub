@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2017 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Alastair Munro <alastair.munro@totaralearning.com>
- * @package totara
- * @subpackage totara_sync
- *
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @package tool_totara_sync
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
+require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/comp.php');
 require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_comp_csv.php');
 
 /**
