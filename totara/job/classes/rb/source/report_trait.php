@@ -879,6 +879,12 @@ trait report_trait {
             "{$userjoin}.{$userfield}",
             $userjoin
         );
+        $filteroptions[] = new \rb_filter_option(
+            'job_assignment',
+            'numjobassignments',
+            get_string('usersnumjobassignments', 'totara_reportbuilder'),
+            'number'
+        );
 
         // Manager field filters.
         // Manager field filters (Limits the number of selected managers in the report-builder JA filter)
