@@ -2235,7 +2235,7 @@ class hierarchy {
      * @param bool $disabled
      * @return No return value but prints export select form
      */
-    function export_select($baseurl=null, $disabled=false) {
+    function export_select($baseurl = null, $disabled = false) {
         global $CFG;
         require_once($CFG->dirroot.'/totara/hierarchy/export_form.php');
         if (empty($baseurl)) {
@@ -2256,9 +2256,9 @@ class hierarchy {
      *
      * @param string $baseurl
      * @param bool $disabled
-     * @return No return value but prints export select form
+     * @return string HTML code
      */
-    function export_frameworks_select_for_template($baseurl=null, $disabled=false) {
+    public function export_frameworks_select_for_template($baseurl = null, $disabled = false) {
         global $CFG;
         require_once($CFG->dirroot.'/totara/hierarchy/export_frameworks_form.php');
         if (empty($baseurl)) {
@@ -2334,7 +2334,9 @@ class hierarchy {
 
         if ($custom_fields = $DB->get_records($this->shortprefix.'_type_info_field')) {
             foreach ($custom_fields as $field) {
-                $def['from'] .= " LEFT JOIN {{$this->shortprefix}_type_info_data} cf_{$field->id} ON hierarchy.id = cf_{$field->id}.{$this->prefix}id AND cf_{$field->id}.fieldid = :cf_{$field->id}";
+                $def['from'] .= " LEFT JOIN {{$this->shortprefix}_type_info_data} cf_{$field->id}
+                                         ON hierarchy.id = cf_{$field->id}.{$this->prefix}id
+                                        AND cf_{$field->id}.fieldid = :cf_{$field->id}";
                 $def['params']["cf_{$field->id}"] = $field->id;
             }
         }
@@ -2349,13 +2351,14 @@ class hierarchy {
      * @param string $format Format for the export hr/ods/csv/xls
      * @param bool $exportall Export all elements or only elements in this framework
      * @param string $file File to export data to - used for testing
-     * @return void|
+     * @return void
      */
     public function export_data(string $format, bool $exportall = false, string $file = null) {
         global $CFG;
 
         if (!empty($CFG->hierarchylegacyexport)) {
-            return $this->export_data_legacy($format);
+            $this->export_data_legacy($format);
+            return;
         }
 
         $fields = $this->get_export_field_def();

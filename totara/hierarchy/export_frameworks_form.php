@@ -39,7 +39,7 @@ class hierarchy_export_frameworks_form extends moodleform {
      */
     function definition() {
         global $HIERARCHY_EXPORT_OPTIONS;
-        $mform =& $this->_form;
+        $mform = $this->_form;
 
         $select = array();
         $sitecontext = context_system::instance();
@@ -59,8 +59,8 @@ class hierarchy_export_frameworks_form extends moodleform {
         } else {
             // show pulldown menu
             $group=array();
-            $group[] =& $mform->createElement('select', 'format', get_string('exportframeworks', 'totara_hierarchy'), $select, $attributes);
-            $group[] =& $mform->createElement('submit', 'export', get_string('export', 'totara_hierarchy'), $attributes);
+            $group[] = $mform->createElement('select', 'format', get_string('exportframeworks', 'totara_hierarchy'), $select, $attributes);
+            $group[] = $mform->createElement('submit', 'export', get_string('export', 'totara_hierarchy'), $attributes);
             $mform->addGroup($group, 'exportframeworksgroup', get_string('exportframeworks', 'totara_hierarchy'), array(' '), false);
             $mform->addHelpButton('exportframeworksgroup', 'exportframeworks', 'totara_hierarchy');
         }

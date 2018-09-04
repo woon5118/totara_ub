@@ -959,7 +959,8 @@ class competency extends hierarchy {
     protected function get_export_fields() {
         $fields = array_merge(
             parent::get_export_fields(),
-            ['aggregationmethod' => 'hierarchy.aggregationmethod']);
+            ['aggregationmethod' => 'hierarchy.aggregationmethod']
+        );
 
         return $fields;
     }
