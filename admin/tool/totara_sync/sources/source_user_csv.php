@@ -292,6 +292,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 }
             }
 
+            $dbrow = $this->clean_fields($dbrow);
+
             if (empty($csvrow['timemodified'])) {
                 $dbrow['timemodified'] = 0;
             } else {
@@ -470,6 +472,44 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
      * @return string[] Same structure as input but with cleaned values.
      */
     private function clean_fields($row) {
-        // TODO
+        $cleaned = [];
+        foreach($row as $key => $value) {
+            switch ($key) {
+                case 'idnumber':
+                case 'timemodified':
+                case 'username':
+                case 'firstname':
+                case 'lastname':
+                case 'firstnamephonetic':
+                case 'lastnamephonetic':
+                case 'middlename':
+                case 'alternatename':
+                case 'email':
+                case 'emailstop':
+                case 'city':
+                case 'country':
+                case 'timezone':
+                case 'lang':
+                case 'url':
+                case 'institution':
+                case 'department':
+                case 'phone1':
+                case 'phone2':
+                case 'address':
+                case 'auth':
+                case 'deleted':
+                case 'suspended':
+                    $cleaned[$key] = clean_param(trim($value), PARAM_TEXT);
+                    break;
+                case 'description':
+                case 'password':
+                    $cleaned[$key] = clean_param(trim($value), PARAM_RAW);
+                    break;
+                default:
+                    throw new totara_sync_exception($this->get_element_name(), 'importdata', 'nocleaninginstruction');
+            }
+        }
+
+        return $cleaned;
     }
 }
