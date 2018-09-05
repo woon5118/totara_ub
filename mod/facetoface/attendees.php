@@ -366,7 +366,9 @@ if ($action == 'attendees' && $actionallowed) {
             $actions['add']    = get_string('addattendees', 'facetoface');
             $actions['bulkaddfile']  = get_string('addattendeesviafileupload', 'facetoface');
             $actions['bulkaddinput'] = get_string('addattendeesviaidlist', 'facetoface');
-            $actions['remove']    = get_string('removeattendees', 'facetoface');
+            if (has_capability('mod/facetoface:removeattendees', $context)) {
+                $actions['remove'] = get_string('removeattendees', 'facetoface');
+            }
         }
     }
 
