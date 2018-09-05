@@ -441,7 +441,11 @@ class event extends \moodleform {
                         ($endtime == $existing->timefinish) || ($starttime == $existing->timestart)) {
                         // This date clashes with an existing date - either they overlap or
                         // one of them is zero minutes and they start at the same time or end at the same time.
-                        $errdates[] = get_string('error:sessiondatesconflict', 'facetoface');
+                        $messageconflictsamedate = get_string('error:sessiondatesconflict', 'facetoface');
+                        if (!in_array($messageconflictsamedate, $errdates)) {
+                            $errdates[] = $messageconflictsamedate;
+                            break;
+                        }
                     }
                 }
             }
