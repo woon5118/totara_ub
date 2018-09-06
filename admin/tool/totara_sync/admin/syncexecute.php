@@ -90,13 +90,13 @@ foreach ($elements as $element) {
         $nosourceconfigurl = new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php',
             array('element' => $elname, 'source' => $sourceclass));
         $nosourceconfiglink = html_writer::link($nosourceconfigurl, get_string('nosourceconfig', 'tool_totara_sync', $elnametext));
-        if (core_text::strtolower($source) == 'csv') {
+        if (strstr($sourceclass, 'csv')) {
             $encoding = get_config('totara_sync_source_' . $elname . '_csv', 'csv' . $elname . 'encoding');
             if (empty($encoding)) {
                 // If the encoding config key doesn't exist then the configuration settings have not been saved.
                 $configured = false;
                 $cells[] = new html_table_cell($nosourceconfiglink);
-            } else if (strstr($sourceclass, 'csv') && get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY && !get_config('totara_sync', 'filesdir')) {
+            } else if (get_config('totara_sync', 'fileaccess') == FILE_ACCESS_DIRECTORY && !get_config('totara_sync', 'filesdir')) {
                 $configured = false;
                 $url = new moodle_url('/admin/tool/totara_sync/admin/settings.php');
                 $link = html_writer::link($url, get_string('nofilesdir', 'tool_totara_sync'));
