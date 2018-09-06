@@ -104,15 +104,27 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         }
 
         // Ensure necessary fields are present
-        foreach ($fieldmappings as $f => $m) {
-            if (!in_array($f, $fields)) {
+        foreach ($fieldmappings as $field => $mapping) {
+            if (!in_array($mapping, $fields)) {
                 // typeidnumber field can be optional if no custom fields specified
-                if (($m == 'typeidnumber') && !empty($customfields)) {
-                    if ($f == $m) {
-                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldx', $f);
-                    } else {
-                        throw new totara_sync_exception($this->get_element_name(), 'mapfields', 'csvnotvalidmissingfieldxmappingx', (object)array('field' => $f, 'mapping' => $m));
-                    }
+                if (($field == 'typeidnumber') && empty($customfields)) {
+                    continue;
+                }
+
+                if ($field == $mapping) {
+                    throw new totara_sync_exception(
+                        $this->get_element_name(),
+                        'mapfields',
+                        'csvnotvalidmissingfieldx',
+                        $field
+                    );
+                } else {
+                    throw new totara_sync_exception(
+                        $this->get_element_name(),
+                        'mapfields',
+                        'csvnotvalidmissingfieldxmappingx',
+                        (object)['field' => $field, 'mapping' => $mapping]
+                    );
                 }
             }
         }

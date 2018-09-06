@@ -281,6 +281,10 @@ class customfield_multiselect extends customfield_base {
             $data = array();
         }
 
+        if (!empty($extradata['isexport'])) {
+            $extradata['display'] = 'list-text';
+        }
+
         foreach ($data as $item) {
             $return[] = self::get_item_string(format_string($item['option']), $item['icon'], $extradata['display']);
         }
