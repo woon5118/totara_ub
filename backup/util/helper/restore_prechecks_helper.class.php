@@ -100,8 +100,8 @@ abstract class restore_prechecks_helper {
             $message = new stdclass();
             $message->serverversion = $CFG->version;
             $message->serverrelease = $CFG->release;
-            $message->backupversion = $controller->get_info()->moodle_version;
-            $message->backuprelease = $controller->get_info()->moodle_release;
+            $message->backupversion = $controller->get_info()->totara_version;
+            $message->backuprelease = $controller->get_info()->totara_release;
             $warnings[] = get_string('noticenewerbackup','',$message);
         }
 
