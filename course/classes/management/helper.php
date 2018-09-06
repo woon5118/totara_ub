@@ -847,11 +847,22 @@ class helper {
      * @return array
      */
     public static function get_category_courses_visibility($categoryid) {
-        global $DB;
-        $sql = "SELECT c.id, c.visible
-                  FROM {course} c
-                 WHERE c.category = :category";
-        $params = array('category' => (int)$categoryid);
+        global $DB, $CFG;
+
+        // Building the sql here based on config item of audiencevisibilty, if the config is disabled, the sql only
+        // needs for course.visibility, otherwise, sql need to also check for course.audiencevisible as well
+        $sql = "SELECT c.id";
+        $params = array();
+
+        if (empty($CFG->audiencevisibility)) {
+            $sql .= ", c.visible ";
+        } else {
+            $sql .= ", CASE WHEN c.audiencevisible = :audiencevisible THEN c.visible ELSE '1' END AS visible ";
+            $params['audiencevisible'] = COHORT_VISIBLE_NOUSERS;
+        }
+
+        $sql .= " FROM {course} c WHERE c.category = :category";
+        $params['category'] = (int)$categoryid;
         return $DB->get_records_sql($sql, $params);
     }
 
