@@ -884,7 +884,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
      */
     public function rb_cols_generator_allcustomfieldssignupmanage(rb_column_option $columnoption, $hidden) {
         $results = $this->rb_cols_generator_allcustomfields($columnoption, $hidden);
-        $found = false;
+
+        if (empty($results)) {
+            // No money no honey.
+            return $results;
+        }
 
         $extrafields = [
             'courseid' => 'facetoface.course',
@@ -893,45 +897,23 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             'userid' => 'base.userid',
         ];
 
-        if (empty($results)) {
-            // No money no honey.
-            return $results;
-        }
-        foreach ($results as $column) {
-            // First try to find simple column (displayfunc is not set) that we can use for our actions display.
-            if (empty($column->displayfunc)) {
-                $column->displayfunc = 'f2f_all_signup_customfields_manage';
-                if (!is_array($column->extrafields)) {
-                    if (empty($column->extrafields)) {
-                        $column->extrafields = [];
-                    } else {
-                        $column->extrafields = [$column->extrafields];
-                    }
-                }
-                $column->extrafields = array_merge($extrafields, $column->extrafields);
-                $found = true;
-                break;
-            }
-        }
 
-        if (!$found) {
-            // If there were no simple columns, add extra.
-            $results[] = new rb_column(
-                'facetoface_signup_manage',
-                'custom_field_edit_all',
-                get_string('actions', 'facetoface'),
-                'NULL',
-                [
-                    'displayfunc' => 'f2f_all_signup_customfields_manage',
-                    'noexport' => true,
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text',
-                    'style' => null,
-                    'class' => null,
-                    'extrafields' => $extrafields,
-                ]
-            );
-        }
+        $results[] = new rb_column(
+            'facetoface_signup_manage',
+            'custom_field_edit_all',
+            get_string('actions', 'facetoface'),
+            'NULL',
+            [
+                'displayfunc' => 'f2f_all_signup_customfields_manage',
+                'noexport' => true,
+                'dbdatatype' => 'text',
+                'outputformat' => 'text',
+                'style' => null,
+                'class' => null,
+                'extrafields' => $extrafields,
+            ]
+        );
+
         return $results;
     }
 
