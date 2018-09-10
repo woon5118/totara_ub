@@ -64,7 +64,7 @@ class event_date extends \totara_reportbuilder\rb\display\base {
             $tzstring = \core_date::get_localised_timezone($targetTZ);
             return $date . $tzstring;
         } else {
-            $date = userdate($date, get_string('strfdateattime', 'langconfig'), $targetTZ);
+            $date = userdate($date, get_string('strftimedatetime', 'langconfig'), $targetTZ);
             return $date;
         }
     }

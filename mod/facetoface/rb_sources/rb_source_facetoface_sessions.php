@@ -360,7 +360,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'extrafields' => array(
                         'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
-                    'displayfunc' => 'nice_date' . $intimezone,
+                    'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -388,7 +388,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'extrafields' => array(
                         'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_date' . $intimezone,
+                    'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(

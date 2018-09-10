@@ -47,7 +47,7 @@ class event_date_link extends \totara_reportbuilder\rb\display\base {
         if ($date && is_numeric($date)) {
             $date = \mod_facetoface\rb\display\event_date::display($date, $format, $row, $column, $report);
         } else {
-            $date = get_string('unknowndate', 'rb_source_facetoface_summary');
+            return "";
         }
         if ($format != 'html') {
             return $date;
