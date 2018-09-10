@@ -134,6 +134,7 @@ $string['displayname:totara_sync_source_pos_csv'] = 'CSV';
 $string['displayname:totara_sync_source_pos_database'] = 'External Database';
 $string['displayname:totara_sync_source_comp_csv'] = 'CSV';
 $string['displayname:totara_sync_source_comp_database'] = 'External Database';
+$string['hierarchycustomfieldneedstypeid'] = 'Type must be imported when importing custom fields';
 $string['settings:totara_sync_source_org_csv'] = 'Organisation - CSV source settings';
 $string['settings:totara_sync_source_org_database'] = 'Organisation - external database source settings';
 $string['settings:totara_sync_source_pos_csv'] = 'Position - CSV source settings';

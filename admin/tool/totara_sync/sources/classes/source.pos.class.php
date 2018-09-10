@@ -212,4 +212,26 @@ abstract class totara_sync_source_pos extends totara_sync_source {
 
         return $table;
     }
+
+    /**
+     * Validates configuration settings for this source.
+     *
+     * @param array $data Data submitted via the moodle form.
+     * @param array $files Files submitted via the moodle form.
+     * @return string[] Containing errors found during validation.
+     */
+    public function validate_settings($data, $files = []) {
+        $errors = parent::validate_settings($data, $files);
+
+        if (empty($data['import_typeidnumber'])) {
+            foreach ($this->hierarchy_customfields as $customfield) {
+                if (!empty($data[$customfield->get_import_setting_name()])) {
+                    $errors['import_typeidnumber'] = get_string('hierarchycustomfieldneedstypeid', 'tool_totara_sync');
+                    break;
+                }
+            }
+        }
+
+        return $errors;
+    }
 }

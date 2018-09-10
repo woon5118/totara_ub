@@ -129,6 +129,12 @@ class totara_sync_source_settings_form extends moodleform {
         }
         parent::set_data($data);
     }
+
+    public function validation($data, $files) {
+        /* @var totara_sync_source $source */
+        $source = $this->_customdata['source'];
+        return $source->validate_settings($data);
+    }
 }
 
 

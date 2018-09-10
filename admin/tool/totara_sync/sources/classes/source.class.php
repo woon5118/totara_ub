@@ -359,4 +359,14 @@ abstract class totara_sync_source {
         return $CFG->csvdateformat ?? get_string('csvdateformatdefault', 'totara_core');
     }
 
+    /**
+     * Validates configuration settings for this source.
+     *
+     * @param array $data Data submitted via the moodle form.
+     * @param array $files Files submitted via the moodle form.
+     * @return string[] Containing errors found during validation.
+     */
+    public function validate_settings($data, $files = []) {
+        return [];
+    }
 }
