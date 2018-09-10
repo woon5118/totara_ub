@@ -11,6 +11,7 @@ information provided here is intended especially for developers.
    - repositorytype (the repository name in case is a external file)
    Those fields are VALUE_OPTIONAL for backwards compatibility.
  * core_course_renderer::course_section_cm_completion() has changed
+ * core_course_management_renderer::detail_pair has changed
 
 === 11 ===
 
