@@ -385,4 +385,31 @@ class organisation extends hierarchy {
         return $message;
     }
 
+    /**
+     * Overiding the method here, since the organisation part needs the ability to replace the error content join table
+     * into a `base` table. So far that the report source such as rb_source_dp_certification and rp_dp_program is having
+     * a join content option which is working fine with it's own scope but not cope well with the Organisation filter
+     * dialog box. Therefore, those invalid included join tables should be defined in this scope only to fix the
+     * pre-defined join tables embedded within the report builder source that only work with rb source sql, not dialog search
+     * sql (these re-defined join tables should stay away form hierarchy scope).
+     *
+     * @inheritdoc
+     *
+     * @param int $reportid
+     * @param null $userid
+     * @throws coding_exception
+     */
+    public function set_content_restriction_from_report($reportid, $userid=null) {
+        if (empty($reportid)) {
+            return;
+        }
+
+        $report = new \reportbuilder($reportid, null, false, null, $userid);
+
+        // This is quite a dirty way to fix up the issue within content restriction sql.
+        $tablemaps = array('auser' => 'base');
+
+        list($this->contentwhere, $this->contentparams) =
+            $report->get_hierarchy_content_restrictions($this->shortprefix, false, $tablemaps);
+    }
 }

@@ -320,7 +320,15 @@ class totara_reportbuilder_generator extends component_generator_base {
         if (!is_array($record)) {
             $record = (array)$record;
         }
-        $record = array_merge($record, $addon);
+
+        // Update record addon here, if the record does not have any value, then the default value will fallback to add-on
+        // value
+        foreach ($addon as $key => $value) {
+            if (!isset($record[$key])) {
+                $record[$key] = $value;
+            }
+        }
+
         $id = $DB->insert_record("report_builder", (object)$record, true);
 
         $src = reportbuilder::get_source_object($record['source']);
@@ -330,6 +338,11 @@ class totara_reportbuilder_generator extends component_generator_base {
 
         /** @var rb_column_option $columnoption */
         foreach ($columnoptions as $columnoption) {
+            // By default way, the columns that are deprecated should not be added into the report builder
+            if (isset($columnoption->deprecated) && $columnoption->deprecated) {
+                continue;
+            }
+
             $item = array(
                 'reportid'      => $id,
                 'type'          => $columnoption->type,

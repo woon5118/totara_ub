@@ -2564,10 +2564,14 @@ class reportbuilder {
      * restrictions
      * @param string $prefix Get restrictions for this prefix class only
      * @param bool $cache if enabled, only alias fields will be used
+     * @param array $tablemaps Array<search, replace> Where as search and replace are both string, and by passing this
+     * array, the field's tables that are predefined (which is `search` for) within content options will be replace
+     * with `replace`. This will be handy when the pre-defined content option's join is working with the report builder
+     * sql but not coping well with the dialog search box
      *
      * @return array containing SQL snippet created from content restrictions, as well as SQL params array
      */
-    function get_hierarchy_content_restrictions($prefix, $cache = false) {
+    function get_hierarchy_content_restrictions($prefix, $cache = false, array $tablemaps=array()) {
         // if no content restrictions enabled return a TRUE snippet
         // use 1=1 instead of TRUE for MSSQL support
         if ($this->contentmode == REPORT_BUILDER_CONTENT_MODE_NONE) {
@@ -2591,11 +2595,19 @@ class reportbuilder {
                 $classname = 'rb_' . $name . '_content';
                 $settingname = $name . '_content';
 
+                $tabletoreplace = "";
+                if (isset($tablemaps[$option->joins])) {
+                    $tabletoreplace = $tablemaps[$option->joins];
+                }
+
                 $fields = array();
                 foreach ($option->fields as $key => $field) {
                     if ($cache) {
                         $fields[$key] = 'rb_content_option_' . $key;
                     } else {
+                        if (!empty($tabletoreplace)) {
+                            $field = str_replace($option->joins, $tabletoreplace, $field);
+                        }
                         $fields[$key] = $field;
                     }
                 }
