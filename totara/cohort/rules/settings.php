@@ -31,6 +31,7 @@ require_once($CFG->dirroot . '/totara/cohort/rules/ui.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandler.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/inlist.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/date.php');
+require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/certification_status.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/completion.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/manager.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/userstatus.php');
@@ -612,6 +613,20 @@ function cohort_rules_list($reset = false){
                     COHORT_PICKER_PROGRAM_COMPLETION
                 ),
                 new cohort_rule_sqlhandler_completion_duration_started_program()
+            );
+        }
+
+        // Certification rules.
+        if (totara_feature_visible('certifications')) {
+            // Certification status.
+            $rules[] = new cohort_rule_option(
+                'learning',
+                'certificationstatus',
+                new cohort_rule_ui_picker_certification_status(
+                    get_string('ruledesc-learning-certificationstatus', 'totara_cohort'),
+                    COHORT_PICKER_CERTIFICATION_COMPLETION
+                ),
+                new cohort_rule_sqlhandler_certification_status()
             );
         }
 
