@@ -115,6 +115,12 @@ class totara_dashboard {
             return array();
         }
 
+        //Create a cache to store user dashbaords
+        $cache = cache::make_from_params(cache_store::MODE_REQUEST, 'totara_core', 'dashboard');
+        if ($cache->has('user_' . $userid)) {
+            return $cache->get('user_' . $userid);
+        }
+
         // Get user cohorts.
         $cohortsql = '1 = 0';
         $cohortsparams = array();
@@ -131,7 +137,9 @@ class totara_dashboard {
                   AND td.published > 0
                 ORDER BY td.sortorder
                ";
-        return $DB->get_records_sql($sql, $cohortsparams);
+        $results = $DB->get_records_sql($sql, $cohortsparams);
+        $cache->set('user_' . $userid, $results);
+        return $results;
     }
 
     /**

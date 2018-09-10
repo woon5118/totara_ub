@@ -36,10 +36,24 @@ class masthead_logo implements \renderable, \templatable {
      * @return array
      */
     public function export_for_template(\renderer_base $output) {
-        global $PAGE, $SITE, $OUTPUT, $CFG;
+        global $PAGE, $SITE, $OUTPUT, $CFG, $USER;
+
+        $defaultpage = $CFG->wwwroot . '/';
+        if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+            $defaultpage = $CFG->wwwroot . '/totara/dashboard/index.php';
+
+            require_once($CFG->dirroot . '/totara/dashboard/lib.php');
+            $availabledash = array_keys(\totara_dashboard::get_user_dashboards($USER->id));
+
+            //Update the homepage dashboard id
+            $id = get_user_preferences('user_home_totara_dashboard_id', -1);
+            if ($id != -1 && in_array($id, $availabledash)) {
+                $defaultpage .= '?id=' . $id;
+            }
+        }
 
         $templatecontext = array(
-            'siteurl' => $CFG->wwwroot . '/',
+            'siteurl' => $defaultpage,
             'shortname' => $SITE->shortname,
         );
 
