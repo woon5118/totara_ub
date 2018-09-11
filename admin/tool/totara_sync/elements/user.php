@@ -427,7 +427,7 @@ class totara_sync_element_user extends totara_sync_element {
                     }
                 }
 
-                if ($this->config->allow_delete == self::SUSPEND_USERS && (isset($suser->deleted) && $suser->deleted !== 1) || $this->config->sourceallrecords == 1) {
+                if ($this->config->allow_delete == self::SUSPEND_USERS && ((isset($suser->deleted) && $suser->deleted !== 1) || $this->config->sourceallrecords == 1)) {
                     if ($user->suspended == 1) {
                         $suspenduser = false;
                         $suser->suspended = '0';

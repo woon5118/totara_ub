@@ -421,6 +421,34 @@ class tool_totara_sync_user_csv_suspend_field_testcase extends advanced_testcase
     }
 
     /**
+     * Test multiple uploads of a file keeps the suspended flag
+     * as set in the file.
+     */
+    public function test_user_stays_suspended() {
+        global $DB;
+
+        set_config('allow_delete', totara_sync_element_user::DELETE_USERS, 'totara_sync_element_user');
+        $element = $this->get_element();
+        $element->set_config('sourceallrecords', '1');
+
+        $this->load_user_csv_file('user_suspended_2.csv');
+        $this->assertTrue($this->get_element()->sync());
+
+        // Check user is suspended.
+        $user = $DB->get_record('user', array('id' => $this->user->id));
+        $this->assertEquals('user1', $user->username);
+        $this->assertEquals(1, $user->suspended);
+
+        $this->load_user_csv_file('user_suspended_2.csv');
+        $this->assertTrue($this->get_element()->sync());
+
+        // Check user is still suspended.
+        $user = $DB->get_record('user', array('id' => $this->user->id));
+        $this->assertEquals('user1', $user->username);
+        $this->assertEquals(1, $user->suspended);
+    }
+
+    /**
      * Helper function to load CSV file.
      *
      * @param String $filename Name of file to load
