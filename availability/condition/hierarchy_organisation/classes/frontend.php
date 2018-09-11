@@ -23,7 +23,12 @@
 
 namespace availability_hierarchy_organisation;
 
+use totara_reportbuilder\rb\display\format_string;
+
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once("{$CFG->dirroot}/totara/hierarchy/prefix/organisation/lib.php");
 
 /**
  * Front-end class.
@@ -95,6 +100,28 @@ class frontend extends \core_availability\frontend {
                 foreach ($org_names as $id => $value) {
                     $value->fullname = format_string($value->fullname);
                     $org_names[$id] = $value;
+                }
+            }
+        } else if (!empty($section->availability)) {
+            // A fallback for section_info if cm_info is null
+            $availability = json_decode($section->availability, true);
+            if (!is_bool($availability)) {
+                $organisation = new \organisation();
+                $items = isset($availability['c']) ? $availability['c'] : array();
+
+                foreach ($items as $item) {
+                    if (!isset($item['type']) || !isset($item['organisation'])) {
+                        continue;
+                    }
+
+                    $record = $organisation->get_item((int) $item['organisation']);
+                    if (is_bool($record)) {
+                        continue;
+                    }
+
+                    $single = new \stdClass();
+                    $single->fullname = format_string($record->fullname);
+                    $org_names[$record->id] = $single;
                 }
             }
         }
