@@ -42,3 +42,10 @@ $field = new xmldb_field('invalidatecache', XMLDB_TYPE_INTEGER, '1', null, null,
 if (!$dbman->field_exists($table, $field)) {
     $dbman->add_field($table, $field);
 }
+
+// Update the indexes on the course_info_data table.
+$table = new xmldb_table('course_completion_criteria');
+$index = new xmldb_index('moduleinstance', XMLDB_INDEX_NOTUNIQUE, array('moduleinstance'));
+if (!$dbman->index_exists($table, $index)) {
+    $dbman->add_index($table, $index);
+}

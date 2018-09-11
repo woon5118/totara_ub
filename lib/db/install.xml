@@ -175,6 +175,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="moduleinstance" UNIQUE="false" FIELDS="moduleinstance"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="course_completion_crit_compl" COMMENT="Course completion user records">
