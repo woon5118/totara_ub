@@ -647,19 +647,18 @@ class totara_program_observer {
         $userid = $event->relateduserid;
         $courseid = $event->courseid;
 
-        $sql = "SELECT pc.*
-                  FROM {prog_user_assignment} pua
-            INNER JOIN {prog_courseset} pc
-                    ON pc.programid = pua.programid
-            INNER JOIN {prog_courseset_course} pcc
-                    ON pcc.coursesetid = pc.id
-            INNER JOIN {prog_completion} comp
-                    ON comp.userid = pua.userid
-                   AND comp.programid = pua.programid
-                   AND comp.coursesetid = 0
-                   AND comp.timecompleted = 0
-                 WHERE pua.userid = :uid
-                   AND pcc.courseid = :cid";
+        $sql = "SELECT pc.id, pc.programid
+                FROM {prog_courseset} pc
+                JOIN {prog_courseset_course} pcc ON pcc.coursesetid = pc.id AND pcc.courseid = :cid
+                WHERE EXISTS (
+                    SELECT pua.id
+                    FROM {prog_user_assignment} pua
+                    JOIN {prog_completion} comp ON comp.userid = pua.userid
+                        AND comp.programid = pua.programid
+                        AND comp.coursesetid = 0
+                        AND comp.timecompleted = 0
+                    WHERE pua.programid = pc.programid
+                    AND pua.userid = :uid)";
         $params = array('uid' => $userid, 'cid' => $courseid);
 
         $coursesets = $DB->get_records_sql($sql, $params);
