@@ -1478,7 +1478,7 @@ function facetoface_notify_under_capacity() {
             'sendmail' => TOTARA_MSG_EMAIL_YES,
         );
 
-        if (CLI_SCRIPT) {
+        if (CLI_SCRIPT && !PHPUNIT_TEST) {
             mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under minimum bookings - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing session roles.");
         }
 

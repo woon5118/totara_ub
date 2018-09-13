@@ -2783,14 +2783,11 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
         $facetofacegenerator->add_session($sessiondata);
 
         $sink = $this->redirectMessages();
-        ob_start();
         facetoface_notify_under_capacity();
-        $mtrace = ob_get_clean();
-        $this->assertContains('is under minimum bookings', $mtrace);
         $messages = $sink->get_messages();
 
         // Only the teacher should get a message.
-        $this->assertCount(1, $messages);
+        $this->assertCount(1, $messages, 'The test suit was expecting one message to be sent out regarding seminar event being under minimum booking.');
         $this->assertEquals($messages[0]->useridto, $teacher1->id);
 
         // Check they got the right message.
@@ -2837,14 +2834,11 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
         $facetofacegenerator->add_session($sessiondata);
 
         $sink = $this->redirectMessages();
-        ob_start();
         facetoface_notify_under_capacity();
-        $mtrace = ob_get_clean();
-        $this->assertNotContains('is under minimum bookings', $mtrace);
         $messages = $sink->get_messages();
 
         // There should be no messages received.
-        $this->assertCount(0, $messages);
+        $this->assertCount(0, $messages, 'The test suit was expecting no message to be sent out regarding seminar event being under minimum booking.');
     }
 
     // Face-to-face minimum bookings specification.
@@ -2903,14 +2897,11 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
         $DB->execute($sql, array('sessionid' => $sessionid));
 
         $sink = $this->redirectMessages();
-        ob_start();
         facetoface_notify_under_capacity();
-        $mtrace = ob_get_clean();
-        $this->assertContains('is under minimum bookings - 1/10 (min capacity 4)', $mtrace);
         $messages = $sink->get_messages();
 
         // There should be one messages received.
-        $this->assertCount(1, $messages);
+        $this->assertCount(1, $messages, 'The test suit was expecting one message to be sent out regarding seminar event being under minimum booking.');
         $message = array_pop($messages);
         $this->assertSame('Event under minimum bookings for: facetoface1', $message->subject);
         $this->assertContains('The following event is under minimum bookings:', $message->fullmessage);
