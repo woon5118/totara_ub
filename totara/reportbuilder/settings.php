@@ -34,6 +34,9 @@ $rb = new admin_settingpage('rbsettings',
                             array('totara/reportbuilder:managereports'));
 
 if ($ADMIN->fulltree) {
+    // Add require here so its only included when needed
+    require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
+
     $rb->add(new totara_reportbuilder_admin_setting_configexportoptions());
 
     $rb->add(new admin_setting_configcheckbox('reportbuilder/exporttofilesystem', new lang_string('exporttofilesystem', 'totara_reportbuilder'),
