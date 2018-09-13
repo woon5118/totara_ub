@@ -51,7 +51,7 @@ class block_current_learning extends block_base {
      * The sortorder for content.
      * @var string
      */
-    private $sortorder = 'shortname';
+    private $sortorder = 'fullname';
 
     /**
      * The number of items to display per page.
@@ -406,7 +406,7 @@ class block_current_learning extends block_base {
         $items = $this->expand_item_specialisations($items);
 
         // Sort the data.
-        core_collator::asort_objects_by_property($items, $this->sortorder);
+        core_collator::asort_objects_by_property($items, $this->sortorder, core_collator::SORT_NATURAL);
 
         // Filter the content to exclude duplications, completed courses and other block specific criteria.
         $items = $this->filter_collective_content($items);
