@@ -181,7 +181,7 @@ trait customfield_processor_trait {
                     continue 2;
                 }
             }
-
+            $invalidtype->idnumber = $sourcerow['idnumber'];
             // By this point, we found no valid combination of type id number and column name.
             $this->addlog(get_string('customfieldinvalidmaptype', 'tool_totara_sync', $invalidtype), 'error', 'customfieldprocessing');
         }

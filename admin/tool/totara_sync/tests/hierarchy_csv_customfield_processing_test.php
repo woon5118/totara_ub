@@ -322,7 +322,7 @@ class tool_totara_sync_hierarchy_csv_customfield_processing_testcase extends adv
         $values = $this->get_custom_fields_array($hierarchyfullname, $item1);
         $this->assertCount(0, $values);
 
-        $this->assertTrue($this->sync_log_contains('The custom field column, customfield_customfieldB, is not valid for type: typeidnumber1'));
+        $this->assertTrue($this->sync_log_contains('While processing item id1: the custom field column, customfield_customfieldB, is not valid for type: typeidnumber1'));
     }
 
     /**
@@ -465,7 +465,7 @@ class tool_totara_sync_hierarchy_csv_customfield_processing_testcase extends adv
         $values = $this->get_custom_fields_array($hierarchyfullname, $item2);
         // The value did not get imported.
         $this->assertCount(0, $values);
-        $this->assertTrue($this->sync_log_contains('The custom field column, customfield_customfieldA, is not valid for type: typeidnumber2'));
+        $this->assertTrue($this->sync_log_contains('While processing item id2: the custom field column, customfield_customfieldA, is not valid for type: typeidnumber2'));
 
         $item3 = $DB->get_record($hierarchyshortname, ['idnumber' => 'id3']);
         $this->assertEquals('item three', $item3->fullname);
