@@ -32,7 +32,7 @@ $debug = optional_param('debug', 0, PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('noblocks');
-$PAGE->set_url('/totara/program/find.php');
+$PAGE->set_url('/totara/program/find.php', array('sid' => $sid, 'format' => $format));
 if ($CFG->forcelogin) {
     require_login();
 }

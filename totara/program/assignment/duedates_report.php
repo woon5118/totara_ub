@@ -38,7 +38,7 @@ require_capability('totara/program:configureassignments', $program->get_context(
 $program->check_enabled();
 $iscertif = $program->is_certif();
 
-$PAGE->set_url('/totara/program/assignment/duedates_report.php');
+$PAGE->set_url('/totara/program/assignment/duedates_report.php', array('program' => $programid));
 $PAGE->set_context(context_system::instance());
 /** @var totara_reportbuilder_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_reportbuilder');

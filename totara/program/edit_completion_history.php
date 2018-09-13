@@ -46,7 +46,7 @@ require_capability('totara/program:editcompletion', $programcontext);
 
 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
-$url = new moodle_url('/totara/program/edit_completion_history.php');
+$url = new moodle_url('/totara/program/edit_completion_history.php', array('id' => $id, 'userid' => $userid, 'chid' => $chid));
 
 // Prepare the form.
 $PAGE->set_program($program);

@@ -46,7 +46,7 @@ if ($filter == 'program') {
     print_error('programsandcertificationsdisabled', 'totara_program');
 }
 
-$PAGE->set_url('/totara/program/required.php');
+$PAGE->set_url('/totara/program/required.php', array('id' => $programid, 'userid' => $userid, 'filter' => $filter));
 $PAGE->set_pagelayout('report');
 
 //
