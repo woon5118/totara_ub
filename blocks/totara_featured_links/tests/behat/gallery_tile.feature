@@ -235,7 +235,7 @@ Feature: Tests the behaviour of the gallery tile
     And I should not see "Finished editing"
     And I should see the "Featured Links" block
     And I should see "default description"
-    And "//a[@href='http://www.example.com']" "xpath_element" should exist
+    And "//a[@href='https://www.example.com']" "xpath_element" should exist
     And ".block-totara-featured-links-gallery-subtiles" "css_element" should exist
 
   Scenario: Check that the sub tiles are rendered in the manage content form
