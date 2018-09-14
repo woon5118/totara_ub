@@ -34,9 +34,6 @@ $rb = new admin_settingpage('rbsettings',
                             array('totara/reportbuilder:managereports'));
 
 if ($ADMIN->fulltree) {
-    // Add require here so its only included when needed
-    require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
-
     $rb->add(new totara_reportbuilder_admin_setting_configexportoptions());
 
     $rb->add(new admin_setting_configcheckbox('reportbuilder/exporttofilesystem', new lang_string('exporttofilesystem', 'totara_reportbuilder'),
@@ -89,8 +86,17 @@ if ($ADMIN->fulltree) {
     );
 
     // Schedule type options.
+    // NOTE: these must be kept in sync with constants in
+    // totara/core/lib/scheduler.php
+    $scheduler_options = array(
+        'daily' => 1,
+        'weekly' => 2,
+        'monthly' => 3,
+        'hourly' => 4,
+        'minutely' => 5,
+    );
     $options = array();
-    foreach (scheduler::get_options() as $option => $code) {
+    foreach ($scheduler_options as $option => $code) {
         $options[$code] = get_string('schedule' . $option, 'totara_core');
     }
     $rb->add(
@@ -98,7 +104,7 @@ if ($ADMIN->fulltree) {
             'totara_reportbuilder/schedulerfrequency',
             new lang_string('scheduledreportfrequency', 'totara_reportbuilder'),
             new lang_string('scheduledreportfrequency_desc', 'totara_reportbuilder'),
-            scheduler::MINUTELY,
+            $scheduler_options['minutely'],
             $options
         )
     );
