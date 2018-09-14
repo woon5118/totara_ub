@@ -28,7 +28,7 @@ use core\plugininfo\base;
 
 defined('MOODLE_INTERNAL') || die();
 
-final class contentmarketplace extends base {
+class contentmarketplace extends base {
 
     public static function get_enabled_plugins() {
         global $DB;
