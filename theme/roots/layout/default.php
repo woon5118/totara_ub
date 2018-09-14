@@ -32,6 +32,11 @@ $PAGE->set_popup_notification_allowed(false);
 
 $themerenderer = $PAGE->get_renderer('theme_roots');
 
+$full_header = $themerenderer->full_header();
+if (isset($PAGE->layout_options['nonavbar']) && $PAGE->layout_options['nonavbar'] && strpos($full_header, '<input') === false) {
+    $full_header = '';
+}
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
@@ -63,14 +68,16 @@ $nocustommenu = !empty($PAGE->layout_options['nocustommenu']);
 echo $totara_core_renderer->masthead($hasguestlangmenu, $nocustommenu);
 ?>
 
+<?php if ($full_header !== '') { ?>
 <!-- Breadcrumb and edit buttons -->
 <div class="container-fluid breadcrumb-container">
     <div class="row">
         <div class="col-sm-12">
-            <?php echo $themerenderer->full_header(); ?>
+            <?php echo $full_header; ?>
         </div>
     </div>
 </div>
+<?php } ?>
 
 <!-- Content -->
 <div id="page" class="container-fluid">
