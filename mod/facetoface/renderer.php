@@ -117,6 +117,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $status = MDL_F2F_STATUS_BOOKED;
             } else {
                 $status = MDL_F2F_STATUS_WAITLISTED;
+                $comp = '=';
             }
             $signupcount = facetoface_get_num_attendees($session->id, $status, $comp);
             $sessionfull = ($signupcount >= $session->capacity);
@@ -124,6 +125,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $rooms = facetoface_get_session_rooms($session->id);
 
             if (empty($session->sessiondates)) {
+                // An event without session dates, is a wait-listed event
                 $sessionrow = array();
 
                 if (!$minimal) {
@@ -271,7 +273,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * If the user has viewattendees permissions, this will show capacity.
      * If not, then this will show seats remanining.
      *
-     * @param stdClass $session
+     * @param stdClass $session - An event, not session date
      * @param bool $viewattendees - true if they do have permissions.
      * @param int $signupcount - number currently signed up to this session.
      * @param int $datescount - this determines the rowspan. Count the number of session dates to get this figure.
@@ -291,8 +293,16 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $stats .= " (" . $waitlisted . " " . get_string('status_waitlisted', 'facetoface') . ")";
                 }
             } else {
-                $a = array('current' => 0, 'maximum' => $session->capacity);
+
+                // Since within the event that has no sesison date, and user that are in wait-list could be moved to
+                // attendees, and it caused the number of wait-listed user being calculated and rendered wrong.
+                // If there is any user that confirm as booked, then it should display the number of booked user within current
+                $currentbookeduser = (int) facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_BOOKED, "=");
+                $a = array('current' => $currentbookeduser, 'maximum' => $session->capacity);
                 $stats = get_string('capacitycurrentofmaximum', 'facetoface', $a);
+                if ($currentbookeduser > $session->capacity) {
+                    $stats .= get_string('capacityoverbooked', 'facetoface');
+                }
                 $stats .= " (" . $signupcount . " " . get_string('status_waitlisted', 'facetoface') . ")";
             }
         } else {
