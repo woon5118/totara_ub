@@ -3,6 +3,307 @@
 
 Totara Learn Changelog
 
+Release Evergreen (19th September 2018):
+========================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-14270       Added additional information about plugins usage to registration system
+    TL-18788       Added data about installed language packs into registration system
+    TL-18789       Added data about number of active users in last 3 months to registration system
+
+New features:
+
+    TL-17426   +   Add Totara content marketplace and GO1 marketplace
+
+                   Totara content marketplace provides support for browsing and importing
+                   external content from content providers directly into your site.
+
+                   Content providers can implement a new "marketplace" plugin type to
+                   integrate their content into Totara Learn. The release includes a
+                   marketplace plugin for GO1 ([https://totara.go1.com/]), which provides
+                   direct access to search and include GO1 aggregated content.
+
+                   When first installed the content marketplace plugin will send an internal
+                   notification to site administrators and site managers on the next cron run,
+                   letting them know that content marketplaces are available. To prevent this
+                   notification and completely disable marketplaces add
+                   $CFG->enablecontentmarketplaces = false; in your site's config.php *before*
+                   you upgrade your site.
+
+    TL-17475   +   Added support for pluggable course creation workflows
+
+                   This patch adds support for general purpose, pluggable workflows which
+                   provide an extensible way to provide different workflows for a specific
+                   task.
+
+                   The first workflow type to be implemented is the course creation workflow,
+                   which provides a way to design custom workflows to collect information and
+                   generate specific types of courses.
+
+                   See here for developer documentation:
+
+                   https://help.totaralearning.com/display/DEV/Workflows
+
+Improvements:
+
+    TL-11243       Removed ambiguity from the confirmation messages for Seminar booking requests
+    TL-16728   +   Ensured all Report Builder columns have a display class defined
+
+                   To improve Report Builder performance, all columns now need to define a
+                   display class best suited to the data type being displayed. This reduces
+                   unnecessary formatting.
+
+                   A PHP Unit test is included to assert new columns have the 'displayfunc'
+                   option defined.
+                   Run 'vendor/bin/phpunit totara_reportbuilder_display_testcase
+                   totara/reportbuilder/tests/display_test.php' to find any local
+                   customisations that should be updated.
+
+    TL-17130       Added consent statement filter for the Site policies report
+
+                   This patch adds support for a consent statement filter for the Site
+                   policies report as well as a few minor improvements to the site policy
+                   filters including:
+                    * Removing the filter Current Version (Primary Policy)
+                    * Replacing plain text version filter to a smart dropdown menu, which
+                      includes now the list of available versions as well as the option to select
+                      current version of the policy
+                    * Adding policy filter which allows you to filter only by policy
+                    * Making user consent statement a simple filter
+                    * Added custom help for consent statement filter
+                    * Added custom help for policy version filter
+
+                   Now to select the current version of the policy it is a matter of using 2
+                   filters:
+                    * Policy filter to select appropriate policy
+                    * Version filter to select current version
+
+                   Please note, that this patch will also remove Current Version (Primary
+                   Policy) filter from any saved search using it.
+
+    TL-17901   +   Hierarchy export improvements
+
+                   Hierarchy export has been improved as follows:
+                    * Competency items can now be exported in the same manner as any other
+                      type of hierarchy
+                    * The default export file format has been changed. By default the file
+                      will now contain all item data allowing it to be used for re-import via HR
+                      Import.
+                      To revert back to the old hierarchical format (not suitable for HR Import),
+                      add the following line to config.php:
+                         $CFG->hierarchylegacyexport = 0;
+                    * An option has been added to the Manage _<hierarchy>_ pages allowing the
+                      user to export all items in all frameworks to a single file
+
+    TL-17902   +   Added HR Import for competencies
+
+                   Competencies can now be created, updated and deleted via HR Import.
+
+                   Each competency must reference an existing framework via its ID Number.
+                   Values for types and custom fields may also be imported for each
+                   competency, providing these exist on the site that the import is run on.
+
+    TL-18591   +   Added an index to the moduleinstance column of the course_completion_criteria database table
+    TL-18596       Added a filter for the Number of Job Assignments for a user
+
+                   A filter has been added for the Number of Job Assignments column and is
+                   available in all report sources that include the Job Assignments filters.
+                   This filter adds a way to filter users that have no Job Assignments.
+
+    TL-18600   +   Import of custom field values allows for duplicate shortnames
+
+                   When using HR Import to create and update positions or organisations,
+                   custom field short names had to be unique across the site, despite the only
+                   restriction in the UI being that they are unique within a given type. HR
+                   Import now accounts for this configuration when importing custom fields for
+                   hierarchies, such as position and organisation.
+
+    TL-18601   +   Added 'type ID number' column to the 'Manage types' hierarchy tables to allow administrators
+                   to have one place to go to to identify the available typeidnumbers
+    TL-18639       Added support for custom help tooltips for Report Builder filters
+
+                   When a report source is defined it is now possible to define a custom
+                   filter option to override the default help tooltip for the given filter.
+
+    TL-18646   +   HR Import allows HTML tags for fields where this is permitted
+
+                   Fields such as descriptions or text area custom fields allow HTML tags when
+                   a value is added via the interface. However, HR Import was stripping these
+                   tags. Cleaning of these fields is now the same whether values are added via
+                   the interface or HR Import, i.e. they retain their HTML tags.
+
+    TL-18693   +   Fixed memory leaks in PHPUnit test by resetting properties in tearDown() method
+
+                   Additionally this patch introduces a check in the advanced_testcase which
+                   checks after each test for properties which weren't reset. It fails any
+                   test where it finds unreset instance properties to prevent creating more
+                   memory leaks in the future. There is an option to disable this check if
+                   needed by setting the constant PHPUNIT_DISABLE_UNRESET_PROPERTIES_CHECK in
+                   phpunit.xml.
+
+    TL-18700       Backported MDL-54901 to add an environment check for https
+
+                   If the site is not running on https the environment check now shows a
+                   warning that it is not enabled. Installing the site is still possible
+                   without https.
+
+    TL-18709   +   Changed font size in header navigation from 16px to 14px
+    TL-18712   +   The site logo link now takes the user to their default home page
+
+                   Previously when the user clicked on the site logo they were taken to the
+                   sites home page.
+                   Now they are taken to their default home page, which may be the site home
+                   page, or one of their dashboards.
+
+    TL-18718   +   Added upgrade step to set new redis cache store settings 'test_password' and 'test_serializer'
+                   to default values when not already set
+
+                   In a previous patch new settings 'test_password' and 'test_serializer' for
+                   the Redis Cache Store were introduced. If the site hasn't already been
+                   upgraded to a version which includes these settings we set the password to
+                   an empty string and the serializer to PHP's default value to ensure that
+                   previous functionality works as before. These settings can still be changed
+                   in the appropriate section of the Site Administration.
+
+    TL-18777       Allowed plugins to have custom plugininfo class instead of just type class
+    TL-18793       Improved display of course details in the course and categories management page
+
+Bug fixes:
+
+    TL-16532       Fixed caching of OpenSesame reports
+    TL-17852   +   onchange Totara form actions now support comparing against arrays
+    TL-18494       Fixed 'Bulk add attendees' results in Seminar to show ID Number instead of internal user ID
+    TL-18549       Fixed 'Remove users' option showing in attendee actions for users without the removeattendees capability
+    TL-18571       Fixed access rights bug when viewing goal questions in completed appraisals
+
+                   If an appraisal has a goal question and the appraisal was completed, then
+                   it is the current learner's manager who can see the goal question. However,
+                   there was an issue when a learner and their manager completed the appraisal
+                   but then a new manager was assigned to the learner. In this case, only the
+                   old manager could see the completed appraisal but they could not see the
+                   goal question because they didn't have the correct access rights. The new
+                   manager could not see the completed appraisal at all.
+
+                   This applies to static appraisals.
+
+    TL-18578       Fixed missing required parameter when viewing 'Course membership' embedded report
+    TL-18588       Prevented duplicate results when searching in Seminar dialogs
+
+                   Seminar dialogs that provide search functionality (such as the rooms and
+                   assets selectors) now ensure that search results are unique.
+
+    TL-18602       Fixed Seminar's event decline emails to not include iCalendar attachments
+
+                   When a booking approval request with a setting of email confirmation set as
+                   'Email with iCalendar appointment' gets declined, then the iCalendar
+                   attachment will not be included in the email sent back to the user who made
+                   the request.
+
+    TL-18680       Fixed the resetting of event data for each recipient of email notifications for under-capacity seminars
+    TL-18682       Fixed the course name not appearing below the event time in calendar
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-18685       Fixed the Seminar summary report visibility records when Audience-based visibility is enabled
+
+                   When a course had audience-based visibility enabled and the course
+                   visibility was set to anything other than 'All users', the seminar sessions
+                   report was still displaying the course to users even when they didn't match
+                   the visibility criteria. This has been corrected.
+
+    TL-18687   +   Fixed seminar signup-custom field action cog column placement to be right-most when more then one custom field is used
+    TL-18691       Fixed course's visibility icon within course management search to reflect the course visibility settings
+    TL-18707       Fixed HR Import sanity check for an Organisation or Position parent
+
+                   If the organisation or position parent id number was set to zero, the
+                   sanity check to determine if the parent exists was being skipped. Zero is a
+                   valid idnumber and is now used in the sanity check.
+
+    TL-18737       Fixed issue with help icons not having an alt text associated with them
+    TL-18738       Replaced hardcoded strings in environment checks with properly translated strings
+    TL-18740       Updated program observer sql for course_in_progress() function to ensure first column is always unique
+    TL-18742       Fixed failing unit tests in totara_job_dialog_assign_manager_testcase
+    TL-18743       Fixed date conflicts validation error showing repeatedly in the event form
+    TL-18746   +   Fixed performance by removing multiple course_in_progress event triggers
+
+                   Performance is improved by removing multiple course_in_progress event
+                   triggers when activity or course completion is triggered.
+
+                   Event \core\event\course_in_progress was triggered every time when
+                   completion_completion::mark_in_progress() was called. Now this event is
+                   triggered only once per user enrolment (when timestarted is not yet set).
+                   This is a change in behaviour since events will not be triggered anymore.
+                   This behaviour will affect sites that have callbacks assuming that
+                   course_in_progress will be fired each time when mark_in_progress is called.
+
+    TL-18758       Fixed JavaScript race condition error when adding attendees
+    TL-18765       Fixed usertours not recognising parameters on some program pages
+    TL-18766       Fixed changes to Site Policy primary language not being saved
+
+                   It is now possible to change the primary language of a Site Policy after it
+                   was created.
+
+    TL-18771       Fixed the management interface for 'assigned position' access restrictions in course sections
+
+                   Prior to this change it was possible to add assigned position as a
+                   conditional access restriction on course sections. However it was not
+                   possible after adding the restriction to then edit or delete it. This has
+                   now been fixed and the assigned position conditional access restriction for
+                   sections behaves like all other conditional access restrictions.
+
+    TL-18775       Added character length validation rule for appraisal multiple choice question options
+    TL-18781       Fixed an incorrect condition to detect the csv source in HR Import
+    TL-18804       Fixed the management interface for 'assigned organisation' access restrictions in course sections
+
+                   Prior to this change it was possible to add assigned organisations as a
+                   conditional access restriction on course sections but subsequent editing or
+                   deleting assignments was not possible. This has been fixed and the
+                   assigned organisation conditional access restriction for sections behaves
+                   like all other conditional access restrictions.
+
+    TL-18811       Fixed issue with HR Import where suspended state for a user would toggle
+
+                   When importing users using HR Import and the 'Source contains all users'
+                   setting was being used, any users who were set to be suspended would be set
+                   to suspended on the first execution of HR Import and then unsuspended on
+                   the second execution. Subsequent runs of HR Import would toggle the
+                   suspended state for the user between suspended and active. The user is now
+                   only unsuspended if specified in the imported data source.
+
+    TL-18813       Fixed Seminar event dates being incorrectly created when editing an event with no dates
+
+                   Prior to this fix if you created a Seminar event with no dates, and then
+                   went back and edited the event, a session date would be automatically
+                   created and you would have to remove them again.
+                   This fix ensures a default session date is only added when a new event is
+                   created.
+
+    TL-18819       Fixed missing library inclusion for Report Builder settings file
+
+                   In some circumstances an error was being thrown when the scheduler class
+                   was not found. This only occurred very rarely when the file containing the
+                   scheduler class was not included by another file.
+
+    TL-18823       Fixed displayed ordering of items in Current Learning block
+
+                   Items were sorted by short name, but the full name was displayed in the
+                   list. Where short and full name differ significantly, the displayed order
+                   would then appear to be somewhat random. The items are now sorted by full
+                   name, matching what is displayed, to avoid this confusion.
+
+    TL-18856       Added character length validation rule for appraisal multiple choice question options
+
+Contributions:
+
+    * Artur Poninski at Webanywhere - TL-18811
+    * Jo Jones at Kineo UK - TL-18591
+    * Russell England at Kineo USA - TL-18740, TL-18746
+
+
 Release Evergreen (24th August 2018):
 =====================================
 
@@ -613,7 +914,7 @@ Miscellaneous Moodle fixes:
     TL-15564   +   MDL-57813: Added Web Service mod_feedback_get_last_completed
     TL-15565   +   MDL-58453: Refactored get_non_respondents Web Service
     TL-15569   +   MDL-56632: Moved the "Turn editing on\off" link to the top of the book administration menu
-    TL-15575   +   MDL-57553: Fixed user tour steps so that they do not inherit attributes from CSS selector 
+    TL-15575   +   MDL-57553: Fixed user tour steps so that they do not inherit attributes from CSS selector
 
                    Updated the flexitour component to v0.10.0 and the popper.js library to
                    v1.0.8 in the process.
@@ -2439,7 +2740,7 @@ Bug fixes:
                    the associated course.
 
     TL-16925       Fixed the calculation of SCORM display size when the Navigation panel is no longer displayed
-    TL-17104       Fixed an error when disposing of left-over temporary tables in MS SQL Server 
+    TL-17104       Fixed an error when disposing of left-over temporary tables in MS SQL Server
     TL-17115       Fixed the time assigned column for the Record of Learning : Programs report source
 
                    The time assigned column was previously displaying the data for
