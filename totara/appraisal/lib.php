@@ -4166,23 +4166,34 @@ class appraisal_question extends question_storage {
     }
 
     /**
-     * Adding custom rules to the appraisal question.
+     * Adding custom validation to the appraisal question.
      *
      * This can be used if appraisal questions need to validate with extra rules which are not defined in the core
      * questions classes.
      *
      * @param question_base $element
-     * @param moodleform    $mform
+     * @param array    $data
      *
      */
-    public static function add_custom_rules(question_base $element, &$mform) {
+    public static function add_custom_validation(question_base $element, array $data) {
         global $CFG;
         require_once($CFG->dirroot . '/totara/question/field/multichoice.class.php');
+        $errors = [];
+
         if ($element instanceof multichoice) {
-            for ($i = 0; $i < $element::MAX_CHOICES; $i++) {
-                $mform->addGroupRule("choice[{$i}]", get_string('maximumchars', '', 255), 'maxlength', 255);
+            // Add validation only for new options
+            if (isset($data['selectchoices']) && $data['selectchoices'] == 0) {
+                for ($i = 0; $i < $element::MAX_CHOICES; $i++) {
+                    if (isset($data['choice'][$i]['option'])) {
+                        if (core_text::strlen($data['choice'][$i]['option']) > 255) {
+                            $errors["choice[{$i}]"] = get_string('maximumchars', '', 255);
+                        }
+                    }
+                }
             }
         }
+
+        return $errors;
     }
 
     /**

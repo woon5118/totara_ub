@@ -472,7 +472,6 @@ class appraisal_quest_edit_form extends question_base_form {
         if ($readonly) {
             $mform->freeze();
         } else {
-            appraisal_question::add_custom_rules($element, $mform);
             if (!is_ajax_request($_SERVER)) {
                 $this->add_action_buttons();
             }
@@ -675,6 +674,8 @@ class appraisal_quest_edit_form extends question_base_form {
                 }
             }
         }
+
+        $err = array_merge($err, appraisal_question::add_custom_validation($element, $data));
 
         return $err;
     }
