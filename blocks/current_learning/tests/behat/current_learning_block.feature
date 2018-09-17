@@ -224,20 +224,20 @@ Feature: Test Current Learning block
     Then I should see "Course 10"
 
     When I click on ".block_current_learning .pagination [data-page=2]" "css_element"
-    Then I should see "Course 5"
-    And I should not see "Course 10"
+    Then I should see "Course 12"
+    And I should not see "Course 5"
 
     When I click on ".block_current_learning .pagination [data-page=1]" "css_element"
-    Then I should see "Course 10"
-    And I should not see "Course 5"
+    Then I should see "Course 5"
+    And I should not see "Course 12"
 
     When I click on ".block_current_learning .pagination [data-page=next]" "css_element"
-    Then I should see "Course 5"
-    And I should not see "Course 10"
+    Then I should see "Course 12"
+    And I should not see "Course 5"
 
     When I click on ".block_current_learning .pagination [data-page=prev]" "css_element"
-    Then I should see "Course 10"
-    And I should not see "Course 5"
+    Then I should see "Course 5"
+    And I should not see "Course 12"
 
     # Check popover integration
     When I click on "0%" "text"
