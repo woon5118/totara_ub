@@ -4,6 +4,7 @@
 @tcm-spacing: @panel-body-padding;
 @tcm-shadow: 0 2px 11px 0 rgba(0, 0, 0, 0.5);
 @tcm-shadow_2: 0 3px 17px 0 rgba(0, 0, 0, 0.5);
+@tcm-screen-xs-max: @screen-xs-max;
 @tcm-screen-sm: @screen-sm;
 @tcm-screen-md: @screen-md;
 @tcm-screen-lg: @screen-lg;
@@ -34,15 +35,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.tcm-search_filter legend {
+.tcm-search-filter legend {
     margin-bottom: 0;
     border: none;
 }
-.tcm-search_filter .legend {
+.tcm-search-filter .legend {
     font-weight: bold;
     font-size: 14px;
 }
-.tcm-search_filter {
+.tcm-search-filter {
     margin-bottom: 2em;
 }
 .tcm-search_toolbar {
@@ -201,19 +202,115 @@ h2.tcm-explorer-heading {
     border-color: @tcm-border-color;
 }
 
-/**
- * Show more action for filters
- */
-.tcm-checkbox-filter .tcm-filter-show-more {
-    margin-left: 1.7em;
-    cursor: pointer;
+.tcm-search-filters-header {
+    h2 {
+        margin: 0 0 3rem;
+        font-size: (@font-size-base * 0.9);
+        text-transform: uppercase;
+        color: @block-actions-color;
+    }
 }
 
-/**
- * Add a bit of space next the filter option count
- */
-.tcm-filter-option-count {
-    padding-left: 2px;
+.tcm-search-filters-wrapper {
+
+    .tcm-search-filters {
+        display: none;
+    }
+
+    .tcm-filter-radios input,
+    .tcm-checkbox-filter input {
+        margin: 0.3em 0.5em 0 0;
+    }
+
+    .tcm-checkbox-filter {
+        margin-bottom: 0.35em;
+        label {
+            display: block;
+            font-weight: normal;
+            white-space: nowrap;
+            overflow:  auto;
+            text-overflow: unset;
+            margin-bottom: 0;
+        }
+    }
+
+    legend {
+        margin-bottom: 0.5rem;
+    }
+
+    .tcm-filter-option-label {
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        float: left;
+    }
+
+    .tcm-search-filter-with-counts .tcm-filter-option-label {
+        width: ~"calc(100% - 4em)";
+    }
+
+    .tcm-search-filter-results {
+        display: none;
+        padding: 0.5rem;
+        max-height: 21em;
+        overflow-y: scroll;
+        border: 1px solid #c8cfd6;
+    }
+
+    .tcm-search-filter-term {
+        margin: 0;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+
+        &:focus {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+        }
+    }
+
+    .tcm-filter-radios {
+        padding: 0 0.5rem;
+    }
+
+    .tcm-search-filter-selection {
+        margin-bottom: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .tcm-search-filter-results .tcm-search-filter-selection {
+        margin-bottom: 0;
+    }
+
+    .focused .tcm-search-filter-results {
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+        position: absolute;
+        background: white;
+        left: @tcm-spacing;
+        right: @tcm-spacing;
+        z-index: 100;
+        padding-top: 1rem;
+    }
+
+    .tcm-filter-input .tcm-search-filter-term {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .tcm-search-filter-term-wrapper {
+        position: relative;
+        display: inline;
+    }
+
+    .tcm-search-filter-widget .caret {
+        position: absolute;
+        top: 0.8rem;
+        right: 1rem;
+        pointer-events: none;
+    }
+
 }
 
 .tcm-explorer .tcm-results {
@@ -329,6 +426,12 @@ h2.tcm-explorer-heading {
 }
 
 /* Responsiveness */
+@media (max-width: @tcm-screen-xs-max) {
+    .tcm-search-filters-header {
+        margin-top: 4rem;
+    }
+}
+
 @media (min-width: @tcm-screen-sm) {
     .tcm-explorer .tcm-result {
         width: 50%;

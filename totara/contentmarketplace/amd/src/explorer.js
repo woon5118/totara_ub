@@ -27,7 +27,7 @@
  * @package    totara_contentmarketplace
  */
 
-define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_factory', 'core/modal_events'], function($, Str, mdlcfg, templates, ModalFactory, ModalEvents) {
+define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_factory', 'core/modal_events', 'totara_contentmarketplace/filters'], function($, Str, mdlcfg, templates, ModalFactory, ModalEvents, Filters) {
 
     // This must match \totara_contentmarketplace\explorer::MODE_CREATE_COURSE
     var MODE_CREATE_COURSE = 'create-course';
@@ -41,6 +41,7 @@ define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_facto
     explorer.maxSelectAll = 10000;
     explorer.maxCreateCourse = 100;
     explorer.warnCreateCourse = 11;
+    explorer.filters = null;
     explorer.lockId = 0;
     explorer.createpagepath = "";
 
@@ -57,7 +58,7 @@ define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_facto
         this.category = context.data('category');
         $('.tcm-sorting select', context).on('change', this, function(event) {event.preventDefault(); event.data.sort();});
         $('.tcm-search_query form', context).on('submit', this, function(event) {event.preventDefault(); event.data.search();});
-        context.on('change', '.tcm-search_filter input', this, function(event) {event.preventDefault(); event.data.search();});
+        this.filters = new Filters(selector, this.search.bind(this), this.marketplace, this.mode, this.category);
         $('.tcm-load-more button', context).on('click', this, function(event) {event.preventDefault(); event.data.more();});
         context.on('change', '.tcm-thumbnail_selection input', this, function(event) {
             event.preventDefault();
@@ -121,20 +122,15 @@ define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_facto
             data.isfirstquerywithdefaultsort = true;
         }
 
-        $(".tcm-search_filter").each(function() {
-            var selection,
-                name = $(this).attr("data-filter-name");
-            if ($(".totara_form_element_checkboxes_checkbox", this).length > 0) {
-                selection = $("input:checked", this).map(function() {
-                    return $(this).val();
-                }).get();
-                data.multivaluefilters.push(name);
-            } else if ($(".totara_form_element_radios_radio", this).length > 0) {
-                selection = $("input:checked", this).val();
-                data.singlevaluefilters.push(name);
+        $.each(this.filters.getValues(), function(name, value) {
+            if (value instanceof Array) {
+                data["multivaluefilters"].push(name);
+            } else {
+                data["singlevaluefilters"].push(name);
             }
-            data["filter-" + name] = selection;
+            data["filter-" + name] = value;
         });
+
         this.data = data;
         $.post({
             url: mdlcfg.wwwroot + "/totara/contentmarketplace/ajax/search.php",
@@ -162,14 +158,9 @@ define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_facto
                 }
                 self.initResizeHandler();
             });
-            templates.render('totara_contentmarketplace/filters', data).done(function(html) {
-                if (!self.checkLock(lock)) {
-                    // Not the current request
-                    return;
-                }
-                $('.tcm-search_filters', context).replaceWith(html);
-                $('.tcm-checkbox-filter').on('click', '.tcm-filter-show-more', function(event) {event.preventDefault(); self.showMoreFilter(event);});
-            });
+            if (self.checkLock(lock)) {
+                self.filters.setCounts(data.filters);
+            }
             templates.render('totara_contentmarketplace/result_summary', data).done(function(html) {
                 if (!self.checkLock(lock)) {
                     // Not the current request
@@ -355,16 +346,6 @@ define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_facto
             self.search();
         });
         self.selected = [];
-    };
-
-    explorer.showMoreFilter = function(event) {
-        var filter, hidden;
-        filter = event.delegateTarget;
-        hidden = $('.tcm-filter_checkboxes-page.hidden', filter);
-        hidden.first().removeClass('hidden');
-        if (hidden.length === 1) {
-            $('.tcm-filter-show-more', filter).hide();
-        }
     };
 
     explorer.warningTooManySelectAll = function() {

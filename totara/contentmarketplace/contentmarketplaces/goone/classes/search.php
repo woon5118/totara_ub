@@ -82,7 +82,7 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
                 $params[$name] = $filter[$name];
             }
         }
-        $availability_selection = $this->availability_selection($filter, $mode, $context);
+        $availability_selection = $this->availability_selection($filter, $context, $mode);
         $params += $this->availability_query($availability_selection);
 
         $response = $api->get_learning_objects($params);
@@ -119,131 +119,12 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         $results = new search_results();
         $results->hits = $hits;
 
-        $results->filters = array();
-
-        $availability_filter = $this->availability_filter($availability_selection, $params, $context);
-        if (isset($availability_filter)) {
-            $results->filters[] = $availability_filter;
-        }
-
-        $tags = array();
-        $nonzerofilters = array();
-        foreach ($response->facets->tag->buckets as $bucket) {
-            $checked = (key_exists("tags", $filter) and in_array($bucket->key, $filter["tags"]));
-            if ($checked) {
-                $nonzerofilters[] = $bucket->key;
-            }
-            $tags[] = array(
-                "htmlid" => 'tag' . $filterid++,
-                "value" => $bucket->key,
-                "label" => $bucket->key,
-                "formatcount" => local::format_integer($bucket->doc_count),
-                "count" => $bucket->doc_count,
-                "checked" => $checked,
-            );
-        }
-        if (key_exists("tags", $filter)) {
-            foreach ($filter["tags"] as $value) {
-                if (!in_array($value, $nonzerofilters)) {
-                    $tags[] = array(
-                        "htmlid" => 'tag' . $filterid++,
-                        "value" => $value,
-                        "label" => $value,
-                        "formatcount" => local::format_integer(0),
-                        "count" => 0,
-                        "checked" => true,
-                    );
-                }
-            }
-        }
-        $tag_filter = array(
-            "name" => "tags",
-            "label" => get_string('filter:tags', 'contentmarketplace_goone'),
-            "template" => "totara_contentmarketplace/filter_checkboxes",
-            "paginated_options" => self::paginate(self::sort($tags)),
-        );
-        $results->filters[] = $tag_filter;
-
-        $providers = array();
-        $nonzerofilters = array();
-        $filterid = 0;
-        foreach ($response->facets->instance->buckets as $bucket) {
-            $checked = (key_exists("provider", $filter) and in_array($bucket->key, $filter["provider"]));
-            if ($checked) {
-                $nonzerofilters[] = $bucket->key;
-            }
-            $providers[] = array(
-                "htmlid" => 'provider' . $filterid++,
-                "value" => $bucket->key,
-                "label" => $bucket->name,
-                "formatcount" => local::format_integer($bucket->doc_count),
-                "count" => $bucket->doc_count,
-                "checked" => $checked,
-            );
-        }
-        if (key_exists("provider", $filter)) {
-            foreach ($filter["provider"] as $value) {
-                if (!in_array($value, $nonzerofilters)) {
-                    $providers[] = array(
-                        "htmlid" => 'provider' . $filterid++,
-                        "value" => $value,
-                        "label" => $value,
-                        "formatcount" => local::format_integer(0),
-                        "count" => 0,
-                        "checked" => true,
-                    );
-                }
-            }
-        }
-        $provider_filter = array(
-            "name" => "provider",
-            "label" => get_string('filter:provider', 'contentmarketplace_goone'),
-            "template" => "totara_contentmarketplace/filter_checkboxes",
-            "paginated_options" => self::paginate(self::sort($providers)),
-        );
-        $results->filters[] = $provider_filter;
-
-        $languages = array();
-        $nonzerofilters = array();
-        $stringmanager = new string_manager();
-        $filterid = 0;
-        foreach ($response->facets->language->buckets as $bucket) {
-            $checked = (key_exists("language", $filter) and in_array($bucket->key, $filter["language"]));
-            if ($checked) {
-                $nonzerofilters[] = $bucket->key;
-            }
-            $label = $stringmanager->get_language($bucket->key);
-            $languages[] = array(
-                "htmlid" => 'language' . $filterid++,
-                "value" => $bucket->key,
-                "label" => $label,
-                "formatcount" => local::format_integer($bucket->doc_count),
-                "count" => $bucket->doc_count,
-                "checked" => $checked,
-            );
-        }
-        if (key_exists("language", $filter)) {
-            foreach ($filter["language"] as $value) {
-                if (!in_array($value, $nonzerofilters)) {
-                    $label = $stringmanager->get_language($value);
-                    $languages[] = array(
-                        "htmlid" => 'language' . $filterid++,
-                        "value" => $value,
-                        "label" => $label,
-                        "formatcount" => local::format_integer(0),
-                        "count" => 0,
-                        "checked" => true,
-                    );
-                }
-            }
-        }
-        $language_filter = array(
-            "name" => "language",
-            "label" => get_string('filter:language', 'contentmarketplace_goone'),
-            "template" => "totara_contentmarketplace/filter_checkboxes",
-            "paginated_options" => self::paginate(self::sort($languages)),
-        );
-        $results->filters[] = $language_filter;
+        $results->filters = [
+            [
+                'name' => 'availability',
+                'values' => $this->availability_filter($params, $context)
+            ]
+        ];
 
         $results->total = $response->total;
 
@@ -260,72 +141,43 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
     }
 
     /**
-     * @param string $selection
      * @param array $params
      * @param \context $context
-     * @return array|null
+     * @return array
      */
-    public function availability_filter($selection, array $params, \context $context) {
+    public function availability_filter(array $params, \context $context) {
         $api = new api();
 
-        $options = [];
+        $values = [];
         $availablityoptions = contentmarketplace::content_availability_options($context);
         if (in_array('all', $availablityoptions)) {
-            $options[] = [
-                "value" => "all",
-                "label" => get_string("availability-filter:all", "contentmarketplace_goone"),
-                "formatcount" => local::format_integer($api->get_learning_objects_total_count($params)),
-                "checked" => $selection === "all",
-                "htmlid" => "all",
-            ];
+            $values["all"] = local::format_integer($api->get_learning_objects_total_count($params));
         }
 
         if (in_array('subscribed', $availablityoptions)) {
-            $options[] = [
-                "value" => "subscribed",
-                "label" => get_string("availability-filter:subscription", "contentmarketplace_goone"),
-                "formatcount" => local::format_integer($api->get_learning_objects_subscribed_count($params)),
-                "checked" => $selection === "subscribed",
-                "htmlid" => "subscribed",
-            ];
+            $values["subscribed"] = local::format_integer($api->get_learning_objects_subscribed_count($params));
         }
 
         if (in_array('collection', $availablityoptions)) {
-            $options[] = [
-                "value" => "collection",
-                "label" => get_string("availability-filter:collection", "contentmarketplace_goone"),
-                "formatcount" => local::format_integer($api->get_learning_objects_collection_count($params)),
-                "checked" => $selection === "collection",
-                "htmlid" => "collection",
-            ];
+            $values["collection"] = local::format_integer($api->get_learning_objects_collection_count($params));
         }
 
-        if (!empty($options)) {
-            $filter = array(
-                "name" => "availability",
-                "label" => get_string('filter:availability', 'contentmarketplace_goone'),
-                "template" => "totara_contentmarketplace/filter_radios",
-                "options" => $options,
-            );
-            return $filter;
-        } else {
-            return null;
-        }
+        return $values;
     }
 
     /**
      * @param array $filter
-     * @param string $mode
      * @param \context $context
+     * @param string|null $mode
      * @return null|string
      */
-    public function availability_selection(array $filter, string $mode, \context $context) {
+    public function availability_selection(array $filter, \context $context, string $mode = null) {
         if (key_exists("availability", $filter)) {
             $selection = $filter["availability"];
             if (!in_array($selection, array("all", "subscribed", "collection"))) {
                 $selection = null;
             }
-        } else if ($mode == 'explore-collection') {
+        } else if ($mode == \totara_contentmarketplace\explorer::MODE_EXPLORE_COLLECTION) {
             $selection = 'collection';
         } else {
             $selection = null;
@@ -391,7 +243,7 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
                 $params[$name] = $filter[$name];
             }
         }
-        $availability_selection = $this->availability_selection($filter, $mode, $context);
+        $availability_selection = $this->availability_selection($filter, $context, $mode);
         $params += $this->availability_query($availability_selection);
 
         $api = new api();
@@ -449,4 +301,155 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
 
         return $learningobject;
     }
+
+    /**
+     * @param string $mode
+     * @param \context $context
+     * @return array
+     */
+    public function availability_filter_seed($context, $mode) {
+        $selection = $this->availability_selection([], $context, $mode);
+        $filterid = 0;
+        $all = [
+            "htmlid" => 'tcm-filter-availability-' . $filterid++,
+            "value" => "all",
+            "label" => get_string("availability-filter:all", "contentmarketplace_goone"),
+            "count" => "",
+            "checked" => $selection === "all",
+        ];
+
+        $subscribed = [
+            "htmlid" => 'tcm-filter-availability-' . $filterid++,
+            "value" => "subscribed",
+            "label" => get_string("availability-filter:subscription", "contentmarketplace_goone"),
+            "count" => "",
+            "checked" => $selection === "subscribed",
+        ];
+
+        $collection = [
+            "htmlid" => 'tcm-filter-availability-' . $filterid++,
+            "value" => "collection",
+            "label" => get_string("availability-filter:collection", "contentmarketplace_goone"),
+            "count" => "",
+            "checked" => $selection === "collection",
+        ];
+
+        $content_settings = get_config('contentmarketplace_goone', 'content_settings_creators');
+        if (has_capability('totara/contentmarketplace:config', $context)) {
+            $options = [$all, $subscribed, $collection];
+        } else if (has_capability('totara/contentmarketplace:add', $context)) {
+            switch ($content_settings) {
+                case "all":
+                    $options = [$all, $subscribed, $collection];
+                    break;
+                case "subscribed":
+                    $options = [$subscribed, $collection];
+                    break;
+                default:
+                    $options = [];
+            }
+        } else {
+            $options = [];
+        }
+
+        $seed = [
+            "name" => "availability",
+            "options" => $options,
+        ];
+        return $seed;
+    }
+
+    /**
+     * @param \stdClass $response
+     * @return array
+     */
+    public function tags_filter_seed($response) {
+        $tags = [];
+        $filterid = 0;
+        foreach ($response->facets->tag->buckets as $bucket) {
+            $tags[$bucket->key] = [
+                "htmlid" => 'tcm-filter-tag-' . $filterid++,
+                "value" => $bucket->key,
+                "label" => $bucket->key,
+                "checked" => false,
+            ];
+        }
+        $seed = array(
+            "name" => "tags",
+            "options" => $tags,
+        );
+        return $seed;
+    }
+
+    /**
+     * @param \stdClass $response
+     * @return array
+     */
+    public function provider_filter_seed($response) {
+        $providers = [];
+        $filterid = 0;
+        foreach ($response->facets->instance->buckets as $bucket) {
+            $providers[$bucket->key] = [
+                "htmlid" => 'tcm-filter-provider-' . $filterid++,
+                "value" => $bucket->key,
+                "label" => $bucket->name,
+                "checked" => false,
+            ];
+        }
+        $seed = [
+            "name" => "provider",
+            "options" => $providers,
+        ];
+        return $seed;
+    }
+
+    /**
+     * @param \stdClass $response
+     * @return array
+     */
+    public function language_filter_seed($response) {
+        $languages = [];
+        $filterid = 0;
+        $stringmanager = new string_manager();
+        foreach ($response->facets->language->buckets as $bucket) {
+            $label = $stringmanager->get_language($bucket->key);
+            $languages[$bucket->key] = [
+                "htmlid" => 'tcm-filter-language-' . $filterid++,
+                "value" => $bucket->key,
+                "label" => $label,
+                "checked" => false,
+            ];
+        }
+        $seed = [
+            "name" => "language",
+            "options" => $languages,
+        ];
+        return $seed;
+    }
+
+    /**
+     * @param string $mode
+     * @param \context $context
+     * @return array
+     */
+    public function get_filter_seeds($context, $mode) {
+        $api = new api();
+        $params = array(
+            "offset" => 0,
+            "limit" => 0,
+            "facets" => "tag,language,instance",
+        );
+        $availabilityselection = $this->availability_selection([], $context);
+        $params += $this->availability_query($availabilityselection);
+
+        $response = $api->get_learning_objects($params);
+
+        $data = [];
+        $data[] = $this->availability_filter_seed($context, $mode);
+        $data[] = $this->tags_filter_seed($response);
+        $data[] = $this->provider_filter_seed($response);
+        $data[] = $this->language_filter_seed($response);
+        return $data;
+    }
+
 }

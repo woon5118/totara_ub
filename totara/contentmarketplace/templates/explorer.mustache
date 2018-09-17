@@ -30,17 +30,34 @@
         "mode": "create-course",
         "category": 0,
         "heading": "Explore Content Marketplace: Demo content marketplace"
-        "filter": {
-            "label": "Type",
-            "options": [
-                {
-                    "text": "Food"
-                },
-                {
-                    "text": "Water"
-                }
-            ]
-        },
+        "filters": [
+            {
+                "name": "avaliablity",
+                "label": "Avaliablity",
+                "showcounts": true,
+                "template": "totara_contentmarketplace/filter_radios",
+                "options": [
+                    {
+                        "htmlid": "tcm-filter-avaliablity-0",
+                        "label": "All",
+                        "value": "all",
+                        "checked": true
+                    },
+                    {
+                        "htmlid": "tcm-filter-avaliablity-1",
+                        "label": "Subscription",
+                        "value": "subscribed",
+                        "checked": false
+                    },
+                    {
+                        "htmlid": "tcm-filter-avaliablity-2",
+                        "label": "Collection",
+                        "value": "collection",
+                        "checked": false
+                    }
+                ]
+            }
+        ]
         "sortby": [
             {
                 "value": "most-popular",
@@ -75,6 +92,7 @@
                 <div class="tcm-search_result_summary"></div>
                 <div class="tcm-status-searching">
                     <span class="tcm-loading-icon">{{#pix}} y/loading, core, loading, core {{/pix}}</span>
+                    {{#str}} loading_search_results, totara_contentmarketplace {{/str}}
                 </div>
             </div>
             <div class="col-md-4 tcm-sorting form-inline col-xs-12">
@@ -117,14 +135,11 @@
     </div>
     <div class="col-md-3 col-md-pull-9 col-sm-4 col-sm-pull-8 col-xs-12">
 
-        <div class="block">
-            <div class="header block-header">
-                <div class="title block-title">
-                    <h2>{{#str}} filters, totara_contentmarketplace {{/str}}</h2>
-                </div>
+        <div>
+            <div class="tcm-search-filters-header">
+                <h2>{{#str}} filters, totara_contentmarketplace {{/str}}</h2>
             </div>
-            <div class="content block-content tcm-search_filters">
-            </div>
+            {{> totara_contentmarketplace/filters }}
         </div>
     </div>
     <div class="tcm-details-wrapper clearfix">

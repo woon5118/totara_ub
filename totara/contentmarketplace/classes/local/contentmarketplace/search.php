@@ -119,4 +119,11 @@ abstract class search {
         return $listing;
     }
 
+    /**
+     * @param \context $context
+     * @param string $mode
+     * @return array
+     */
+    abstract public function get_filter_seeds($context, $mode);
+
 }

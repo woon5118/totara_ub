@@ -28,19 +28,28 @@
     {
         "filters": [
             {
-                "name": "tags",
-                "label": "Tags",
+                "name": "avaliablity",
+                "label": "Avaliablity",
+                "showcounts": true,
                 "template": "totara_contentmarketplace/filter_radios",
                 "options": [
                     {
-                        "name": "Food",
-                        "count": "12,345",
-                        "checked": true,
+                        "htmlid": "tcm-filter-avaliablity-0",
+                        "label": "All",
+                        "value": "all",
+                        "checked": true
                     },
                     {
-                        "name": "Drink",
-                        "count": "123",
-                        "checked": false,
+                        "htmlid": "tcm-filter-avaliablity-1",
+                        "label": "Subscription",
+                        "value": "subscribed",
+                        "checked": false
+                    },
+                    {
+                        "htmlid": "tcm-filter-avaliablity-2",
+                        "label": "Collection",
+                        "value": "collection",
+                        "checked": false
                     }
                 ]
             }
@@ -48,13 +57,22 @@
     }
 
 }}
-<div class="content block-content tcm-search_filters">
-    {{#filters}}
-        <fieldset class="tcm-search_filter tcm-search_filter-{{name}}" data-filter-name="{{name}}">
-            <legend class="tf_element_title"><span class="legend" data-element-label>{{ label }}</span></legend>
-            <div class="tf_element_input">
-                {{> &&template }}
-            </div>
-        </fieldset>
-    {{/filters}}
+<div class="content block-content tcm-search-filters-wrapper">
+    <div class="tcm-search-filters-loading">
+        <span class="tcm-loading-icon">{{#pix}} y/loading, core, loading, core {{/pix}}</span>
+        {{#str}} loading_filters, totara_contentmarketplace {{/str}}
+    </div>
+    <div class="tcm-search-filters">
+        {{#filters}}
+            <fieldset class="tcm-search-filter tcm-search-filter-name-{{name}} {{#showcounts}}tcm-search-filter-with-counts{{/showcounts}}"
+                      data-filter-name="{{name}}"
+                      data-filter-module="{{module}}"
+                      data-filter-showcounts="{{#showcounts}}ture{{/showcounts}}{{^showcounts}}false{{/showcounts}}">
+                <legend class="tf_element_title"><span class="legend" data-element-label>{{ label }}</span></legend>
+                <div class="tf_element_input tcm-filter-input">
+                    {{#template}}{{> &&template }}{{/template}}
+                </div>
+            </fieldset>
+        {{/filters}}
+    </div>
 </div>

@@ -41,7 +41,7 @@ final class content_settings_form extends \totara_form\form {
 
         $explorecollectionurl = new \moodle_url('/totara/contentmarketplace/explorer.php', [
             'marketplace' => 'goone',
-            'mode' => 'explore-collection',
+            'mode' => \totara_contentmarketplace\explorer::MODE_EXPLORE_COLLECTION,
         ]);
         $this->model->add(new radios(
             'creators',

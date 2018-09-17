@@ -33,9 +33,10 @@ defined('MOODLE_INTERNAL') || die();
 final class explorer {
 
     /**
-     * The two modes that we know exist, marketplace plugins may introduce their own in addition to these.
+     * The three modes that we know exist, marketplace plugins may introduce their own in addition to these.
      */
     const MODE_EXPLORE = 'explore';
+    const MODE_EXPLORE_COLLECTION = 'explore-collection';
     const MODE_CREATE_COURSE = 'create-course';
 
     /** @var string */
@@ -90,6 +91,33 @@ final class explorer {
 
         $data->mode = $this->mode;
         $data->createpagepath = $this->plugin->contentmarketplace()->course_create_page();
+
+        $data->filters = [
+            [
+                'name' => 'availability',
+                'label' => 'Availability',
+                'module' => 'totara_contentmarketplace/filter_radios',
+                'showcounts' => true,
+            ], [
+                'name' => 'tags',
+                'label' => 'Tags',
+                'template' => 'totara_contentmarketplace/filter_checkboxes_searchable_init',
+                'module' => 'totara_contentmarketplace/filter_checkboxes_searchable',
+                'showcounts' => false,
+            ], [
+                'name' => 'provider',
+                'label' => 'Provider',
+                'template' => 'totara_contentmarketplace/filter_checkboxes_searchable_init',
+                'module' => 'totara_contentmarketplace/filter_checkboxes_searchable',
+                'showcounts' => false,
+            ], [
+                'name' => 'language',
+                'label' => 'Language',
+                'template' => 'totara_contentmarketplace/filter_checkboxes_searchable_init',
+                'module' => 'totara_contentmarketplace/filter_checkboxes_searchable',
+                'showcounts' => false,
+            ]
+        ];
 
         return $OUTPUT->render_from_template('totara_contentmarketplace/explorer', $data);
     }

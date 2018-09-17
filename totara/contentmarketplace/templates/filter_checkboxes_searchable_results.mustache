@@ -20,44 +20,46 @@
    @package totara_contentmarketplace
 }}
 {{!
-    @template totara_contentmarketplace/filter_radios
+    @template totara_contentmarketplace/filter_checkboxes_searchable_results
 
-    Content Marketplace explorer filter control
+    Content Marketplace checkbox filter search results template
 
     Example context (json):
     {
-        "name": "avaliablity",
-        "options": [
+        "results": [
             {
-                "htmlid": "tcm-filter-avaliablity-0",
-                "label": "All",
-                "value": "all",
-                "checked": true
-            },
-            {
-                "htmlid": "tcm-filter-avaliablity-1",
-                "label": "Subscription",
-                "value": "subscribed",
+                "htmlid": "tcm-filter-tags-0",
+                "value": "communication",
+                "label": "Communication",
+                "count": "1,234",
                 "checked": false
             },
             {
-                "htmlid": "tcm-filter-avaliablity-2",
-                "label": "Collection",
-                "value": "collection",
+                "htmlid": "tcm-filter-tags-1",
+                "value": "development",
+                "label": "Development",
+                "count": "123",
+                "checked": false
+            },
+            {
+                "htmlid": "tcm-filter-tags-2",
+                "value": "sales",
+                "label": "Sales",
+                "count": "1",
                 "checked": false
             }
         ]
     }
 
 }}
-<div class="tcm-filter-radios">
-    {{#options}}
-        <div class="totara_form_element_radios_radio clearfix">
-            <input id="{{htmlid}}" type="radio" name="{{name}}" value="{{value}}" {{#checked}}checked{{/checked}}/>
+<div class="tcm-search-filter-selection">
+    {{#results}}
+        <div class="tcm-checkbox-filter totara_form_element_checkboxes_checkbox">
+            <input type="checkbox" id="{{htmlid}}" name="{{name}}[]" value="{{value}}" {{#checked}}checked{{/checked}} />
             <label for="{{htmlid}}">
-                <span title="{{label}}" class="tcm-filter-option-label">{{label}}</span>
-                <span title="{{#str}} total, totara_contentmarketplace {{/str}}" class="pull-right tcm-filter-option-count" data-value="{{value}}"></span>
+                <span class="tcm-filter-option-label" title="{{label}}">{{label}}</span>
+                <span class="pull-right tcm-filter-option-count" data-value="{{value}}">{{count}}</span>
             </label>
         </div>
-    {{/options}}
+    {{/results}}
 </div>

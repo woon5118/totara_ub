@@ -43,6 +43,7 @@ final class mock_curl {
         'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&subscribed=true&event=false'     => '/learning-objects/GET-count-with-facets-subscription.json',
         'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&event=false'                     => '/learning-objects/GET-count-with-facets-all.json',
         'GET /learning-objects?sort=created%3Adesc&offset=0&limit=48&facets=tag%2Clanguage%2Cinstance&event=false'                    => '/learning-objects/GET-listing-all.json',
+        'GET /learning-objects?offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&event=false'                                         => '/learning-objects/GET-count-with-facets-all.json',
         'POST /oauth/token'                                                                                                           => '/oauth/token/POST.json',
     ];
 

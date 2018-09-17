@@ -30,7 +30,7 @@ class search_results {
     /** @var array detailing each hit */
     public $hits;
 
-    /** @var array of search filters */
+    /** @var array of data to pass to each of the search filters */
     public $filters;
 
     /** @var int total number of search hits */
