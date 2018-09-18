@@ -25,13 +25,13 @@ use totara_contentmarketplace\local;
 
 defined('MOODLE_INTERNAL') || die();
 
-class local_testcase extends basic_testcase {
+class local_testcase extends advanced_testcase {
 
     /**
      * @dataProvider money_provider
      */
     public function test_format_money($locale, $value, $currency, $expected) {
-        $price= local::format_money($value, $currency, $locale);
+        $price = local::format_money($value, $currency, $locale);
         $this->assertSame($expected, $price);
     }
 
@@ -50,7 +50,33 @@ class local_testcase extends basic_testcase {
         ];
     }
 
+    /**
+     * @dataProvider integer_provider
+     */
+    public function test_format_integer($locale, $integer, $expected) {
+        $number = local::format_integer($integer, $locale);
+        $this->assertSame($expected, $number);
+    }
 
+    public function integer_provider() {
+        return [
+            ['en_AU.UTF-8', 0, "0"],
+            ['en_AU.UTF-8', 1, "1"],
+            ['en_AU.UTF-8', 1000, "1,000"],
+            ['en_AU.UTF-8', 1000000, "1,000,000"],
+            ['fr_FR.UTF-8', 1000000, "1\u{00a0}000\u{00a0}000"],
+            ['de_DE.UTF-8', 1000000, "1.000.000"],
+        ];
+    }
 
+    public function test_is_enabled() {
+        $this->resetAfterTest(true);
+        set_config('enablecontentmarketplaces', 1);
+        $this->assertTrue((bool)local::is_enabled());
+        set_config('enablecontentmarketplaces', 0);
+        $this->assertFalse((bool)local::is_enabled());
+        $this->expectException(\moodle_exception::class);
+        local::require_contentmarketplace();
+    }
 
 }

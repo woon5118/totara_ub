@@ -35,7 +35,7 @@ final class local {
      * @return boolean 1 for true, 0 for false.
      */
     public static function is_enabled() {
-        return get_config('enablecontentmarketplaces');
+        return get_config('core', 'enablecontentmarketplaces');
     }
 
     /**
