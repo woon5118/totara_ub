@@ -57,7 +57,7 @@ if ($format != '') {
 $report->include_js();
 
 $PAGE->set_title($report->fullname);
-$PAGE->set_button($report->edit_button());
+$PAGE->set_button($PAGE->button . $report->edit_button());
 
 echo $OUTPUT->header();
 
