@@ -247,8 +247,13 @@ if ($usernew = $userform->get_data()) {
         core_user::update_picture($usernew, $filemanageroptions);
     }
 
+    $emailbouncecounter = new core_user\email_bounce_counter($user);
     // Update mail bounces.
-    useredit_update_bounces($user, $usernew);
+    if ($emailchanged) {
+        // If it is a confirmation, start tracking the bounce/send counter
+        $tracking = (bool) $CFG->emailchangeconfirmation;
+        $emailbouncecounter->update_bounces($tracking);
+    }
 
     // Update forum track preference.
     useredit_update_trackforums($user, $usernew);
@@ -279,8 +284,13 @@ if ($usernew = $userform->get_data()) {
         // Email confirmation directly rather than using messaging so they will definitely get an email.
         $noreplyuser = core_user::get_noreply_user();
         if (!$mailresults = email_to_user($tempuser, $noreplyuser, $emailupdatetitle, $emailupdatemessage)) {
+            // Restore counter here, even if the the email was failed to send
+            $emailbouncecounter->restore();
             die("could not send email!");
         }
+
+        // After the email is sent to the user, the email bounce and email send count should be restore at this point
+        $emailbouncecounter->restore();
     }
 
     // Reload from db, we need new full name on this page if we do not redirect.

@@ -6444,3 +6444,39 @@ function get_user_access_sitewide($userid) {
 
     return $accessdata;
 }
+
+/**
+ * Used to increment or reset email sent count
+ *
+ * This function has been deprecated please call \core_user\email_bounce_counter::set_send_count instead
+ * @see \core_user\email_bounce_counter::set_send_count()
+ * @param stdClass $user object containing an id
+ * @param bool $reset will reset the count to 0
+ * @return void
+ * @deprecated Since Totara 11.8
+ */
+function set_send_count($user, $reset=false) {
+    debugging("set_send_count() has been deprecated, please use \\core_user\\email_bounce_counter::set_send_count() instead", DEBUG_DEVELOPER);
+    if (empty($user->id)) {
+        // No real (DB) user, nothing to do here.
+        return;
+    }
+
+    $emailbouncecounter = new core_user\email_bounce_counter($user);
+    $emailbouncecounter->set_send_count($reset);
+}
+
+/**
+ * Increment or reset user's email bounce count
+ *
+ * This function has been deprecated please call \core_user\email_bounce_counter::set_bounce_count instead
+ * @see \core_user\email_bounce_counter::set_bounce_count()
+ * @param stdClass $user object containing an id
+ * @param bool $reset will reset the count to 0
+ * @deprecated Since Totara 11.8
+ */
+function set_bounce_count($user, $reset=false) {
+    debugging("set_bounce_count() has been deprecated, please use \\core_user\\email_bounce_counter::set_bounce_count() instead", DEBUG_DEVELOPER);
+    $emailbouncecounter = new core_user\email_bounce_counter($user);
+    $emailbouncecounter->set_bounce_count($reset);
+}

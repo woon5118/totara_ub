@@ -37,6 +37,7 @@ if (!$user = $DB->get_record('user', array('id' => $id))) {
     print_error('invaliduserid');
 }
 
+$emailbouncecounter = new core_user\email_bounce_counter($user);
 $preferences = get_user_preferences(null, null, $user->id);
 $a = new stdClass();
 $a->fullname = fullname($user, true);
@@ -68,6 +69,9 @@ if (empty($preferences['newemailattemptsleft'])) {
         $authplugin->user_update($olduser, $user);
         user_update_user($user, false);
         $a->email = $user->email;
+        // Updating the user's email bounce/send count here, and there should be no record tracker involve,
+        // as the user confirmed to update the email
+        $emailbouncecounter->update_bounces(false);
         redirect(
                 new moodle_url('/user/view.php', ['id' => $user->id]),
                 get_string('emailupdatesuccess', 'auth', $a),

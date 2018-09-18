@@ -3487,56 +3487,6 @@ function over_bounce_threshold($user) {
 }
 
 /**
- * Used to increment or reset email sent count
- *
- * @param stdClass $user object containing an id
- * @param bool $reset will reset the count to 0
- * @return void
- */
-function set_send_count($user, $reset=false) {
-    global $DB;
-
-    if (empty($user->id)) {
-        // No real (DB) user, nothing to do here.
-        return;
-    }
-
-    if ($pref = $DB->get_record('user_preferences', array('userid' => $user->id, 'name' => 'email_send_count'))) {
-        $pref->value = (!empty($reset)) ? 0 : $pref->value+1;
-        $DB->update_record('user_preferences', $pref);
-    } else if (!empty($reset)) {
-        // If it's not there and we're resetting, don't bother. Make a new one.
-        $pref = new stdClass();
-        $pref->name   = 'email_send_count';
-        $pref->value  = 1;
-        $pref->userid = $user->id;
-        $DB->insert_record('user_preferences', $pref, false);
-    }
-}
-
-/**
- * Increment or reset user's email bounce count
- *
- * @param stdClass $user object containing an id
- * @param bool $reset will reset the count to 0
- */
-function set_bounce_count($user, $reset=false) {
-    global $DB;
-
-    if ($pref = $DB->get_record('user_preferences', array('userid' => $user->id, 'name' => 'email_bounce_count'))) {
-        $pref->value = (!empty($reset)) ? 0 : $pref->value+1;
-        $DB->update_record('user_preferences', $pref);
-    } else if (!empty($reset)) {
-        // If it's not there and we're resetting, don't bother. Make a new one.
-        $pref = new stdClass();
-        $pref->name   = 'email_bounce_count';
-        $pref->value  = 1;
-        $pref->userid = $user->id;
-        $DB->insert_record('user_preferences', $pref, false);
-    }
-}
-
-/**
  * Determines if the logged in user is currently moving an activity
  *
  * @param int $courseid The id of the course being tested
@@ -5821,7 +5771,8 @@ function moodle_process_email($modargs, $body) {
                 // Check the half md5 of their email.
                 $md5check = substr(md5($user->email), 0, 16);
                 if ($md5check == substr($modargs, -16)) {
-                    set_bounce_count($user);
+                    $emailbouncecounter = new \core_user\email_bounce_counter($user);
+                    $emailbouncecounter->set_bounce_count(false);
                 }
                 // Else maybe they've already changed it?
             }
@@ -6383,7 +6334,8 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
 
     if ($mail->send()) {
-        set_send_count($user);
+        $emailbouncecounter = new \core_user\email_bounce_counter($user);
+        $emailbouncecounter->set_send_count(false);
         if (!empty($mail->SMTPDebug)) {
             echo '</pre>';
         }
