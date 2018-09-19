@@ -2094,55 +2094,23 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
     // Fast version of "facetoface_get_attendees()" for all sessions
     $sessionsignups = array();
     $signupsql = "
-        SELECT
-            su.id AS submissionid,
-            s.id AS sessionid,
-            u.*,
-            f.course AS courseid,
-            f.selectjobassignmentonsignup,
-            ss.grade,
-            sign.timecreated,
-            su.jobassignmentid
-        FROM
-            {facetoface} f
-        JOIN
-            {facetoface_sessions} s
-         ON s.facetoface = f.id
-        JOIN
-            {facetoface_signups} su
-         ON s.id = su.sessionid
-        JOIN
-            {facetoface_signups_status} ss
-         ON su.id = ss.signupid
-        LEFT JOIN
-            (
-            SELECT
-                ss.signupid,
-                MAX(ss.timecreated) AS timecreated
-            FROM
-                {facetoface_signups_status} ss
-            INNER JOIN
-                {facetoface_signups} s
-             ON s.id = ss.signupid
-            INNER JOIN
-                {facetoface_sessions} se
-             ON s.sessionid = se.id
-            AND se.facetoface = $facetofaceid
-            WHERE
-                ss.statuscode IN (:booked,:waitlisted)
-            GROUP BY
-                ss.signupid
-            ) sign
-         ON su.id = sign.signupid
-        JOIN
-            {user} u
-            ON u.id = su.userid
-        WHERE
-            f.id = :fid
-        AND ss.superceded != 1
-        AND ss.statuscode >= :waitlisted2
-        ORDER BY
-            s.id, u.firstname, u.lastname";
+        SELECT su.id AS submissionid, s.id AS sessionid, u.*, f.course AS courseid, f.selectjobassignmentonsignup,
+            ss.grade, sign.timecreated, su.jobassignmentid
+        FROM {facetoface} f
+        JOIN {facetoface_sessions} s ON s.facetoface = f.id
+        JOIN {facetoface_signups} su ON s.id = su.sessionid
+        JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+        JOIN {user} u ON u.id = su.userid
+        LEFT JOIN (
+            SELECT ss.signupid, MAX(ss.timecreated) AS timecreated
+            FROM {facetoface_signups_status} ss
+            INNER JOIN {facetoface_signups} s ON s.id = ss.signupid
+            INNER JOIN {facetoface_sessions} se ON s.sessionid = se.id AND se.facetoface = $facetofaceid
+            WHERE ss.statuscode IN (:booked,:waitlisted)
+            GROUP BY ss.signupid
+        ) sign ON su.id = sign.signupid
+        WHERE f.id = :fid AND ss.superceded != 1 AND ss.statuscode >= :waitlisted2
+        ORDER BY s.id, u.firstname, u.lastname";
     $signupparams =  array(
         'booked' => MDL_F2F_STATUS_BOOKED,
         'waitlisted' => MDL_F2F_STATUS_WAITLISTED,
@@ -2191,7 +2159,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
     }
 
     $sql = "SELECT d.id as dateid, s.id, s.capacity, d.timestart, d.timefinish, d.roomid,
-                   d.sessiontimezone
+                   d.sessiontimezone, s.cancelledstatus, s.registrationtimestart, s.registrationtimefinish
               FROM {facetoface_sessions} s
               JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
              WHERE s.facetoface = :fid AND d.sessionid = s.id
@@ -2236,8 +2204,15 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                     $signupcount = count($sessionsignups[$session->id]);
                 }
 
-                if ($signupcount >= $session->capacity) {
+                // Before making any status changes, check mod_facetoface_renderer::session_status_table_cell first.
+                if (!empty($session->cancelledstatus)) {
+                    $status = get_string('bookingsessioncancelled', 'facetoface');
+                } else if ($signupcount >= $session->capacity) {
                     $status = get_string('bookingfull', 'facetoface');
+                } else if (!empty($session->registrationtimestart) && $session->registrationtimestart > $timenow) {
+                    $status = get_string('registrationnotopen', 'facetoface');
+                } else if (!empty($session->registrationtimefinish) && $timenow > $session->registrationtimefinish) {
+                    $status = get_string('registrationclosed', 'facetoface');
                 } else {
                     $status = get_string('bookingopen', 'facetoface');
                 }
