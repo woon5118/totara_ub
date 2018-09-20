@@ -993,14 +993,18 @@ if ($show_table) {
                     $label = '';
                 }
 
-                $url = new moodle_url('/mod/facetoface/attendee_job_assignment.php', array('s' => $session->id, 'id' => $attendee->id));
-                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-job-assignment pull-right'));
-                $jobassign = html_writer::span($label, 'jobassign'.$attendee->id, array('id' => 'jobassign'.$attendee->id));
+                if (!$download) {
+                    $url = new moodle_url('/mod/facetoface/attendee_job_assignment.php', array('s' => $session->id, 'id' => $attendee->id));
+                    $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-job-assignment pull-right'));
+                    $jobassign = html_writer::span($label, 'jobassign' . $attendee->id, array('id' => 'jobassign' . $attendee->id));
 
-                if ($canchangesignedupjobassignment) {
-                    $data[] = $icon . $jobassign;
+                    if ($canchangesignedupjobassignment) {
+                        $data[] = $icon . $jobassign;
+                    } else {
+                        $data[] = $jobassign;
+                    }
                 } else {
-                    $data[] = $jobassign;
+                    $data[] = $label;
                 }
             }
 
