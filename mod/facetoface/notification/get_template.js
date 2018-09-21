@@ -99,9 +99,16 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
 
         });
 
-        // Reset the template to the empty option as soon as user enters some text in any of these fields.
-        $('#id_title, #id_body_editor, #id_managerprefix_editor').change(function() {
-            $('#id_templateid').val('0');
+        // We want to listen to changes, however when the editor processes the body and manager copy it may
+        // change spacing, encode entities, or change non-visual markup.
+        // These all lead to a change event, which we don't care about, as its the editor changing content, not the user.
+        // To get around this (and its a hack sorry) we just want until the user has clicked or pressed a key down.
+        // Only then do we start listening.
+        $('body').on('keydown click', function() {
+            // Reset the template to the empty option as soon as user enters some text in any of these fields.
+            $('#id_title, #id_body_editor, #id_managerprefix_editor').change(function() {
+                $('#id_templateid').val('0');
+            });
         });
     }
 }

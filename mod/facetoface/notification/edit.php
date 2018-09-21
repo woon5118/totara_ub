@@ -138,10 +138,19 @@ if ($form->is_cancelled()) {
         $default = file_prepare_standard_editor($default, 'body', $editoroptions, $context, 'mod_facetoface', 'notification', $id);
         $default = file_prepare_standard_editor($default, 'managerprefix', $editoroptions, $context, 'mod_facetoface', 'notification', $id);
 
+        // At this point, we have to filter the $data's text as well, since it is required to have the same formatted
+        // filter as the default, so that the contents are the same when compared.
+        // Importantly we also clone $data as this will lead to modifications.
+        $clonedata = clone($data);
+        $clonedata = file_prepare_standard_editor($clonedata, 'body', $editoroptions, $context, 'mod_facetoface', $id);
+        $clonedata = file_prepare_standard_editor($clonedata, 'managerprefix', $editoroptions, $context, 'mod_facetoface', $id);
+
         // Double-check that the content is the same as the template - if customised then set template to 0.
-        if (!facetoface_notification_match($data, $default)) {
+        if (!facetoface_notification_match($clonedata, $default)) {
             $DB->set_field('facetoface_notification', 'templateid', 0, array('id' => $notification->id));
         }
+        // Explicitly remove the clone, we don't want anyone to use it after this.
+        unset($clonedata);
     }
     totara_set_notification(get_string('notificationsaved', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
