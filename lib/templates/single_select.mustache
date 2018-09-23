@@ -95,7 +95,7 @@
         {{#helpicon}}
             {{>core/help_icon}}
         {{/helpicon}}
-        <select {{#attributes}}{{name}}="{{value}}" {{/attributes}} id="{{id}}" class="custom-select {{classes}}" name="{{name}}">
+        <select {{#attributes}}{{name}}="{{value}}" {{/attributes}}{{#disabled}} disabled{{/disabled}}{{#title}} title="{{.}}"{{/title}} id="{{id}}" class="custom-select {{classes}}" name="{{name}}">
             {{#options}}
                 {{#optgroup}}
                     <optgroup label="{{name}}">

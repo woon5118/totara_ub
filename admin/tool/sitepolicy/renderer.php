@@ -216,6 +216,12 @@ class tool_sitepolicy_renderer extends plugin_renderer_base {
         );
         $select->class = 'singleselect pull-right';
 
+        // If there are no languages available to translate then disable the select box and add a meaningful title.
+        if (empty($options)) {
+            $select->disabled = true;
+            $select->tooltip = get_string('morelanguagesrequired', 'tool_sitepolicy');
+        }
+
         return $this->output->render($select);
     }
 

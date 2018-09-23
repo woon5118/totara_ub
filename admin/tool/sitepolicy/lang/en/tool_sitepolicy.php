@@ -48,6 +48,7 @@ $string['deleteversiontitle'] = 'Are you sure you want to delete version {$a->ve
 $string['deleteversionx'] = 'Delete version {$a}';
 $string['enablesitepolicies'] = 'Enable site policies';
 $string['managepolicies'] = 'Manage policies';
+$string['morelanguagesrequired'] = "No languages found. To add translation you must first install the desired languages. Go to 'Language packs' or contact your system administrator.";
 $string['pluginname'] = 'Site policies';
 $string['policiesempty'] = 'No policies created';
 $string['policieslabelname'] = 'Name';
