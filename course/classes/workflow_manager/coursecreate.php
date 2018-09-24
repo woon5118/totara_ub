@@ -89,7 +89,7 @@ class coursecreate extends \totara_workflow\workflow_manager\base {
      *
      * @param \totara_form\model $model
      */
-    public function add_workflow_manager_form_elements(\totara_form\model $model) {
+    public function add_workflow_manager_form_elements(\totara_form\model $model): void {
         $model->add(new \totara_form\form\element\hidden('category', PARAM_INT));
         $model->add(new \totara_form\form\element\hidden('returnto', PARAM_ALPHANUM));
         $model->add(new \totara_form\form\element\hidden('returnurl', PARAM_LOCALURL));

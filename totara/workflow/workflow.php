@@ -44,6 +44,7 @@ $pageparams = [
 $PAGE->set_url(new \moodle_url('/totara/workflow/workflow.php', $pageparams));
 $PAGE->set_pagelayout('noblocks');
 
+/** @var \totara_workflow\workflow\base $workflow */
 $workflow = $workflowclass::instance();
 $params = $workflow->get_workflow_manager_data();
 $workflow->set_params($params);
@@ -55,6 +56,7 @@ if (!$workflow->is_available()) {
 
 $formclass = $workflow->get_form_name();
 $currentdata = $workflow->get_current_data();
+/** @var \totara_workflow\form\workflow_form $form */
 $form = new $formclass($currentdata, ['workflow' => $workflow]);
 
 if ($data = $form->get_data()) {

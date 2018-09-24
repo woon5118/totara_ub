@@ -38,6 +38,7 @@ class workflow_form extends \totara_form\form {
         if (!isset($this->parameters['workflow'])) {
             throw new \coding_exception('Workflow must be passed as a parameter to ' . get_class($this));
         }
+        /** @var \totara_workflow\workflow\base $workflow */
         $workflow = $this->parameters['workflow'];
         $this->model->add(new \totara_form\form\element\hidden('component', PARAM_COMPONENT));
         $this->model->add(new \totara_form\form\element\hidden('manager', PARAM_ALPHANUMEXT));

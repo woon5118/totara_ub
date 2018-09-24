@@ -47,9 +47,9 @@ abstract class base {
      * Extract component and manager data from the manager classname.
      *
      * @param string $managerclass Name of the workflow class to split.
-     * @return array Array of [$component, $manager] as strings.
+     * @return string[] Array of [$component, $manager] as strings.
      */
-    protected static function split_classname(string $managerclass) {
+    protected static function split_classname(string $managerclass): array {
         if (!preg_match('/^([a-z][a-z0-9_]*)\\\\workflow_manager\\\\([a-zA-Z0-9_-]+)$/', $managerclass, $matches)) {
             throw new \coding_exception("Workflow manager class '{$managerclass}' does not match expected format.");
         }
@@ -82,7 +82,7 @@ abstract class base {
      * Return an array of workflow objects for the specified namespace.
      *
      * @param bool $all If true returns all workflows, otherwise only returns available workflows.
-     * @return array Array of workflow objects.
+     * @return \totara_workflow\workflow\base[] Array of workflow objects.
      */
     public function get_workflows(bool $all = false): array {
 
@@ -124,9 +124,9 @@ abstract class base {
      * is enabled and accessible.
      *
      * @param string $classname Name of workflow class.
-     * @return \totara_workflow\workflow\base Workflow object or null
+     * @return \totara_workflow\workflow\base Workflow object
      */
-    public function get_workflow(string $classname): ?\totara_workflow\workflow\base {
+    public function get_workflow(string $classname): \totara_workflow\workflow\base {
 
         if (!class_exists($classname)) {
             throw new \coding_exception("Attempt to instantiate class '{$classname}' which does not exist.");
@@ -149,7 +149,7 @@ abstract class base {
     /**
      * Returns a list of all workflow classes of this type.
      *
-     * @return array Array of fully-qualified class names.
+     * @return string[] Array of fully-qualified class names.
      */
     abstract protected function get_all_workflow_classes(): array;
 
@@ -172,13 +172,13 @@ abstract class base {
      *
      * @param \totara_form\model $model
      */
-    public function add_workflow_manager_form_elements(\totara_form\model $model) {
+    public function add_workflow_manager_form_elements(\totara_form\model $model): void {
     }
 
     /**
      * Get list of workflow manager classes.
      *
-     * @return array Array of all workflow manager classes.
+     * @return string[] Array of all workflow manager classes.
      */
     public static function get_all_workflow_manager_classes(): array {
         return \core_component::get_namespace_classes('workflow_manager', '\\totara_workflow\\workflow_manager\\base');
@@ -189,7 +189,7 @@ abstract class base {
      *
      * @param array $params Key/value array of parameters to store.
      */
-    public function set_params(array $params) {
+    public function set_params(array $params): void {
         $this->params = $params;
     }
 
@@ -206,6 +206,8 @@ abstract class base {
      * Return name of template to use for the workflow selector.
      *
      * Can override in manager or use the default tile template.
+     *
+     * @return string
      */
     public function get_workflow_template(): string {
         return 'totara_workflow/workflow_selector';

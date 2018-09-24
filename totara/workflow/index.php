@@ -38,6 +38,7 @@ if ($action && $component && $manager && $workflow) {
     if (!class_exists($classname)) {
         print_error('error:noworkflowclass', 'totara_workflow', '', $classname);
     }
+    /** @var \totara_workflow\workflow\base $workflow */
     $workflow = $classname::instance();
     if ($action == 'enable') {
         $workflow->enable();
@@ -66,6 +67,7 @@ $workflow_managers = \totara_workflow\workflow_manager\base::get_all_workflow_ma
 $contextdata = [];
 $contextdata['workflow_managers'] = [];
 foreach ($workflow_managers as $workflow_manager) {
+    /** @var \totara_workflow\workflow_manager\base $wm */
     $wm = new $workflow_manager();
     $contextdata['workflow_managers'][] = $wm->export_for_template($OUTPUT);
 }

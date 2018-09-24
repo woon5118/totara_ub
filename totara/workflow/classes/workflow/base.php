@@ -35,12 +35,17 @@ abstract class base implements \templatable {
      */
     protected $manager;
 
+    /**
+     * Constructor.
+     *
+     * @param \totara_workflow\workflow_manager\base $workflowmanager
+     */
     public function __construct(\totara_workflow\workflow_manager\base $workflowmanager) {
         $this->manager = $workflowmanager;
     }
 
     /**
-     * Name of workflow
+     * Localised name of workflow
      *
      * @return string
      */
@@ -64,7 +69,7 @@ abstract class base implements \templatable {
      * Optional image to be displayed when selecting workflow.
      * Will be cropped and resized to fill 100x100px area.
      *
-     * @return moodle_url URL of image resource.
+     * @return \moodle_url|null URL of image resource.
      */
     public function get_image(): ?\moodle_url {
         return null;
@@ -97,9 +102,9 @@ abstract class base implements \templatable {
      * Extract component, manager and workflow data from the classname.
      *
      * @param string $workflowclass Name of the workflow class to split.
-     * @return array Array of [$component, $manager, $workflow] as strings.
+     * @return string[] Array of [$component, $manager, $workflow] as strings.
      */
-    protected static function split_classname(string $workflowclass) {
+    protected static function split_classname(string $workflowclass): array {
         if (!preg_match('/^([a-z][a-z0-9_]*)\\\\workflow\\\\([a-zA-Z0-9_-]+)\\\\([a-zA-Z0-9_-]+)$/', $workflowclass, $matches)) {
             throw new \coding_exception("Workflow class '{$workflowclass}' does not match expected format.");
         }
@@ -183,9 +188,20 @@ abstract class base implements \templatable {
      */
     public static function instance(): \totara_workflow\workflow\base {
         $managername = static::get_manager_class();
+        /** @var \totara_workflow\workflow_manager\base $wm */
         $wm = new $managername();
         $workflow = $wm->get_workflow(static::class);
         return $workflow;
+    }
+
+    /**
+     * Returns workflow form class name.
+     *
+     * @return string
+     */
+    final public function get_form_name(): string {
+        // NOTE: this should not be overridden, instead override define_form() method.
+        return 'totara_workflow\form\workflow_form';
     }
 
     /**
@@ -195,9 +211,18 @@ abstract class base implements \templatable {
      *
      * @param \totara_form\model $model Form model to add elements to.
      */
-    public function add_workflow_form_elements(\totara_form\model $model) {
+    public function add_workflow_form_elements(\totara_form\model $model): void {
 
         $this->manager->add_workflow_manager_form_elements($model);
+    }
+
+    /**
+     * Define form elements.
+     *
+     * @param \totara_form\model $model Form model to add elements to.
+     */
+    public function define_form(\totara_form\model $model): void {
+        // NOTE: this method should be overridden if a custom form is used.
     }
 
     /**
@@ -236,6 +261,16 @@ abstract class base implements \templatable {
     }
 
     /**
+     * Process the submitted data.
+     *
+     * @param \stdClass $data
+     * @param array $files
+     */
+    public function process_form(\stdClass $data, array $files): void {
+        // NOTE: override if necessary.
+    }
+
+    /**
      * Returns true if the workflow has been enabled via the workflow management page.
      *
      * @return bool True if enabled.
@@ -247,14 +282,14 @@ abstract class base implements \templatable {
     /**
      * Enable this workflow.
      */
-    public final function enable() {
+    public final function enable(): void {
         set_config(get_class($this), 1, 'totara_workflow');
     }
 
     /**
      * Disable this workflow.
      */
-    public final function disable() {
+    public final function disable(): void {
         set_config(get_class($this), 0, 'totara_workflow');
     }
 
@@ -263,7 +298,7 @@ abstract class base implements \templatable {
      *
      * @param array $params Key/value array of parameters to store.
      */
-    public function set_params(array $params) {
+    public function set_params(array $params): void {
         $this->manager->set_params($params);
     }
 
@@ -281,7 +316,7 @@ abstract class base implements \templatable {
      *
      * @return array Workflow manager data.
      */
-    public function get_workflow_manager_data() {
+    public function get_workflow_manager_data(): array {
         return $this->manager->get_workflow_manager_data();
     }
 }

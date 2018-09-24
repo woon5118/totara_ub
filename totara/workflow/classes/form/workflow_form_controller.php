@@ -30,6 +30,11 @@ abstract class workflow_form_controller extends \totara_form\form_controller {
      */
     private $workflow;
 
+    /**
+     * @var \totara_workflow\form\workflow_form $form
+     */
+    protected $form;
+
     public function __construct() {
         $this->workflow = $this->get_workflow();
     }
@@ -50,12 +55,13 @@ abstract class workflow_form_controller extends \totara_form\form_controller {
         }
         $formclass = $this->workflow->get_form_name();
         $currentdata = $this->workflow->get_current_data();
-        return new $formclass($currentdata, ['workflow' => $this->workflow], $idsuffix);
+        $this->form =  new $formclass($currentdata, ['workflow' => $this->workflow], $idsuffix);
+        return $this->form;
     }
 
     public function process_ajax_data() {
-        $data = (array)$this->form->get_data();
+        $data = $this->form->get_data();
         $files = (array)$this->form->get_files();
-        $this->workflow->process_data($data, $files);
+        $this->workflow->process_form($data, $files);
     }
 }

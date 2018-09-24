@@ -42,10 +42,13 @@ $pageparams = [
 $PAGE->set_url(new \moodle_url('/totara/workflow/manager.php', $pageparams));
 $PAGE->set_pagelayout('noblocks');
 
+/** @var \totara_workflow\workflow_manager\base $wm */
 $wm = new $managerclass();
 $params = $wm->get_workflow_manager_data();
 $wm->set_params($params);
-$workflows = $wm->get_workflows();
+$workflows = $wm->get_workflows(false);
+
+// Security note: $wm->get_workflows(false) returns empty array when user cannot access the workflow manager.
 
 if (count($workflows) === 0) {
     print_error('error:noworkflows', 'totara_workflow');
