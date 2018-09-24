@@ -1116,11 +1116,11 @@ FloatingHeaders.prototype = {
 
         require(['jquery'], function($) {
             // Resize user cells.
-            var userWidth = $(this.firstUserCell.getDOMNode()).outerWidth();
+            var userWidth = $(self.firstUserCell.getDOMNode()).outerWidth();
             var userCells = Y.all(SELECTORS.USERCELL);
-            this.userColumnHeader.one('.cell').setStyle('width', userWidth);
+            self.userColumnHeader.one('.cell').setStyle('width', userWidth);
 
-            this.userColumn.all('.cell').each(function (cell, idx) {
+            self.userColumn.all('.cell').each(function(cell, idx) {
                 var height = $(userCells.item(idx).getDOMNode()).outerHeight() + 'px';
                 cell.setStyles({
                     width: userWidth,
@@ -1130,10 +1130,10 @@ FloatingHeaders.prototype = {
 
             // Resize headers & footers.
             // This is an expensive operation, not expected to happen often.
-            var headers = this.gradeItemHeadingContainer.all('.cell');
+            var headers = self.gradeItemHeadingContainer.all('.cell');
             var resizedcells = Y.all(SELECTORS.HEADERCELLS);
 
-            var headeroffsetleft = this.headerRow.getX();
+            var headeroffsetleft = self.headerRow.getX();
             var newcontainerwidth = 0;
             resizedcells.each(function(cell, idx) {
                 var headercell = headers.item(idx);
