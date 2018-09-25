@@ -55,6 +55,9 @@ class moodle_phpmailer extends PHPMailer {
         // MDL-52637: Disable the automatic TLS encryption added in v5.2.10 (9da56fc1328a72aa124b35b738966315c41ef5c6).
         $this->SMTPAutoTLS = false;
 
+        // Totara: Use HTML5 email validation to fix compatibility with PHP 7.3 with PCRE2 and to match PARAM_EMAIL.
+        self::$validator = 'html5';
+
         if (!empty($CFG->smtpauthtype)) {
             $this->AuthType = $CFG->smtpauthtype;
         }

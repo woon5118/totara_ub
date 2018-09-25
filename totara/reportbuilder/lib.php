@@ -1861,7 +1861,7 @@ class reportbuilder {
         }
 
         // Leaves only letters and numbers replaces spaces + dashes with underscores.
-        $fullname = strtolower(preg_replace(['/[^a-zA-Z\d\s-_]/', '/[\s-]/'], ['', '_'], $fullname));
+        $fullname = strtolower(preg_replace(['/[^a-zA-Z\d\s\-_]/', '/[\s\-]/'], ['', '_'], $fullname));
         $shortname = "report_{$fullname}";
 
         if (strlen($shortname) > 255) {

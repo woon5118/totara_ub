@@ -3004,7 +3004,7 @@ function facetoface_approve_requests($data) {
                             true,
                             null
                         )) {
-                        continue;
+                        break;
                     }
 
                     // Approved users.
@@ -3014,7 +3014,7 @@ function facetoface_approve_requests($data) {
             case 0:
             default:
                 // Change nothing
-                continue;
+                break;
         }
     }
 
@@ -5281,7 +5281,7 @@ function facetoface_generate_bulk_result_notice($results, $type = 'bulkadd') {
  * Kohl's KW - WP06A - Google calendar integration
  *
  * @deprecated since Totara 12.0
- 
+
  * If the unassigned user belongs to a course with an upcoming
  * face-to-face session and they are signed-up to attend, cancel
  * the sign-up (and trigger notification).

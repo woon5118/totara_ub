@@ -99,7 +99,7 @@ class question_manager {
         foreach ($elemfiles as $file) {
             $element = basename($file, '.class.php');
             $classname = 'question_'.$element;
-            if (strpos($file, '..' !== false)) {
+            if (strpos($file, '..') !== false) {
                 throw new exception('Custom field element file cannot have two dots \'..\' sequentially');
             }
             require_once($file);
