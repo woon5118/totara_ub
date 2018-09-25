@@ -32,6 +32,32 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
     var debug = (window.console && CFG.hasOwnProperty('developerdebug')) ? CFG.developerdebug : false;
 
     /**
+     * Watches a form DOM elementand confirms that it has been fully initialised
+     *
+     * @param {String} formid HTML id of the form to watch (NOTE: thsi already needs to have been added to the DOM)
+     * @returns {Promise} resolved once the form has completed it's initialisation process
+     */
+    function addCompletewatch(formid) {
+        var p = new Promise(function(resolve) {
+            var formElement = document.getElementById(formid);
+            var observerCallback = function() {
+                if (formElement.getAttribute('data-totara_form-initialised') === 'true') {
+                    observer.disconnect();
+                    resolve();
+                }
+            };
+
+            var observer = new MutationObserver(observerCallback);
+            observer.observe(formElement, {
+                attributes: true,   // required for IE11 (at minimum)
+                attributeFilter: ['data-totara_form-initialised']
+            });
+        });
+
+        return p;
+    }
+
+    /**
      * Generic element class.
      *
      * @class
@@ -1175,6 +1201,10 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          */
         replaceFormContents: function(html, js) {
             Templates.replaceNode(this.form, html, js);
+            M.util.js_pending('totara_form-replaceform');
+            addCompletewatch(this.form.attr('id')).then(function() {
+                M.util.js_complete('totara_form-replaceform');
+            });
         },
 
         /**
@@ -1561,6 +1591,8 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                 if (useCustomValidation) {
                     form.setCustomValidation();
                 }
+
+                formNode.setAttribute('data-totara_form-initialised', true);
                 working.resolve();
 
                 MODULE.debug('Initialised form #' + formData.id + '.', Form, MODULE.LOGLEVEL.success);
@@ -1611,6 +1643,8 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                 container = $('#' + target),
                 deferred = $.Deferred();
 
+            M.util.js_pending('totara_form-loading');
+
             $.ajax({
                 url: CFG.wwwroot + '/totara/form/ajax.php',
                 data: formdata,
@@ -1619,9 +1653,12 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                     if (data.formstatus === 'display') {
                         MODULE.debug('Displaying the form for the first time.', Form, MODULE.LOGLEVEL.debug);
                         container.empty();
-                        Templates.render(data.templatename, data.templatedata).done(function (html, js) {
+                        Templates.render(data.templatename, data.templatedata).done(function(html, js) {
                             Templates.replaceNodeContents($('#' + target), html, js);
-                            deferred.resolve('display', data.templatedata.formid);
+                            addCompletewatch(data.templatedata.formid).then(function() {
+                                M.util.js_complete('totara_form-loading');
+                                deferred.resolve('display', data.templatedata.formid);
+                            });
                         }).fail(Notification.exception);
                     } else {
                         MODULE.debug('Unexpected form response', Form, MODULE.LOGLEVEL.warn);
