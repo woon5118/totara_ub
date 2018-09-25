@@ -435,16 +435,5 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018092600, 'totara', 'core');
     }
 
-    if ($oldversion < 2018100100) {
-        // Rebuild the context map, this may take a very long time on large sites.
-
-        upgrade_set_timeout(7200);
-        \totara_core\access::build_context_map();
-        upgrade_set_timeout();
-
-        // Core savepoint reached.
-        upgrade_plugin_savepoint(true, 2018100100, 'totara', 'core');
-    }
-
     return true;
 }

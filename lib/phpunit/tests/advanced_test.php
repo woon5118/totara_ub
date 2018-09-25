@@ -159,7 +159,7 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
 
         // This is weird table - id is NOT a sequence here.
         $this->assertEquals(0, $DB->count_records('context_temp'));
-        $DB->import_record('context_temp', array('id'=>5, 'path'=>'/1/2', 'depth'=>2));
+        $DB->import_record('context_temp', array('id'=>5, 'path'=>'/1/2', 'depth'=>2, 'parentid'=>1));
         $record = $DB->get_record('context_temp', array());
         $this->assertEquals(5, $record->id);
 

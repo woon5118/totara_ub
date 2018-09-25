@@ -18,10 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author  Simon Coggins <simon.coggins@totaralearning.com>
+ * @author  Petr Skoda <petr.skoda@totaralearning.com>
  * @package totara_core
  */
 
 namespace totara_core;
+
+use totara_reportbuilder\rb\display\duration_hours_minutes;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -354,41 +357,192 @@ EXISTS (
      * most cases you want the full context path.
      *
      * NOTE: this may be extremely slow on large installations
+     *
+     * @param bool $verbose print perf info to output
      */
-    public static function build_context_map() {
+    public static function build_context_map($verbose = false) {
         global $DB;
 
-        // Clear out any contexts that no longer apply.
-        $deletesql = "DELETE FROM {context_map}
-            WHERE NOT EXISTS (
-                SELECT 1
-                    FROM {context} child
-                    JOIN {context} parent
-                         ON parent.id = child.id OR child.path LIKE " . $DB->sql_concat('parent.path', "'/%'") . "
-                   WHERE {context_map}.parentid = parent.id AND {context_map}.childid = child.id
-                )";
-        $DB->execute($deletesql);
+        // NOTE: it is very unlikely there are any extra entries,
+        //       so performance for fast detection only, deleting itself can be slow.
+
+        // We want context stats to be in top shape because it will be used heavily in joins.
+        self::analyze_table('context');
+
+        // Make sure only existing contexts are referenced,
+        // this may happen if context deletion is interrupted.
+        if ($verbose) {
+            echo str_pad(userdate(time(), '%H:%M:%S'), 10) . 'Deleting entries for non-existent contexts' . "\n";
+        }
+        $sql = "SELECT map.id
+                  FROM {context_map} map
+             LEFT JOIN {context} parent ON parent.id = map.parentid
+             LEFT JOIN {context} child ON child.id = map.childid
+                 WHERE child.id IS NULL OR parent.id IS NULL";
+        $start = time();
+        $entries = $DB->get_records_sql($sql);
+        if ($entries) {
+            $entries = array_keys($entries);
+            list($select, $params) = $DB->get_in_or_equal($entries);
+            $DB->delete_records_select('context_map', "id $select", $params);
+        }
+        if ($verbose) {
+            $duration = time()  - $start;
+            $seconds = $duration % 60;
+            $minutes = (int)floor($duration / 60);
+            echo str_pad(userdate(time(), '%H:%M:%S'), 10) . '... done, ' . count($entries) . " deleted, duration $minutes'$seconds\"\n";
+        }
+
+        // Now remove invalid entries using current context paths,
+        // these are most likely result of somebody hacking database tables directly,
+        // so anything found is highly suspicious.
+        if ($verbose) {
+            echo str_pad(userdate(time(), '%H:%M:%S'), 10) . 'Deleting invalid context map entries' . "\n";
+        }
+        $sql = "SELECT map.id
+                  FROM {context_map} map
+                  JOIN {context} child ON child.id = map.childid AND child.path IS NOT NULL
+                  JOIN {context} parent ON parent.id = map.parentid AND parent.path IS NOT NULL
+                 WHERE parent.id <> child.id AND child.path NOT LIKE " . $DB->sql_concat('parent.path', "'/%'");
+        $start = time();
+        $entries = $DB->get_records_sql($sql);
+        if ($entries) {
+            debugging('Incorrect entries detected in context_map table, this is likely a result of unsupported changes in context table.', DEBUG_DEVELOPER);
+            $entries = array_keys($entries);
+            list($select, $params) = $DB->get_in_or_equal($entries);
+            $DB->delete_records_select('context_map', "id $select", $params);
+        }
+        if ($verbose) {
+            $duration = time()  - $start;
+            $seconds = $duration % 60;
+            $minutes = (int)floor($duration / 60);
+            echo str_pad(userdate(time(), '%H:%M:%S'), 10) . '... done, ' . count($entries) . " deleted, duration $minutes'$seconds\"\n";
+        }
 
         // Add missing map entries.
-        self::add_missing_map_entries();
+        self::add_missing_map_entries($verbose);
     }
 
     /**
      * Add missing map entries.
+     *
+     * @param bool $verbose print perf info to output
      */
-    public static function add_missing_map_entries() {
+    public static function add_missing_map_entries($verbose = false) {
         global $DB;
 
-        // Add mappings that don't already exist.
-        $sql = "SELECT parent.id AS parentid, child.id AS childid
-                  FROM {context} child
-                  JOIN {context} parent
-                       ON parent.id = child.id OR child.path LIKE " . $DB->sql_concat('parent.path', "'/%'") . "
-             LEFT JOIN {context_map} map
-                       ON map.parentid = parent.id AND map.childid = child.id
-                 WHERE map.id IS NULL";
+        // Make sure context_map is in the best shape to get lots of additions.
+        self::analyze_table('context_map');
 
-        $DB->execute("INSERT INTO {context_map} (parentid, childid) {$sql}");
+        $syscontextid = SYSCONTEXTID;
+        $maxdepth = (int)$DB->get_field_sql("SELECT MAX(depth) FROM {context}");
+        if ($maxdepth < 2) {
+            // Missing depths and paths, we cannot build the map yet.
+            return;
+        }
+
+        $sqls = array();
+
+        // Deal with system context.
+        $sqls[1] = "INSERT INTO {context_map_temp} (parentid, childid)
+
+                   SELECT {$syscontextid}, child.id
+                     FROM {context} child
+                LEFT JOIN {context_map} map ON map.parentid = {$syscontextid} AND map.childid = child.id
+                    WHERE map.id IS NULL";
+
+        // Add self link.
+        $sqls[2] = "INSERT INTO {context_map_temp} (parentid, childid)
+
+                   SELECT child.id, child.id
+                     FROM {context} child
+                LEFT JOIN {context_map} map ON map.parentid = child.id AND map.childid = child.id
+                    WHERE map.id IS NULL";
+
+        // Now fill each level map for remaining levels top to down.
+        for ($depth = 3; $depth <= $maxdepth; $depth++) {
+            $sqls[$depth] = "INSERT INTO {context_map_temp} (parentid, childid)
+
+                       SELECT parents.parentid, child.id
+                         FROM {context} child
+                         JOIN {context} parent ON parent.id = child.parentid
+                         JOIN {context_map} parents ON parents.childid = parent.id
+                    LEFT JOIN {context_map} map ON map.parentid = parents.parentid AND map.childid = child.id
+                        WHERE child.depth = {$depth} AND map.id IS NULL";
+        }
+
+        $mergesql = "INSERT INTO {context_map} (parentid, childid)
+
+                     SELECT parentid, childid
+                       FROM {context_map_temp}";
+
+        // Create temporary table for insert speedups.
+        $dbman = $DB->get_manager();
+        $temptable = new \xmldb_table('context_map_temp');
+        $temptable->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $temptable->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $temptable->add_field('childid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $temptable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_temp_table($temptable);
+
+        foreach ($sqls as $depth => $sql) {
+            $depthstart = time();
+            if ($verbose) {
+                echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "Checking context depth $depth\n";
+            }
+            $trans = $DB->start_delegated_transaction();
+            if ($verbose) {
+                echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "  finding missing entries\n";
+            }
+            $DB->execute($sql);
+            $insertedcount = $DB->count_records('context_map_temp');
+            if ($insertedcount > 0) {
+                if ($verbose) {
+                    echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "  inserting $insertedcount missing entries\n";
+                }
+                $DB->execute($mergesql);
+                $DB->execute("TRUNCATE TABLE {context_map_temp}");
+            }
+            if ($verbose) {
+                $duration = time()  - $depthstart;
+                $seconds = $duration % 60;
+                $minutes = (int)floor($duration / 60);
+                echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "...done, duration $minutes'$seconds\"\n";
+            }
+            $trans->allow_commit();
+
+            // Force stats update after any large number of inserts.
+            if ($insertedcount > 1000) {
+                self::analyze_table('context_map');
+            }
+        }
+
+        $dbman->drop_table($temptable);
+    }
+
+    /**
+     * Force update of db table statistics to make sure
+     * we get the best performance in complex selects.
+     *
+     * @param string $tablename
+     */
+    protected static function analyze_table($tablename) {
+        global $DB;
+
+        $dbfamily = $DB->get_dbfamily();
+
+        if ($dbfamily === 'postgres') {
+            $DB->execute("ANALYZE {{$tablename}}");
+
+        } else if ($dbfamily === 'mysql') {
+            $DB->execute("ANALYZE TABLE {{$tablename}}");
+
+        } else if ($dbfamily === 'mssql') {
+            $DB->execute("UPDATE STATISTICS {{$tablename}}");
+
+        } else {
+            throw new \coding_exception('Unsupported database family: ' . $dbfamily);
+        }
     }
 
     /**
@@ -418,9 +572,6 @@ EXISTS (
                  )";
         $params = array('path' => $record->path . '/%');
         $DB->execute($sql, $params);
-
-        // Add all entries back.
-        self::add_missing_map_entries();
     }
 
     /**
@@ -448,6 +599,25 @@ EXISTS (
             $records[] = array('parentid' => $parent, 'childid' => $record->id);
         }
         $DB->insert_records('context_map', $records);
+
+        // Add parent id if missing.
+        if (!isset($record->parentid)) {
+            $selfid = array_pop($parents);
+            if ($selfid == SYSCONTEXTID) {
+                return;
+            }
+            if ($selfid != $record->id) {
+                debugging('Invalid context record supplied to \totara_core\access::context_created(), invalid path', DEBUG_DEVELOPER);
+                return;
+            }
+            $parentid = array_pop($parents);
+            if (!$parentid) {
+                debugging('Invalid context record supplied to \totara_core\access::context_created(), malformed path', DEBUG_DEVELOPER);
+                return;
+            }
+            $record->parentid = $parentid;
+            $DB->set_field('context', 'parentid', $parentid, array('id' => $record->id));
+        }
     }
 
     /**
@@ -458,6 +628,9 @@ EXISTS (
      */
     public static function context_deleted($contextid) {
         global $DB;
+
+        // NOTE: all the children of this context should have been already deleted,
+        //       so no need to delete_records via parentid.
 
         $DB->delete_records('context_map', array('childid' => $contextid));
     }

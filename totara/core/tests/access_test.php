@@ -107,6 +107,28 @@ class totara_core_access_testcase extends advanced_testcase {
         totara_core\access::build_context_map();
         $newmap = $DB->get_records('context_map', array(), 'id ASC');;
         $this->assertEquals($prevmap, $newmap);
+
+        // Test that unexpected context tree changes are detected as hacks.
+        $this->assertDebuggingNotCalled();
+        $prehack = new stdClass();
+        $prehack->parentid = $catcontext->id;
+        $prehack->childid = $modcontext->id;
+        $DB->insert_record('context_map', $prehack);
+        totara_core\access::build_context_map();
+        $this->assertDebuggingCalled('Incorrect entries detected in context_map table, this is likely a result of unsupported changes in context table.');
+        $newmap = $DB->get_records('context_map', array(), 'id ASC');;
+        $this->assertEquals($prevmap, $newmap);
+
+        // Make sure the building can be run inside db transaction.
+        $this->assertFalse($DB->is_transaction_started());
+        $trans = $DB->start_delegated_transaction();
+        totara_core\access::build_context_map();
+        $this->assertTrue($DB->is_transaction_started());
+        $newmap = $DB->get_records('context_map', array(), 'id ASC');;
+        $this->assertEquals($prevmap, $newmap);
+        $trans->allow_commit();
+        $newmap = $DB->get_records('context_map', array(), 'id ASC');;
+        $this->assertEquals($prevmap, $newmap);
     }
 
     public function test_get_has_capability_sql() {

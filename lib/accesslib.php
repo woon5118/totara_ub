@@ -4974,6 +4974,11 @@ abstract class context extends stdClass implements IteratorAggregate {
          $record->path         = $rec->ctxpath;     unset($rec->ctxpath);
          $record->depth        = $rec->ctxdepth;    unset($rec->ctxdepth);
 
+         if (!empty($rec->ctxparentid)) {
+             $record->parentid = $rec->ctxparentid;
+         }
+         unset($rec->ctxparentid);
+
          return context::create_instance_from_record($record);
      }
 
@@ -5109,12 +5114,13 @@ abstract class context extends stdClass implements IteratorAggregate {
         if ($dbfamily == 'mysql') {
             $updatesql = "UPDATE {context} ct, {context_temp} temp
                              SET ct.path     = temp.path,
-                                 ct.depth    = temp.depth
+                                 ct.depth    = temp.depth,
+                                 ct.parentid = temp.parentid
                            WHERE ct.id = temp.id";
         } else if ($dbfamily == 'oracle') {
             $updatesql = "UPDATE {context} ct
-                             SET (ct.path, ct.depth) =
-                                 (SELECT temp.path, temp.depth
+                             SET (ct.path, ct.depth, ct.parentid) =
+                                 (SELECT temp.path, temp.depth, temp.parentid
                                     FROM {context_temp} temp
                                    WHERE temp.id=ct.id)
                            WHERE EXISTS (SELECT 'x'
@@ -5123,14 +5129,16 @@ abstract class context extends stdClass implements IteratorAggregate {
         } else if ($dbfamily == 'postgres' or $dbfamily == 'mssql') {
             $updatesql = "UPDATE {context}
                              SET path     = temp.path,
-                                 depth    = temp.depth
+                                 depth    = temp.depth,
+                                 parentid = temp.parentid
                             FROM {context_temp} temp
                            WHERE temp.id={context}.id";
         } else {
             // sqlite and others
             $updatesql = "UPDATE {context}
                              SET path     = (SELECT path FROM {context_temp} WHERE id = {context}.id),
-                                 depth    = (SELECT depth FROM {context_temp} WHERE id = {context}.id)
+                                 depth    = (SELECT depth FROM {context_temp} WHERE id = {context}.id),
+                                 parentid = (SELECT parentid FROM {context_temp} WHERE id = {context}.id)
                              WHERE id IN (SELECT id FROM {context_temp})";
         }
 
@@ -5195,10 +5203,11 @@ abstract class context extends stdClass implements IteratorAggregate {
             $setdepth = ", depth = depth + $diff";
         }
         $sql = "UPDATE {context}
-                   SET path = ?
+                   SET path = ?,
+                       parentid = ?
                        $setdepth
                  WHERE id = ?";
-        $params = array($newpath, $this->_id);
+        $params = array($newpath, $newparent->id, $this->_id);
         $DB->execute($sql, $params);
 
         $this->_path  = $newpath;
@@ -5215,11 +5224,15 @@ abstract class context extends stdClass implements IteratorAggregate {
 
         context::reset_caches();
 
-        // Totara: update our context_map table once contexts have been updated.
+        // Totara: remove afected context_map entries.
         $newrecord = (object)array('id' => $this->id, 'path' => $newpath);
         \totara_core\access::context_moved($newrecord);
 
         $trans->allow_commit();
+
+        // Totara: Add all entries back, this may take a few minutes and it is safe if it gets interrupted,
+        //         so do it after the transaction.
+        \totara_core\access::add_missing_map_entries(false);
     }
 
     /**
@@ -5239,6 +5252,7 @@ abstract class context extends stdClass implements IteratorAggregate {
         if ($this->_contextlevel != CONTEXT_SYSTEM) {
             $DB->set_field('context', 'depth', 0, array('id'=>$this->_id));
             $DB->set_field('context', 'path', NULL, array('id'=>$this->_id));
+            $DB->set_field('context', 'parentid', NULL, array('id'=>$this->_id));
             $this->_depth = 0;
             $this->_path = null;
         }
@@ -5765,19 +5779,26 @@ class context_helper extends context {
      *
      * @static
      * @param bool $force false means add missing only
+     * @param bool $verbose true means print verbose output for performance debugging
      * @return void
      */
-    public static function build_all_paths($force = false) {
+    public static function build_all_paths($force = false, $verbose = false) {
         self::init_levels();
         foreach (self::$alllevels as $classname) {
+            if ($verbose) {
+                echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "Checking context paths for $classname\n";
+            }
             $classname::build_paths($force);
         }
 
         // reset static course cache - it might have incorrect cached data
+        if ($verbose) {
+            echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "Clearing access caches\n";
+        }
         accesslib_clear_all_caches(true);
 
         // Totara: rebuild the map.
-        \totara_core\access::build_context_map();
+        \totara_core\access::build_context_map($verbose);
     }
 
     /**
@@ -5994,6 +6015,7 @@ class context_system extends context {
                 $record->instanceid   = 0;
                 $record->path         = '/'.SYSCONTEXTID;
                 $record->depth        = 1;
+                $record->parentid     = 0;
                 context::$systemcontext = new context_system($record);
             }
             return context::$systemcontext;
@@ -6018,6 +6040,7 @@ class context_system extends context {
             $record->instanceid   = 0;
             $record->depth        = 1;
             $record->path         = null; //not known before insert
+            $record->parentid     = 0;
 
             try {
                 if ($DB->count_records('context')) {
@@ -6043,7 +6066,8 @@ class context_system extends context {
             debugging('Invalid system context detected');
         }
 
-        if ($record->depth != 1 or $record->path != '/'.$record->id) {
+        // Totara: do not verify the parentid here, it would cause notices before upgrade.
+        if ($record->depth != 1 or $record->path !== '/'.$record->id) {
             // fix path if necessary, initial install or path reset
             $record->depth = 1;
             $record->path  = '/'.$record->id;
@@ -6126,10 +6150,11 @@ class context_system extends context {
             debugging('Invalid SYSCONTEXTID detected');
         }
 
-        if ($record->depth != 1 or $record->path != '/'.$record->id) {
+        if ($record->depth != 1 or $record->path !== '/'.$record->id or $record->parentid !== '0') {
             // fix path if necessary, initial install or path reset
             $record->depth    = 1;
             $record->path     = '/'.$record->id;
+            $record->perentid = 0;
             $DB->update_record('context', $record);
         }
     }
@@ -6321,21 +6346,24 @@ class context_user extends context {
     protected static function build_paths($force) {
         global $DB;
 
+        $syscontextid = SYSCONTEXTID;
+
         // First update normal users.
         $path = $DB->sql_concat('?', 'id');
         $pathstart = '/' . SYSCONTEXTID . '/';
         $params = array($pathstart);
 
         if ($force) {
-            $where = "depth <> 2 OR path IS NULL OR path <> ({$path})";
+            $where = "depth <> 2 OR path IS NULL OR path <> ({$path}) OR parentid <> {$syscontextid}";
             $params[] = $pathstart;
         } else {
-            $where = "depth = 0 OR path IS NULL";
+            $where = "depth = 0 OR path IS NULL OR parentid IS NULL";
         }
 
         $sql = "UPDATE {context}
                    SET depth = 2,
-                       path = {$path}
+                       path = {$path},
+                       parentid = {$syscontextid}
                  WHERE contextlevel = " . CONTEXT_USER . "
                    AND ($where)";
         $DB->execute($sql, $params);
@@ -6531,12 +6559,14 @@ class context_coursecat extends context {
     protected static function build_paths($force) {
         global $DB;
 
-        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_COURSECAT." AND (depth = 0 OR path IS NULL)")) {
+        $syscontextid = SYSCONTEXTID;
+
+        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_COURSECAT." AND (depth = 0 OR path IS NULL OR parentid IS NULL)")) {
             if ($force) {
                 $ctxemptyclause = $emptyclause = '';
             } else {
-                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0)";
-                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0)";
+                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0 OR ctx.parentid IS NULL)";
+                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0 OR {context}.parentid IS NULL)";
             }
 
             $base = '/'.SYSCONTEXTID;
@@ -6544,7 +6574,8 @@ class context_coursecat extends context {
             // Normal top level categories
             $sql = "UPDATE {context}
                        SET depth=2,
-                           path=".$DB->sql_concat("'$base/'", 'id')."
+                           path=".$DB->sql_concat("'$base/'", 'id').",
+                           parentid = {$syscontextid}
                      WHERE contextlevel=".CONTEXT_COURSECAT."
                            AND EXISTS (SELECT 'x'
                                          FROM {course_categories} cc
@@ -6555,8 +6586,8 @@ class context_coursecat extends context {
             // Deeper categories - one query per depthlevel
             $maxdepth = $DB->get_field_sql("SELECT MAX(depth) FROM {course_categories}");
             for ($n=2; $n<=$maxdepth; $n++) {
-                $sql = "INSERT INTO {context_temp} (id, path, depth)
-                        SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1
+                $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
+                        SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
                           FROM {context} ctx
                           JOIN {course_categories} cc ON (cc.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_COURSECAT." AND cc.depth = $n)
                           JOIN {context} pctx ON (pctx.instanceid = cc.parent AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
@@ -6757,12 +6788,14 @@ class context_course extends context {
     protected static function build_paths($force) {
         global $DB;
 
-        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_COURSE." AND (depth = 0 OR path IS NULL)")) {
+        $syscontextid = SYSCONTEXTID;
+
+        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_COURSE." AND (depth = 0 OR path IS NULL OR parentid IS NULL)")) {
             if ($force) {
                 $ctxemptyclause = $emptyclause = '';
             } else {
-                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0)";
-                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0)";
+                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0 OR ctx.parentid IS NULL)";
+                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0 OR {context}.parentid IS NULL)";
             }
 
             $base = '/'.SYSCONTEXTID;
@@ -6770,7 +6803,8 @@ class context_course extends context {
             // Standard frontpage
             $sql = "UPDATE {context}
                        SET depth = 2,
-                           path = ".$DB->sql_concat("'$base/'", 'id')."
+                           path = ".$DB->sql_concat("'$base/'", 'id').",
+                           parentid = {$syscontextid}
                      WHERE contextlevel = ".CONTEXT_COURSE."
                            AND EXISTS (SELECT 'x'
                                          FROM {course} c
@@ -6779,8 +6813,8 @@ class context_course extends context {
             $DB->execute($sql);
 
             // standard courses
-            $sql = "INSERT INTO {context_temp} (id, path, depth)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
                       FROM {context} ctx
                       JOIN {course} c ON (c.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_COURSE." AND c.category <> 0)
                       JOIN {context} pctx ON (pctx.instanceid = c.category AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
@@ -6984,12 +7018,20 @@ class context_program extends context {
     protected static function build_paths($force) {
         global $DB;
 
-        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_PROGRAM." AND (depth = 0 OR path IS NULL)")) {
+        // NOTE: work around problems in program contexts for now.
+        $tables = $DB->get_tables('prog');
+        if (!isset($tables['prog'])) {
+            return;
+        }
+
+        $syscontexid = SYSCONTEXTID;
+
+        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_PROGRAM." AND (depth = 0 OR path IS NULL OR parentid IS NULL)")) {
             if ($force) {
                 $ctxemptyclause = $emptyclause = '';
             } else {
-                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0)";
-                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0)";
+                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0 OR ctx.parentid IS NULL)";
+                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0 OR {context}.parentid IS NULL)";
             }
 
             $base = '/'.SYSCONTEXTID;
@@ -6997,7 +7039,8 @@ class context_program extends context {
             // Standard frontpage
             $sql = "UPDATE {context}
                        SET depth = 2,
-                           path = ".$DB->sql_concat("'$base/'", 'id')."
+                           path = ".$DB->sql_concat("'$base/'", 'id').",
+                           parentid = {$syscontexid}
                      WHERE contextlevel = ".CONTEXT_PROGRAM."
                            AND EXISTS (SELECT 'x'
                                          FROM {prog} p
@@ -7006,8 +7049,8 @@ class context_program extends context {
             $DB->execute($sql);
 
             // standard programs
-            $sql = "INSERT INTO {context_temp} (id, path, depth)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
                       FROM {context} ctx
                       JOIN {prog} p ON (p.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_PROGRAM." AND p.category <> 0)
                       JOIN {context} pctx ON (pctx.instanceid = p.category AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
@@ -7241,15 +7284,15 @@ class context_module extends context {
     protected static function build_paths($force) {
         global $DB;
 
-        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_MODULE." AND (depth = 0 OR path IS NULL)")) {
+        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_MODULE." AND (depth = 0 OR path IS NULL OR parentid IS NULL)")) {
             if ($force) {
                 $ctxemptyclause = '';
             } else {
-                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0)";
+                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0 OR ctx.parentid IS NULL)";
             }
 
-            $sql = "INSERT INTO {context_temp} (id, path, depth)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
                       FROM {context} ctx
                       JOIN {course_modules} cm ON (cm.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_MODULE.")
                       JOIN {context} pctx ON (pctx.instanceid = cm.course AND pctx.contextlevel = ".CONTEXT_COURSE.")
@@ -7461,16 +7504,16 @@ class context_block extends context {
     protected static function build_paths($force) {
         global $DB;
 
-        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_BLOCK." AND (depth = 0 OR path IS NULL)")) {
+        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_BLOCK." AND (depth = 0 OR path IS NULL OR parentid IS NULL)")) {
             if ($force) {
                 $ctxemptyclause = '';
             } else {
-                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0)";
+                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0 OR ctx.parentid IS NULL)";
             }
 
             // pctx.path IS NOT NULL prevents fatal problems with broken block instances that point to invalid context parent
-            $sql = "INSERT INTO {context_temp} (id, path, depth)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
                       FROM {context} ctx
                       JOIN {block_instances} bi ON (bi.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_BLOCK.")
                       JOIN {context} pctx ON (pctx.id = bi.parentcontextid)

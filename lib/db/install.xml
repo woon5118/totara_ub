@@ -1011,6 +1011,7 @@
         <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="depth" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"  COMMENT="Used by Totara SQL access code"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -1019,9 +1020,10 @@
         <INDEX NAME="contextlevel-instanceid" UNIQUE="true" FIELDS="contextlevel, instanceid"/>
         <INDEX NAME="instanceid" UNIQUE="false" FIELDS="instanceid"/>
         <INDEX NAME="path" UNIQUE="false" FIELDS="path" HINTS="varchar_pattern_ops"/>
+        <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="context_map" COMMENT="Map context hierarchy into a flat structure to make parent-child queries more efficient">
+    <TABLE NAME="context_map" COMMENT="Map context hierarchy into a flat structure to make parent-child queries in Totara SQL access more efficient">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of parent context"/>
@@ -1039,6 +1041,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This id isn't autonumeric/sequence. It's the context-&gt;id"/>
         <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="depth" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Used by Totara SQL access code"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

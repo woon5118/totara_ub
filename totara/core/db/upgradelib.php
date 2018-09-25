@@ -462,3 +462,56 @@ function totara_core_migrate_bogus_course_backup_areas() {
         totara_core_migrate_bogus_course_backup_area($contextid);
     }
 }
+
+/**
+ * Makes sure that context related tables are up to date.
+ *
+ * NOTE: this must be called before upgrade starts executing.
+ */
+function totara_core_upgrade_context_tables() {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    $updated = false;
+
+    // Add parentid to context table.
+    $table = new xmldb_table('context');
+    $field = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'depth');
+    $index = new xmldb_index('parentid', XMLDB_INDEX_NOTUNIQUE, array('parentid'));
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+        $updated = true;
+    }
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+    // Add parentid to context_temp table.
+    $table = new xmldb_table('context_temp');
+    $field = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'depth');
+    $index = new xmldb_index('parentid', XMLDB_INDEX_NOTUNIQUE, array('parentid'));
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+        $updated = true;
+    }
+
+    // Add context_map table to be used for flattening context tree.
+    $table = new xmldb_table('context_map');
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('childid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+    $table->add_index('parentid_childid_ix', XMLDB_INDEX_UNIQUE, array('parentid', 'childid'));
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
+        $updated = true;
+    }
+
+    if ($updated) {
+        // Add parentid to context and build context_map.
+        $systemcontext = context_system::instance();
+        $systemcontext->mark_dirty();
+        upgrade_set_timeout(7200);
+        \context_helper::build_all_paths(true, false);
+    }
+}

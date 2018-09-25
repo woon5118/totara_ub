@@ -2834,6 +2834,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $oldcontexts = $DB->get_records('context', array(), 'id');
         $DB->set_field_select('context', 'path', null, "contextlevel <> ".CONTEXT_SYSTEM);
         $DB->set_field_select('context', 'depth', 0, "contextlevel <> ".CONTEXT_SYSTEM);
+        $DB->set_field_select('context', 'parentid', null, "contextlevel <> ".CONTEXT_SYSTEM);
         context_helper::build_all_paths();
         $newcontexts = $DB->get_records('context', array(), 'id');
         $this->assertEquals($oldcontexts, $newcontexts);
