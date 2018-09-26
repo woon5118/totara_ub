@@ -425,5 +425,15 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018092101, 'totara', 'core');
     }
 
+    if ($oldversion < 2018092600) {
+        // Removing cachestore plugin incompatible with PHP7.
+        if (!file_exists($CFG->dirroot . '/cache/stores/memcache/settings.php')) {
+            unset_all_config_for_plugin('cachestore_memcache');
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018092600, 'totara', 'core');
+    }
+
     return true;
 }

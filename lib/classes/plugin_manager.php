@@ -1145,7 +1145,7 @@ class core_plugin_manager {
 
             // Totara 12.0 removals.
             'auth_fc', 'auth_imap', 'auth_nntp', 'auth_none', 'auth_pam', 'auth_pop3',
-            'tool_innodb',
+            'tool_innodb', 'cachestore_memcache',
 
             // Totara 10.0 removals.
             'theme_kiwifruitresponsive',
@@ -1260,7 +1260,7 @@ class core_plugin_manager {
             ),
 
             'cachestore' => array(
-                'file', 'memcache', 'memcached', 'mongodb', 'session', 'static', 'apcu', 'redis'
+                'file', 'memcached', 'mongodb', 'session', 'static', 'apcu', 'redis'
             ),
 
             'calendartype' => array(

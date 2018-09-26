@@ -9,6 +9,7 @@ Information provided here is intended especially for developers.
   a coding_exception will be thrown if attempts are made at other times.
   Multiple calls to cache::make with different identifiers will produce 2 caches instead of changing the
   keyspace of a single cache.
+* The memcache store was removed as it is not compatible with PHP 7.0.
 
 === 10 ===
 
