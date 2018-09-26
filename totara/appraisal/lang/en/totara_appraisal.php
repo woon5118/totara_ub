@@ -100,6 +100,7 @@ $string['assignnumusers_help'] = 'Shows the current number of users in the speci
 $string['assignsourcename'] = 'Assigned Group';
 $string['assignnumcompleted'] = '{$a->total} ({$a->completed} completed)';
 $string['backtoappraisal'] = 'Back to appraisal';
+$string['backtoappraisalx'] = '&lt; Back to appraisal: {$a}';
 $string['cancelled'] = 'Cancelled';
 $string['changesnotlive'] = 'Changes within the assigned groups have occurred but are not yet live. Appraisal assignments will be updated on the next cron run';
 $string['changessaved'] = 'Changes saved';

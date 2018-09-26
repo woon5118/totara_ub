@@ -1834,6 +1834,9 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 !$page->is_completed($roleassignment);
         $showcompletestage = $showsaveprogress && ($page->id == end($pages)->id);
         $actions = $this->display_stage_actions_for_pages($showsaveprogress, $showcompletestage, $urlparams);
+        $stagesstr = get_string('backtoappraisalx', 'totara_appraisal', format_string($appraisal->name));
+        $stagesurl = new moodle_url('/totara/appraisal/myappraisal.php', array_merge($urlparams, array('action' => 'stages')));
+        $out .= html_writer::link($stagesurl, $stagesstr);
         $out .= $this->display_stage($appraisal, $activestage, $userassignment, $roleassignment, $actions, $preview);
 
         // Check to see if there are any pages to display.
