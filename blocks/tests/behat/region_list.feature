@@ -113,16 +113,16 @@ Feature: Ensure page layouts are listed correctly
 
     When I click on "Dashboard" in the totara menu
     And I click on "Customise this page" "button"
-    Then "#region-main.editing-region-border" "css_element" should exist
+    Then "#region-main .editing-region-border" "css_element" should exist
     And "#block-region-top.editing-region-border" "css_element" should exist
     And "#block-region-bottom.editing-region-border" "css_element" should exist
     And "#block-region-side-pre.editing-region-border" "css_element" should exist
     And "#block-region-side-post.editing-region-border" "css_element" should exist
     When I click on "Stop customising this page" "button"
-    Then "#region-main.editing-region-border" "css_element" should not exist
+    Then "#region-main .editing-region-border" "css_element" should not exist
 
     # On "Advanced features" page only the left region should have the region border displayed.
     When I navigate to "Advanced features" node in "Site administration"
     And I click on "Blocks editing on" "button"
     Then "#block-region-side-pre.editing-region-border" "css_element" should exist
-    And "#region-main.editing-region-border" "css_element" should not exist
+    And "#region-main .editing-region-border" "css_element" should not exist
