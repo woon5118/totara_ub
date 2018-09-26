@@ -24,4 +24,7 @@
 
 $string['pluginname'] = 'Aiken format';
 $string['pluginname_help'] = 'This is a simple format for importing multiple choice questions from a text file.';
-$string['pluginname_link'] = 'Adding quiz questions#Addingquizquestions-Importsettings';
+$string['pluginname_link'] = 'qformat/aiken';
+$string['questionmissinganswers'] = 'Question must have at least 2 answers on line {$a}';
+$string['questionnotcomplete'] = 'Question not completed before next question start on line {$a}';
+$string['questionnotstarted'] = 'Question not started on line {$a}';
