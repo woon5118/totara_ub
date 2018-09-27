@@ -300,10 +300,6 @@ ul.assetlist {
     float: left;
 }
 
-.ui-dialog [id^='selectassets'][id$='-dialog'] .dialog-footer {
-    margin-top: -2em;
-}
-
 .f2f-ignoreconflicts-checkbox {
     padding: 10px;
 }
