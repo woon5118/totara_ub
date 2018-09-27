@@ -33,8 +33,7 @@ Feature: Specific permissions allow users to manage programs
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
     # Add some users that will have exceptions so we know the Exceptions tab won't be there without the right capabilities.
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
@@ -62,11 +61,9 @@ Feature: Specific permissions allow users to manage programs
 
   Scenario: An authenticated user without any program management permissions can not edit program details
     Given I log in as "authuser"
-    When I click on "Programs" in the totara menu
-    And I follow "Program One"
+    When I am on "Program One" program homepage
     Then "Edit program details" "button" should not exist
-    When I click on "Programs" in the totara menu
-    And I follow "Program Two"
+    When I am on "Program Two" program homepage
     Then "Edit program details" "button" should not exist
 
   Scenario: totara/program:configuredetails allows a user to edit program details
@@ -74,8 +71,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                       | permission | role          | contextlevel | reference |
       | totara/program:configuredetails  | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     Then "Edit program details" "button" should be visible
     When I press "Edit program details"
     Then I should not see "Edit program content"
@@ -89,8 +85,7 @@ Feature: Specific permissions allow users to manage programs
     And I press "Save changes"
     Then I should see "Program details saved successfully"
     And I should see "Program One New Name"
-    When I click on "Programs" in the totara menu
-    And I follow "Program Two"
+    When I am on "Program Two" program homepage
     Then "Edit program details" "button" should not exist
 
   Scenario: totara/program:configurecontent allows a user to edit program content
@@ -98,8 +93,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                       | permission | role          | contextlevel | reference |
       | totara/program:configurecontent  | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     Then "Edit program details" "button" should not exist
     And "Edit program assignments" "button" should not exist
@@ -122,8 +116,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                           | permission | role          | contextlevel | reference |
       | totara/program:configuremessages     | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     Then "Edit program details" "button" should not exist
     And "Edit program assignments" "button" should not exist
@@ -144,8 +137,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                           | permission | role          | contextlevel | reference |
       | totara/program:configureassignments  | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     Then "Edit program details" "button" should not exist
     And "Edit program content" "button" should not exist
@@ -167,8 +159,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                           | permission | role          | contextlevel | reference |
       | totara/program:configureassignments  | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     When I press "Edit program assignments"
     And I click on "Set due date" "link" in the "John Smith" "table_row"
@@ -189,8 +180,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                       | permission | role          | contextlevel | reference |
       | totara/program:handleexceptions  | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     Then "Edit program details" "button" should not exist
     And "Edit program content" "button" should not exist
@@ -213,8 +203,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                                  | permission | role          | contextlevel | reference |
       | totara/certification:configurecertification | Allow      | progmanager   | Program      | cert1     |
     And I log in as "progman"
-    And I click on "Certifications" in the totara menu
-    And I follow "Certification One"
+    And I am on "Certification One" certification homepage
     And I press "Edit certification details"
     Then "Edit program details" "button" should not exist
     And "Edit program content" "button" should not exist
@@ -229,8 +218,7 @@ Feature: Specific permissions allow users to manage programs
     # or this test isn't making the right checks, so make sure the buttons we looked for do exist, when all permissions are there.
     When I log out
     And I log in as "admin"
-    And I click on "Certifications" in the totara menu
-    And I follow "Certification One"
+    And I am on "Certification One" certification homepage
     And I press "Edit certification details"
     Then "Edit program details" "button" should be visible
     And "Edit program content" "button" should be visible
@@ -243,15 +231,13 @@ Feature: Specific permissions allow users to manage programs
       | capability                                  | permission | role          | contextlevel | reference |
       | totara/certification:configurecertification | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     Then "Edit program details" "button" should not exist
     # Enable another capability so that they can get to the overview page and we can check there is no certification link.
     When the following "permission overrides" exist:
       | capability                       | permission | role          | contextlevel | reference |
       | totara/program:configuredetails  | Allow      | progmanager   | Program      | prog1     |
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     Then "Edit program content" "button" should not exist
     And "Edit program messages" "button" should not exist
@@ -265,8 +251,7 @@ Feature: Specific permissions allow users to manage programs
       | capability                       | permission | role          | contextlevel | reference |
       | totara/program:editcompletion    | Allow      | progmanager   | Program      | prog1     |
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     Then "Edit program details" "button" should not exist
     And "Edit program content" "button" should not exist
@@ -287,15 +272,13 @@ Feature: Specific permissions allow users to manage programs
       | enableprogramcompletioneditor | 0 |
     And I log out
     And I log in as "progman"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     Then "Edit program details" "button" should not exist
     # Enable another capability so that they can get to the overview page and we can check there is no completion link.
     When the following "permission overrides" exist:
       | capability                       | permission | role          | contextlevel | reference |
       | totara/program:configuredetails  | Allow      | progmanager   | Program      | prog1     |
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     Then "Edit program content" "button" should not exist
     And "Edit program messages" "button" should not exist

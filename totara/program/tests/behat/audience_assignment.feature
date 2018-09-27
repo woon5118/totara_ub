@@ -31,8 +31,7 @@ Feature: Check user view capability for audiences in the assignments tab
   Scenario: Test Audience assignment dialog is showing audiences the user is allowed to
 #    catmgr should see Audience2 in the audience dialog of Category1 Permission Test program.
     Given I log in as "catmgr"
-    And I click on "Programs" in the totara menu
-    And I click on "Category1 Permission Test" "link"
+    And I am on "Category1 Permission Test" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
     And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
@@ -68,8 +67,7 @@ Feature: Check user view capability for audiences in the assignments tab
     And I log out
 
     When I log in as "catmgr"
-    And I click on "Programs" in the totara menu
-    And I click on "Category1 Permission Test" "link"
+    And I am on "Category1 Permission Test" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
     And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
@@ -104,8 +102,7 @@ Feature: Check user view capability for audiences in the assignments tab
     And I log out
 
     And I log in as "catmgr"
-    And I click on "Programs" in the totara menu
-    And I click on "Category1 Permission Test" "link"
+    And I am on "Category1 Permission Test" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
     Then I should see "Audience1" in the "#assignment_categories" "css_element"

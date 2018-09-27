@@ -25,10 +25,7 @@ Feature: Test competencies achieved is updated
 
   Scenario: Add a choice activity and complete the activity as a user
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "An Unexpected Journey" "link"
-    And I turn editing mode on
+    And I am on "An Unexpected Journey" course homepage with editing mode on
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name         | Help to Gandalf the Grey                          |
       | Description         | The wizard, member of the Istari order            |

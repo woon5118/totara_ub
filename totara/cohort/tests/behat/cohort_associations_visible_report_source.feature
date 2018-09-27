@@ -50,9 +50,7 @@ Feature: Test the cohort association visibility report source.
     And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"
     And I click on "Save changes" "button"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course #1"
+    Given I am on "Course #1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I click on "Enrolled users and members of the selected audiences" "option" in the "#id_audiencevisible" "css_element"
     And I click on "Add visible audiences" "button"

@@ -30,9 +30,7 @@ Feature: Seminar Signup Role Approval after creating an event
   @javascript
   Scenario: Learner is trying to sing-up when there is approval role and no trainer appointed.
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -44,9 +42,7 @@ Feature: Seminar Signup Role Approval after creating an event
     And I press "Save changes"
     And I click on "s__facetoface_approvaloptions[approval_role_3]" "checkbox"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Approval Options" "link"
@@ -55,17 +51,13 @@ Feature: Seminar Signup Role Approval after creating an event
     And I log out
 
     When I log in as "sally"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "Sign-up"
     Then I should see "This seminar requires role approval, there are no users assigned to this role. Please contact the site administrator"
     And I log out
 
     When I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     And I click on "Edit event" "link"
     And I click on "Freddy Fred" "checkbox" in the "#id_trainerroles" "css_element"
@@ -74,9 +66,7 @@ Feature: Seminar Signup Role Approval after creating an event
     And I log out
 
     When I log in as "sally"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     Then I should see "Editing Trainer"

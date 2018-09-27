@@ -414,8 +414,7 @@ Feature: Users assignments to a program
   @javascript
   Scenario: Site manager at category context can see emails when assigning individuals
     Given I log in as "catmgr"
-    And I click on "Programs" in the totara menu
-    And I click on "Category Permission Test" "link"
+    And I am on "Category Permission Test" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
     And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
@@ -434,8 +433,7 @@ Feature: Users assignments to a program
   @javascript
   Scenario: Assignments can not be updated after program end date
     Given I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I click on "Assignment Program Tests" "link"
+    And I am on "Assignment Program Tests" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
     And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"

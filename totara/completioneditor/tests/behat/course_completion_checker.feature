@@ -26,8 +26,7 @@ Feature: The course completion checker is functioning
     And I should see "Problem records: 0"
 
   Scenario: Completion checker link in course completion editor works
-    When I click on "Courses" in the totara menu
-    And I click on "Course One" "link"
+    When I am on "Course One" course homepage
     And I navigate to "Completion editor" node in "Course administration"
     And I click on "Check course completions" "link"
     Then I should see "Completion records with problems"

@@ -63,9 +63,7 @@ Feature: Ensure progress is shown in Record of Learning
     When I log in as "admin"
 
     # Set course completion criteria
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Label - course1 label1" to "1"
@@ -73,9 +71,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I set the field "Label - course1 label3" to "1"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Label - course2 label1" to "1"
@@ -83,9 +79,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I set the field "Label - course2 label3" to "1"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Label - course3 label1" to "1"
@@ -93,9 +87,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I set the field "Label - course3 label3" to "1"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 4"
+    And I am on "Course 4" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Label - course4 label1" to "1"
@@ -103,9 +95,7 @@ Feature: Ensure progress is shown in Record of Learning
     And I set the field "Label - course4 label3" to "1"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 5"
+    And I am on "Course 5" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Label - course5 label1" to "1"
@@ -118,9 +108,7 @@ Feature: Ensure progress is shown in Record of Learning
     # Complete some activities to get different progress
     When I log in as "learner1"
     # course1 - 100%
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: course1 label1. Select to mark as complete." "link"
     And I click on "Not completed: course1 label2. Select to mark as complete." "link"
     And I click on "Not completed: course1 label3. Select to mark as complete." "link"
@@ -129,30 +117,22 @@ Feature: Ensure progress is shown in Record of Learning
     And I should see "Completed: course1 label3. Select to mark as not complete."
 
     # course2 - 33%
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I click on "Not completed: course2 label1. Select to mark as complete." "link"
     Then I should see "Completed: course2 label1. Select to mark as not complete."
 
     # course3 - 66%
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    When I am on "Course 3" course homepage
     And I click on "Not completed: course3 label1. Select to mark as complete." "link"
     And I click on "Not completed: course3 label2. Select to mark as complete." "link"
     Then I should see "Completed: course3 label1. Select to mark as not complete."
     And I should see "Completed: course3 label2. Select to mark as not complete."
 
     # course4 - 0%
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 4"
+    When I am on "Course 4" course homepage
 
     # course5 - 33%
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 5"
+    When I am on "Course 5" course homepage
     And I click on "Not completed: course5 label1. Select to mark as complete." "link"
     Then I should see "Completed: course5 label1. Select to mark as not complete."
     And I log out

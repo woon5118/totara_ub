@@ -36,8 +36,7 @@ Feature: Deferred assignments task for programs
 
   Scenario: Deferred assignments task assigns users when their position has been added
     Given I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Positions" from the "Add a new" singleselect
@@ -57,8 +56,7 @@ Feature: Deferred assignments task for programs
     And I press "Update job assignment"
     And I log out
     And I log in as "user001"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     # The task has not been run since the position was updated, so won't be assigned yet.
     Then I should not see "Hold position of 'Position One'"
     When I run the scheduled task "\totara_program\task\assignments_deferred_task"
@@ -67,8 +65,7 @@ Feature: Deferred assignments task for programs
 
   Scenario: Deferred assignments task assigns users when their organisation has been added
     Given I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Organisations" from the "Add a new" singleselect
@@ -88,8 +85,7 @@ Feature: Deferred assignments task for programs
     And I press "Update job assignment"
     And I log out
     And I log in as "user001"
-    And I click on "Programs" in the totara menu
-    And I follow "Program One"
+    And I am on "Program One" program homepage
     # The task has not been run since the position was updated, so won't be assigned yet.
     Then I should not see "Member of organisation 'Organisation One'"
     When I run the scheduled task "\totara_program\task\assignments_deferred_task"

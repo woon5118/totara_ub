@@ -20,9 +20,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
 
   Scenario: Verify that "moodle/course:viewsuspendedusers" capability is necessary to see suspended users in the list of enrolment candidates
     When I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I wait "2" seconds
     When I click on "Enrol users" "button"
@@ -36,9 +34,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     And I log out
     # Check if the teacher can see the suspended users.
     When I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     When I click on "Enrol users" "button"
     Then I should see "James First" in the ".user-enroller-panel" "css_element"
@@ -55,9 +51,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     And I log out
     # Check if the teacher still can see the suspended users.
     When I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     When I click on "Enrol users" "button"
     Then I should see "James First" in the ".user-enroller-panel" "css_element"

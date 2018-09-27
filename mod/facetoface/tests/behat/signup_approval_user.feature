@@ -33,18 +33,14 @@ Feature: Seminar Signup User Approval
 
   @javascript
   Scenario: Student gets approved through manager approval by "learner" role
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 9360"
+    And I am on "Course 9360" course homepage
     And I follow "Seminar 9360"
     And I follow "Add a new event"
     And I press "Save changes"
     And I log out
 
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 9360"
+    And I am on "Course 9360" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager Approval"

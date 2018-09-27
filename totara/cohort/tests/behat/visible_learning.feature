@@ -46,9 +46,7 @@ Feature: Assign visible learning to cohort
   @javascript
   Scenario: Edit course visibility for a particular course
     Given I am on homepage
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Edit settings"
     And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
     And I click on "Add visible audiences" "button"

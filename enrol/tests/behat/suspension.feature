@@ -55,8 +55,7 @@ Feature: Suspend enrolled course users
 
     # No cron job is required in this case
     When I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
 
   @totara_cohort
@@ -97,8 +96,7 @@ Feature: Suspend enrolled course users
 
     # No cron job is required in this case
     When I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
 
   @totara_cohort
@@ -154,8 +152,7 @@ Feature: Suspend enrolled course users
 
     # No cron job is required in this case as updating of the cohort rules triggers the neccessary updates
     When I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
 
   @totara_cohort
@@ -207,15 +204,13 @@ Feature: Suspend enrolled course users
 
     # User can still access the course until the cron is run
     When I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Topic 1"
     And I log out
 
     # Now run the cron task
     When I run the scheduled task "\enrol_cohort\task\sync_members"
     And I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
 

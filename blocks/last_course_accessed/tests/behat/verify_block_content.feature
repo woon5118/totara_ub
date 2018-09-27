@@ -24,9 +24,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I should not see "Last Course Accessed"
 
     # Visit the course
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
@@ -35,9 +33,7 @@ Feature: Verify the LCA block content displays the correct information.
     # The admin should not see a progress bar as they're not enrolled on the course.
     And I should see "Not tracked" in the "Last Course Accessed" "block"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
@@ -72,9 +68,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I should not see "Last Course Accessed"
 
     # Visit the course.
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
@@ -83,9 +77,7 @@ Feature: Verify the LCA block content displays the correct information.
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "No criteria" in the "Last Course Accessed" "block"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
@@ -94,9 +86,7 @@ Feature: Verify the LCA block content displays the correct information.
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "0%" in the "Last Course Accessed" "block"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
     And I follow "Test Page"
     When I click on "Dashboard" in the totara menu
@@ -139,9 +129,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I press "Save changes"
 
     # Visit the course.
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
     # Add a forum post.
@@ -203,9 +191,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     # Login as admin so we can unenrol the learner.
     When I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     Then I should see "C3" in the ".breadcrumb-nav" "css_element"
 
     # Unenrol the learner from Course 3.
@@ -223,9 +209,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     # Login as admin so we can unenrol the learner from Course 2.
     When I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
     # Unenrol the learner from Course 2.

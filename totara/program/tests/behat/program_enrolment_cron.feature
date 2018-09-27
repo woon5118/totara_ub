@@ -53,8 +53,7 @@ Feature: Enrolment plugin cron tasks
 
     # Using program assignment through Organisation for all cases
     And I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Organisations" from the "Add a new" singleselect
@@ -107,11 +106,9 @@ Feature: Enrolment plugin cron tasks
     And I run the scheduled task "\totara_program\task\user_assignments_task"
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -170,11 +167,9 @@ Feature: Enrolment plugin cron tasks
     And I run the scheduled task "\totara_program\task\user_assignments_task"
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -233,11 +228,9 @@ Feature: Enrolment plugin cron tasks
     And I run the scheduled task "\totara_program\task\clean_enrolment_plugins_task"
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 

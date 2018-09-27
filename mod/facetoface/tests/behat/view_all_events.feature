@@ -108,9 +108,7 @@ Feature: Check previous and upcomings sections are right populated
 
   Scenario: Check upcoming and previous events are displayed accordingly
     Given I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "Event in progress" in the ".upcomingsessionlist" "css_element"
     And I should see "1 January 2020" in the ".upcomingsessionlist" "css_element"
@@ -132,9 +130,7 @@ Feature: Check previous and upcomings sections are right populated
 
     # Change sign up for multiple events setting.
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I navigate to "Edit settings" in current page administration
     And I set the field "Users can sign-up to multiple events" to "0"
@@ -142,9 +138,7 @@ Feature: Check previous and upcomings sections are right populated
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "1 January 2020"
     And I should not see "1 January 1999"
     And I should not see "Event in progress"

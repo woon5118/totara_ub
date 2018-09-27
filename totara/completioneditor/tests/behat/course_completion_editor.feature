@@ -19,8 +19,7 @@ Feature: The current course completion record can be edited
 
   Scenario: The current course completion record can be edited when the user is assigned
     # Completion editor list of users.
-    When I click on "Courses" in the totara menu
-    And I click on "Course One" "link"
+    When I am on "Course One" course homepage
     And I navigate to "Completion editor" node in "Course administration"
     Then I should see "FirstName1 LastName1"
 
@@ -161,8 +160,7 @@ Feature: The current course completion record can be edited
     And "RPL Grade (%)" "field" should not exist
 
   Scenario: The current course completion record cannot be edited when the user is not assigned
-    When I click on "Courses" in the totara menu
-    And I click on "Course One" "link"
+    When I am on "Course One" course homepage
     And I navigate to "Completion editor" node in "Course administration"
     Then I should not see "FirstName2"
     # Should check that the correct stuff is displayed when the user's completion is edited, but how?

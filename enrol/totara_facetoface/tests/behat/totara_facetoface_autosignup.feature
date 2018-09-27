@@ -66,17 +66,13 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
       | Automatically sign users up to seminar events |                      1 |
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Sign-up" "link_or_button"
     Then I should see "Your booking has been completed and you have been enrolled on 2 event(s)."
 
@@ -93,18 +89,14 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I click on "Delete" "link" in the "Select room" "table_row"
     And I press "Save changes"
     And I follow "Course 1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name  | Test student enrolment |
       | Default assigned role | Learner                |
     And I log out
 
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Course 1"
     And I click on "Join waitlist" "link_or_button"
     And I click on "Sign-up" "link_or_button"
@@ -166,16 +158,12 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
       | Automatically sign users up to seminar events |                      1 |
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Sign-up" "link_or_button"
     Then I should see "Your request was sent to your manager for approval."

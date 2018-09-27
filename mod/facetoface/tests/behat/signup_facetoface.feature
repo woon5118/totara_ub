@@ -71,9 +71,7 @@ Feature: Sign up to a seminar
 
     # Signing up for an event as a student.
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     When I follow "Sign-up"
     Then I should see "English content"
@@ -86,9 +84,7 @@ Feature: Sign up to a seminar
 
     # As the trainer confirm I can see the details of the signup.
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
     And "Sam1 Student1" row "English content" column of "facetoface_sessions" table should contain "Sample value"
@@ -101,9 +97,7 @@ Feature: Sign up to a seminar
 
   Scenario: Sign up to a session and unable to sign up to a full session from the course page
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I press "Sign-up"
@@ -113,16 +107,12 @@ Feature: Sign up to a seminar
     And I should not see "All events in Test seminar name"
     And I log out
     And I log in as "student2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should not see "Sign-up"
 
   Scenario: Sign up to a session and unable to sign up to a full session for within the activity
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Test seminar name"
     And I follow "Test seminar name"
     And I should see "Sign-up"
@@ -134,16 +124,12 @@ Feature: Sign up to a seminar
     And I should see "All events in Test seminar name"
     And I log out
     And I log in as "student2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should not see "Sign-up"
 
   Scenario: Sign up with note and manage it by Editing Teacher
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I set the following fields to these values:
@@ -153,9 +139,7 @@ Feature: Sign up to a seminar
     And I log out
 
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Attendees"
     When I click on "Edit" "link" in the "Sam1" "table_row"
     Then I should see "Sam1 Student1 - update note"
@@ -163,9 +147,7 @@ Feature: Sign up to a seminar
   @totara_customfield
   Scenario: Sign up with note and ensure that other reports do not have manage button
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I set the following fields to these values:
@@ -386,9 +368,7 @@ Feature: Sign up to a seminar
     And I should see "leaves-green.png"
 
     # As the user signup.
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I set the following fields to these values:
@@ -421,9 +401,7 @@ Feature: Sign up to a seminar
     # As the trainer confirm I can see the details of the signup.
     When I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
     Then "Sam1 Student1" row "Signup URL" column of "facetoface_sessions" table should contain "http://example.org"
@@ -437,9 +415,7 @@ Feature: Sign up to a seminar
 
     When I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Cancel booking"
     And I set the following fields to these values:
@@ -469,9 +445,7 @@ Feature: Sign up to a seminar
 
     When I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
     And I follow "Cancellations"
@@ -524,9 +498,7 @@ Feature: Sign up to a seminar
 
     When I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
     And I set the field "menuf2f-actions" to "Add users"

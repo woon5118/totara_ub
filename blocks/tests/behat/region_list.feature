@@ -41,12 +41,9 @@ Feature: Ensure page layouts are listed correctly
 
   Scenario: Ensure editing a block in a course lists the course layout options
     Given the following "courses" exist:
-      | name     | shortname |
+      | fullname | shortname |
       | course 1 | c1        |
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "course 1" course homepage with editing mode on
     And I configure the "Navigation" block
     And I expand all fieldsets
     Then the "Default region" select box should contain "Left"
@@ -62,12 +59,9 @@ Feature: Ensure page layouts are listed correctly
 
   Scenario: Ensure editing a block in an activity lists the activity layout options
     Given the following "courses" exist:
-      | name     | shortname |
+      | fullname | shortname |
       | course 1 | c1        |
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "course 1" course homepage with editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | name | My forum |
     And I click on "My forum" "link"

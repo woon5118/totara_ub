@@ -78,9 +78,7 @@ Feature: Check attendees actions are performed by users with the right permissio
 
   Scenario: Check trainer actions on attendees page
     Given I log in as "trainer1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     When I click on "Attendees" "link"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
@@ -95,9 +93,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability                       | permission | role           | contextlevel | reference |
       | mod/facetoface:takeattendance    | Prohibit   | editingteacher | Course       |        C1 |
     When I log in as "trainer1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
@@ -117,9 +113,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability                       | permission | role           | contextlevel | reference |
       | mod/facetoface:viewcancellations | Prohibit   | editingteacher | Course       |        C1 |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
@@ -130,9 +124,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I press "Confirm"
     And I log out
     When I log in as "trainer1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
@@ -149,9 +141,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability                    | permission | role           | contextlevel | reference |
       | mod/facetoface:viewattendees  | Prohibit   | editingteacher | Course       |        C1 |
     When I log in as "trainer1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     Then "Attendees" "link" should not exist
     When I visit the attendees page for session "1" with action "takeattendance"
@@ -196,9 +186,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Sign-up"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
@@ -221,7 +209,5 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Cancel booking"

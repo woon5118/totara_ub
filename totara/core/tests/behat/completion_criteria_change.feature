@@ -34,10 +34,7 @@ Feature: Test reaggregating completion data when changing course completion sett
     | user3 | C3     | student |
     # Create Courses 1 Assignment 1.
     Then I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I press "Turn editing on"
+    And I am on "Course 1" course homepage with editing mode on
     And I wait until the page is ready
     And I add a "Assignment" to section "1" and I fill the form with:
     | Assignment name | Assignment 1             |
@@ -51,9 +48,7 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I click on "criteria_self_value" "checkbox"
     And I press "Save changes"
     # Create Course 2 Assignment 2.
-    Then I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    Then I am on "Course 2" course homepage
     And I wait until the page is ready
     And I add a "Assignment" to section "1" and I fill the form with:
     | Assignment name | Assignment 2             |
@@ -67,9 +62,7 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I click on "criteria_self_value" "checkbox"
     And I press "Save changes"
     # Create Course 3 Assignment 3.
-    Then I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    Then I am on "Course 3" course homepage
     And I wait until the page is ready
     And I add a "Assignment" to section "1" and I fill the form with:
     | Assignment name | Assignment 3             |
@@ -83,23 +76,17 @@ Feature: Test reaggregating completion data when changing course completion sett
     # Complete all three courses as user1.
     Then I log out
     And I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Assignment 1. Select to mark as complete." "link"
     And I click on "Complete course" "link"
     And I press "Yes"
     And I should see "You have already completed this course"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I click on "Not completed: Assignment 2. Select to mark as complete." "link"
     And I click on "Complete course" "link"
     And I press "Yes"
     And I should see "You have already completed this course"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     And I click on "Not completed: Assignment 3. Select to mark as complete." "link"
     # Confirm the status of the courses for user1.
     And I click on "Record of Learning" in the totara menu
@@ -111,17 +98,11 @@ Feature: Test reaggregating completion data when changing course completion sett
     # Complete all three assignments (but not manual self completion) as user2.
     Then I log out
     And I log in as "user2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Assignment 1. Select to mark as complete." "link"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I click on "Not completed: Assignment 2. Select to mark as complete." "link"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     And I click on "Not completed: Assignment 3. Select to mark as complete." "link"
     # Confirm the status of the courses for user2.
     When I click on "Record of Learning" in the totara menu
@@ -133,15 +114,11 @@ Feature: Test reaggregating completion data when changing course completion sett
     # Complete manual self completion (but not assignments) as user3.
     Then I log out
     And I log in as "user3"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Complete course" "link"
     And I press "Yes"
     And I should see "You have already marked yourself as complete in this course"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I click on "Complete course" "link"
     And I press "Yes"
     And I should see "You have already marked yourself as complete in this course"
@@ -156,24 +133,18 @@ Feature: Test reaggregating completion data when changing course completion sett
     # For course 1, unlock with delete and remove Manual self completion. Assignment completion will reaggregate.
     Then I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    Then I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria and delete existing completion data"
     And I click on "criteria_self_value" "checkbox"
     And I press "Save changes"
     # For course 2, just unlock with delete and save again. Manual self completion data will be lost.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria and delete existing completion data"
     And I press "Save changes"
     # For course 3, unlock without delete, remove assignment and add Manual self completion. Previous completions are kept.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria without deleting"
     And I click on "Assignment 3" "checkbox"

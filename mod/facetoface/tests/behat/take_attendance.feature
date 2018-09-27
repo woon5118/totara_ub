@@ -81,9 +81,7 @@ Feature: Take attendance for seminar sessions
 
   Scenario: Set attendance for individual users
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I click on "Take attendance" "link"
@@ -102,9 +100,7 @@ Feature: Take attendance for seminar sessions
 
   Scenario: Set attendance in bulk
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I click on "Take attendance" "link"

@@ -13,10 +13,7 @@ Feature: Adding a new seminar's notification
   @javascript
   Scenario: I add the seminar and the notification to the course
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Seminar 1             |
       | Description | This is description   |

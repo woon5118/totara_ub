@@ -69,9 +69,7 @@ Feature: Seminar Signup Self Approval
     And I press "Save changes"
 
   Scenario: Student signs up and self approves
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    When I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     And I follow "Edit settings"
     And I expand all fieldsets
@@ -82,9 +80,7 @@ Feature: Seminar Signup Self Approval
     And I press "Save and display"
     And I log out
     And I log in as "jimmy"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     Then I should see "Self authorisation"

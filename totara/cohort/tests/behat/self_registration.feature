@@ -342,9 +342,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     Then I should see "An email should have been sent to your address at selfie002@example.com"
     # Create and confirm initial audience enrolments for courses.
     When I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I click on "Add enrolled audiences" "button"
     And I click on "Username - manual" "link"
@@ -361,9 +359,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "fname003 lname003" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I click on "Add enrolled audiences" "button"
     And I click on "Username - selfie" "link"
@@ -376,9 +372,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "fname003 lname003" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    When I am on "Course 3" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I click on "Add enrolled audiences" "button"
     And I click on "City - Wellington" "link"
@@ -407,9 +401,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
 
     # Check course enrolments for user 1 (but not user 2) as admin
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should see "fnameman lnameman" in the "userenrolment" "table"
     And I should see "fname001 lname001" in the "userenrolment" "table"
@@ -417,9 +409,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "fname003 lname003" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should not see "fnameman lnameman" in the "userenrolment" "table"
     And I should not see "fname001 lname001" in the "userenrolment" "table"
@@ -427,9 +417,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "fname003 lname003" in the "userenrolment" "table"
     And I should see "Selfie ZeroZeroOne" in the "userenrolment" "table"
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    When I am on "Course 3" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should not see "fnameman lnameman" in the "userenrolment" "table"
     And I should see "fname001 lname001" in the "userenrolment" "table"

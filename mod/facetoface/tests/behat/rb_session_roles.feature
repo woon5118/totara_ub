@@ -111,9 +111,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the field "All users can view this report" to "1"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -227,9 +225,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Save changes"
 
     # Course 1 setup
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -287,9 +283,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Confirm"
 
     # Course 2 setup
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"

@@ -76,9 +76,7 @@ Feature: Add seminar attendess from csv file with custom fields
       | Short name (must be unique) | url           |
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"
@@ -118,9 +116,7 @@ Feature: Add seminar attendess from csv file with custom fields
   @_file_upload
   Scenario: Invalid CSV format, where header and colums are missed
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"
@@ -134,9 +130,7 @@ Feature: Add seminar attendess from csv file with custom fields
   @_file_upload
   Scenario: Invalid CSV format, one of the custom field values is missed
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I press "Save changes"

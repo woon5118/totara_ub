@@ -13,7 +13,6 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
       | fullname | shortname  | enablecompletion |
       | Course 1 | Course 1   | 1                |
     And I log in as "admin"
-    And I click on "Courses" in the totara menu
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Page" to section "1" and I fill the form with:
       | Name                | Page One                                          |
@@ -42,8 +41,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 0 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -65,8 +63,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 0 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -88,8 +85,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -111,8 +107,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -134,8 +129,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -153,8 +147,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 0 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -171,8 +164,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 0 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -189,8 +181,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -207,8 +198,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -235,8 +225,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 0 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"
@@ -260,8 +249,7 @@ Feature: Check visibility of courses in Record of Learning for unenrolled users
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I click on "Unenrol" "link" in the "Joe Bloggs" "table_row"
     And I press "Continue"

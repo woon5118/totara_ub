@@ -16,8 +16,8 @@ Feature: Check to see that programs with only a single course are displayed as e
     And I set the following administration settings values:
       | menulifetime | 0 |
     And I set self completion for "Course 1" in the "Miscellaneous" category
-    And I click on "Programs" in the totara menu
-    And I press "Create Program"
+    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I press "Add a new program"
     And I set the following fields to these values:
       | Full name  | Test Single Course Program |
       | Short name | testsinglecourseprog       |

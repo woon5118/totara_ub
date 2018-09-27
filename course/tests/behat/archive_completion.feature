@@ -61,8 +61,7 @@ Feature: Test we can manually archive course completion.
     And I expand all fieldsets
     And I click on "criteria_self_value" "checkbox"
     And I press "Save changes"
-    And I click on "Programs" in the totara menu
-    And I click on "Completion archive test" "link"
+    And I am on "Completion archive test" program homepage
     And I click on "Edit program details" "button"
     And I click on "Content" "link"
     And I click on "addcontent_ce" "button" in the "#edit-program-content" "css_element"
@@ -73,8 +72,7 @@ Feature: Test we can manually archive course completion.
     And I click on "Save all changes" "button"
     And I log out
     And I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I click on "Complete course" "link"
     And I press "Yes"
     And I log out

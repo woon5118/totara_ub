@@ -523,15 +523,13 @@ Feature: Users completion of programs and coursesets
       | Short name    | testcustomscore |
     And I press "Save changes"
 
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
     And I set the field "testcustomscore" to "10"
     And I press "Save and display"
 
-    And I click on "Courses" in the totara menu
-    And I click on "Course 2" "link"
+    And I am on "Course 2" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
     And I set the field "testcustomscore" to "10"

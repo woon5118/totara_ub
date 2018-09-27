@@ -24,10 +24,7 @@ Feature: Test progress bar percentange is displayed according to criteria comple
     | user3 | C1     | student |
 #     Create Courses 1 Assignment 1.
     Then I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
-    And I press "Turn editing on"
+    And I am on "Course 1" course homepage with editing mode on
     And I wait until the page is ready
     And I add a "Certificate" to section "1" and I fill the form with:
     | Name                | Certificate 1 |
@@ -47,9 +44,7 @@ Feature: Test progress bar percentange is displayed according to criteria comple
     # Complete Certificate 1 as user 1 but don't access Certificate 2.
     Then I log out
     And I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Certificate 1"
     # Confirm the status of the courses for user1.
     And I click on "Record of Learning" in the totara menu
@@ -59,9 +54,7 @@ Feature: Test progress bar percentange is displayed according to criteria comple
     # Complete Certificate 2 as user 2 but don't access Certificate 1.
     Then I log out
     And I log in as "user2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Certificate 2"
     # Confirm the status of the courses for user1.
     And I click on "Record of Learning" in the totara menu

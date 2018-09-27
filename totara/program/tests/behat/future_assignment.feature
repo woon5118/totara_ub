@@ -29,8 +29,7 @@ Feature: User assignments with due date base on first login
     Given I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I click on "Programs" in the totara menu
-    And I click on "Assignment Program Tests" "link"
+    And I am on "Assignment Program Tests" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
 
@@ -103,8 +102,7 @@ Feature: User assignments with due date base on first login
 
     When I log out
     And I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I click on "Assignment Program Tests" "link"
+    And I am on "Assignment Program Tests" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
     Then I should see "Complete within 4 Week(s) of First login"
@@ -130,8 +128,7 @@ Feature: User assignments with due date base on first login
     Given I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I click on "Programs" in the totara menu
-    And I click on "Assignment Program Tests" "link"
+    And I am on "Assignment Program Tests" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
 
@@ -212,8 +209,7 @@ Feature: User assignments with due date base on first login
 
     When I log out
     And I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I click on "Assignment Program Tests" "link"
+    And I am on "Assignment Program Tests" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
     Then I should see "Complete within 4 Week(s) of First login"
@@ -246,8 +242,7 @@ Feature: User assignments with due date base on first login
     Given I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I click on "Programs" in the totara menu
-    And I click on "Assignment Program Tests" "link"
+    And I am on "Assignment Program Tests" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
 
@@ -314,8 +309,7 @@ Feature: User assignments with due date base on first login
     Given I log in as "admin"
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1 |
-    And I click on "Programs" in the totara menu
-    And I click on "Assignment Program Tests" "link"
+    And I am on "Assignment Program Tests" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
 

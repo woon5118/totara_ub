@@ -118,9 +118,7 @@ Feature: Seminar event cancellation custom fields
     Then I should see "test.jpg"
     And I should see "leaves-green.png"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test Seminar |
       | Description | Test Seminar |
@@ -149,9 +147,7 @@ Feature: Seminar event cancellation custom fields
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
     And I set the following fields to these values:

@@ -39,8 +39,7 @@ Feature: Availability of programs affects assignments
       | fullname                      | shortname    | category   |
       | Availability Assignment Tests | assigntest   |            |
     And I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I click on "Availability Assignment Tests" "link"
+    And I am on "Availability Assignment Tests" program homepage
     And I click on "Edit program details" "button"
 
   Scenario: Before a program is available, an admin can add and remove assignments but assigned totals are not shown

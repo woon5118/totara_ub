@@ -84,9 +84,7 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     And I press "Save changes"
     And I log out
     And I log in as "alice"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 10782"
+    And I am on "Course 10782" course homepage
     And I follow "Sign-up"
     When I press "Sign-up"
     Then I should see "Seminar 10782: Your request was accepted"

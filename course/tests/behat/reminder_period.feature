@@ -19,9 +19,7 @@ Feature: Verify course reminder periods.
 
   Scenario: Verify an admin user can set Reminder periods of 60 and 90 days.
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Reminders" node in "Course administration"
     Then the "Period" select box should contain "60"
     And the "Period" select box should contain "90"
@@ -32,9 +30,7 @@ Feature: Verify course reminder periods.
       | id_reminderperiod   | 90            |
       | id_escalationperiod | 90            |
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Reminders" node in "Course administration"
     And I set the following fields to these values:
       | Title               | Test 1        |

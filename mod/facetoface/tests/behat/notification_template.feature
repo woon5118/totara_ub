@@ -70,9 +70,7 @@ Feature: Edit seminar notification templates
       | Body                  | A customised body  |
       | Update all activities | 1                  |
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
     And I click on "Edit" "link" in the "A customised title" "table_row"
@@ -102,9 +100,7 @@ Feature: Edit seminar notification templates
       | Body                  | A customised body  |
       | Update all activities | 0                  |
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
     And I click on "Edit" "link" in the "Seminar registration closed" "table_row"

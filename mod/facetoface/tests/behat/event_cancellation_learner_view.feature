@@ -118,18 +118,14 @@ Feature: Seminar event cancellation learner views
 
     Given I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
     And I press "Yes"
 
     When I log out
     And I log in as "learner1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
@@ -155,9 +151,7 @@ Feature: Seminar event cancellation learner views
 
     Given I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
     And I press "Yes"
@@ -228,9 +222,7 @@ Feature: Seminar event cancellation learner views
 
     Given I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
     And I press "Yes"

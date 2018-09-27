@@ -78,9 +78,7 @@ Feature: Seminar Signup Admin Approval
 
   Scenario: Student signs up with no manager assigned when admin approval is required
     When I log in as "sally"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager and Administrative approval"
@@ -93,9 +91,7 @@ Feature: Seminar Signup Admin Approval
     And I press "Save changes"
     And I log out
     And I log in as "sally"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager and Administrative approval"
@@ -131,9 +127,7 @@ Feature: Seminar Signup Admin Approval
 
   Scenario: Student gets approved through both steps of the 2 stage approval
     When I log in as "jimmy"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager and Administrative approval"
@@ -172,9 +166,7 @@ Feature: Seminar Signup Admin Approval
     And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking confirmation"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    When I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"
 
@@ -186,9 +178,7 @@ Feature: Seminar Signup Admin Approval
     And I log out
 
     And I log in as "sammy"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager and Administrative approval"
@@ -206,9 +196,7 @@ Feature: Seminar Signup Admin Approval
   Scenario: Administrator approve and deny before manager
     # Add admin approver
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     # Add users
     And I click on "Attendees" "link"
@@ -245,18 +233,14 @@ Feature: Seminar Signup Admin Approval
 
     # Check decline
     When I log in as "jimmy"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     Then I should see "Sign-up"
     And I log out
 
     # Check approve
     When I log in as "timmy"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     Then I should see "Booked"
     And I should see "Cancel booking"
@@ -264,9 +248,7 @@ Feature: Seminar Signup Admin Approval
 
     # Check haven't decided
     When I log in as "sammy"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     Then I should see "Requested"
     And I should see "Cancel booking"
@@ -289,9 +271,7 @@ Feature: Seminar Signup Admin Approval
     Then I should see "Approver name"
 
     # Add user to the event
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -319,9 +299,7 @@ Feature: Seminar Signup Admin Approval
     And I log out
 
     When I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     And I click on "Attendees" "link"
     Then the following should exist in the "facetoface_sessions" table:

@@ -44,8 +44,7 @@ Feature: Check that the Grade display in the Set a quiz to be marked complete wh
     And I add the "Grade" column to the report
     And I press "Save changes"
 
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz name"
     And I navigate to "Edit quiz" node in "Quiz administration"
 

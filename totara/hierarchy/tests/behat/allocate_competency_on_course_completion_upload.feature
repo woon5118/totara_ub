@@ -29,9 +29,7 @@ Feature: Verify competencies completion status is updated when the associated co
       | Completion tracking | 2                      |
       | Require view        | 1                      |
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I add a "Page" to section "1" and I fill the form with:
       | Name                | Course 2 Completion Page |
       | Description         | -                      |
@@ -40,17 +38,13 @@ Feature: Verify competencies completion status is updated when the associated co
       | Require view        | 1                      |
 
     # Set course completion on the courses.
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I click on "criteria_activity_value[1]" "checkbox"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I click on "criteria_activity_value[2]" "checkbox"
@@ -83,9 +77,7 @@ Scale 1
     And I press "Save changes"
     Then I should see "My Template"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Competencies" node in "Course administration"
     And I press "Assign course completion to competencies"
     And I follow "Competency 1"
@@ -94,9 +86,7 @@ Scale 1
     And I should see "Competency 1"
     And I set the field "linktype" to "Mandatory"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Competencies" node in "Course administration"
     And I press "Assign course completion to competencies"
     And I follow "Competency 1"

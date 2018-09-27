@@ -74,9 +74,7 @@ Feature: Seminar Select position with Manager approval
   @javascript
   Scenario: Student signs up with two managers assigned
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager Approval"
@@ -86,17 +84,13 @@ Feature: Seminar Select position with Manager approval
     And I should see "Your request was sent to your manager for approval."
     And I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
     And I should not see "Approval required" in the ".tabtree" "css_element"
     And I log out
     And I log in as "teacher2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
     And I switch to "Approval required" tab

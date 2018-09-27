@@ -47,8 +47,7 @@ Feature: See that program visibility affects Required Learning content correctly
   @javascript
   Scenario: Normal visibility (default), hidden, RL should be shown and link to the program.
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I click on "RoLProgVisibility Test Program 1" "link"
+    And I am on "RoLProgVisibility Test Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
     And I set the field "Visible" to "0"
@@ -83,8 +82,7 @@ Feature: See that program visibility affects Required Learning content correctly
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Programs" in the totara menu
-    And I click on "RoLProgVisibility Test Program 1" "link"
+    When I am on "RoLProgVisibility Test Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
     And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
@@ -105,8 +103,7 @@ Feature: See that program visibility affects Required Learning content correctly
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Programs" in the totara menu
-    And I click on "RoLProgVisibility Test Program 1" "link"
+    When I am on "RoLProgVisibility Test Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
     And I set the field "Visibility" to "Enrolled users only"
@@ -127,8 +124,7 @@ Feature: See that program visibility affects Required Learning content correctly
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Programs" in the totara menu
-    And I click on "RoLProgVisibility Test Program 1" "link"
+    When I am on "RoLProgVisibility Test Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
     And I set the field "Visibility" to "Enrolled users only"
@@ -150,8 +146,7 @@ Feature: See that program visibility affects Required Learning content correctly
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Programs" in the totara menu
-    And I click on "RoLProgVisibility Test Program 1" "link"
+    When I am on "RoLProgVisibility Test Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
     And I set the field "Visibility" to "No users"
@@ -170,8 +165,7 @@ Feature: See that program visibility affects Required Learning content correctly
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Programs" in the totara menu
-    And I click on "RoLProgVisibility Test Program 1" "link"
+    When I am on "RoLProgVisibility Test Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
     And I set the field "Visibility" to "No users"

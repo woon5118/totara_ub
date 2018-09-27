@@ -21,16 +21,12 @@ Feature: Test the visibility to see the seminar summary report depending on the 
       | facetoface | Seminar 17392A | C17392A | S17392A  |
       | facetoface | Seminar 17392B | C17392B | S17392B  |
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 17392A"
+    And I am on "Course 17392A" course homepage
     And I follow "Seminar 17392A"
     And I follow "Add a new event"
     And I press "Save changes"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 17392B"
+    And I am on "Course 17392B" course homepage
     And I follow "Seminar 17392B"
     And I follow "Add a new event"
     And I press "Save changes"
@@ -59,9 +55,7 @@ Feature: Test the visibility to see the seminar summary report depending on the 
 
     #  Learner see seminar with visibility All users and should not see a seminar with visibility No users
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 17392B"
+    And I am on "Course 17392B" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I set the field "Visibility" to "No users"
     And I press "Save and display"

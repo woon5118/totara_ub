@@ -26,9 +26,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
   Scenario: Send message to attendee and manager using CC recipient's manager
     Given I log in as "admin"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Seminar 15838"
     And I follow "Add a new event"
     And I press "Save changes"
@@ -59,9 +57,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
     And the following config values are set as admin:
       | facetoface_selectjobassignmentonsignupglobal | 1 |
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Seminar 15838"
     And I follow "Add a new event"
     And I press "Save changes"

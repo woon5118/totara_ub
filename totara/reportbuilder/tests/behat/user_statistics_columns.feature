@@ -29,9 +29,7 @@ Feature: Statistics columns in user reports should show data correctly
       | learner3 | C2     | student |
       | learner4 | C1     | student |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Condition: Manual completion by others" "link"
     And I set the following fields to these values:
@@ -42,9 +40,7 @@ Feature: Statistics columns in user reports should show data correctly
     And I complete the course via rpl for "Learner2 Two" with text "RPL"
     And I complete the course via rpl for "Learner3 Three" with text "RPL"
     And I complete the course via rpl for "Learner4 Four" with text "RPL"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 2" "link"
+    And I am on "Course 2" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Condition: Manual completion by others" "link"
     And I set the following fields to these values:
@@ -54,9 +50,7 @@ Feature: Statistics columns in user reports should show data correctly
     And I complete the course via rpl for "Learner1 One" with text "RPL"
     And I complete the course via rpl for "Learner2 Two" with text "RPL"
     And I complete the course via rpl for "Learner3 Three" with text "RPL"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 3" "link"
+    And I am on "Course 3" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Condition: Manual completion by others" "link"
     And I set the following fields to these values:

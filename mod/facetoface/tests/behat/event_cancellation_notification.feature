@@ -99,9 +99,7 @@ Feature: Seminar event cancellation notifications
 
     Given I log out
     And I log in as "learner3"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Join waitlist"
     And I press "Sign-up"
 
@@ -109,9 +107,7 @@ Feature: Seminar event cancellation notifications
   Scenario: mod_facetoface_cancel_200: people notified of cancelled event with single future date.
     When I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "2 / 2" in the "10 February 2025" "table_row"
@@ -192,9 +188,7 @@ Feature: Seminar event cancellation notifications
   Scenario: mod_facetoface_cancel_201: people notified of cancelled event with multiple future dates.
     Given I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Edit event" "link" in the "10 February 2025" "table_row"
     And I press "Add a new session"
     And I follow "show-selectdate1-dialog"
@@ -217,9 +211,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
@@ -304,9 +296,7 @@ Feature: Seminar event cancellation notifications
   Scenario: mod_facetoface_cancel_202: deleting a cancelled event does not resend cancellation messages.
     When I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "2 / 2" in the "10 February 2025" "table_row"
@@ -329,9 +319,7 @@ Feature: Seminar event cancellation notifications
 
     Given I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Delete event" "link" in the "10 February 2025" "table_row"
     And I press "Continue"
@@ -346,9 +334,7 @@ Feature: Seminar event cancellation notifications
   Scenario: mod_facetoface_cancel_203: manager with reservations notified of cancelled event.
     When I log out
     And I log in as "manager4"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Booking full" in the "10 February 2025" "table_row"
@@ -361,18 +347,14 @@ Feature: Seminar event cancellation notifications
 
     Given I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
     And I press "Yes"
 
     When I log out
     And I log in as "manager4"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
@@ -396,9 +378,7 @@ Feature: Seminar event cancellation notifications
   Scenario: mod_facetoface_cancel_204: manager with allocations notified of cancelled event.
     When I log out
     And I log in as "manager4"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Booking full" in the "10 February 2025" "table_row"
@@ -412,9 +392,7 @@ Feature: Seminar event cancellation notifications
 
     Given I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
     And I press "Yes"
@@ -436,9 +414,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "manager4"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"

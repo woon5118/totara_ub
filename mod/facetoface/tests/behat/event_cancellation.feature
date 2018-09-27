@@ -66,9 +66,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "2 / 39" in the "10 February 2025" "table_row"
@@ -101,9 +99,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "2 / 39" in the "10 February 2025" "table_row"
@@ -245,9 +241,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
@@ -261,9 +255,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
@@ -344,9 +336,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"

@@ -52,9 +52,7 @@ Feature: mod_scorm: check view SCORM page permissions
   Scenario: SCORM view page content according to permissions
     When I log out
     And I log in as "jr"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "SCORM viewing page permission test"
     # All users who can access the SCORM see the info tab. We also never redirect to reports by default.
     Then I should see "Info"
@@ -69,9 +67,7 @@ Feature: mod_scorm: check view SCORM page permissions
 
     When I log out
     And I log in as "ji"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "SCORM viewing page permission test"
     Then I should see "Info"
     And I should see "Grading method: Highest attempt"
@@ -79,9 +75,7 @@ Feature: mod_scorm: check view SCORM page permissions
 
     When I log out
     And I log in as "bo"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "SCORM viewing page permission test"
     Then I should see "Info"
     And I should see "Grading method: Highest attempt"
@@ -105,9 +99,7 @@ Feature: mod_scorm: check view SCORM page permissions
 
     When I log out
     And I log in as "guest"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "SCORM viewing page permission test"
     Then I should see "Info"
     And I should see "Grading method: Highest attempt"

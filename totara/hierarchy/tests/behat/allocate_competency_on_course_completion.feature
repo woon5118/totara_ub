@@ -29,9 +29,7 @@ Feature: Verify completion of a course triggers assigning a competency.
       | Require view        | 1         |
 
     # Set course completion on course 2.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I click on "criteria_activity_value[1]" "checkbox"
@@ -78,9 +76,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I press "Save changes"
     Then I should see "My Template"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Competencies" node in "Course administration"
     And I press "Assign course completion to competencies"
     And I follow "Competency 1"

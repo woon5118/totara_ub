@@ -22,8 +22,8 @@ Feature: User certifications and their courses appear correctly in the current l
     And I set self completion for "Certify Course 2" in the "Miscellaneous" category
     And I set self completion for "Recertify Course 1" in the "Miscellaneous" category
     And I set self completion for "Recertify Course 2" in the "Miscellaneous" category
-    And I click on "Certifications" in the totara menu
-    And I press "Create Certification"
+    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I press "Add new certification"
     And I set the following fields to these values:
       | Full name  | Test Certification |
       | Short name | tstcert            |

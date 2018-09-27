@@ -101,8 +101,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Save changes"
 
     # Create the certification and add the course.
-    And I click on "Certifications" in the totara menu
-    And I press "Create Certification"
+    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I press "Add new certification"
     And I press "Save changes"
     And I switch to "Certification" tab
     And I set the following fields to these values:
@@ -141,9 +141,7 @@ Feature: Take attendance for a seminar with multiple sessions
 
   Scenario: Complete older session, archive cert, complete newer session, see newer completion date on cert
     # Complete older session.
-    Then I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    Then I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -173,9 +171,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     And I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -207,9 +203,7 @@ Feature: Take attendance for a seminar with multiple sessions
 
   Scenario: Complete newer session, archive cert, complete older session, still see newer completion date on cert
     # Complete newer session.
-    Then I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    Then I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -242,9 +236,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     And I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -275,9 +267,7 @@ Feature: Take attendance for a seminar with multiple sessions
 
   Scenario: Complete newer, complete older, see newer completion date, reset activity completion, see newer completion date
     # Complete newer session.
-    Then I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    Then I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -301,9 +291,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     And I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -327,9 +315,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Reset activity completion.
     And I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "seminar1" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Activity completion" "link"
@@ -350,9 +336,7 @@ Feature: Take attendance for a seminar with multiple sessions
 
   Scenario: Complete older, complete newer, see older completion date, reset activity completion, see newer completion date
     # Complete older session.
-    Then I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    Then I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -376,9 +360,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     And I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -402,9 +384,7 @@ Feature: Take attendance for a seminar with multiple sessions
     # Reset activity completion.
     And I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "seminar1" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Activity completion" "link"
@@ -437,9 +417,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And the following "course enrolments" exist:
       | user  | course  | role    |
       | taker | course1 | teacher |
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -450,9 +428,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Confirm"
     And I log out
     When I log in as "taker"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course1"
+    And I am on "course1" course homepage
     And I click on "seminar1" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I switch to "Take attendance" tab

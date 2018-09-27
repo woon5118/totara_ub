@@ -52,9 +52,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
       | Requests for session organiser | Lorem ipsum dolor sit amet |
@@ -70,9 +68,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
 
   Scenario: Seminar direct enrolment disabled
     Given I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    When I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
 
   Scenario: Enrol through course catalogue
@@ -82,9 +78,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I press "Save changes"
     And I log out
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -121,9 +115,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
       | Signup text input | Lorem ipsum dolor sit amet |

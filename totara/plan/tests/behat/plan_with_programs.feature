@@ -98,8 +98,7 @@ Feature: Learner creates learning plan with programs
 
     When I log out
     And I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Program 1"
+    And I am on "Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link" in the ".tabtree" "css_element"
     And I select "Individuals" from the "Add a new" singleselect

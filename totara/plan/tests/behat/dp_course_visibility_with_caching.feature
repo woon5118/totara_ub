@@ -60,8 +60,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
 
   @javascript
   Scenario: Normal visibility (default), hidden.
-    And I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    And I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Course visibility" to "0"
     And I press "Save and display"
@@ -101,8 +100,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
 
   @javascript
   Scenario: Normal visibility (default), hidden, 2nd course assigned.
-    And I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    And I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Course visibility" to "0"
     And I press "Save and display"
@@ -142,8 +140,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
 
   @javascript
   Scenario: Normal vis hidden, switch to audience vis.
-    And I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    And I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Course visibility" to "0"
     And I press "Save and display"
@@ -242,8 +239,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    When I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
     And I press "Save and display"
@@ -286,8 +282,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    When I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Visibility" to "Enrolled users only"
     And I press "Save and display"
@@ -330,8 +325,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    When I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Visibility" to "No users"
     And I press "Save and display"
@@ -376,8 +370,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    When I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Visibility" to "No users"
     And I press "Save and display"
@@ -420,8 +413,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     And I press "Save changes"
     Then I should see "Changes saved"
 
-    When I click on "Courses" in the totara menu
-    And I click on "RoLCourseVisibility Test Course 1" "link"
+    When I am on "RoLCourseVisibility Test Course 1" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the field "Visibility" to "No users"
     And I press "Save and display"

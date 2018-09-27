@@ -84,9 +84,7 @@ Feature: Seminar Event Registration Closure
     And I press "Update requests"
     And I log out
     And I log in as "manager"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test facetoface name" "link"
     And I follow "Attendees"
     And I follow "Approval required"
@@ -110,9 +108,7 @@ Feature: Seminar Event Registration Closure
     And I should see "Requested" in the "Minny Min" "table_row"
     And I should see "Booked" in the "Sally Sal" "table_row"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    When I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Edit event" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:

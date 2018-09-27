@@ -138,9 +138,7 @@ Feature: Check room details with all possible custom fields
     And I press "Add a room"
 
     # Use the room.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Select room" "link"
@@ -148,9 +146,7 @@ Feature: Check room details with all possible custom fields
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
     # View the room.
     And I click on "Room details" "link"

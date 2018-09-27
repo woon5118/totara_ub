@@ -22,43 +22,33 @@ Feature: Return to previous page after actions in seminar
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Save changes" "button"
 
   Scenario: Course page - Seminar edit session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Edit" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Edit" "link" in the "Booking open" "table_row"
     And I click on "Save changes" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
   Scenario: Sessions page - Seminar edit session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Edit" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "All events in"
     And I should not see "View all events"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Edit" "link" in the "Booking open" "table_row"
     And I click on "Save changes" "button"
@@ -66,17 +56,13 @@ Feature: Return to previous page after actions in seminar
     And I should not see "View all events"
 
   Scenario: Course page - Seminar cancel session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Cancel event" "link" in the "Booking open" "table_row"
     And I click on "No" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Cancel event" "link" in the "Booking open" "table_row"
     And I click on "Yes" "button"
     Then I should see "View all events"
@@ -84,18 +70,14 @@ Feature: Return to previous page after actions in seminar
     And I should see "Event cancelled"
 
   Scenario: Sessions page - Seminar cancel session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Cancel event" "link" in the "Booking open" "table_row"
     And I click on "No" "button"
     Then I should see "All events in"
     And I should not see "View all events"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Cancel event" "link" in the "Booking open" "table_row"
     And I click on "Yes" "button"
@@ -104,35 +86,27 @@ Feature: Return to previous page after actions in seminar
     And I should see "Event cancelled"
 
   Scenario: Course page - Seminar clone session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Copy" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Copy" "link" in the "Booking open" "table_row"
     And I click on "Save changes" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
   Scenario: Sessions page - Seminar clone session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Copy" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "All events in"
     And I should not see "View all events"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Copy" "link" in the "Booking open" "table_row"
     And I click on "Save changes" "button"
@@ -140,17 +114,13 @@ Feature: Return to previous page after actions in seminar
     And I should not see "View all events"
 
   Scenario: Course page - Seminar delete session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Delete" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Delete" "link" in the "Booking open" "table_row"
     And I click on "Continue" "button"
     Then I should see "View all events"
@@ -158,18 +128,14 @@ Feature: Return to previous page after actions in seminar
     And I should not see "Booking open"
 
   Scenario: Sessions page - Seminar delete session actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Delete" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "All events in"
     And I should not see "View all events"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Delete" "link" in the "Booking open" "table_row"
     And I click on "Continue" "button"
@@ -178,69 +144,53 @@ Feature: Return to previous page after actions in seminar
     And I should not see "Booking open"
 
   Scenario: Course page - Seminar singup and cancel actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Sign-up" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Sign-up" "link" in the "Booking open" "table_row"
     And I click on "Sign-up" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Cancel booking" "link" in the "Booked" "table_row"
     And I click on "No" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Cancel booking" "link" in the "Booked" "table_row"
     And I click on "Yes" "button"
     Then I should see "View all events"
     And I should not see "All events in"
 
   Scenario: Sessions page - Seminar singup and cancel actions return to original page
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Sign-up" "link" in the "Booking open" "table_row"
     And I click on "Cancel" "button"
     Then I should see "All events in"
     And I should not see "View all events"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Sign-up" "link" in the "Booking open" "table_row"
     And I click on "Sign-up" "button"
     Then I should see "All events in"
     And I should not see "View all events"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Cancel booking" "link" in the "Booked" "table_row"
     And I click on "No" "button"
     Then I should see "All events in"
     And I should not see "View all events"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Cancel booking" "link" in the "Booked" "table_row"
     And I click on "Yes" "button"
@@ -248,17 +198,13 @@ Feature: Return to previous page after actions in seminar
     And I should not see "View all events"
 
   Scenario: Seminar attendees back link return to original page - top level only
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     When I click on "Attendees" "link" in the "Booking open" "table_row"
     And I click on "Go back" "link"
     Then I should see "View all events"
     And I should not see "All events in"
 
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Attendees" "link" in the "Booking open" "table_row"
     And I click on "Go back" "link"

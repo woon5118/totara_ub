@@ -41,9 +41,7 @@ Feature: Test room conflicts through backup/restore
 
   @javascript
   Scenario: Add sessions with different rooms and duplicate facetoface
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Facetoface TL12734"
 
     And I follow "Add a new event"

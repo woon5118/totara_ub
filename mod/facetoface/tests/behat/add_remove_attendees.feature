@@ -32,9 +32,7 @@ Feature: Add - Remove seminar attendees
 
   Scenario: Add users to a seminar session with dates
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -71,9 +69,7 @@ Feature: Add - Remove seminar attendees
 
   Scenario: Add and remove users to a Seminar session without dates (waitlist)
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
@@ -93,9 +89,7 @@ Feature: Add - Remove seminar attendees
 
   Scenario: Add users by username via textarea
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
@@ -122,9 +116,7 @@ Feature: Add - Remove seminar attendees
 
   Scenario: Add users by email via textarea
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
@@ -152,9 +144,7 @@ Feature: Add - Remove seminar attendees
   @_file_upload
   Scenario: Add users via file upload and then remove
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -195,9 +185,7 @@ Feature: Add - Remove seminar attendees
 
   Scenario: Use the allow scheduling conflicts checkbox
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -274,9 +262,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Use invalid csv file to test the errors
     Given I log in as "admin"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -310,9 +296,7 @@ Feature: Add - Remove seminar attendees
     And I log out
 
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
@@ -351,9 +335,7 @@ Feature: Add - Remove seminar attendees
     And I log out
 
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
@@ -376,9 +358,7 @@ Feature: Add - Remove seminar attendees
       | Show user identity | ID number |
     And I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -443,9 +423,7 @@ Feature: Add - Remove seminar attendees
       | moodle/site:viewuseridentity | Prohibit |
     And I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit session" "link"

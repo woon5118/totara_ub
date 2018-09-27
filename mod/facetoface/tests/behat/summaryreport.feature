@@ -130,9 +130,7 @@ Feature: Seminar sessions report overview
   Scenario: Check active seminar sessions summary report
     # Prepare 4 sessions in three activities:
     # 2: (2nd activity of C1) Two dates, self approved, overbooked, 1st started, 2nd upcoming
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name 2      |
       | Description       | Test seminar description |
@@ -211,9 +209,7 @@ Feature: Seminar sessions report overview
     And I press "Confirm"
 
     # 4: (1st activity of C2) Fully booked, ended, no one
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     #And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name 3      |
@@ -249,9 +245,7 @@ Feature: Seminar sessions report overview
     And I press "Confirm"
 
     # 5: (1st activity of C2) N/A, ended, no one
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name 4      |
       | Description       | Test seminar description |

@@ -32,9 +32,7 @@ Feature: Cancellation for session
   @javascript
   Scenario: User can cancel their booking at any time until seminar session starts
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -58,9 +56,7 @@ Feature: Cancellation for session
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
@@ -73,9 +69,7 @@ Feature: Cancellation for session
 
     # Check that editing teacher can manage cancellation notes
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Attendees" in row 1
     And I follow "Cancellations"
@@ -87,9 +81,7 @@ Feature: Cancellation for session
 
     # Check that teacher can not manage cancellation notes
     And I log in as "teacher2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Attendees" in row 1
     And I follow "Cancellations"
@@ -100,9 +92,7 @@ Feature: Cancellation for session
   @javascript
   Scenario: User cannot cancel their booking (Never)
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -126,9 +116,7 @@ Feature: Cancellation for session
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
@@ -139,9 +127,7 @@ Feature: Cancellation for session
   @javascript
   Scenario: User can cancel their booking if cut-off period is not reached
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -165,9 +151,7 @@ Feature: Cancellation for session
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
@@ -176,9 +160,7 @@ Feature: Cancellation for session
     And I log out
 
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Edit event" "link"
     And I click on "Edit session" "link"
@@ -202,9 +184,7 @@ Feature: Cancellation for session
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should not see "Cancel booking"
     And I log out
@@ -212,9 +192,7 @@ Feature: Cancellation for session
   @javascript
   Scenario: User can cancel their booking at any time until session starts even when cancellation note field is deleted
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -243,9 +221,7 @@ Feature: Cancellation for session
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"

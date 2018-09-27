@@ -49,9 +49,7 @@ Feature: Seminar room availability
 
   Scenario: Time based seminar room conflicts
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -245,9 +243,7 @@ Feature: Seminar room availability
 
   Scenario: Hiding related seminar room availability
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -283,9 +279,7 @@ Feature: Seminar room availability
     And I click on "Hide from users when choosing a room on the Add/Edit event page" "link" in the "Room 1" "table_row"
     And I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
 
     When I follow "Add a new event"
@@ -343,9 +337,7 @@ Feature: Seminar room availability
 
   Scenario: Custom seminar room availability
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -439,9 +431,7 @@ Feature: Seminar room availability
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I press "Cancel"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
     And I follow "Add a new event"
     And I click on "Select room" "link"
@@ -455,9 +445,7 @@ Feature: Seminar room availability
     And I log out
 
     When I log in as "teacher2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
     And I follow "Add a new event"
     And I click on "Select room" "link"
@@ -469,9 +457,7 @@ Feature: Seminar room availability
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I press "Cancel"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
     And I click on "Select room" "link"
@@ -485,9 +471,7 @@ Feature: Seminar room availability
 
   Scenario: Seminar switch site room to not allow conflicts
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -540,9 +524,7 @@ Feature: Seminar room availability
     Then I should see "Room has conflicting usage"
     And I press "Cancel"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I click on "Edit event" "link" in the "0 / 30" "table_row"
     And I click on "Edit session" "link"
@@ -568,9 +550,7 @@ Feature: Seminar room availability
 
   Scenario: Seminar switch custom room to not allow conflicts
     Given I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -652,9 +632,7 @@ Feature: Seminar room availability
 
   Scenario: Reportbuilder seminar room availability filter
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
     And I set the following fields to these values:

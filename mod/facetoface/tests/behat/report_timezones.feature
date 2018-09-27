@@ -180,9 +180,7 @@ Feature: Seminar timezones in reports
       | timefinish[timezone] | Australia/Perth |
     And I press "OK"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar 2 name        |
       | Description | Test seminar 2 description |

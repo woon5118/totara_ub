@@ -92,9 +92,7 @@ Feature: Users can enrol themself in courses with selected position where semina
   Scenario: Add and configure a seminar activity with a single session and position asked for but not mandated then
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
       | Select a job assignment | jobassignment2 (Position2) |

@@ -132,27 +132,21 @@ Feature: Test course visibility
       | Enable audience-based visibility | 1 |
 
     # Make Chemistry visible only to enrolled users.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Chemistry"
+    And I am on "Chemistry" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I set the following fields to these values:
       | Visibility | Enrolled users only |
     And I press "Save and display"
 
     # Make Physics visible to enrolled users and selected audiences.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Physics"
+    And I am on "Physics" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I set the following fields to these values:
       | Visibility | Enrolled users and members of the selected audiences |
     And I press "Save and display"
 
     # Make Calculus visible to no users.
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Calculus"
+    And I am on "Calculus" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I set the following fields to these values:
       | Visibility | No users |

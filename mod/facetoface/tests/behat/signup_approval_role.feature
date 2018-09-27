@@ -70,9 +70,7 @@ Feature: Seminar Signup Role Approval
 
   Scenario: Student signs up a with no roles assigned
     When I log in as "sally"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Editing Trainer"
@@ -81,9 +79,7 @@ Feature: Seminar Signup Role Approval
 
   Scenario: Student gets approved through role approval
     When I log in as "jimmy"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    And I am on "Classroom Connect Course" course homepage
     And I should see "Sign-up"
     And I follow "Sign-up"
     Then I should see "Editing Trainer"
@@ -115,8 +111,6 @@ Feature: Seminar Signup Role Approval
     And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking confirmation"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Classroom Connect Course"
+    When I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"

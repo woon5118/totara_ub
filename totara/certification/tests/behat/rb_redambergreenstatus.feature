@@ -14,8 +14,8 @@ Feature: The Certification Completion report displays correctly for a learner.
     And I log in as "admin"
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
-    And I click on "Certifications" in the totara menu
-    And I press "Create Certification"
+    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I press "Add new certification"
     And I set the following fields to these values:
       | Full name  | Test Certification |
       | Short name | tstcert            |
@@ -76,8 +76,7 @@ Feature: The Certification Completion report displays correctly for a learner.
     #
     When I log out
     And I log in as "admin"
-    And I click on "Certifications" in the totara menu
-    And I follow "Test Certification"
+    And I am on "Test Certification" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
@@ -138,8 +137,7 @@ Feature: The Certification Completion report displays correctly for a learner.
     # Status: Overdue since.
     #
     When I log in as "admin"
-    And I click on "Certifications" in the totara menu
-    And I follow "Test Certification"
+    And I am on "Test Certification" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"

@@ -48,9 +48,7 @@ Feature: Review quiz attempts
   @javascript
   Scenario: User answers some questions correct and review quiz attempt
     Given I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz"
     And I press "Attempt quiz now"
     And I click on "Three" "checkbox" in the "//div[contains(@id, 'q1')]/div[contains(@class, 'content')]" "xpath_element"
@@ -80,9 +78,7 @@ Feature: Review quiz attempts
 
     # Check the formatting of the grade in the review
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz"
     Then I should see "Grade / 4"
     And I should see "Review" in the "1" "table_row"

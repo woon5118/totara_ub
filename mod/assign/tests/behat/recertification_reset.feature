@@ -23,8 +23,8 @@ Feature: Learners can submit assignments again when certification is expired
       | assignsubmission_onlinetext_enabled | 1 |
       | assignsubmission_file_enabled | 0 |
 
-    And I click on "Certifications" in the totara menu
-    And I press "Create Certification"
+    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I press "Add new certification"
     And I set the following fields to these values:
         | Full name  | Test Certification |
         | Short name | tstcert            |
@@ -57,8 +57,7 @@ Feature: Learners can submit assignments again when certification is expired
 
   Scenario: Add submission then lock it then reset certification and confirm that assignment submission is unlocked
     Given I log in as "student1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -70,8 +69,7 @@ Feature: Learners can submit assignments again when certification is expired
     And I log out
 
     And I log in as "admin"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I follow "View all submissions"
     And I click on "Edit" "link" in the "Student 1" "table_row"
@@ -84,8 +82,7 @@ Feature: Learners can submit assignments again when certification is expired
     And I log out
 
     And I log in as "student1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:

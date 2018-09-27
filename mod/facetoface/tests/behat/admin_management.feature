@@ -11,16 +11,13 @@ Feature: Add and remove seminar Administrators
       | admin2   | Admin     | Two      | admin2@example.com |
       | admin3   | Admin     | Three    | admin3@example.com |
     And the following "courses" exist:
-      | name     | shortname |
+      | fullname | shortname |
       | course 1 | c1        |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Manager and Administrative approval" "text"
     And I click on "Save changes" "button"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "course 1"
-    And I click on "Turn editing on" "button"
+    And I am on "course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1"
     And I expand all fieldsets
 

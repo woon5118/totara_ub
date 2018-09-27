@@ -22,9 +22,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | student1 | C1     | student        |
       | student2 | C1     | student        |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar1"
     And I follow "Add a new event"
     And I click on "Edit session" "link"

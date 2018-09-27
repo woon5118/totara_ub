@@ -21,8 +21,7 @@ Feature: Certification completion date is based on course completion time
     And I set the following administration settings values:
       | enableprogramcompletioneditor | 1       |
       | enableprograms                | Disable |
-    And I click on "Certifications" in the totara menu
-    And I follow "Certification One"
+    And I am on "Certification One" certification homepage
     And I press "Edit certification details"
     And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
@@ -102,8 +101,7 @@ Feature: Certification completion date is based on course completion time
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And I click on "Certifications" in the totara menu
-    And I follow "Certification One"
+    And I am on "Certification One" certification homepage
     And I press "Edit certification details"
     And I switch to "Completion" tab
     And I click on "Edit completion records" "link" in the "Learner One" "table_row"

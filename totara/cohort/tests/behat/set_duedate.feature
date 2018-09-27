@@ -64,13 +64,11 @@ Feature: Set due date for program assignments via audience management
     And I click on "OK" "button" in the "Confirm issue resolution" "totaradialogue"
     And I log out
     And I log in as "user1"
-    And I click on "Programs" in the totara menu
-    And I click on "Set Due Date Tests" "link"
+    And I am on "Set Due Date Tests" program homepage
     Then I should see "Due date: 09 December 2015, 2:30 PM"
     When I log out
     And I log in as "user2"
-    And I click on "Programs" in the totara menu
-    And I click on "Set Due Date Tests" "link"
+    And I am on "Set Due Date Tests" program homepage
     Then I should see "Due date: 09 December 2015, 8:30 AM"
 
   @javascript

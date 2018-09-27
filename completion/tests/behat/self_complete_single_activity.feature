@@ -17,9 +17,7 @@ Feature: User can self complete an activity from within a single activity course
       | user  | course | role    |
       | user1 | c1     | student |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I expand all fieldsets
     And I set the field "Type of activity" to "<activity>"
     And I click on "Save and display" "button"
@@ -33,9 +31,7 @@ Feature: User can self complete an activity from within a single activity course
     And I follow "Log out"
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set the "I have completed this activity" Totara form field to "1"
     And I reload the page
     And I set the "I have completed this activity" Totara form field to "0"
@@ -70,9 +66,7 @@ Feature: User can self complete an activity from within a single activity course
       | user  | course | role    |
       | user1 | c1     | student |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I set the following fields to these values:
       | Name                | Book Book                                            |
       | Completion tracking | Learners can manually mark the activity as completed |
@@ -84,9 +78,7 @@ Feature: User can self complete an activity from within a single activity course
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set the "I have completed this activity" Totara form field to "1"
     And I reload the page
     And I set the "I have completed this activity" Totara form field to "0"
@@ -102,9 +94,7 @@ Feature: User can self complete an activity from within a single activity course
       | user  | course | role    |
       | user1 | c1     | student |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I expand all fieldsets
     And I set the field "Type of activity" to "SCORM package"
     And I click on "Save and display" "button"
@@ -116,9 +106,7 @@ Feature: User can self complete an activity from within a single activity course
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set the "I have completed this activity" Totara form field to "1"
     And I reload the page
     And I set the "I have completed this activity" Totara form field to "0"
@@ -134,9 +122,7 @@ Feature: User can self complete an activity from within a single activity course
       | user  | course | role    |
       | user1 | c1     | student |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I expand all fieldsets
     And I set the field "Type of activity" to "IMS content package"
     And I click on "Save and display" "button"
@@ -150,9 +136,7 @@ Feature: User can self complete an activity from within a single activity course
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set the "I have completed this activity" Totara form field to "1"
     And I reload the page
     And I set the "I have completed this activity" Totara form field to "0"
@@ -171,9 +155,7 @@ Feature: User can self complete an activity from within a single activity course
     And I navigate to "File" node in "Site administration > Plugins > Activity modules"
     And I set the field "Available display options" to "<type>"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I expand all fieldsets
     And I set the field "Type of activity" to "File"
     And I click on "Save and display" "button"
@@ -186,9 +168,7 @@ Feature: User can self complete an activity from within a single activity course
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I set the "I have completed this activity" Totara form field to "1"
     And I reload the page
     And I set the "I have completed this activity" Totara form field to "0"

@@ -586,6 +586,23 @@ class behat_navigation extends behat_base {
     }
 
     /**
+     * Opens the certification homepage.
+     *
+     * @Given /^I am on "(?P<certificationfullname_string>(?:[^"]|\\")*)" (certification|program) homepage$/
+     * @throws coding_exception
+     * @param string $certificationfullname The full name of the certification.
+     * @return void
+     */
+    public function i_am_on_certification_homepage($certificationfullname) {
+        \behat_hooks::set_step_readonly(false);
+        global $DB;
+        $certification = $DB->get_record("prog", array("fullname" => $certificationfullname), 'id', MUST_EXIST);
+        $url = new moodle_url('/totara/program/view.php', ['id' => $certification->id]);
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->wait_for_pending_js();
+    }
+
+    /**
      * Opens the course homepage with editing mode on.
      *
      * @Given /^I am on "(?P<coursefullname_string>(?:[^"]|\\")*)" course homepage with editing mode on$/

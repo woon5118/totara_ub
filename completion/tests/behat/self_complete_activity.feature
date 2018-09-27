@@ -17,10 +17,7 @@ Feature: User can self complete an activity from within an activity
 
   Scenario Outline: Confirm activities have self completion avaliable inside the activity
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "<activity>" to section "1" and I fill the form with:
       | <name>              | Activity Name                                        |
       | Completion tracking | Learners can manually mark the activity as completed |
@@ -28,9 +25,7 @@ Feature: User can self complete an activity from within an activity
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Activity Name"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
@@ -67,10 +62,7 @@ Feature: User can self complete an activity from within an activity
     And I navigate to "File" node in "Site administration > Plugins > Activity modules"
     And I set the field "Available display options" to "<type>"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "File" to section "1" and I fill the form with:
       | Name                | Pictured                                             |
       | Completion tracking | Learners can manually mark the activity as completed |
@@ -80,9 +72,7 @@ Feature: User can self complete an activity from within an activity
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Pictured"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
@@ -100,10 +90,7 @@ Feature: User can self complete an activity from within an activity
 
   Scenario: Confirm the book activity has self completion available inside itself
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Book" to section "1" and I fill the form with:
       | Name                | Book Book                                            |
       | Completion tracking | Learners can manually mark the activity as completed |
@@ -115,9 +102,7 @@ Feature: User can self complete an activity from within an activity
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Book Book"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
@@ -131,10 +116,7 @@ Feature: User can self complete an activity from within an activity
   @_file_upload
   Scenario: Confirm the SCORM activity has self completion available inside itself
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "SCORM package" to section "1" and I fill the form with:
       | Name                | SCORMed                                              |
       | Completion tracking | Learners can manually mark the activity as completed |
@@ -144,9 +126,7 @@ Feature: User can self complete an activity from within an activity
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "SCORMed"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
@@ -160,10 +140,7 @@ Feature: User can self complete an activity from within an activity
   @_file_upload
   Scenario: Confirm the IMS activity has self completion available inside itself
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "IMS content package" to section "1" and I fill the form with:
       | Name                | This is IMS                                          |
       | Completion tracking | Learners can manually mark the activity as completed |
@@ -172,9 +149,7 @@ Feature: User can self complete an activity from within an activity
     And I log out
 
     When I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "This is IMS"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
@@ -187,10 +162,7 @@ Feature: User can self complete an activity from within an activity
 
   Scenario: Confirm self completion form is not displayed when other completion options are used
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
-    And I click on "Turn editing on" "button"
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name     | No completion                       |
       | Completion tracking | Do not indicate activity completion |
@@ -201,9 +173,7 @@ Feature: User can self complete an activity from within an activity
     And I log out
 
     Given I log in as "user1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "No completion"
     Then I should not see "I have completed this activity"
 

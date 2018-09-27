@@ -65,9 +65,7 @@ Feature: Add - Remove manager reservations in Seminar
 
   Scenario: Add and then remove users from Seminar using manager reservations
     Given I log in as "manager"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test Seminar name" "link"
     And I should see "Allocate spaces for team (0/2)"
     And I should see "Reserve spaces for team (0/2)"
@@ -86,9 +84,7 @@ Feature: Add - Remove manager reservations in Seminar
 
   Scenario: Confirm correct message when other manager cannot have reservations
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Test Seminar name" "link"
     And I should see "Reserve for another manager"
     And I click on "Reserve for another manager" "link"

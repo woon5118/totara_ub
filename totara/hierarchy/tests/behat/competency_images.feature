@@ -110,9 +110,7 @@ Feature: Test use of images in competencies and competency custom fields
     # For this we need a completed competency
     # Add a choice activity and complete the activity as a learner
     When I am on site homepage
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on "An Unexpected Journey" "link"
+    And I am on "An Unexpected Journey" course homepage
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name         | Help to Gandalf the Grey                          |
       | Description         | The wizard, member of the Istari order            |

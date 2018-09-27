@@ -30,9 +30,7 @@ Feature: Test expand course details in Reportbuilder
     And I set the field "Add method" to "Seminar direct enrolment"
     And I press "Add method"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                    | Test seminar 2             |
       | Description                             | Test seminar 2 description |
@@ -59,9 +57,7 @@ Feature: Test expand course details in Reportbuilder
     And I set the field "Add method" to "Seminar direct enrolment"
     And I press "Add method"
 
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     And I add a "Page" to section "1" and I fill the form with:
       | Name                | Page 1 |
       | Description         | Test   |

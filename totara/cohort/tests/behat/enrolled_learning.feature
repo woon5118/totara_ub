@@ -57,16 +57,12 @@ Feature: Assign enrolled learning to cohort
     Then I should see "Course 1" in the "td.associations_nameiconlink" "css_element"
     And I should not see "Course 2" in the "td.associations_nameiconlink" "css_element"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should not see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
@@ -83,15 +79,13 @@ Feature: Assign enrolled learning to cohort
     Then I should see "Program 1" in the "td.associations_nameiconlink" "css_element"
     And I should not see "Program 2" in the "td.associations_nameiconlink" "css_element"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 1"
+    When I am on "Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 2"
+    When I am on "Program 2" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
@@ -109,15 +103,13 @@ Feature: Assign enrolled learning to cohort
     Then I should see "Certification 1" in the "td.associations_nameiconlink" "css_element"
     And I should not see "Certification 2" in the "td.associations_nameiconlink" "css_element"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 1"
+    When I am on "Certification 1" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 2"
+    When I am on "Certification 2" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
@@ -142,16 +134,12 @@ Feature: Assign enrolled learning to cohort
     Then I should not see "Course 1" in the "td.associations_nameiconlink" "css_element"
     And I should see "Course 2" in the "td.associations_nameiconlink" "css_element"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should not see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
@@ -174,15 +162,13 @@ Feature: Assign enrolled learning to cohort
     Then I should not see "Program 1" in the "td.associations_nameiconlink" "css_element"
     And I should see "Program 2" in the "td.associations_nameiconlink" "css_element"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 1"
+    When I am on "Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 2"
+    When I am on "Program 2" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
@@ -206,15 +192,13 @@ Feature: Assign enrolled learning to cohort
     Then I should not see "Certification 1" in the "td.associations_nameiconlink" "css_element"
     And I should see "Certification 2" in the "td.associations_nameiconlink" "css_element"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 1"
+    When I am on "Certification 1" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 2"
+    When I am on "Certification 2" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
@@ -238,16 +222,12 @@ Feature: Assign enrolled learning to cohort
       | Name     | Type   |
       | Course 3 | Course |
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
@@ -270,15 +250,13 @@ Feature: Assign enrolled learning to cohort
       | Name      | Type    |
       | Program 3 | Program |
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 1"
+    When I am on "Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 2"
+    When I am on "Program 2" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
@@ -302,15 +280,13 @@ Feature: Assign enrolled learning to cohort
       | Name            | Type          |
       | Certification 3 | Certification |
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 1"
+    When I am on "Certification 1" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 2"
+    When I am on "Certification 2" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
@@ -345,23 +321,17 @@ Feature: Assign enrolled learning to cohort
       | Course 3 | Course |
     And I click to delete the cohort enrolled learning association on "Course 2"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should not see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    When I am on "Course 3" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
@@ -395,22 +365,19 @@ Feature: Assign enrolled learning to cohort
       | Program 3 | Program |
     And I click to delete the cohort enrolled learning association on "Program 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 1"
+    When I am on "Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 2"
+    When I am on "Program 2" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 3"
+    When I am on "Program 3" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
@@ -445,22 +412,19 @@ Feature: Assign enrolled learning to cohort
       | Certification 3 | Certification |
     And I click to delete the cohort enrolled learning association on "Certification 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 1"
+    When I am on "Certification 1" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 2"
+    When I am on "Certification 2" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 3"
+    When I am on "Certification 3" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
@@ -609,64 +573,52 @@ Feature: Assign enrolled learning to cohort
       | Certification 2 | Certification |
       | Program 2       | Program       |
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should not see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    When I am on "Course 3" course homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Audience sync (Cohort 1 - Learner)"
     And I should not see "Audience sync (Cohort 2 - Learner)"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 1"
+    When I am on "Certification 1" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 2"
+    When I am on "Certification 2" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Certifications" in the totara menu
-    And I follow "Certification 3"
+    When I am on "Certification 3" certification homepage
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 1"
+    When I am on "Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 2"
+    When I am on "Program 2" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should not see "Cohort 1"
     And I should not see "Cohort 2"
 
-    When I click on "Programs" in the totara menu
-    And I follow "Program 3"
+    When I am on "Program 3" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     Then I should see "Cohort 1"
@@ -685,9 +637,7 @@ Feature: Assign enrolled learning to cohort
   @javascript
   Scenario: Edit course visibility for a particular course
     Given I am on homepage
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Edit settings"
     And I click on "Add enrolled audiences" "button"
     And I follow "Cohort 1"
@@ -698,28 +648,20 @@ Feature: Assign enrolled learning to cohort
   @javascript
   Scenario: Check all courses are displayed correctly in the enrolled learning dialog
     # Set completion criteria for courses: 1, 4, 6 and 8.
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    Given I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Condition: Manual self completion" "link"
     And I click on "criteria_self_value" "checkbox"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 4"
+    And I am on "Course 4" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Condition: Manual self completion" "link"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 6"
+    And I am on "Course 6" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Condition: Manual self completion" "link"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 8"
+    And I am on "Course 8" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Condition: Manual self completion" "link"
     And I press "Save changes"

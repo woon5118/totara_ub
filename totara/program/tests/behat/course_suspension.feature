@@ -60,8 +60,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users enrolled via a program with organisation assignment by removing the learner from the organisation
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Organisations" from the "Add a new" singleselect
@@ -102,11 +101,9 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I run the scheduled task "\totara_program\task\user_assignments_task"
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -134,8 +131,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users enrolled via a program with organisation assignment by changing the assigned organisation
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Organisations" from the "Add a new" singleselect
@@ -176,11 +172,9 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     # learner1 not able to access program or course
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -217,8 +211,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users enrolled via a program with position assignment by changing the learner's position
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Positions" from the "Add a new" singleselect
@@ -259,11 +252,9 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I run the scheduled task "\totara_program\task\user_assignments_task"
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -291,8 +282,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users enrolled via a program with position assignment by changing the assigned position
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Positions" from the "Add a new" singleselect
@@ -333,11 +323,9 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     # learner1 not able to access program or course
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -374,8 +362,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users enrolled via a program with management hierarchy assignment by changing the learner's profile
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Management hierarchy" from the "Add a new" singleselect
@@ -416,11 +403,9 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     When I run the scheduled task "\totara_program\task\user_assignments_task"
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -449,8 +434,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users enrolled via a program with management hierarchy assignment by changing the assigned manager
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Management hierarchy" from the "Add a new" singleselect
@@ -490,11 +474,9 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     # learner1 not able to access program or course
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -531,8 +513,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users that were enrolled as individuals through a program
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Individuals" from the "Add a new" singleselect
@@ -571,11 +552,9 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     # learner1 not able to access program or course
     And I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    When I am on "Test Program 1" program homepage
     Then "//input[@type='submit' and @value='Not available' and @disabled]" "xpath_element" should exist in the "Course 1" "table_row"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
@@ -612,8 +591,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
   Scenario: Suspend users by making the program unavailable
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Individuals" from the "Add a new" singleselect
@@ -637,8 +615,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
     # Make the program unavailable by setting an expiry date that is in the past
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Details" tab
     And I set the following fields to these values:
@@ -661,15 +638,13 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
     Then I should not see "Test Program 1"
     When I click on "Programs" in the totara menu
     Then I should not see "Test Program 1"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
     # Make the program available again
     When I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Details" tab
     And I set the following fields to these values:

@@ -70,8 +70,7 @@ Feature: The competencies can be disabled
     Then I should see "Types"
 
     # Check competencies could be add to the program's content.
-    When I click on "Programs" in the totara menu
-    And I click on "Program 1" "link"
+    When I am on "Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Content" "link"
     And the "contenttype_ce" select box should contain "Competency"
@@ -101,8 +100,7 @@ Feature: The competencies can be disabled
     Then I should not see "Competencies"
 
     # Check competencies are not an option to be added in the program's content.
-    When I click on "Programs" in the totara menu
-    And I click on "Program 1" "link"
+    When I am on "Program 1" program homepage
     And I click on "Edit program details" "button"
     And I click on "Content" "link"
     And the "contenttype_ce" select box should not contain "Competency"

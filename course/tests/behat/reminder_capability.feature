@@ -30,9 +30,7 @@ Feature: Verify course reminder capability.
   @javascript
   Scenario: Verify an admin user can access Reminders.
     Given I log in as "admin"
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Reminders" node in "Course administration"
     Then I should see "Edit course reminders"
     And I log out
@@ -40,9 +38,7 @@ Feature: Verify course reminder capability.
   @javascript
   Scenario: Verify a Site Manager can access Reminders.
     Given I log in as "manager1"
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to "Reminders" node in "Course administration"
     Then I should see "Edit course reminders"
     And I log out
@@ -53,18 +49,14 @@ Feature: Verify course reminder capability.
     When I set the following system permissions of "Site Manager" role:
       | capability                    | permission |
       | moodle/course:managereminders | Prevent    |
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should not see "Reminders"
     And I log out
 
   @javascript
   Scenario: Verify Editing Trainer can access Reminders.
     Given I log in as "editingtrainer"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    When I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should not see "Reminders"
     And I log out
 
@@ -76,9 +68,7 @@ Feature: Verify course reminder capability.
     And I log out
 
     And I log in as "editingtrainer"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Reminders" node in "Course administration"
     Then I should see "Edit course reminders"
     And I log out

@@ -21,9 +21,7 @@ Feature: Restore course completion report rpl
       | label    | label1 | label1 | C1     | label1   | 1          |
       | label    | label2 | label2 | C1     | label2   | 1          |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I click on "criteria_activity_value[1]" "checkbox"

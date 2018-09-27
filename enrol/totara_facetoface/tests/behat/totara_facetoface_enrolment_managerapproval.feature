@@ -50,9 +50,7 @@ Feature: Users are forced to get manager approval where required
 
   Scenario: Should be unable to enrol using seminar direct without a manager
     Given I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "You can not enrol yourself in this course."
 
   Scenario: A user with a manager can request access, withdraw request and be granted access
@@ -67,9 +65,7 @@ Feature: Users are forced to get manager approval where required
       | student1 | POS001   | teacher1 |
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
@@ -84,9 +80,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "manager request already pending"
     And I follow "Withdraw pending request"
     And I press "Confirm"
@@ -102,9 +96,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
@@ -118,7 +110,5 @@ Feature: Users are forced to get manager approval where required
     And I press "Update requests"
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Topic 1"

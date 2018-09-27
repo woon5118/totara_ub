@@ -19,8 +19,8 @@ Feature: User recertification and expiry of certification
       | enableprograms | Disable |
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
-    And I click on "Certifications" in the totara menu
-    And I press "Create Certification"
+    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    And I press "Add new certification"
     And I set the following fields to these values:
         | Full name  | Test Certification |
         | Short name | tstcert            |

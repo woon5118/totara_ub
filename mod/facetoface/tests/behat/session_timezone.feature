@@ -176,9 +176,7 @@ Feature: Seminar session date with timezone management
 
     When I log out
     And I log in as "teacher2"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     Then I should see "3:00 PM - 4:00 PM Pacific/Auckland" in the "Room 1" "table_row"
     And I should see "10:00 AM - 11:00 AM Europe/Prague" in the "Room 2" "table_row"
@@ -190,9 +188,7 @@ Feature: Seminar session date with timezone management
       | facetoface_displaysessiontimezones | 0 |
     And I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     Then I should see "10:00 AM - 11:00 AM " in the "Room 1" "table_row"
     And I should see "5:00 PM - 6:00 PM " in the "Room 2" "table_row"

@@ -25,8 +25,7 @@ Feature: Verify badge issue based on program completion criterion.
 
     When I log in as "admin"
     # Set up the label to complete Course 1.
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Completion requirements" to "Course is complete when ANY of the conditions are met"
@@ -35,8 +34,7 @@ Feature: Verify badge issue based on program completion criterion.
     Then I should see "Course completion criteria changes have been saved"
 
     # Set up the label to complete Course 2.
-    When I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the field "Completion requirements" to "Course is complete when ANY of the conditions are met"
@@ -102,8 +100,7 @@ Feature: Verify badge issue based on program completion criterion.
   Scenario: Verify badge is issued when program is completed.
 
     Given I log in as "learner1"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I click on "Not completed: Click to complete course. Select to mark as complete." "link"
     And I follow "Profile" in the user menu
     Then I should see "Program Badge"
@@ -136,8 +133,7 @@ Feature: Verify badge issue based on program completion criterion.
     # Login as a learner and complete the course required
     # to complete the program and receive the badge.
     When I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I click on "Not completed: Click to complete course. Select to mark as complete." "link"
     And I follow "Profile" in the user menu
     # The bagde has been issued

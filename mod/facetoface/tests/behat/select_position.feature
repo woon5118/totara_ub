@@ -51,9 +51,7 @@ Feature: Add a seminar with select position
     And I should see "1 January 2020"
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Sign-up"
     And I press "Sign-up"
@@ -97,9 +95,7 @@ Feature: Add a seminar with select position
     And I should see "1 January 2020"
     And I log out
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Sign-up"
     And I set the following fields to these values:
@@ -110,17 +106,13 @@ Feature: Add a seminar with select position
     And I should see "Unnamed job assignment (ID: 2)"
     And I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Attendees"
     And I should see "Position2"
     And I log out
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Attendees"
     And I should see "Position2"
@@ -158,9 +150,7 @@ Feature: Add a seminar with select position
     And I should see "1 January 2020"
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Sign-up"
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity"
@@ -203,9 +193,7 @@ Feature: Add a seminar with select position
     And I should see "1 January 2020"
     And I log out
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Sign-up"
     And I set the following fields to these values:
@@ -213,9 +201,7 @@ Feature: Add a seminar with select position
     And I press "Sign-up"
     And I log out
     And I log in as "teacher1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Attendees"
     Then I should see "Position2"

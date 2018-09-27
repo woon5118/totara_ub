@@ -139,9 +139,7 @@ Feature: Check My bookings displays the right information for future and past ev
     Then I should see "My Future Bookings: 0 records shown"
 
     # Sign-up for Seminar 1 and Seminar 2.
-    When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I click on "Sign-up" "link" in the "115" "table_row"
     And I press "Sign-up"
     And I click on "Sign-up" "link" in the "125" "table_row"

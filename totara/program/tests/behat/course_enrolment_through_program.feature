@@ -52,8 +52,7 @@ Feature: Course enrolment through programs
 
     # Assign the position Learner program1
     And I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I follow "Test Program 1"
+    And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Positions" from the "Add a new" singleselect
@@ -66,8 +65,7 @@ Feature: Course enrolment through programs
     Then I should see "Learner"
 
     # Assign the organisation to the program2
-    When I click on "Programs" in the totara menu
-    And I follow "Test Program 2"
+    When I am on "Test Program 2" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
     And I select "Organisations" from the "Add a new" singleselect
@@ -96,15 +94,11 @@ Feature: Course enrolment through programs
     Given I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I set the field "Visibility" to "Enrolled users only"
     And I press "Save and display"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I navigate to "Edit settings" node in "Course administration"
     And I set the field "Visibility" to "Enrolled users only"
     And I press "Save and display"
@@ -151,8 +145,7 @@ Feature: Course enrolment through programs
 
     When I follow "Course 1"
     Then I should see "You can not enrol yourself in this course"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     Then I should see "Topic 1"
     And I log out
 
@@ -199,8 +192,7 @@ Feature: Course enrolment through programs
     When I follow "Course 1"
     Then I should see "You can not enrol yourself in this course"
 
-    When I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     Then I should see "Topic 1"
     And I log out
 
@@ -247,8 +239,7 @@ Feature: Course enrolment through programs
     When I follow "Course 1"
     Then I should see "You can not enrol yourself in this course"
 
-    When I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     Then I should see "Topic 1"
     And I log out
 
@@ -277,8 +268,7 @@ Feature: Course enrolment through programs
 
     When I follow "Course 1"
     Then I should see "You can not enrol yourself in this course"
-    When I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     Then I should see "You can not enrol yourself in this course"
     And I log out
 
