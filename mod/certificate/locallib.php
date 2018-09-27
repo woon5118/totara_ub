@@ -245,7 +245,7 @@ function certificate_email_student($course, $certificate, $certrecord, $context,
     $info->certificate = format_string($certificate->name, true);
     $info->course = format_string($course->fullname, true);
     $from = fullname($teacher);
-    $subject = $info->course . ': ' . $info->certificate;
+    $subject = format_string($course->fullname . ': ' . $certificate->name, true, array('escape' => false));
     $message = get_string('emailstudenttext', 'certificate', $info) . "\n";
 
     // Make the HTML version more XHTML happy  (&amp;)
