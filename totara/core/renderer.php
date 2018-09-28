@@ -223,29 +223,38 @@ class totara_core_renderer extends plugin_renderer_base {
      */
     public function report_list_export_for_template($reports, $canedit) {
         $report_list = array();
+        $systemcontext = context_system::instance();
 
         foreach ($reports as $report) {
+
+            $reportname = format_string($report->fullname, true, ['context' => $systemcontext]);
+
             // Check url property is set.
-            if (isset($report->url)) {
-                // Escaping is done in the mustache template, so no need to do it in format string
-                $report_data = array ('name' => format_string($report->fullname), 'href' => $report->url);
-
-                if ($canedit) {
-                    $icon_params = array(
-                        'alt' => get_string('editreport', 'totara_reportbuilder', $report->fullname)
-                    );
-                    $icon = \core\output\flex_icon::get_icon('t/edit', 'core', $icon_params);
-                    $report_data['icon'] = array(
-                        'template' => $icon->get_template(),
-                        'context' => $icon->export_for_template($this)
-                    );
-                    $report_data['edit_href'] = (string) new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
-                }
-
-                $report_list[] = $report_data;
-            } else {
-                debugging(get_string('error:reporturlnotset', 'totara_reportbuilder', $report->fullname), DEBUG_DEVELOPER);
+            if (!isset($report->url)) {
+                debugging('The url property for report ' . $reportname . ' is missing, please ask your developers to check your code', DEBUG_DEVELOPER);
+                continue;
             }
+
+            // Escaping is done in the mustache template, so no need to do it in format string
+            $report_data = [
+                'name' => $reportname,
+                'href' => $report->url
+            ];
+
+            if ($canedit) {
+                $icon_params = array(
+                    // Report name must be decoded, alt goes to an attribute
+                    'alt' => get_string('edit', 'totara_reportbuilder')
+                );
+                $icon = \core\output\flex_icon::get_icon('t/edit', 'core', $icon_params);
+                $report_data['icon'] = array(
+                    'template' => $icon->get_template(),
+                    'context' => $icon->export_for_template($this)
+                );
+                $report_data['edit_href'] = (string) new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
+            }
+
+            $report_list[] = $report_data;
         }
 
         return $report_list;

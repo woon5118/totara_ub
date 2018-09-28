@@ -41,6 +41,7 @@ information provided here is intended especially for developers.
 * Deprecated function totara_core_renderer::render_totara_menu(), use totara_core_renderer::masthead() instead.
 * totara_core_renderer::icon_list() has changed
 * totara_core/icon_list mustache template has been updated
+* totara/core/templates/report_list.mustache name property was being double escaped, converted from double to triple braces.
 
 === 11 ===
 

@@ -13,6 +13,7 @@ error:groupnotcreated,totara_reportbuilder
 error:groupnotcreatedinitfail,totara_reportbuilder
 error:groupnotcreatedpreproc,totara_reportbuilder
 error:groupnotdeleted,totara_reportbuilder
+error:reporturlnotset,totara_reportbuilder
 groupcontents,totara_reportbuilder
 groupconfirmdelete,totara_reportbuilder
 groupdeleted,totara_reportbuilder

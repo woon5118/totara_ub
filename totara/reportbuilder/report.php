@@ -37,7 +37,8 @@ $debug = optional_param('debug', 0, PARAM_INT);
 
 require_login();
 
-$PAGE->set_context(context_system::instance());
+$context = context_system::instance();
+$PAGE->set_context($context);
 $PAGE->set_url('/totara/reportbuilder/report.php', array('id' => $id));
 $PAGE->set_totara_menu_selected('myreports');
 $PAGE->set_pagelayout('noblocks');
@@ -71,8 +72,8 @@ if ($format != '') {
 $PAGE->requires->string_for_js('reviewitems', 'block_totara_alerts');
 $report->include_js();
 
-$fullname = format_string($report->fullname);
-$pagetitle = format_string(get_string('report', 'totara_reportbuilder').': '.$fullname);
+$fullname = format_string($report->fullname, true, ['context' => $context]);
+$pagetitle = get_string('report', 'totara_reportbuilder').': '.$fullname;
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_button($report->edit_button());

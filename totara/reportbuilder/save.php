@@ -34,7 +34,8 @@ require_login();
 
 $id = required_param('id', PARAM_INT); // Id for report to save.
 
-$PAGE->set_context(context_system::instance());
+$context = context_system::instance();
+$PAGE->set_context($context);
 $PAGE->set_totara_menu_selected('myreports');
 
 $report = new reportbuilder($id);
@@ -80,8 +81,8 @@ if ($fromform = $mform->get_data()) {
     redirect($returnurl);
 }
 
-$fullname = $report->fullname;
-$pagetitle = format_string(get_string('savesearch', 'totara_reportbuilder').': '.$fullname);
+$fullname = format_string($report->fullname, true, ['context' => $context]);
+$pagetitle = get_string('savesearch', 'totara_reportbuilder').': '.$fullname;
 
 $PAGE->set_title($pagetitle);
 $PAGE->navbar->add(get_string('report', 'totara_reportbuilder'));
