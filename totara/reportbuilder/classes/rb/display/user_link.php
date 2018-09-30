@@ -62,8 +62,19 @@ class user_link extends base {
             // No user id means no link, most likely the fullname is empty anyway.
             return $fullname;
         }
+        // A hacky way to detect whether we are displaying the user name link within a course context or not.
+        // TL-18965 reported with inconsistency link for username that it goes to system context instead of course
+        // context even though the embedded report was view within course.
+        $params = array('id' => $extrafields->id);
+        if (!CLI_SCRIPT) {
+            global $PAGE;
+            // Only adding the course id if user the course is not one of the SITE course
+            if ($PAGE->course->id != SITEID) {
+                $params['course'] = $PAGE->course->id;
+            }
+        }
 
-        $url = new \moodle_url('/user/view.php', array('id' => $extrafields->id));
+        $url = new \moodle_url('/user/view.php', $params);
         if ($fullname === '') {
             return '';
         } else {
