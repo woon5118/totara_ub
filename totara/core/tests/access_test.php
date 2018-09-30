@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Tests covering accesslib related additions and common problems in Totara.
+ * Tests covering totara_core\access class and common access related problems in Totara.
  */
 class totara_core_access_testcase extends advanced_testcase {
 

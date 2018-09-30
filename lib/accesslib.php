@@ -4974,6 +4974,7 @@ abstract class context extends stdClass implements IteratorAggregate {
          $record->path         = $rec->ctxpath;     unset($rec->ctxpath);
          $record->depth        = $rec->ctxdepth;    unset($rec->ctxdepth);
 
+         // Totara: remove additional parentid too.
          if (!empty($rec->ctxparentid)) {
              $record->parentid = $rec->ctxparentid;
          }
@@ -5266,6 +5267,8 @@ abstract class context extends stdClass implements IteratorAggregate {
             \totara_core\access::build_context_map();
 
         } else {
+            // Totara: do not delete context_map entries, it would be too expensive,
+            //         we should not get here on production sites anyway.
             context::reset_caches();
         }
     }
@@ -5373,7 +5376,7 @@ abstract class context extends stdClass implements IteratorAggregate {
             $DB->update_record('context', $record);
         }
 
-        // Totara: add context map entries for all parents of this context.
+        // Totara: add context map entries for all parents of this context and self.
         \totara_core\access::context_created($record);
 
         return $record;
@@ -5768,7 +5771,7 @@ class context_helper extends context {
             }
         }
 
-        // Totara: rebuild the map if we have paths.
+        // Totara: rebuild the map if we have paths and parentids.
         if ($buildpaths) {
             \totara_core\access::build_context_map();
         }
@@ -5797,7 +5800,7 @@ class context_helper extends context {
         }
         accesslib_clear_all_caches(true);
 
-        // Totara: rebuild the map.
+        // Totara: rebuild the context_map table.
         \totara_core\access::build_context_map($verbose);
     }
 
@@ -6067,7 +6070,7 @@ class context_system extends context {
         }
 
         // Totara: do not verify the parentid here, it would cause notices before upgrade.
-        if ($record->depth != 1 or $record->path !== '/'.$record->id) {
+        if ($record->depth != 1 or $record->path != '/'.$record->id) {
             // fix path if necessary, initial install or path reset
             $record->depth = 1;
             $record->path  = '/'.$record->id;
@@ -6150,7 +6153,7 @@ class context_system extends context {
             debugging('Invalid SYSCONTEXTID detected');
         }
 
-        if ($record->depth != 1 or $record->path !== '/'.$record->id or $record->parentid !== '0') {
+        if ($record->depth != 1 or $record->path != '/'.$record->id or $record->parentid !== '0') {
             // fix path if necessary, initial install or path reset
             $record->depth    = 1;
             $record->path     = '/'.$record->id;

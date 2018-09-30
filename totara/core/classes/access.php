@@ -24,8 +24,6 @@
 
 namespace totara_core;
 
-use totara_reportbuilder\rb\display\duration_hours_minutes;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -117,7 +115,7 @@ EXISTS (
     }
 
     /**
-     * Validates contextidfield parameter to make sure it works well
+     * Validates contextidfield parameter to make sure there are no SQL injections or SQL errors
      * in the generic queries and in the queries for the cached reports.
      *
      * @param string $contextidfield
@@ -139,8 +137,7 @@ EXISTS (
      * Use get_has_capability_sql() to emulate has_capability(),
      * this is intended mainly for testing purposes.
      *
-     * Note this still doesn't do all the other checks that the existing has_capability() function does,
-     * for example role switching is completely ignored.
+     * Note: role switching is completely ignored.
      *
      * @param string        $capability
      * @param \context      $context
@@ -176,7 +173,7 @@ EXISTS (
      * - $CFG->guestroleid
      * - $CFG->defaultfrontpageroleid
      *
-     * @param int $userid ID of the user to check permissions for.
+     * @param int $userid ID of the user to check permissions for, 0 means not-logger-in user
      *
      * @return string sql fragment with embedded parameters
      */
@@ -526,7 +523,7 @@ EXISTS (
      *
      * @param string $tablename
      */
-    protected static function analyze_table($tablename) {
+    private static function analyze_table($tablename) {
         global $DB;
 
         $dbfamily = $DB->get_dbfamily();
@@ -572,6 +569,8 @@ EXISTS (
                  )";
         $params = array('path' => $record->path . '/%');
         $DB->execute($sql, $params);
+
+        // NOTE: the rebuilding is initiated after transaction is committed in context::update_moved().
     }
 
     /**

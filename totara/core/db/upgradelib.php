@@ -486,10 +486,10 @@ function totara_core_upgrade_context_tables() {
     if (!$dbman->index_exists($table, $index)) {
         $dbman->add_index($table, $index);
     }
+
     // Add parentid to context_temp table.
     $table = new xmldb_table('context_temp');
     $field = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'depth');
-    $index = new xmldb_index('parentid', XMLDB_INDEX_NOTUNIQUE, array('parentid'));
     if (!$dbman->field_exists($table, $field)) {
         $dbman->add_field($table, $field);
         $updated = true;
