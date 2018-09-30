@@ -1401,13 +1401,20 @@ function disable_output_buffering() {
  */
 function is_major_upgrade_required() {
     global $CFG;
+
+    // Totara: do not modify, always keep in sync with Moodle branch!!!
     $lastmajordbchanges = 2017040403.00;
+
+    // Totara: bump up the following version to match /totara/core/version.php
+    //         if your upgrade step prevents users from logging in before upgrade.
+    $totaracoremajordbchanges = 2018091900;
 
     $required = empty($CFG->version);
     $required = $required || (float)$CFG->version < $lastmajordbchanges;
     $required = $required || during_initial_install();
     $required = $required || !empty($CFG->adminsetuppending);
     $required = $required || !isset($CFG->totara_version);
+    $required = $required || (get_config('totara_core', 'version') < $totaracoremajordbchanges);
 
     return $required;
 }
