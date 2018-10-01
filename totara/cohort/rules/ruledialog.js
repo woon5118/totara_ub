@@ -317,16 +317,18 @@ var funccompletiondate =  function(element) {
     element = $(element);
     var parent = element.parent();
     if (!element.val().match(M.util.get_string('datepickerlongyearregexjs', 'totara_core'))){
-        parent.addClass('error');
         if ($('#id_error_completiondate').length == 0) {
-            parent.prepend('<span id="id_error_completiondate" class="error">' +
-                M.util.get_string('error:baddate','totara_cohort') +
-                '</span>');
+            require(['core/templates'], function (templates) {
+                templates.renderIcon('times-circle-danger').done(function (icon) {
+                    parent.prepend('<span id="id_error_completiondate" class="error">' +
+                        icon + M.util.get_string('error:baddate','totara_cohort') +
+                        '</span>');
+                });
+            });
         }
         return false;
     } else {
         $('#id_error_completiondate').remove();
-        parent.removeClass('error');
         return true;
     }
 };
@@ -336,16 +338,18 @@ var funccompletionduration = function(element) {
     element = $(element);
     var parent = element.parent();
     if (!element.val().match(/[1-9]+[0-9]*/)){
-        parent.addClass('error');
         if ( $('#id_error_completiondurationdate').length == 0 ) {
-            parent.prepend('<span id="id_error_completiondurationdate" class="error">' +
-                M.util.get_string('error:badduration','totara_cohort') +
-                '</span>');
+            require(['core/templates'], function (templates) {
+                templates.renderIcon('times-circle-danger').done(function (icon) {
+                    parent.prepend('<span id="id_error_completiondurationdate" class="error">' +
+                        icon + M.util.get_string('error:badduration','totara_cohort') +
+                        '</span>');
+                });
+            });
         }
         return false;
     } else {
         $('#id_error_completiondurationdate').remove();
-        parent.removeClass('error');
         return true;
     }
 };
