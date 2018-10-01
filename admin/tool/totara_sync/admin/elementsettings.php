@@ -36,7 +36,7 @@ if (!$element = totara_sync_get_element($elementname)) {
 
 admin_externalpage_setup('syncelement'.$elementname);
 
-$task = \core\task\manager::get_scheduled_task('tool_totara_sync\task\\' . $element->get_name());
+$task = $element->get_dedicated_scheduled_task();
 list($complexscheduling, $scheduleconfig) = get_schedule_form_data($task);
 
 $form = new totara_sync_element_settings_form($FULLME, ['element' => $element, 'complexscheduling' => $complexscheduling]);

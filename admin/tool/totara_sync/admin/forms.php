@@ -131,7 +131,6 @@ class totara_sync_element_settings_form extends moodleform {
         $mform->addHelpButton('csvsaveemptyfields', 'emptyfieldsbehaviourhierarchy', 'tool_totara_sync');
 
         // Disable the field when nothing is selected, and when database is selected.
-        $mform->disabledIf('csvsaveemptyfields', $sourceselection, 'eq', '');
         $mform->disabledIf('csvsaveemptyfields', $sourceselection, 'noteq', $csvsource);
 
         // Element configuration

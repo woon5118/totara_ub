@@ -229,6 +229,8 @@ abstract class totara_sync_element {
      * @param stdClass $data Values from submitted config form.
      */
     public function save_configuration($data) {
+        global $CFG;
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/locallib.php');
 
         // Set selected source. This is saved within the plugin 'totara_sync', while other setting consider
         // the plugin to be the element classname when being saved.
@@ -254,19 +256,39 @@ abstract class totara_sync_element {
             $this->set_config('notifymailto', $data->notifymailto);
         }
 
-        $this->set_config('scheduleusedefaults', $data->scheduleusedefaults);
-        if ($data->scheduleusedefaults) {
-            $data->cronenable = 0;
+        $scheduled_task = $this->get_dedicated_scheduled_task();
+        if ($scheduled_task) {
+            if ($data->scheduleusedefaults) {
+                $data->cronenable = 0;
+            }
+            save_scheduled_task_from_form(
+                $data,
+                $scheduled_task
+            );
+        } else {
+            // False for $scheduled_task means it could not be found. For backwards compatibility, allow this but let devs know.
+            debugging('There is no dedicated scheduled task for this element: ' . $this->get_name());
+            $data->scheduleusedefaults = 1;
         }
-        save_scheduled_task_from_form(
-            $data,
-            \core\task\manager::get_scheduled_task('\tool_totara_sync\task\\' . $this->get_name())
-        );
+        $this->set_config('scheduleusedefaults', $data->scheduleusedefaults);
+
 
         if ($this->has_config()) {
             // Save element-specific config.
             $this->config_save($data);
         }
+    }
+
+    /**
+     * Return an instance of a scheduled task that would run only this element.
+     *
+     * So this does not return the default scheduled task even if this element is set to use schedule defaults.
+     * This is only to return the scheduled tasks that is specific to this element.
+     *
+     * @return \core\task\scheduled_task|bool The associated scheduled task or False if none can be found.
+     */
+    public function get_dedicated_scheduled_task() {
+        return \core\task\manager::get_scheduled_task('\tool_totara_sync\task\\' . $this->get_name());
     }
 
     /**
@@ -294,17 +316,22 @@ abstract class totara_sync_element {
         }
 
         // Get most recent log messages of type.
-        list($sqlin, $params) = $DB->get_in_or_equal($notifytypes);
-        $params = array_merge($params, [$runid]);
+        list($sqlin, $params) = $DB->get_in_or_equal($notifytypes, SQL_PARAMS_NAMED);
+        $params = array_merge($params, ['runid' => $runid]);
         $logitems = $DB->get_records_select(
             'totara_sync_log',
-            "logtype {$sqlin} AND runid = ?",
+            "logtype {$sqlin} AND runid = :runid",
             $params,
             'time DESC',
             '*',
             0,
             TOTARA_SYNC_LOGTYPE_MAX_NOTIFICATIONS
         );
+
+        if (empty($logitems)) {
+            // Nothing to report.
+            return;
+        }
 
         // Build email message.
         $logcount = count($logitems);
@@ -338,7 +365,9 @@ abstract class totara_sync_element {
         );
 
         // Send emails.
-        mtrace("\n{$logcount} relevant totara sync log messages for run id: " . $runid . ". Sending notifications...");
+        if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
+            mtrace("\n{$logcount} relevant totara sync log messages for run id: " . $runid . ". Sending notifications...");
+        }
         $supportuser = core_user::get_support_user();
         foreach ($notifymailto as $emailaddress) {
             $userto = \totara_core\totara_user::get_external_user(trim($emailaddress));
@@ -357,7 +386,11 @@ abstract class totara_sync_element {
     protected function get_configuration_errors(): array {
         $errors = [];
 
-        $elementtext = get_string('displayname:'.$this->get_name(), 'tool_totara_sync');
+        if (get_string_manager()->string_exists('displayname:'.$this->get_name(), 'tool_totara_sync')) {
+            $elementtext = get_string('displayname:' . $this->get_name(), 'tool_totara_sync');
+        } else {
+            $elementtext = $this->get_name();
+        }
 
         if (!get_config('totara_sync', 'source_' . $this->get_name())) {
             $errors[] = get_string('sourcenotfound', 'tool_totara_sync', $elementtext);
@@ -366,14 +399,24 @@ abstract class totara_sync_element {
             return $errors;
         }
 
-        $config = $this->get_source()->get_config(null);
+        try {
+            $source = $this->get_source();
+        } catch (totara_sync_exception $exception) {
+            $errors[] = get_string('sourcetypenotloaded', 'tool_totara_sync', $elementtext);
+
+            // The rest of the checks won't work.
+            return $errors;
+        }
+
+        // This might fail if the source isn't valid.
+        $config = $source->get_config(null);
         $props = get_object_vars($config);
         if (empty($props)) {
             $errors[] = get_string('nosourceconfig', 'tool_totara_sync', $elementtext);
         }
 
         try {
-            if ($this->get_source()->uses_files()
+            if ($source->uses_files()
                 && ($this->get_fileaccess() == FILE_ACCESS_DIRECTORY)
                 && empty($this->get_filesdir())) {
                 $errors[] = get_string('nofilesdir', 'tool_totara_sync');
@@ -398,7 +441,9 @@ abstract class totara_sync_element {
 
         $errors = $this->get_configuration_errors();
         if (!empty($errors)) {
-            mtrace(get_string('syncnotconfiguredsummary', 'tool_totara_sync', implode(", ", $errors)));
+            if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
+                mtrace(get_string('syncnotconfiguredsummary', 'tool_totara_sync', implode(", ", $errors)));
+            }
             return false;
         }
 

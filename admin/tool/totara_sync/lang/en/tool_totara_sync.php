@@ -132,6 +132,7 @@ $string['uploadsyncfiles'] = 'Upload HR Import files';
 $string['sourcedoesnotusefiles'] = 'Source does not use files';
 $string['nosourceconfig'] = 'No source configuration for \'{$a}\'';
 $string['sourceconfigured'] = 'Source has configuration';
+$string['sourcetypenotloaded'] = 'Source could not be loaded for {$a}';
 $string['uploadfilelink'] = 'Files can be uploaded <a href=\'{$a}\'>here</a>';
 
 // Hierarchy items
@@ -435,6 +436,8 @@ $string['fileaccess_default'] = 'Default ({$a})';
 $string['fileaccess_directory'] = 'Directory Check';
 $string['fileaccess_upload'] = 'Upload Files';
 $string['fileaccess_unknowndefault'] = 'Default (Unknown)';
+$string['fileaccessnotset'] = 'No valid file access configuration found';
+$string['filesdirnotset'] = 'No valid file directory configuration found';
 $string['defaultsettings'] = 'Default settings';
 $string['invalidemailaddress'] = 'Invalid email address \'{$a}\'';
 $string['noneselected'] = 'None selected';

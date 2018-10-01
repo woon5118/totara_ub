@@ -17,7 +17,7 @@ information provided here is intended especially for developers.
   * set_sync_user_fields the third parameter is no longer used. Behaviour of the function has not changed.
   * put_custom_field_data() the third parameter is no longer used. Behaviour of the function has not changed.
 * rb_source_totara_sync_log::rb_display_logtype() has been deprecated, please call tool_totara_sync\rb\display\totara_sync_log_type::display instead().
-* Syncing of elements is now iterates through each element and runs the whole sync process, including checking for configuration
+* Syncing of elements now iterates through each element and runs the whole sync process, including checking for configuration
     errors, the import of data, triggering the event and notifying users, before going to the next element and repeating
     this process
 * tool_totara_sync\event\sync_completed now contains a parameter within its 'other' data entry called 'element'. This contains
@@ -33,6 +33,8 @@ information provided here is intended especially for developers.
     data against a task other than the default.
 * totara_sync_notify has been deprecated. Elements should be run via totara_sync_element::run_sync(), which will notify users following the run.
     Alternatively, the protected method totara_sync_element::notify_user can perform this operation.
+* The base source class now uses the element property in its constructor. In extended source classes, it is now recommended
+    to assign a value to $this->element before calling parent::construct().
 
 === 11.0 ===
 
