@@ -57,10 +57,15 @@ class mod_facetoface_notification_template_form extends moodleform {
         $mform->setType('status', PARAM_INT);
         $mform->addHelpButton('status', 'notificationtemplatestatus', 'facetoface');
 
-        $mform->addElement('static', 'updateactivitieswarning', null, get_string('updateactivitieswarning', 'facetoface'));
-        $mform->addElement('advcheckbox', 'updateactivities', get_string('updateactivities', 'facetoface'));
+        if ($this->_customdata['id'] && $this->_customdata['reference']) {
+            $mform->addElement('static', 'updateactivitieswarning', null, get_string('updateactivitieswarning', 'facetoface'));
+            $mform->addElement('advcheckbox', 'updateactivities', get_string('updateactivities', 'facetoface'));
+            $mform->addHelpButton('updateactivities', 'updateactivities', 'facetoface');
+        } else {
+            $mform->addElement('hidden', 'updateactivities');
+            $mform->setDefault('updateactivities', 0);
+        }
         $mform->setType('updateactivities', PARAM_INT);
-        $mform->addHelpButton('updateactivities', 'updateactivities', 'facetoface');
 
         if ($this->_customdata['id']) {
             $label = null;
