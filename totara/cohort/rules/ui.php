@@ -2226,3 +2226,54 @@ class cohort_rule_ui_cohortmember extends cohort_rule_ui {
         return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }
+
+/**
+ * Class cohort_rule_ui_authentication_type
+ * @property array $options Array<value, label> where 'value' is mixed type and 'label' is a string
+ */
+class cohort_rule_ui_authentication_type extends cohort_rule_ui_menu {
+    /**
+     * cohort_rule_ui_authentication_type constructor.
+     * @param string $description
+     */
+    public function __construct($description) {
+        parent::__construct($description, array());
+        $this->init();
+    }
+
+    /**
+     * @return void
+     */
+    private function init(): void {
+        if (empty($this->options)) {
+            $authavailables = core_component::get_plugin_list('auth');
+            foreach ($authavailables as $auth => $dirpath) {
+                $authplugin = get_auth_plugin($auth);
+                $this->options[$auth] = $authplugin->get_title();
+            }
+        }
+    }
+
+    /**
+     * A method for validating the form submitted data
+     * @return bool
+     */
+    public function validateResponse() {
+        /** @var core_renderer $OUTPUT */
+        global $OUTPUT;
+        $form = $this->constructForm();
+        if  ($data = $form->get_submitted_data()) {
+            $success = !empty($data->listofvalues);
+            // Checking whether the listofvalues being passed is empty or not. If it is empty, error should be returned
+            if (!$success) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('msg:missing_auth_type', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+            }
+            return $success;
+        }
+
+        // If the form is not submitted at all, then there is no point to validate and false should be returned here
+        return false;
+    }
+}

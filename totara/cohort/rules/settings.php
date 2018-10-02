@@ -258,6 +258,16 @@ function cohort_rules_list($reset = false){
             }
         }
 
+        // User authentication
+        $rules[] = new cohort_rule_option(
+            'user',
+            'authenticationtype',
+            new cohort_rule_ui_authentication_type(
+                get_string('ruledesc-user-authenticationtype', 'totara_cohort')
+            ),
+            new cohort_rule_sqlhandler_in_userfield_char('auth', COHORT_RULES_TYPE_MENU)
+        );
+
         // Audience rules applied across all job assignments.
         $rules[] = new cohort_rule_option(
             'alljobassign',
