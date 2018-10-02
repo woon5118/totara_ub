@@ -487,14 +487,10 @@ function totara_core_upgrade_context_tables() {
         $dbman->add_index($table, $index);
     }
 
-    // Add parentid to context_temp table,
-    // but first make sure it is empty.
-    $DB->delete_records('context_temp', array());
+    // Remove fake context_temp table, real temp table is used in Totara.
     $table = new xmldb_table('context_temp');
-    $field = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'depth');
-    if (!$dbman->field_exists($table, $field)) {
-        $dbman->add_field($table, $field);
-        $updated = true;
+    if ($dbman->table_exists($table)) {
+        $dbman->drop_table($table);
     }
 
     // Add context_map table to be used for flattening context tree.

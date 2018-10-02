@@ -5095,12 +5095,57 @@ abstract class context extends stdClass implements IteratorAggregate {
     }
 
     /**
+     * Create real temporary table context_temp.
+     *
+     * @since Totara 12
+     */
+    protected static function create_context_temp_table() {
+        global $DB;
+
+        $dbman = $DB->get_manager();
+
+        if ($dbman->table_exists('context_temp')) {
+            return;
+        }
+
+        $table = new xmldb_table('context_temp');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null); // This is context.id, not incrementing id.
+        $table->add_field('path', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('depth', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        $dbman->create_temp_table($table);
+    }
+
+    /**
+     * Drop real temporary table context_temp.
+     *
+     * @since Totara 12
+     */
+    protected static function drop_context_temp_table() {
+        global $DB;
+
+        $dbman = $DB->get_manager();
+
+        if ($dbman->table_exists('context_temp')) {
+            $dbman->drop_table(new xmldb_table('context_temp'));
+        }
+    }
+
+    /**
      * Copy prepared new contexts from temp table to context table,
      * we do this in db specific way for perf reasons only.
+     *
+     * Totara: context_temp table is emptied after merge
+     *
      * @static
      */
     protected static function merge_context_temp_table() {
         global $DB;
+
+        // Totara: make sure the temporary table stats are properly updated.
+        $DB->update_temp_table_stats();
 
         /* MDL-11347:
          *  - mysql does not allow to use FROM in UPDATE statements
@@ -5144,6 +5189,10 @@ abstract class context extends stdClass implements IteratorAggregate {
         }
 
         $DB->execute($updatesql);
+
+        // Totara: make sure the temporary table is empty and stats are properly reset.
+        $DB->update_temp_table_stats();
+        $DB->delete_records('context_temp');
     }
 
    /**
@@ -5759,6 +5808,9 @@ class context_helper extends context {
      * @return void
      */
     public static function create_instances($contextlevel = null, $buildpaths = true) {
+        // Totara: use real temp table.
+        context::create_context_temp_table();
+
         self::init_levels();
         foreach (self::$alllevels as $level=>$classname) {
             if ($contextlevel and $level > $contextlevel) {
@@ -5770,6 +5822,9 @@ class context_helper extends context {
                 $classname::build_paths(false);
             }
         }
+
+        // Totara: drop temp table.
+        context::drop_context_temp_table();
 
         // Totara: rebuild the map if we have paths and parentids.
         if ($buildpaths) {
@@ -5786,6 +5841,9 @@ class context_helper extends context {
      * @return void
      */
     public static function build_all_paths($force = false, $verbose = false) {
+        // Totara: use real temp table.
+        context::create_context_temp_table();
+
         self::init_levels();
         foreach (self::$alllevels as $classname) {
             if ($verbose) {
@@ -5799,6 +5857,9 @@ class context_helper extends context {
             echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "Clearing access caches\n";
         }
         accesslib_clear_all_caches(true);
+
+        // Totara: drop temp table.
+        context::drop_context_temp_table();
 
         // Totara: rebuild the context_map table.
         \totara_core\access::build_context_map($verbose);

@@ -157,11 +157,8 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
 
         $this->assertEquals(1, $DB->count_records('course')); // Only frontpage in new site.
 
-        // This is weird table - id is NOT a sequence here.
-        $this->assertEquals(0, $DB->count_records('context_temp'));
-        $DB->import_record('context_temp', array('id'=>5, 'path'=>'/1/2', 'depth'=>2, 'parentid'=>1));
-        $record = $DB->get_record('context_temp', array());
-        $this->assertEquals(5, $record->id);
+        // Totara: we use real temporary table for context_temp since Totara 12,
+        //         there are no problematic tables with non-incrementing ids any more.
 
         $this->assertEquals(0, $DB->count_records('user_preferences'));
         $originaldisplayid = $DB->insert_record('user_preferences', array('userid'=>2, 'name'=> 'phpunittest', 'value'=>'x'));
@@ -178,7 +175,6 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
         $this->resetAllData();
 
         $this->assertEquals(1, $DB->count_records('course')); // Only frontpage in new site.
-        $this->assertEquals(0, $DB->count_records('context_temp')); // Only frontpage in new site.
 
         $numcourses = $DB->count_records('course');
         $course = $this->getDataGenerator()->create_course();
