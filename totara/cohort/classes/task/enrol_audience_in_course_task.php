@@ -43,7 +43,13 @@ class enrol_audience_in_course_task extends \core\task\adhoc_task {
         raise_memory_limit(MEMORY_HUGE);
         \core_php_time_limit::raise(60 * 30);
 
-        $trace = new \text_progress_trace();
+        // No output needed for unit tests.
+        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST === true) {
+            $trace = new \null_progress_trace();
+        } else {
+            $trace = new \text_progress_trace();
+        }
+
         enrol_cohort_sync($trace, $courseid, $cohortid);
     }
 }
