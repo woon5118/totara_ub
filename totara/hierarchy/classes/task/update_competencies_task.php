@@ -361,10 +361,10 @@ class update_competencies_task extends \core\task\scheduled_task {
      *
      * @param int $userid
      * @param array $evidence_records
-     * @param stdClass $job_assignment
+     * @param job_assignment|null $job_assignment
      * @return void
      */
-    private function aggregate_competency_evidence_items(int $userid, array $evidence_records, ?stdClass $job_assignment): void {
+    private function aggregate_competency_evidence_items(int $userid, array $evidence_records, ?job_assignment $job_assignment): void {
         global $COMP_AGGREGATION;
 
         foreach ($evidence_records as $competencyid => $records) {
@@ -453,9 +453,9 @@ class update_competencies_task extends \core\task\scheduled_task {
      * @param int $userid
      * @param int $competencyid
      * @param int $status
-     * @param stdClass $jobassignment
+     * @param job_assignment|null $jobassignment
      */
-    private function update_competency_evidence(int $userid, int $competencyid, int $status, ?stdClass $jobassignment): void {
+    private function update_competency_evidence(int $userid, int $competencyid, int $status, ?job_assignment $jobassignment): void {
         if (debugging()) {
             mtrace('Update proficiency to ' . $status);
         }
