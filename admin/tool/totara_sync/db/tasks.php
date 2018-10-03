@@ -33,7 +33,8 @@ $tasks = [
         'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'month' => '*',
+        'disabled' => 1
     ],
     [
         'classname' => 'tool_totara_sync\task\pos',
@@ -42,7 +43,8 @@ $tasks = [
         'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'month' => '*',
+        'disabled' => 1
     ],
     [
         'classname' => 'tool_totara_sync\task\org',
@@ -51,7 +53,8 @@ $tasks = [
         'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'month' => '*',
+        'disabled' => 1
     ],
     [
         'classname' => 'tool_totara_sync\task\jobassignment',
@@ -60,7 +63,8 @@ $tasks = [
         'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'month' => '*',
+        'disabled' => 1
     ],
     [
         'classname' => 'tool_totara_sync\task\user',
@@ -69,6 +73,7 @@ $tasks = [
         'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'month' => '*',
+        'disabled' => 1
     ],
 ];
