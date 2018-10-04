@@ -751,7 +751,7 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $crscomp1 = $DB->get_record('course_completions', array('userid' => $users['u1']->id, 'course' => $course->id));
         $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u1']->id));
         foreach ($progcomps as $progcomp) {
-            $this->assertEquals($crscomp1->timestarted, $progcomp->timestarted);
+            $this->assertGreaterThanOrEqual($crscomp1->timestarted, $progcomp->timestarted);
         }
 
         $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u2']->id));
@@ -775,12 +775,12 @@ class totara_program_completions_task_testcase extends advanced_testcase {
 
         $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u1']->id));
         foreach ($progcomps as $progcomp) {
-            $this->assertEquals($crscomp1->timestarted, $progcomp->timestarted);
+            $this->assertGreaterThanOrEqual($crscomp1->timestarted, $progcomp->timestarted);
         }
 
         $progcomps = $DB->get_records('prog_completion', array('userid' => $users['u2']->id));
         foreach ($progcomps as $progcomp) {
-            $this->assertEquals($crscomp2->timestarted, $progcomp->timestarted);
+            $this->assertGreaterThanOrEqual($crscomp2->timestarted, $progcomp->timestarted);
         }
     }
 }
