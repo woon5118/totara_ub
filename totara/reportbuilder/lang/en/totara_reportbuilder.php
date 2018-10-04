@@ -90,6 +90,7 @@ $string['assigngroup'] = 'Assign a group to restriction';
 $string['assigngrouprecord'] = 'Assign restriction records';
 $string['assigngroupuser'] = 'Assign restricted users';
 $string['at'] = 'at';
+$string['audience'] = 'The audience';
 $string['audiences'] = 'Audiences';
 $string['audiencevisibility'] = 'Audience Visibility';
 $string['audiencevisibilitydisabled'] = 'Audience Visibility (not applicable)';
@@ -427,6 +428,8 @@ $string['globalrestrictions'] = 'Global report restrictions for report builder r
 $string['globalrestrictionsdisabled'] = 'Global report restrictions disabled';
 $string['globalrestrictiondescription'] = 'Global report restrictions are enabled separately for each report in the report\'s Content tab. Administrator may configure if global report restrictions are enabled automatically in all new reports.';
 $string['globalrestrictionnew'] = 'New restriction';
+$string['globalsettingaudiencename'] = "Set a default audience-based content restriction for all new user reports";
+$string['globalsettingaudiencedescription'] = "The audience selected above will appear as the default audience-based content restriction settings for all new user reports. It can be overridden on individual reports by report creators.";
 $string['globalsettings'] = 'General settings';
 $string['globalsettingsupdated'] = 'Global settings updated';
 $string['gotofacetofacesettings'] = 'To view this report go to a seminar activity and use the \'Declared interest report\' link in the \'Seminar administration\' admin menu.';
@@ -530,6 +533,7 @@ $string['noactiverestrictionsbehaviour'] = 'Global restriction behaviour for use
 $string['noactiverestrictionsbehaviour_desc'] = 'Specifies what users will see when viewing a report with global restrictions enabled when they don\'t have any restrictions applied to them.';
 $string['noactiverestrictionsbehaviournone'] = 'Show no records';
 $string['noactiverestrictionsbehaviourall'] = 'Show all records';
+$string['noaudienceselected'] = 'You have to select an audience';
 $string['nocolumnsyet'] = 'No columns have been created yet - add them by selecting a column name in the pulldown below.';
 $string['nocontentrestriction'] = 'Show all records';
 $string['nodeletereport'] = 'Report could not be deleted';
@@ -644,6 +648,10 @@ When set to **All users can view this report** there are no restrictions applied
 When set to **Only certain users can view this report** the report will be restricted to the user groups selected below.
 
 Note that access restrictions only control who can view the report, not which records it contains. See the **Content** tab for controlling the report contents.';
+$string['reportbuilderaudience'] = 'Show records by audience';
+$string['reportbuilderaudience_help'] = "When **Show records based on audience** is selected the report will only show data of users who are members of the selected audience.";
+$string['reportbuilderaudiencenopermissionapplied'] = "An audience based content restriction has been applied but you don't have permissions to view audiences.";
+$string['reportbuilderaudiencenopermission'] = "You don't have permission to view audiences. Please note that currently no audience-based restriction has been applied";
 $string['reportbuildercache'] = 'Enable report caching';
 $string['reportbuildercache_disabled'] = 'This setting is not available for this report source';
 $string['reportbuildercache_heading'] = 'Caching Performance Settings';

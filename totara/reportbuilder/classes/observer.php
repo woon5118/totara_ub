@@ -58,4 +58,24 @@ class totara_reportbuilder_observer {
 
         $transaction->allow_commit();
     }
+
+    /**
+     * Event that is triggered when a report is created.
+     *
+     * Update default restriction settings
+     *
+     * @param \totara_reportbuilder\event\report_created $event
+     *
+     */
+    public static function add_default_restriction(\totara_reportbuilder\event\report_created $event) {
+        global $CFG;
+        include_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+        $reportid = $event->objectid;
+        $report = new reportbuilder($reportid);
+
+        if (in_array('audience', $report->get_content_options())) {
+            $restriction = new rb_audience_content();
+            $restriction->set_default_restriction($reportid);
+        }
+    }
 }

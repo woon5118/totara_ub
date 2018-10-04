@@ -76,6 +76,22 @@ if ($ADMIN->fulltree) {
         )
     );
 
+    //Audience settings
+    $cohorts = cohort_get_all_cohorts(0, 0);
+    $cohortoptions = [0 => get_string('no_audience_defined', 'rb_source_user')];
+    foreach ($cohorts['cohorts'] as $cohort) {
+        $cohortoptions[$cohort->id] = format_string($cohort->name);
+    }
+    $rb->add(
+        new admin_setting_configselect(
+            'totara_reportbuilder/userrestrictaudience',
+            new lang_string('globalsettingaudiencename', 'totara_reportbuilder'),
+            new lang_string('globalsettingaudiencedescription', 'totara_reportbuilder'),
+            0,
+            $cohortoptions
+        )
+    );
+
     $rb->add(
         new admin_setting_configcheckbox(
             'totara_reportbuilder/globalinitialdisplay',
@@ -111,7 +127,6 @@ if ($ADMIN->fulltree) {
 
     // Scheduled reports recipients settings.
     $rb->add(new totara_reportbuilder_admin_setting_configallowedscheduledrecipients());
-
 }
 
 // Add all above settings to the report builder settings node.

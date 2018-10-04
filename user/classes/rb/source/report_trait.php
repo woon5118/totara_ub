@@ -999,6 +999,14 @@ trait report_trait {
             "{$join}"
         );
 
+        // Add audience content options.
+        $contentoptions[] = new \rb_content_option(
+            'audience',
+            get_string('audience', 'rb_source_user'),
+            "{$join}.id",
+            "{$join}"
+        );
+
         return true;
     }
 }

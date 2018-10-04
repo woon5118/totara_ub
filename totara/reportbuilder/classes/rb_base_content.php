@@ -1639,3 +1639,5 @@ include_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_trainer_content.p
 include_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_session_roles_content.php');
 // Include report access content restriction.
 include_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_report_access_content.php');
+// Include audience restriction.
+include_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_audience_content.php');
