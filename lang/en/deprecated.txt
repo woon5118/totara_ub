@@ -58,9 +58,6 @@ strftimedaydatetime,core_message
 timenosee,core_message
 timesent,core_message
 userssearchresults,core_message
-datelabelisafter,core_filters
-datelabelisbefore,core_filters
-datelabelisbetween,core_filters
 configcustommenuitems,core_admin
 custommenuitems,core_admin
 custommenu,core_admin

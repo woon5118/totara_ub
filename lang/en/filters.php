@@ -104,6 +104,9 @@ $string['courserole'] = 'Course role';
 $string['courserolelabel'] = '{$a->label} is {$a->rolename} in {$a->coursename} from {$a->categoryname}';
 $string['courserolelabelerror'] = '{$a->label} error: course {$a->coursename} does not exist';
 $string['coursevalue'] = 'course value';
+$string['datelabelisafter'] = '{$a->label} is after {$a->after}';
+$string['datelabelisbefore'] = '{$a->label} is before {$a->before}';
+$string['datelabelisbetween'] = '{$a->label} is between {$a->after} and {$a->before}';
 $string['defaultx'] = 'Default ({$a})';
 $string['disabled'] = 'Disabled';
 $string['doesnotcontain'] = 'doesn\'t contain';
@@ -154,11 +157,3 @@ $string['tablenosave'] = 'Changes in table above are saved automatically.';
 $string['textlabel'] = '{$a->label} {$a->operator} {$a->value}';
 $string['textlabelnovalue'] = '{$a->label} {$a->operator}';
 $string['valuefor'] = '{$a} value';
-
-/*
- * @deprecated Since Totara v10.0.
- */
-
-$string['datelabelisafter'] = '{$a->label} is after {$a->after}';
-$string['datelabelisbefore'] = '{$a->label} is before {$a->before}';
-$string['datelabelisbetween'] = '{$a->label} is between {$a->after} and {$a->before}';
