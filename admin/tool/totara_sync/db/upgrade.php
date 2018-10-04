@@ -189,7 +189,14 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             ['plugin' => 'totara_sync_source_pos_%', 'name' => 'import_customfield_%']
         );
         foreach ($records as $record) {
-            $shortname = explode('_', $record->name)[2];
+            $pieces = explode('_', $record->name);
+            if (count($pieces) !== 3) {
+                // Prior to this upgrade step, we expect settings to be like import_customfield_{shortname} = 3 pieces.
+                // If we're here, this seems to be a setting that has already been upgraded, or otherwise
+                // is not what we expect. Avoid doing anything with it.
+                continue;
+            }
+            $shortname = $pieces[2];
             if (isset($posbyshortname[$shortname]) && is_array($posbyshortname[$shortname])) {
                 foreach ($posbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'import_customfield_' . $typeid . '_' . $shortname;
@@ -210,7 +217,14 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             ['plugin' => 'totara_sync_source_pos_%', 'name' => 'fieldmapping_customfield_%']
         );
         foreach ($records as $record) {
-            $shortname = explode('_', $record->name)[2];
+            $pieces = explode('_', $record->name);
+            if (count($pieces) !== 3) {
+                // Prior to this upgrade step, we expect settings to be like fieldmapping_customfield_{shortname} = 3 pieces.
+                // If we're here, this seems to be a setting that has already been upgraded, or otherwise
+                // is not what we expect. Avoid doing anything with it.
+                continue;
+            }
+            $shortname = $pieces[2];
             if (isset($posbyshortname[$shortname]) && is_array($posbyshortname[$shortname])) {
                 foreach ($posbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'fieldmapping_customfield_' . $typeid . '_' . $shortname;
@@ -250,7 +264,14 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             ['plugin' => 'totara_sync_source_org_%', 'name' => 'import_customfield_%']
         );
         foreach ($records as $record) {
-            $shortname = explode('_', $record->name)[2];
+            $pieces = explode('_', $record->name);
+            if (count($pieces) !== 3) {
+                // Prior to this upgrade step, we expect settings to be like import_customfield_{shortname} = 3 pieces.
+                // If we're here, this seems to be a setting that has already been upgraded, or otherwise
+                // is not what we expect. Avoid doing anything with it.
+                continue;
+            }
+            $shortname = $pieces[2];
             if (isset($orgbyshortname[$shortname]) && is_array($orgbyshortname[$shortname])) {
                 foreach ($orgbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'import_customfield_' . $typeid . '_' . $shortname;
@@ -271,7 +292,14 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
             ['plugin' => 'totara_sync_source_org_%', 'name' => 'fieldmapping_customfield_%']
         );
         foreach ($records as $record) {
-            $shortname = explode('_', $record->name)[2];
+            $pieces = explode('_', $record->name);
+            if (count($pieces) !== 3) {
+                // Prior to this upgrade step, we expect settings to be like fieldmapping_customfield_{shortname} = 3 pieces.
+                // If we're here, this seems to be a setting that has already been upgraded, or otherwise
+                // is not what we expect. Avoid doing anything with it.
+                continue;
+            }
+            $shortname = $pieces[2];
             if (isset($orgbyshortname[$shortname]) && is_array($orgbyshortname[$shortname])) {
                 foreach ($orgbyshortname[$shortname] as $typeid) {
                     $newsettingname = 'fieldmapping_customfield_' . $typeid . '_' . $shortname;
