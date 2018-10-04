@@ -239,8 +239,10 @@ class component_installer {
 
     /// Check the zip file is a correct one (by extension)
         if (stripos($this->zipfilename, '.zip') === false) {
-            $this->errorstring='wrongzipfilename';
-            return false;
+            if (substr($this->zipfilename, -4) !== '.tgz') { // Totara: tgz extraction is much faster.
+                $this->errorstring = 'wrongzipfilename';
+                return false;
+            }
         }
     /// Check that exists under dataroot
         if (!empty($this->destpath)) {
@@ -250,8 +252,7 @@ class component_installer {
             }
         }
     /// Calculate the componentname
-        $pos = stripos($this->zipfilename, '.zip');
-        $this->componentname = substr($this->zipfilename, 0, $pos);
+        $this->componentname = substr($this->zipfilename, 0, -4);
     /// Calculate md5filename if it's empty
         if (empty($this->md5filename)) {
             $this->md5filename = $this->componentname.'.md5';
@@ -337,7 +338,12 @@ class component_installer {
         @rename($destinationcomponent, $destinationcomponentold);
 
         // Unzip new version.
-        $packer = get_file_packer('application/zip');
+        if (substr($zipfile, -4) === '.tgz') {
+            // Totara: tgz extraction is much, much faster.
+            $packer = get_file_packer('application/x-gzip');
+        } else {
+            $packer = get_file_packer('application/zip');
+        }
         $unzipsuccess = $packer->extract_to_pathname($zipfile, $destinationdir, null, null, true);
         if (!$unzipsuccess) {
             @remove_dir($destinationcomponent);
@@ -696,7 +702,7 @@ class lang_installer {
         if (empty($langcode)) {
             return DOWNLOAD_BASE . '/'.$this->version.'/';
         } else {
-            return DOWNLOAD_BASE . '/'.$this->version.'/'.$langcode.'.zip';
+            return DOWNLOAD_BASE . '/'.$this->version.'/'.$langcode.'.tgz';
         }
     }
 
@@ -706,7 +712,7 @@ class lang_installer {
      * @return array|bool false if can not download
      */
     public function get_remote_list_of_languages() {
-        $source = DOWNLOAD_BASE . '/' . $this->version . '/languages.md5';
+        $source = DOWNLOAD_BASE . '/' . $this->version . '/languages_tgz.md5';
         $availablelangs = array();
 
         if ($content = download_file_content($source)) {
@@ -799,7 +805,7 @@ class lang_installer {
         global $OUTPUT;
         // initialise new component installer to process this language
         $installer = new component_installer(DOWNLOAD_BASE, $this->version,
-            $langcode . '.zip', 'languages.md5', 'lang');
+            $langcode . '.tgz', 'languages_tgz.md5', 'lang');
 
         if (!$installer->requisitesok) {
             echo $OUTPUT->notification(get_string($installer->get_error(), 'error'), 'notifyproblem');
