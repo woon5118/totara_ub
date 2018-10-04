@@ -1306,10 +1306,11 @@ function facetoface_remove_reservations_after_deadline($testing) {
                   JOIN {facetoface_signups_status} sus ON sus.signupid = su.id AND sus.superceded = 0
                  WHERE f.reservecanceldays > 0 AND sd.timestart < (:timenow + (f.reservecanceldays * :daysecs))";
     $params = array('timenow' => time(), 'daysecs' => DAYSECS);
-    $signups = $DB->get_records_sql($sql, $params);
+    $signups = $DB->get_recordset_sql($sql, $params);
 
     if ($signups) {
         $tonotify = array();
+        $signupids = array();
         if (!$testing) {
             mtrace('Removing unconfirmed face to face reservations for sessions that will be starting soon');
         }
@@ -1324,8 +1325,9 @@ function facetoface_remove_reservations_after_deadline($testing) {
                 $tonotify[$signup->facetofaceid][$signup->sessionid] = array();
             }
             $tonotify[$signup->facetofaceid][$signup->sessionid][$signup->bookedby] = $signup->bookedby;
+            $signupids[] = $signup->id;
         }
-        $signupids = array_keys($signups);
+        $signups->close();
         $DB->delete_records_list('facetoface_signups_status', 'signupid', $signupids);
         $DB->delete_records_list('facetoface_signups', 'id', $signupids);
 
@@ -1405,6 +1407,7 @@ function facetoface_allow_user_cancellation($session) {
 
 /**
  * Send out email notifications for all sessions that are under capacity at the cut-off.
+ * TODO: This method explicitly depends on send_notifications_task run and must be moved there
  */
 function facetoface_notify_under_capacity() {
     global $CFG, $DB;
@@ -1544,6 +1547,7 @@ function facetoface_cancel_pending_requests($session) {
 
 /**
  * Send out email notifications for all sessions where registration period has ended.
+ * TODO: This function explicitly depends on send_notifications_task run and must be moved into that class
  */
 function facetoface_notify_registration_ended() {
     global $CFG, $DB;
@@ -1572,7 +1576,7 @@ function facetoface_notify_registration_ended() {
             AND registrationtimefinish >= :lastcron
             AND registrationtimefinish != 0";
 
-    $tocheck = $DB->get_records_sql($sql, $params);
+    $tocheck = $DB->get_recordset_sql($sql, $params);
 
     foreach ($tocheck as $session) {
         $notification = new \facetoface_notification((array)$session, false);

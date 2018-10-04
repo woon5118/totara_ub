@@ -1437,15 +1437,6 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
         $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[12]->id, $signups[21]->id, $signups[22]->id], 0, 0);
     }
 
-    function test_facetoface_cron() {
-        $this->init_sample_data();
-
-        // Test for valid case.
-        $cron = new \mod_facetoface\task\send_notifications_task();
-        $cron->testing = true;
-        $cron->execute();
-    }
-
     function test_facetoface_has_session_started() {
         $this->init_sample_data();
 
