@@ -98,7 +98,7 @@ Feature: Verify appraisal data generators.
 
     When I click on "Messages" "link" in the ".tabtree" "css_element"
     Then I should see "Message 1" in the "1" "table_row"
-    Then I should see "Appraisal activation" in the "1" "table_row"
+    Then I should see "Assignee gains access to the appraisal" in the "1" "table_row"
     Then I should see "Immediate" in the "1" "table_row"
     Then I should see "Learner" in the "1" "table_row"
     Then I should see "Manager" in the "1" "table_row"

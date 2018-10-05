@@ -28,7 +28,7 @@
  */
 $string['activate'] = 'Activate';
 $string['activatenow'] = 'Activate now';
-$string['appraisal_activation'] = 'Appraisal activation';
+$string['appraisal_activation'] = 'Assignee gains access to the appraisal';
 $string['active'] = 'Active';
 $string['activeappraisals'] = 'Active appraisals';
 $string['addpage'] = 'Add new page';
@@ -243,7 +243,7 @@ $string['error:viewrequired'] = 'At least one role must have visibility access';
 $string['error:rolemessage'] = 'At least one role should be selected to receive message';
 $string['error:toomanyquestions'] = 'This appraisal contains too many questions. Please remove questions to make activation possible.';
 $string['event'] = 'Event';
-$string['eventactivation'] = 'Appraisal Activation';
+$string['eventactivation'] = 'Assignee gains access to the appraisal';
 $string['eventafter'] = '{$a->delta} {$a->period} after event';
 $string['eventbefore'] = '{$a->delta} {$a->period} before event';
 $string['eventcreatedappraisal'] = 'Created Appraisal';
@@ -259,6 +259,7 @@ $string['eventmessagebody'] = 'Message body';
 $string['eventmessageroletitle'] = '{$a} message title';
 $string['eventmessagerolebody'] = '{$a} message body';
 $string['eventrecipients'] = 'Recipients';
+$string['eventrecipients_help'] = 'When multiple job assignments are enabled, recipients in roles other than learner are only determined once the learner has selected a job assignment in the appraisal. Messages scheduled to be sent to these recipients when the assignee gains access will be sent on job assignment selection.';
 $string['eventsendroleall'] = 'Send same message to all roles';
 $string['eventsendroleeach'] = 'Send different message for each role';
 $string['eventsendstagecompleted'] = 'Only send to people if their stage is';

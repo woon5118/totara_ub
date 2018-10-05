@@ -794,6 +794,7 @@ class appraisal_message_form extends moodleform {
             $rolesgrp[] = $mform->createElement('advcheckbox', $role, '', $name);
         }
         $mform->addGroup($rolesgrp, 'rolegrp', get_string('eventrecipients', 'totara_appraisal'), html_writer::empty_tag('br'));
+        $mform->addHelpButton('rolegrp', 'eventrecipients', 'totara_appraisal');
         $mform->addRule('rolegrp', null, 'required');
 
         // Send for completed.

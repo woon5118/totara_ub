@@ -692,4 +692,52 @@ class appraisal_message_test extends appraisal_testcase {
 
         ini_set('error_log', $oldlog);
     }
+
+    public function test_activated_appraisal_new_appraisee_notification() {
+        $this->resetAfterTest();
+        $sink = $this->redirectEmails();
+        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
+
+        $learner1 = $this->getDataGenerator()->create_user(array('username' => 'learner1'));
+        [$appraisal] = $this->prepare_appraisal_with_users([], [$learner1]);
+
+        $roles = [appraisal::ROLE_LEARNER];
+        $notification = new appraisal_message();
+        $notification->event_appraisal($appraisal->id); // By default this is activation.
+        $notification->set_delta(0);
+        $notification->set_roles($roles);
+        $notification->set_message(0, 'Appraisal activation', 'Body 1');
+        $notification->save();
+
+        $validationstatus = $appraisal->validate();
+        $this->assertEmpty($validationstatus[0]);
+        $this->assertEmpty($validationstatus[1]);
+
+        $appraisal->activate();
+        \appraisal::send_scheduled();
+
+        $emails = $sink->get_messages();
+        $this->assertCount(1, $emails);
+        $this->assertSame('Appraisal activation', $emails[0]->subject, "wrong subject");
+        $this->assertSame($learner1->email, $emails[0]->to, "wrong email");
+        $sink->clear();
+
+        // Add new appraisees after activation.
+        $learner2 = $this->getDataGenerator()->create_user(['username' => 'learner2']);
+        $cohortgenerator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
+        $cohort = $cohortgenerator->create_cohort(['name' => 'newappraisees']);
+        $cohortgenerator->cohort_assign_users($cohort->id, [$learner2->id]);
+        $this->getDataGenerator()->get_plugin_generator('totara_appraisal')->create_group_assignment($appraisal, 'cohort', $cohort->id);
+
+        // Simulate a cron run.
+        $appraisal->check_assignment_changes();
+
+        $emails = $sink->get_messages();
+        $this->assertCount(1, $emails);
+        $this->assertSame('Appraisal activation', $emails[0]->subject, "wrong subject");
+        $this->assertSame($learner2->email, $emails[0]->to, "wrong email");
+        $sink->clear();
+
+        $sink->close();
+    }
 }

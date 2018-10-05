@@ -500,17 +500,22 @@ class appraisal {
         $assign = new totara_assign_appraisal('appraisal', $this);
 
         // Remember new appraisee ids for potential job assignment linking below.
+        // Also need to get new appraisees so that activation notifications can
+        // be sent out.
         $linkjobappraiseeids = [];
-        if (self::can_auto_link_job_assignments()) {
-            /** @var moodle_recordset $added */
-            $added = $assign->get_unstored_users();
-            if ($added->valid()) {
-                foreach ($added as $newappraisee) {
+        $appraiseestonotify = [];
+
+        $added = $assign->get_unstored_users();
+        if ($added->valid()) {
+            foreach ($added as $newappraisee) {
+                $appraiseestonotify[] = $newappraisee->id;
+
+                if (self::can_auto_link_job_assignments()) {
                     $linkjobappraiseeids[] = $newappraisee->id;
                 }
             }
-            $added->close();
         }
+        $added->close();
 
         // Create user assignments and role assignments for new users.
         $added = $assign->get_unstored_users();
@@ -636,6 +641,27 @@ class appraisal {
                                         'userassignmentid' => $userassignmentid);
                         $DB->execute($sql, $params);
                     }
+                }
+            }
+        }
+
+        // The activate() method sends out activation notifications for learners
+        // that were added *before* the appraisal was activated. However learners
+        // that were added after activation also have to be notified; that needs
+        // to be done here.
+        if (!empty($appraiseestonotify)) {
+            $filters = [
+                'event' => appraisal_message::EVENT_APPRAISAL_ACTIVATION,
+                'appraisalid' => $this->id
+            ];
+            $event = $DB->get_record("appraisal_event", $filters);
+
+            if ($event) {
+                $msg = new appraisal_message($event->id);
+                $msg->event_appraisal($this->id);
+
+                foreach ($appraiseestonotify as $appraisee) {
+                    $msg->send_user_specific_message($appraisee);
                 }
             }
         }
