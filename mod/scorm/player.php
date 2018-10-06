@@ -62,6 +62,11 @@ if (!empty($currentorg)) {
     }
 }
 
+// Totara: check login fist and respect view and launch permissions.
+require_login($course, false, $cm);
+require_capability('mod/scorm:view', context_module::instance($cm->id));
+require_capability('mod/scorm:launch', context_module::instance($cm->id));
+
 // If new attempt is being triggered set normal mode and increment attempt number.
 $attempt = scorm_get_last_attempt($scorm->id, $USER->id);
 
@@ -97,8 +102,6 @@ if (empty($collapsetocwinsize)) {
 } else {
     $collapsetocwinsize = intval($collapsetocwinsize);
 }
-
-require_login($course, false, $cm);
 
 $strscorms = get_string('modulenameplural', 'scorm');
 $strscorm  = get_string('modulename', 'scorm');
@@ -286,4 +289,6 @@ $PAGE->requires->yui_module('moodle-core-checknet', 'M.core.checknet.init', arra
 echo $OUTPUT->footer();
 
 // Set the start time of this SCO.
-scorm_insert_track($USER->id, $scorm->id, $scoid, $attempt, 'x.start.time', time());
+if (has_capability('mod/scorm:savetrack', context_module::instance($cm->id))) {
+    scorm_insert_track($USER->id, $scorm->id, $scoid, $attempt, 'x.start.time', time());
+}

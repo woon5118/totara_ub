@@ -919,6 +919,11 @@ function scorm_get_all_attempts($scormid, $userid) {
 function scorm_print_launch ($user, $scorm, $action, $cm) {
     global $CFG, $DB, $OUTPUT;
 
+    // Totara: user needs launch permission.
+    if (!has_capability('mod/scorm:launch', context_module::instance($cm->id))) {
+        return;
+    }
+
     if ($scorm->updatefreq == SCORM_UPDATE_EVERYTIME) {
         scorm_parse($scorm, false);
     }
@@ -984,7 +989,10 @@ function scorm_print_launch ($user, $scorm, $action, $cm) {
                                                         'method' => 'post',
                                                         'action' => $CFG->wwwroot.'/mod/scorm/player.php',
                                                         'class' => 'container'));
-        if ($scorm->hidebrowse == 0) {
+        if (!has_capability('mod/scorm:savetrack', context_module::instance($cm->id))) {
+            // Totara: no real attempt if user does not have savetrack permission.
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'mode', 'value' => 'browse'));
+        } else if ($scorm->hidebrowse == 0) {
             print_string('mode', 'scorm');
             echo ': '.html_writer::empty_tag('input', array('type' => 'radio', 'id' => 'b', 'name' => 'mode',
                     'value' => 'browse', 'class' => 'm-r-1')).
@@ -998,7 +1006,10 @@ function scorm_print_launch ($user, $scorm, $action, $cm) {
         } else {
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'mode', 'value' => 'normal'));
         }
-        if ($scorm->forcenewattempt == 1) {
+        if (!has_capability('mod/scorm:savetrack', context_module::instance($cm->id))) {
+            // Totara: always new attempt when previous is not supposed to be saved.
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'newattempt', 'value' => 'on'));
+        } else if ($scorm->forcenewattempt == 1) {
             if ($incomplete === false) {
                 echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'newattempt', 'value' => 'on'));
             }
@@ -1029,6 +1040,11 @@ function scorm_simple_play($scorm, $user, $context, $cmid) {
 
     if (has_capability('mod/scorm:viewreport', $context)) {
         // If this user can view reports, don't skipview so they can see links to reports.
+        return $result;
+    }
+
+    // Totara: user needs launch permission.
+    if (!has_capability('mod/scorm:launch', $context)) {
         return $result;
     }
 
@@ -1262,7 +1278,9 @@ function scorm_get_attempt_status($user, $scorm, $cm='') {
     } else {
         $result .= get_string('unlimited').html_writer::empty_tag('br');
     }
-    $result .= get_string('noattemptsmade', 'scorm').': ' . $attemptcount . html_writer::empty_tag('br');
+    if (!isguestuser()) { // Totara: guest account cannot make real attempts.
+        $result .= get_string('noattemptsmade', 'scorm').': ' . $attemptcount . html_writer::empty_tag('br');
+    }
 
     if ($scorm->maxattempt == 1) {
         switch ($scorm->grademethod) {
@@ -1314,7 +1332,9 @@ function scorm_get_attempt_status($user, $scorm, $cm='') {
         $calculatedgrade = number_format($calculatedgrade * 100, 0) .'%';
     }
     $result .= get_string('grademethod', 'scorm'). ': ' . $grademethod;
-    if (empty($attempts)) {
+    if (isguestuser()) {
+        // Totara: it makes no sense to display grades of guest account.
+    } else if (empty($attempts)) {
         $result .= html_writer::empty_tag('br').get_string('gradereported', 'scorm').
                     ': '.get_string('none').html_writer::empty_tag('br');
     } else {

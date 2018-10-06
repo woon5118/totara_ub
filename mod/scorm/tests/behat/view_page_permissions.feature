@@ -18,10 +18,13 @@ Feature: mod_scorm: check view SCORM page permissions
       | Both        | Both        | System       | staffmanager |
     And the following "permission overrides" exist:
       | capability           | permission | role        | contextlevel | reference |
+      | mod/scorm:view       | Allow      | JustReports | System       |           |
       | mod/scorm:savetrack  | Prohibit   | JustReports | System       |           |
       | mod/scorm:viewreport | Allow      | JustReports | System       |           |
+      | mod/scorm:view       | Allow      | JustInfo    | System       |           |
       | mod/scorm:savetrack  | Allow      | JustInfo    | System       |           |
       | mod/scorm:viewreport | Prohibit   | JustInfo    | System       |           |
+      | mod/scorm:view       | Allow      | Both        | System       |           |
       | mod/scorm:savetrack  | Allow      | Both        | System       |           |
       | mod/scorm:viewreport | Allow      | Both        | System       |           |
     And the following "role assigns" exist:
@@ -69,7 +72,8 @@ Feature: mod_scorm: check view SCORM page permissions
     And I log in as "ji"
     And I am on "Course 1" course homepage
     And I follow "SCORM viewing page permission test"
-    Then I should see "Info"
+    # In Totara the Info tab is not displayed if it is the only tab present.
+    Then I should not see "Info"
     And I should see "Grading method: Highest attempt"
     And I should not see "Reports"
 
@@ -101,6 +105,7 @@ Feature: mod_scorm: check view SCORM page permissions
     And I log in as "guest"
     And I am on "Course 1" course homepage
     And I follow "SCORM viewing page permission test"
-    Then I should see "Info"
+    # In Totara the Info tab is not displayed if it is the only tab present.
+    Then I should not see "Info"
     And I should see "Grading method: Highest attempt"
     And I should not see "Reports"

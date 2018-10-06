@@ -393,7 +393,10 @@ if (!empty($command)) {
             break;
             case 'exitau':
                 if ($status == 'Running') {
-                    if (isset($scormsession->sessiontime) && ($scormsession->sessiontime != '')) {
+                    // Totara: do not store results without the savetrack permission!
+                    $savetrack = has_capability('mod/scorm:savetrack', context_module::instance($cm->id), $aiccuser->id);
+
+                    if ($savetrack && isset($scormsession->sessiontime) && ($scormsession->sessiontime != '')) {
                         if ($track = $DB->get_record('scorm_scoes_track', array("userid" => $aiccuser->id,
                                                                                 "scormid" => $scorm->id,
                                                                                 "scoid" => $sco->id,

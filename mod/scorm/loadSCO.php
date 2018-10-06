@@ -60,18 +60,24 @@ if (!isloggedin()) { // Prevent login page from being shown in iframe.
     exit;
 }
 
-require_login($course, false, $cm, false); // Call require_login anyway to set up globals correctly.
+require_login($course, false, $cm, false, true); // Totara: no redirects here.
+
+// Totara: respect view and launch permissions.
+require_capability('mod/scorm:view', context_module::instance($cm->id));
+require_capability('mod/scorm:launch', context_module::instance($cm->id));
+
 scorm_send_headers_totara();
 
 // Check if SCORM is available.
 scorm_require_available($scorm);
 
 $context = context_module::instance($cm->id);
+$savetrack = has_capability('mod/scorm:savetrack', context_module::instance($cm->id));
 
 // Forge SCO URL.
 list($sco, $scolaunchurl) = scorm_get_sco_and_launch_url($scorm, $scoid, $context);
 
-if ($sco->scormtype == 'asset') {
+if ($savetrack && $sco->scormtype == 'asset') { // Do not save tracks if not allowed.
     $attempt = scorm_get_last_attempt($scorm->id, $USER->id);
     $element = (scorm_version_check($scorm->version, SCORM_13)) ? 'cmi.completion_status' : 'cmi.core.lesson_status';
     $value = 'completed';

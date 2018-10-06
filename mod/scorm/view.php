@@ -64,8 +64,12 @@ require_login($course, false, $cm);
 $context = context_course::instance($course->id);
 $contextmodule = context_module::instance($cm->id);
 
+// Totara: respect view and launch permissions.
+require_capability('mod/scorm:view', $contextmodule);
+$canlaunch = has_capability('mod/scorm:launch', $contextmodule);
+
 $launch = false; // Does this automatically trigger a launch based on skipview.
-if ($scorm->popup == 1) {
+if ($canlaunch && $scorm->popup == 1) {
     $orgidentifier = '';
 
     $scoid = 0;
@@ -129,7 +133,7 @@ $pagetitle = strip_tags($shortname.': '.format_string($scorm->name));
 // Trigger module viewed event.
 scorm_view($scorm, $course, $cm, $contextmodule);
 
-if (empty($preventskip) && empty($launch) && (has_capability('mod/scorm:skipview', $contextmodule))) {
+if ($canlaunch && empty($preventskip) && empty($launch) && (has_capability('mod/scorm:skipview', $contextmodule))) {
     scorm_simple_play($scorm, $USER, $contextmodule, $cm->id);
 }
 
@@ -174,14 +178,16 @@ if (!$available) {
     echo $OUTPUT->box(get_string($reason, "scorm", $warnings[$reason]));
 }
 
-if ($available && empty($launch)) {
+if ($canlaunch && $available && empty($launch)) {
     scorm_print_launch($USER, $scorm, 'view.php?id='.$cm->id, $cm);
+} else {
+    echo $OUTPUT->notification(get_string('nolaunch', 'mod_scorm'), \core\output\notification::NOTIFY_INFO);
 }
-if (!empty($forcejs)) {
+if ($canlaunch && !empty($forcejs)) {
     echo $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "forcejavascriptmessage");
 }
 
-if ($scorm->popup == 1) {
+if ($canlaunch && $scorm->popup == 1) {
     $PAGE->requires->js_init_call('M.mod_scormform.init');
 }
 

@@ -958,6 +958,14 @@ function scorm_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
 
     require_login($course, true, $cm);
 
+    // Totara: respect view and launch permissions.
+    if (!has_capability('mod/scorm:view', $context)) {
+        return false;
+    }
+    if (!has_capability('mod/scorm:launch', $context)) {
+        return false;
+    }
+
     $canmanageactivity = has_capability('moodle/course:manageactivities', $context);
     $lifetime = null;
 
@@ -1621,6 +1629,15 @@ function scorm_validate_package($file) {
  */
 function scorm_check_mode($scorm, &$newattempt, &$attempt, $userid, &$mode) {
     global $DB;
+
+    // Totara: restrict modes and attempts if results are not supposed to be saved.
+    $cm = get_coursemodule_from_instance("scorm", $scorm->id);
+    if (!has_capability('mod/scorm:savetrack', context_module::instance($cm->id))) {
+        $newattempt = 'on';
+        $attempt = '1';
+        $mode = 'browse';
+        return;
+    }
 
     if (($mode == 'browse')) {
         if ($scorm->hidebrowse == 1) {

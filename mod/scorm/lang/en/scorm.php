@@ -294,6 +294,7 @@ $string['noattemptsallowed'] = 'Number of attempts allowed';
 $string['noattemptsmade'] = 'Number of attempts you have made';
 $string['no_attributes'] = 'Tag {$a->tag} must have attributes';
 $string['no_children'] = 'Tag {$a->tag} must have children';
+$string['nolaunch'] = 'You are not allowed to launch SCORM content.';
 $string['nolimit'] = 'Unlimited attempts';
 $string['nomanifest'] = 'Incorrect file package - missing imsmanifest.xml or AICC structure';
 $string['noprerequisites'] = 'Sorry but you don\'t have the required prerequisites to access this activity.';
@@ -365,7 +366,8 @@ $string['scormloggingon'] = 'API logging is on';
 $string['scormopen'] = 'Available from';
 $string['scormresponsedeleted'] = 'Deleted user attempts';
 $string['scorm:deleteownresponses'] = 'Delete own attempts';
-$string['scorm:savetrack'] = 'Save tracks';
+$string['scorm:launch'] = 'Launch SCORM content';
+$string['scorm:savetrack'] = 'Save tracks, progress and results';
 $string['scorm:skipview'] = 'Skip overview';
 $string['scormtype'] = 'Type';
 $string['scormtype_help'] = 'This setting determines how the package is included in the course. There are up to four options:
@@ -374,6 +376,7 @@ $string['scormtype_help'] = 'This setting determines how the package is included
 * **External SCORM manifest**: Enables an imsmanifest.xml URL to be specified. Note that if the URL has a different domain name than your site, then **Downloaded package** is a better option, since otherwise grades are not saved.
 * **Downloaded package**: Enables a package URL to be specified. The package will be unzipped and saved locally, and updated when the external SCORM package is updated.
 * **External AICC URL**: This URL is the launch URL for a single AICC Activity.  A psuedo package will be constructed around this.';
+$string['scorm:view'] = 'View SCORM overview';
 $string['scorm:viewreport'] = 'View reports';
 $string['scorm:viewscores'] = 'View scores';
 $string['scrollbars'] = 'Allow the window to be scrolled';
