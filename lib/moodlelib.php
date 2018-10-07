@@ -3370,30 +3370,81 @@ function update_user_login_times() {
  * redirected to edit their profile. In most cases, you should perform the
  * strict check.
  *
+ * NOTE: true result means code should redirect user to profile editing or stop execution.
+ *
  * @param stdClass $user A {@link $USER} object to test for the existence of a valid name and email
  * @param bool $strict Be more strict and assert id and custom profile fields set, too
  * @return bool
  */
 function user_not_fully_set_up($user, $strict = true) {
-    global $CFG;
+    global $CFG, $USER;
     require_once($CFG->dirroot.'/user/profile/lib.php');
 
-    if (isguestuser($user)) {
+    // Totara: this method we redesigned to make the $strict mode less strict.
+
+    // Only real users can set up account.
+    if (isguestuser($user) or empty($user->id)) {
         return false;
     }
 
-    if (empty($user->firstname) or empty($user->lastname) or empty($user->email) or over_bounce_threshold($user)) {
+    // These fields are required for proper system operation, they MUST be filled.
+    if (empty($user->firstname) or empty($user->lastname) or empty($user->email)) {
         return true;
     }
 
-    if ($strict) {
-        if (empty($user->id)) {
-            // Strict mode can be used with existing accounts only.
-            return true;
+    // Strict mode may lead to dead ends, we need to prevent those situations here,
+    // the intention is to force users to fill missing data in profile, but only if they can!
+    if (!$strict) {
+        return false;
+    }
+
+    // Ignore strict mode for mnet users.
+    if (is_mnet_remote_user($user)) {
+        return false;
+    }
+
+    if ($user->id == $USER->id) {
+        // Most likely some ajax or file serving script, we certainly do not want to block those or do redirects.
+        if (!WS_SERVER and NO_DEBUG_DISPLAY) {
+            return false;
         }
-        if (!profile_has_required_custom_fields_set($user->id)) {
-            return true;
+
+        // Do not use strict mode for primary admin, they need to be able to fix
+        // problems without being interrupted by forced redirects.
+        if (is_primary_admin($user->id)) {
+            return false;
         }
+
+        // Only the real user should be prompted to edit their profile.
+        if (\core\session\manager::is_loggedinas()) {
+            return false;
+        }
+
+        // Following checks are not cost free, this is used from require_login(),
+        // that means we need to use some form of caching for current user at least.
+        if (!empty($USER->fullysetupaccount)) { // Flag is cached in session.
+            return false;
+        }
+    }
+
+    // Check problems with emails being returned, prompt them to fix email.
+    // Or are there any new requirements to fill custom profile fields?
+    if (over_bounce_threshold($user) or !profile_has_required_custom_fields_set($user->id)) {
+        // We need to be careful here, double change that user may actually edit profile
+        // because these requirements are not real hard limits to use of system,
+        // match the access control used in user/edit.php page.
+        // Ignore external profile editing pages, because we have no control over that.
+        if (exists_auth_plugin($user->auth)) {
+            $auth = get_auth_plugin($user->auth);
+            if ($auth->can_edit_profile() and has_capability('moodle/user:editownprofile', context_system::instance(), $user)) {
+                // Finally we know user may fix their own profile.
+                return true;
+            }
+        }
+    }
+
+    if ($user->id == $USER->id) {
+        $USER->fullysetupaccount = 1; // Flag is cached in session.
     }
 
     return false;

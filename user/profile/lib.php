@@ -949,7 +949,7 @@ function profile_has_required_custom_fields_set($userid) {
     $sql = "SELECT f.id
               FROM {user_info_field} f
          LEFT JOIN {user_info_data} d ON (d.fieldid = f.id AND d.userid = ?)
-             WHERE f.required = 1 AND f.visible > 0 AND f.locked = 0 AND d.id IS NULL";
+             WHERE f.required = 1 AND f.visible > 0 AND f.locked = 0 AND (d.id IS NULL OR d.data = '')";
 
     if ($DB->record_exists_sql($sql, [$userid])) {
         return false;

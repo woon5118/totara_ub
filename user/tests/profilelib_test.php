@@ -147,8 +147,7 @@ class core_user_profilelib_testcase extends advanced_testcase {
      * Test that {@link user_not_fully_set_up()} takes required custom fields into account.
      */
     public function test_profile_has_required_custom_fields_set() {
-        global $CFG, $DB;
-        require_once($CFG->dirroot.'/mnet/lib.php');
+        global $CFG, $DB, $USER;
 
         $this->resetAfterTest();
 
@@ -201,14 +200,23 @@ class core_user_profilelib_testcase extends advanced_testcase {
         $this->assertTrue(user_not_fully_set_up($hermione, true));
         $this->assertTrue(user_not_fully_set_up($hermione, false));
 
-        // When confirming remote MNet users, we do not have custom fields available.
-        $roamingharry = mnet_strip_user($harry, ['firstname', 'lastname', 'email']);
-        $roaminghermione = mnet_strip_user($hermione, ['firstname', 'lastname', 'email']);
+        // Totara: we do not really support mnet, strict mode is ignored.
+        $ron->mnethostid = 11212121;
+        $this->assertFalse(user_not_fully_set_up($ron, true));
+        $this->assertFalse(user_not_fully_set_up($ron, false));
 
-        $this->assertTrue(user_not_fully_set_up($roamingharry, true));
-        $this->assertFalse(user_not_fully_set_up($roamingharry, false));
-        $this->assertTrue(user_not_fully_set_up($roaminghermione, true));
-        $this->assertTrue(user_not_fully_set_up($roaminghermione, false));
+        // Totara: test cache flag $USER->fullysetupaccount was set properly.
+        $hermione = $DB->get_record('user', array('id' => $hermione->id));
+        $this->assertObjectNotHasAttribute('fullysetupaccount', $hermione);
+        $this->setUser($hermione);
+        $this->assertSame($hermione->id, $USER->id);
+        $this->assertFalse(user_not_fully_set_up($hermione, false));
+        $this->assertObjectNotHasAttribute('fullysetupaccount', $USER);
+        $this->assertFalse(user_not_fully_set_up($hermione, true));
+        $this->assertSame(1, $USER->fullysetupaccount);
+        $readcount = $DB->perf_get_reads();
+        $this->assertFalse(user_not_fully_set_up($hermione, true));
+        $this->assertSame($readcount, $DB->perf_get_reads());
     }
 
     /**

@@ -45,7 +45,11 @@ class user_edit_form extends moodleform {
         $mform = $this->_form;
         $editoroptions = null;
         $filemanageroptions = null;
-        $usernotfullysetup = user_not_fully_set_up($USER);
+        // Totara: detect missing email and names, this is not about missing custom fields,
+        //         this prevents problems in file picker ajax caused by require_login() checks.
+        //         If any problems pop up then developers need to make sure that all ajax scripts
+        //         used on profile edit page have AJAX_SCRIPT defined properly.
+        $usernotfullysetup = user_not_fully_set_up($USER, false);
 
         if (!is_array($this->_customdata)) {
             throw new coding_exception('invalid custom data for user_edit_form');
