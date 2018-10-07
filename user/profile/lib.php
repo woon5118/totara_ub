@@ -940,6 +940,8 @@ function profile_view($user, $context, $course = null) {
  * So this is actually checking if we should redirect the user to edit their
  * profile, rather than whether there is a value in the database.
  *
+ * Totara: we do not use this function!
+ *
  * @param int $userid
  * @return bool
  */
@@ -949,7 +951,7 @@ function profile_has_required_custom_fields_set($userid) {
     $sql = "SELECT f.id
               FROM {user_info_field} f
          LEFT JOIN {user_info_data} d ON (d.fieldid = f.id AND d.userid = ?)
-             WHERE f.required = 1 AND f.visible > 0 AND f.locked = 0 AND (d.id IS NULL OR d.data = '')";
+             WHERE f.required = 1 AND f.visible > 0 AND f.locked = 0 AND d.id IS NULL";
 
     if ($DB->record_exists_sql($sql, [$userid])) {
         return false;

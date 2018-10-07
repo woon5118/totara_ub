@@ -2800,6 +2800,7 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
     // Check that the user account is properly set up. If we can't redirect to
     // edit their profile and this is not a WS request, perform just the lax check.
     // It will allow them to use filepicker on the profile edit page.
+
     if ($preventredirect && !WS_SERVER) {
         $usernotfullysetup = user_not_fully_set_up($USER);
     } else {
@@ -3367,26 +3368,11 @@ function update_user_login_times() {
  * @return bool
  */
 function user_not_fully_set_up($user) {
-    global $CFG;
-    require_once($CFG->dirroot.'/user/profile/lib.php');
-
+    // Totara: we do not check required custom profile fields intentionally!!!
     if (isguestuser($user)) {
         return false;
     }
-
-    if (empty($user->firstname) or empty($user->lastname) or empty($user->email) or over_bounce_threshold($user)) {
-        return true;
-    }
-
-    if (\core\session\manager::is_loggedinas()) {
-        return false;
-    }
-
-    if (!profile_has_required_custom_fields_set($user->id)) {
-        return true;
-    }
-
-    return false;
+    return (empty($user->firstname) or empty($user->lastname) or empty($user->email) or over_bounce_threshold($user));
 }
 
 /**
