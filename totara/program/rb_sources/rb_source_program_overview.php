@@ -452,9 +452,9 @@ class rb_source_program_overview extends rb_base_source {
                 'course',
                 'shortname',
                 get_string('courseshortname', 'rb_source_program_overview'),
-                'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname').', \'-\')',
+                \totara_program\rb_course_sortorder_helper::get_column_field_definition('course.shortname'),
                 array(
-                    'joins' => 'course',
+                    'joins' => ['course', 'program'],
                     'grouping' => 'sql_aggregate',
                     'grouporder' => array(
                         'csorder'  => 'prog_courseset.sortorder',
@@ -470,9 +470,9 @@ class rb_source_program_overview extends rb_base_source {
                 'course',
                 'status',
                 get_string('coursecompletionstatus', 'rb_source_program_overview'),
-                'COALESCE('.$DB->sql_cast_2char('course_completions.status').', \''.COMPLETION_STATUS_NOTYETSTARTED.'\')',
+                \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.status')),
                 array(
-                    'joins' => 'course_completions',
+                    'joins' => ['course_completions', 'program'],
                     'grouping' => 'sql_aggregate',
                     'grouporder' => array(
                         'csorder'  => 'prog_courseset.sortorder',
@@ -489,16 +489,16 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'timeenrolled',
             get_string('coursecompletiontimeenrolled', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_cast_2char('course_completions.timeenrolled').', \'-\')',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timeenrolled')),
             array(
-                'joins' => 'course_completions',
+                'joins' => ['course_completions', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'orderedlist_to_newline_date',
+                'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -507,16 +507,16 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'timestarted',
             get_string('coursecompletiontimestarted', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_cast_2char('course_completions.timestarted').', \'-\')',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timestarted')),
             array(
-                'joins' => 'course_completions',
+                'joins' => ['course_completions', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'orderedlist_to_newline_date',
+                'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -525,16 +525,16 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'timecompleted',
             get_string('coursecompletiontimecompleted', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_cast_2char('course_completions.timecompleted').', \'-\')',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timecompleted')),
             array(
-                'joins' => 'course_completions',
+                'joins' => ['course_completions', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'orderedlist_to_newline_date',
+                'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -544,9 +544,9 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'finalgrade',
             get_string('finalgrade', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_cast_2char('grade_grades.finalgrade').', \'-\')',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('grade_grades.finalgrade')),
             array(
-                'joins' => 'grade_grades',
+                'joins' => ['grade_grades', 'course', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
@@ -556,7 +556,7 @@ class rb_source_program_overview extends rb_base_source {
                     'orderby' => array('prog_courseset.sortorder', 'prog_courseset_course.id'),
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'orderedlist_to_newline',
+                'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -565,16 +565,16 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'gradepass',
             get_string('gradepass', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_cast_2char('criteria.gradepass').', \'-\')',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('criteria.gradepass')),
             array(
-                'joins' => 'criteria',
+                'joins' => ['criteria', 'course', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'orderedlist_to_newline',
+                'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -585,16 +585,16 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'name',
             get_string('coursecategory', 'totara_reportbuilder'),
-            'course_category.name',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.name'),
             array(
-                'joins' => 'course_category',
+                'joins' => ['course_category', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'orderedlist_to_newline',
+                'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
                 'outputformat' => 'text'
@@ -605,12 +605,14 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'namelink',
             get_string('coursecategorylinked', 'totara_reportbuilder'),
-            $DB->sql_concat_join(
-                "'|'",
-                array(
-                    $DB->sql_cast_2char('course_category.id'),
-                    $DB->sql_cast_2char("course_category.visible"),
-                    'course_category.name'
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition(
+                $DB->sql_concat_join(
+                    "'|'",
+                    array(
+                        $DB->sql_cast_2char('course_category.id'),
+                        $DB->sql_cast_2char("course_category.visible"),
+                        'course_category.name'
+                    )
                 )
             ),
             array(
@@ -632,11 +634,11 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'id',
             get_string('coursecategoryid', 'totara_reportbuilder'),
-            'COALESCE(course_category.idnumber, \'-\')',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.idnumber'),
             array(
                 'joins' => array('course', 'course_category'),
                 'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'orderedlist_to_newline',
+                'displayfunc' => 'program_course_newline',
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',

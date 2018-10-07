@@ -47,5 +47,14 @@ $definitions = array(
         'simpledata' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 10
-    )
+    ),
+
+    'course_order' => array(
+        'mode'                   => cache_store::MODE_APPLICATION,
+        'simplekeys'             => true,
+        'simpledata'             => true,
+        'staticacceleration'     => true,
+        'staticaccelerationsize' => 100, // Small memory footprint, so make it large.
+        'datasource'             => '\totara_program\rb_course_sortorder_helper',
+    ),
 );

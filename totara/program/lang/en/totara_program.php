@@ -124,6 +124,7 @@ $string['beforeprogramisdue'] = 'Before program is due';
 $string['beforesetisdue'] = 'Before set is due';
 $string['bestguess'] = 'Best guess: {$a}';
 $string['browsecategories'] = 'Browse categories';
+$string['cachedef_course_order'] = 'Program courses cache';
 $string['cachedef_program_progressinfo'] = 'Program completion cache';
 $string['cachedef_program_users'] = 'Program users cache';
 $string['cachedef_user_programs'] = 'User programs cache';

@@ -17,23 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Player <simon.player@totaralearning.com>
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  * @package totara_program
  */
 
 namespace totara_program\rb\display;
 
 /**
- * Display class intended for course statuses
+ * Display class intended for course names as html links
  *
- * @author Simon Player <simon.player@totaralearning.com>
- * @package totara_program
+ * @deprecated since Totara 12, will be removed once MSSQL 2017 is the minimum required version.
  */
-class program_course_status_list extends program_course_base {
+class program_course_newline_date extends program_course_base {
 
     /**
      * Handles the display
-     *
      * @param string $value
      * @param string $format
      * @param \stdClass $row
@@ -42,27 +40,24 @@ class program_course_status_list extends program_course_base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $COMPLETION_STATUS;
 
         if (empty($value)) {
             return '';
         }
 
-        $output = array();
         $uniquedelimiter = $report->src->get_uniquedelimiter();
 
+        $output = array();
         $items = explode($uniquedelimiter, $value);
         $reference = [];
         $programid = null;
         foreach ($items as $key => $item) {
-            list($programid, $courseid, $status) = explode('|', $item);
-            if ($status === '') {
-                $status = (string)COMPLETION_STATUS_NOTYETSTARTED;
-            }
-            if (in_array($status, array_keys($COMPLETION_STATUS))) {
-                $output[$key] = get_string('coursecompletion_'.$COMPLETION_STATUS[$status], 'rb_source_program_overview');
+            if ($items)
+            list($programid, $courseid, $date) = explode('|', $item);
+            if (empty($date) || $date === '-') {
+                $output[$key] = '-';
             } else {
-                $output[$key] = get_string('coursecompletion_notyetstarted', 'rb_source_program_overview');
+                $output[$key] = userdate($date, get_string('strfdateshortmonth', 'langconfig'));
             }
             $reference[$key] = $courseid;
         }

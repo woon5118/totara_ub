@@ -1453,6 +1453,23 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Returns true if group concat supports order by.
+     *
+     * Not all databases support order by.
+     * If it is not supported the when calling sql_group_concat with an order by it will be ignored.
+     * You can call this method to check whether the database supports it in order to implement alternative solutions.
+     *
+     * @since      Totara 12
+     * @deprecated since Totara 12 This function will be removed when MSSQL 2017 is the minimum required version. All
+     *             other databases support orderby.
+     * @return bool
+     */
+    public function sql_group_concat_orderby_supported() {
+        $serverinfo = $this->get_server_info();
+        return (version_compare($serverinfo['version'], '14', '>='));
+    }
+
+    /**
      * Returns database specific SQL code similar to GROUP_CONCAT() behaviour from MySQL.
      *
      * NOTE: NULL values are skipped, use COALESCE if you want to include a replacement.

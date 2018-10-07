@@ -27,7 +27,7 @@ namespace totara_reportbuilder\rb\display;
  * Displays a delimited list of ints as one nice_date per line, based off nice_date_list
  * Assumes you used "'grouping' => 'sql_aggregate'", which concatenates with $uniquedelimiter to construct a pre-ordered string
  *
-j * @author Simon Player <simon.player@totaralearning.com>
+ * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_reportbuilder
  */
 class orderedlist_to_newline_date extends base {

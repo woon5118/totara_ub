@@ -286,9 +286,9 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'course',
             'shortname',
             get_string('courseshortname', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname').', \'-\')',
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course.shortname'),
             array(
-                'joins' => 'course',
+                'joins' => ['course', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',
@@ -305,9 +305,9 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'course',
             'status',
             get_string('coursecompletionstatus', 'rb_source_program_overview'),
-            $DB->sql_cast_2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.status')),
             array(
-                'joins' => 'course_completions',
+                'joins' => ['course_completions', 'program'],
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
                     'csorder'  => 'prog_courseset.sortorder',

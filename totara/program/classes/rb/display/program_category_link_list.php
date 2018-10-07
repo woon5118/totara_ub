@@ -22,7 +22,6 @@
  */
 
 namespace totara_program\rb\display;
-use totara_reportbuilder\rb\display\base;
 
 /**
  * Display class intended for course categories as html links
@@ -30,7 +29,7 @@ use totara_reportbuilder\rb\display\base;
  * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_program
  */
-class program_category_link_list extends base {
+class program_category_link_list extends program_course_base {
 
     /**
      * Handles the display
@@ -52,14 +51,21 @@ class program_category_link_list extends base {
         $uniquedelimiter = $report->src->get_uniquedelimiter();
 
         $items = explode($uniquedelimiter, $value);
-        foreach ($items as $item) {
-            list($catid, $visible, $catname) = explode('|', $item);
+        $reference = [];
+        $programid = null;
+        foreach ($items as $key => $item) {
+            list($programid, $courseid, $catid, $visible, $catname) = explode('|', $item);
             if ($visible) {
                 $url = new \moodle_url('/course/index.php', array('categoryid' => $catid));
-                $output[] = \html_writer::link($url, format_string($catname));
+                $output[$key] = \html_writer::link($url, format_string($catname));
             } else {
-                $output[] = format_string($catname);
+                $output[$key] = format_string($catname);
             }
+            $reference[$key] = $courseid;
+        }
+
+        if ($programid && self::resort_required()) {
+            self::resort($programid, $output, $reference);
         }
 
         return implode($output, "\n");

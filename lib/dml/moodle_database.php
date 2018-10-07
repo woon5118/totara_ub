@@ -2410,6 +2410,21 @@ abstract class moodle_database {
     public abstract function sql_concat();
 
     /**
+     * Returns true if group concat supports order by.
+     *
+     * Not all databases support order by.
+     * If it is not supported the when calling sql_group_concat with an order by it will be ignored.
+     * You can call this method to check whether the database supports it, in order to implement alternative solutions.
+     *
+     * @since Totara 11.7
+     * @deprecated since Totara 11.7 This function will be removed when MSSQL 2017 is the minimum required version. All other databases support orderby.
+     * @return bool
+     */
+    public function sql_group_concat_orderby_supported() {
+        return true;
+    }
+
+    /**
      * Returns database specific SQL code similar to GROUP_CONCAT() behaviour from MySQL.
      *
      * NOTE: NULL values are skipped, use COALESCE if you want to include a replacement.

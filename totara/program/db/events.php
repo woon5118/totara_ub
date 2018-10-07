@@ -80,4 +80,12 @@ $observers = array(
         'eventname' => '\core\event\course_in_progress',
         'callback'  => 'totara_program_observer::course_in_progress',
     ),
+    array(
+        'eventname' => '\totara_program\event\program_contentupdated',
+        'callback'  => '\totara_program\rb_course_sortorder_helper::handle_program_contentupdated',
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_deleted',
+        'callback'  => '\totara_program\rb_course_sortorder_helper::handle_program_deleted',
+    ),
 );
