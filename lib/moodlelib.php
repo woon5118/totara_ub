@@ -2802,9 +2802,9 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
     // It will allow them to use filepicker on the profile edit page.
 
     if ($preventredirect && !WS_SERVER) {
-        $usernotfullysetup = user_not_fully_set_up($USER);
+        $usernotfullysetup = user_not_fully_set_up($USER, false);
     } else {
-        $usernotfullysetup = user_not_fully_set_up($USER);
+        $usernotfullysetup = user_not_fully_set_up($USER, true);
     }
 
     if ($usernotfullysetup) {
@@ -3364,15 +3364,39 @@ function update_user_login_times() {
 /**
  * Determines if a user has completed setting up their account.
  *
+ * The lax mode (with $strict = false) has been introduced for special cases
+ * only where we want to skip certain checks intentionally. This is valid in
+ * certain mnet or ajax scenarios when the user cannot / should not be
+ * redirected to edit their profile. In most cases, you should perform the
+ * strict check.
+ *
  * @param stdClass $user A {@link $USER} object to test for the existence of a valid name and email
+ * @param bool $strict Be more strict and assert id and custom profile fields set, too
  * @return bool
  */
-function user_not_fully_set_up($user) {
-    // Totara: we do not check required custom profile fields intentionally!!!
+function user_not_fully_set_up($user, $strict = true) {
+    global $CFG;
+    require_once($CFG->dirroot.'/user/profile/lib.php');
+
     if (isguestuser($user)) {
         return false;
     }
-    return (empty($user->firstname) or empty($user->lastname) or empty($user->email) or over_bounce_threshold($user));
+
+    if (empty($user->firstname) or empty($user->lastname) or empty($user->email) or over_bounce_threshold($user)) {
+        return true;
+    }
+
+    if ($strict) {
+        if (empty($user->id)) {
+            // Strict mode can be used with existing accounts only.
+            return true;
+        }
+        if (!profile_has_required_custom_fields_set($user->id)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**

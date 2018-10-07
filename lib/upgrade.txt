@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 12.0 ===
 
+* The user_not_fully_set_up() function has a new $strict parameter (defaulting to true) in order to decide when
+  custom fields (and other checks) should be evaluated to determine if the user has been completely setup.
 * updated popover_region.mustache correcting role attribute
 * Upgraded jQuery to 3.3.1
 * $CFG->loginhttps setting was removed, do not use it.

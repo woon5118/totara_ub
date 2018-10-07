@@ -940,8 +940,6 @@ function profile_view($user, $context, $course = null) {
  * So this is actually checking if we should redirect the user to edit their
  * profile, rather than whether there is a value in the database.
  *
- * Totara: we do not use this function!
- *
  * @param int $userid
  * @return bool
  */
