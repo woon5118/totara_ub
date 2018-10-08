@@ -27,7 +27,14 @@ use totara_contentmarketplace\local;
 define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
+$marketplace = required_param('marketplace', PARAM_ALPHA);
+$sort = optional_param('sort', '', PARAM_STRINGID);
+$query = optional_param('query', '', PARAM_RAW_TRIMMED);
+$page = optional_param('page', 0, PARAM_INT);
+$isfirstquerywithdefaultsort = optional_param('isfirstquerywithdefaultsort', false, PARAM_BOOL);
+$mode = optional_param('mode', \totara_contentmarketplace\explorer::MODE_EXPLORE, PARAM_ALPHANUMEXT);
 $category = optional_param('category', 0, PARAM_INT);
+
 if ($category == 0) {
     $context = context_system::instance();
 } else {
@@ -35,45 +42,31 @@ if ($category == 0) {
 }
 
 $PAGE->set_context($context);
-require_sesskey();
-require_login();
-\totara_contentmarketplace\local::require_contentmarketplace();
+$PAGE->set_url(new moodle_url('/totara/contentmarketplace/ajax/search.php', ['marketplace' => $marketplace]));
+
+require_login(null, false, null, false, true);
 require_capability('totara/contentmarketplace:add', $context);
+require_sesskey();
 
-$marketplace = required_param('marketplace', PARAM_ALPHA);
-$sort = optional_param('sort', '', PARAM_STRINGID);
-$query = optional_param('query', '', PARAM_RAW_TRIMMED);
-$page = optional_param('page', 0, PARAM_INT);
-$isfirstquerywithdefaultsort = optional_param('isfirstquerywithdefaultsort', false, PARAM_BOOL);
-$mode = optional_param('mode', 'explore', PARAM_ALPHANUMEXT);
-
-$filter = array();
-$multivaluefilternames = optional_param_array('multivaluefilters', array(), PARAM_RAW_TRIMMED);
-foreach ($multivaluefilternames as $name) {
-    $filter[$name] = optional_param_array('filter-' . $name, array(), PARAM_RAW_TRIMMED);
-}
-$singlevaluefilternames = optional_param_array('singlevaluefilters', array(), PARAM_RAW_TRIMMED);
-foreach ($singlevaluefilternames as $name) {
-    $filter[$name] = optional_param('filter-' . $name, null, PARAM_RAW_TRIMMED);
-}
-
-$mp = contentmarketplace::plugin($marketplace);
-if (!$mp->is_enabled()) {
+local::require_contentmarketplace();
+$mp = contentmarketplace::plugin($marketplace, false);
+if ($mp === null || !$mp->is_enabled()) {
+    echo $OUTPUT->header();
     echo json_encode(false);
     exit;
 }
-$search = $mp->search();
-$results = $search->query($query, $sort, $filter, $page, $isfirstquerywithdefaultsort, $mode, $context);
 
-echo $OUTPUT->header();
+$filters = \totara_contentmarketplace\ajax_helper::extract_explorer_filters();
+
+$search = $mp->search();
+$results = $search->query($query, $sort, $filters, $page, $isfirstquerywithdefaultsort, $mode, $context);
 
 $data = new stdClass();
 $data->success = true;
-
 $data->hits = $results->hits;
-
 $data->filters = $results->filters;
 $data->total = $results->total;
+
 switch ($results->total) {
     case 0:
         $data->resultsummary = get_string('search:no-results', 'totara_contentmarketplace');
@@ -89,6 +82,7 @@ switch ($results->total) {
 $data->more = $results->more;
 $data->sort = $results->sort;
 $data->selectionmode = $results->selectionmode;
-$data->template = "contentmarketplace_$marketplace/thumbnail";
+$data->template = "contentmarketplace_{$marketplace}/thumbnail";
 
+echo $OUTPUT->header();
 echo json_encode($data);

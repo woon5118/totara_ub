@@ -25,21 +25,36 @@ namespace contentmarketplace_goone;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Collection class.
+ */
 final class collection extends \totara_contentmarketplace\local\contentmarketplace\collection {
 
-    public function get($id = 'default') {
+    /**
+     * @param string $id The collection ID
+     * @return array
+     */
+    public function get($id = 'default'): array {
         $api = new api();
         return $api->list_ids_for_all_learning_objects(['collection' => $id]);
     }
 
-    public function add($items, $id = 'default') {
+    /**
+     * @param array $items
+     * @param string $id The collection ID
+     */
+    public function add($items, $id = 'default'): void {
         $api = new api();
-        return $api->add_to_collection($items, $id);
+        $api->add_to_collection($items, $id);
     }
 
-    public function remove($items, $id = 'default') {
+    /**
+     * @param array $items
+     * @param string $id The collection ID
+     */
+    public function remove($items, $id = 'default'): void {
         $api = new api();
-        return $api->remove_from_collection($items, $id);
+        $api->remove_from_collection($items, $id);
     }
 
 }

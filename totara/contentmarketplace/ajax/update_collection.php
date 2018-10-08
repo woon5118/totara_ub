@@ -26,29 +26,33 @@ use totara_contentmarketplace\plugininfo\contentmarketplace;
 define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
+$marketplace = required_param('marketplace', PARAM_ALPHA);
+$action = required_param('action', PARAM_ALPHA);
+$selection = optional_param_array('selection', [], PARAM_ALPHANUMEXT);
+
 $context = context_system::instance();
 $PAGE->set_context($context);
-require_sesskey();
+
 require_login();
-\totara_contentmarketplace\local::require_contentmarketplace();
 require_capability('totara/contentmarketplace:add', $context);
+require_sesskey();
+\totara_contentmarketplace\local::require_contentmarketplace();
 
-$marketplace = required_param('marketplace', PARAM_ALPHA);
-$selection = optional_param_array('selection', [], PARAM_ALPHANUMEXT);
-$action = optional_param('action', '', PARAM_ALPHA);
-
-$mp = contentmarketplace::plugin($marketplace);
-if (!$mp->is_enabled()) {
+$mp = contentmarketplace::plugin($marketplace, false);
+if ($mp === null || !$mp->is_enabled()) {
+    echo $OUTPUT->header();
     echo json_encode(false);
     exit;
 }
 
-$result = null;
 $collection = $mp->collection();
-if ($action == 'add') {
-    $result = $collection->add($selection);
-} elseif ($action == 'remove') {
-    $result = $collection->remove($selection);
+if ($action === 'add') {
+    $collection->add($selection);
+} else if ($action === 'remove') {
+    $collection->remove($selection);
+} else {
+    throw new coding_exception('Invalid action provided', $action);
 }
 
-echo json_encode($result);
+echo $OUTPUT->header();
+echo json_encode(true);

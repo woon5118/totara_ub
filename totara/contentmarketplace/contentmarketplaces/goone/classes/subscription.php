@@ -25,8 +25,11 @@ namespace contentmarketplace_goone;
 
 defined('MOODLE_INTERNAL') || die();
 
-class subscription {
+final class subscription {
 
+    /**
+     * @var array
+     */
     private $ids;
 
     /**

@@ -25,6 +25,11 @@ use totara_contentmarketplace\local;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class local_testcase
+ *
+ * @group totara_contentmarketplace
+ */
 class local_testcase extends advanced_testcase {
 
     /**

@@ -61,6 +61,20 @@ if (!empty($courses) && !empty($data->plan_name)) {
 $data->enabled_by = get_config('contentmarketplace_goone', 'enabled_by');
 $data->enabled_on = get_config('contentmarketplace_goone', 'enabled_on');
 
+if (!empty($data->enabled_by)) {
+    if ($data->enabled_by == -1) {
+        // It was enabled by the system.
+        $data->enabled_by = get_string('enabledbyunknown', 'contentmarketplace_goone');
+    } else if (is_int($data->enabled_by)) {
+        $enabledby = $DB->get_record('user', ['id' => $data->enabled_by], 'id, ' . get_all_user_name_fields());
+        if (empty($enabledby)) {
+            $data->enabled_by = get_string('enabledbyunknown', 'contentmarketplace_goone');
+        } else {
+            $data->enabled_by = fullname($enabledby);
+        }
+    }
+}
+
 if (!empty($data->enabled_on)) {
     $data->enabled_on = userdate($data->enabled_on, get_string('strftimedate', 'core_langconfig'));
 }

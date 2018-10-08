@@ -35,7 +35,20 @@ $category = optional_param('category', 0, PARAM_INT);
 $selection = required_param_array('selection', PARAM_ALPHANUMEXT);
 $create = optional_param('create', create_course_form::CREATE_COURSE_MULTI_ACTIVITY, PARAM_INT);
 $category = optional_param('category', 0, PARAM_INT);
-$mode = optional_param('mode', 'create-course', PARAM_ALPHAEXT);
+$mode = optional_param('mode', \totara_contentmarketplace\explorer::MODE_CREATE_COURSE, PARAM_ALPHAEXT);
+
+if ($category === 0) {
+    $context = context_system::instance();
+    $pageparams = [];
+} else {
+    $context = context_coursecat::instance($category);
+    $pageparams = ['category' => $category];
+}
+$PAGE->set_context($context);
+$PAGE->set_url(new \moodle_url('/totara/contentmarketplace/contentmarketplaces/goone/coursecreate.php', $pageparams));
+
+require_login();
+require_capability('totara/contentmarketplace:add', $context);
 
 // Check marketplaces are enabled.
 \totara_contentmarketplace\local::require_contentmarketplace();
@@ -43,24 +56,15 @@ $mode = optional_param('mode', 'create-course', PARAM_ALPHAEXT);
 // Check Go1 marketplace plugin is enabled.
 /** @var \totara_contentmarketplace\plugininfo\contentmarketplace $plugin */
 $plugin = \core_plugin_manager::instance()->get_plugin_info("contentmarketplace_goone");
+if ($plugin === null) {
+    throw new coding_exception('The contentmarketplace_goone plugin is not yet installed.');
+}
 if (!$plugin->is_enabled()) {
     throw new \moodle_exception('error:disabledmarketplace', 'totara_contentmarketplace', '', $plugin->displayname);
 }
-require_login();
 
-if ($category === 0) {
-    $context = context_system::instance();
-} else {
-    $context = context_coursecat::instance($category);
-}
-require_capability('totara/contentmarketplace:add', $context);
-
-$PAGE->set_context($context);
-$pageparams = is_null($category) ? [] : ['category' => $category];
-$PAGE->set_url(new \moodle_url('/totara/contentmarketplace/contentmarketplaces/goone/coursecreate.php', $pageparams));
 $PAGE->set_title(get_string('addcourse', 'contentmarketplace_goone'));
 $PAGE->set_pagelayout('noblocks');
-
 
 /**
  * Check that current user has suitable access to the given learning objects in the given context.
@@ -201,6 +205,9 @@ $form = new create_course_form($currentdata, $params);
 
 if ($form->is_cancelled()) {
     $url = new moodle_url('/totara/contentmarketplace/explorer.php', ['marketplace' => 'goone', 'mode' => $mode]);
+    if (!empty($category)) {
+        $url->param('category', $category);
+    }
     redirect($url);
 } else if ($data = $form->get_data()) {
     require_once($CFG->dirroot.'/course/modlib.php');

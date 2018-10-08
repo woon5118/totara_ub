@@ -23,13 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-use core_course\workflow_manager\coursecreate;
-use totara_contentmarketplace\workflow_manager\exploremarketplace;
+if ($hassiteconfig or has_any_capability(array('totara/contentmarketplace:config', 'totara/contentmarketplace:add'), $systemcontext)) {
 
-$context = context_system::instance();
-
-if ($hassiteconfig or has_any_capability(array('totara/contentmarketplace:config', 'totara/contentmarketplace:add'), $context)) {
-
+    /** @var admin_root $ADMIN */
     $ADMIN->add('root', new admin_category(
             'contentmarketplace',
             get_string('contentmarketplace', 'totara_contentmarketplace')
@@ -37,45 +33,51 @@ if ($hassiteconfig or has_any_capability(array('totara/contentmarketplace:config
         'appearance'
     );
 
+    $marketplaceenabled = \totara_contentmarketplace\local::is_enabled();
     // Check for explicit disable via config.php
-    $forcedisabled = (!\totara_contentmarketplace\local::is_enabled() && array_key_exists('enablecontentmarketplaces', $CFG->config_php_settings));
+    $forcedisabled = (!$marketplaceenabled && array_key_exists('enablecontentmarketplaces', $CFG->config_php_settings));
     // Check if enabled and configured.
-    $alreadysetup = (\totara_contentmarketplace\local::is_enabled() && !\totara_contentmarketplace\local::should_show_admin_setup_intro());
+    $alreadysetup = ($marketplaceenabled && !\totara_contentmarketplace\local::should_show_admin_setup_intro());
 
     // Hide if force disabled or already setup.
-    $setuphidden = ($forcedisabled || $alreadysetup);
     $ADMIN->add('contentmarketplace', new admin_externalpage(
         'setup_content_marketplaces',
         get_string('setup_content_marketplaces', 'totara_contentmarketplace'),
         $CFG->wwwroot.'/totara/contentmarketplace/setup.php',
         'totara/contentmarketplace:config',
-        $setuphidden
+        ($forcedisabled || $alreadysetup)
     ));
 
     // Hide unless marketplaces are already setup.
-    $managehidden = !$alreadysetup;
     $ADMIN->add('contentmarketplace', new admin_externalpage(
         'manage_content_marketplaces',
         get_string('manage_content_marketplaces', 'totara_contentmarketplace'),
         $CFG->wwwroot.'/totara/contentmarketplace/marketplaces.php',
         'totara/contentmarketplace:config',
-        $managehidden
+        !$alreadysetup
     ));
 
-    $beforesibling = $ADMIN->locate('addcategory') ? 'addcategory' : '';
-    $wm = new exploremarketplace();
-    $explorehidden = !\totara_contentmarketplace\local::is_enabled() || !$wm->workflows_available();
-    $url = $wm->get_url();
+    $beforesibling = null;
+    if (has_capability('moodle/category:manage', $systemcontext)) {
+        $beforesibling = 'addcategory';
+    }
+    $wm = new \totara_contentmarketplace\workflow_manager\exploremarketplace();
     $ADMIN->add(
         'courses',
         new admin_externalpage(
             'exploremarketplaces',
             new lang_string('explore_totara_content', 'totara_contentmarketplace'),
-            $url,
+            $wm->get_url(),
             array('totara/contentmarketplace:add'),
-            $explorehidden
+            (!$marketplaceenabled || !$wm->workflows_available())
         ),
         $beforesibling
     );
 
+    // Clean up after ourselves, the admin tree is big enough without us leaving things around.
+    unset($wm);
+    unset($marketplaceenabled);
+    unset($forcedisabled);
+    unset($alreadysetup);
+    unset($beforesibling);
 }

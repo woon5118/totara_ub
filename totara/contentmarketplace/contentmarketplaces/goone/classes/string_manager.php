@@ -23,17 +23,33 @@
 
 namespace contentmarketplace_goone;
 
+defined('MOODLE_INTERNAL') || die();
+
 final class string_manager {
 
+    /**
+     * @var \core_string_manager
+     */
     private $manager;
+
+    /**
+     * @var array
+     */
     private $languages;
 
-    public function __construct($config = null) {
+    /**
+     * Constructor
+     */
+    public function __construct() {
         $this->manager = get_string_manager();
         $this->languages = $this->manager->get_list_of_languages();
     }
 
-    public function get_language($lang) {
+    /**
+     * @param string $lang
+     * @return string
+     */
+    public function get_language(string $lang): string {
         if (array_key_exists($lang, $this->languages)) {
             return $this->languages[$lang];
         }
@@ -56,6 +72,10 @@ final class string_manager {
         return $lang;
     }
 
+    /**
+     * @param string $region
+     * @return string
+     */
     public function get_region($region) {
         if (empty($region)) {
             return '';

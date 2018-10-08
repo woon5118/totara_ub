@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 class plugininfo extends \core\plugininfo\totara {
     public function get_usage_for_registration_data() {
-        global $CFG;
         $data = array();
 
         $data['marketplacesconfigured'] = (int)(

@@ -26,43 +26,39 @@ use totara_contentmarketplace\plugininfo\contentmarketplace;
 define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
+$marketplace = required_param('marketplace', PARAM_ALPHA);
+$query = optional_param('query', '', PARAM_RAW_TRIMMED);
+$mode = optional_param('mode', \totara_contentmarketplace\explorer::MODE_EXPLORE, PARAM_ALPHANUMEXT);
 $category = optional_param('category', 0, PARAM_INT);
+
 if ($category == 0) {
     $context = context_system::instance();
 } else {
     $context = context_coursecat::instance($category);
 }
 $PAGE->set_context($context);
-require_sesskey();
-require_login();
-\totara_contentmarketplace\local::require_contentmarketplace();
+$PAGE->set_url(new moodle_url('/totara/contentmarketplace/ajax/select.php', ['marketplace' => $marketplace]));
+
+require_login(null, false, null, false, true);
 require_capability('totara/contentmarketplace:add', $context);
+require_sesskey();
+\totara_contentmarketplace\local::require_contentmarketplace();
 
-$marketplace = required_param('marketplace', PARAM_ALPHA);
-$query = optional_param('query', '', PARAM_RAW_TRIMMED);
-$mode = optional_param('mode', 'explore', PARAM_ALPHANUMEXT);
-
-$filter = array();
-$multivaluefilternames = optional_param_array('multivaluefilters', array(), PARAM_RAW_TRIMMED);
-foreach ($multivaluefilternames as $name) {
-    $filter[$name] = optional_param_array('filter-' . $name, array(), PARAM_RAW_TRIMMED);
-}
-$singlevaluefilternames = optional_param_array('singlevaluefilters', array(), PARAM_RAW_TRIMMED);
-foreach ($singlevaluefilternames as $name) {
-    $filter[$name] = optional_param('filter-' . $name, null, PARAM_RAW_TRIMMED);
-}
-
-$mp = contentmarketplace::plugin($marketplace);
-if (!$mp->is_enabled()) {
+$mp = contentmarketplace::plugin($marketplace, false);
+if ($mp === null || !$mp->is_enabled()) {
+    echo $OUTPUT->header();
     echo json_encode(false);
     exit;
 }
-$search = $mp->search();
-$selection = $search->select_all($query, $filter, $mode, $context);
 
-echo $OUTPUT->header();
+$filters = \totara_contentmarketplace\ajax_helper::extract_explorer_filters();
+
+$search = $mp->search();
+$selection = $search->select_all($query, $filters, $mode, $context);
 
 $data = new stdClass();
 $data->success = true;
 $data->selection = $selection;
+
+echo $OUTPUT->header();
 echo json_encode($data);

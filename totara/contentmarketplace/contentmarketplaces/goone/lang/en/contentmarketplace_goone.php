@@ -50,6 +50,7 @@ $string['courses_amount_label'] = '({$a} courses)';
 $string['currentplan'] = 'Current Plan';
 $string['duration'] = '{$a} minutes';
 $string['enabledby'] = 'Enabled by';
+$string['enabledbyunknown'] = 'Unknown';
 $string['enableddate'] = 'Enabled date';
 $string['error:invalid_token'] = 'There is an authentication problem when connecting to the GO1 servers. The GO1 content marketplace will need to be set up again.';
 $string['error:rest_client_timeout'] = 'Communication with GO1 server timed out. Please try again in a moment.';

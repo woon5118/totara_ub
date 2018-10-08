@@ -32,13 +32,73 @@ defined('MOODLE_INTERNAL') || die();
  */
 abstract class contentmarketplace {
 
-    public $fullname;
+    /**
+     * This plugins name, must be set by the extending class.
+     * @var string
+     */
     public $name;
+
+    /**
+     * A translated fullname for this plugin - set during construction.
+     * @var string
+     */
+    public $fullname;
+
+    /**
+     * A translated description for this plugin - set during construction.
+     * @var string
+     */
     public $descriptionhtml;
 
+    /**
+     * The plugin directory - set during construction.
+     * @var string
+     */
+    private $plugin_directory;
+
+    /**
+     * The plugin name - set during construction.
+     * @var string
+     */
+    private $plugin_name;
+
     public function __construct() {
-        $this->descriptionhtml = get_string('plugin_description_html', 'contentmarketplace_'.$this->name);
-        $this->fullname = get_string('pluginname', 'contentmarketplace_'.$this->name);
+
+        if (empty($this->name)) {
+            throw new \coding_exception('All content marketplace must define a name.', static::class);
+        }
+        if (clean_param($this->name, PARAM_COMPONENT) !== $this->name) {
+            // This is a coding exception, but its required for security, we use this in directory paths, and as part of a
+            // frankenstyle name. We use PARAM_COMPONENT as its stricter than PARAM_SAFEDIR.
+            throw new \coding_exception('The content marketplace name is not safe.', $this->name);
+        }
+
+        $this->plugin_directory = \core_component::get_plugin_directory('contentmarketplace', $this->name);
+        if (empty($this->plugin_directory)) {
+            throw new \coding_exception('Invalid marketplace name given, it needs to match plugin name.', $this->name);
+        }
+        $this->plugin_name = 'contentmarketplace_'.$this->name;
+
+        $this->descriptionhtml = get_string('plugin_description_html', $this->get_plugin_name());
+        $this->fullname = get_string('pluginname', $this->get_plugin_name());
+    }
+
+    /**
+     * Returns the absolute directory path for content marketplace instance
+     *
+     * @return string
+     */
+    final public function get_plugin_directory() {
+        return $this->plugin_directory;
+    }
+
+    /**
+     * Returns the plugins frankenstyle name, e.g. contentmarketplace_goone
+     *
+     * @return string
+     */
+    final public function get_plugin_name() {
+        return $this->plugin_name;
     }
 
     /**
@@ -63,12 +123,13 @@ abstract class contentmarketplace {
      * @return string Logo HTML, or empty string if no logo found.
      */
     public function get_logo_html($width = 100) {
-        global $CFG;
-        $logo = '/totara/contentmarketplace/contentmarketplaces/'. $this->name .'/pix/logo.png';
-        if (file_exists($CFG->dirroot. $logo)) {
+        global $PAGE;
+
+        $logo = $this->get_plugin_directory() . '/pix/logo.png';
+        if (file_exists($logo)) {
             // No need to screen variables here; html_writer takes care of it.
             return \html_writer::img(
-                new \moodle_url($logo),
+                $PAGE->theme->image_url('logo', $this->get_plugin_name()),
                 $this->name,
                 array('width' => $width, 'title' => $this->fullname, 'alt' => $this->fullname)
             );
@@ -110,7 +171,7 @@ abstract class contentmarketplace {
      * @return string
      */
     public function get_source($id) {
-        return "content-marketplace://$this->name/$id";
+        return "content-marketplace://{$this->name}/{$id}";
     }
 
 }

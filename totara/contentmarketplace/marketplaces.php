@@ -24,6 +24,9 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 
+// This is very purposefully here, please don't move it beneath admin_externalpage_setup.
+// We want users on sites where it is not enabled, or where they've followed a link on a call to action to be directed
+// to a page that engages them.
 if (!\totara_contentmarketplace\local::is_enabled() || \totara_contentmarketplace\local::should_show_admin_setup_intro()) {
     redirect(new moodle_url('/totara/contentmarketplace/setup.php'));
     die;
@@ -33,13 +36,9 @@ $id = optional_param('id', null, PARAM_ALPHAEXT);
 $enable = optional_param('enable', null, PARAM_BOOL);
 $disable = optional_param('disable', null, PARAM_BOOL);
 
-$context = context_system::instance();
-
 admin_externalpage_setup('manage_content_marketplaces');
-require_capability('totara/contentmarketplace:config', $context);
 
-$PAGE->set_context($context);
-$PAGE->set_url('/totara/contentmarketplace/marketplaces.php');
+// Set a better title and heading.
 $title = get_string('subplugintype_contentmarketplace', 'totara_contentmarketplace');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
@@ -58,23 +57,21 @@ if (!empty($id)) {
             break;
         }
     }
-    if (!$pl) {
+    unset($pl);
+    if (!$plugin) {
         redirect($PAGE->url);
-        exit;
     }
 
     if (!empty($enable)) {
         require_sesskey();
-        $pl->enable();
+        $plugin->enable();
         redirect($PAGE->url);
-        exit;
     }
 
     if (!empty($disable)) {
         require_sesskey();
-        $pl->disable();
+        $plugin->disable();
         redirect($PAGE->url);
-        exit;
     }
 
     if (!$plugin->is_enabled()) {
@@ -83,7 +80,7 @@ if (!empty($id)) {
 
     $PAGE->navbar->add($plugin->displayname);
     echo $OUTPUT->header();
-    $settingspage = dirname(__FILE__).'/contentmarketplaces/'.$pl->name.'/config.php';
+    $settingspage = $CFG->dirroot . '/totara/contentmarketplace/contentmarketplaces/'.$plugin->name.'/config.php';
     if (!file_exists($settingspage)) {
         echo $OUTPUT->error_text(get_string('settings_page_not_found', 'totara_contentmarketplace'));
     } else {
@@ -161,6 +158,5 @@ foreach ($plugins as $plugin) {
     $table->rowclasses[] = $plugin->component;
 }
 
-echo html_writer::table($table);
-
+echo $OUTPUT->render($table);
 echo $OUTPUT->footer();

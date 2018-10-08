@@ -23,6 +23,8 @@
 
 namespace contentmarketplace_goone;
 
+defined('MOODLE_INTERNAL') || die();
+
 class unavailable_learning_object_exception extends \moodle_exception {
 
     public function __construct($learningobjectid) {

@@ -23,12 +23,22 @@
 
 namespace contentmarketplace_goone;
 
+defined('MOODLE_INTERNAL') || die();
+
 final class config_db_storage extends config_storage {
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function get($name) {
         return get_config('contentmarketplace_goone', $name);
     }
 
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
     public function set($name, $value) {
         set_config($name, $value, 'contentmarketplace_goone');
     }

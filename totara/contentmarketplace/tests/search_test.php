@@ -25,6 +25,11 @@ use totara_contentmarketplace\local\contentmarketplace;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class contentmarketplace_search_testcase
+ *
+ * @group totara_contentmarketplace
+ */
 class contentmarketplace_search_testcase extends basic_testcase {
 
     public function test_paginate_one_page() {

@@ -22,7 +22,6 @@
  */
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
-require_once($CFG->libdir.'/adminlib.php');
 
 use contentmarketplace_goone\contentmarketplace;
 use contentmarketplace_goone\oauth;
@@ -32,13 +31,14 @@ $code = required_param('code', PARAM_RAW);
 $client_id = required_param('client_id', PARAM_RAW);
 $client_secret = required_param('client_secret', PARAM_RAW);
 
-\totara_contentmarketplace\local::require_contentmarketplace();
-require_login();
 $context = context_system::instance();
-require_capability('totara/contentmarketplace:config', $context);
-
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/contentmarketplace/contentmarketplaces/goone/signin.php');
+
+require_login();
+require_capability('totara/contentmarketplace:config', $context);
+\totara_contentmarketplace\local::require_contentmarketplace();
+
 $PAGE->set_pagelayout('popup');
 
 $oauth_client = new oauth(new config_session_storage());

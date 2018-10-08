@@ -29,6 +29,9 @@
 
 define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_factory', 'core/modal_events'], function($, Str, mdlcfg, templates, ModalFactory, ModalEvents) {
 
+    // This must match \totara_contentmarketplace\explorer::MODE_CREATE_COURSE
+    var MODE_CREATE_COURSE = 'create-course';
+
     var explorer = {};
 
     explorer.selector = null;
@@ -48,7 +51,7 @@ define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_facto
         this.createpagepath = context.data('createpagepath');
         this.marketplace = context.data('marketplace');
         this.mode = context.data('mode');
-        if (this.mode == 'create-course') {
+        if (this.mode === MODE_CREATE_COURSE) {
             $('.tcm-collection-tool', this.selector).hide();
         }
         this.category = context.data('category');
@@ -176,7 +179,7 @@ define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_facto
                 $('.tcm-search_result_summary', context).replaceWith(html);
             });
             $('.tcm-sorting select', context).val(data.sort);
-            if (self.mode !== 'create-course') {
+            if (self.mode !== MODE_CREATE_COURSE) {
                 if (data.selectionmode === 'add') {
                     $('.tcm-add-to-collection', context).show();
                     $('.tcm-remove-from-collection', context).hide();

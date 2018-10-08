@@ -23,6 +23,8 @@
 
 namespace contentmarketplace_goone;
 
+defined('MOODLE_INTERNAL') || die();
+
 final class config_session_storage extends config_storage {
 
     public function get($name) {

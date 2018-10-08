@@ -29,6 +29,7 @@ final class setup_wizard extends \totara_form\form\group\wizard {
 
     public function export_for_template(\renderer_base $output) {
         $result = parent::export_for_template($output);
+        // We intentionally override wizardnextbtn here.
         $result['wizardnextbtn'] = get_string('continue', 'contentmarketplace_goone');
         return $result;
     }

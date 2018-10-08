@@ -23,6 +23,8 @@
 
 namespace contentmarketplace_goone;
 
+defined('MOODLE_INTERNAL') || die();
+
 class invalid_token_exception extends \moodle_exception {
 
     public function __construct($url) {

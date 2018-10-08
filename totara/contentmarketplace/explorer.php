@@ -23,11 +23,8 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 
-\totara_contentmarketplace\local::require_contentmarketplace();
-require_login();
-
 $marketplace = required_param('marketplace', PARAM_ALPHA);
-$mode = optional_param('mode', 'explore', PARAM_ALPHAEXT);
+$mode = optional_param('mode', \totara_contentmarketplace\explorer::MODE_EXPLORE, PARAM_ALPHAEXT);
 $category = optional_param('category', 0, PARAM_INT);
 
 if ($category == 0) {
@@ -35,22 +32,25 @@ if ($category == 0) {
 } else {
     $context = context_coursecat::instance($category);
 }
-require_capability('totara/contentmarketplace:add', $context);
 
+$PAGE->set_context($context);
+$PAGE->set_url('/totara/contentmarketplace/explorer.php', ['marketplace' => $marketplace]);
+
+require_login();
+require_capability('totara/contentmarketplace:add', $context);
+\totara_contentmarketplace\local::require_contentmarketplace();
 
 $explorer = new \totara_contentmarketplace\explorer($marketplace, $mode, $category);
 
 /** @var totara_contentmarketplace\plugininfo\contentmarketplace $plugin */
-$plugin = core_plugin_manager::instance()->get_plugin_info("contentmarketplace_$marketplace");
+$plugin = core_plugin_manager::instance()->get_plugin_info("contentmarketplace_{$marketplace}");
 if (!$plugin->is_enabled()) {
     throw new moodle_exception('error:disabledmarketplace', 'totara_contentmarketplace', '', $plugin->displayname);
 }
 
-$PAGE->set_context($context);
 $PAGE->set_pagelayout('noblocks');
-$PAGE->set_url('/totara/contentmarketplace/explorer.php', ['marketplace' => $marketplace]);
 
-if ($mode == 'create-course') {
+if ($mode === \totara_contentmarketplace\explorer::MODE_CREATE_COURSE) {
     $PAGE->navbar->add(get_string('administrationsite'));
     $PAGE->navbar->add(get_string('courses'));
     $PAGE->navbar->add(get_string('createcourse', 'totara_contentmarketplace'));
@@ -58,7 +58,7 @@ if ($mode == 'create-course') {
 } else {
     $PAGE->navbar->add(get_string('contentmarketplace', 'totara_contentmarketplace'));
     $PAGE->navbar->add($plugin->displayname);
-    $PAGE->navbar->add("Explore");
+    $PAGE->navbar->add(get_string('explore', 'totara_contentmarketplace'));
 }
 
 if (has_capability('totara/contentmarketplace:config', $context)) {

@@ -37,32 +37,24 @@ if (!\totara_contentmarketplace\local::is_enabled() &&
 if (\totara_contentmarketplace\local::is_enabled() &&
     !\totara_contentmarketplace\local::should_show_admin_setup_intro()) {
     redirect(new \moodle_url('/totara/contentmarketplace/marketplaces.php'));
-    die;
 }
 
-require_login();
-$context = context_system::instance();
 admin_externalpage_setup('setup_content_marketplaces');
-require_capability('totara/contentmarketplace:config', $context);
 
 if ($action) {
     require_sesskey();
     $value = ($action == 'enable');
     set_config('enablecontentmarketplaces', $value);
     redirect(new \moodle_url('/totara/contentmarketplace/setup.php'));
-    die;
 }
 
-$PAGE->set_context($context);
-$PAGE->set_url('/totara/contentmarketplace/setup.php');
+// Set a more appropriate title.
 $title = get_string('setup_tc', 'totara_contentmarketplace');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
-
 echo $OUTPUT->heading(get_string('setup_content_marketplaces', 'totara_contentmarketplace'));
-
 echo $OUTPUT->render_from_template('totara_contentmarketplace/setup_description', []);
 
 if (!\totara_contentmarketplace\local::is_enabled()) {
@@ -109,6 +101,5 @@ foreach ($plugins as $plugin) {
     $table->rowclasses[] = $plugin->component;
 }
 
-echo html_writer::table($table);
-
+echo $OUTPUT->render($table);
 echo $OUTPUT->footer();

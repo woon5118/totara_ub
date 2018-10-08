@@ -26,18 +26,22 @@ use totara_contentmarketplace\plugininfo\contentmarketplace;
 define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
+$id = required_param('id', PARAM_INT);
+$marketplace = required_param('marketplace', PARAM_ALPHA);
+
 $context = context_system::instance();
 $PAGE->set_context($context);
-require_sesskey();
-require_login();
-\totara_contentmarketplace\local::require_contentmarketplace();
+$PAGE->set_url(new moodle_url('/totara/contentmarketplace/ajax/fetch_details.php', ['id' => $id, 'marketplace' => $marketplace]));
+
+// Order of checking is important as getting it wrong can give away information.
+require_login(null, false, null, false, true);
 require_capability('totara/contentmarketplace:add', $context);
+require_sesskey();
+\totara_contentmarketplace\local::require_contentmarketplace();
 
-$marketplace = required_param('marketplace', PARAM_ALPHA);
-$id = required_param('id', PARAM_INT);
-
-$mp = contentmarketplace::plugin($marketplace);
-if (!$mp->is_enabled()) {
+$mp = contentmarketplace::plugin($marketplace, false);
+if ($mp === null || !$mp->is_enabled()) {
+    echo $OUTPUT->header();
     echo json_encode(false);
     exit;
 }
@@ -46,11 +50,10 @@ $lo = $search->get_details($id);
 
 if (!$lo) {
     $data->success = false;
+    echo $OUTPUT->header();
     echo json_encode($data);
     exit;
 }
-
-echo $OUTPUT->header();
 
 $data = new stdClass();
 $data->success = true;
@@ -91,4 +94,5 @@ if ($data->delivery_has_items) {
     }
 }
 
+echo $OUTPUT->header();
 echo json_encode($data);

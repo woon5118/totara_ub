@@ -45,8 +45,14 @@ final class setup_wizard_default_controller extends \totara_form\form_controller
      */
     public function get_ajax_form_instance($idsuffix) {
         // Access control first.
-        require_login();
+
+        if (!defined('AJAX_SCRIPT') || AJAX_SCRIPT !== true) {
+            throw new \coding_exception('This method can only be called by AJAX scripts');
+        }
+
+        require_login(null, false, null, false, true);
         require_sesskey();
+
         $syscontext = \context_system::instance();
         require_capability('totara/contentmarketplace:config', $syscontext);
 

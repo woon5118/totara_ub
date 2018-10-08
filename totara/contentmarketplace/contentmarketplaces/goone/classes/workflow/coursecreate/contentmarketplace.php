@@ -52,7 +52,7 @@ class contentmarketplace extends \core_course\workflow\coursecreate {
         // Go1 marketplace plugin enabled.
         /** @var \totara_contentmarketplace\plugininfo\contentmarketplace $plugin */
         $plugin = \core_plugin_manager::instance()->get_plugin_info("contentmarketplace_goone");
-        if (!$plugin->is_enabled()) {
+        if ($plugin === null || !$plugin->is_enabled()) {
             return false;
         }
 
@@ -62,8 +62,8 @@ class contentmarketplace extends \core_course\workflow\coursecreate {
     public function get_workflow_url(): \moodle_url {
         return new \moodle_url('/totara/contentmarketplace/explorer.php', [
             'marketplace' => 'goone',
-            'mode' => 'create-course',
-            ]);
+            'mode' => \totara_contentmarketplace\explorer::MODE_CREATE_COURSE,
+        ]);
     }
 
     public function get_image(): \moodle_url {

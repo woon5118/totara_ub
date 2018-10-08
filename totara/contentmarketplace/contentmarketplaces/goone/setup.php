@@ -27,16 +27,13 @@ use contentmarketplace_goone\form\setup_form;
 use contentmarketplace_goone\contentmarketplace;
 use contentmarketplace_goone\oauth;
 
-\totara_contentmarketplace\local::require_contentmarketplace();
-require_login();
 $context = context_system::instance();
-require_capability('totara/contentmarketplace:config', $context);
-
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/contentmarketplace/setup.php');
-$PAGE->set_title(get_string('setup_page_header', 'contentmarketplace_goone'));
-$PAGE->set_heading(get_string('setup_page_header', 'contentmarketplace_goone'));
-$PAGE->set_pagelayout('noblocks');
+
+require_login();
+require_capability('totara/contentmarketplace:config', $context);
+\totara_contentmarketplace\local::require_contentmarketplace();
 
 if (!oauth::have_config_in_session()) {
     // Looks like the form has already been successfully processed.
@@ -61,6 +58,10 @@ if ($form->is_cancelled()) {
     $plugin->enable();
     redirect(new moodle_url('/totara/contentmarketplace/explorer.php', array('marketplace' => 'goone')));
 }
+
+$PAGE->set_title(get_string('setup_page_header', 'contentmarketplace_goone'));
+$PAGE->set_heading(get_string('setup_page_header', 'contentmarketplace_goone'));
+$PAGE->set_pagelayout('noblocks');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('setup_page_header', 'contentmarketplace_goone'));

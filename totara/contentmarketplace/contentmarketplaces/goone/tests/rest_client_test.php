@@ -27,6 +27,11 @@ use contentmarketplace_goone\rest_client_timeout_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class rest_client_testcase
+ *
+ * @group totara_contentmarketplace
+ */
 class rest_client_testcase extends basic_testcase {
 
     public function test_get() {

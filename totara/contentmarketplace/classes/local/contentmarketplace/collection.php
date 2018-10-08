@@ -33,23 +33,28 @@ abstract class collection {
 
     /**
      * Fetch all available items in collection.
+     *
+     * @param string $id Collection ID
+     * @return array
      */
-    abstract public function get($id = 'default');
+    abstract public function get($id = 'default'): array;
 
     /**
      * Add items to collection
      *
      * @param array $items Array of item IDs to be added
      * @param string $id Collection ID
+     * @return void
      */
-    abstract public function add($items, $id = 'default');
+    abstract public function add($items, $id = 'default'): void;
 
     /**
      * Add items to collection
      *
      * @param array $items Array of item IDs to be removed
      * @param string $id Collection ID
+     * @return void
      */
-    abstract public function remove($items, $id = 'default');
+    abstract public function remove($items, $id = 'default'): void;
 
 }

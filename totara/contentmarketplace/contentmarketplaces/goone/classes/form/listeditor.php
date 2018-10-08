@@ -21,11 +21,11 @@
  * @package contentmarketplace_goone
  */
 
- namespace contentmarketplace_goone\form;
+namespace contentmarketplace_goone\form;
 
- use totara_form\element,
-     totara_form\item,
-     totara_form\form\clientaction\supports_onchange_clientactions;
+use totara_form\element,
+    totara_form\item,
+    totara_form\form\clientaction\supports_onchange_clientactions;
 
 
 class listeditor extends element implements supports_onchange_clientactions {
@@ -150,7 +150,7 @@ class listeditor extends element implements supports_onchange_clientactions {
     /**
      * Get the value of text input element.
      *
-     * @return string|null
+     * @return array|null
      */
     public function get_field_value() {
         $model = $this->get_model();
@@ -173,7 +173,7 @@ class listeditor extends element implements supports_onchange_clientactions {
      * Returns current selected checkboxes value.
      *
      * @param bool $debuggingifinvalid true means print debugging message if value invalid
-     * @return string|null null means incorrect current value or not specified
+     * @return array|null null means incorrect current value or not specified
      */
     protected function get_current_value($debuggingifinvalid = false) {
         $name = $this->get_name();

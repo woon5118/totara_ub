@@ -23,12 +23,9 @@
 
 namespace totara_contentmarketplace\plugininfo;
 
-use core_plugin_manager;
-use core\plugininfo\base;
-
 defined('MOODLE_INTERNAL') || die();
 
-class contentmarketplace extends base {
+class contentmarketplace extends \core\plugininfo\base {
 
     public static function get_enabled_plugins() {
         global $DB;
@@ -61,7 +58,7 @@ class contentmarketplace extends base {
      * @return \totara_contentmarketplace\local\contentmarketplace\contentmarketplace
      */
     public function contentmarketplace() {
-        $classname = "\\$this->component\\contentmarketplace";
+        $classname = "\\{$this->component}\\contentmarketplace";
         return new $classname();
     }
 
@@ -69,7 +66,7 @@ class contentmarketplace extends base {
      * @return \totara_contentmarketplace\local\contentmarketplace\search
      */
     public function search() {
-        $classname = "\\$this->component\\search";
+        $classname = "\\{$this->component}\\search";
         return new $classname();
     }
 
@@ -77,36 +74,49 @@ class contentmarketplace extends base {
      * @return \totara_contentmarketplace\local\contentmarketplace\collection
      */
     public function collection() {
-        $classname = "\\$this->component\\collection";
+        $classname = "\\{$this->component}\\collection";
         return new $classname();
     }
 
     /**
-     * @return contentmarketplace
+     * @param string $name
+     * @param bool $required If set to true (default) and the plugin doesn't exist a coding_exception is thrown.
+     * @return contentmarketplace|null
      */
-    public static function plugin($name) {
-        return core_plugin_manager::instance()->get_plugin_info("contentmarketplace_$name");
+    public static function plugin($name, $required = true) {
+        $plugin = \core_plugin_manager::instance()->get_plugin_info("contentmarketplace_{$name}");
+        if ($plugin === null) {
+            if ($required) {
+                throw new \coding_exception('Unknown content marketplace plugin requested.');
+            }
+            return null;
+        }
+        if (!$plugin instanceof contentmarketplace) {
+            throw new \coding_exception('Content marketplace plugin is not of the correct type.');
+        }
+        return $plugin;
     }
 
     public function enable() {
         global $USER;
-        set_config('enabled_by', fullname($USER), 'contentmarketplace_'.$this->name);
-        set_config('enabled_on', time(), 'contentmarketplace_'.$this->name);
+        $userid = (isloggedin()) ? $USER->id : -1;
+        set_config('enabled_by', $userid, $this->component);
+        set_config('enabled_on', time(), $this->component);
         $this->set_enabled(1);
     }
 
     public function disable() {
-        set_config('enabled_by', '', 'contentmarketplace_'.$this->name);
-        set_config('enabled_on', '', 'contentmarketplace_'.$this->name);
+        set_config('enabled_by', '', $this->component);
+        set_config('enabled_on', '', $this->component);
         $this->set_enabled(0);
     }
 
     protected function set_enabled($value) {
-        set_config('enabled', $value, 'contentmarketplace_'.$this->name);
-        core_plugin_manager::reset_caches();
+        set_config('enabled', $value, $this->component);
+        \core_plugin_manager::reset_caches();
     }
 
     public function has_never_been_enabled() {
-        return get_config('contentmarketplace_'.$this->name, 'enabled') === false;
+        return get_config($this->component, 'enabled') === false;
     }
 }

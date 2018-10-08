@@ -44,6 +44,7 @@ final class create_course_form extends \totara_form\form {
         } else {
             $legend = get_string("itemselected_plural", "totara_contentmarketplace", (string) $this->parameters['totalselected']);
         }
+        /** @var section $selectedcourses */
         $selectedcourses = $this->model->add(new section('selectedcourses', $legend));
         $selectedcourses->set_collapsible(false);
 
@@ -51,6 +52,7 @@ final class create_course_form extends \totara_form\form {
         $selectedcourses->add($selection);
         $this->model->add_clientaction(new onchange_reload($selection));
 
+        /** @var section $settings */
         $settings = $this->model->add(new section('settings', get_string('coursesettings', 'totara_contentmarketplace')));
         $settings->set_collapsible(false);
 
@@ -97,6 +99,7 @@ final class create_course_form extends \totara_form\form {
         } else {
 
             foreach ($this->parameters['selection'] as $id) {
+                /** @var section $course */
                 $course = $this->model->add(new section('course_' . $id, $this->parameters['section_' . $id]));
                 $course->set_collapsible(false);
 

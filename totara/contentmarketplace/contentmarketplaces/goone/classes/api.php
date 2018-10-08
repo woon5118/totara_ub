@@ -31,19 +31,24 @@ final class api {
     const MAX_PAGE_SIZE = 50;
     const MAX_AVAILABLE_RESULTS = 10000;
 
-    /** @var oauth_rest_client $client */
+    /** @var oauth_rest_client */
     private $client;
 
     /** @var config_storage  */
     private $config;
 
-    /** @var \cache $learningobjectcache Cache for individual learning objects */
+    /** @var \cache Cache for individual learning objects */
     private $learningobjectcache;
-    /** @var \cache $bulklearningobjectcache Cache for bulk results, eg. a search. */
+    /** @var \cache Cache for bulk results, eg. a search. */
     private $bulklearningobjectcache;
-    /** @var \cache $countcache Cache for counts of objects. */
+    /** @var \cache Cache for counts of objects. */
     private $countcache;
 
+    /**
+     * The api constructor.
+     *
+     * @param config_storage|null $config
+     */
     public function __construct(config_storage $config = null) {
         $this->config = isset($config) ? $config : new config_db_storage();
         $oauth = new oauth($this->config);
@@ -55,8 +60,8 @@ final class api {
 
     /**
      * Get an individual learning object.
-     * @param  int    $id remote id of the learning object.
-     * @return object object returned from the Go1 web service.
+     * @param int $id remote id of the learning object.
+     * @return \stdClass Object returned from the Go1 web service.
      */
     public function get_learning_object(int $id) {
         $data = $this->learningobjectcache->get($id);
@@ -69,6 +74,10 @@ final class api {
         return $data;
     }
 
+    /**
+     * Smooths and cleans data on the given object (by reference)
+     * @param \stdClass $data
+     */
     private function clean_learning_object(&$data) {
         // Populate any missing non-guaranteed properties.
         $data->image = isset($data->image) ? $data->image : null;
@@ -89,6 +98,10 @@ final class api {
         $data->reviews->rating = isset($data->reviews->rating) ? $data->reviews->rating : null;
     }
 
+    /**
+     * @param int $id
+     * @return mixed
+     */
     public function get_scorm(int $id) {
         $url = 'learning-objects/' . $id . '/scorm';
         $headers = [
@@ -198,9 +211,10 @@ final class api {
     }
 
     /**
+     * @param array $params The parameters to the API query.
      * @return int The total number of all packages for this account
      */
-    public function get_learning_objects_total_count($params = array()) {
+    public function get_learning_objects_total_count(array $params = []) {
         unset($params["subscribed"]);
         unset($params["collection"]);
         $params["limit"] = 0;
@@ -215,9 +229,10 @@ final class api {
     }
 
     /**
+     * @param array $params The parameters to the API query.
      * @return int The total number of subscribed packages for this account
      */
-    public function get_learning_objects_subscribed_count($params = array()) {
+    public function get_learning_objects_subscribed_count(array $params = []) {
         $params["subscribed"] = "true";
         unset($params["collection"]);
         $params["limit"] = 0;
@@ -231,9 +246,11 @@ final class api {
     }
 
     /**
+     * @param array $params The parameters to the API query.
+     * @param string $collectionid
      * @return int The total number of packages for the given collection
      */
-    public function get_learning_objects_collection_count($params = array(), $collectionid = 'default') {
+    public function get_learning_objects_collection_count(array $params = [], $collectionid = 'default') {
         $this->check_processing_cache_timer();
         unset($params["subscribed"]);
         $params['collection'] = $collectionid;
@@ -248,9 +265,10 @@ final class api {
     }
 
     /**
+     * @param array $params The parameters to the API query.
      * @return array Listing of all the learning objects id's for the given filter
      */
-    public function list_ids_for_all_learning_objects($params = []) {
+    public function list_ids_for_all_learning_objects(array $params = []) {
         $ids = [];
         for ($page = 0; $page < self::MAX_AVAILABLE_RESULTS/self::MAX_PAGE_SIZE; $page += 1) {
             $params['offset'] = $page * self::MAX_PAGE_SIZE;
@@ -302,7 +320,13 @@ final class api {
         }
     }
 
-    private function update_collection($operation, $items, $collectionid) {
+    /**
+     * @param string $operation
+     * @param array $items
+     * @param string $collectionid
+     * @return void
+     */
+    private function update_collection($operation, array $items, $collectionid) {
         if (empty($items)) {
             return;
         }
@@ -325,22 +349,22 @@ final class api {
      * Adds items to collection.
      *
      * @param array of item IDs.
-     * @param string $collection_id Collection ID ("default" by default).
+     * @param string $collectionid Collection ID ("default" by default).
      * @return void
      */
-    public function add_to_collection($items, $collectionid = 'default') {
-        return $this->update_collection('add', $items, $collectionid);
+    public function add_to_collection(array $items, $collectionid = 'default') {
+        $this->update_collection('add', $items, $collectionid);
     }
 
     /**
      * Removes items from collection.
      *
      * @param array of item IDs.
-     * @param string $collection_id Collection ID ("default" by default).
+     * @param string $collectionid Collection ID ("default" by default).
      * @return void
      */
-    public function remove_from_collection($items, $collectionid = 'default') {
-        return $this->update_collection('remove', $items, $collectionid);
+    public function remove_from_collection(array $items, $collectionid = 'default') {
+        $this->update_collection('remove', $items, $collectionid);
     }
 
     /**

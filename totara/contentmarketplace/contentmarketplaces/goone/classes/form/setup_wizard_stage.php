@@ -29,6 +29,7 @@ final class setup_wizard_stage extends \totara_form\form\group\wizard_stage {
 
     public function export_for_template(\renderer_base $output) {
         $result = parent::export_for_template($output);
+        // We very intentionally override form_item_template here.
         $result['form_item_template'] = 'contentmarketplace_goone/setup_wizard_stage';
         return $result;
     }

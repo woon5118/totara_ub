@@ -33,7 +33,8 @@ $capabilities = array(
     ),
     'totara/contentmarketplace:add' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'riskbitmask' => RISK_XSS,
+        'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
             'coursecreator' => CAP_ALLOW,

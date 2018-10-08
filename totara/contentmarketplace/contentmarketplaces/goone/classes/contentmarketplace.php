@@ -106,21 +106,28 @@ final class contentmarketplace extends \totara_contentmarketplace\local\contentm
         $api->purge_all_caches();
     }
 
+    /**
+     * @param \stdClass $data
+     */
     public static function save_content_settings_data(\stdClass $data) {
         set_config('content_settings_creators', $data->creators, 'contentmarketplace_goone');
         set_config('pay_per_seat', $data->pay_per_seat, 'contentmarketplace_goone');
 
-        $apidata = (object) [
-            'pay_per_seat' => (bool) $data->pay_per_seat
-        ];
+        $apidata = ['pay_per_seat' => (bool) $data->pay_per_seat];
         $api = new api();
         $api->save_configuration($apidata);
     }
 
-    public static function oauth_redirect_uri() {
+    /**
+     * @return \moodle_url
+     */
+    public static function oauth_redirect_uri(): \moodle_url {
         return new \moodle_url("/totara/contentmarketplace/contentmarketplaces/goone/signin.php");
     }
 
+    /**
+     * @return array
+     */
     private static function oauth_user_state() {
         global $USER, $CFG;
 
@@ -142,6 +149,7 @@ final class contentmarketplace extends \totara_contentmarketplace\local\contentm
 
     /**
      * @param \contentmarketplace_goone\api $api
+     * @return mixed The account object.
      */
     public static function load_account_data($api) {
         $account = $api->get_account();
@@ -149,12 +157,12 @@ final class contentmarketplace extends \totara_contentmarketplace\local\contentm
     }
 
     /**
-     * Return listing of content availablity options for the current user in the given context.
+     * Return listing of content availability options for the current user in the given context.
      *
-     * @param context $context
-     * @return array Listing of availablility options
+     * @param \context $context
+     * @return string[] Listing of availability options
      */
-    public static function content_availability_options($context) {
+    public static function content_availability_options(\context $context) {
         if (has_capability('totara/contentmarketplace:config', $context)) {
             return ['all', 'subscribed', 'collection'];
         } elseif (has_capability('totara/contentmarketplace:add', $context)) {
@@ -162,10 +170,8 @@ final class contentmarketplace extends \totara_contentmarketplace\local\contentm
             switch ($content_settings) {
                 case "all":
                     return ['all', 'subscribed', 'collection'];
-                    break;
                 case "subscribed":
                     return ['subscribed', 'collection'];
-                    break;
             }
         }
         return [];

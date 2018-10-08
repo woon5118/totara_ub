@@ -35,11 +35,11 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
     const SEARCH_PAGE_SIZE = 48;
 
     /**
-     * List sorting options aviable for the search results.
+     * List sorting options available for the search results.
      *
-     * @return array
+     * @return string[]
      */
-    public function sort_options() {
+    public function sort_options(): array {
         $options = array(
             'created:desc',
             'relevance',
@@ -51,7 +51,17 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         return $options;
     }
 
-    public function query($keyword, $sort, $filter, $page, $isfirstquerywithdefaultsort, $mode, $context) {
+    /**
+     * @param string $keyword
+     * @param string $sort
+     * @param array $filter
+     * @param int $page
+     * @param bool $isfirstquerywithdefaultsort
+     * @param string $mode
+     * @param \context $context
+     * @return search_results
+     */
+    public function query(string $keyword, string $sort, array $filter, int $page, bool $isfirstquerywithdefaultsort, string $mode, \context $context): search_results {
         $api = new api();
         $hits = array();
         $filterid = 0;
@@ -249,7 +259,13 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         return $results;
     }
 
-    public function availability_filter($selection, $params, $context) {
+    /**
+     * @param string $selection
+     * @param array $params
+     * @param \context $context
+     * @return array|null
+     */
+    public function availability_filter($selection, array $params, \context $context) {
         $api = new api();
 
         $options = [];
@@ -297,8 +313,13 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         }
     }
 
-
-    public function availability_selection($filter, $mode, $context) {
+    /**
+     * @param array $filter
+     * @param string $mode
+     * @param \context $context
+     * @return null|string
+     */
+    public function availability_selection(array $filter, string $mode, \context $context) {
         if (key_exists("availability", $filter)) {
             $selection = $filter["availability"];
             if (!in_array($selection, array("all", "subscribed", "collection"))) {
@@ -336,6 +357,10 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         return $selection;
     }
 
+    /**
+     * @param string $selection
+     * @return array
+     */
     public function availability_query($selection) {
         switch ($selection) {
             case 'subscribed':
@@ -350,7 +375,14 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         return $query;
     }
 
-    public function select_all($query, $filter, $mode, $context) {
+    /**
+     * @param string $query
+     * @param array $filter
+     * @param string $mode
+     * @param \context $context
+     * @return array
+     */
+    public function select_all($query, array $filter, string $mode, \context $context) {
         $params = array(
             "keyword" => $query,
         );
@@ -366,6 +398,10 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         return $api->list_ids_for_all_learning_objects($params);
     }
 
+    /**
+     * @param \stdClass $course
+     * @return string
+     */
     public static function price($course) {
         if (!is_null($course->subscription->licenses) and ($course->subscription->licenses === -1 or $course->subscription->licenses > 0)) {
             return get_string('price:included', 'contentmarketplace_goone');
@@ -387,6 +423,10 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         }
     }
 
+    /**
+     * @param \stdClass $course
+     * @return string
+     */
     public static function duration($course) {
         if (empty($course->delivery) || empty($course->delivery->duration)) {
             return '';
@@ -394,15 +434,19 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
         return get_string('duration', 'contentmarketplace_goone', $course->delivery->duration);
     }
 
-    public function get_details($id) {
+    /**
+     * @param int $id
+     * @return \stdClass|null
+     */
+    public function get_details(int $id) {
         try {
             $api = new api();
-            $lo = $api->get_learning_object($id);
+            $learningobject = $api->get_learning_object($id);
         } catch (\Exception $ex) {
-            debugging($ex->getMessage());
-            return;
+            debugging($ex->getMessage(), DEBUG_DEVELOPER);
+            return null;
         }
 
-        return $lo;
+        return $learningobject;
     }
 }

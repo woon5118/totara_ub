@@ -35,7 +35,14 @@ final class oauth_rest_client extends rest_client {
         parent::__construct($endpoint, $curl);
     }
 
-    public function get($resourcename, $params = [], $headers = [], $options = []) {
+    /**
+     * @param string $resourcename
+     * @param array $params
+     * @param array $headers
+     * @param array $options
+     * @return mixed
+     */
+    public function get(string $resourcename, array $params = [], array $headers = [], array $options = []) {
         try {
             return parent::get($resourcename, $params, $this->headers_with_auth($headers), $options);
         } catch (invalid_token_exception $e) {
@@ -44,7 +51,7 @@ final class oauth_rest_client extends rest_client {
         }
     }
 
-    public function post($resourcename, $params = [], $headers = [], $options = []) {
+    public function post(string $resourcename, array $params = [], array $headers = [], array $options = []) {
         try {
             return parent::post($resourcename, $params, $this->headers_with_auth($headers), $options);
         } catch (invalid_token_exception $e) {
@@ -53,7 +60,7 @@ final class oauth_rest_client extends rest_client {
         }
     }
 
-    public function put($resourcename, $params = [], $headers = [], $options = []) {
+    public function put(string $resourcename, array $params = [], array $headers = [], array $options = []) {
         try {
             return parent::put($resourcename, $params, $this->headers_with_auth($headers), $options);
         } catch (invalid_token_exception $e) {

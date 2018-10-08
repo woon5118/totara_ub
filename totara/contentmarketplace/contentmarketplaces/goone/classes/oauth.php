@@ -35,11 +35,22 @@ final class oauth {
     /** @var rest_client $client */
     public $client = null;
 
+    /**
+     * oauth constructor.
+     *
+     * @param config_storage $config
+     * @param \curl|null $curl
+     */
     public function __construct(config_storage $config, $curl = null) {
         $this->config = $config;
         $this->client = new rest_client(self::ENDPOINT, $curl);
     }
 
+    /**
+     * @param \moodle_url $redirect_uri
+     * @param array $state
+     * @return \moodle_url
+     */
     public static function get_authorize_url($redirect_uri, $state) {
         $url = self::ENDPOINT . '/oauth/authorize';
         if (defined('BEHAT_SITE_RUNNING') || defined('GO1_MOCK_API_ENDPOINTS')) {
@@ -55,7 +66,13 @@ final class oauth {
         ));
     }
 
-    public function token_setup($client_id, $client_secret, $code, $redirect_uri) {
+    /**
+     * @param string $client_id
+     * @param string $client_secret
+     * @param string $code
+     * @param \moodle_url $redirect_uri
+     */
+    public function token_setup($client_id, $client_secret, $code, \moodle_url $redirect_uri) {
         $this->config->set('oauth_client_id', $client_id);
         $this->config->set('oauth_client_secret', $client_secret);
         $params = array(
@@ -70,6 +87,9 @@ final class oauth {
         $this->config->set('oauth_refresh_token', $token->refresh_token);
     }
 
+    /**
+     * Refreshes the token and stores the new token.
+     */
     public function token_refresh() {
         $params = array(
             "client_id" => $this->config->get('oauth_client_id'),
@@ -94,6 +114,9 @@ final class oauth {
         $sessionstorage->clear();
     }
 
+    /**
+     * @return bool
+     */
     public static function have_config_in_session() {
         $sessionstorage = new config_session_storage();
         return $sessionstorage->exists();

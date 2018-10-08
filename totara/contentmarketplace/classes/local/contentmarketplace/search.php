@@ -50,7 +50,7 @@ abstract class search {
      * @param \context $context
      * @return search_results
      */
-    abstract public function query($keyword, $sort, $filter, $page, $isfirstquerywithdefaultsort, $mode, $context);
+    abstract public function query(string $keyword, string $sort, array $filter, int $page, bool $isfirstquerywithdefaultsort, string $mode, \context $context): search_results;
 
     /**
      * @param string $query
@@ -59,13 +59,13 @@ abstract class search {
      * @param \context $context
      * @return array
      */
-    abstract public function select_all($query, $filter, $mode, $context);
+    abstract public function select_all($query, array $filter, string $mode, \context $context);
 
     /**
      * @param int $id
      * @return mixed
      */
-    abstract public function get_details($id);
+    abstract public function get_details(int $id);
 
     /**
      * @param array $listing

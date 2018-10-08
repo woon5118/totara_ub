@@ -50,7 +50,7 @@ class goone extends \totara_contentmarketplace\workflow\exploremarketplace {
         // Check Go1 marketplace plugin is enabled.
         /** @var \totara_contentmarketplace\plugininfo\contentmarketplace $plugin */
         $plugin = \core_plugin_manager::instance()->get_plugin_info("contentmarketplace_goone");
-        if (!$plugin->is_enabled()) {
+        if ($plugin === null || !$plugin->is_enabled()) {
             return false;
         }
         return true;

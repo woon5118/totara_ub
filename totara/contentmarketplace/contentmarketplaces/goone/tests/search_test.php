@@ -25,6 +25,11 @@ use contentmarketplace_goone\search;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class search_testcase
+ *
+ * @group totara_contentmarketplace
+ */
 class search_testcase extends basic_testcase {
 
     /**

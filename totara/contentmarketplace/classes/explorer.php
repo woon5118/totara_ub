@@ -32,6 +32,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class explorer {
 
+    /**
+     * The two modes that we know exist, marketplace plugins may introduce their own in addition to these.
+     */
+    const MODE_EXPLORE = 'explore';
+    const MODE_CREATE_COURSE = 'create-course';
+
     /** @var string */
     private $marketplace;
 
@@ -72,15 +78,15 @@ final class explorer {
         $data->sortby = array();
         foreach ($search->sort_options() as $option) {
             $data->sortby[] = array(
-                    "value" => $option,
-                    "title" => get_string("sort:$option", "contentmarketplace_$this->marketplace"),
-                    "selected" => false
+                "value" => $option,
+                "title" => get_string("sort:$option", "contentmarketplace_{$this->marketplace}"),
+                "selected" => false
             );
         }
         $data->sortby_has_items = !empty($data->sortby);
         $data->heading = $this->get_heading();
         $data->intro = $this->get_intro();
-        $data->searchplaceholder = get_string('search:placeholder', "contentmarketplace_$this->marketplace");
+        $data->searchplaceholder = get_string('search:placeholder', "contentmarketplace_{$this->marketplace}");
 
         $data->mode = $this->mode;
         $data->createpagepath = $this->plugin->contentmarketplace()->course_create_page();
@@ -92,7 +98,7 @@ final class explorer {
      * @return string
      */
     public function get_heading() {
-        if ($this->mode == 'create-course') {
+        if ($this->mode === self::MODE_CREATE_COURSE) {
             return get_string("explorecreatecourseheading", "totara_contentmarketplace");
         } else {
             return get_string("explore_totara_content_x", "totara_contentmarketplace", $this->plugin->displayname);
@@ -103,7 +109,7 @@ final class explorer {
      * @return string
      */
     public function get_intro() {
-        if ($this->mode == 'create-course') {
+        if ($this->mode === self::MODE_CREATE_COURSE) {
             return get_string("explorecreatecourseintro", "totara_contentmarketplace");
         } else {
             return '';

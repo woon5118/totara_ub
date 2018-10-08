@@ -25,16 +25,24 @@ namespace contentmarketplace_goone;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->libdir . '/filelib.php');
 
 class rest_client {
 
+    /** @var string */
     private $endpoint = null;
 
     /** @var \curl $curl */
     private $curl = null;
 
-    public function __construct($endpoint, $curl = null) {
+    /**
+     * rest_client constructor.
+     *
+     * @param string $endpoint
+     * @param \curl|null $curl
+     */
+    public function __construct(string $endpoint, $curl = null) {
         $this->endpoint = $endpoint;
 
         if (isset($curl)) {
@@ -46,6 +54,9 @@ class rest_client {
         }
     }
 
+    /**
+     * @return mock_curl
+     */
     private static function get_mock_curl() {
         global $CFG;
         require_once($CFG->dirroot . '/totara/contentmarketplace/contentmarketplaces/goone/tests/fixtures/mock_curl.php');
@@ -57,11 +68,9 @@ class rest_client {
      * @param array $params
      * @param array $headers
      * @param array $options
-     * @throws invalid_token_exception
-     * @throws rest_client_timeout_exception
-     * @return mixed
+     * @return null|string|\stdClass
      */
-    public function get($resourcename, $params = [], $headers = [], $options = []) {
+    public function get(string $resourcename, array $params = [], array $headers = [], array $options = []) {
         list($url, $options) = $this->prepare_request($resourcename, $params, $headers, $options);
         $response = $this->curl->get($url, [], $options);
         return $this->parse_response($response);
@@ -69,14 +78,12 @@ class rest_client {
 
     /**
      * @param string $resourcename
-     * @param mixed $params
+     * @param array $params
      * @param array $headers
      * @param array $options
-     * @throws invalid_token_exception
-     * @throws rest_client_timeout_exception
-     * @return mixed
+     * @return null|string|\stdClass
      */
-    public function post($resourcename, $params = [], $headers = [], $options = []) {
+    public function post(string $resourcename, array $params = [], array $headers = [], array $options = []) {
         $iscontenttypeheader = function($header) {
             return \core_text::strpos(\core_text::strtolower($header), 'content-type: ') === 0;
         };
@@ -91,14 +98,12 @@ class rest_client {
 
     /**
      * @param string $resourcename
-     * @param mixed $params
+     * @param array $params
      * @param array $headers
      * @param array $options
-     * @throws invalid_token_exception
-     * @throws rest_client_timeout_exception
-     * @return mixed
+     * @return null|string|\stdClass
      */
-    public function put($resourcename, $params = [], $headers = [], $options = []) {
+    public function put(string $resourcename, array $params = [], array $headers = [], array $options = []) {
         $iscontenttypeheader = function($header) {
             return \core_text::strpos(\core_text::strtolower($header), 'content-type: ') === 0;
         };
@@ -114,7 +119,12 @@ class rest_client {
         return $this->parse_response($response);
     }
 
-    private function build_url($resourcename, $params = []) {
+    /**
+     * @param string $resourcename
+     * @param array $params
+     * @return string
+     */
+    private function build_url(string $resourcename, array $params = []) {
         $url = $this->endpoint . '/' . $resourcename;
 
         $params = array_filter($params, function($value) {
@@ -127,7 +137,14 @@ class rest_client {
         return $url;
     }
 
-    private function prepare_request($resourcename, $params, $headers, $options) {
+    /**
+     * @param string $resourcename
+     * @param array $params
+     * @param array $headers
+     * @param array $options
+     * @return array
+     */
+    private function prepare_request(string $resourcename, array $params, array $headers, array $options) {
         $url = $this->build_url($resourcename, $params);
         $isacceptheader = function($header) {
             return \core_text::strpos(\core_text::strtolower($header), 'accept: ') === 0;
@@ -148,9 +165,13 @@ class rest_client {
         return [$url, $options];
     }
 
+    /**
+     * @param string $response
+     * @return null|string|\stdClass
+     */
     private function parse_response($response) {
         $info = $this->curl->get_info();
-        $url= $info['url'];
+        $url = $info['url'];
 
         if ($this->curl->errno !== CURLE_OK) {
             if ($this->curl->errno == CURLE_OPERATION_TIMEOUTED) {
@@ -196,7 +217,11 @@ class rest_client {
         }
     }
 
-    public static function is_content_type_json($contenttype) {
+    /**
+     * @param string $contenttype
+     * @return bool
+     */
+    public static function is_content_type_json(string $contenttype) {
         $contenttype = \core_text::strtolower($contenttype);
         if ($contenttype === 'application/json' || $contenttype === 'application/json; charset=utf-8') {
             return true;

@@ -41,13 +41,17 @@ final class create_course_controller extends \totara_form\form_controller {
      */
     public function get_ajax_form_instance($idsuffix) {
 
-        require_login();
+        if (!defined('AJAX_SCRIPT') || AJAX_SCRIPT !== true) {
+            throw new \coding_exception('This method can only be called by AJAX scripts');
+        }
+
+        require_login(null, false, null, false, true);
         require_sesskey();
 
         $selection = required_param_array('selection', PARAM_ALPHANUMEXT);
         $create = optional_param('create', create_course_form::CREATE_COURSE_MULTI_ACTIVITY, PARAM_INT);
         $category = optional_param('category', 0, PARAM_INT);
-        $mode = optional_param('mode', 'create-course', PARAM_ALPHAEXT);
+        $mode = optional_param('mode', \totara_contentmarketplace\explorer::MODE_CREATE_COURSE, PARAM_ALPHAEXT);
 
         if ($category === 0) {
             $context = \context_system::instance();
