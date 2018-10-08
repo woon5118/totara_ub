@@ -493,9 +493,7 @@ class tool_uploadcourse_helper {
      */
     public static function get_course_type_name($type) {
         if (empty($type)) {
-            // If the type id is not provided,
-            // then the default value should be 0
-            $type = TOTARA_COURSE_TYPE_ELEARNING;
+            // If type is not provided - do not change it
         } else if (!is_numeric($type) && is_string($type)) {
             $type = self::get_coursetypeid_from_string($type);
         }

@@ -58,8 +58,8 @@ class coursetype_helper_test extends advanced_testcase {
             ['blended', 'Blended'],
             ['facetoface', 'Seminar'],
             ['lebronjames', null],
-            [null, 'E-learning'],
-            ['', 'E-learning']
+            [null, null],
+            ['', null]
         ];
     }
 

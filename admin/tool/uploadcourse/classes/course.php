@@ -505,9 +505,6 @@ class tool_uploadcourse_course {
                 $this->error("coursetypenotsupported", $lang);
                 return false;
             }
-        } else {
-            // By default, the course type is E-Learning
-            $coursedata['coursetype'] = TOTARA_COURSE_TYPE_ELEARNING;
         }
 
         // If the course does not exist, or will be forced created.
