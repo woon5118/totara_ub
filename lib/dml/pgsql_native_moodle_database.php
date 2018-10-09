@@ -1589,14 +1589,17 @@ class pgsql_native_moodle_database extends moodle_database {
         }
 
         $score = array();
+        $condition = array();
         foreach ($searchfields as $field => $weight) {
             $score[] = "COALESCE(ts_rank(to_tsvector('{$language}',{$field}),query),0)*{$weight}";
+            $condition[] = "query @@ to_tsvector('{$language}',{$field})";
         }
 
         $scoresum = implode(' + ', $score);
+        $where = implode(' OR ', $condition);
         $sql = "SELECT basesearch.id, {$scoresum} AS score
                   FROM {{$table}} basesearch, {$q} query
-                 WHERE {$scoresum} > 0.00000001";
+                 WHERE {$where}";
 
         return array("({$sql})", array($paramname => $searchtext));
     }
