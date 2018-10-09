@@ -49,7 +49,6 @@ newsearch,core_message
 nosearchresults,core_message
 onlymycourses,core_message
 pagerefreshes,core_message
-page-message-x,core_message
 recent,core_message
 savemysettings,core_message
 search,core_message

@@ -5551,19 +5551,7 @@ function message_mark_messages_read($touserid, $fromuserid) {
     \core_message\api::mark_all_read_for_user($touserid, $fromuserid);
 }
 
-/**
- * Return a list of page types
- *
- * @deprecated since Moodle 3.2
- * @param string $pagetype current page type
- * @param stdClass $parentcontext Block's parent context
- * @param stdClass $currentcontext Current context of block
- */
-function message_page_type_list($pagetype, $parentcontext, $currentcontext) {
-    debugging('message_page_type_list() is deprecated and is no longer used.', DEBUG_DEVELOPER);
-
-    return array('messages-*'=>get_string('page-message-x', 'message'));
-}
+// Totara: removed message_page_type_list() from the deprecated list.
 
 /**
  * Determines if a user is permitted to send another user a private message.
