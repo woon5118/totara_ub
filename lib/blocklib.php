@@ -2656,6 +2656,7 @@ function blocks_add_default_system_blocks() {
     $page->set_context(context_system::instance());
     $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('navigation', 'settings')), '*', null, true); // Totara: we do want these!
     $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('admin_bookmarks')), 'admin-*', null, null, 2);
+    $page->blocks->add_blocks(array(BLOCK_POS_RIGHT => array('totara_community')), 'site-index', null, null, 10);
 
     if ($defaultmypage = $DB->get_record('my_pages', array('userid' => null, 'name' => '__default', 'private' => 1))) {
         $subpagepattern = $defaultmypage->id;
