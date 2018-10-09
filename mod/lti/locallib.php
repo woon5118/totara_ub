@@ -313,6 +313,7 @@ function lti_register($toolproxy) {
     echo $content;
 }
 
+
 /**
  * Gets the parameters for the regirstration request
  *

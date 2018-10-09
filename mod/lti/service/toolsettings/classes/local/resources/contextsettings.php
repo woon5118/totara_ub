@@ -72,8 +72,8 @@ class contextsettings extends \mod_lti\local\ltiservice\resource_base {
         $productcode = $params['product_code'];
         $bubble = optional_param('bubble', '', PARAM_ALPHA);
         $ok = !empty($contexttype) && !empty($contextid) &&
-            !empty($vendorcode) && !empty($productcode) &&
-            $this->check_tool_proxy($productcode, $response->get_request_data());
+              !empty($vendorcode) && !empty($productcode) &&
+              $this->check_tool_proxy($productcode, $response->get_request_data());
         if (!$ok) {
             $response->set_code(401);
         }
@@ -81,8 +81,8 @@ class contextsettings extends \mod_lti\local\ltiservice\resource_base {
         $simpleformat = !empty($contenttype) && ($contenttype == $this->formats[1]);
         if ($ok) {
             $ok = (empty($bubble) || ((($bubble == 'distinct') || ($bubble == 'all')))) &&
-                (!$simpleformat || empty($bubble) || ($bubble != 'all')) &&
-                (empty($bubble) || ($response->get_request_method() == 'GET'));
+                 (!$simpleformat || empty($bubble) || ($bubble != 'all')) &&
+                 (empty($bubble) || ($response->get_request_method() == 'GET'));
         }
 
         if (!$ok) {
@@ -130,7 +130,7 @@ class contextsettings extends \mod_lti\local\ltiservice\resource_base {
                     $ok = !empty($json);
                     if ($ok) {
                         $ok = isset($json->{"@graph"}) && is_array($json->{"@graph"}) && (count($json->{"@graph"}) == 1) &&
-                            ($json->{"@graph"}[0]->{"@type"} == 'ToolProxyBinding');
+                              ($json->{"@graph"}[0]->{"@type"} == 'ToolProxyBinding');
                     }
                     if ($ok) {
                         $settings = $json->{"@graph"}[0]->custom;

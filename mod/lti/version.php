@@ -48,7 +48,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2017111301.01;    // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2018051400.01; // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2017110800;    // Requires this Moodle version.
 $plugin->component = 'mod_lti';     // Full name of the plugin (used for diagnostics).
 $plugin->cron      = 0;
+$plugin->backported = 'v3.5.4';     // TOTARA: backported v3.5.4 for Totara 13
