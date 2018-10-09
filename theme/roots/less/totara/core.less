@@ -21,6 +21,30 @@
 // @author    Joby Harding <joby.harding@totaralearning.com>
 
 /** Page layout CSS starts **/
+html {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+body {
+    align-items: stretch;
+    display: flex;
+    flex: 1 0 auto;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    min-height: 100%;
+}
+
+.breadcrumb-container {
+    width: 100%;
+}
+
+#page {
+    width: 100%;
+    flex-grow: 1;
+}
+
 .layout-option-noheader #page-header,
 .layout-option-nonavbar #page-navbar,
 .layout-option-nofooter #page-footer,
