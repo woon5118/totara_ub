@@ -475,3 +475,60 @@ form.print-stages-form .fitem .fitemtitle {
         content: " ";
     }
 }
+
+.appraisal-stage-inprogress {
+    background: #fdf8e4;
+}
+
+@media (max-width: 768px) {
+
+    .appraisal-stage {
+        padding: 3.2rem 10px 10px;
+    }
+
+    .appraisal-stage .appraisal-stagestate {
+        display: inline-block;
+        float: none;
+        margin: 0;
+        position: absolute;
+        right: .8rem;
+        text-align: right;
+        top: .4rem;
+        width: 100%;
+
+        .appraisal-statetext {
+            display: inline-block;
+            padding: 0 .8rem;
+        }
+
+        .flex-icon {
+            float: right;
+            font-size: 1.9em;
+            width: auto;
+
+            &.ft-spacer {
+                width: 0;
+            }
+        }
+    }
+
+    .appraisal-stage .appraisal-stageactions {
+        clear: both;
+        float: none;
+        text-align: right;
+        width: 100%;
+
+        .singlebutton {
+            margin: .8rem 0 0;
+        }
+    }
+
+    .appraisal-stageinfo {
+        width: 68%;
+    }
+
+    .appraisal-stagetitle {
+        width: 30%;
+        word-wrap: break-word;
+    }
+}
