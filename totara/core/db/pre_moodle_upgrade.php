@@ -56,3 +56,8 @@ if (!$dbman->index_exists($table, $index)) {
 
 // Migrate old block titles to the new common config storage.
 totara_core_migrate_old_block_titles();
+
+// One-off fix for incorrect default setting from Moodle.
+if (!get_config('scorm', 'protectpackagedownloads')) {
+    unset_config('protectpackagedownloads', 'scorm');
+}
