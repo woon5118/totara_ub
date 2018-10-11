@@ -27,21 +27,40 @@ defined('MOODLE_INTERNAL') || die();
 
 final class mock_curl {
 
+    const MOCK_REQUESTS = [
+        'GET /account'                                                                                                    => '/account/GET.json',
+        'GET /configuration'                                                                                              => '/configuration/GET.json',
+        'PUT /configuration'                                                                                              => '/configuration/PUT.json',
+        'GET /learning-objects/971893/scorm'                                                                              => '/learning-objects/971893/scorm/GET.zip',
+        'GET /learning-objects/972943/scorm'                                                                              => '/learning-objects/972943/scorm/GET.zip',
+        'GET /learning-objects/973003/scorm'                                                                              => '/learning-objects/973003/scorm/GET.zip',
+        'GET /learning-objects/1004684/scorm'                                                                             => '/learning-objects/1004684/scorm/GET.zip',
+        'GET /learning-objects/1080067/scorm'                                                                             => '/learning-objects/1080067/scorm/GET.zip',
+        'GET /learning-objects?limit=0'                                                                                   => '/learning-objects/GET-count-all.json',
+        'GET /learning-objects?collection=default&limit=0'                                                                => '/learning-objects/GET-count-collection.json',
+        'GET /learning-objects?subscribed=true&limit=0'                                                                   => '/learning-objects/GET-count-subscription.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&collection=default'  => '/learning-objects/GET-count-with-facets-collection.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&subscribed=true'     => '/learning-objects/GET-count-with-facets-subscription.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance'                     => '/learning-objects/GET-count-with-facets-all.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=48&facets=tag%2Clanguage%2Cinstance'                    => '/learning-objects/GET-listing-all.json',
+        'POST /oauth/token'                                                                                               => '/oauth/token/POST.json',
+    ];
+
     public static function get_base_filename($url, $options) {
         $method = self::get_method($options);
         if (\core_text::strpos($url, api::ENDPOINT) === 0) {
             $name = \core_text::substr($url, \core_text::strlen(api::ENDPOINT) + 1);
         } elseif (\core_text::strpos($url, oauth::ENDPOINT) === 0) {
             $name = \core_text::substr($url, \core_text::strlen(oauth::ENDPOINT) + 1);
-        }
-        $query = parse_url($url, PHP_URL_QUERY);
-        if (empty($query)) {
-            $name = $name . "/" . $method;
         } else {
-            $name = \core_text::substr($name, 0, \core_text::strpos($name, '?'));
-            $name = $name . "/" . $method . "?" . str_replace('&', ',', $query);
+            throw new \Exception("Unknown host for: $url");
         }
-        return $name;
+        $request = $method . ' /' . $name;
+        if (array_key_exists($request, self::MOCK_REQUESTS)) {
+            return self::MOCK_REQUESTS[$request];
+        } else {
+            throw new \Exception("Missing mock curl response for request: $url");
+        }
     }
 
     public static function get_method($options) {
@@ -67,7 +86,8 @@ final class mock_curl {
         return 'json';
     }
 
-    public static function get_content_type($extension) {
+    public static function get_content_type($path) {
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
         switch ($extension) {
             case 'json':
                 return 'application/json';
@@ -96,8 +116,7 @@ final class mock_curl {
         self::validate_oauth($url, $options);
 
         $basename = self::get_base_filename($url, $options);
-        $extension = self::get_extension($options);
-        $path = $CFG->dirroot . "/totara/contentmarketplace/contentmarketplaces/goone/tests/behat/fixtures/$basename.$extension";
+        $path = $CFG->dirroot . "/totara/contentmarketplace/contentmarketplaces/goone/tests/behat/fixtures$basename";
         $path = clean_param($path, PARAM_PATH);
         if (!file_exists($path)) {
             throw new \Exception("File for mock curl response does not exist: $path");
@@ -106,7 +125,7 @@ final class mock_curl {
         $this->info = [
             'url' => $url,
             'http_code' => 200,
-            'content_type' => self::get_content_type($extension),
+            'content_type' => self::get_content_type($path),
         ];
         $this->errno = CURLE_OK;
         return file_get_contents($path);
