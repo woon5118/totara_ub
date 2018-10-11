@@ -489,8 +489,9 @@ class hierarchylib_contentrestrictions_test extends advanced_testcase {
         $data->position->frameworkid = $data->posfw['pframe']->id;
         $items = $data->position->get_items();
         $this->assertTrue((bool)is_array($items));
-        $this->assertEquals(1, count($items));
-        $this->assertEquals($data->pos['pos110'], current($items));
+        $this->assertEquals(2, count($items));
+        $this->assertEquals($data->pos['pos100'], current($items)); // includes parent to allow hierarchy tree visualisation
+        $this->assertEquals($data->pos['pos110'], next($items));
 
         $data->position->frameworkid = $data->posfw['pframe2']->id;
         $items = $data->position->get_items();
@@ -597,10 +598,11 @@ class hierarchylib_contentrestrictions_test extends advanced_testcase {
         $this->assertEquals(1, count($items));
         $this->assertTrue(array_key_exists($data->pos['pos110']->id, $items));
 
-        // user2 - no root items
+        // user2 - root item not allowed, but include it anyway so that we print hierarchy tree
         $items = $data->position->get_items_by_parent();
         $this->assertTrue((bool)is_array($items));
-        $this->assertEquals(0, count($items));
+        $this->assertEquals(1, count($items));
+        $this->assertTrue(array_key_exists($data->pos['pos100']->id, $items));
     }
 
     /**
@@ -766,7 +768,8 @@ class hierarchylib_contentrestrictions_test extends advanced_testcase {
         $data->position->set_content_restriction_from_report($data->reportid, $userid);
         $items = $data->position->get_item_descendants($data->pos['pos110']->id);
         $this->assertTrue((bool)is_array($items));
-        $this->assertEquals(1, count($items));
+        $this->assertEquals(2, count($items));
+        $this->assertTrue(array_key_exists($data->pos['pos110']->id, $items)); // includes parent so that we can construct hierarchy tree
         $this->assertTrue(array_key_exists($data->pos['pos111']->id, $items));
     }
 
