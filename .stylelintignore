@@ -63,6 +63,9 @@ lib/maxmind/GeoIp2/
 lib/maxmind/MaxMind/
 lib/ltiprovider/
 lib/amd/src/truncate.js
+lib/javascript_polyfill/src/es6-promise.auto.js
+lib/lib/javascript_polyfill/src/fetch.js
+lib/javascript_polyfill/src/other_ie11.js
 media/player/videojs/amd/src/video-lazy.js
 media/player/videojs/amd/src/Youtube-lazy.js
 media/player/videojs/videojs/
