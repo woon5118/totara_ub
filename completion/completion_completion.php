@@ -913,6 +913,23 @@ class completion_completion extends data_object {
 
         return $data;
     }
+
+    /**
+     * @param bool $deleted
+     * @return void
+     */
+    public function notify_changed($deleted) {
+        if ($deleted) {
+            if (empty($this->userid) || empty($this->course)) {
+                // If the userid or course is not being set then there is no point to proceed here
+                return;
+            }
+
+            $key = $this->userid . "_" . $this->course;
+            $cache = cache::make("core", "coursecompletion");
+            $cache->delete($key);
+        }
+    }
 }
 
 
