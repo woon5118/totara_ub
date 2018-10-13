@@ -26,6 +26,8 @@ namespace totara_job\rb\source;
 defined('MOODLE_INTERNAL') || die();
 
 trait report_trait {
+    /** @var array $addedjobjoins internal tracking of job columns */
+    private $addedjobjoins = array();
 
     /**
      * Adds the job_assignment, pos and org tables to the $joinlist array. All job assignments belonging to the user are returned.
@@ -35,144 +37,18 @@ trait report_trait {
      *                         include new table joins
      * @param string $join Name of the join that provides the 'user' table
      * @param string $field Name of user id field to join on
-     * @param string $jointype Type of join. For performance reasons it's better to use INNER, but only use INNER if the
-     *                         report base doesn't have rows with invalid or NULL values for userid (=$join.$field),
-     *                         because these rows would be dropped.
+     *
      * @return boolean True
      */
-    protected function add_totara_job_tables(&$joinlist, $join, $field, $jointype = 'LEFT') {
+    protected function add_totara_job_tables(&$joinlist, $join, $field) {
         global $DB;
 
-        // All job fields listed by sortorder.
-        $jobfieldlistsubsql = "
-            (SELECT u.id AS jfid, COUNT(uja.id) AS jobcount,
-            " . $DB->sql_group_concat('COALESCE(uja.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS titlenamelist,
-            " . $DB->sql_group_concat('COALESCE(uja.startdate, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS jobstartdatelist,
-            " . $DB->sql_group_concat('COALESCE(uja.enddate, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS jobenddatelist
-               FROM {user} u
-          LEFT JOIN {job_assignment} uja
-                 ON uja.userid = u.id
-           GROUP BY u.id)";
-
-        $joinlist[] = new \rb_join(
-            'alljobfields',
-            $jointype,
-            $jobfieldlistsubsql,
-            "alljobfields.jfid = {$join}.{$field}",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            $join
-        );
-
-        // All manager fields listed by job sortorder.
-        $usednamefields = totara_get_all_user_name_fields_join('manager', null, true);
-        $manlistsubsql = "
-            (SELECT u.id AS manlistid,
-            " . $DB->sql_group_concat($DB->sql_concat_join("' '", $usednamefields), $this->uniquedelimiter, 'uja.sortorder') . " AS manfullnamelist,
-            " . $DB->sql_group_concat('COALESCE(manager.firstname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manfirstnamelist,
-            " . $DB->sql_group_concat('COALESCE(manager.lastname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manlastnamelist,
-            " . $DB->sql_group_concat('COALESCE(manager.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(manager.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manidlist,
-            " . $DB->sql_group_concat('COALESCE(CASE WHEN manager.maildisplay <> 1 THEN \'!private!\' ELSE manager.email END, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manemailobslist,
-            " . $DB->sql_group_concat('COALESCE(manager.email, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manemailunobslist
-
-                FROM {user} u
-           LEFT JOIN {job_assignment} uja
-                  ON uja.userid = u.id
-           LEFT JOIN {job_assignment} mja
-                  ON mja.id = uja.managerjaid
-           LEFT JOIN {user} manager
-                  ON mja.userid = manager.id
-            GROUP BY u.id)";
-
-        $joinlist[] = new \rb_join(
-            'manallfields',
-            $jointype,
-            $manlistsubsql,
-            "manallfields.manlistid = {$join}.{$field}",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            $join
-        );
-
-        // All position fields listed by job sortorder.
-        $poslistsubsql = "
-            (SELECT u.id AS poslistid,
-            " . $DB->sql_group_concat('COALESCE(position.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS posidlist,
-            " . $DB->sql_group_concat('COALESCE(position.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS posidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(position.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS posnamelist,
-            " . $DB->sql_group_concat('COALESCE(ptype.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS ptypenamelist,
-            " . $DB->sql_group_concat('COALESCE(pframe.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS pframeidlist,
-            " . $DB->sql_group_concat('COALESCE(pframe.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS pframeidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(pframe.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS pframenamelist
-                FROM {user} u
-           LEFT JOIN {job_assignment} uja
-                  ON uja.userid = u.id
-           LEFT JOIN {pos} position
-                  ON uja.positionid = position.id
-           LEFT JOIN {pos_type} ptype
-                  ON position.typeid = ptype.id
-           LEFT JOIN {pos_framework} pframe
-                  ON position.frameworkid = pframe.id
-            GROUP BY u.id)";
-
-        $joinlist[] = new \rb_join(
-            'posallfields',
-            $jointype,
-            $poslistsubsql,
-            "posallfields.poslistid = {$join}.{$field}",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            $join
-        );
-
-        // List of all assigned organisation names.
-        $orglistsubsql = "
-            (SELECT u.id AS orglistid,
-            " . $DB->sql_group_concat('COALESCE(organisation.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS orgidlist,
-            " . $DB->sql_group_concat('COALESCE(organisation.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS orgidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(organisation.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS orgnamelist,
-            " . $DB->sql_group_concat('COALESCE(otype.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS otypenamelist,
-            " . $DB->sql_group_concat('COALESCE(oframe.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS oframeidlist,
-            " . $DB->sql_group_concat('COALESCE(oframe.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS oframeidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(oframe.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS oframenamelist
-                FROM {user} u
-           LEFT JOIN {job_assignment} uja
-                  ON uja.userid = u.id
-           LEFT JOIN {org} organisation
-                  ON uja.organisationid = organisation.id
-           LEFT JOIN {org_type} otype
-                  ON organisation.typeid = otype.id
-           LEFT JOIN {org_framework} oframe
-                  ON organisation.frameworkid = oframe.id
-            GROUP BY u.id)";
-
-        $joinlist[] = new \rb_join(
-            'orgallfields',
-            $jointype,
-            $orglistsubsql,
-            "orgallfields.orglistid = {$join}.{$field}",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            $join
-        );
-
-        // List of all assigned appraiser names.
-        $usednamefields = totara_get_all_user_name_fields_join('appraiser', null, true);
-        $applistsubsql = "
-            (SELECT u.id AS applistid,
-            " . $DB->sql_group_concat($DB->sql_concat_join("' '", $usednamefields), $this->uniquedelimiter, 'uja.sortorder') . " AS appfullnamelist
-                FROM {user} u
-           LEFT JOIN {job_assignment} uja
-                  ON uja.userid = u.id
-           LEFT JOIN {user} appraiser
-                  ON uja.appraiserid = appraiser.id
-            GROUP BY u.id)";
-
-        $joinlist[] = new \rb_join(
-            'appallfields',
-            $jointype,
-            $applistsubsql,
-            "appallfields.applistid = {$join}.{$field}",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            $join
-        );
+        if ($this->addedjobjoins) {
+            // NOTE: for now jobs can be added to a source only once.
+            debugging('Job assignments can be added to source only once', DEBUG_DEVELOPER);
+            return false;
+        }
+        $this->addedjobjoins['job_assignments'] = array('join' => $join, 'field' => $field);
 
         // Set up the position and organisation custom field joins.
         $posfields = $DB->get_records('pos_type_info_field', array('hidden' => '0'));
@@ -197,19 +73,29 @@ trait report_trait {
     protected function add_totara_job_columns(&$columnoptions) {
         global $CFG, $DB;
 
+        if (!$this->addedjobjoins) {
+            debugging('Job assignments joins must be added before adding of column options', DEBUG_DEVELOPER);
+            return false;
+        }
+        $userjoin = $this->addedjobjoins['job_assignments']['join'];
+        $userfield = $this->addedjobjoins['job_assignments']['field'];
+
         // Job assignment field columns.
         $columnoptions[] = new \rb_column_option(
             'job_assignment',
             'alltitlenames',
             get_string('usersjobtitlenameall', 'totara_reportbuilder'),
-            "alljobfields.titlenamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(uja.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'alljobfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -218,14 +104,17 @@ trait report_trait {
             'job_assignment',
             'allstartdates',
             get_string('usersjobstartdateall', 'totara_reportbuilder'),
-            "alljobfields.jobstartdatelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(uja.startdate, \'0\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'alljobfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline_date',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -234,14 +123,17 @@ trait report_trait {
             'job_assignment',
             'allenddates',
             get_string('usersjobenddateall', 'totara_reportbuilder'),
-            "alljobfields.jobenddatelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(uja.enddate, \'0\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'alljobfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline_date',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -249,12 +141,15 @@ trait report_trait {
             'job_assignment',
             'numjobassignments',
             get_string('usersnumjobassignments', 'totara_reportbuilder'),
-            "alljobfields.jobcount",
+            "(SELECT COUNT('x')
+                FROM {job_assignment} uja
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins'       => 'alljobfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'plaintext', // We know we will have an integer here, so minimum cleaning needed.
                 'iscompound'  => true,
                 'dbdatatype'  => 'integer',
+                'issubquery' => true,
             )
         );
 
@@ -263,14 +158,18 @@ trait report_trait {
             'job_assignment',
             'allpositionnames',
             get_string('usersposnameall', 'totara_reportbuilder'),
-            "posallfields.posnamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(position.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {pos} position ON position.id = uja.positionid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'posallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -278,14 +177,18 @@ trait report_trait {
             'job_assignment',
             'allpositionids',
             get_string('usersposidall', 'totara_reportbuilder'),
-            "posallfields.posidlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(position.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {pos} position ON position.id = uja.positionid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'posallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -293,14 +196,18 @@ trait report_trait {
             'job_assignment',
             'allpositionidnumbers',
             get_string('usersposidnumberall', 'totara_reportbuilder'),
-            "posallfields.posidnumberlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(position.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {pos} position ON position.id = uja.positionid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'posallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -308,14 +215,19 @@ trait report_trait {
             'job_assignment',
             'allpositiontypes',
             get_string('userspostypeall', 'totara_reportbuilder'),
-            "posallfields.ptypenamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(ptype.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {pos} position ON position.id = uja.positionid
+           LEFT JOIN {pos_type} ptype ON ptype.id = position.typeid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'posallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -323,14 +235,19 @@ trait report_trait {
             'job_assignment',
             'allposframenames',
             get_string('usersposframenameall', 'totara_reportbuilder'),
-            "posallfields.pframenamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(pframe.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {pos} position ON position.id = uja.positionid
+           LEFT JOIN {pos_framework} pframe ON pframe.id = position.frameworkid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'posallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -338,14 +255,19 @@ trait report_trait {
             'job_assignment',
             'allposframeids',
             get_string('usersposframeidall', 'totara_reportbuilder'),
-            "posallfields.pframeidlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(pframe.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {pos} position ON position.id = uja.positionid
+           LEFT JOIN {pos_framework} pframe ON pframe.id = position.frameworkid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'posallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -353,14 +275,19 @@ trait report_trait {
             'job_assignment',
             'allposframeidnumbers',
             get_string('usersposframeidnumberall', 'totara_reportbuilder'),
-            "posallfields.pframeidnumberlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(pframe.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {pos} position ON position.id = uja.positionid
+           LEFT JOIN {pos_framework} pframe ON pframe.id = position.frameworkid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'posallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -370,14 +297,18 @@ trait report_trait {
             'job_assignment',
             'allorganisationnames',
             get_string('usersorgnameall', 'totara_reportbuilder'),
-            "orgallfields.orgnamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(organisation.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {org} organisation ON organisation.id = uja.organisationid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'orgallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -385,14 +316,18 @@ trait report_trait {
             'job_assignment',
             'allorganisationids',
             get_string('usersorgidall', 'totara_reportbuilder'),
-            "orgallfields.orgidlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(organisation.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {org} organisation ON organisation.id = uja.organisationid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'orgallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -400,14 +335,18 @@ trait report_trait {
             'job_assignment',
             'allorganisationidnumbers',
             get_string('usersorgidnumberall', 'totara_reportbuilder'),
-            "orgallfields.orgidnumberlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(organisation.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {org} organisation ON organisation.id = uja.organisationid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'orgallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -415,14 +354,19 @@ trait report_trait {
             'job_assignment',
             'allorganisationtypes',
             get_string('usersorgtypeall', 'totara_reportbuilder'),
-            "orgallfields.otypenamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(otype.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {org} organisation ON organisation.id = uja.organisationid
+           LEFT JOIN {org_type} otype ON otype.id = organisation.typeid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'orgallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -430,14 +374,19 @@ trait report_trait {
             'job_assignment',
             'allorgframenames',
             get_string('usersorgframenameall', 'totara_reportbuilder'),
-            "orgallfields.oframenamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(oframe.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {org} organisation ON organisation.id = uja.organisationid
+           LEFT JOIN {org_framework} oframe ON oframe.id = organisation.frameworkid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'orgallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -445,14 +394,19 @@ trait report_trait {
             'job_assignment',
             'allorgframeids',
             get_string('usersorgframeidall', 'totara_reportbuilder'),
-            "orgallfields.oframeidlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(oframe.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {org} organisation ON organisation.id = uja.organisationid
+           LEFT JOIN {org_framework} oframe ON oframe.id = organisation.frameworkid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'orgallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -460,31 +414,42 @@ trait report_trait {
             'job_assignment',
             'allorgframeidnumbers',
             get_string('usersorgframeidnumberall', 'totara_reportbuilder'),
-            "orgallfields.oframeidnumberlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(oframe.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {org} organisation ON organisation.id = uja.organisationid
+           LEFT JOIN {org_framework} oframe ON oframe.id = organisation.frameworkid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'orgallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
 
         // Manager field columns.
+        $usednamefields = totara_get_all_user_name_fields_join('manager', null, true);
         $columnoptions[] = new \rb_column_option(
             'job_assignment',
             'allmanagernames',
             get_string('usersmanagernameall', 'totara_reportbuilder'),
-            "manallfields.manfullnamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(' . $DB->sql_concat_join("' '", $usednamefields) . ', \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {job_assignment} mja ON mja.id = uja.managerjaid
+           LEFT JOIN {user} manager ON manager.id = mja.userid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'manallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -492,14 +457,19 @@ trait report_trait {
             'job_assignment',
             'allmanagerfirstnames',
             get_string('usersmanagerfirstnameall', 'totara_reportbuilder'),
-            "manallfields.manfirstnamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(manager.firstname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {job_assignment} mja ON mja.id = uja.managerjaid
+           LEFT JOIN {user} manager ON manager.id = mja.userid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'manallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -507,14 +477,19 @@ trait report_trait {
             'job_assignment',
             'allmanagerlastnames',
             get_string('usersmanagerlastnameall', 'totara_reportbuilder'),
-            "manallfields.manlastnamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(manager.lastname, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {job_assignment} mja ON mja.id = uja.managerjaid
+           LEFT JOIN {user} manager ON manager.id = mja.userid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'manallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -522,14 +497,19 @@ trait report_trait {
             'job_assignment',
             'allmanagerids',
             get_string('usersmanageridall', 'totara_reportbuilder'),
-            "manallfields.manidlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(manager.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {job_assignment} mja ON mja.id = uja.managerjaid
+           LEFT JOIN {user} manager ON manager.id = mja.userid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'manallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -537,14 +517,19 @@ trait report_trait {
             'job_assignment',
             'allmanageridnumbers',
             get_string('usersmanageridnumberall', 'totara_reportbuilder'),
-            "manallfields.manidnumberlist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(manager.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {job_assignment} mja ON mja.id = uja.managerjaid
+           LEFT JOIN {user} manager ON manager.id = mja.userid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'manallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -557,9 +542,13 @@ trait report_trait {
                 'job_assignment',
                 'allmanagerunobsemails',
                 get_string('usersmanagerunobsemailall', 'totara_reportbuilder'),
-                "manallfields.manemailunobslist",
+                "(SELECT " . $DB->sql_group_concat('COALESCE(manager.email, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {job_assignment} mja ON mja.id = uja.managerjaid
+           LEFT JOIN {user} manager ON manager.id = mja.userid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
                 array(
-                    'joins' => 'manallfields',
+                    'joins' => $userjoin,
                     'displayfunc' => 'orderedlist_to_newline_email',
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
@@ -568,6 +557,7 @@ trait report_trait {
                     // Users must have viewuseridentity.
                     'capability' => 'moodle/site:viewuseridentity',
                     'iscompound' => true,
+                    'issubquery' => true,
                 )
             );
         }
@@ -576,31 +566,41 @@ trait report_trait {
             'job_assignment',
             'allmanagerobsemails',
             get_string('usersmanagerobsemailall', 'totara_reportbuilder'),
-            "manallfields.manemailobslist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(CASE WHEN manager.maildisplay <> 1 THEN \'!private!\' ELSE manager.email END, \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {job_assignment} mja ON mja.id = uja.managerjaid
+           LEFT JOIN {user} manager ON manager.id = mja.userid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'manallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline_email',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
 
         // Appraiser field columns.
+        $usednamefields = totara_get_all_user_name_fields_join('appraiser', null, true);
         $columnoptions[] = new \rb_column_option(
             'job_assignment',
             'allappraisernames',
             get_string('usersappraisernameall', 'totara_reportbuilder'),
-            "appallfields.appfullnamelist",
+            "(SELECT " . $DB->sql_group_concat('COALESCE(' . $DB->sql_concat_join("' '", $usednamefields) . ', \'-\')', $this->uniquedelimiter, 'uja.sortorder ASC') . "
+                FROM {job_assignment} uja
+           LEFT JOIN {user} appraiser ON appraiser.id = uja.appraiserid
+               WHERE uja.userid = {$userjoin}.{$userfield})",
             array(
-                'joins' => 'appallfields',
+                'joins' => $userjoin,
                 'displayfunc' => 'orderedlist_to_newline',
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
                 'nosort' => true,
                 'iscompound' => true,
+                'issubquery' => true,
                 'style' => array('white-space' => 'pre')
             )
         );
@@ -625,8 +625,19 @@ trait report_trait {
      * @param string $userfield Field name containing the user's id
      * @return True
      */
-    protected function add_totara_job_filters(&$filteroptions, $userjoin = 'auser', $userfield = 'id') {
+    protected function add_totara_job_filters(&$filteroptions, $userjoin = null, $userfield = null) {
         global $DB, $CFG;
+
+        if (!$this->addedjobjoins) {
+            debugging('Job assignments joins must be added before adding of filter options', DEBUG_DEVELOPER);
+            return false;
+        }
+        if (!$userjoin) {
+            $userjoin = $this->addedjobjoins['job_assignments']['join'];
+        }
+        if (!$userfield) {
+            $userfield = $this->addedjobjoins['job_assignments']['field'];
+        }
 
         // Job assignment field filters.
         $filteroptions[] = new \rb_filter_option(
@@ -996,7 +1007,7 @@ trait report_trait {
      * Adds the joins for pos/org custom fields to the $joinlist.
      *
      * @param string $prefix    Whether this is a pos/org
-     * @param string $fields    The fields that need to be joined
+     * @param array  $fields    The fields that need to be joined
      * @param string $join      The table to take the userid from
      * @param string $joinfield The field to take the userid from
      * @param array  $joinlist
