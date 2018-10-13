@@ -131,22 +131,6 @@ class rb_source_course_completion extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'grade_items'
             ),
-            new rb_join(
-                'user_enrolments',
-                'LEFT',
-                '{user_enrolments}',
-                '(user_enrolments.userid = base.userid AND ' .
-                    'user_enrolments.enrolid IN (SELECT id FROM {enrol} WHERE courseid = base.course))',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
-            new rb_join(
-                'enrol',
-                'LEFT',
-                '{enrol}',
-                'enrol.id = user_enrolments.enrolid',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'user_enrolments'
-            ),
         );
 
         // include some standard joins
@@ -163,6 +147,7 @@ class rb_source_course_completion extends rb_base_source {
     }
 
     protected function define_columnoptions() {
+        global $DB;
         $columnoptions = array(
             new rb_column_option(
                 'course_completion',
@@ -273,12 +258,14 @@ class rb_source_course_completion extends rb_base_source {
                 'course_completion',
                 'enrolltype',
                 get_string('courseenroltypes', 'totara_reportbuilder'),
-                'enrol.enrol',
+                "(SELECT " . $DB->sql_group_concat('e.enrol', ', ', 'e.enrol ASC') . "
+                    FROM {enrol} e
+                    JOIN {user_enrolments} ue ON ue.enrolid = e.id
+                   WHERE ue.userid = base.userid AND e.courseid = base.course)",
                 array(
-                    'joins' => 'enrol',
-                    'grouping' => 'comma_list_unique',
                     'displayfunc' => 'enrolment_types_list',
-                    'dbdatatype' => 'char'
+                    'issubquery' => true,
+                    'iscompound' => true,
                 )
             ),
             new rb_column_option(
