@@ -103,7 +103,7 @@ class rb_source_goal_details extends rb_base_source {
         );
 
         $this->add_core_user_tables($joinlist, 'base', 'userid');
-        $this->add_totara_job_tables($joinlist, 'base', 'userid', 'INNER');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
