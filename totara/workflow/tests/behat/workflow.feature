@@ -20,7 +20,7 @@ Feature: Visit a workflow and experience the different possible behaviours
     Then I should see "Subscription details"
     And I should see "testing.mygo1.com"
     And I click on "Continue" "button"
-    And I should see "All content (177,485)"
+    And I should see "All content (82,137)"
     And I click on "Save and explore GO1" "button"
     And I should see "Explore Content Marketplace: GO1"
     And I should see "82,137 results"
