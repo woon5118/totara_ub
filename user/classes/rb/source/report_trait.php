@@ -23,20 +23,28 @@
 
 namespace core_user\rb\source;
 
-// Note that because we are using the cohort trait within this
-// trait if we use both \core_user\rb\source\report_trait and
-// \totara_cohort\rb\source\report_trait trait collisions will
-// occur!
-use totara_cohort\rb\source\report_trait as cohort_trait;
-
 defined('MOODLE_INTERNAL') || die();
 
 trait report_trait {
+    // Note: it is perfectly fine to include the same trait repeatedly.
+    use \totara_cohort\rb\source\report_trait;
 
-    use cohort_trait {
-        add_totara_cohort_user_tables as cohort_trait_add_cohort_user_tables;
-        add_totara_cohort_user_columns as cohort_trait_add_cohort_user_columns;
-        add_totara_cohort_user_filters as cohort_trait_add_cohort_user_filters;
+    /** @var array $addeduserjoins internal tracking of user columns */
+    private $addeduserjoins = array();
+
+    /**
+     * Do not call directly, to be used from rb_base_source constructor only.
+     * @internal
+     */
+    protected function finalise_core_user_trait() {
+        foreach ($this->addeduserjoins as $join => $info) {
+            if (empty($info['groupname'])) {
+                // Most likely somebody did not add any user columns, in that case do not add custom fields and rely on the BC fallback later.
+                continue;
+            }
+            $this->add_core_customfield_user($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
+            $this->addeduserjoins[$join]['processed'] = true;
+        }
     }
 
     /**
@@ -56,6 +64,7 @@ trait report_trait {
             debugging("User join '{$alias}' was already added to the source", DEBUG_DEVELOPER);
         } else {
             $this->addeduserjoins[$alias] = array('join' => $join);
+            $this->add_finalisation_method('finalise_core_user_trait');
         }
 
         // join uses 'auser' as name because 'user' is a reserved keyword
@@ -69,7 +78,7 @@ trait report_trait {
         );
 
         // Add cohort tables
-        $this->cohort_trait_add_cohort_user_tables($joinlist, $join, $field, $alias.'cohort');
+        $this->add_totara_cohort_user_tables($joinlist, $join, $field, $alias.'cohort');
 
         return true;
     }
@@ -97,6 +106,7 @@ trait report_trait {
 
         if ($join === 'base' and !isset($this->addeduserjoins['base'])) {
             $this->addeduserjoins['base'] = array('join' => 'base');
+            $this->add_finalisation_method('finalise_core_user_trait');
         }
 
         if (!isset($this->addeduserjoins[$join])) {
@@ -532,7 +542,7 @@ trait report_trait {
             )
         );
 
-        $this->cohort_trait_add_cohort_user_columns($columnoptions, $join.'cohort', $groupname);
+        $this->add_totara_cohort_user_columns($columnoptions, $join.'cohort', $groupname);
 
         return true;
     }
@@ -749,7 +759,7 @@ trait report_trait {
             )
         );
 
-        $this->cohort_trait_add_cohort_user_filters($filteroptions, $groupname);
+        $this->add_totara_cohort_user_filters($filteroptions, $groupname);
 
         return true;
     }
