@@ -27,27 +27,80 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
 
 /**
  * Abstract base class to be extended to create report builder sources
- *
- * @property string $base
- * @property rb_join[] $joinlist
- * @property rb_column_option[] $columnoptions
- * @property rb_filter_option[] $filteroptions
  */
 abstract class rb_base_source {
 
     use \totara_customfield\rb\source\report_trait,
         \totara_reportbuilder\rb\source\base_deprecated_t12_trait; // To be deleted in T13.
 
-    /*
-     * Used in default pre_display_actions function.
-     */
-    public $needsredirect, $redirecturl, $redirectmessage;
+    // ==== Properties required to be specified in every source ====
 
-    /** @var array of component used for lookup of classes */
+    /** @var string the base database table (or query), must be set */
+    public $base = null;
+
+    /** @var string name of the source, must be set */
+    public $sourcetitle = null;
+
+    /** @var rb_column_option[] list of available columns */
+    public $columnoptions = array();
+
+    // ==== Optional properties to be defined in sources ====
+
+    /** @var rb_join[] list of joins */
+    public $joinlist = array();
+
+    /** @var rb_filter_option[] list of available filters */
+    public $filteroptions = array();
+
+    /** @var rb_content_option[] list fo available content restrictions  */
+    public $contentoptions = array();
+
+    /** @var rb_param_option[] list fo available parameters */
+    public $paramoptions = array();
+
+    /** @var array list of default columns in new reports based on the source */
+    public $defaultcolumns = array();
+
+    /** @var array list of default filters in new reports based on the source */
+    public $defaultfilters = array();
+
+    /** @var bool true if source is selectable for new reports */
+    public $selectable = true;
+
+    /** @var bool true if reports with this source can be scheduled */
+    public $scheduleable = true;
+
+    /** @var bool true if reports with this source are compatible with report caching */
+    public $cacheable = true;
+
+    /** @var string report aggregation setting */
+    public $grouptype = 'none';
+
+    /** @var rb_column[] columns that must be always present (not recommended to be used) */
+    public $requiredcolumns = array();
+
+    /** @var string preprocessor name (not recommended to be used) */
+    public $preproc = null;
+
+    /** @var mixed group report id (not recommended to be used) */
+    public $groupid = null;
+
+    // === Internal properties, do not modify in child classes directly ===
+
+    /** @var bool Used in default pre_display_actions function. */
+    public $needsredirect = false;
+
+    /** @var string|\moodle_url Used in default pre_display_actions function. */
+    public $redirecturl;
+
+    /** @var string Used in default pre_display_actions function. */
+    public $redirectmessage;
+
+    /** @var array auxiliary map of hierarchies */
+    public $hierarchymap = array();
+
+    /** @var string[] of components used for lookup of /rb/ classes */
     protected $usedcomponents = array();
-
-    /** @var rb_column[] */
-    public $requiredcolumns;
 
     /** @var rb_global_restriction_set with active restrictions, ignore if null */
     protected $globalrestrictionset = null;
@@ -60,7 +113,7 @@ abstract class rb_base_source {
 
     /**
      * TODO - it would be nice to make this definable in the config or something.
-     * @var string $uniqueseperator - A string unique enough to use as a seperator for textareas
+     * @var string $uniqueseperator - A string unique enough to use as a separator for textareas
      */
     protected $uniquedelimiter = '^|:';
 
@@ -82,40 +135,40 @@ abstract class rb_base_source {
         $this->usedcomponents[] = 'totara_reportbuilder';
         $this->usedcomponents[] = 'totara_customfield';
 
-        // check that child classes implement required properties
-        $properties = array(
-            'base',
-            'joinlist',
-            'columnoptions',
-            'filteroptions',
-        );
-        foreach ($properties as $property) {
-            if (!property_exists($this, $property)) {
-                $a = new stdClass();
-                $a->property = $property;
-                $a->class = get_class($this);
-                throw new ReportBuilderException(get_string('error:propertyxmustbesetiny', 'totara_reportbuilder', $a));
-            }
+        // Check that child classes implement required properties.
+        if (!$this->base) {
+            $a = new stdClass();
+            $a->property = 'base';
+            $a->class = get_class($this);
+            throw new ReportBuilderException(get_string('error:propertyxmustbesetiny', 'totara_reportbuilder', $a));
+        }
+        if (!$this->columnoptions) {
+            debugging('No columns options defined in report source', DEBUG_DEVELOPER);
+        }
+        if (!isset($this->sourcetitle)) {
+            debugging('No sourcetitle defined in report source', DEBUG_DEVELOPER);
+            $this->sourcetitle = static::class;
         }
 
-        // set sensible defaults for optional properties
-        $defaults = array(
-            'paramoptions' => array(),
-            'requiredcolumns' => array(),
-            'contentoptions' => array(),
-            'preproc' => null,
-            'grouptype' => 'none',
-            'groupid' => null,
-            'selectable' => true,
-            'scheduleable' => true,
-            'cacheable' => true,
-            'hierarchymap' => array()
+        // Check array types.
+        $properties = array(
+            'columnoptions',
+            'joinlist',
+            'contentoptions',
+            'paramoptions',
+            'defaultcolumns',
+            'defaultfilters',
+            'requiredcolumns',
         );
-        foreach ($defaults as $property => $default) {
-            if (!property_exists($this, $property)) {
-                $this->$property = $default;
-            } else if ($this->$property === null) {
-                $this->$property = $default;
+        foreach ($properties as $property) {
+            if ($this->{$property} === null) {
+                //NOTE: we should fix the sources, continue for now.
+                $this->{$property} = array();
+                continue;
+            }
+            if (!is_array($this->{$property})) {
+                debugging("Invalid value in {$property}, it must be an array");
+                $this->{$property} = array();
             }
         }
 

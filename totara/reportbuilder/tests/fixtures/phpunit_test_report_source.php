@@ -34,4 +34,9 @@ class phpunit_test_report_source extends rb_base_source {
     public $columnoptions = [];
     public $filteroptions = [];
 
+    public function __construct() {
+        $this->sourcetitle = 'some title';
+        $this->columnoptions[] = new rb_column_option('type', 'value', 'name', 'id');
+        parent::__construct();
+    }
 }

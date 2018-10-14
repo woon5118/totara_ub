@@ -653,6 +653,9 @@ class reportbuilder {
      *                the preproc can't be found
      */
     static function get_preproc_object($preproc, $groupid) {
+        if (!$preproc) {
+            return false;
+        }
         $sourcepaths = self::find_source_dirs();
         foreach ($sourcepaths as $sourcepath) {
             $classfile = $sourcepath . 'rb_preproc_' . $preproc . '.php';
