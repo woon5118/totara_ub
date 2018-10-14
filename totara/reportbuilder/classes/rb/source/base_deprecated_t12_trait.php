@@ -41,7 +41,7 @@ trait base_deprecated_t12_trait {
      *
      * @internal
      *
-     * @return \core_user\rb\source\report_trait|\totara_cohort\rb\source\report_trait|\core_course\rb\source\report_trait|\totara_reportbuilder\rb\source\report_trait|\totara_program\rb\source\report_trait|\totara_certification\rb\source\report_trait|\core_course\rb\source\report_trait|\totara_job\rb\source\report_trait|totara_customfield\rb\source\report_trait|\core_tag\rb\source\report_trait|\totara_cohort\rb\source\report_trait
+     * @return \core_user\rb\source\report_trait|\totara_cohort\rb\source\report_trait|\core_course\rb\source\report_trait|\totara_reportbuilder\rb\source\report_trait|\totara_program\rb\source\report_trait|\totara_certification\rb\source\report_trait|\core_course\rb\source\report_trait|\totara_job\rb\source\report_trait|\core_tag\rb\source\report_trait|\totara_cohort\rb\source\report_trait
      */
     private function get_bc_trait_instance() {
         if (isset($this->bc_trait_instance)) {
@@ -49,17 +49,13 @@ trait base_deprecated_t12_trait {
         }
 
         $this->bc_trait_instance = new class extends \rb_base_source {
-            use \core_user\rb\source\report_trait,
-                \totara_cohort\rb\source\report_trait,
-                \core_course\rb\source\report_trait,
-                \totara_reportbuilder\rb\source\report_trait,
-                \totara_program\rb\source\report_trait,
-                \totara_certification\rb\source\report_trait,
-                \core_course\rb\source\report_trait,
-                \totara_job\rb\source\report_trait,
-                \totara_customfield\rb\source\report_trait,
+            use \core_course\rb\source\report_trait,
                 \core_tag\rb\source\report_trait,
-                \totara_cohort\rb\source\report_trait;
+                \core_user\rb\source\report_trait, // Includes cohort trait.
+                \totara_certification\rb\source\report_trait,
+                \totara_job\rb\source\report_trait,
+                \totara_reportbuilder\rb\source\report_trait,
+                \totara_program\rb\source\report_trait;
 
             public function __construct() {}
 
@@ -1506,7 +1502,7 @@ trait base_deprecated_t12_trait {
         debugging('add_user_fields_to_columns has been deprecated. Please use add_core_user_columns in \course\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $trait = $this->get_bc_trait_instance();
-        return $trait->add_core_user_columns($filteroptions, $groupname, $addtypetoheading);
+        return $trait->add_core_user_filters($filteroptions, $groupname, $addtypetoheading);
     }
 
     public function rb_filter_auth_options() {

@@ -25,6 +25,11 @@ namespace totara_cohort\rb\source;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Cohort trait
+ *
+ * NOTE: do not add if \core_user\rb\source\report_trait is used already because it contains this trait.
+ */
 trait report_trait {
 
     /**

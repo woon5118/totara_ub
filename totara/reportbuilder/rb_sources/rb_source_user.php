@@ -750,7 +750,7 @@ class rb_source_user extends rb_base_source {
 
     /**
      * Display for count
-     * 
+     *
      * @deprecated Since Totara 12.0
      * @param $result
      * @return int

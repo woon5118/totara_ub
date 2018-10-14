@@ -25,8 +25,13 @@ namespace core_user\rb\source;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Trait that adds methods for user related joins, columns and filters.
+ *
+ * NOTE: this includes \totara_cohort\rb\source\report_trait
+ */
 trait report_trait {
-    // Note: it is perfectly fine to include the same trait repeatedly.
+    // Note: cohort trait has to be included only once, so if report uses this trait it should not include the cohort trait.
     use \totara_cohort\rb\source\report_trait;
 
     /** @var array $addeduserjoins internal tracking of user columns */
