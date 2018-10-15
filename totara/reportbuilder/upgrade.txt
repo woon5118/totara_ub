@@ -50,13 +50,13 @@ information provided here is intended especially for developers.
   * add_core_tag_tables_to_joinlist instead use add_core_tag_tables in \core_tag\rb\source\report_trait
   * add_core_tag_fields_to_columns instead use add_core_tag_columns in \core_tag\rb\source\report_trait
   * add_core_tag_fields_to_filters instead use add_core_tag_filters in \core_tag\rb\source\report_trait
-  * add_cohort_user_tables_to_joinlist instead use add_totara_cohort_user_tables in \totara_cohort\rb\source\report_trait
+  * add_cohort_user_tables_to_joinlist is not supposed to be used any more
   * add_cohort_course_table_to_joinlist instead use add_totara_cohort_course_tables in \totara_cohort\rb\source\report_trait
   * add_cohort_program_tables_to_joinlist instead use add_totara_cohort_program_tables in \totara_cohort\rb\source\report_trait
-  * add_cohort_user_fields_to_columns instead use add_totara_cohort_user_columns in \totara_cohort\rb\sources\report_trait
+  * add_cohort_user_fields_to_columns is not supposed to be used any more
   * add_cohort_course_fields_to_columns instead use add_totara_cohort_course_columns in \totara_cohort\rb\source\report_trait
   * add_cohort_program_fields_to_columns instead use add_totara_cohort_program_columns in \totara_cohort\rb\source\report_trait
-  * add_cohort_user_fields_to_filters instead use add_totara_cohort_user_filters in \totara_cohort\rb\source\report_trait
+  * add_cohort_user_fields_to_filters is not supposed to be used any more
   * add_cohort_course_fields_to_filters instead use add_totara_cohort_course_filters in \totara_cohort\rb\source\report_trait
   * add_cohort_program_fields_to_filters instead use add_totara_cohort_program_filters in \totara_cohort\rb\source\report_trait
 * Deprecated the following report builder display functions and replaced with display classes

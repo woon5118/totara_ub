@@ -30,6 +30,7 @@ require_once($CFG->dirroot . '/totara/certification/lib.php');
 
 class rb_source_certification_completion extends rb_source_program_completion {
     use \totara_certification\rb\source\report_trait;
+    use \totara_cohort\rb\source\report_trait;
 
     /**
      * Overwrite instance type value of totara_visibility_where() in rb_source_program->post_config().

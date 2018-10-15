@@ -226,7 +226,6 @@ class rb_source_user extends rb_base_source {
             'user_extra');
 
         $this->add_totara_job_tables($joinlist, 'base', 'id', 'INNER');
-        $this->add_totara_cohort_user_tables($joinlist, 'base', 'id', 'basecohort');
 
         return $joinlist;
     }

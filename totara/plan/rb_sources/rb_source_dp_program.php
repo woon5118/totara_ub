@@ -36,6 +36,7 @@ class rb_source_dp_program extends rb_base_source {
     use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
+    use \totara_cohort\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;

@@ -27,41 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Cohort trait
- *
- * NOTE: do not add if \core_user\rb\source\report_trait is used already because it contains this trait.
  */
 trait report_trait {
-
-    /**
-     * Adds the cohort user tables to the $joinlist array
-     *
-     * @param array &$joinlist Array of current join options
-     *                         Passed by reference and updated to
-     *                         include new table joins
-     * @param string $join Name of the join that provides the
-     *                     'user' table
-     * @param string $field Name of user id field to join on
-     * @return boolean True
-     */
-    protected function add_totara_cohort_user_tables(&$joinlist, $join, $field, $alias = 'ausercohort') {
-        global $DB;
-
-        $idlist = $DB->sql_group_concat_unique($DB->sql_cast_2char('cm.cohortid'),'|');
-        $joinlist[] = new \rb_join(
-            $alias,
-            'LEFT',
-            // subquery as table name
-            "(SELECT cm.userid AS userid, {$idlist} AS idlist
-                FROM {cohort_members} cm
-            GROUP BY cm.userid)",
-            "{$alias}.userid = $join.$field",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            $join
-        );
-
-        return true;
-    }
-
     /**
      * Adds the cohort course tables to the $joinlist array
      *
@@ -129,38 +96,6 @@ trait report_trait {
         return true;
     }
 
-
-    /**
-     * Adds some common cohort user info to the $columnoptions array
-     *
-     * @param array &$columnoptions Array of current column options
-     *                              Passed by reference and updated by
-     *                              this method
-     * @param string $join Name of the join that provides the
-     *                          'cohortuser' table.
-     *
-     * @return True
-     */
-    protected function add_totara_cohort_user_columns(&$columnoptions,
-                                                         $join='ausercohort', $groupname = 'user',
-                                                         $addtypetoheading = false) {
-
-        $columnoptions[] = new \rb_column_option(
-            $groupname,
-            'usercohortids',
-            get_string('usercohortids', 'totara_reportbuilder'),
-            "$join.idlist",
-            array(
-                'joins' => $join,
-                'selectable' => false,
-                'addtypetoheading' => $addtypetoheading
-            )
-        );
-
-        return true;
-    }
-
-
     /**
      * Adds some common cohort course info to the $columnoptions array
      *
@@ -205,30 +140,6 @@ trait report_trait {
             array('joins' => $cohortenrolledids, 'selectable' => false)
         );
 
-        return true;
-    }
-
-    /**
-     * Adds some common user cohort filters to the $filteroptions array
-     *
-     * @param array &$columnoptions Array of current filter options
-     *                              Passed by reference and updated by
-     *                              this method
-     * @return True
-     */
-    protected function add_totara_cohort_user_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
-
-        if (!has_capability('moodle/cohort:view', \context_system::instance())) {
-            return true;
-        }
-
-        $filteroptions[] = new \rb_filter_option(
-            $groupname,
-            'usercohortids',
-            get_string('userincohort', 'totara_reportbuilder'),
-            'cohort',
-            array('addtypetoheading' => $addtypetoheading)
-        );
         return true;
     }
 

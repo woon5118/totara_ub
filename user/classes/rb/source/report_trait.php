@@ -27,13 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Trait that adds methods for user related joins, columns and filters.
- *
- * NOTE: this includes \totara_cohort\rb\source\report_trait
  */
 trait report_trait {
-    // Note: cohort trait has to be included only once, so if report uses this trait it should not include the cohort trait.
-    use \totara_cohort\rb\source\report_trait;
-
     /** @var array $addeduserjoins internal tracking of user columns */
     private $addeduserjoins = array();
 
@@ -81,9 +76,6 @@ trait report_trait {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
-
-        // Add cohort tables
-        $this->add_totara_cohort_user_tables($joinlist, $join, $field, $alias.'cohort');
 
         return true;
     }
@@ -546,9 +538,20 @@ trait report_trait {
                 'iscompound' => true,
             )
         );
-
-        $this->add_totara_cohort_user_columns($columnoptions, $join.'cohort', $groupname);
-
+        $columnoptions[] = new \rb_column_option(
+            $groupname,
+            'usercohortids',
+            get_string('usercohortids', 'totara_reportbuilder'),
+            "(SELECT " . $DB->sql_group_concat('cm.cohortid', '|', 'cm.cohortid ASC') . "
+                FROM {cohort_members} cm
+               WHERE cm.userid = $join.id)",
+            array(
+                'joins' => $join,
+                'selectable' => false,
+                'issubquery' => true,
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
         return true;
     }
 
@@ -582,6 +585,7 @@ trait report_trait {
         }
         if (!$found) {
             debugging("Add user join with group name '{$groupname}' via add_core_user_tables() before calling add_core_user_filters()", DEBUG_DEVELOPER);
+            $join = null;
         }
 
         // auto-generate filters for user fields
@@ -764,7 +768,27 @@ trait report_trait {
             )
         );
 
-        $this->add_totara_cohort_user_filters($filteroptions, $groupname);
+        // NOTE: this is a wrong place to use capability, anyway...
+        if (has_capability('moodle/cohort:view', \context_system::instance())) {
+            if ($join) {
+                $filteroptions[] = new \rb_filter_option(
+                    $groupname,
+                    'usercohortids',
+                    get_string('userincohort', 'totara_reportbuilder'),
+                    'correlated_subquery_number',
+                    array(
+                        'searchfield' => 'cm.cohortid',
+                        'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {cohort_members} cm
+                                       WHERE cm.userid = (%1\$s) AND (%2\$s) )",
+                        array('addtypetoheading' => $addtypetoheading),
+                        'cachingcompatible' => false,
+                    ),
+                    "{$join}.id",
+                    $join
+                );
+            }
+        }
 
         return true;
     }

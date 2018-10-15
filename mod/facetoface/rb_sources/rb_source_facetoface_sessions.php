@@ -35,6 +35,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     use \totara_job\rb\source\report_trait;
     use \mod_facetoface\rb\traits\required_columns;
     use \mod_facetoface\rb\traits\post_config;
+    use \totara_cohort\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;

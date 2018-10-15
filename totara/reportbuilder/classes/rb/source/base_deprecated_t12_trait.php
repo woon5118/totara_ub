@@ -2115,10 +2115,9 @@ trait base_deprecated_t12_trait {
      */
     protected function add_cohort_user_tables_to_joinlist(&$joinlist, $join, $field, $alias = 'ausercohort') {
 
-        debugging('add_cohort_user_tables_to_joinlist is deprecated. Please use add_totara_cohort_user_tables in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_cohort_user_tables_to_joinlist is deprecated, do not use it any more.', DEBUG_DEVELOPER);
 
-        $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_cohort_user_tables($joinlist, $join, $field, $alias);
+        return true;
     }
 
     /**
@@ -2175,14 +2174,11 @@ trait base_deprecated_t12_trait {
      * @return True
      * @deprecated since Totara 12.0
      */
-    protected function add_cohort_user_fields_to_columns(&$columnoptions,
-                                                         $join='ausercohort', $groupname = 'user',
-                                                         $addtypetoheading = false) {
+    protected function add_cohort_user_fields_to_columns(&$columnoptions, $join='ausercohort', $groupname = 'user', $addtypetoheading = false) {
 
-        debugging('add_cohort_user_fields_to_columns is deprecated. Please use add_totara_cohort_user_columns in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_cohort_user_fields_to_columns is deprecated, do not use it any more.', DEBUG_DEVELOPER);
 
-        $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_cohort_user_columns($columnoptions, $join, $groupname, $addtypetoheading);
+        return true;
     }
 
 
@@ -2238,10 +2234,9 @@ trait base_deprecated_t12_trait {
      */
     protected function add_cohort_user_fields_to_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
 
-        debugging('add_cohort_user_fields_to_filters is deprecated. Please use add_totara_cohort_user_filters in \totara_cohort\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_cohort_user_fields_to_filters is deprecated, do not use it any more.', DEBUG_DEVELOPER);
 
-        $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_cohort_user_filters($filteroptions, $groupname, $addtypetoheading);
+        return true;
     }
 
     /**
