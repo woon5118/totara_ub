@@ -29,9 +29,9 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
  * Abstract base class to be extended to create report builder sources
  */
 abstract class rb_base_source {
-
-    use \totara_customfield\rb\source\report_trait,
-        \totara_reportbuilder\rb\source\base_deprecated_t12_trait; // To be deleted in T13.
+    use \core_user\rb\source\report_trait;
+    use \totara_customfield\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\base_deprecated_t12_trait; // To be deleted in T13.
 
     // ==== Properties required to be specified in every source ====
 

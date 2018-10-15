@@ -32,7 +32,6 @@ require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_join_nonpruneable
  * A report builder source for DP objectives
  */
 class rb_source_dp_objective extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;

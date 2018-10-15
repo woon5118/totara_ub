@@ -29,7 +29,6 @@ global $CFG;
 
 class rb_source_program_completion extends rb_base_source {
     use \core_course\rb\source\report_trait;
-    use \core_user\rb\source\report_trait;
     use \totara_program\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;

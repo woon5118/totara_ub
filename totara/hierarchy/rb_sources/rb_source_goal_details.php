@@ -28,7 +28,6 @@ global $CFG;
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/goal/lib.php');
 
 class rb_source_goal_details extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;

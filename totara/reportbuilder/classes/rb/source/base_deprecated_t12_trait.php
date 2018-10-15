@@ -51,16 +51,22 @@ trait base_deprecated_t12_trait {
         $this->bc_trait_instance = new class extends \rb_base_source {
             use \core_course\rb\source\report_trait,
                 \core_tag\rb\source\report_trait,
-                \core_user\rb\source\report_trait, // Includes cohort trait.
+                \totara_cohort\rb\source\report_trait,
                 \totara_certification\rb\source\report_trait,
                 \totara_job\rb\source\report_trait,
                 \totara_reportbuilder\rb\source\report_trait,
                 \totara_program\rb\source\report_trait;
 
-            public function __construct() {}
+            public function __construct() {
+                // Do not call parent constructor intentionally
+                // because validation should not be done here.
+            }
 
             public function extract_addeduserjoins() {
-                return $this->addeduserjoins;
+                $reflector = new \ReflectionObject($this);
+                $joins = $reflector->getProperty('addeduserjoins');
+                $joins->setAccessible(true);
+                return $joins->getValue($this);
             }
         };
 

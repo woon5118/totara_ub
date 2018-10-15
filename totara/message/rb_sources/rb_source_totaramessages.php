@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 
 class rb_source_totaramessages extends rb_base_source {
     use \totara_job\rb\source\report_trait;
-    use \core_user\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;

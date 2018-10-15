@@ -37,7 +37,6 @@ trait report_trait {
         checkbox_report_trait,
         file_report_trait,
         url_report_trait;
-    use \core_user\rb\source\report_trait;
 
     /**
      * Function to add all customfield-related information to the base source.

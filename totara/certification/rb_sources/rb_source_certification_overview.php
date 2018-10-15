@@ -29,7 +29,6 @@ require_once($CFG->dirroot . '/totara/certification/lib.php');
 require_once($CFG->dirroot . '/totara/program/rb_sources/rb_source_program_overview.php');
 
 class rb_source_certification_overview extends rb_source_program_overview {
-    use \core_user\rb\source\report_trait;
     use \core_course\rb\source\report_trait;
     use \totara_certification\rb\source\report_trait;
 

@@ -26,7 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_competency_evidence extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;

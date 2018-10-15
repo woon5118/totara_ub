@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once('rb_source_goal_details.php');
 
 class rb_source_goal_status_history extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;

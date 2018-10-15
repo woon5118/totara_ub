@@ -27,8 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * Reportbuildersource for deleted users.
  */
 final class rb_source_userdata_deleted_users extends rb_base_source {
-    use \core_user\rb\source\report_trait;
-
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;

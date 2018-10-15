@@ -27,7 +27,6 @@ require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_sour
 
 class rb_source_facetoface_events extends rb_facetoface_base_source {
     use \core_course\rb\source\report_trait;
-    use \core_user\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \mod_facetoface\rb\traits\required_columns;

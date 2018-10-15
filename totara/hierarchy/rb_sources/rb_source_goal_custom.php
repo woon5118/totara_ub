@@ -25,8 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_goal_custom extends rb_base_source {
-    use \core_user\rb\source\report_trait;
-
     public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
     public $defaultcolumns, $defaultfilters, $embeddedparams;
     public $sourcetitle, $shortname, $scheduleable, $cacheable;

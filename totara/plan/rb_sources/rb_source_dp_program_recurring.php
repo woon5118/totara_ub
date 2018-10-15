@@ -33,7 +33,6 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 class rb_source_dp_program_recurring extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
 
@@ -236,7 +235,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
 
     /**
      * Display program completion status
-     * 
+     *
      * @deprecated Since Totara 12.0
      * @param $status
      * @param $row

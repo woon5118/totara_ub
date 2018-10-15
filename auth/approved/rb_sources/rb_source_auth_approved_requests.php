@@ -28,8 +28,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_auth_approved_requests extends rb_base_source {
-    use \core_user\rb\source\report_trait;
-
     public $base;
     public $joinlist;
     public $columnoptions;

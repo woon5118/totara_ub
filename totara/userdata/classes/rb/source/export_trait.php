@@ -30,8 +30,6 @@ use rb_join;
 /**
  * Trait export_trait
  *
- * NOTE: this trait requires \core_user\rb\source\report_trait
- *
  * @property string[] $usedcomponents
  * @property rb_join[] $joinlist
  * @property rb_column_option[] $columnoptions

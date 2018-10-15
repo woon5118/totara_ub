@@ -28,7 +28,6 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 
 class rb_source_certification_membership extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_certification\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;

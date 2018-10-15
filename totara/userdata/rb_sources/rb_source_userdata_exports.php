@@ -27,8 +27,7 @@ defined('MOODLE_INTERNAL') || die();
  * Class representing exports of user data.
  */
 final class rb_source_userdata_exports extends rb_base_source {
-    use \core_user\rb\source\report_trait,
-        \totara_userdata\rb\source\export_trait,
+    use \totara_userdata\rb\source\export_trait,
         \totara_userdata\rb\source\export_type_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;

@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class rb_source_scheduled_reports extends rb_base_source {
 
-    use \core_user\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_schedule_trait;
     use \totara_reportbuilder\rb\source\report_saved_trait;

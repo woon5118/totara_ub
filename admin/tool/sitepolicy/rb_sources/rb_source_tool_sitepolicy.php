@@ -30,8 +30,6 @@ global $CFG;
 require_once($CFG->dirroot . '/admin/tool/sitepolicy/rb_sources/rb_filter_policy_select_version.php');
 
 class rb_source_tool_sitepolicy extends rb_base_source {
-    use \core_user\rb\source\report_trait;
-
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $requiredcolumns;
 

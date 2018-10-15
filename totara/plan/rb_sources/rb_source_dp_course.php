@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/completion/completion_completion.php');
  */
 class rb_source_dp_course extends rb_base_source {
     use \core_course\rb\source\report_trait;
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;

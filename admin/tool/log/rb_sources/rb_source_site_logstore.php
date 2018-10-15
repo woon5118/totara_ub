@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 class rb_source_site_logstore extends rb_base_source {
     use \core_course\rb\source\report_trait;
     use \core_tag\rb\source\report_trait;
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;
 

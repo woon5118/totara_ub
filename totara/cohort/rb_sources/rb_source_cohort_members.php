@@ -33,7 +33,6 @@ require_once($CFG->dirroot.'/cohort/lib.php');
  * A report builder source for cohorts
  */
 class rb_source_cohort_members extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;

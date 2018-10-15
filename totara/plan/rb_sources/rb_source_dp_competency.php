@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
  * A report builder source for DP competencies
  */
 class rb_source_dp_competency extends rb_base_source {
-    use \core_user\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
