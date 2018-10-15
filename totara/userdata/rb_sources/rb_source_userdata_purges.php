@@ -27,7 +27,8 @@ defined('MOODLE_INTERNAL') || die();
  * Reportbuildersource for data purges.
  */
 final class rb_source_userdata_purges extends rb_base_source {
-    use \totara_userdata\rb\source\purge_trait,
+    use \core_user\rb\source\report_trait,
+        \totara_userdata\rb\source\purge_trait,
         \totara_userdata\rb\source\purge_type_trait;
 
     public $base, $joinlist, $columnoptions, $filteroptions;
