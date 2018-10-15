@@ -29,9 +29,7 @@ require_once($CFG->dirroot . '/totara/appraisal/rb_sources/rb_source_appraisal.p
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 
 class rb_source_appraisal_detail extends rb_source_appraisal {
-    public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
-    public $contentoptions, $defaultcolumns, $defaultfilters, $embeddedparams;
-    public $sourcetitle, $shortname, $cacheable;
+    public $shortname;
 
     /**
      * Stored during post_params() so that it can be used later when generating columns.

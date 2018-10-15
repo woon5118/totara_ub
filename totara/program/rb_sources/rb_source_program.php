@@ -35,10 +35,6 @@ class rb_source_program extends rb_base_source {
     use \totara_cohort\rb\source\report_trait;
     use \totara_program\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     protected $instancetype = 'program';
 
     public function __construct() {

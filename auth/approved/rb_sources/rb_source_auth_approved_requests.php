@@ -28,17 +28,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_auth_approved_requests extends rb_base_source {
-    public $base;
-    public $joinlist;
-    public $columnoptions;
-    public $filteroptions;
-    public $contentoptions;
-    public $paramoptions;
-    public $defaultcolumns;
-    public $defaultfilters;
-    public $requiredcolumns;
-    public $sourcetitle;
-
     public function __construct() {
         $this->usedcomponents[] = 'auth_approved';
         $this->base = '{auth_approved_request}';

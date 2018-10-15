@@ -34,11 +34,6 @@ require_once($CFG->dirroot.'/cohort/lib.php');
  * the cohort's members should be enrolled in
  */
 class rb_source_cohort_associations_visible extends rb_base_source {
-
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     /**
      * Constructor
      * @global object $CFG

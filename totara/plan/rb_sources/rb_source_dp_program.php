@@ -37,9 +37,7 @@ class rb_source_dp_program extends rb_base_source {
     use \totara_reportbuilder\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle, $instancetype;
+    public $instancetype;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {

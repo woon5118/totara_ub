@@ -25,8 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_column_extra_id extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions;
-
     function __construct() {
         $this->base = '{course}';
         $this->joinlist = $this->define_joinlist();

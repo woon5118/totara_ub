@@ -33,10 +33,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     use \mod_facetoface\rb\traits\required_columns;
     use \mod_facetoface\rb\traits\post_config;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $sourcetitle;
-
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');

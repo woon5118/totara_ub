@@ -76,6 +76,12 @@ abstract class rb_base_source {
     /** @var string report aggregation setting */
     public $grouptype = 'none';
 
+    /** @var string extra WHERE statement for source */
+    public $sourcewhere = '';
+
+    /** @var array sql parameters for sourcewhere */
+    public $sourceparams = array();
+
     /** @var rb_column[] columns that must be always present (not recommended to be used) */
     public $requiredcolumns = array();
 

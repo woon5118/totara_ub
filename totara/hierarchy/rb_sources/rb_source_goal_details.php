@@ -30,10 +30,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/goal/lib.php');
 class rb_source_goal_details extends rb_base_source {
     use \totara_job\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
-    public $contentoptions, $defaultcolumns, $defaultfilters, $embeddedparams;
-    public $sourcetitle, $shortname, $sourcewhere;
-
+    public $shortname;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         global $DB;

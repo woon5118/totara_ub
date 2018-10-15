@@ -34,10 +34,6 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 class rb_source_dp_plan extends rb_base_source {
     use \totara_job\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     /**
      * Constructor
      */

@@ -25,10 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 class rb_source_opensesame extends rb_base_source {
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     public function __construct() {
         $this->base = '{repository_opensesame_pkgs}';
         $this->joinlist = $this->define_joinlist();

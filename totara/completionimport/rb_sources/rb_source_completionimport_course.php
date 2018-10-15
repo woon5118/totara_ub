@@ -31,11 +31,6 @@ require_once($CFG->dirroot . '/totara/completionimport/lib.php');
  * A report builder source for Certifications
  */
 class rb_source_completionimport_course extends rb_base_source {
-
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     /**
      * Constructor
      */

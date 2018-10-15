@@ -31,10 +31,6 @@ class rb_source_courses extends rb_base_source {
     use \totara_cohort\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     function __construct() {
         $this->base = '{course}';
         $this->joinlist = $this->define_joinlist();

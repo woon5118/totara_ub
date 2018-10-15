@@ -27,10 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 class rb_source_assign extends rb_base_source {
     use \core_course\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $defaultcolumns, $defaultfilters, $requiredcolumns;
-    public $sourcetitle;
-
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');

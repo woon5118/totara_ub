@@ -27,12 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * Reportbuildersource for deleted users.
  */
 final class rb_source_userdata_deleted_users extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-    public $sourcewhere, $sourceparams;
-    public $cacheable;
-
     public function __construct() {
         $this->usedcomponents[] = 'totara_userdata';
         $this->base = "{user}";

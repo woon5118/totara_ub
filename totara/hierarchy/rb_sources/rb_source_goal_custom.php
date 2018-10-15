@@ -25,9 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_goal_custom extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
-    public $defaultcolumns, $defaultfilters, $embeddedparams;
-    public $sourcetitle, $shortname, $scheduleable, $cacheable;
+    public $shortname;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {

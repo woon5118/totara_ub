@@ -26,10 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_org extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     function __construct() {
         $this->base = '{org}';
         $this->joinlist = $this->define_joinlist();

@@ -30,17 +30,6 @@ class rb_source_course_membership extends rb_base_source {
     use \core_course\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
 
-    public $base;
-    public $joinlist;
-    public $columnoptions;
-    public $filteroptions;
-    public $contentoptions;
-    public $paramoptions;
-    public $defaultcolumns;
-    public $defaultfilters;
-    public $requiredcolumns;
-    public $sourcetitle;
-
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');

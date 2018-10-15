@@ -10,10 +10,7 @@
 // the file rb_source_[source_name].php
 
 class rb_source_[source_name] extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $requiredcolumns;
-
-    function __construct() {
+    public function __construct() {
         $this->base = ''; // a {tablename}, or subquery
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();

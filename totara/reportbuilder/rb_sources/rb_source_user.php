@@ -33,24 +33,6 @@ require_once("{$CFG->dirroot}/completion/completion_completion.php");
 class rb_source_user extends rb_base_source {
     use \totara_job\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
-    /**
-     * Conditional SQL to filter the data source available to the report.
-     *
-     * @var string
-     */
-    public $sourcewhere;
-
-    /**
-     * Parameters to support the conditional SQL that filters the data source available to the report.
-     *
-     * @var array
-     */
-    public $sourceparams;
-
     /**
      * Whether the "staff_facetoface_sessions" report exists or not (used to determine
      * whether or not to display icons that link to it)

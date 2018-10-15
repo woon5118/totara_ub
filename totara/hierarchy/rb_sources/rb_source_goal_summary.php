@@ -25,10 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_goal_summary extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
-    public $defaultcolumns, $defaultfilters, $embeddedparams;
-    public $sourcetitle, $shortname, $scheduleable, $cacheable;
-
+    public $shortname;
 
     /**
      * Stored during post_config so that it can be used later.

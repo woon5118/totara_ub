@@ -25,10 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_customlang extends rb_base_source {
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     function __construct() {
         $this->base = '(SELECT *
             FROM {tool_customlang}

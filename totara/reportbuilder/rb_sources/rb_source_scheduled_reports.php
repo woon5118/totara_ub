@@ -33,10 +33,6 @@ final class rb_source_scheduled_reports extends rb_base_source {
     use \totara_reportbuilder\rb\source\report_saved_trait;
     use \totara_job\rb\source\report_trait;
 
-    public $base, $joinlist, $columnoptions, $filteroptions;
-    public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
-
     private $reporturl;
 
     /**
