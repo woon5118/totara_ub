@@ -169,7 +169,7 @@ trait report_trait {
         }
 
         if ($cf_prefix === 'user') {
-            return $this->add_core_customfield_user($joinlist, $columnoptions, $filteroptions, $join, 'user', false, $nofilter);
+            return $this->add_core_user_customfield($joinlist, $columnoptions, $filteroptions, $join, 'user', false, $nofilter);
         }
 
         // Check if there are any visible custom fields of this type.

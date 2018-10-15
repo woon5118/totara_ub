@@ -87,7 +87,7 @@ trait base_deprecated_t12_trait {
             if (empty($info['groupname'])) {
                 continue;
             }
-            $trait->add_core_customfield_user($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
+            $trait->add_core_user_customfield($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
         }
     }
 
@@ -1884,10 +1884,10 @@ trait base_deprecated_t12_trait {
     protected function add_custom_user_fields(array &$joinlist, array &$columnoptions,
                                               array &$filteroptions, $basejoin = 'auser', $groupname = 'user', $addtypetoheading = false, $nofilter = false) {
 
-        debugging(__FUNCTION__ . ' is deprecated. Please use add_core_customfield_user in core_user\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging(__FUNCTION__ . ' is deprecated. Please use add_core_user_customfield in core_user\rb\source\report_trait instead', DEBUG_DEVELOPER);
 
         $trait = $this->get_bc_trait_instance();
-        return $trait->add_core_customfield_user($joinlist, $columnoptions, $filteroptions, $basejoin, $groupname, $addtypetoheading, $nofilter);
+        return $trait->add_core_user_customfield($joinlist, $columnoptions, $filteroptions, $basejoin, $groupname, $addtypetoheading, $nofilter);
     }
 
     /**

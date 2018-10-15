@@ -42,7 +42,7 @@ trait report_trait {
                 // Most likely somebody did not add any user columns, in that case do not add custom fields and rely on the BC fallback later.
                 continue;
             }
-            $this->add_core_customfield_user($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
+            $this->add_core_user_customfield($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
             $this->addeduserjoins[$join]['processed'] = true;
         }
     }
@@ -806,7 +806,7 @@ trait report_trait {
      *
      * @return boolean
      */
-    protected function add_core_customfield_user(array &$joinlist, array &$columnoptions, array &$filteroptions,
+    protected function add_core_user_customfield(array &$joinlist, array &$columnoptions, array &$filteroptions,
                                                  $basejoin = 'auser', $groupname = 'user', $addtypetoheading = false, $nofilter = false) {
         global $DB;
 
