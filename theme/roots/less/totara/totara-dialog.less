@@ -20,6 +20,17 @@
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @package   theme_roots
 
+@totara-dialog__z-index: @zindex-modal;
+@totara-dialog__z-index_bg: @zindex-modal-background;
+
+.ui-widget-overlay {
+    z-index: @totara-dialog__z-index_bg;
+}
+
+.totara-dialog.ui-dialog {
+    z-index: @totara-dialog__z-index;
+}
+
 .totara-dialog.notifynotice h2,
 .totara-dialog.notifynotice div {
     border: none;

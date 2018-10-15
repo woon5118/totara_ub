@@ -7,6 +7,7 @@ This file describes API changes for 'theme_roots'.
 * Added two new full width block regions 'top' and 'bottom'
 * Deprecated layout/partials/header.php
 * Redesigned navigation implemented, deprecated navigation hasn't been removed
+* z-index for Totara dialogs has been updated to match Bootstrap 3 levels
 
 === 10.0 ===
 
