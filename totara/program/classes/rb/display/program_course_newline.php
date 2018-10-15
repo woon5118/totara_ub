@@ -23,6 +23,8 @@
 
 namespace totara_program\rb\display;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Display class intended for course names as html links
  *
@@ -38,7 +40,7 @@ class program_course_newline extends program_course_base {
      * @param \stdClass $row
      * @param \rb_column $column
      * @param \reportbuilder $report
-     * @return string
+     * @return string|array
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
 
@@ -64,8 +66,8 @@ class program_course_newline extends program_course_base {
             $reference[$key] = $courseid;
         }
 
-        if ($programid && self::resort_required()) {
-            self::resort($programid, $newitems, $reference);
+        if ($programid && count($newitems) > 1 && self::resort_required()) {
+            $newitems = self::resort($programid, $newitems, $reference);
         }
 
         $output = implode($newitems, "\n");

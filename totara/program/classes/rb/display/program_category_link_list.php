@@ -64,8 +64,8 @@ class program_category_link_list extends program_course_base {
             $reference[$key] = $courseid;
         }
 
-        if ($programid && self::resort_required()) {
-            self::resort($programid, $output, $reference);
+        if ($programid && count($reference) > 1 && self::resort_required()) {
+            $output = self::resort($programid, $output, $reference);
         }
 
         return implode($output, "\n");

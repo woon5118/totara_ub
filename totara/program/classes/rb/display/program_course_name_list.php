@@ -58,8 +58,8 @@ class program_course_name_list extends program_course_base {
             $reference[$key] = $courseid;
         }
 
-        if ($programid && self::resort_required()) {
-            self::resort($programid, $items, $reference);
+        if ($programid && count($items) > 1 && self::resort_required()) {
+            $items = self::resort($programid, $items, $reference);
         }
 
         return implode($items, "\n");

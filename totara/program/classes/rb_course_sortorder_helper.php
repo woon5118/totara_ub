@@ -23,6 +23,8 @@
 
 namespace totara_program;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Report Builder program course sortorder helper
  *
@@ -31,6 +33,7 @@ namespace totara_program;
  *
  * This class also acts as a cache data source so that it can seamlessly load
  *
+ * @internal
  * @deprecated since Totara 12, will be removed once MSSQL 2017 is the minimum required version.
  */
 final class rb_course_sortorder_helper implements \cache_data_source {
@@ -51,9 +54,10 @@ final class rb_course_sortorder_helper implements \cache_data_source {
      *
      * @param event\program_contentupdated $event
      */
-    public static function handle_program_contentupdated(event\program_contentupdated $event) {
+    public static function handle_program_contentupdated(event\program_contentupdated $event): void {
+        $programid = $event->objectid;
         $cache = self::get_cache();
-        $cache->delete($event->objectid);
+        $cache->delete($programid);
     }
 
     /**
@@ -61,18 +65,23 @@ final class rb_course_sortorder_helper implements \cache_data_source {
      *
      * @param event\program_contentupdated $event
      */
-    public static function handle_program_deleted(event\program_deleted $event) {
+    public static function handle_program_deleted(event\program_deleted $event): void {
+        $programid = $event->objectid;
         $cache = self::get_cache();
-        $cache->delete($event->objectid);
+        $cache->delete($programid);
     }
 
     /**
      * Returns the course sortorder for the program with the given id.
      *
+     * The cache uses a data source, as such the request to get data will never fail.
+     * If the cache does not contain the required data then {@see self::load_for_cache()} will be
+     * called to load it.
+     *
      * @param int $programid
      * @return int[]
      */
-    public static function get_sortorder($programid) {
+    public static function get_sortorder($programid): array {
         $cache = self::get_cache();
         return $cache->get($programid);
     }
@@ -82,7 +91,7 @@ final class rb_course_sortorder_helper implements \cache_data_source {
      *
      * @return \cache_loader
      */
-    private static function get_cache() {
+    private static function get_cache(): \cache_loader {
         return \cache::make('totara_program', 'course_order');
     }
 
@@ -94,7 +103,7 @@ final class rb_course_sortorder_helper implements \cache_data_source {
      * @param int|string $programid
      * @return int[]
      */
-    public function load_for_cache($programid) {
+    public function load_for_cache($programid): array {
         global $DB;
         $sql = 'SELECT pcc.id, pcc.courseid
                   FROM {prog_courseset_course} pcc
@@ -114,8 +123,14 @@ final class rb_course_sortorder_helper implements \cache_data_source {
      * @param int|string $programid
      * @return int[]
      */
-    public function load_many_for_cache(array $keys) {
+    public function load_many_for_cache(array $keys): array {
         global $DB;
+
+        $return = [];
+        // Ensure all keys are present, even if we don't get a result from the database we have a result that we want to store.
+        foreach ($keys as $key) {
+            $return[$key] = [];
+        }
 
         list ($programidin, $params) = $DB->get_in_or_equal($keys, SQL_PARAMS_NAMED);
         $sql = "SELECT pc.programid, pcc.id, pcc.courseid
@@ -123,19 +138,14 @@ final class rb_course_sortorder_helper implements \cache_data_source {
                   JOIN {prog_courseset} pc ON pcc.coursesetid = pc.id
                 WHERE pc.programid {$programidin}
                 ORDER BY pc.programid, pc.sortorder ASC, pcc.id ASC";
-        $result = $DB->get_records_sql_menu($sql, $params);
+        $result = $DB->get_records_sql($sql, $params);
 
-        $return = [];
         foreach ($result as $row) {
             $programid = $row->programid;
             $coursesetid = $row->courseid;
             $courseid = $row->id;
 
-            if (!isset($return[$programid])) {
-                $return[$programid] = [$coursesetid => $courseid];
-            } else {
-                $return[$programid][$coursesetid] = $courseid;
-            }
+            $return[$programid][$coursesetid] = $courseid;
         }
 
         return $return;
@@ -147,7 +157,7 @@ final class rb_course_sortorder_helper implements \cache_data_source {
      * @param \cache_definition $definition
      * @return rb_course_sortorder_helper
      */
-    public static function get_instance_for_cache(\cache_definition $definition) {
+    public static function get_instance_for_cache(\cache_definition $definition): rb_course_sortorder_helper {
         return new rb_course_sortorder_helper;
     }
 }

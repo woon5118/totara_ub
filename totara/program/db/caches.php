@@ -49,6 +49,9 @@ $definitions = array(
         'staticaccelerationsize' => 10
     ),
 
+    // Used to store course sortorder within progammes.
+    // The key is the program id (int) and the data is an array of courseids in the correct order (int[])
+    // This cache is used by report source display columns in situations where the database can't sort within group concat.
     'course_order' => array(
         'mode'                   => cache_store::MODE_APPLICATION,
         'simplekeys'             => true,

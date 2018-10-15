@@ -23,6 +23,8 @@
 
 namespace totara_program\rb\display;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class to aid with display classes utilising rb_course_sortorder_helper.
  *
@@ -33,6 +35,11 @@ namespace totara_program\rb\display;
 abstract class program_course_base extends \totara_reportbuilder\rb\display\base {
 
     /**
+     * @var bool
+     */
+    private static $resort_required = null;
+
+    /**
      * Returns true if the data must be resorted.
      *
      * @param bool $recalculate
@@ -41,12 +48,11 @@ abstract class program_course_base extends \totara_reportbuilder\rb\display\base
     final protected static function resort_required($recalculate = false) {
         global $DB;
 
-        static $required = null;
-        if ($required === null || $recalculate) {
-            $required = $DB->sql_group_concat_orderby_supported();
+        if (self::$resort_required === null || $recalculate) {
+            self::$resort_required = !$DB->sql_group_concat_orderby_supported();
         }
 
-        return $required;
+        return self::$resort_required;
     }
 
     /**
@@ -61,7 +67,12 @@ abstract class program_course_base extends \totara_reportbuilder\rb\display\base
      *
      * @return array The courses array, but sorted correctly.
      */
-    final protected static function resort($programid, $courses, $map) {
+    final protected static function resort($programid, array $courses, array $map): array {
+        if (count($courses) < 2) {
+            // Either no records, or a single record; no need to sort anything.
+            return $courses;
+        }
+
         $order = \totara_program\rb_course_sortorder_helper::get_sortorder($programid);
         if (!$order) {
             debugging('Unknown program id passed to resort, ' . $programid, DEBUG_DEVELOPER);
@@ -71,7 +82,19 @@ abstract class program_course_base extends \totara_reportbuilder\rb\display\base
         $return = [];
         foreach ($order as $courseid) {
             $key = array_search($courseid, $map);
-            $return[] = $courses[$key];
+            if ($key !== false) {
+                $return[] = $courses[$key];
+                unset($courses[$key]);
+            }
+        }
+
+        if (debugging() && count($courses) > 0) {
+            // The courses given exceed the number in the cache.
+            // Add any that are missing to the end of the array and show a debugging notice.
+            debugging('Expected program courses count does not match cached course count, try purging your caches.', DEBUG_DEVELOPER);
+            foreach ($courses as $course) {
+                $return[] = $course;
+            }
         }
 
         return $return;

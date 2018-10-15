@@ -42,7 +42,10 @@ class program_course_status_list extends program_course_base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $COMPLETION_STATUS;
+        global $CFG, $COMPLETION_STATUS;
+
+        // Needed for the globals and defines.
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
 
         if (empty($value)) {
             return '';
@@ -67,8 +70,8 @@ class program_course_status_list extends program_course_base {
             $reference[$key] = $courseid;
         }
 
-        if ($programid && self::resort_required()) {
-            self::resort($programid, $output, $reference);
+        if ($programid && count($output) > 1 && self::resort_required()) {
+            $output = self::resort($programid, $output, $reference);
         }
 
         return implode($output, "\n");
