@@ -53,3 +53,6 @@ $index = new xmldb_index('moduleinstance', XMLDB_INDEX_NOTUNIQUE, array('modulei
 if (!$dbman->index_exists($table, $index)) {
     $dbman->add_index($table, $index);
 }
+
+// Migrate old block titles to the new common config storage.
+totara_core_migrate_old_block_titles();

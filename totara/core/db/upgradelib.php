@@ -607,44 +607,66 @@ function totara_core_migrate_frontpage_display() {
 function totara_core_migrate_old_block_titles() {
     global $DB;
 
-    [$sql_block_names, $sql_block_params] = $DB->get_in_or_equal([
-        'html',
-        'totara_featured_links',
-        'totara_report_graph',
-        'totara_report_table',
-        'totara_quick_links',
-        'totara_program_completion',
-        'tags',
-        'tag_youtube',
-        'tag_flickr',
-        'rss_client',
-        'mentees',
-        'glossary_random',
-        'blog_tags',
-        ]);
+    $dbman = $DB->get_manager();
 
-    $instances = $DB->get_records_sql_menu("SELECT id, configdata FROM {block_instances} WHERE
-                                      blockname {$sql_block_names} AND configdata <> ''", $sql_block_params);
+    $table = new xmldb_table('block_instances');
+    $field = new xmldb_field('common_config', XMLDB_TYPE_TEXT);
 
-    foreach ($instances as $id => $config_data) {
-        try {
-            $config = (array) unserialize(base64_decode($config_data));
+    // Only proceed if the field doesn't exist.
+    if ($dbman->field_exists($table, $field)) {
+        return;
+    }
 
-            // Explicitly converting $title to string below to avoid any confusions down the road as we
-            // expect title to be a string.
+    $dbman->add_field($table, $field);
 
-            if (isset($config['title'])) {
-                $DB->update_record('block_instances', (object) [
-                    'common_config' => json_encode([
-                        'id' => $id,
-                        'title' => (string) $config['title'],
-                        'override_title' => 1,
-                    ]),
-                ]);
+    $instances = $DB->get_records_sql("SELECT id, configdata, blockname FROM {block_instances} WHERE configdata <> ''");
+
+    foreach ($instances as $id => $instance) {
+
+        // We upgrade border for all blocks and title only for those which had user-configurable title
+
+        $title_upgrade_elegible = [
+            'html',
+            'totara_featured_links',
+            'totara_report_graph',
+            'totara_report_table',
+            'totara_quick_links',
+            'totara_program_completion',
+            'tags',
+            'tag_youtube',
+            'tag_flickr',
+            'rss_client',
+            'mentees',
+            'glossary_random',
+            'blog_tags',
+        ];
+
+        $config = (array) unserialize(base64_decode($instance->configdata));
+
+        // Explicitly converting config values to proper types below to avoid any confusions down the road as we
+        // expect title to be a string.
+
+        $common_config = [];
+
+        if (isset($config['title']) && in_array($instance->blockname, $title_upgrade_elegible)) {
+
+            // HTML block is a very special boy, it allows you to have an empty title, the rest just replace
+            // it with default if title is not specified.
+            if ($instance->blockname == 'html' || !empty($config['title'])) {
+                $common_config['title'] = (string) $config['title'];
+                $common_config['override_title'] = true;
             }
+        }
 
-        } catch (\Exception $exception) {
-            // We'll just skip a broken record, no reason to fail site upgrade because of this.
+        if (isset($config['display_with_border'])) {
+            $common_config['show_border'] = (bool) $config['display_with_border'];
+        }
+
+        if (!empty($common_config)) {
+            $DB->update_record('block_instances', (object) [
+                'id' => $id,
+                'common_config' => json_encode($common_config),
+            ]);
         }
     }
 }

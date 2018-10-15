@@ -454,19 +454,5 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018100101, 'totara', 'core');
     }
 
-    if ($oldversion < 2018101500) {
-        // Add an extra field to the block instance table to store common configuration options
-        if (!$dbman->field_exists($table = new xmldb_table('block_instances'),
-            $field = new xmldb_field('common_config', XMLDB_TYPE_TEXT))) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Update the config to store old titles as new common config setting
-        totara_core_migrate_old_block_titles();
-
-        // Core savepoint reached.
-        upgrade_plugin_savepoint(true, 2018101500, 'totara', 'core');
-    }
-
     return true;
 }

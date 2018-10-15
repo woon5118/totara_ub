@@ -51,11 +51,7 @@ class block_course_progress_report extends block_base {
     }
 
     public function specialization() {
-        if (!empty($this->config->title)) {
-            $this->title = format_string($this->config->title);
-        } else {
-            $this->title = get_string('title', 'block_course_progress_report');
-        }
+        $this->title = get_string('title', 'block_course_progress_report');
     }
 
     public function get_content() {

@@ -39,3 +39,6 @@ totara_upgrade_installed_languages();
 
 // Add parentid to context table and create context_map table.
 totara_core_upgrade_context_tables();
+
+// Migrate block title from storing in the config to a new model.
+totara_core_migrate_old_block_titles();

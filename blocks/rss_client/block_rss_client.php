@@ -46,13 +46,8 @@
 
     function specialization() {
         // After the block has been loaded we customize the block's title display
-        if (!empty($this->config) && !empty($this->config->title)) {
-            // There is a customized block title, display it
-            $this->title = $this->config->title;
-        } else {
-            // No customized block title, use localized remote news feed string
-            $this->title = get_string('remotenewsfeed', 'block_rss_client');
-        }
+        // Totara: Title override is done via get_title(); So loading only default title here
+        $this->title = get_string('remotenewsfeed', 'block_rss_client');
     }
 
     /**
@@ -212,7 +207,7 @@
             $feedtitle = $this->format_title(s($feedrecord->preferredtitle));
         }
 
-        if (empty($this->config->title)){
+        if (empty($this->get_title())){
             //NOTE: this means the 'last feed' displayed wins the block title - but
             //this is exiting behaviour..
             $this->title = strip_tags($feedtitle);

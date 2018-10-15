@@ -132,7 +132,8 @@ class block_html extends block_base {
      * @return bool
      */
     public function instance_can_be_docked() {
-        return (!empty($this->config->title) && parent::instance_can_be_docked());
+        // Totara: Title override is done via get_title();
+        return (!empty($this->get_title()) && parent::instance_can_be_docked());
     }
 
     /*

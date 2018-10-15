@@ -205,14 +205,10 @@ class block_totara_report_table extends block_base {
 
         \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
-        if (!empty($this->config->title)) {
-            $this->title = format_string($this->config->title);
-        } else {
-            $this->title = format_string($report->fullname);
+        $this->title = format_string($report->fullname);
 
-            if (!empty($savedfiltername)) {
-                $this->title .= ': ' . format_string($savedfiltername);
-            }
+        if (!empty($savedfiltername)) {
+            $this->title .= ': ' . format_string($savedfiltername);
         }
 
         $reporturl = new moodle_url($report->report_url());

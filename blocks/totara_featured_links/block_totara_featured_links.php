@@ -73,7 +73,7 @@ class block_totara_featured_links extends block_base {
             'tile_data' => [],
             'editing' => $editing,
             'size' => $this->config->size,
-            'title' => $this->config->title,
+            'title' => $this->get_title(),
             'manual_id' => $this->config->manual_id,
             'instanceid' => $this->instance->id,
             'shape' => isset($this->config->shape) ? $this->config->shape : 'square'
@@ -127,7 +127,6 @@ class block_totara_featured_links extends block_base {
         $this->config = new \stdClass();
         $this->config->size = 'medium';
         $this->config->shape = 'square';
-        $this->config->title = get_string('pluginname', 'block_totara_featured_links');
         $this->config->manual_id = '';
 
         $this->instance_config_commit();
@@ -238,7 +237,7 @@ class block_totara_featured_links extends block_base {
      * @return bool
      */
     public function hide_header() {
-        return empty($this->config->title);
+        return empty($this->get_title());
     }
 
     /**

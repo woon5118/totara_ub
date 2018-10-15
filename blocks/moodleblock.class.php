@@ -53,6 +53,11 @@ class block_base {
 
     /**
      * The title of the block to be displayed in the block title area.
+     *
+     * Totara: Please note this is used as default block title supplied by the block developer.
+     * To get block title considering possible user override, please use $this->get_title()
+     * that would return the current instance respecting the instance configuration.
+     *
      * @var string $title
      */
     var $title         = NULL;
@@ -756,20 +761,24 @@ EOD;
      * @return bool
      */
     public function display_with_border(): bool {
-        return $this->get_common_config_value('show_border');
+        return (bool) $this->get_common_config_value('show_border');
     }
 
     /**
      * Returns true if setting not initialize
      *
+     * @since Totara 12 (Totara only method)
+     *
      * @return bool
      */
     public function display_with_header(): bool {
-        return $this->get_common_config_value('show_header');
+        return (bool) $this->get_common_config_value('show_header');
     }
 
     /**
      * Returns true if setting not initialize
+     *
+     * @since Totara 12 (Totara only method)
      *
      * @return bool
      */
@@ -789,6 +798,8 @@ EOD;
     /**
      * Load common block configuration from the table
      *
+     * @since Totara 12 (Totara only method)
+     *
      * @param bool $override Override with data from the table if already loaded
      * @param null|stdClass $instance Block instance, in case it's not loaded yet
      */
@@ -798,8 +809,13 @@ EOD;
         $instance = $instance ?? $this->instance;
 
         if (is_null($this->common_config) || $override) {
-            $this->common_config = json_decode($instance->common_config ?? '', true)
-                                        ?? $this->get_default_common_config_values();
+
+            // Attempting to get common config safely, falling back to empty array if not set or failed to decode.
+            $common_config = json_decode($instance->common_config ?? '', true) ?: [];
+
+            // Always supplying user configured values on top of default ones to make sure
+            // whatever is querying the value would get the default if nothing is supplied.
+            $this->common_config = array_merge($this->get_default_common_config_values(), $common_config);
         }
     }
 
