@@ -969,4 +969,40 @@ trait report_trait {
 
         return true;
     }
+
+    /**
+     * Adds the basic user based content options
+     *      - Manager
+     *      - Position
+     *      - Organisation
+     *
+     * @param array $contentoptions     The sources content options array
+     * @param string $join              The name of the user table in the report
+     * @return boolean
+     */
+    protected function add_basic_user_content_options(&$contentoptions, $join = 'auser') {
+        // Add the manager/staff content options.
+        $contentoptions[] = new \rb_content_option(
+            'user',
+            get_string('user', 'rb_source_user'),
+            "{$join}.id",
+            "{$join}"
+        );
+        // Add the position content options.
+        $contentoptions[] = new \rb_content_option(
+            'current_pos',
+            get_string('currentpos', 'totara_reportbuilder'),
+            "{$join}.id",
+            "{$join}"
+        );
+        // Add the organisation content options.
+        $contentoptions[] = new \rb_content_option(
+            'current_org',
+            get_string('currentorg', 'totara_reportbuilder'),
+            "{$join}.id",
+            "{$join}"
+        );
+
+        return true;
+    }
 }
