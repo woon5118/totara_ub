@@ -23,6 +23,10 @@
 
 namespace core_course\rb\source;
 
+use moodleform, HTML_QuickForm_static, HTML_QuickForm_button, MoodleQuickForm_hidden;
+use context_course, coursecat_helper, completion_completion, course_in_list, moodle_url;
+use report_builder_course_expand_form;
+
 defined('MOODLE_INTERNAL') || die();
 
 trait report_trait {
@@ -388,6 +392,7 @@ trait report_trait {
      *                     'course id' field
      * @param string $field Name of course id field to join on
      * @param string $jointype Type of Join (INNER, LEFT, RIGHT)
+     * @return boolean
      */
     protected function add_core_course_tables(&$joinlist, $join, $field, $jointype = 'LEFT') {
 
@@ -399,6 +404,8 @@ trait report_trait {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
+
+        return true;
     }
 
     /**
@@ -492,7 +499,7 @@ trait report_trait {
     /**
      * Adds some common course category filters to the $filteroptions array
      *
-     * @param array &$columnoptions Array of current filter options
+     * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
      * @return True
@@ -518,5 +525,315 @@ trait report_trait {
             'course_category'
         );
         return true;
+    }
+
+
+    /**
+     * Expanding content to display when clicking a course.
+     * Will be placed inside a table cell which is the width of the table.
+     * Call required_param to get any param data that is needed.
+     * Make sure to check that the data requested is permitted for the viewer.
+     *
+     * @return string
+     */
+    public function rb_expand_course_details() {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        require_once($CFG->dirroot . '/course/renderer.php');
+        require_once($CFG->dirroot . '/lib/coursecatlib.php');
+
+        $courseid = required_param('expandcourseid', PARAM_INT);
+        $userid = $USER->id;
+
+        if (!totara_course_is_viewable($courseid)) {
+            ajax_result(false, get_string('coursehidden'));
+            exit();
+        }
+
+        $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+
+        $chelper = new coursecat_helper();
+
+        $formdata = array(
+            // The following are required.
+            'summary' => $chelper->get_course_formatted_summary(new course_in_list($course)),
+            'status' => null,
+            'courseid' => $courseid,
+
+            // The following are optional, and depend upon state.
+            'inlineenrolmentelements' => null,
+            'enroltype' => null,
+            'progress' => null,
+            'enddate' => null,
+            'grade' => null,
+            'action' => null,
+            'url' => null,
+        );
+
+        $coursecontext = context_course::instance($course->id, MUST_EXIST);
+        $enrolled = is_enrolled($coursecontext);
+
+        $inlineenrolments = array();
+        if ($enrolled) {
+            $ccompl = new completion_completion(array('userid' => $userid, 'course' => $courseid));
+            $complete = $ccompl->is_complete();
+            if ($complete) {
+                $sql = 'SELECT gg.*
+                          FROM {grade_grades} gg
+                          JOIN {grade_items} gi
+                            ON gg.itemid = gi.id
+                         WHERE gg.userid = ?
+                           AND gi.courseid = ?';
+                $grade = $DB->get_record_sql($sql, array($userid, $courseid));
+                $coursecompletion = $DB->get_record('course_completions', array('userid' => $userid, 'course' => $courseid));
+                $coursecompletedon = userdate($coursecompletion->timecompleted, get_string('strfdateshortmonth', 'langconfig'));
+
+                $formdata['status'] = get_string('coursestatuscomplete', 'totara_reportbuilder');
+                $formdata['progress'] = get_string('coursecompletedon', 'totara_reportbuilder', $coursecompletedon);
+                if ($grade) {
+                    if (!isset($grade->finalgrade)) {
+                        $formdata['grade'] = '-';
+                    } else {
+                        $formdata['grade'] = get_string('xpercent', 'totara_core', $grade->finalgrade);
+                    }
+                }
+            } else {
+                $formdata['status'] = get_string('coursestatusenrolled', 'totara_reportbuilder');
+
+                list($statusdpsql, $statusdpparams) = $this->get_dp_status_sql($userid, $courseid);
+                $statusdp = $DB->get_record_sql($statusdpsql, $statusdpparams);
+                $progress = totara_display_course_progress_bar($userid, $courseid,
+                    $statusdp->course_completion_statusandapproval);
+                // Highlight if the item has not yet been approved.
+                if ($statusdp->approved == DP_APPROVAL_UNAPPROVED
+                    || $statusdp->approved == DP_APPROVAL_REQUESTED) {
+                    $progress .= $this->rb_display_plan_item_status($statusdp->approved);
+                }
+                $formdata['progress'] = $progress;
+
+                // Course not finished, so no end date for course.
+                $formdata['enddate'] = '';
+            }
+            $formdata['url'] = new moodle_url('/course/view.php', array('id' => $courseid));
+            $formdata['action'] =  get_string('launchcourse', 'totara_program');
+        } else {
+            $formdata['status'] = get_string('coursestatusnotenrolled', 'totara_reportbuilder');
+
+            $instances = enrol_get_instances($courseid, true);
+            $plugins = enrol_get_plugins(true);
+
+            $enrolmethodlist = array();
+            foreach ($instances as $instance) {
+                if (!isset($plugins[$instance->enrol])) {
+                    continue;
+                }
+                $plugin = $plugins[$instance->enrol];
+                if (enrol_is_enabled($instance->enrol)) {
+                    $enrolmethodlist[] = $plugin->get_instance_name($instance);
+                    // If the enrolment plugin has a course_expand_hook then add to a list to process.
+                    if (method_exists($plugin, 'course_expand_get_form_hook')
+                        && method_exists($plugin, 'course_expand_enrol_hook')) {
+                        $enrolment = array ('plugin' => $plugin, 'instance' => $instance);
+                        $inlineenrolments[$instance->id] = (object) $enrolment;
+                    }
+                }
+            }
+            $enrolmethodstr = implode(', ', $enrolmethodlist);
+            $realuser = \core\session\manager::get_realuser();
+
+            $inlineenrolmentelements = $this->get_inline_enrolment_elements($inlineenrolments);
+            $formdata['inlineenrolmentelements'] = $inlineenrolmentelements;
+            $formdata['enroltype'] = $enrolmethodstr;
+
+            if (is_viewing($coursecontext, $realuser->id) || is_siteadmin($realuser->id)) {
+                $formdata['action'] = get_string('viewcourse', 'totara_program');
+                $formdata['url'] = new moodle_url('/course/view.php', array('id' => $courseid));
+            }
+        }
+
+        $mform = new report_builder_course_expand_form(null, $formdata);
+
+        if (!empty($inlineenrolments)) {
+            $this->process_enrolments($mform, $inlineenrolments);
+        }
+
+        return $mform->render();
+    }
+
+    /**
+     * @param $inlineenrolments array of objects containing matching instance/plugin pairs
+     * @return array of form elements
+     */
+    private function get_inline_enrolment_elements(array $inlineenrolments) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/lib/pear/HTML/QuickForm/button.php');
+        require_once($CFG->dirroot . '/lib/pear/HTML/QuickForm/static.php');
+
+        $retval = array();
+        foreach ($inlineenrolments as $inlineenrolment) {
+            $instance = $inlineenrolment->instance;
+            $plugin = $inlineenrolment->plugin;
+            $enrolform = $plugin->course_expand_get_form_hook($instance);
+
+            $nameprefix = 'instanceid_' . $instance->id . '_';
+
+            // Currently, course_expand_get_form_hook check if the user can self enrol before creating the form, if not, it will
+            // return the result of the can_self_enrol function which could be false or a string.
+            if (!$enrolform || is_string($enrolform)) {
+                $retval[] = new HTML_QuickForm_static(null, null, $enrolform);
+                continue;
+            }
+
+            if ($enrolform instanceof moodleform) {
+                foreach ($enrolform->_form->_elements as $element) {
+                    if ($element->_type == 'button' || $element->_type == 'submit') {
+                        continue;
+                    } else if ($element->_type == 'group') {
+                        $newelements = array();
+                        foreach ($element->getElements() as $subelement) {
+                            if ($subelement->_type == 'button' || $subelement->_type == 'submit') {
+                                continue;
+                            }
+                            $elementname = $subelement->getName();
+                            $newelement  = $nameprefix . $elementname;
+                            $subelement->setName($newelement);
+                            if (!empty($enrolform->_form->_types[$elementname]) && $subelement instanceof MoodleQuickForm_hidden) {
+                                $subelement->setType($newelement, $enrolform->_form->_types[$elementname]);
+                            }
+                            $newelements[] = $subelement;
+                        }
+                        if (count($newelements)>0) {
+                            $element->setElements($newelements);
+                            $retval[] = $element;
+                        }
+                    } else {
+                        $elementname = $element->getName();
+                        $newelement  = $nameprefix . $elementname;
+                        $element->setName($newelement);
+                        if (!empty($enrolform->_form->_types[$elementname]) && $element instanceof MoodleQuickForm_hidden) {
+                            $element->setType($newelement, $enrolform->_form->_types[$elementname]);
+                        }
+                        $retval[] = $element;
+                    }
+                }
+            }
+
+            if (count($inlineenrolments) > 1) {
+                $enrollabel = get_string('enrolusing', 'totara_reportbuilder', $plugin->get_instance_name($instance->id));
+            } else {
+                $enrollabel = get_string('enrol', 'totara_reportbuilder');
+            }
+            $name = $instance->id;
+
+            $retval[] = new HTML_QuickForm_button($name, $enrollabel, array('class' => 'expandenrol'));
+        }
+        return $retval;
+    }
+
+    /**
+     * @param $mform
+     * @param $inlineenrolments
+     */
+    private function process_enrolments($mform, $inlineenrolments) {
+        global $CFG;
+
+        if ($formdata = $mform->get_data()) {
+            $submittedinstance = required_param('instancesubmitted', PARAM_INT);
+            $inlineenrolment = $inlineenrolments[$submittedinstance];
+            $instance = $inlineenrolment->instance;
+            $plugin = $inlineenrolment->plugin;
+            $nameprefix = 'instanceid_' . $instance->id . '_';
+            $nameprefixlength = strlen($nameprefix);
+
+            $valuesforenrolform = array();
+            foreach ($formdata as $name => $value) {
+                if (substr($name, 0, $nameprefixlength) === $nameprefix) {
+                    $name = substr($name, $nameprefixlength);
+                    $valuesforenrolform[$name] = $value;
+                }
+            }
+            $enrolform = $plugin->course_expand_get_form_hook($instance);
+
+            $enrolform->_form->updateSubmission($valuesforenrolform, null);
+
+            $enrolled = $plugin->course_expand_enrol_hook($enrolform, $instance);
+            if ($enrolled) {
+                $mform->_form->addElement('hidden', 'redirect', $CFG->wwwroot . '/course/view.php?id=' . $instance->courseid);
+            }
+
+            foreach ($enrolform->_form->_errors as $errorname => $error) {
+                $mform->_form->_errors[$nameprefix . $errorname] = $error;
+            }
+        }
+    }
+
+    /**
+     * Get course progress status for user according his record of learning
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array
+     */
+    public function get_dp_status_sql($userid, $courseid) {
+        global $CFG;
+        require_once($CFG->dirroot.'/totara/plan/rb_sources/rb_source_dp_course.php');
+        // Use base query from rb_source_dp_course, and column/joins of statusandapproval.
+        $base_sql = $this->get_dp_status_base_sql();
+        $sql = "SELECT CASE WHEN dp_course.planstatus = " . DP_PLAN_STATUS_COMPLETE . "
+                            THEN dp_course.completionstatus
+                            ELSE course_completion.status
+                            END AS course_completion_statusandapproval,
+                       dp_course.approved AS approved
+                 FROM ".$base_sql. " base
+                 LEFT JOIN {course_completions} course_completion
+                   ON (base.courseid = course_completion.course
+                  AND base.userid = course_completion.userid)
+                 LEFT JOIN (SELECT p.userid AS userid, p.status AS planstatus,
+                                   pc.courseid AS courseid, pc.approved AS approved,
+                                   pc.completionstatus AS completionstatus
+                              FROM {dp_plan} p
+                             INNER JOIN {dp_plan_course_assign} pc ON p.id = pc.planid) dp_course
+                   ON dp_course.userid = base.userid AND dp_course.courseid = base.courseid
+                WHERE base.userid = ? AND base.courseid = ?";
+        return array($sql, array($userid, $courseid));
+    }
+
+    /**
+     * Get base sql for course record of learning.
+     * @return string
+     */
+    public function get_dp_status_base_sql() {
+        global $DB;
+
+        // Apply global user restrictions.
+        $global_restriction_join_ue = $this->get_global_report_restriction_join('ue', 'userid');
+        $global_restriction_join_cc = $this->get_global_report_restriction_join('cc', 'userid');
+        $global_restriction_join_p1 = $this->get_global_report_restriction_join('p1', 'userid');
+
+        $uniqueid = $DB->sql_concat_join(
+            "','",
+            array(
+                $DB->sql_cast_2char('userid'),
+                $DB->sql_cast_2char('courseid')
+            )
+        );
+        return  "(SELECT " . $uniqueid . " AS id, userid, courseid
+                    FROM (SELECT ue.userid AS userid, e.courseid AS courseid
+                           FROM {user_enrolments} ue
+                           JOIN {enrol} e ON ue.enrolid = e.id
+                           {$global_restriction_join_ue}
+                          UNION
+                         SELECT cc.userid AS userid, cc.course AS courseid
+                           FROM {course_completions} cc
+                           {$global_restriction_join_cc}
+                          WHERE cc.status > " . COMPLETION_STATUS_NOTYETSTARTED . "
+                          UNION
+                         SELECT p1.userid AS userid, pca1.courseid AS courseid
+                           FROM {dp_plan_course_assign} pca1
+                           JOIN {dp_plan} p1 ON pca1.planid = p1.id
+                           {$global_restriction_join_p1}
+                    )
+                basesub)";
     }
 }
