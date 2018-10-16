@@ -188,6 +188,13 @@ class reportbuilder {
     protected $baseurl = null;
 
     /**
+     * Caching data for display methods, use display class name as key.
+     * This is intended to prevent repeated DB requests in display methods.
+     * @var array
+     */
+    public $displaycache = array();
+
+    /**
      * @var bool $cache Cache state for current report
      */
     public $cache;

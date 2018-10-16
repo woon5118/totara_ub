@@ -102,9 +102,6 @@ abstract class rb_base_source {
     /** @var string Used in default pre_display_actions function. */
     public $redirectmessage;
 
-    /** @var array auxiliary map of hierarchies */
-    public $hierarchymap = array();
-
     /** @var string[] of components used for lookup of /rb/ classes */
     protected $usedcomponents = array();
 
@@ -1158,22 +1155,6 @@ abstract class rb_base_source {
     // Wrapper functions to add columns/fields/joins in one go
     //
     //
-
-    /**
-     * Populate the hierarchymap private variable to look up Hierarchy names from ids
-     * e.g. when converting a hierarchy path from ids to human-readable form
-     *
-     * @param array $hierarchies array of all the hierarchy types we want to populate (pos, org, comp, goal etc)
-     *
-     * @return boolean True
-     */
-    function populate_hierarchy_name_map($hierarchies) {
-        global $DB;
-        foreach ($hierarchies as $hierarchy) {
-            $this->hierarchymap["{$hierarchy}"] = $DB->get_records_menu($hierarchy, null, 'id', 'id, fullname');
-        }
-        return true;
-    }
 
     /**
      * Returns true if global report restrictions can be used with this source.

@@ -54,7 +54,6 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
-        $this->populate_hierarchy_name_map(array('org'));
     }
 
     /**

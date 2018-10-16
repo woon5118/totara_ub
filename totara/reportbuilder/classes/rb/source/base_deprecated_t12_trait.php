@@ -31,6 +31,8 @@ defined('MOODLE_INTERNAL') || die();
  * Stuff deprecated in rb_base_source in T12, to be deleted in T13.
  */
 trait base_deprecated_t12_trait {
+    /** @var array auxiliary map of hierarchies */
+    public $hierarchymap = array();
 
     /** @var mixed used for method depreciation only */
     private $bc_trait_instance;
@@ -2280,5 +2282,25 @@ trait base_deprecated_t12_trait {
 
         $trait = $this->get_bc_trait_instance();
         return $trait->add_totara_cohort_program_filters($filteroptions, $langfile);
+    }
+
+    /**
+     * Populate the hierarchymap private variable to look up Hierarchy names from ids
+     * e.g. when converting a hierarchy path from ids to human-readable form
+     *
+     * @param array $hierarchies array of all the hierarchy types we want to populate (pos, org, comp, goal etc)
+     *
+     * @return boolean True
+     * @deprecated since Totara 12.0
+     */
+    function populate_hierarchy_name_map($hierarchies) {
+        global $DB;
+
+        debugging('populate_hierarchy_name_map is deprecated, use display caches instead', DEBUG_DEVELOPER);
+
+        foreach ($hierarchies as $hierarchy) {
+            $this->hierarchymap["{$hierarchy}"] = $DB->get_records_menu($hierarchy, null, 'id', 'id, fullname');
+        }
+        return true;
     }
 }

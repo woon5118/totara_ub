@@ -43,30 +43,41 @@ class hierarchy_nice_path extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        global $DB;
+
         if (empty($value)) {
             return '';
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
-        $displaypath = '';
+
+        if (!isset($extrafields->hierarchytype) or !in_array($extrafields->hierarchytype, array('pos', 'org'))) {
+            return '';
+        }
+
         $parentid = 0;
-        // Make sure we know what we are looking for, and that the private var is populated (in source constructor).
-        if (isset($extrafields->hierarchytype) && isset($report->src->hierarchymap[$extrafields->hierarchytype])) {
-            $paths = explode('/', substr($value, 1));
-            $map = $report->src->hierarchymap[$extrafields->hierarchytype];
-            foreach ($paths as $path) {
-                if ($parentid !== 0) {
-                    // Include ' > ' before name except on top element.
-                    $displaypath .= ' &gt; ';
-                }
-                if (isset($map[$path])) {
-                    $displaypath .= $map[$path];
-                } else {
-                    // Should not happen if paths are correct!
-                    $displaypath .= get_string('unknown', 'totara_reportbuilder');
-                }
-                $parentid = $path;
+        $displaypath = '';
+
+        if (!isset($report->displaycache[__CLASS__])) {
+            $report->displaycache[__CLASS__] = array();
+        }
+        if (!isset($report->displaycache[__CLASS__][$extrafields->hierarchytype])) {
+            $report->displaycache[__CLASS__][$extrafields->hierarchytype] = $DB->get_records_menu($extrafields->hierarchytype, null, 'id ASC', 'id, fullname');
+        }
+        $map = $report->displaycache[__CLASS__][$extrafields->hierarchytype];
+        $paths = explode('/', substr($value, 1));
+        foreach ($paths as $path) {
+            if ($parentid !== 0) {
+                // Include ' > ' before name except on top element.
+                $displaypath .= ' &gt; ';
             }
+            if (isset($map[$path])) {
+                $displaypath .= $map[$path];
+            } else {
+                // Should not happen if paths are correct!
+                $displaypath .= get_string('unknown', 'totara_reportbuilder');
+            }
+            $parentid = $path;
         }
 
         $displaypath = format_string($displaypath);
