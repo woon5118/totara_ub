@@ -115,7 +115,6 @@ abstract class rb_base_source {
     public $globalrestrictionparams = array();
 
     /**
-     * TODO - it would be nice to make this definable in the config or something.
      * @var string $uniqueseperator - A string unique enough to use as a separator for textareas
      */
     protected $uniquedelimiter = '^|:';
@@ -206,6 +205,7 @@ abstract class rb_base_source {
      * @return bool
      */
     public function is_ignored() {
+        // NOTE: override in source if required.
         return false;
     }
 
@@ -221,6 +221,7 @@ abstract class rb_base_source {
      */
     public function global_restrictions_supported() {
         // Null means not converted yet, override in sources with true or false.
+        // NOTE: always override in source.
         return null;
     }
 
@@ -1321,6 +1322,7 @@ abstract class rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
+        // NOTE: override in source if used.
         return array();
     }
 
@@ -1328,6 +1330,7 @@ abstract class rb_base_source {
      * @return array
      */
     protected function define_filteroptions() {
+        // NOTE: override in source if used.
         return array();
     }
 
@@ -1335,6 +1338,7 @@ abstract class rb_base_source {
      * @return array
      */
     protected function define_defaultcolumns() {
+        // NOTE: override in source if used.
         return array();
     }
 
@@ -1342,6 +1346,7 @@ abstract class rb_base_source {
      * @return array
      */
     protected function define_defaultfilters() {
+        // NOTE: override in source if used.
         return array();
     }
 
@@ -1349,6 +1354,7 @@ abstract class rb_base_source {
      * @return array
      */
     protected function define_contentoptions() {
+        // NOTE: override in source if used.
         return array();
     }
 
@@ -1356,6 +1362,7 @@ abstract class rb_base_source {
      * @return array
      */
     protected function define_paramoptions() {
+        // NOTE: override in source if used.
         return array();
     }
 
@@ -1363,6 +1370,7 @@ abstract class rb_base_source {
      * @return array
      */
     protected function define_requiredcolumns() {
+        // NOTE: override in source if used.
         return array();
     }
 
@@ -1375,6 +1383,7 @@ abstract class rb_base_source {
      * @param reportbuilder $report
      */
     public function post_params(reportbuilder $report) {
+        // NOTE: override in source if required.
     }
 
     /**
@@ -1392,6 +1401,7 @@ abstract class rb_base_source {
      * @param reportbuilder $report
      */
     public function post_config(reportbuilder $report) {
+        // NOTE: override in source if required.
     }
 
     /**
@@ -1400,6 +1410,7 @@ abstract class rb_base_source {
      * @return array(object)
      */
     public function get_required_jss() {
+        // NOTE: override in source if required.
         return array();
     }
 
@@ -1562,6 +1573,7 @@ abstract class rb_base_source {
      * @return mixed|null must be possible to cast to string[][]
      */
     public function get_custom_export_header(reportbuilder $report, $format) {
+        // NOTE: override in source if required.
         return null;
     }
 
