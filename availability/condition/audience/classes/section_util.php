@@ -74,26 +74,27 @@ class section_util
         }
 
         $data = json_decode($this->section->availability, true);
-        if (is_bool($data)) {
+        if (!$data || !isset($data['c'])) {
+            // No point to procceed if the $data does not have the condition
             return array();
         }
 
-        $finaldata = array();
-
-        $items = isset($data['c']) ? $data['c'] : array();
-
-        foreach ($items as $index => $item) {
-            if (!isset($item['type']) || !isset($item['cohort'])) {
-                continue;
+        $cohortids = array();
+        // Retrieving all the possible cohort id here, since there is a rule of the restriction
+        // set, might need to walk thrue it recursively.
+        array_walk_recursive($data['c'], function($value, $key) use (&$cohortids) {
+            if ($key == "cohort") {
+                $cohortids[] = $value;
             }
+        });
 
-            $cohort = $DB->get_record("cohort", [
-                'id' => (int)$item['cohort']
-            ], "id, name", MUST_EXIST);
-
-            $finaldata[] = $cohort;
+        $records = null;
+        if (!empty($cohortids)) {
+            list($insql, $params) = $DB->get_in_or_equal($cohortids, SQL_PARAMS_QM);
+            $sql = "SELECT id, name FROM {cohort} WHERE id {$insql}";
+            $records = $DB->get_records_sql($sql, $params);
         }
 
-        return $finaldata;
+        return $records ? array_values($records) :  array();
     }
 }

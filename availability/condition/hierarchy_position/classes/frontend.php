@@ -104,17 +104,18 @@ class frontend extends \core_availability\frontend {
         } else if (!empty($section->availability)) {
             // A fallback for section_info if cm_info is null
             $availability = json_decode($section->availability, true);
-            $position = new \position();
-            if (!is_bool($availability)) {
-                $items = isset($availability['c']) ? $availability['c'] : array();
-                foreach ($items as $item) {
-                    if (!isset($item['type']) || !isset($item['position'])) {
-                        continue;
+            if ($availability && !empty($availability['c'])) {
+                $position = new \position();
+                $positionids = array();
+                array_walk_recursive($availability['c'], function ($item, $key) use (&$positionids) {
+                    if ($key == 'position') {
+                        $positionids[] = (int) $item;
                     }
+                });
 
-                    /** @var \stdClass|bool $record */
-                    $record = $position->get_item((int)$item['position']);
-                    if (is_bool($record)) {
+                foreach ($positionids as $positionid) {
+                    $record = $position->get_item($positionid);
+                    if (!$record) {
                         continue;
                     }
 

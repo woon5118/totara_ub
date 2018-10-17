@@ -105,20 +105,20 @@ class frontend extends \core_availability\frontend {
         } else if (!empty($section->availability)) {
             // A fallback for section_info if cm_info is null
             $availability = json_decode($section->availability, true);
-            if (!is_bool($availability)) {
+            if ($availability && !empty($availability['c'])) {
                 $organisation = new \organisation();
-                $items = isset($availability['c']) ? $availability['c'] : array();
+                $organisationids = array();
+                array_walk_recursive($availability['c'], function($item, $key) use(&$organisationids) {
+                    if ($key == "organisation") {
+                        $organisationids[] = (int)$item;
+                    }
+                });
 
-                foreach ($items as $item) {
-                    if (!isset($item['type']) || !isset($item['organisation'])) {
+                foreach ($organisationids as $organisationid) {
+                    $record = $organisation->get_item($organisationid);
+                    if (!$record) {
                         continue;
                     }
-
-                    $record = $organisation->get_item((int) $item['organisation']);
-                    if (is_bool($record)) {
-                        continue;
-                    }
-
                     $single = new \stdClass();
                     $single->fullname = format_string($record->fullname);
                     $org_names[$record->id] = $single;
