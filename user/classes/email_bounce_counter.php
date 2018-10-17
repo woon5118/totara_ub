@@ -35,18 +35,24 @@ use stdClass;
  * Therefore, the system need to keep track the history of these preferences (temporally). Until the user confirm the
  * request, then these track records will be removed
  *
- * Class user_email_bounce
+ * @since Totara 11.8
+ *
  * @package core_user
  */
 final class email_bounce_counter {
-    /**
-     * @var stdClass
-     */
+    /** @var stdClass */
     private $user;
 
+    /** @var int|null */
+    private $backup_bounce_count = null;
+
+    /** @var int|null */
+    private $backup_send_count = null;
+
     /**
-     * user_email_preference constructor.
-     * @param stdClass $user        The target $user that is being updated
+     * Constructor.
+     *
+     * @param stdClass $user The target $user that is being updated
      */
     public function __construct(stdClass $user) {
         $this->user = $user;
@@ -56,132 +62,98 @@ final class email_bounce_counter {
     }
 
     /**
-     * The method only create the history of user's preference, only if there is any preference. If there is no such
-     * preference found for the user, then the method will not create any history track
+     * Fetch current count.
      *
-     * @param string $name
-     * @return void
+     * @param string $preference 'email_bounce_count' or 'email_send_count'
+     * @return int
      */
-    private function create_history_preference(string $name): void {
-        $currentvalue = get_user_preferences($name, null, $this->user->id);
-        // Using is_null($currentvalue) here, as !0 could evaluated as true and sometimes 0 is an actual intended value
-        // of the preference $name
-        if (is_null($currentvalue)) {
-            // There is no such preference, therefore, we should not create a history of the preference
-            return;
-        }
-
-        set_user_preference("old_{$name}", $currentvalue, $this->user->id);
+    private function get_count(string $preference) {
+        // NOTE: use the user id instead of user object to fetch the latest value.
+        return (int)get_user_preferences($preference, 0, $this->user->id);
     }
 
     /**
-     * Only restoring this history track of preference, if both preference and history track preference exists concurrently.
-     * However, if either preference or history track is missing, then the restore process would not restore anything.
+     * Call when email bounces back..
      *
-     * @param string $name
+     * @return void
      */
-    private function restore_preference(string $name): void {
-        $currentvalue = get_user_preferences($name, null, $this->user->id);
-        // Using is_null($currentvalue) here, as !0 could evaluated as true and sometimes 0 is an actual intended value
-        // of the preference $name
-        if (is_null($currentvalue)) {
-            // If there is no preference record found, then there is no point to proceed
-            debugging("There was no user's preference ($name)", DEBUG_DEVELOPER);
-            return;
-        }
-
-        $oldvalue = get_user_preferences("old_{$name}", null, $this->user->id);
-        // Using is_null($oldvalue) here, as !0 could evaluated as true and sometimes 0 is an actual intended value
-        // of the preference $name
-        if (is_null($oldvalue)) {
-            // If there is no old history preference, then there is no point to proceed
-            debugging("There was no user's old preference (old_{$name})", DEBUG_DEVELOPER);
-            return;
-        }
-
-        if ($currentvalue != $oldvalue) {
-            // Only updating when the current value is different than then old value. When it is different, restoring
-            // the old value to the preference
-            set_user_preference($name, $oldvalue, $this->user->id);
-        }
-
-        // After restore the preferences, it is quite important to clean up the old preference that is being used
-        // to track the history of current preference
-        $this->delete_old_preference($name);
+    public function increase_bounce_count(): void {
+        $count = $this->get_count('email_bounce_count');
+        set_user_preference('email_bounce_count', $count + 1, $this->user->id);
     }
 
     /**
-     * Deleting the history track of preference
+     * Call after every email that was sent.
      *
-     * @param string $name
      * @return void
      */
-    private function delete_old_preference(string $name): void {
-        unset_user_preference("old_{$name}", $this->user->id);
+    public function increase_send_count(): void {
+        $count = $this->get_count('email_send_count');
+        set_user_preference('email_send_count', $count + 1, $this->user->id);
     }
 
     /**
-     * A method to update the user's bounce/send count preference. As when user requests to change the email, these
-     * preferences need to be resetted so that an email is able to send out to user.
+     * A method to reset the user's bounce and send count preference.
      *
-     * @param bool      $track      Flag this field to record the history of user's email bounce/send count preference.
-     * @param bool      $reset      Flag this field to reset the email bounce/send count preference of a user
      * @return void
-     * @see useredit_update_bounces
      */
-    public function update_bounces(bool $track = true, bool $reset = true): void {
-        // Before updating the mail bounce and mail send, at this point, the system need to record the history of
-        // these values first, before it make any changes to the current preferences. Only create a history track
-        // if the the email actually changed.
-        if ($track) {
-            $this->create_history_preference("email_bounce_count");
-            $this->create_history_preference("email_send_count");
-        }
-
-        // Bundle setters here
-        $this->set_bounce_count($reset);
-        $this->set_send_count($reset);
+    public function reset_counts(): void {
+        // Bundle reset methods here.
+        $this->reset_bounce_count();
+        $this->reset_send_count();
     }
 
     /**
-     * @param bool $reset
+     * Reset email bounce count to 0. By default, it will keep on track the current value of bounce
+     * counter.
+     *
      * @return void
      */
-    public function set_bounce_count(bool $reset = false): void {
-        $this->set_preference("email_bounce_count", $reset);
+    public function reset_bounce_count(): void {
+        $this->backup_bounce_count = $this->get_count('email_bounce_count');
+        set_user_preference('email_bounce_count', 0, $this->user->id);
     }
 
     /**
-     * @param bool $reset
+     * Reset send email count to 0. By default, it will keep track on the current value of send
+     * counter
+     *
      * @return void
      */
-    public function set_send_count(bool $reset = false): void {
-        $this->set_preference("email_send_count", $reset);
-    }
-
-    /**
-     * @param string    $name       This is only either "email_bounce_count" or "email_send_count"
-     * @param bool      $reset
-     * @return void
-     */
-    private function set_preference(string $name, bool $reset = true): void {
-        if ($reset) {
-            // If it is a reset, make it zero anyway. Don't bother to find one
-            $newvalue = 0;
-        } else {
-            $value = get_user_preferences($name, 0, $this->user->id);
-            $newvalue = $value + 1;
-        }
-
-        set_user_preference($name, $newvalue, $this->user->id);
+    public function reset_send_count(): void {
+        $this->backup_send_count = $this->get_count('email_send_count');
+        set_user_preference('email_send_count', 0, $this->user->id);
     }
 
     /**
      * A bundle method of restoring the 'email_bounce_count' and 'email_send_count'
+     * in case we want to reset the email bounce/send counter of the user.
+     *
      * @return void
      */
     public function restore(): void {
-        $this->restore_preference("email_send_count");
-        $this->restore_preference("email_bounce_count");
+        if (isset($this->backup_bounce_count)) {
+            set_user_preference('email_bounce_count', $this->backup_bounce_count, $this->user->id);
+        }
+        if (isset($this->backup_send_count)) {
+            set_user_preference('email_send_count', $this->backup_send_count, $this->user->id);
+        }
+    }
+
+    /**
+     * Returning null if the backup value of email_bounce_count and email_send_count is not being set.
+     * Or the key is not appearing in the map. Otherwise, an integer of backup counter should be
+     * returned here.
+     *
+     * @param string $key
+     * @return int|null
+     */
+    public function get_backup_count_value(string $key): ?int {
+        $map = array(
+            'email_bounce_count' => $this->backup_bounce_count,
+            'email_send_count' => $this->backup_send_count
+        );
+
+        return (isset($map[$key])) ? (int)$map[$key] : null;
     }
 }

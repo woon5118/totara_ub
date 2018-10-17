@@ -31,7 +31,7 @@ use core_user\email_bounce_counter;
  */
 class core_user_email_bounce_counter_testcase extends advanced_testcase {
     /**
-     * Test suite of creating the history of user's email bounce/send when it is being updated
+     * Test suite of creating the history of user's email bounce/send when it is being updated.
      * @return void
      */
     public function test_create_history_preference(): void {
@@ -40,18 +40,11 @@ class core_user_email_bounce_counter_testcase extends advanced_testcase {
 
         $user = $this->getDataGenerator()->create_user();
         $emailbouncecounter = new email_bounce_counter($user);
-        $emailbouncecounter->set_bounce_count(true);
-        $emailbouncecounter->set_send_count(true);
-        $emailbouncecounter->update_bounces(true);
-
+        $emailbouncecounter->reset_counts();
         $preferences = ["email_bounce_count", "email_send_count"];
         foreach ($preferences as $prefname) {
-            $old = $DB->get_record("user_preferences", [
-                'name' => "old_{$prefname}",
-                'userid' => $user->id
-            ]);
-
-            $this->assertEquals(0, $old->value);
+            $backupvalue = $emailbouncecounter->get_backup_count_value($prefname);
+            $this->assertEquals(0, $backupvalue);
         }
     }
 
@@ -85,7 +78,7 @@ class core_user_email_bounce_counter_testcase extends advanced_testcase {
         }
 
         $emailcounter = new email_bounce_counter($user);
-        $emailcounter->update_bounces(true);
+        $emailcounter->reset_counts();
         foreach ($preferences as $prefname) {
             $snapshotvalue = $snapshots[$prefname];
             $value = get_user_preferences($prefname, 0, $user->id);

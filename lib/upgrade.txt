@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 12.0 ===
 
+* set_send_count() has been deprecated, please use \core_user\email_bounce_counter instead
+* set_bounce_count() has been deprecated, please use \core_user\email_bounce_counter instead
 * The user_not_fully_set_up() function has a new $strict parameter (defaulting to true) in order to decide when
   custom fields (and other checks) should be evaluated to determine if the user has been completely setup.
 * updated popover_region.mustache correcting role attribute
@@ -107,11 +109,6 @@ information provided here is intended especially for developers.
 * Added a lock to prevent 'coursemodinfo' cache to be built multiple times in parallel
 * PHPUnit's bootstrap has been changed to use HTTPS wwwroot (https://www.example.com/moodle) from previous HTTP version. Any
   existing test expecting the old HTTP URLs will need to be switched to the new HTTPS value (reference: MDL-54901).
-
-=== 11.8 ===
-
-* set_send_count() has been deprecated, please call \core_user\email_bounce_counter::set_send_count instead
-* set_bounce_count() has been deprecated, please call \core_user\email_bounce_counter::set_bounce_count instead
 
 === 11.0 ===
 

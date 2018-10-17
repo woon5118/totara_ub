@@ -195,6 +195,9 @@ if ($userform->is_cancelled()) {
 }
 
 if ($usernew = $userform->get_data()) {
+    // Totara: if the user is trying to abort the update process, the script still need to be run
+    // and process data changed.
+    ignore_user_abort(true);
 
     $emailchangedhtml = '';
 
@@ -247,12 +250,10 @@ if ($usernew = $userform->get_data()) {
         core_user::update_picture($usernew, $filemanageroptions);
     }
 
-    $emailbouncecounter = new core_user\email_bounce_counter($user);
+    $emailbouncecounter = new core_user\email_bounce_counter($usernew);
     // Update mail bounces.
     if ($emailchanged) {
-        // If it is a confirmation, start tracking the bounce/send counter
-        $tracking = (bool) $CFG->emailchangeconfirmation;
-        $emailbouncecounter->update_bounces($tracking);
+        $emailbouncecounter->reset_counts();
     }
 
     // Update forum track preference.
@@ -283,14 +284,17 @@ if ($usernew = $userform->get_data()) {
 
         // Email confirmation directly rather than using messaging so they will definitely get an email.
         $noreplyuser = core_user::get_noreply_user();
-        if (!$mailresults = email_to_user($tempuser, $noreplyuser, $emailupdatetitle, $emailupdatemessage)) {
-            // Restore counter here, even if the the email was failed to send
+        $mailresults = email_to_user($tempuser, $noreplyuser, $emailupdatetitle, $emailupdatemessage);
+        if ($CFG->emailchangeconfirmation) {
+            // Totara: after the email is sent to the user, the email bounce/send counter should be
+            // restored at this point if the config $emailchangeconfirmation is enabled. Which
+            // the user has to approve the change they made to fully reset the counter
             $emailbouncecounter->restore();
+
+        }
+        if (!$mailresults) {
             die("could not send email!");
         }
-
-        // After the email is sent to the user, the email bounce and email send count should be restore at this point
-        $emailbouncecounter->restore();
     }
 
     // Reload from db, we need new full name on this page if we do not redirect.

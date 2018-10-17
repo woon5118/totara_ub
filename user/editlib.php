@@ -204,21 +204,20 @@ function useredit_update_picture(stdClass $usernew, moodleform $userform, $filem
 /**
  * Updates the user email bounce + send counts when the user is edited.
  *
- * This function has been deprecated please call \core_user\email_bounce_counter::update_bounces instead
- * @see \core_user\email_bounce_counter::update_bounces
  * @param stdClass $user The current user object.
  * @param stdClass $usernew The updated user object.
- * @deprecated Since Totara 11.8
+ * @deprecated Since Totara 12
  */
 function useredit_update_bounces($user, $usernew) {
-    debugging("useredit_update_bounces() has been deprecated, please use \\core_user\\email_bounce_counter::update_bounces instead", DEBUG_DEVELOPER);
+    debugging("useredit_update_bounces() has been deprecated, please use \\core_user\\email_bounce_counter instead", DEBUG_DEVELOPER);
     if (!isset($usernew->email)) {
         // Locked field.
         return;
     }
     if (!isset($user->email) || $user->email !== $usernew->email) {
-        set_bounce_count($usernew, true);
-        set_send_count($usernew, true);
+        // Totara: the old code was explicitly stating to reset the counter here.
+        $emailbouncecounter = new \core_user\email_bounce_counter($user);
+        $emailbouncecounter->reset_counts();
     }
 }
 

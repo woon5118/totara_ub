@@ -3487,6 +3487,47 @@ function over_bounce_threshold($user) {
 }
 
 /**
+ * Used to increment or reset email sent count
+ *
+ * @param stdClass $user object containing an id
+ * @param bool $reset will reset the count to 0
+ * @return void
+ * @deprecated Since Totara 12
+ */
+function set_send_count($user, $reset=false) {
+    debugging("set_send_count() has been deprecated, please use \\core_user\\email_bounce_counter instead", DEBUG_DEVELOPER);
+    if (empty($user->id)) {
+        // No real (DB) user, nothing to do here.
+        return;
+    }
+
+    $emailbouncecounter = new core_user\email_bounce_counter($user);
+    if ($reset) {
+        $emailbouncecounter->reset_send_count();
+    } else {
+        $emailbouncecounter->increase_send_count();
+    }
+}
+
+/**
+ * Increment or reset user's email bounce count
+ *
+ * @param stdClass $user object containing an id
+ * @param bool $reset will reset the count to 0
+ * @deprecated Since Totara 12
+ */
+function set_bounce_count($user, $reset=false) {
+    debugging("set_bounce_count() has been deprecated, please use \\core_user\\email_bounce_counter instead", DEBUG_DEVELOPER);
+
+    $emailbouncecounter = new core_user\email_bounce_counter($user);
+    if ($reset) {
+        $emailbouncecounter->reset_bounce_count();
+    } else {
+        $emailbouncecounter->increase_bounce_count();
+    }
+}
+
+/**
  * Determines if the logged in user is currently moving an activity
  *
  * @param int $courseid The id of the course being tested
@@ -5772,7 +5813,7 @@ function moodle_process_email($modargs, $body) {
                 $md5check = substr(md5($user->email), 0, 16);
                 if ($md5check == substr($modargs, -16)) {
                     $emailbouncecounter = new \core_user\email_bounce_counter($user);
-                    $emailbouncecounter->set_bounce_count(false);
+                    $emailbouncecounter->increase_bounce_count();
                 }
                 // Else maybe they've already changed it?
             }
@@ -6335,7 +6376,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
 
     if ($mail->send()) {
         $emailbouncecounter = new \core_user\email_bounce_counter($user);
-        $emailbouncecounter->set_send_count(false);
+        $emailbouncecounter->increase_send_count();
         if (!empty($mail->SMTPDebug)) {
             echo '</pre>';
         }

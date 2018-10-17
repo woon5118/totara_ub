@@ -276,7 +276,10 @@ if ($usernew = $userform->get_data()) {
     }
 
     // Update mail bounces.
-    useredit_update_bounces($user, $usernew);
+    if (!$iscreating && isset($usernew->email) && $user->email !== $usernew->email) {
+        $emailbouncecounter = new \core_user\email_bounce_counter($usernew);
+        $emailbouncecounter->reset_counts();
+    }
 
     // Update forum track preference.
     useredit_update_trackforums($user, $usernew);
