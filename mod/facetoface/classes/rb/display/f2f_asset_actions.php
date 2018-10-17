@@ -55,7 +55,7 @@ class f2f_asset_actions extends base {
         $output = array();
 
         $output[] = $OUTPUT->action_icon(
-            new \moodle_url('/mod/facetoface/asset.php', array('assetid' => $value)),
+            new \moodle_url('/mod/facetoface/reports/assets.php', array('assetid' => $value)),
             new \pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
         );
 
@@ -65,13 +65,13 @@ class f2f_asset_actions extends base {
         );
 
         if ($extrafields->hidden && $report->src->get_embeddedurl()) {
-            $params = array_merge($report->src->get_urlparams(), array('show' => $value, 'sesskey' => sesskey()));
+            $params = array_merge($report->src->get_urlparams(), array('action' => 'show', 'id' => $value, 'sesskey' => sesskey()));
             $output[] = $OUTPUT->action_icon(
                 new \moodle_url($report->src->get_embeddedurl(), $params),
                 new \pix_icon('t/show', get_string('assetshow', 'mod_facetoface'))
             );
         } else if ($report->src->get_embeddedurl()) {
-            $params = array_merge($report->src->get_urlparams(), array('hide' => $value, 'sesskey' => sesskey()));
+            $params = array_merge($report->src->get_urlparams(), array('action' => 'hide', 'id' => $value, 'sesskey' => sesskey()));
             $output[] = $OUTPUT->action_icon(
                 new \moodle_url($report->src->get_embeddedurl(), $params),
                 new \pix_icon('t/hide', get_string('assethide', 'mod_facetoface'))
@@ -82,7 +82,7 @@ class f2f_asset_actions extends base {
             $output[] = $OUTPUT->pix_icon('t/delete_gray', get_string('currentlyassigned', 'mod_facetoface'), 'moodle', array('class' => 'disabled iconsmall'));
         } else {
             $output[] = $OUTPUT->action_icon(
-                new \moodle_url('/mod/facetoface/asset/manage.php', array('delete' => $value)),
+                new \moodle_url('/mod/facetoface/asset/manage.php', array('action' => 'delete', 'id' => $value)),
                 new \pix_icon('t/delete', get_string('delete'))
             );
         }

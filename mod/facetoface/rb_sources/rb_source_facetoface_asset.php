@@ -220,7 +220,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
         $output = array();
 
         $output[] = $OUTPUT->action_icon(
-            new moodle_url('/mod/facetoface/asset.php', array('assetid' => $assetid)),
+            new moodle_url('/mod/facetoface/reports/assets.php', array('assetid' => $assetid)),
             new pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
         );
 
@@ -230,13 +230,13 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
         );
 
         if ($row->hidden && $this->embeddedurl) {
-            $params = array_merge($this->urlparams, array('show' => $assetid, 'sesskey' => sesskey()));
+            $params = array_merge($this->urlparams, ['action' => 'show', 'id' => $assetid, 'sesskey' => sesskey()]);
             $output[] = $OUTPUT->action_icon(
                 new moodle_url($this->embeddedurl, $params),
                 new pix_icon('t/show', get_string('assetshow', 'mod_facetoface'))
             );
         } else if ($this->embeddedurl) {
-            $params = array_merge($this->urlparams, array('hide' => $assetid, 'sesskey' => sesskey()));
+            $params = array_merge($this->urlparams, ['action' => 'hide', 'id' => $assetid, 'sesskey' => sesskey()]);
             $output[] = $OUTPUT->action_icon(
                 new moodle_url($this->embeddedurl, $params),
                 new pix_icon('t/hide', get_string('assethide', 'mod_facetoface'))
@@ -247,7 +247,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
             $output[] = $OUTPUT->pix_icon('t/delete_gray', get_string('currentlyassigned', 'mod_facetoface'), 'moodle', array('class' => 'disabled iconsmall'));
         } else {
             $output[] = $OUTPUT->action_icon(
-                new moodle_url('/mod/facetoface/asset/manage.php', array('delete' => $assetid)),
+                new moodle_url('/mod/facetoface/asset/manage.php', ['action' => 'delete', 'id' => $assetid]),
                 new pix_icon('t/delete', get_string('delete'))
             );
         }

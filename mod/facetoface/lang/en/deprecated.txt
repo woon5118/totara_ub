@@ -86,3 +86,6 @@ availablesignupnote,mod_facetoface
 availablesignupnote_help,mod_facetoface
 missingdefaultnotifications,mod_facetoface
 missingdefaultsfix,mod_facetoface
+error:couldnotaddsession,mod_facetoface
+error:couldnotupdatesession,mod_facetoface
+status_session_cancelled,mod_facetoface

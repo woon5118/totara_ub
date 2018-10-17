@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod_facetoface
 Feature: Users can enrol on courses that have autosignup enabled and get signed for appropriate sessions
   In order to participate in courses with seminars
   As a user
@@ -99,7 +99,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I am on "Course 1" course homepage
     And I follow "Course 1"
     And I click on "Join waitlist" "link_or_button"
-    And I click on "Sign-up" "link_or_button"
+    And I click on "Join waitlist" "link_or_button"
     Then I should see "Your request was accepted"
     And I should see "Wait-listed"
 

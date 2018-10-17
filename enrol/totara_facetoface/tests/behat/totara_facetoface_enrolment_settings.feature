@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod_facetoface
 Feature: Admin can change default Seminar direct enrolment plugin settings
   In order to change Seminar direct enrolment settings
   As a admin

@@ -80,16 +80,16 @@ Feature: Seminar event cancellation status
 #    Users requesting approval
     Given I log in as "learner1"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I press "Request approval"
     And I log out
 
     Given I log in as "learner2"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I press "Request approval"
     And I log out
@@ -97,8 +97,8 @@ Feature: Seminar event cancellation status
 #   Learner Five requesting approval and immediately withdrawing his pending request
     Given I log in as "learner5"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I press "Request approval"
     And I should see "Your request was sent to your manager for approval."
@@ -107,7 +107,7 @@ Feature: Seminar event cancellation status
     And I should see "Withdraw pending request"
     And I click on "Withdraw pending request" "link"
     And I press "Confirm"
-    And I should see "Sign-up"
+    And I should see "Request approval"
     And I log out
 
 #   Manager adding Learners 3 and 4 as attendees, approving Learner 1 and declining request for Learner 2
@@ -150,6 +150,7 @@ Feature: Seminar event cancellation status
     When I follow "Cancellations"
     Then I should see "Learner Five" in the ".cancellations" "css_element"
     And I should not see "Learner Two" in the ".cancellations" "css_element"
+    And I run all adhoc tasks
     And I log out
 
 #  Checking status as learners
@@ -198,6 +199,7 @@ Feature: Seminar event cancellation status
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     When I click on "Attendees" "link" in the "3 / 10" "table_row"
+    And I click on "Cancellations" "link"
     Then I should see "Event cancellation" in the "Learner One" "table_row"
     And I should see "Event cancellation" in the "Learner Three" "table_row"
     And I should see "Event cancellation" in the "Learner Four" "table_row"
@@ -264,6 +266,7 @@ Feature: Seminar event cancellation status
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     When I click on "Attendees" "link"
+    And I click on "Cancellations" "link"
     Then I should see "Event cancellation" in the "Learner One" "table_row"
     And I should see "Event cancellation" in the "Learner Three" "table_row"
     And I should see "User cancellation" in the "Learner Five" "table_row"

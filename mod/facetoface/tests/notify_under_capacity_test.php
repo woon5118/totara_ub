@@ -109,10 +109,9 @@ class mod_facetoface_notify_under_capacity_test extends advanced_testcase {
             job_assignment::create($data);
         }
 
-        $discountcode = 'disc1';
-        $notificationtype = 1;
-        $statuscode = MDL_F2F_STATUS_APPROVED;
-        facetoface_user_signup($session, $f2f, $course, $discountcode, $notificationtype, $statuscode, $user->id);
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
+        \mod_facetoface\signup_helper::signup($signup);
     }
 
     /**

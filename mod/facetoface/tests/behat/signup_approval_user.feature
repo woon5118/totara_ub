@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript
+@javascript @mod @mod_facetoface @totara
 Feature: Seminar Signup User Approval
   In order to signup to seminar
   As a learner
@@ -31,7 +31,6 @@ Feature: Seminar Signup User Approval
       | Name              | Seminar 9360     |
       | approvaloptions   | approval_manager |
 
-  @javascript
   Scenario: Student gets approved through manager approval by "learner" role
     And I am on "Course 9360" course homepage
     And I follow "Seminar 9360"
@@ -41,11 +40,12 @@ Feature: Seminar Signup User Approval
 
     And I log in as "student1"
     And I am on "Course 9360" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I press "Request approval"
-    And I should see "Your request was sent to your manager for approval"
+    And I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
     And I log out
 
     And I log in as "student2"
@@ -59,7 +59,3 @@ Feature: Seminar Signup User Approval
     Then I should not see "Sam1 Student1"
     And I should see "Attendance requests updated"
     And I should see "No pending approvals"
-
-
-
-

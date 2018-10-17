@@ -87,9 +87,9 @@ Feature: Test room conflicts through backup/restore
 
     When I click on "Duplicate" "link" in the "Facetoface TL12734" activity
     And I turn editing mode off
-    Then "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3]/span[contains(text(), 'Room 1')]" "xpath_element" should exist
-    And "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3]/span[contains(text(), 'Room 2')]" "xpath_element" should exist
+    Then "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3][contains(text(), 'Room 1')]" "xpath_element" should exist
+    And "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3][contains(text(), 'Room 2')]" "xpath_element" should exist
     # The room with prevent conflict should not appear.
-    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3]/span[contains(text(), 'Room 1')]" "xpath_element" should not exist
-    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3]/span[contains(text(), 'Room 2')]" "xpath_element" should exist
+    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3][contains(text(), 'Room 1')]" "xpath_element" should not exist
+    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3][contains(text(), 'Room 2')]" "xpath_element" should exist
 

@@ -78,7 +78,8 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $cancellationexp = text_to_html(get_string('setting:defaultcancellationinstrmngrdefault', 'facetoface') . "test");
         $this->assertEquals($cancellationexp, $cancellation);
 
-        $rolerequest = $DB->get_field('facetoface_notification', 'managerprefix', array('title' => 'Test title 4'));
+        $rolerequest = $DB->get_field_select('facetoface_notification', 'managerprefix',
+            $DB->sql_compare_text('title') . ' = :title', array('title' => 'Test title 4'));
         $rolerequestexp = text_to_html("test" . get_string('setting:defaultrolerequestinstrmngrdefault', 'facetoface'));
         $this->assertEquals($rolerequestexp, $rolerequest);
 
@@ -87,7 +88,8 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $reminderexp = text_to_html(get_string('setting:defaultreminderinstrmngrdefault_v92', 'facetoface'));
         $this->assertEquals($reminderexp, $reminder);
 
-        $request = $DB->get_field('facetoface_notification', 'managerprefix', array('title' => 'Test title 3'));
+        $request = $DB->get_field_select('facetoface_notification', 'managerprefix',
+            $DB->sql_compare_text('title') . ' = :title', array('title' => 'Test title 3'));
         $requestexp = text_to_html(get_string('setting:defaultrequestinstrmngrdefault_v92', 'facetoface'));
         $this->assertEquals($requestexp, $request);
     }
@@ -123,8 +125,8 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $sid = $facetofacegenerator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
 
         // We still need to add the calendar entries.
-        $session = facetoface_get_session($sid);
-        facetoface_update_calendar_entries($session);
+        $seminarevent = new \mod_facetoface\seminar_event($sid);
+        \mod_facetoface\calendar::update_entries($seminarevent);
 
         $events = $DB->get_records('event', array('modulename' => 'facetoface', 'eventtype' => 'facetofacesession', 'courseid' => $course->id),
             'timestart');

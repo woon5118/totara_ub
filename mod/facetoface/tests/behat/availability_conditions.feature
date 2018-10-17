@@ -33,7 +33,6 @@ Feature: Seminar availability based on activity completion
     And I set the following fields to these values:
       | Name             | Test seminar 1 |
       | Description      | Test seminar 1 |
-      | Manager Approval | 0              |
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And "Add restriction..." "dialogue" should be visible

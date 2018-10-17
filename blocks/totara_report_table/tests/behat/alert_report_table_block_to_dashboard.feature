@@ -85,6 +85,8 @@ Feature: Only Alerts Report table block on dashboard
     Then I should see "Admin User"
     Then I should see "Sam1 Student1"
     Then I should see "Bob2 Student2"
+
+    And I run all adhoc tasks
     And I log out
 
   Scenario: Add only the Alerts report table block to the dashboard

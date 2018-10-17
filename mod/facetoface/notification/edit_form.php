@@ -126,11 +126,9 @@ class mod_facetoface_notification_form extends moodleform {
         }
 
         // Display message content settings.
-        $mform->addElement('text', 'title', get_string('title', 'facetoface'), array('size' => 50));
+        $mform->addElement('text', 'title', get_string('title', 'facetoface'));
         $mform->addRule('title', null, 'required', null, 'client');
         $mform->setType('title', PARAM_TEXT);
-        // The title is limited to 255 chars. We copy what forum post subject does and add client side validation.
-        $mform->addRule('title', get_string('error:notificationtitletoolong', 'mod_facetoface'), 'maxlength', 255, 'client');
 
         $mform->addElement('editor', 'body_editor', get_string('body', 'facetoface'));
         $mform->addHelpButton('body_editor', 'body', 'facetoface');
@@ -174,11 +172,6 @@ class mod_facetoface_notification_form extends moodleform {
      */
     function validation($data, $files) {
         $errors = parent::validation($data, $files);
-
-        // Title is limited to 255 chars, there is client side validation and this is the server side validation.
-        if (!isset($errors['title']) && core_text::strlen($data['title']) > 255) {
-            $errors['title'] = get_string('error:notificationtitletoolong', 'mod_facetoface');
-        }
 
         $mform =& $this->_form;
 

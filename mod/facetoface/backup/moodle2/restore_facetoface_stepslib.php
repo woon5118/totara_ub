@@ -319,23 +319,20 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         }
 
         // Ok, we are on the same site, let's see if the room still exists and use it if there are no conflicts.
-        $room = $DB->get_record('facetoface_room', array('id' => $oldid));
-        if (!$room) {
-            $this->log('original seminar room not found', backup::LOG_WARNING);
-            return;
-        }
-        if ($room->custom != 0) {
+        $room = new \mod_facetoface\room($oldid);
+        if ($room->get_custom()) {
             // This should not ever happen, somebody hacked DB or backup file.
             return;
         }
-        if ($room->allowconflicts == 0) {
-            if (!facetoface_is_room_available($sessiondate->timestart, $sessiondate->timefinish, $room, $sessiondate->sessionid, $facetofaceid)) {
+        if (!$room->get_allowconflicts()) {
+            $seminarevent = new \mod_facetoface\seminar_event($sessiondate->sessionid);
+            if (!$room->is_available($sessiondate->timestart, $sessiondate->timefinish, $seminarevent)) {
                 $this->log('seminar room not available', backup::LOG_WARNING);
                 return;
             }
         }
         // It should be fine to add the room to the session.
-        $DB->set_field('facetoface_sessions_dates', 'roomid', $room->id, array('id' => $sessionsdateid));
+        $DB->set_field('facetoface_sessions_dates', 'roomid', $room->get_id(), array('id' => $sessionsdateid));
     }
 
     protected function process_facetoface_room_custom_field($data) {
@@ -414,23 +411,20 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         }
 
         // Ok, we are on the same site, let's see if the asset still exists and use it if there are no conflicts.
-        $asset = $DB->get_record('facetoface_asset', array('id' => $oldid));
-        if (!$asset) {
-            $this->log('original seminar asset not found', backup::LOG_WARNING);
-            return;
-        }
-        if ($asset->custom != 0) {
+        $asset = new \mod_facetoface\asset($oldid);
+        if (!$asset->get_custom()) {
             // This should not ever happen, somebody hacked DB or backup file.
             return;
         }
-        if ($asset->allowconflicts == 0) {
-            if (!facetoface_is_asset_available($sessiondate->timestart, $sessiondate->timefinish, $asset, $sessiondate->sessionid, $facetofaceid)) {
+        if (!$asset->get_allowconflicts()) {
+            $seminarevent = new \mod_facetoface\seminar_event($sessiondate->sessionid);
+            if (!$asset->is_available($sessiondate->timestart, $sessiondate->timefinish, $seminarevent)) {
                 $this->log('seminar asset not available', backup::LOG_WARNING);
                 return;
             }
         }
         // It should be fine to add the asset to the session.
-        $DB->insert_record('facetoface_asset_dates', (object)array('assetid' => $asset->id, 'sessionsdateid' => $sessionsdateid));
+        $DB->insert_record('facetoface_asset_dates', (object)array('assetid' => $asset->get_id(), 'sessionsdateid' => $sessionsdateid));
     }
 
     protected function process_facetoface_asset_custom_field($data) {

@@ -161,7 +161,6 @@ Feature: Suspend user in different session times
     And I should see "Sam2 Student2"
 
     And I click on "Go back" "link"
-
     When I click on "Attendees" "link" in the "Event over" "table_row"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"

@@ -86,7 +86,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     if (tab.length > 0) {
                         //remove the nolink class if present and set up the link attributes
                         tab.parent('a').removeClass('nolink');
-                        tab.parent('a').attr("href", M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&action=approvalrequired');
+                        tab.parent('a').attr("href", M.cfg.wwwroot + '/mod/facetoface/attendees/approvalrequired.php?s=' + M.totara_f2f_attendees.config.sessionid);
                         tab.parent('a').attr("title", M.util.get_string('approvalreqd','facetoface'));
                     }
                 }
@@ -116,7 +116,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     buttons: buttonsObj,
                     title: '<h2>' + M.util.get_string('bulkaddattendeesresults', 'facetoface') + '</h2>'
                 },
-                M.cfg.wwwroot + '/mod/facetoface/attendees/bulkadd_results.php?s=' + M.totara_f2f_attendees.config.sessionid,
+                M.cfg.wwwroot + '/mod/facetoface/attendees/ajax/bulk_add.php?s=' + M.totara_f2f_attendees.config.sessionid,
                 handler
                 );
         })();
@@ -145,13 +145,21 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             }
         }
 
-        // Print notice of operation (boolean: true =>success false=>failure).
-        function print_notice(success) {
+        /**
+         * Print notice of operation
+         * @param bool success true =>success false=>failure
+         * @param string Optional HTML content of the result
+         */
+        function print_notice(success, content) {
             var notice = M.util.get_string('updateattendeessuccessful','facetoface');
             var classname = 'notifysuccess';
             if (!success) {
                 notice = M.util.get_string('updateattendeesunsuccessful','facetoface');
                 classname = 'notifyproblem';
+            }
+            if (content) {
+                $('div#noticeupdate').removeClass('hide').html(notice + content);
+                return;
             }
             $('div#noticeupdate').removeClass('hide').addClass(classname).text(notice);
         }
@@ -372,16 +380,16 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
 
             switch (current) {
                 case "add":
-                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/add.php?s=' + M.totara_f2f_attendees.config.sessionid;
+                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/list/add.php?s=' + M.totara_f2f_attendees.config.sessionid;
                     break;
                 case "bulkaddfile":
-                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/addfile.php?s=' + M.totara_f2f_attendees.config.sessionid;
+                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/list/addfile.php?s=' + M.totara_f2f_attendees.config.sessionid;
                     break;
                 case "bulkaddinput":
-                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/addlist.php?s=' + M.totara_f2f_attendees.config.sessionid;
+                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/list/addlist.php?s=' + M.totara_f2f_attendees.config.sessionid;
                     break;
                 case "remove":
-                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/remove.php?s=' + M.totara_f2f_attendees.config.sessionid;
+                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/list/remove.php?s=' + M.totara_f2f_attendees.config.sessionid;
                     break;
             }
 
@@ -430,7 +438,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
 
             // If exporting, redirect to that url
             if (current.substr(0, 6) == "export") {
-                var url = M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&action=' + M.totara_f2f_attendees.config.action + '&download=';
+                var page = M.totara_f2f_attendees.config.action + '.php';
+                var url = M.cfg.wwwroot + '/mod/facetoface/attendees/' + page + '?s=' + M.totara_f2f_attendees.config.sessionid + '&download=';
                 url += current.substr(6);
                 url += '&onlycontent=1';
                 window.location.href = url;
@@ -454,7 +463,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             }
 
             function do_post() {
-                Y.io(M.cfg.wwwroot + '/mod/facetoface/updatewaitlist.php', {
+                Y.io(M.cfg.wwwroot + '/mod/facetoface/attendees/ajax/update_waitlist.php', {
                     data: {
                         courseid: M.totara_f2f_attendees.config.courseid,
                         sessionid: M.totara_f2f_attendees.config.sessionid,
@@ -505,6 +514,9 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                                 });
 
                                 print_notice(true);
+                            }
+                            if (parsedResponse.result == 'failure') {
+                                print_notice(false, parsedResponse.content);
                             }
                         },
                         failure: function () {

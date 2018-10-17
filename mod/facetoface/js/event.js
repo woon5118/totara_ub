@@ -188,7 +188,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     buttons: buttonsObj,
                     title: '<h2>'+ M.util.get_string('bookingconflict', 'facetoface') +'</h2>',
                 },
-                M.cfg.wwwroot + '/mod/facetoface/attendees/booking_conflict_results.php?datetimestart=' + datetimestart +
+                M.cfg.wwwroot + '/mod/facetoface/attendees/ajax/booking_conflict.php?datetimestart=' + datetimestart +
                 '&datetimefinish=' + datetimefinish +
                 '&s=' + M.totara_f2f_room.config.sessionid +
                 '&sesskey=' + M.cfg.sesskey,

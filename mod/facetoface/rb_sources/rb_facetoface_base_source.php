@@ -216,7 +216,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 'session',
                 'currentuserstatus',
                 get_string('userstatus', 'rb_source_facetoface_events'),
-                "CASE WHEN currentuserstatus.statuscode > 0 THEN currentuserstatus.statuscode ELSE '" . MDL_F2F_STATUS_NOT_SET . "' END",
+                "CASE WHEN currentuserstatus.statuscode > 0 THEN currentuserstatus.statuscode ELSE '" . \mod_facetoface\signup\state\not_set::get_code() . "' END",
                 array(
                     'joins' => array('currentuserstatus'),
                     'displayfunc' => 'signup_status',
@@ -268,7 +268,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 {$global_restriction_join_su}
                 JOIN {facetoface_signups_status} ss
                     ON su.id = ss.signupid
-                WHERE ss.superceded=0 AND ss.statuscode >= " . MDL_F2F_STATUS_APPROVED ."
+                WHERE ss.superceded=0 AND ss.statuscode >= " . \mod_facetoface\signup\state\waitlisted::get_code() ."
                 GROUP BY su.sessionid)",
             "attendees.sessionid = {$sessiondatejoin}.sessionid",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
@@ -421,7 +421,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      */
     public function add_session_status_to_columns(&$columnoptions, $joindates = 'base', $joinsessions = 'sessions') {
         $now = time();
-            // TODO: TL-8187 Cancellation status ("Face-to-face cancellations" specification).
         $columnoptions[] = new rb_column_option(
             'session',
             'overallstatus',
@@ -483,7 +482,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 FROM {facetoface_sessions} s
                 LEFT JOIN {facetoface_signups} su ON (su.sessionid = s.id)
                 LEFT JOIN {facetoface_signups_status} ss
-                    ON (su.id = ss.signupid AND ss.superceded = 0 AND ss.statuscode >= " . MDL_F2F_STATUS_BOOKED . ")
+                    ON (su.id = ss.signupid AND ss.superceded = 0 AND ss.statuscode >= " . \mod_facetoface\signup\state\booked::get_code() . ")
                 WHERE 1=1
                 GROUP BY s.id)",
 
@@ -622,7 +621,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         }
 
         return html_writer::link(
-            new moodle_url('/mod/facetoface/room.php', array('roomid' => $row->roomid)),
+            new moodle_url('/mod/facetoface/reports/rooms.php', array('roomid' => $row->roomid)),
             $roomname
         );
     }
@@ -644,7 +643,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             return '';
         }
         return html_writer::link(
-            new moodle_url('/mod/facetoface/asset.php', array('assetid' => $row->assetid)),
+            new moodle_url('/mod/facetoface/reports/assets.php', array('assetid' => $row->assetid)),
             $assetname
         );
     }
@@ -695,7 +694,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         $viewattendees = get_string('viewattendees', 'mod_facetoface');
 
         $description = html_writer::span($viewattendees, 'sr-only');
-        return html_writer::link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $row->session)), $cntattendees . $description, array('title' => $viewattendees));
+        return html_writer::link(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $row->session)), $cntattendees . $description, array('title' => $viewattendees));
 
     }
 
@@ -718,10 +717,13 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * @return array
      */
     protected static function get_currentuserstatus_options() {
-        global $MDL_F2F_STATUS;
 
         $statusopts = array();
-        foreach($MDL_F2F_STATUS as $status => $name) {
+        $states = \mod_facetoface\signup\state\state::get_all_states();
+        foreach($states as $state) {
+            $status = $state::get_code();
+            $class = explode('\\', $state);
+            $name = end($class);
             $statusopts[$status] =  get_string('userstatus:' . $name, 'rb_source_facetoface_events');
         }
 

@@ -247,10 +247,9 @@ class core_calendar_calendar_information_testcase extends advanced_testcase {
         $this->facetoface_generator->add_session(array('facetoface' => $facetoface6->id, 'sessiondates' => array($sessiondate)));
 
         // We still need to add the calendar entries.
-        $sessions = $DB->get_records('facetoface_sessions');
-        foreach ($sessions as $s) {
-            $session = facetoface_get_session($s->id);
-            facetoface_update_calendar_entries($session);
+        $seminarevents = \mod_facetoface\seminar_event_list::get_all();
+        foreach ($seminarevents as $seminarevent) {
+            \mod_facetoface\calendar::update_entries($seminarevent);
         }
     }
 
@@ -275,10 +274,9 @@ class core_calendar_calendar_information_testcase extends advanced_testcase {
         }
 
         // We still need to add the calendar entries.
-        $sessions = $DB->get_records('facetoface_sessions');
-        foreach ($sessions as $s) {
-            $session = facetoface_get_session($s->id);
-            facetoface_update_calendar_entries($session);
+        $seminarevents = \mod_facetoface\seminar_event_list::get_all();
+        foreach ($seminarevents as $seminarevent) {
+            \mod_facetoface\calendar::update_entries($seminarevent);
         }
     }
 

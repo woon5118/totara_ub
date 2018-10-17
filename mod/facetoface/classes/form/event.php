@@ -27,6 +27,11 @@
 namespace mod_facetoface\form;
 
 global $CFG;
+
+use core\command\exception;
+use mod_facetoface\seminar_event;
+use mod_facetoface\signup_helper;
+
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
@@ -542,7 +547,7 @@ class event extends \moodleform {
             }
             $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
             // Check if default role approval is selected.
-            if ($facetoface->approvaltype == APPROVAL_ROLE && !in_array($facetoface->approvalrole, $selectedroleids)) {
+            if ($facetoface->approvaltype == \mod_facetoface\seminar::APPROVAL_ROLE && !in_array($facetoface->approvalrole, $selectedroleids)) {
                 $rolenames = role_get_names($this->context);
                 $errors['roleapprovalerror'] = get_string('error:rolerequired', 'facetoface', $rolenames[$facetoface->approvalrole]->localname);
             }
@@ -668,13 +673,6 @@ class event extends \moodleform {
             $sessiondata->cntdates = $cntdates;
             $nbdays = 1;
         } else {
-            if (!empty($session->sessiondates[0]->sessiontimezone) and $session->sessiondates[0]->sessiontimezone != '99') {
-                $defaulttimezone = \core_date::normalise_timezone($session->sessiondates[0]->sessiontimezone);
-            }
-
-            $editoroptions = $TEXTAREA_OPTIONS;
-            $editoroptions['context'] = $context;
-
             // Load custom fields data for the session.
             customfield_load_data($session, 'facetofacesession', 'facetoface_session');
 
@@ -683,9 +681,13 @@ class event extends \moodleform {
             if (isset($sessiondata->sessiondates)) {
                 unset($sessiondata->sessiondates);
             }
+
+            $editoroptions = $TEXTAREA_OPTIONS;
+            $editoroptions['context'] = $context;
             $sessiondata->detailsformat = FORMAT_HTML;
             $sessiondata = file_prepare_standard_editor($sessiondata, 'details', $editoroptions, $editoroptions['context'],
                 'mod_facetoface', 'session', $session->id);
+
             // Let form know how many dates to process.
             if ($cntdates > $sessiondata->cntdates) {
                 $sessiondata->cntdates = $cntdates;
@@ -874,63 +876,59 @@ class event extends \moodleform {
             $todb->id  = $session->id;
             $sessionid = $session->id;
             $olddates  = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
-            if (!facetoface_update_session($todb, $sessiondates)) {
-                print_error('error:couldnotupdatesession', 'facetoface', $this->returnurl);
-            }
         } else {
             // Create or Duplicate the session.
-            if (!$sessionid = facetoface_add_session($todb, $sessiondates)) {
-                print_error('error:couldnotaddsession', 'facetoface', $this->returnurl);
-            }
+            $sessionid = 0;
+        }
+        try {
+            $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+            $seminarevent->from_record($todb);
+            $seminarevent->save();
+            facetoface_save_dates($seminarevent->to_record(), $sessiondates);
+        } catch (exception $e) {
+            print_error('error:couldnotsaveevent', 'facetoface', $this->returnurl);
         }
 
-        $fromform->id = $sessionid;
+        $fromform->id = $seminarevent->get_id();
         customfield_save_data($fromform, 'facetofacesession', 'facetoface_session');
 
         $transaction->allow_commit();
 
-        // Retrieve record that was just inserted/updated.
-        if (!$session = facetoface_get_session($sessionid)) {
-            print_error('error:couldnotfindsession', 'facetoface', $this->returnurl);
-        }
-
         if ($update) {
             // Now that we have updated the session record fetch the rest of the data we need.
-            facetoface_update_attendees($session);
+            signup_helper::update_attendees($seminarevent);
         }
 
-        // Set session dates.
-         $session->sessiondates = $sessiondates;
-
+        // Retrieve record that was just inserted/updated.
+        if (!$session = facetoface_get_session($seminarevent->get_id())) {
+            print_error('error:couldnotfindsession', 'facetoface', $this->returnurl);
+        }
         // Get details.
         // This should be done before sending any notification as it could be a required field in their template.
-        $data = file_postupdate_standard_editor($fromform, 'details', $this->editoroptions, $this->context, 'mod_facetoface', 'session', $session->id);
+        $data = file_postupdate_standard_editor($fromform, 'details', $this->editoroptions, $this->context, 'mod_facetoface', 'session', $seminarevent->get_id());
         $session->details = $data->details;
-        $DB->set_field('facetoface_sessions', 'details', $data->details, array('id' => $session->id));
+        $DB->set_field('facetoface_sessions', 'details', $data->details, array('id' => $seminarevent->get_id()));
 
         // Save trainer roles.
         if (isset($fromform->trainerrole)) {
             facetoface_update_trainers($facetoface, $session, $fromform->trainerrole);
         }
 
-        // Save any calendar entries.
-        facetoface_update_calendar_entries($session, $facetoface);
+        \mod_facetoface\calendar::update_entries($seminarevent);
 
         if ($update) {
             // Send any necessary datetime change notifications but only if date/time is known.
             if (!empty($sessiondates) && facetoface_session_dates_check($olddates, $sessiondates)) {
                 $attendees = facetoface_get_attendees($session->id);
                 foreach ($attendees as $user) {
-                    // Checking sign-up status here to determine whether to include iCal attachment or not.
-                    $invite = $user->statuscode != MDL_F2F_STATUS_WAITLISTED;
-
-                    facetoface_send_datetime_change_notice($facetoface, $session, $user->id, $olddates, $invite);
+                    $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
+                    \mod_facetoface\notice_sender::signup_datetime_changed($signup, $olddates);
                 }
                 $sessiontrainers = facetoface_get_trainers($session->id);
                 if (!empty($sessiontrainers)) {
                     foreach ($sessiontrainers as $roleid => $trainers) {
                         foreach ($trainers as $trainer) {
-                            facetoface_send_datetime_change_notice($facetoface, $session, $trainer->id, $olddates);
+                            \mod_facetoface\notice_sender::event_datetime_changed($trainer->id, $seminarevent, $olddates);
                         }
                     }
                 }

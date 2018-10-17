@@ -77,7 +77,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 {$global_restriction_join_su}
                 JOIN {facetoface_signups_status} ss
                     ON su.id = ss.signupid
-                WHERE ss.superceded=0 AND ss.statuscode >= " . MDL_F2F_STATUS_APPROVED ."
+                WHERE ss.superceded=0 AND ss.statuscode >= " . \mod_facetoface\signup\state\waitlisted::get_code() ."
                 GROUP BY su.sessionid)",
             "attendees.sessionid = base.id",
             REPORT_BUILDER_RELATION_ONE_TO_ONE
@@ -134,7 +134,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'totalnumattendees',
                 get_string('totalnumattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode >= ' . MDL_F2F_STATUS_REQUESTED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode >= ' . \mod_facetoface\signup\state\requested::get_code() . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
@@ -146,7 +146,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'waitlistattendees',
                 get_string('waitlistattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . MDL_F2F_STATUS_WAITLISTED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\waitlisted::get_code() . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
@@ -158,7 +158,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'numspaces',
                 get_string('numspaces', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode >= ' . MDL_F2F_STATUS_APPROVED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode >= ' . \mod_facetoface\signup\state\waitlisted::get_code() . ' THEN 1 ELSE NULL END)',
                 array('joins' => array('allattendees'),
                     'grouping' => 'count',
                     'displayfunc' => 'f2f_session_spaces',
@@ -171,7 +171,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'cancelledattendees',
                 get_string('cancelledattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode IN (' . MDL_F2F_STATUS_USER_CANCELLED . ', ' . MDL_F2F_STATUS_SESSION_CANCELLED . ') THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode IN (' . \mod_facetoface\signup\state\user_cancelled::get_code() . ', ' . \mod_facetoface\signup\state\event_cancelled::get_code() . ') THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
@@ -183,7 +183,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'fullyattended',
                 get_string('fullyattended', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . MDL_F2F_STATUS_FULLY_ATTENDED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\fully_attended::get_code() . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
@@ -195,7 +195,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'partiallyattended',
                 get_string('partiallyattended', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . MDL_F2F_STATUS_PARTIALLY_ATTENDED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\partially_attended::get_code() . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
@@ -207,7 +207,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'noshowattendees',
                 get_string('noshowattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . MDL_F2F_STATUS_NO_SHOW . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\no_show::get_code() . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
@@ -219,7 +219,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'session',
                 'declinedattendees',
                 get_string('declinedattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . MDL_F2F_STATUS_DECLINED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\declined::get_code() . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('allattendees'),
                     'grouping' => 'count',
@@ -393,7 +393,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 FROM {facetoface_sessions} s
                 LEFT JOIN {facetoface_signups} su ON (su.sessionid = s.id)
                 LEFT JOIN {facetoface_signups_status} ss
-                    ON (su.id = ss.signupid AND ss.superceded = 0 AND ss.statuscode >= " . MDL_F2F_STATUS_BOOKED . ")
+                    ON (su.id = ss.signupid AND ss.superceded = 0 AND ss.statuscode >= " . \mod_facetoface\signup\state\booked::get_code() . ")
                 WHERE 1=1
                 GROUP BY s.id)",
 
@@ -615,7 +615,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         }
 
         return html_writer::link(
-            new moodle_url('/mod/facetoface/attendees.php', array('s' => $session)),
+            new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $session)),
             $OUTPUT->pix_icon('t/cohort', get_string("attendees", "facetoface"))
         );
     }

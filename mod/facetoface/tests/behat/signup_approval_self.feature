@@ -85,7 +85,7 @@ Feature: Seminar Signup Self Approval
     And I follow "Sign-up"
     Then I should see "Self authorisation"
 
-    When I press "Agree and submit"
+    When I press "Sign-up"
     Then I should see "Required"
 
     When I follow "Terms and conditions"
@@ -93,5 +93,5 @@ Feature: Seminar Signup Self Approval
 
     When I press "Close"
     And I click on "authorisation" "checkbox"
-    When I press "Agree and submit"
+    When I press "Sign-up"
     Then I should see "Your request was accepted"

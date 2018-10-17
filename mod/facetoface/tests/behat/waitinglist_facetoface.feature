@@ -68,19 +68,17 @@ Feature: Seminar Manager approval of waiting list
     When I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Join waitlist"
-    Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
-    And I press "Sign-up"
-    # TODO: Seems functionality bug (not behat test)
-    #And I should see "You have been placed on the waitlist for this event."
+    Then I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
+    And I press "Join waitlist"
+    And I should see "You have been placed on the waitlist for this event."
     And I log out
 
     When I log in as "student3"
     And I am on "Course 1" course homepage
     And I follow "Join waitlist"
-    Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
-    And I press "Sign-up"
-    # TODO: Seems functionality bug (not behat test)
-    #And I should see "You have been placed on the waitlist for this event."
+    Then I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
+    And I press "Join waitlist"
+    And I should see "You have been placed on the waitlist for this event."
     And I log out
 
     When I log in as "teacher1"
@@ -91,17 +89,15 @@ Feature: Seminar Manager approval of waiting list
     And I follow "Wait-list"
     Then I should see "Sam2 Student2"
     And I click on "input[type=checkbox]" "css_element" in the "Sam2 Student2" "table_row"
-
-    # Behat bug: cannot push buttons in confirmation dialogs. TL-8632
-    #And I set the field "menuf2f-actions" to "Confirm"
-    #And I press "Yes"
-    #And I should see "Successfully updated attendance"
-    #Then I should not see "Sam2 Student2"
-    #And I click on "input[type=checkbox]" "css_element" in the "Sam3 Student3" "table_row"
-    #And I set the field "menuf2f-actions" to "Cancel"
-    #And I should see "Successfully updated attendance"
-    #Then I should not see "Sam3 Student3"
-    #And I follow "Attendees"
-    #Then I should see "Sam2 Student2"
-    #And I follow "Cancellations"
-    #Then I should see "Sam3 Student3"
+    And I set the field "menuf2f-actions" to "Confirm"
+    And I press "Yes"
+    And I should see "Successfully updated attendance"
+    Then I should not see "Sam2 Student2"
+    And I click on "input[type=checkbox]" "css_element" in the "Sam3 Student3" "table_row"
+    And I set the field "menuf2f-actions" to "Remove from waitlist"
+    And I should see "Successfully updated attendance"
+    Then I should not see "Sam3 Student3"
+    And I follow "Attendees"
+    Then I should see "Sam2 Student2"
+    And I follow "Cancellations"
+    Then I should see "Sam3 Student3"

@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod_facetoface
 Feature: Users can enrol on courses that have position signup enabled and get signed for appropriate sessions
   In order to participate in courses with seminars
   As a user
@@ -97,5 +97,5 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I log out
     And I log in as "student1"
     And I am on "Course 2" course homepage
-    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
+    And I click on "More info" "link" in the "1 January 2020" "table_row"
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity."

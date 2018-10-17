@@ -63,7 +63,7 @@ Feature: Add - Remove manager reservations in Seminar
     And I press "Save changes"
     And I log out
 
-  Scenario: Add and then remove users from Seminar using manager reservations
+  Scenario: Add and then remove users from Seminar using manager allocations
     Given I log in as "manager"
     And I am on "Course 1" course homepage
     And I click on "Test Seminar name" "link"
@@ -81,6 +81,36 @@ Feature: Add - Remove manager reservations in Seminar
     And I click on "Test Seminar name" "link"
     And I should see "Allocate spaces for team (1/2)"
     And I should see "Reserve spaces for team (1/1)"
+
+  Scenario: Add and then remove users from Seminar using manager reservations
+    Given I log in as "manager"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Courses" in the totara menu
+    And I follow "Course 1"
+    And I click on "Test Seminar name" "link"
+    And I click on "Reserve spaces for team" "link"
+    And I select "2" from the "reserve" singleselect
+    When I press "Update"
+    Then I should see "Reserve spaces for team (2/2)"
+
+    When I follow "Manage reservations"
+    Then I should see "2" in the "Max Manager" "table_row"
+    And I press "Go back"
+
+    When I click on "Allocate spaces for team" "link"
+    And I click on "Sam1 Student1" "option"
+    And I click on "Sam2 Student2" "option"
+    And I press "Add"
+    And I click on "Test Seminar name" "link"
+    Then I should see "Allocate spaces for team (2/2)"
+
+    When I click on "Allocate spaces for team" "link"
+    And I click on "Sam2 Student2" "option"
+    And I press "Remove"
+    And I click on "Test Seminar name" "link"
+    Then I should see "Allocate spaces for team (1/2)"
+    And I should see "Reserve spaces for team (1/1)"
+
 
   Scenario: Confirm correct message when other manager cannot have reservations
     Given I log in as "admin"

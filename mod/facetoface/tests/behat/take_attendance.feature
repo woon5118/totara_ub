@@ -1,4 +1,4 @@
-@javascript @mod @mod_facetoface @totara @takeattendance
+@javascript @mod @mod_facetoface @totara
 Feature: Take attendance for seminar sessions
   In order to take attendance in a seminar session
   As a teacher

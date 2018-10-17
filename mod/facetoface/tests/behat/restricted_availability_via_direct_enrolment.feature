@@ -1,4 +1,4 @@
-@mod @mod_facetoface @availability @totara @javascript @totara_facetoface
+@mod @mod_facetoface @availability @totara @javascript
 Feature: Seminar availability based on activity completion using direct enrolment plugin
   In order to check if we can sign up for the course using seminar direct enrolment and
   Availabilty restrictions are honored

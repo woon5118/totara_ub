@@ -724,4 +724,15 @@ abstract class advanced_testcase extends base_testcase {
 
         $this->totalwaitforsecond += (microtime(true) - $microstart);
     }
+
+    /**
+     * Execute all adhoc tasks in queue
+     */
+    public function execute_adhoc_tasks() {
+        $now = time();
+        while ($task = \core\task\manager::get_next_adhoc_task($now)) {
+            $task->execute();
+            \core\task\manager::adhoc_task_complete($task);
+        }
+    }
 }

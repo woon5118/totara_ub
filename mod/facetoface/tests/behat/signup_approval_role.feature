@@ -71,22 +71,23 @@ Feature: Seminar Signup Role Approval
   Scenario: Student signs up a with no roles assigned
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Editing Trainer"
     And I press "Request approval"
-    Then I should see "Your request was sent for approval"
+    Then I should see "Your request was sent to your manager for approval."
 
   Scenario: Student gets approved through role approval
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     Then I should see "Editing Trainer"
     And I should see "Freddy Fred"
 
     When I press "Request approval"
-    Then I should see "Your request was sent for approval"
+    Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
 
     And I log out
     And I log in as "manager"
@@ -105,6 +106,7 @@ Feature: Seminar Signup Role Approval
     When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
     And I click on "Update requests" "button"
     Then I should not see "Jimmy Jim"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "jimmy"

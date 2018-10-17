@@ -249,7 +249,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
         $output = array();
 
         $output[] = $OUTPUT->action_icon(
-            new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)),
+            new moodle_url('/mod/facetoface/reports/rooms.php', array('roomid' => $roomid)),
             new pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
         );
 
@@ -264,13 +264,13 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
         }
 
         if ($row->hidden && $this->embeddedurl) {
-            $params = array_merge($this->urlparams, array('show' => $roomid, 'sesskey' => sesskey()));
+            $params = array_merge($this->urlparams, array('action' => 'show', 'id' => $roomid, 'sesskey' => sesskey()));
             $output[] = $OUTPUT->action_icon(
                 new moodle_url($this->embeddedurl, $params),
                 new pix_icon('t/show', get_string('roomshow', 'mod_facetoface'))
             );
         } else if ($this->embeddedurl) {
-            $params = array_merge($this->urlparams, array('hide' => $roomid, 'sesskey' => sesskey()));
+            $params = array_merge($this->urlparams, array('action' => 'hide', 'id' => $roomid, 'sesskey' => sesskey()));
             $output[] = $OUTPUT->action_icon(
                 new moodle_url($this->embeddedurl, $params),
                 new pix_icon('t/hide', get_string('roomhide', 'mod_facetoface'))
@@ -281,7 +281,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
             $output[] = $OUTPUT->pix_icon('t/delete_gray', get_string('currentlyassigned', 'mod_facetoface'), 'moodle', array('class' => 'disabled iconsmall'));
         } else {
             $output[] = $OUTPUT->action_icon(
-                new moodle_url('/mod/facetoface/room/manage.php', array('delete' => $roomid)),
+                new moodle_url('/mod/facetoface/room/manage.php', array('action' => 'delete', 'id' => $roomid)),
                 new pix_icon('t/delete', get_string('delete'))
             );
         }

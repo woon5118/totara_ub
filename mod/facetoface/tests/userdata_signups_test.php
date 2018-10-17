@@ -73,7 +73,10 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $student2 = $datagenerator->create_user();
 
         $session1 = $f2fgenerator->create_session_for_course($course);
-        $session2 = $f2fgenerator->create_session_for_course($course);
+        $session2 = $f2fgenerator->create_session_for_course($course, 2);
+
+        $this->getDataGenerator()->enrol_user($student1->id, $course->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
         $signups = [];
         $signups[11] = $f2fgenerator->create_signup($student1, $session1);
@@ -102,6 +105,8 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $f2fgenerator->create_file_customfield($signups[11], 'cancellation', 'testfile3.txt', 2);
         $f2fgenerator->create_file_customfield($signups[21], 'signup', 'testfile4.txt', 3);
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 4);
+
+        $this->execute_adhoc_tasks();
 
         // Purge data in system context.
         $targetuser = new target_user($student1);
@@ -178,13 +183,20 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $student2 = $datagenerator->create_user();
 
         $session1 = $f2fgenerator->create_session_for_course($course);
-        $session2 = $f2fgenerator->create_session_for_course($course);
+        $session2 = $f2fgenerator->create_session_for_course($course, 2);
+
+        $this->getDataGenerator()->enrol_user($student1->id, $course->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
         $signups = [];
         $signups[11] = $f2fgenerator->create_signup($student1, $session1);
         $signups[12] = $f2fgenerator->create_signup($student1, $session2);
         $signups[21] = $f2fgenerator->create_signup($student2, $session1);
         $signups[22] = $f2fgenerator->create_signup($student2, $session2);
+
+        $emailsink = $this->redirectMessages();
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
 
         $signupcustomfieldids = [];
         $signupcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'signup', 3, 1);
@@ -206,6 +218,8 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 5);
 
         $student1 = $this->handle_user_status($student1, $userstatus);
+
+        $this->execute_adhoc_tasks();
 
         // Purge data in module context.
         $coursemodule = get_coursemodule_from_instance('facetoface', $session2->facetoface);
@@ -270,9 +284,14 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $student1 = $datagenerator->create_user();
         $student2 = $datagenerator->create_user();
 
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course2->id);
+
         $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1);
-        $session3 = $f2fgenerator->create_session_for_course($course2);
+        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
 
         $signups = [];
         $signups[11] = $f2fgenerator->create_signup($student1, $session1);
@@ -281,6 +300,10 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $signups[21] = $f2fgenerator->create_signup($student2, $session1);
         $signups[22] = $f2fgenerator->create_signup($student2, $session2);
         $signups[23] = $f2fgenerator->create_signup($student2, $session3);
+
+        $emailsink = $this->redirectMessages();
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
 
         $signupcustomfieldids = [];
         $signupcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'signup', 3, 1);
@@ -304,6 +327,8 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 5);
 
         $student1 = $this->handle_user_status($student1, $userstatus);
+
+        $this->execute_adhoc_tasks();
 
         // Purge data in course context.
         $targetuser = new target_user($student1);
@@ -348,7 +373,7 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $this->assert_count_customfield_data('signup', [$signups[23]->id], 5, 2);
 
         $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[12]->id, $signups[21]->id, $signups[23]->id], 0, 0);
-        $this->assert_count_customfield_data('cancellation', [$signups[13]->id], 0 + $additionalcancellation, 0);
+        $this->assert_count_customfield_data('cancellation', [$signups[13]->id], 0, 0);
         $this->assert_count_customfield_data('cancellation', [$signups[22]->id], 4, 1);
 
         // Files should be purged as well.
@@ -379,9 +404,16 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $student1 = $datagenerator->create_user();
         $student2 = $datagenerator->create_user();
 
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course3->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course3->id);
+
         $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course2);
-        $session3 = $f2fgenerator->create_session_for_course($course3);
+        $session2 = $f2fgenerator->create_session_for_course($course2, 2);
+        $session3 = $f2fgenerator->create_session_for_course($course3, 3);
 
         $signups = [];
         $signups[11] = $f2fgenerator->create_signup($student1, $session1);
@@ -390,6 +422,10 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $signups[21] = $f2fgenerator->create_signup($student2, $session1);
         $signups[22] = $f2fgenerator->create_signup($student2, $session2);
         $signups[23] = $f2fgenerator->create_signup($student2, $session3);
+
+        $emailsink = $this->redirectMessages();
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
 
         $signupcustomfieldids = [];
         $signupcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'signup', 3, 1);
@@ -413,6 +449,8 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 5);
 
         $student1 = $this->handle_user_status($student1, $userstatus);
+
+        $this->execute_adhoc_tasks();
 
         // Purge data in category context.
         $targetuser = new target_user($student1);
@@ -457,7 +495,7 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $this->assert_count_customfield_data('signup', [$signups[23]->id], 5, 2);
 
         $this->assert_count_customfield_data('cancellation', [$signups[12]->id, $signups[13]->id, $signups[21]->id, $signups[23]->id], 0, 0);
-        $this->assert_count_customfield_data('cancellation', [$signups[11]->id], 0 + $additionalcancellation, 0);
+        $this->assert_count_customfield_data('cancellation', [$signups[11]->id], 0, 0);
         $this->assert_count_customfield_data('cancellation', [$signups[22]->id], 4, 1);
 
         // Files should be purged as well.
@@ -550,10 +588,17 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $student1 = $datagenerator->create_user();
         $student2 = $datagenerator->create_user();
 
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course3->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course3->id);
+
         $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1);
-        $session3 = $f2fgenerator->create_session_for_course($course2);
-        $session4 = $f2fgenerator->create_session_for_course($course3);
+        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
+        $session4 = $f2fgenerator->create_session_for_course($course3, 4);
 
         $f2fgenerator->create_signup($student1, $session1);
         $f2fgenerator->create_signup($student1, $session2);
@@ -562,6 +607,10 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $f2fgenerator->create_signup($student2, $session1);
         $f2fgenerator->create_signup($student2, $session2);
         $f2fgenerator->create_signup($student2, $session3);
+
+        $emailsink = $this->redirectMessages();
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
 
         $targetuser1 = new target_user($student1);
         $targetuser2 = new target_user($student2);
@@ -618,10 +667,17 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $student1 = $datagenerator->create_user();
         $student2 = $datagenerator->create_user();
 
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course3->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course3->id);
+
         $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1);
-        $session3 = $f2fgenerator->create_session_for_course($course2);
-        $session4 = $f2fgenerator->create_session_for_course($course3);
+        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
+        $session4 = $f2fgenerator->create_session_for_course($course3, 4);
 
         $f2fgenerator->create_signup($student1, $session1);
         $f2fgenerator->create_signup($student1, $session2);
@@ -630,6 +686,10 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $f2fgenerator->create_signup($student2, $session1);
         $f2fgenerator->create_signup($student2, $session2);
         $f2fgenerator->create_signup($student2, $session3);
+
+        $emailsink = $this->redirectMessages();
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
 
         $targetuser1 = new target_user($student1);
         $targetuser2 = new target_user($student2);
@@ -676,6 +736,8 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
      * @param array $expectedsessionids
      */
     private function assert_export_data(target_user $targetuser, context $context, array $expectedsessionids) {
+        $this->execute_adhoc_tasks();
+
         $export = signups::execute_export($targetuser, $context);
         $data = $export->data;
         $this->assertCount(count($expectedsessionids), $data);

@@ -65,6 +65,7 @@ Feature: Seminar Approval required
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 4    |
+      | Enable waitlist    | 1    |
     And I press "Save changes"
 
     When I click on "Attendees" "link"
@@ -193,5 +194,6 @@ Feature: Seminar Approval required
     And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
     And I should see "Sam3 Student3" in the "#facetoface_sessions" "css_element"
     And I should see "Sam4 Student4" in the "#facetoface_sessions" "css_element"
-    And I should see "Sam5 Student5" in the "#facetoface_sessions" "css_element"
-    And I should see "Sam6 Student6" in the "#facetoface_sessions" "css_element"
+    And I switch to "Wait-list" tab
+    And I should see "Sam5 Student5" in the ".mod-facetoface-attendees.waitlist" "css_element"
+    And I should see "Sam6 Student6" in the ".mod-facetoface-attendees.waitlist" "css_element"

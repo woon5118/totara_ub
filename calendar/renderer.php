@@ -291,7 +291,7 @@ class core_calendar_renderer extends plugin_renderer_base {
 
         if ($event->modulename == 'facetoface') {
             // This fixed the Google Map for any location custom fields.
-            $eventdetailshtml .= facetoface_print_calendar_session($event);
+            $eventdetailshtml .= $this->facetoface_print_calendar_session($event);
         } else {
             $eventdetailshtml .= format_text($event->description, $event->format, array('context' => $context));
         }
@@ -677,6 +677,47 @@ class core_calendar_renderer extends plugin_renderer_base {
         $html .= html_writer::end_tag('div');
         $html .= html_writer::end_tag('form');
         return $html;
+    }
+
+    /**
+     * Print the details of a session for calendar
+     *
+     * @param object $event         Record from calendar event
+     * @return string|null html markup when return is true
+     */
+    public function facetoface_print_calendar_session($event) {
+        global $CFG, $PAGE, $USER;
+        require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+
+        $seminarevent = new \mod_facetoface\seminar_event($event->uuid);
+        $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
+
+        if (empty($seminar->get_showoncalendar()) && empty($seminar->get_usercalentry())) {
+            return '';
+        }
+        /**
+         * @var
+         */
+        $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+        $output = $seminarrenderer->render_seminar_event($seminarevent, false, true);
+        $users  = facetoface_get_attendees($seminarevent->get_id());
+
+        if ($seminar->get_usercalentry() && array_key_exists($USER->id, $users)) {
+            // Better way is to get an user status and display it.
+            $linkurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $seminarevent->get_id()));
+            $output .= get_string("calendareventdescriptionbooking", 'facetoface', $linkurl->out());
+        } else  if ($seminar->get_showoncalendar() == F2F_CAL_SITE || $seminar->get_showoncalendar() == F2F_CAL_COURSE) {
+            // If the user has not signed up before.
+            if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions() == 1) {
+                $linkurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $seminarevent->get_id()));
+                $linktext = get_string('signupforthissession', 'facetoface');
+                $output .= html_writer::link($linkurl, $linktext);
+            }
+        } else {
+            $output = '';
+        }
+
+        return $output;
     }
 
     /**

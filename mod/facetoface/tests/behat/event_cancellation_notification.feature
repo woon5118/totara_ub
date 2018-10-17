@@ -101,7 +101,7 @@ Feature: Seminar event cancellation notifications
     And I log in as "learner3"
     And I am on "Course 1" course homepage
     And I follow "Join waitlist"
-    And I press "Sign-up"
+    And I press "Join waitlist"
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_200: people notified of cancelled event with single future date.
@@ -122,6 +122,7 @@ Feature: Seminar event cancellation notifications
     And I should see "3 / 2 (Overbooked)" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "learner1"
@@ -215,7 +216,6 @@ Feature: Seminar event cancellation notifications
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
-    And I should see "2 / 2" in the "10 February 2025" "table_row"
     And I should see "Booking full" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
 
@@ -226,6 +226,7 @@ Feature: Seminar event cancellation notifications
     And I should see "3 / 2 (Overbooked)" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "learner1"
@@ -306,6 +307,7 @@ Feature: Seminar event cancellation notifications
     And I should see "Cancelling event in Test Seminar"
     And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
     And I press "Yes"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "learner1"
@@ -351,6 +353,7 @@ Feature: Seminar event cancellation notifications
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
     And I press "Yes"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "manager4"
@@ -396,6 +399,7 @@ Feature: Seminar event cancellation notifications
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
     And I press "Yes"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "learner4"

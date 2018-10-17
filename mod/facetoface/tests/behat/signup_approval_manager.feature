@@ -65,8 +65,8 @@ Feature: Seminar Signup Manager Approval
     When I log out
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "More info"
+    And I follow "More info"
     And I should see "Manager Approval"
     And I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
@@ -77,8 +77,8 @@ Feature: Seminar Signup Manager Approval
     And I log out
     And I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I press "Request approval"
     Then I should see "This seminar requires manager approval, please select a manager to request approval"
@@ -87,7 +87,8 @@ Feature: Seminar Signup Manager Approval
     And I click on "Cassy Cas" "link" in the "Select manager" "totaradialogue"
     And I click on "OK" "button" in the "Select manager" "totaradialogue"
     And I press "Request approval"
-    Then I should see "Your request was sent to your manager for approval"
+    Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "manager"
@@ -105,11 +106,12 @@ Feature: Seminar Signup Manager Approval
     When I log out
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
     And I press "Request approval"
+    And I run all adhoc tasks
     And I log out
 
     And I log in as "manager"
@@ -123,6 +125,7 @@ Feature: Seminar Signup Manager Approval
     When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
     And I click on "Update requests" "button"
     Then I should not see "Jimmy Jim"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "jimmy"
@@ -144,8 +147,8 @@ Feature: Seminar Signup Manager Approval
     And I log out
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
 
@@ -154,6 +157,7 @@ Feature: Seminar Signup Manager Approval
     And I click on "OK" "button" in the "Select manager" "totaradialogue"
 
     And I press "Request approval"
+    And I run all adhoc tasks
     And I log out
 
     And I log in as "timmy"
@@ -167,6 +171,7 @@ Feature: Seminar Signup Manager Approval
     When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
     And I click on "Update requests" "button"
     Then I should not see "Jimmy Jim"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "jimmy"

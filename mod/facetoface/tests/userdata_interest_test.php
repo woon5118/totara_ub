@@ -28,6 +28,7 @@ use context_course;
 use context_coursecat;
 use context_module;
 use context_system;
+use mod_facetoface\seminar;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
@@ -66,11 +67,11 @@ class mod_facetoface_userdata_interest_test extends advanced_testcase {
         $this->facetoface2 = $this->getDataGenerator()->create_module('facetoface', array('course' => $this->course2->id));
         $this->facetoface3 = $this->getDataGenerator()->create_module('facetoface', array('course' => $this->course2->id));
 
-        facetoface_declare_interest($this->facetoface1, 'reason user 1 for f2f 1', $this->user1->id);
-        facetoface_declare_interest($this->facetoface2, 'reason user 1 for f2f 2', $this->user1->id);
-        facetoface_declare_interest($this->facetoface1, 'reason user 2 for f2f 1', $this->user2->id);
-        facetoface_declare_interest($this->facetoface2, 'reason user 2 for f2f 2', $this->user2->id);
-        facetoface_declare_interest($this->facetoface3, 'reason user 2 for f2f 3', $this->user2->id);
+        \mod_facetoface\interest::from_seminar(new seminar($this->facetoface1->id), $this->user1->id)->set_reason('reason user 1 for f2f 1')->declare();
+        \mod_facetoface\interest::from_seminar(new seminar($this->facetoface2->id), $this->user1->id)->set_reason('reason user 1 for f2f 2')->declare();
+        \mod_facetoface\interest::from_seminar(new seminar($this->facetoface1->id), $this->user2->id)->set_reason('reason user 2 for f2f 1')->declare();
+        \mod_facetoface\interest::from_seminar(new seminar($this->facetoface2->id), $this->user2->id)->set_reason('reason user 2 for f2f 2')->declare();
+        \mod_facetoface\interest::from_seminar(new seminar($this->facetoface3->id), $this->user2->id)->set_reason('reason user 2 for f2f 3')->declare();
     }
 
     /**

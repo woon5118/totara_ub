@@ -66,9 +66,9 @@ Feature: Seminar Manager signup approval changes
     And I am on "Classroom Connect Course" course homepage
     And I follow "Join waitlist"
     Then I should not see "Manager Approval"
-    And I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
+    And I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
 
-    Given I press "Sign-up"
+    Given I press "Join waitlist"
     And I log out
     And I log in as "teacher"
     And I am on "Classroom Connect Course" course homepage
@@ -81,11 +81,12 @@ Feature: Seminar Manager signup approval changes
 
     When I log in as "sammy"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Join waitlist"
+    And I follow "Request approval"
     Then I should see "Manager Approval"
-    And I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's waitlist."
+    And I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
     When I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
 
     Given I log out
     And I log in as "manager"

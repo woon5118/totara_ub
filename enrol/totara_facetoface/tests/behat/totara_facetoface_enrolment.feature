@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod_facetoface
 Feature: Users can auto-enrol themself in courses where seminar direct enrolment is allowed
   In order to participate in courses
   As a user

@@ -61,14 +61,11 @@ class f2f_job_assignment_edit extends base {
 
         $jobassignment = \totara_job\job_assignment::get_with_id($extrafields->jobassignmentid, false);
         if (!empty($jobassignment)) {
-            if ($jobassignment->userid != $extrafields->userid) {
-                // TODO: Errror!!!!
-            }
             $label = \position::job_position_label($jobassignment);
         } else {
             $label = '';
         }
-        $url = new \moodle_url('/mod/facetoface/attendee_job_assignment.php', array('s' => $extrafields->sessionid, 'id' => $extrafields->userid));
+        $url = new \moodle_url('/mod/facetoface/attendees/ajax/job_assignment.php', array('s' => $extrafields->sessionid, 'id' => $extrafields->userid));
         $pix = new \pix_icon('t/edit', get_string('edit'));
         $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-job-assignment pull-right'));
         $jobassignmenthtml = \html_writer::span($label, 'jobassign' . $extrafields->userid, array('id' => 'jobassign' . $extrafields->userid));

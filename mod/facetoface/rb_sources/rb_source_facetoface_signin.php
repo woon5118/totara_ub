@@ -757,16 +757,14 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      * @return array
      */
     function rb_filter_session_status_list() {
-        global $CFG,$MDL_F2F_STATUS;
-
-        include_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
         $output = array();
-        if (is_array($MDL_F2F_STATUS)) {
-            foreach ($MDL_F2F_STATUS as $code => $statusitem) {
-                $output[$code] = get_string('status_'.$statusitem,'facetoface');
-            }
+        $states = \mod_facetoface\signup\state\state::get_all_states();
+        foreach ($states as $state) {
+            $code = $state::get_code();
+            $output[$code] = $state::get_string();
         }
+
         // Show most completed option first in pulldown.
         return array_reverse($output, true);
 
@@ -836,17 +834,17 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $data[] = array(get_string('sessionenddate', 'mod_facetoface'), get_string('sessionenddatewithtime', 'facetoface', $dates));
         $data[] = array(get_string('maxbookings', 'mod_facetoface'), $session->capacity);
         $data[] = array(get_string('numberofattendees', 'mod_facetoface'), facetoface_get_num_attendees($session->id));
-        $room = facetoface_get_room($sessiondate->roomid);
-        if (!$room) {
-            $data[] = array(get_string('place', 'mod_facetoface'), get_string('notapplicable', 'facetoface'));
-        } else {
-            $info = customfield_get_data($room, 'facetoface_room', 'facetofaceroom');
-            $data[] = array(get_string('place', 'mod_facetoface'), $room->name);
+        $room = new \mod_facetoface\room($sessiondate->roomid);
+        if ($room->exists()) {
+            $info = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom');
+            $data[] = array(get_string('place', 'mod_facetoface'), $room->get_name());
             foreach ($info as $name => $roomdata) {
                 if (!empty($roomdata)) {
                     $data[] = array($name, $roomdata);
                 }
             }
+        } else {
+            $data[] = array(get_string('place', 'mod_facetoface'), get_string('notapplicable', 'facetoface'));
         }
         unset($room);
 

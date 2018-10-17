@@ -108,7 +108,7 @@ Feature: Reserve spaces for team in seminar
     And I follow "Course 1"
     And I follow "View all events"
     And I click on the link "Join waitlist" in row 1
-    And I press "Sign-up"
+    And I press "Join waitlist"
     And I log out
 
     Given I log in as "sitemanager1"

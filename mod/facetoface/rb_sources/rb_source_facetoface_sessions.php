@@ -21,6 +21,9 @@
  * @author Alastair Munro <alastair.munro@totaralms.com>
  * @package mod_facetoface
  */
+
+use \mod_facetoface\signup\state\waitlisted;
+use \mod_facetoface\signup\state\booked;
 global $CFG;
 
 defined('MOODLE_INTERNAL') || die();
@@ -130,7 +133,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 '{facetoface_signups_status}',
                 '(cancellationstatus.signupid = base.id AND
                     cancellationstatus.superceded = 0 AND
-                    cancellationstatus.statuscode = '.MDL_F2F_STATUS_USER_CANCELLED.')',
+                    cancellationstatus.statuscode = '.\mod_facetoface\signup\state\user_cancelled::get_code().')',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
@@ -167,19 +170,17 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_join(
                 'approver',
                 'LEFT',
-                // Subquery as table - statuscode 50 = approved.
                 // Only want the last approval record
                 "(SELECT status.signupid, status.createdby as approverid, status.timecreated as approvaltime
                     FROM {facetoface_signups_status} status
                     JOIN (SELECT signupid, max(timecreated) as approvaltime
                             FROM {facetoface_signups_status}
-                           WHERE statuscode = " . MDL_F2F_STATUS_APPROVED . "
+                           WHERE statuscode IN (" . waitlisted::get_code() . ", " . booked::get_code() . ") 
                         GROUP BY signupid) lastapproval
                       ON status.signupid = lastapproval.signupid
                      AND status.timecreated = lastapproval.approvaltime
-                  WHERE status.statuscode = " . MDL_F2F_STATUS_APPROVED .
-                 ")",
-                'base.id = approver.signupid',
+                  WHERE statuscode IN (" . waitlisted::get_code() . ", " . booked::get_code() . "))",
+                '(base.id = approver.signupid AND approver.approverid != base.userid)',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
@@ -456,7 +457,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('timeofsignup', 'rb_source_facetoface_sessions'),
                 '(SELECT MAX(timecreated)
                     FROM {facetoface_signups_status}
-                    WHERE signupid = base.id AND statuscode IN ('.MDL_F2F_STATUS_BOOKED.', '.MDL_F2F_STATUS_WAITLISTED.'))',
+                    WHERE signupid = base.id AND statuscode IN ('.\mod_facetoface\signup\state\booked::get_code().', '.\mod_facetoface\signup\state\waitlisted::get_code().'))',
                 array(
                     'displayfunc' => 'nice_datetime',
                     'dbdatatype' => 'timestamp'
@@ -859,7 +860,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $context = context_module::instance($cm->id);
 
         if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
-            $url = new moodle_url('/mod/facetoface/attendee_note.php', array(
+            $url = new moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array(
                 's' => $row->sessionid,
                 'userid' => $row->userid,
                 'sesskey'=> sesskey()
@@ -938,14 +939,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
 
         $jobassignment = \totara_job\job_assignment::get_with_id($row->jobassignmentid, false);
         if (!empty($jobassignment)) {
-            if ($jobassignment->userid != $row->userid) {
-                // TODO: Errror!!!!
-            }
             $label = position::job_position_label($jobassignment);
         } else {
             $label = '';
         }
-        $url = new moodle_url('/mod/facetoface/attendee_job_assignment.php', array('s' => $row->sessionid, 'id' => $row->userid));
+        $url = new moodle_url('/mod/facetoface/attendees/ajax/job_assignment.php', array('s' => $row->sessionid, 'id' => $row->userid));
         $pix = new pix_icon('t/edit', get_string('edit'));
         $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-job-assignment pull-right'));
         $jobassignmenthtml = html_writer::span($label, 'jobassign'.$row->userid, array('id' => 'jobassign'.$row->userid));
@@ -1088,16 +1086,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     //
 
     function rb_filter_session_status_list() {
-        global $CFG,$MDL_F2F_STATUS;
-
-        include_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
         $output = array();
-        if (is_array($MDL_F2F_STATUS)) {
-            foreach ($MDL_F2F_STATUS as $code => $statusitem) {
-                $output[$code] = get_string('status_'.$statusitem,'facetoface');
-            }
+        $states = \mod_facetoface\signup\state\state::get_all_states();
+        foreach ($states as $state) {
+            $code = $state::get_code();
+            $output[$code] = $state::get_string();
         }
+
         // show most completed option first in pulldown
         return array_reverse($output, true);
 

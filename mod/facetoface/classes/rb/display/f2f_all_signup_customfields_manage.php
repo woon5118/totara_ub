@@ -62,7 +62,7 @@ class f2f_all_signup_customfields_manage extends base {
         $context = \context_module::instance($cm->id);
 
         if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
-            $url = new \moodle_url('/mod/facetoface/attendee_note.php', array(
+            $url = new \moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array(
                 's' => $extrafields->sessionid,
                 'userid' => $extrafields->userid,
                 'sesskey'=> sesskey()

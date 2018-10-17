@@ -59,6 +59,33 @@ Feature: Certification completion date is based on course completion time
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
+    # In order to signup create session in future, and then move it back in time
+    And I fill seminar session with relative date in form data:
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +2               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | -1               |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +2               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I press "Save changes"
+    And I click on "Attendees" "link"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Learner One, learner1@example.com" "option"
+    And I press exact "add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I press "Confirm"
+
+    # Move event back in time.
+    And I follow "Go back"
+    And I click on "Edit" "link" in the ".lastrow" "css_element"
+    And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | -2               |
@@ -73,13 +100,8 @@ Feature: Certification completion date is based on course completion time
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
+
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I press "Continue"
-    And I press "Confirm"
     And I click on "Take attendance" "link"
     And I click on "Fully attended" "option" in the "Learner One" "table_row"
     And I press "Save attendance"

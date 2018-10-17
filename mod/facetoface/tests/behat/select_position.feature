@@ -152,7 +152,7 @@ Feature: Add a seminar with select position
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Sign-up"
+    And I follow "More info"
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity"
 
   @javascript

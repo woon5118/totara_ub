@@ -59,7 +59,7 @@ class f2f_num_attendees_link extends base {
         $viewattendees = get_string('viewattendees', 'mod_facetoface');
 
         $description = \html_writer::span($viewattendees, 'sr-only');
-        return \html_writer::link(new \moodle_url('/mod/facetoface/attendees.php', array('s' => $extrafields->session)), $value . $description, array('title' => $viewattendees));
+        return \html_writer::link(new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $extrafields->session)), $value . $description, array('title' => $viewattendees));
 
     }
 

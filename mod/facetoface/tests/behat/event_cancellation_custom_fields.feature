@@ -238,6 +238,7 @@ Feature: Seminar event cancellation custom fields
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_502: use cancellation custom fields in notification template
+    And I run all adhoc tasks
     When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 

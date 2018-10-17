@@ -258,5 +258,23 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018022600, 'facetoface');
     }
 
+    if ($oldversion < 2018050800) {
+
+        $table = new xmldb_table('facetoface_notification_tpl');
+        $field = new xmldb_field('title', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $dbman->change_field_type($table, $field);
+
+        $table = new xmldb_table('facetoface_notification');
+        $index = new xmldb_index('title', XMLDB_INDEX_NOTUNIQUE, array('title'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $field = new xmldb_field('title', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $dbman->change_field_precision($table, $field);
+
+        upgrade_mod_savepoint(true, 2018050800, 'facetoface');
+    }
+
     return true;
 }

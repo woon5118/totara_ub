@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod_facetoface
 Feature: Users are forced to get manager approval where required
 
   Background:
@@ -66,7 +66,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
+    And I click on "Request approval" "link" in the "1 January 2020" "table_row"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
     And I log out
@@ -84,7 +84,7 @@ Feature: Users are forced to get manager approval where required
     Then I should see "manager request already pending"
     And I follow "Withdraw pending request"
     And I press "Confirm"
-    Then I should see "Sign-up"
+    Then I should see "Request approval"
     And I log out
 
     When I log in as "teacher1"
@@ -97,7 +97,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
+    And I click on "Request approval" "link" in the "1 January 2020" "table_row"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
     And I log out

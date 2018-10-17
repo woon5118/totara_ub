@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod_facetoface
 Feature: Users can enrol on courses that have several seminar activities and signup to several sessions
   In order to participate in courses with seminars
   As a user

@@ -145,6 +145,17 @@ $capabilities = array(
         'clonepermissionsfrom' => 'mod/facetoface:editsessions'
     ),
 
+    // Ability to signup people on in progress and past events
+    'mod/facetoface:signuppastevents' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'mod/facetoface:editevents'
+    ),
+
     // View session cancellations.
     'mod/facetoface:viewcancellations' => array(
         'captype' => 'read',
@@ -166,8 +177,7 @@ $capabilities = array(
         ),
     ),
 
-    // Ability to overbook a session by signing up for it.
-    // Users with mod/facetoface:addattendees can also overbook.
+    // Ability to overbook a session by signing up for it when wait list is disabled.
     'mod/facetoface:signupwaitlist' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,

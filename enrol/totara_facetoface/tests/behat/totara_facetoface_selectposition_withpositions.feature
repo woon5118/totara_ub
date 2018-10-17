@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod_facetoface
 Feature: Users can enrol themself in courses with selected position where seminar direct enrolment is allowed
   In order to run a seminar
   As a teacher

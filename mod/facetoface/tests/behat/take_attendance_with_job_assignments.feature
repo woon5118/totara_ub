@@ -1,4 +1,4 @@
-@javascript @mod @mod_facetoface @totara @takeattendance
+@javascript @mod @mod_facetoface @totara
 Feature: Take seminar attendance with job assignment on signup
   In order to verify that job assignment on signup is handled correctly
   As admin

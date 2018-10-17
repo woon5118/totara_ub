@@ -110,8 +110,8 @@ Feature: Seminar event cancellation rebooking
     And I press "Continue"
 
     When I follow "View results"
-    Then I should see "This user is already signed-up" in the "Learner One" "table_row"
-    And I should see "This user is already signed-up" in the "Learner Two" "table_row"
+    Then I should see "You are already signed up in another event for this activity" in the "Learner One" "table_row"
+    And I should see "You are already signed up in another event for this activity" in the "Learner Two" "table_row"
     And I press "Close"
 
     Given I log out

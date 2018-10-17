@@ -245,7 +245,8 @@ Feature: Add - Remove seminar attendees
     And I press "Continue"
     Then I should see "1 problem(s) encountered during import."
     When I click on "View results" "link"
-    Then I should see "Sam1 Student1 is already booked to attend Test seminar name at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
+    Then I should see "Sam1 Student1"
+    And I should see "The signup user has conflicting signups"
     When I press exact "Close"
     And I set the following fields to these values:
       | Allow scheduling conflicts | 1 |

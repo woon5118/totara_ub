@@ -178,12 +178,13 @@ foreach ($notification_templates as $note_templ) {
         $warningicon = new pix_icon('i/warning', get_string('templatecontainsoldplaceholders', 'facetoface'));
         $title .= $OUTPUT->render($warningicon).' ';
     }
-    $title .= clean_text($note_templ->title);
+    $title .= format_string($note_templ->title);
 
     if (isset($unavailabletemplates[$note_templ->reference])) {
         $unavailable = true;
         $title .= ' ' . html_writer::span(get_string('unavailable', 'facetoface'), 'label label-warning');
     }
+
     $row[] = $title;
 
     if ($note_templ->status == 1) {

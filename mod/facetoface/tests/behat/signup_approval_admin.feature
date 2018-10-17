@@ -46,10 +46,10 @@ Feature: Seminar Signup Admin Approval
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Classroom Connect Activity |
       | Description       | Classroom Connect Tests    |
-      | approvaloptions   | approval_admin             |
     And I follow "View all events"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
+    And I click on "#id_approvaloptions_approval_admin" "css_element"
     And I click on "addapprovaladmins" "button"
     And I click on "Larry Lar" "link" in the "Select activity level approvers" "totaradialogue"
     And I click on "Search" "link" in the "Select activity level approvers" "totaradialogue"
@@ -79,8 +79,8 @@ Feature: Seminar Signup Admin Approval
   Scenario: Student signs up with no manager assigned when admin approval is required
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "More info"
+    And I follow "More info"
     And I should see "Manager and Administrative approval"
     Then I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
@@ -92,8 +92,8 @@ Feature: Seminar Signup Admin Approval
     And I log out
     And I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager and Administrative approval"
     And I press "Request approval"
     Then I should see "This seminar requires manager approval, please select a manager to request approval"
@@ -102,7 +102,8 @@ Feature: Seminar Signup Admin Approval
     And I click on "Cassy Cas" "link" in the "Select manager" "totaradialogue"
     And I click on "OK" "button" in the "Select manager" "totaradialogue"
     And I press "Request approval"
-    Then I should see "Your request was sent to your manager for approval"
+    Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "manager"
@@ -128,10 +129,11 @@ Feature: Seminar Signup Admin Approval
   Scenario: Student gets approved through both steps of the 2 stage approval
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager and Administrative approval"
     And I press "Request approval"
+    And I run all adhoc tasks
     And I log out
 
     And I log in as "manager"
@@ -160,6 +162,7 @@ Feature: Seminar Signup Admin Approval
     When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
     And I click on "Update requests" "button"
     Then I should not see "Jimmy Jim"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "jimmy"
@@ -179,12 +182,13 @@ Feature: Seminar Signup Admin Approval
 
     And I log in as "sammy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager and Administrative approval"
     And I should see "Managers from all job assignements will be chosen if left empty"
     And I press "Request approval"
-    Then I should see "Your request was sent to your manager for approval"
+    Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "manager"
@@ -207,6 +211,7 @@ Feature: Seminar Signup Admin Approval
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
+    And I run all adhoc tasks
     And I log out
 
     # Check alert
@@ -235,7 +240,7 @@ Feature: Seminar Signup Admin Approval
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
-    Then I should see "Sign-up"
+    Then I should see "Request approval"
     And I log out
 
     # Check approve
@@ -269,7 +274,6 @@ Feature: Seminar Signup Admin Approval
     And I set the field "newcolumns" to "Approver name"
     And I press "Add"
     Then I should see "Approver name"
-
     # Add user to the event
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
@@ -280,6 +284,7 @@ Feature: Seminar Signup Admin Approval
     And I press "Continue"
     And I press "Confirm"
     Then I should not see "Sammy Sam"
+    And I run all adhoc tasks
     And I log out
 
     # Check alert

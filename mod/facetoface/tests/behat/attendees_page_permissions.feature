@@ -1,4 +1,4 @@
-@javascript @mod @mod_facetoface @totara @takeattendance
+@javascript @mod @mod_facetoface @totara
 Feature: Check attendees actions are performed by users with the right permissions
   In order to check users with the right permission could perform action on the attendees page
   As Admin
@@ -43,18 +43,19 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
+    # In order to signup create session in future, and then move it back in time
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | -1               |
+      | timestart[day]     | +2               |
       | timestart[month]   | 0                |
       | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
+      | timestart[hour]    | -1               |
       | timestart[minute]  | 0                |
-      | timefinish[day]    | 0                |
+      | timefinish[day]    | +2               |
       | timefinish[month]  | 0                |
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
-      | timefinish[minute] | -30              |
+      | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
     And I click on "Attendees" "link"
@@ -74,6 +75,26 @@ Feature: Check attendees actions are performed by users with the right permissio
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
     And I should see "Sam3 Student3"
+
+    # Move event back in time.
+    And I follow "Go back"
+    And I click on "Edit" "link" in the ".lastrow" "css_element"
+    And I click on "Edit session" "link"
+    And I fill seminar session with relative date in form data:
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -2               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | -1               |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | -2               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I press "Save changes"
+
     And I log out
 
   Scenario: Check trainer actions on attendees page
@@ -187,9 +208,10 @@ Feature: Check attendees actions are performed by users with the right permissio
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Sign-up"
+    And I follow "Request approval"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
     And I log out
 
     When I log in as "manager1"

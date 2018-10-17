@@ -75,8 +75,8 @@ Feature: Seminar Select position with Manager approval
   Scenario: Student signs up with two managers assigned
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I should see "Request approval"
+    And I follow "Request approval"
     And I should see "Manager Approval"
     And I set the following fields to these values:
       | Select a job assignment | Unnamed job assignment (ID: 2) (Position2) |
