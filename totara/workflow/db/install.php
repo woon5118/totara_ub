@@ -25,6 +25,8 @@
  * Totara workflow install hook.
  */
 function xmldb_totara_workflow_install() {
+
     // Enable standard course create workflow on install.
-    set_config('core\\workflow\\coursecreate\\standard', 1, 'totara_workflow');
+    $workflow = core\workflow\core_course\coursecreate\standard::instance();
+    $workflow->enable();
 }

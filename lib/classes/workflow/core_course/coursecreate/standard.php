@@ -20,14 +20,14 @@
  * @author Simon Coggins <simon.coggins@totaralearning.com>
  */
 
-namespace core\workflow\coursecreate;
+namespace core\workflow\core_course\coursecreate;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Standard create course workflow implementation.
  */
-class standard extends \core_course\workflow\coursecreate {
+class standard extends \totara_workflow\workflow\base {
 
     public function get_name(): string {
         return get_string('createmultiactivitycourse', 'moodle');

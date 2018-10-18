@@ -23,11 +23,12 @@
 
 require('../../config.php');
 
-$component = required_param('component', PARAM_COMPONENT);
+$managercomponent = required_param('managercomponent', PARAM_COMPONENT);
 $manager = required_param('manager', PARAM_ALPHANUMEXT);
+$workflowcomponent = required_param('workflowcomponent', PARAM_COMPONENT);
 $workflow = required_param('workflow', PARAM_ALPHANUMEXT);
 
-$workflowclass = "{$component}\\workflow\\{$manager}\\{$workflow}";
+$workflowclass = "{$workflowcomponent}\\workflow\\{$managercomponent}\\{$manager}\\{$workflow}";
 if (!class_exists($workflowclass)) {
     print_error('error:noworkflowclass', 'totara_workflow', '', $workflowclass);
 }
@@ -37,8 +38,9 @@ require_login();
 $context = \context_system::instance();
 $PAGE->set_context($context);
 $pageparams = [
-    'component' => $component,
+    'managercomponent' => $managercomponent,
     'manager' => $manager,
+    'workflowcomponent' => $workflowcomponent,
     'workflow' => $workflow,
 ];
 $PAGE->set_url(new \moodle_url('/totara/workflow/workflow.php', $pageparams));

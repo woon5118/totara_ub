@@ -118,21 +118,21 @@ class totara_workflow_workflow_manager_testcase extends advanced_testcase {
             ],
             // Workflow  class
             [
-                'component\\workflow\\coursecreate\\seminar',
+                'component\\workflow\\core_course\\coursecreate\\seminar',
                 false,
                 null,
                 null,
             ],
             // Valid structure but invalid special chars in strings.
             [
-                'bad_special_chars!\\workflow_manager\\course&create',
+                'bad_special_chars!\\managercomponent\\workflow_manager\\course&create',
                 false,
                 null,
                 null,
             ],
             // Valid component and manager with extra workflow
             [
-                'valid_component\\workflow_manager\\validmanager\\workflow',
+                'valid_component\\workflow_manager\\managercomponent\\validmanager\\workflow',
                 false,
                 null,
                 null,
@@ -184,8 +184,8 @@ class totara_workflow_workflow_manager_testcase extends advanced_testcase {
         $wm = new \core_course\workflow_manager\coursecreate();
 
         // Manager should return valid workflow instances.
-        $workflow = $wm->get_workflow('\core\workflow\coursecreate\standard');
-        $this->assertInstanceOf('\core\workflow\coursecreate\standard', $workflow);
+        $workflow = $wm->get_workflow('\core\workflow\core_course\coursecreate\standard');
+        $this->assertInstanceOf('\core\workflow\core_course\coursecreate\standard', $workflow);
 
         // Manager should throw a coding_exception if requested to instantiate invalid class.
         $this->expectException("coding_exception");

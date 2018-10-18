@@ -51,15 +51,6 @@ class coursecreate extends \totara_workflow\workflow_manager\base {
     }
 
     /**
-     * Returns a list of all workflow classes of this type.
-     *
-     * @return array Array of fully-qualified class names.
-     */
-    protected function get_all_workflow_classes(): array {
-        return \core_component::get_namespace_classes('workflow\\coursecreate', '\\core_course\\workflow\\coursecreate');
-    }
-
-    /**
      * Defines data required by the workflow manager.
      * This data is included in the workflow URL and
      * workflow form (via hidden fields below).

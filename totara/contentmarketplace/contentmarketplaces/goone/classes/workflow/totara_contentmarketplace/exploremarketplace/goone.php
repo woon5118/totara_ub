@@ -21,14 +21,14 @@
  * @package contentmarketplace_goone
  */
 
-namespace contentmarketplace_goone\workflow\exploremarketplace;
+namespace contentmarketplace_goone\workflow\totara_contentmarketplace\exploremarketplace;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Go1 explore marketplace workflow implementation.
  */
-class goone extends \totara_contentmarketplace\workflow\exploremarketplace {
+class goone extends \totara_workflow\workflow\base {
 
     public function get_name(): string {
         return get_string('explorego1marketplace', 'contentmarketplace_goone');

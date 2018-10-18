@@ -21,11 +21,11 @@
  * @package contentmarketplace_goone
  */
 
-namespace contentmarketplace_goone\workflow\coursecreate;
+namespace contentmarketplace_goone\workflow\core_course\coursecreate;
 
 defined('MOODLE_INTERNAL') || die();
 
-class contentmarketplace extends \core_course\workflow\coursecreate {
+class contentmarketplace extends \totara_workflow\workflow\base {
 
     public function get_name(): string {
         return get_string('addcoursego1', 'contentmarketplace_goone');

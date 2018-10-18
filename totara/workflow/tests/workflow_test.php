@@ -33,8 +33,8 @@ defined('MOODLE_INTERNAL') || die();
 class totara_workflow_workflow_testcase extends advanced_testcase {
 
     public function test_workflow_basics() {
-        $workflow = \core\workflow\coursecreate\standard::instance();
-        $this->assertInstanceOf('\core\workflow\coursecreate\standard', $workflow);
+        $workflow = \core\workflow\core_course\coursecreate\standard::instance();
+        $this->assertInstanceOf('\core\workflow\core_course\coursecreate\standard', $workflow);
 
         // Workflow params should be empty.
         $params = $workflow->get_params();
@@ -67,7 +67,7 @@ class totara_workflow_workflow_testcase extends advanced_testcase {
         role_assign($creatorrole->id, $coursecreator->id, context_system::instance());
 
         // Student should not be able to access this workflow, because they can't create courses.
-        $workflow = \core\workflow\coursecreate\standard::instance();
+        $workflow = \core\workflow\core_course\coursecreate\standard::instance();
 
         $this->setUser($student->id);
         $this->assertFalse($workflow->is_available());
@@ -84,24 +84,27 @@ class totara_workflow_workflow_testcase extends advanced_testcase {
         return [
             // Test a valid case with simple placeholders.
             [
-                'component\\workflow\\manager\\workflow',
+                'component\\workflow\\managercomponent\\manager\\workflow',
                 true,
-                'component',
+                'managercomponent',
                 'manager',
+                'component',
                 'workflow',
             ],
             // Test a realistic case.
             [
-                'mod_facetoface\\workflow\\coursecreate\\seminar',
+                'mod_facetoface\\workflow\\core_course\\coursecreate\\seminar',
                 true,
-                'mod_facetoface',
+                'core_course',
                 'coursecreate',
+                'mod_facetoface',
                 'seminar',
             ],
             // Very badly formed classname
             [
                 'badclass',
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -113,27 +116,31 @@ class totara_workflow_workflow_testcase extends advanced_testcase {
                 null,
                 null,
                 null,
+                null,
             ],
             // Valid structure but invalid special chars in strings.
             [
-                'bad_special_chars!\\workflow\\course&create\\semi(nar',
+                'bad_special_chars!\\workflow\\core_course\\course&create\\semi(nar',
                 false,
+                null,
                 null,
                 null,
                 null,
             ],
             // Valid component and manager but missing workflow
             [
-                'valid_component\\workflow\\validmanager',
+                'valid_component\\workflow\\managercomponent\\validmanager',
                 false,
+                null,
                 null,
                 null,
                 null,
             ],
             // Valid class but with additional characters on the end.
             [
-                'valid_component\\workflow\\validmanager\\validworkflow\\extrastuff',
+                'valid_component\\workflow\\managercomponent\\validmanager\\validworkflow\\extrastuff',
                 false,
+                null,
                 null,
                 null,
                 null,
@@ -144,7 +151,7 @@ class totara_workflow_workflow_testcase extends advanced_testcase {
     /**
      * @dataProvider example_classnames_data_provider
      */
-    public function test_split_classname(string $classname, bool $valid, ?string $expectedcomponent, ?string $expectedmanager, ?string $expectedworkflow) {
+    public function test_split_classname(string $classname, bool $valid, ?string $expectedmanagercomponent, ?string $expectedmanager, ?string $expectedworkflowcomponent, ?string $expectedworkflow) {
 
         // When classname is not valid a coding_exception is thrown.
         if (!$valid) {
@@ -155,28 +162,30 @@ class totara_workflow_workflow_testcase extends advanced_testcase {
         $rc = new \ReflectionClass('\totara_workflow\workflow\base');
         $rcm = $rc->getMethod('split_classname');
         $rcm->setAccessible(true);
-        list($component, $manager, $workflow) = $rcm->invokeArgs(null, [$classname]);
+        list($managercomponent, $manager, $workflowcomponent, $workflow) = $rcm->invokeArgs(null, [$classname]);
 
         if ($valid) {
-            $this->assertEquals($expectedcomponent, $component);
+            $this->assertEquals($expectedmanagercomponent, $managercomponent);
             $this->assertEquals($expectedmanager, $manager);
+            $this->assertEquals($expectedworkflowcomponent, $workflowcomponent);
             $this->assertEquals($expectedworkflow, $workflow);
         }
     }
 
     public function test_export_for_template() {
         global $OUTPUT;
-        $workflow = \core\workflow\coursecreate\standard::instance();
+        $workflow = \core\workflow\core_course\coursecreate\standard::instance();
 
         $contextdata = $workflow->export_for_template($OUTPUT);
-        $this->assertEquals('core', $contextdata['component']);
+        $this->assertEquals('core_course', $contextdata['managercomponent']);
         $this->assertEquals('coursecreate', $contextdata['manager']);
+        $this->assertEquals('core', $contextdata['workflowcomponent']);
         $this->assertEquals('standard', $contextdata['workflow']);
     }
 
     public function test_enabled() {
         $this->resetAfterTest(true);
-        $workflow = \core\workflow\coursecreate\standard::instance();
+        $workflow = \core\workflow\core_course\coursecreate\standard::instance();
         $workflow->enable();
         $this->assertTrue($workflow->is_enabled());
         $workflow->disable();

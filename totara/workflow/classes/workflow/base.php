@@ -102,17 +102,18 @@ abstract class base implements \templatable {
      * Extract component, manager and workflow data from the classname.
      *
      * @param string $workflowclass Name of the workflow class to split.
-     * @return string[] Array of [$component, $manager, $workflow] as strings.
+     * @return string[] Array of [$managercomponent, $manager, $workflowcomponent, $workflow] as strings.
      */
     protected static function split_classname(string $workflowclass): array {
-        if (!preg_match('/^([a-z][a-z0-9_]*)\\\\workflow\\\\([a-zA-Z0-9_-]+)\\\\([a-zA-Z0-9_-]+)$/', $workflowclass, $matches)) {
+        if (!preg_match('/^([a-z][a-z0-9_]*)\\\\workflow\\\\([a-z][a-z0-9_]*)\\\\([a-zA-Z0-9_-]+)\\\\([a-zA-Z0-9_-]+)$/', $workflowclass, $matches)) {
             throw new \coding_exception("Workflow class '{$workflowclass}' does not match expected format.");
         }
-        $component = $matches[1] ?? null;
-        $manager = $matches[2] ?? null;
-        $workflow = $matches[3] ?? null;
+        $workflowcomponent = $matches[1] ?? null;
+        $managercomponent = $matches[2] ?? null;
+        $manager = $matches[3] ?? null;
+        $workflow = $matches[4] ?? null;
 
-        return [$component, $manager, $workflow];
+        return [$managercomponent, $manager, $workflowcomponent, $workflow];
     }
 
     /**
@@ -124,11 +125,12 @@ abstract class base implements \templatable {
      * @return \moodle_url
      */
     protected function get_workflow_url(): \moodle_url {
-        list($component, $manager, $workflow) = self::split_classname(get_class($this));
+        list($managercomponent, $manager, $workflowcomponent, $workflow) = self::split_classname(get_class($this));
 
         return new \moodle_url('/totara/workflow/workflow.php', [
-            'component' => $component,
+            'managercomponent' => $managercomponent,
             'manager' => $manager,
+            'workflowcomponent' => $workflowcomponent,
             'workflow' => $workflow,
         ]);
     }
@@ -151,11 +153,12 @@ abstract class base implements \templatable {
     /**
      * Returns the workflow's manager instance.
      *
-     * Must be implemented in workflow definition.
-     *
      * @return string name of workflow's manager class.
      */
-    abstract public static function get_manager_class(): string;
+    public static final function get_manager_class(): string {
+        list($managercomponent, $manager, $workflowcomponent, $workflow) = self::split_classname(static::class);
+        return "\\{$managercomponent}\\workflow_manager\\{$manager}";
+    }
 
     /**
      * Return the data required to render the workflow template.
@@ -165,15 +168,16 @@ abstract class base implements \templatable {
      */
     public function export_for_template(\renderer_base $output): array {
 
-        list($component, $manager, $workflow) = self::split_classname(get_class($this));
+        list($managercomponent, $manager, $workflowcomponent, $workflow) = self::split_classname(get_class($this));
 
         return [
             'url' => $this->get_url(),
             'name' => $this->get_name(),
             'description' => $this->get_description(),
             'imageurl' => $this->get_image(),
-            'component' => $component,
+            'managercomponent' => $managercomponent,
             'manager' => $manager,
+            'workflowcomponent' => $workflowcomponent,
             'workflow' => $workflow,
             'enabled' => (int)$this->is_enabled(),
         ];
@@ -244,12 +248,14 @@ abstract class base implements \templatable {
      */
     public final function get_current_data(): array {
 
-        $component = required_param('component', PARAM_COMPONENT);
+        $managercomponent = required_param('managercomponent', PARAM_COMPONENT);
         $manager = required_param('manager', PARAM_ALPHANUMEXT);
+        $workflowcomponent = required_param('workflowcomponent', PARAM_COMPONENT);
         $workflow = required_param('workflow', PARAM_ALPHANUMEXT);
         $data = [
-            'component' => $component,
+            'managercomponent' => $managercomponent,
             'manager' => $manager,
+            'workflowcomponent' => $workflowcomponent,
             'workflow' => $workflow,
         ];
 
@@ -276,21 +282,21 @@ abstract class base implements \templatable {
      * @return bool True if enabled.
      */
     public final function is_enabled(): bool {
-        return (bool) get_config('totara_workflow', get_class($this));
+        return $this->manager->is_workflow_enabled(get_class($this));
     }
 
     /**
      * Enable this workflow.
      */
     public final function enable(): void {
-        set_config(get_class($this), 1, 'totara_workflow');
+        $this->manager->enable_workflow(get_class($this));
     }
 
     /**
      * Disable this workflow.
      */
     public final function disable(): void {
-        set_config(get_class($this), 0, 'totara_workflow');
+        $this->manager->disable_workflow(get_class($this));
     }
 
     /**

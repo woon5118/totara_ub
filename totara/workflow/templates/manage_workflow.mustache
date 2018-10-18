@@ -33,8 +33,9 @@
         "url": "http://example.com/",
         "imageurl": "http://via.placeholder.com/100x100",
         "enabled": 1,
-        "component": "component_name",
+        "managercomponent": "component_name",
         "manager": "wfmanager",
+        "workflowcomponent": "component_name",
         "workflow": "wfname"
     }
 }}
@@ -45,11 +46,11 @@
     <td>
     {{#enabled}}
     <a
-    href="{{wwwroot}}/totara/workflow/index.php?action=disable&sesskey={{sesskey}}&component={{component}}&manager={{manager}}&workflow={{workflow}}">{{#flex_icon}}hide,disable,totara_workflow{{/flex_icon}}</a>
+    href="{{wwwroot}}/totara/workflow/index.php?action=disable&sesskey={{sesskey}}&managercomponent={{managercomponent}}&manager={{manager}}&workflowcomponent={{workflowcomponent}}&workflow={{workflow}}">{{#flex_icon}}hide,disable,totara_workflow{{/flex_icon}}</a>
     {{/enabled}}
     {{^enabled}}
     <a
-    href="{{wwwroot}}/totara/workflow/index.php?action=enable&sesskey={{sesskey}}&component={{component}}&manager={{manager}}&workflow={{workflow}}">{{#flex_icon}}show,enable,totara_workflow{{/flex_icon}}</a>
+    href="{{wwwroot}}/totara/workflow/index.php?action=enable&sesskey={{sesskey}}&managercomponent={{managercomponent}}&manager={{manager}}&workflowcomponent={{workflowcomponent}}&workflow={{workflow}}">{{#flex_icon}}show,enable,totara_workflow{{/flex_icon}}</a>
     {{/enabled}}
     </td>
 </tr>

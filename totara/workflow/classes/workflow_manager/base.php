@@ -151,7 +151,12 @@ abstract class base {
      *
      * @return string[] Array of fully-qualified class names.
      */
-    abstract protected function get_all_workflow_classes(): array;
+    protected final function get_all_workflow_classes(): array {
+
+        list($managercomponent, $manager) = self::split_classname(get_class($this));
+
+        return \core_component::get_namespace_classes("workflow\\{$managercomponent}\\{$manager}", '\\totara_workflow\\workflow\\base');
+    }
 
     /**
      * Defines data required by the workflow manager.
@@ -235,5 +240,78 @@ abstract class base {
         }
 
         return $data;
+    }
+
+    /**
+     * Enable a specific workflow.
+     *
+     * NOTE: This method is safe to call during install and upgrades.
+     *
+     * @param string $workflowclass Classname of workflow to enable.
+     */
+    public final function enable_workflow(string $workflowclass): void {
+        if ($this->is_workflow_enabled($workflowclass)) {
+            // Already enabled.
+            return;
+        }
+        [$managercomponent, $settingname] = $this->get_manager_setting_name();
+        $setting = get_config($managercomponent, $settingname);
+        if (empty($setting)) {
+            $newsetting = $workflowclass;
+        } else {
+            $workflows = explode(',', $setting);
+            $workflows[] = $workflowclass;
+            $newsetting = implode(',', $workflows);
+        }
+        set_config($settingname, $newsetting, $managercomponent);
+    }
+
+    /**
+     * Disable a specific workflow.
+     *
+     * NOTE: This method is safe to call during install and upgrades.
+     *
+     * @param string $workflowclass Classname of workflow to disable.
+     */
+    public final function disable_workflow(string $workflowclass): void {
+        if (!$this->is_workflow_enabled($workflowclass)) {
+            // Already disabled.
+            return;
+        }
+        [$managercomponent, $settingname] = $this->get_manager_setting_name();
+        $setting = get_config($managercomponent, $settingname);
+
+        $workflows = explode(',', $setting);
+        $index = array_search($workflowclass, $workflows);
+        unset($workflows[$index]);
+        $newsetting = implode(',', $workflows);
+        set_config($settingname, $newsetting, $managercomponent);
+    }
+
+    /**
+     * Check if specific workflow is enabled.
+     *
+     * @param string $workflowclass Classname of workflow to check.
+     * @return bool True if the specified workflow is enabled.
+     */
+    public final function is_workflow_enabled(string $workflowclass): bool {
+        [$managercomponent, $settingname] = $this->get_manager_setting_name();
+        $setting = get_config($managercomponent, $settingname);
+        if (empty($setting)) {
+            return false;
+        }
+
+        $workflows = explode(',', $setting);
+        return in_array($workflowclass, $workflows);
+    }
+
+    /**
+     * Return the name of the current manager's config setting.
+     * @return string[] Array containing [$managercomponent, $settingname] for config setting used by this manager.
+     */
+    private function get_manager_setting_name(): array {
+        list($component, $manager) = self::split_classname(get_class($this));
+
+        return [$component, "workflow_manager_{$manager}_enabled_workflows"];
     }
 }

@@ -26,7 +26,10 @@
  */
 function xmldb_contentmarketplace_goone_install() {
     // Enable GO1 course create workflow on install.
-    set_config('contentmarketplace_goone\\workflow\\coursecreate\\contentmarketplace', 1, 'totara_workflow');
+    $workflow = contentmarketplace_goone\workflow\core_course\coursecreate\contentmarketplace::instance();
+    $workflow->enable();
+
     // Enable goone Explore marketplace workflow on install.
-    set_config('contentmarketplace_goone\\workflow\\exploremarketplace\\goone', 1, 'totara_workflow');
+    $workflow = contentmarketplace_goone\workflow\totara_contentmarketplace\exploremarketplace\goone::instance();
+    $workflow->enable();
 }

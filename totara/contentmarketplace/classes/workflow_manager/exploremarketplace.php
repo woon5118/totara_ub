@@ -50,13 +50,4 @@ class exploremarketplace extends \totara_workflow\workflow_manager\base {
         return true;
     }
 
-    /**
-     * Returns a list of all workflow classes of this type.
-     *
-     * @return array Array of fully-qualified class names.
-     */
-    protected function get_all_workflow_classes(): array {
-        return \core_component::get_namespace_classes('workflow\\exploremarketplace', '\\totara_contentmarketplace\\workflow\\exploremarketplace');
-    }
-
 }

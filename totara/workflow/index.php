@@ -24,17 +24,18 @@
 require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$component = optional_param('component', '', PARAM_COMPONENT);
+$managercomponent = optional_param('managercomponent', '', PARAM_COMPONENT);
 $manager = optional_param('manager', '', PARAM_ALPHANUMEXT);
+$workflowcomponent = optional_param('workflowcomponent', '', PARAM_COMPONENT);
 $workflow = optional_param('workflow', '', PARAM_ALPHANUMEXT);
 $action = optional_param('action', '', PARAM_ALPHA);
 
 admin_externalpage_setup('manageworkflows');
 
-if ($action && $component && $manager && $workflow) {
+if ($action && $managercomponent && $manager && $workflowcomponent && $workflow) {
     require_sesskey();
 
-    $classname = "{$component}\\workflow\\{$manager}\\{$workflow}";
+    $classname = "{$workflowcomponent}\\workflow\\{$managercomponent}\\{$manager}\\{$workflow}";
     if (!class_exists($classname)) {
         print_error('error:noworkflowclass', 'totara_workflow', '', $classname);
     }
