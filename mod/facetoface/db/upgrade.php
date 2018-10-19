@@ -258,7 +258,7 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018022600, 'facetoface');
     }
 
-    if ($oldversion < 2018050800) {
+    if ($oldversion < 2018101900) {
 
         $table = new xmldb_table('facetoface_notification_tpl');
         $field = new xmldb_field('title', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
@@ -273,7 +273,7 @@ function xmldb_facetoface_upgrade($oldversion) {
         $field = new xmldb_field('title', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $dbman->change_field_precision($table, $field);
 
-        upgrade_mod_savepoint(true, 2018050800, 'facetoface');
+        upgrade_mod_savepoint(true, 2018101900, 'facetoface');
     }
 
     return true;
