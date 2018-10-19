@@ -123,9 +123,13 @@ Feature: Check previous and upcomings sections are right populated
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Sign-up"
     When I follow "C1"
-    Then I should see "Event in progress"
-    And I should see "1 January 2020"
-    And I should not see "1 January 1999"
+    Then I should see "Booked"
+    And I should not see "Event in progress"
+    And I should not see "Event over"
+    And I follow "View all events"
+    Then I should see "Booked"
+    And I should see "Event in progress"
+    And I should see "Event over"
     And I log out
 
     # Change sign up for multiple events setting.

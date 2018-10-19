@@ -23,6 +23,9 @@
 
 namespace mod_facetoface\signup\state;
 
+use mod_facetoface\signup\transition;
+use mod_facetoface\signup\condition\{event_is_not_cancelled, event_in_the_past};
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -33,8 +36,16 @@ class partially_attended extends state {
      * Get conditions and validations of transitions from current state
      */
     final public function get_map() : array {
-        // Final state.
-        return [];
+        return [
+            transition::to(new no_show($this->signup))->with_conditions(
+                event_is_not_cancelled::class,
+                event_in_the_past::class
+            ),
+            transition::to(new fully_attended($this->signup))->with_conditions(
+                event_is_not_cancelled::class,
+                event_in_the_past::class
+            )
+        ];
     }
 
     /**

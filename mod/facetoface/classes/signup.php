@@ -107,9 +107,10 @@ final class signup {
      *
      * @param int userid
      * @param seminar_event $seminarevent
+     * @param int notificationtype - Default 3 = MDL_F2F_BOTH
      * @return signup
      */
-    public static function create($userid, seminar_event $seminarevent, int $notificationtype = MDL_F2F_BOTH) : signup {
+    public static function create($userid, seminar_event $seminarevent, int $notificationtype = 3) : signup {
         global $DB;
 
         if (empty($seminarevent->get_id())) {
@@ -401,7 +402,11 @@ final class signup {
      * @param status $status
      */
     protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0) : signup_status {
-        global $USER;
+        global $USER, $CFG;
+
+        // We need the completionlib for \completion_info and the COMPLETION_UNKNOWN constant.
+        require_once($CFG->libdir . '/completionlib.php');
+
         $status = signup_status::create($this, $state, $timecreated);
 
         if (empty($userbyid)) {

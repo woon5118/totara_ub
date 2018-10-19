@@ -95,6 +95,10 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['approvaloptions'] = 'approval_none';
         $defaults['usercalentry'] = 1;
         $defaults['multiplesessions'] = 0;
+        $defaults['multisignupmaximum'] = 0;
+        $defaults['multisignupnoshow'] = 0;
+        $defaults['multisignuppartly'] = 0;
+        $defaults['multisignupfully'] = 0;
         $defaults['completionstatusrequired'] = '{"100":1}';
         $defaults['managerreserve'] = 0;
         $defaults['maxmanagerreserves'] = 1;

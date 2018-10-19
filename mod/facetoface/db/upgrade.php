@@ -276,5 +276,106 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018101900, 'facetoface');
     }
 
+    if ($oldversion < 2018102700) {
+
+        // First set the activity default settings to maintain previous behaviour.
+        $oldmulti = (bool) get_config(null, 'facetoface_multiplesessions');
+        set_config('facetoface_multisignup_enable', $oldmulti);
+
+        $restrictions = $oldmulti ? '' : 'multisignuprestrict_partially,multisignuprestrict_noshow';
+        set_config('facetoface_multisignup_restrict', $restrictions);
+
+        $maximum = $oldmulti ? 0 : 2;
+        set_config('facetoface_multisignup_maximum', $maximum);
+
+        set_config('facetoface_waitlistautoclean', 0); // Disable to maintain previous behaviour.
+
+        // Then Create the columns for the restrictions on multiple signups.
+        $table = new xmldb_table('facetoface');
+        $fields = [];
+
+        // multisignupfully - only fully attended users can signup for another event
+        $fields[] = new xmldb_field('multisignupfully', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // multisignuppartly - only partially attended users can signup for another event
+        $fields[] = new xmldb_field('multisignuppartly', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // multisignupnoshow - only users marked as no shows can signup for another event
+        $fields[] = new xmldb_field('multisignupnoshow', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // multisignupmaximum - the maximum amount of event a user can signup for.
+        $fields[] = new xmldb_field('multisignupmaximum', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // waitlistautoclean - Whether to clean the waitlist for an event after it has begun.
+        $fields[] = new xmldb_field('waitlistautoclean', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2018102700, 'facetoface');
+    }
+
+    if ($oldversion < 2018102800) {
+        // Create the default notification template for waitlistautoclean.
+        $title = get_string('setting:defaultwaitlistautocleansubjectdefault', 'facetoface');
+        if (\core_text::strlen($title) > 255) {
+            $title = \core_text::substr($title, 0, 255);
+        }
+
+        $body = text_to_html(get_string('setting:defaultwaitlistautocleanmessagedefault', 'facetoface'));
+
+        if (!$DB->record_exists('facetoface_notification_tpl', ['reference' => 'waitlistautoclean'])) {
+            $tpl_waitlistautoclean = new stdClass();
+            $tpl_waitlistautoclean->status = 1;
+            $tpl_waitlistautoclean->reference = 'waitlistautoclean';
+            $tpl_waitlistautoclean->title = $title;
+            $tpl_waitlistautoclean->body = $body;
+            $tpl_waitlistautoclean->ccmanager = 0;
+            $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_waitlistautoclean);
+        } else {
+            $templateid = $DB->get_field('facetoface_notification_tpl', 'id', ['reference' => 'waitlistautoclean']);
+        }
+
+        // Now add the new template to existing seminars.
+        // NOTE: We don't normally want to do this, but it's safe to do
+        //       here since it's disabled by default and they wont send
+        //       unless someone turns on the setting.
+        $conditiontype = 524288; // Constant MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN.
+        $sql = 'SELECT f.*
+                  FROM {facetoface} f
+             LEFT JOIN {facetoface_notification} fn
+                    ON fn.facetofaceid = f.id
+                   AND fn.conditiontype = :ctype
+             WHERE fn.id IS NULL';
+        $f2fs = $DB->get_records_sql($sql, ['ctype' => $conditiontype]);
+
+        $data = new stdClass();
+        $data->type = 4; // MDL_F2F_NOTIFICATION_AUTO.
+        $data->conditiontype = $conditiontype;
+        $data->booked = 0;
+        $data->waitlisted = 0;
+        $data->cancelled = 0;
+        $data->requested = 0;
+        $data->issent = 0;
+        $data->status = 0; // Disable for existing seminars.
+        $data->templateid = $templateid;
+        $data->ccmanager = 0;
+        $data->title = $title;
+        $data->body = $body;
+
+        foreach ($f2fs as $f2f) {
+            $notification = clone($data);
+            $notification->facetofaceid = $f2f->id;
+            $notification->courseid = $f2f->course;
+
+            $DB->insert_record('facetoface_notification', $notification);
+        }
+
+        upgrade_mod_savepoint(true, 2018102800, 'facetoface');
+    }
+
     return true;
 }

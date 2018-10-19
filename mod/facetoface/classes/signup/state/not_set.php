@@ -26,7 +26,7 @@ namespace mod_facetoface\signup\state;
 use mod_facetoface\signup\condition\{approval_manager_required, approval_not_required, approval_role_required,
     booking_common, has_required_job_assignment, has_signup_capability, is_reservation, no_other_signups,
     event_has_role_approver, user_can_select_manager, user_has_manager, user_has_no_conflicts, user_is_enrolable,
-    waitlist_common, waitlist_everyone_disabled};
+    waitlist_common, waitlist_everyone_disabled, multisignup_common};
 use mod_facetoface\signup\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,6 +40,7 @@ class not_set extends state {
         return [
             // Straight-forward booking
             transition::to(new booked($this->signup))->with_conditions(
+                multisignup_common::class,
                 has_signup_capability::class,
                 has_required_job_assignment::class,
                 no_other_signups::class,
@@ -51,6 +52,7 @@ class not_set extends state {
             ),
             // Straight-forward wait list
             transition::to(new waitlisted($this->signup))->with_conditions(
+                multisignup_common::class,
                 has_signup_capability::class,
                 has_required_job_assignment::class,
                 no_other_signups::class,
@@ -61,6 +63,7 @@ class not_set extends state {
             ),
             // Request approval: manager and user has manager
             transition::to(new requested($this->signup))->with_conditions(
+                multisignup_common::class,
                 approval_manager_required::class,
                 has_required_job_assignment::class,
                 user_has_manager::class,
@@ -68,6 +71,7 @@ class not_set extends state {
             ),
             // Request approval: manager and user can select manager
             transition::to(new requested($this->signup))->with_conditions(
+                multisignup_common::class,
                 approval_manager_required::class,
                 has_required_job_assignment::class,
                 user_can_select_manager::class,
@@ -75,6 +79,7 @@ class not_set extends state {
             ),
             // Request approval: role
             transition::to(new requested($this->signup))->with_conditions(
+                multisignup_common::class,
                 has_signup_capability::class,
                 has_required_job_assignment::class,
                 no_other_signups::class,

@@ -792,7 +792,6 @@ $string['modulename'] = 'Seminar';
 $string['modulenameplural'] = 'Seminars';
 $string['moreinfo'] = 'More info';
 $string['multidate'] = '(multi-date)';
-$string['multiplesessions'] = 'Users can sign-up to multiple events';
 $string['namewithmanager'] = '{$a->attendeename} ({$a->managername})';
 $string['noactionableunapprovedrequests'] = 'No actionable unapproved requests';
 $string['nocancellations'] = 'There have been no cancellations';
@@ -1884,6 +1883,22 @@ $string['setting:defaulttrainersessionunassignedsubject_caption'] = 'Trainer eve
 $string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Face-to-face session trainer unassigned';
 $string['setting:defaulttrainersessionunassignedsubjectdefault_v9'] = 'Seminar event trainer unassigned';
 $string['setting:defaultvalue'] = 'Default value';
+$string['setting:defaultwaitlistautocleansubjectdefault'] = 'Waitlist auto-cancellation';
+$string['setting:defaultwaitlistautocleanmessagedefault'] = 'This is to advise you that your waitlisted signup for the following course has been automatically cancelled due to the event starting:
+
+***WAITLIST CANCELLATION***
+
+Course:   [facetofacename]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]';
 $string['setting:defaultwaitlistedmessage'] = 'Default wait-listed message sent to users.';
 $string['setting:defaultwaitlistedmessage_caption'] = 'Wait-listed message';
 $string['setting:defaultwaitlistedmessagedefault'] = 'This is to advise that you have been added to the waitlist for:
@@ -1988,8 +2003,6 @@ $string['setting:managerreserve_desc'] = 'Managers are able to make reservations
 $string['setting:managerreserveheader'] = 'Manager reservations';
 $string['setting:maxmanagerreserves'] = 'Max reservations';
 $string['setting:maxmanagerreserves_desc'] = 'The total number of reservations / bookings that a manager can make for their team';
-$string['setting:multiplesessions'] = 'Default value for allowing multiple events signup per user';
-$string['setting:multiplesessions_caption'] = 'Multiple events default';
 $string['setting:oneemailperday'] = 'Send multiple confirmation emails for multi-date events. Note: If there is more than one event date on a single day then each session will generate an email. One session spanning over multiple days will generate only one email.';
 $string['setting:oneemailperday_caption'] = 'One message per date:';
 $string['setting:hidecost'] = 'Hide the normal cost, discount cost and user discount code fields.';
@@ -2075,9 +2088,13 @@ $string['state_eventiscancelled_desc'] = 'The event is cancelled';
 $string['state_eventiscancelled_fail'] = 'The event is not cancelled when it is expected to be';
 $string['state_eventisnotcancelled_desc'] = 'The event is not cancelled';
 $string['state_eventnotinthepast_desc'] = 'Event is started or has no dates, or user has permission to singup for events in the past';
-$string['state_eventregistrationisavailable_desc'] = 'We are currently within the registration period of the event, as definied bythe registrationtimestart and registrationtimefinish settings';
+$string['state_eventregistrationisavailable_desc'] = 'We are currently within the registration period of the event, as definied by the registrationtimestart and registrationtimefinish settings';
 $string['state_eventregistrationisavailable_failstart'] = 'The registration period for the event has not opened yet';
 $string['state_hassignupcapability_desc'] = 'User must have "mod/facetoface:signup" capability or seminar enrolment module is enabled for course';
+$string['state_multisignup_common_desc'] = 'Check whether the user is signed up for multiple events in the same seminar';
+$string['state_multisignup_enabled_fail'] = 'Existing sign-up(s) for this seminar';
+$string['state_multisignup_restriction_fail'] = ', are not in the required attendance state(s)';
+$string['state_multisignup_limitation_fail'] = ', have already reached the maximum of {$a} signup(s)';
 $string['state_noothersignups_desc'] = 'User must not have active signups in other events of the same activity, unless multiple signups is enabled for the event.';
 $string['state_userisenrolable_desc'] = 'The user being signed up can be enrolled on the course';
 $string['state_userisenrolable_fail'] = 'User is not enroled and cannot be enroled by signing up to the seminar event';
@@ -2207,6 +2224,8 @@ $string['viewdetails'] = 'View details';
 $string['viewresults'] = 'View results';
 $string['viewroom'] = 'View room';
 $string['viewsubmissions'] = 'View submissions';
+$string['waitlistautoclean'] = 'Auto-clear expired event waitlists';
+$string['waitlistautoclean_help'] = 'The waitlist for events gets cleared when they start, allowing users to signup to a new event. The waitlistautoclean notification can be used to inform users about this happening.';
 $string['waitlistedmessage'] = 'Wait-listed message';
 $string['waitlisteveryone'] = 'Send all bookings to the waiting list';
 $string['waitlisteveryone_help'] = 'Everyone who signs up for this event will be added to the waiting list.';
@@ -2276,7 +2295,20 @@ $string['mods_help'] = 'Seminar activities are used to keep track of in-person t
 Each activity is offered in one or more identical events. These events can be given over multiple days.
 
 Reminder messages are sent to users and their managers a few days before the event is scheduled to start. Confirmation messages are sent when users sign-up for an event or cancel.';
-$string['multiplesessions_help'] = 'Use this option if you want users be able to sign up to multiple events . When this option is toggled, users can sign up for multiple events in the activity.';
+$string['multisignup_header'] = 'Multiple Sign-up Settings';
+$string['multisignupenable'] = 'Users can sign-up to multiple events';
+$string['multisignupenable_desc'] = 'This setting allows users to sign up to more than one event in a seminar, restricted by the settings below';
+$string['multisignupenable_help'] = 'This setting allows users to sign up to more than one event in the seminar, restricted by the settings below';
+$string['multisignupfailure_common'] = 'Existing sign-up(s) for this seminar';
+$string['multisignupfailure_limitation'] = ', have already reached the maximum of {$a} signup(s)';
+$string['multisignupfailure_restriction'] = ', are not in the required attendance state(s)';
+$string['multisignupmaximum'] = 'Maximum number of sign-ups';
+$string['multisignupmaximum_help'] = 'Limits the total number of sign-ups a user can have within the seminar. A value of Zero for this setting means an unlimited number of sign-ups. Note: This setting does not take cancelled sign-ups into consideration.';
+$string['multisignupmaximum_validation'] = 'Please enter a maximum limit of 2 or higher';
+$string['multisignupmaximum_none'] = 'Unlimited';
+$string['multisignuprestrict'] = 'Restrict subsequent sign-ups to';
+$string['multisignuprestrict_desc'] = 'Restrict subsequent sign-ups based on the state of previous signups. Enabling any of these state restrictions will limit users to a single concurrent sign-up within a single seminar, as they will not be able to sign-up to another event until their current sign-up has its attendance set to one of the selected states. If none of these restrictions are enabled users can have as many concurrent sign-ups within the seminar as the maximum limitation allows. Note: Cancelled signups are not taken into consideration.';
+$string['multisignuprestrict_help'] = 'Restrict subsequent sign-ups based on the state of previous signups. Enabling any of these state restrictions will limit users to a single concurrent sign-up within the seminar, as they will not be able to sign-up to another event until their current sign-up has its attendance set to one of the selected states. If none of these restrictions are enabled users can have as many concurrent sign-ups within the seminar as the maximum limitation allows. Note: Cancelled signups are not taken into consideration.';
 $string['normalcost_help'] = 'Normal cost is the amount charged to staff members who do not have a membership ID.';
 $string['notificationtype_help'] = 'Notification Type allows the learner to select how they would like to be notified of their booking.
 
@@ -2372,6 +2404,7 @@ $string['signupstartsonly'] = 'After {$a->startdate} {$a->starttime} {$a->timezo
 $string['signupendsonly'] = 'Before {$a->enddate} {$a->endtime} {$a->timezone}';
 $string['waitlistcancelled'] = 'Your place on the waitlist has been cancelled.';
 $string['waitlistcancellationconfirm'] = 'Are you sure you want to cancel your place on the waiting list for this event?';
+$string['waitlistautocleantask'] = 'Clear seminar event waitlists after the event has started';
 $string['waitlistedforsession'] = 'Waitlisted for event {$a}';
 $string['waitlistfor'] = 'Waitlist for {$a}';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following event';
@@ -2426,7 +2459,6 @@ $string['manageremailformat'] = 'The email address must be of the format \'{$a}\
 $string['manageremailinstruction'] = 'In order to sign-up for a training event, a confirmation email must be sent to your email address and copied to your manager\'s email address.';
 $string['manageremailinstructionconfirm'] = 'Please confirm that this is your manager\'s email address:';
 $string['managerupdated'] = 'Your manager\'s email address has been updated.';
-$string['multiplesessionsheading'] = 'Multiple events signup settings';
 $string['newmanageremailaddress'] = 'Manager\'s email address';
 $string['noposition'] = 'User has no positions assigned.';
 $string['nositenotices'] = '<p>No site notices are defined.</p>';
@@ -2507,3 +2539,8 @@ $string['facetoface:overbook'] = 'Sign-up to full events.';
 $string['missingdefaultnotifications'] = 'There are {$a} missing default notifications.';
 $string['missingdefaultsfix'] = 'Click here to restore missing default notifications.';
 $string['xhxm'] = '{$a->hours}h {$a->minutes}m';
+$string['setting:multiplesessions'] = 'Default value for allowing multiple events signup per user';
+$string['setting:multiplesessions_caption'] = 'Multiple events default';
+$string['multiplesessionsheading'] = 'Multiple events signup settings';
+$string['multiplesessions'] = 'Users can sign-up to multiple events';
+$string['multiplesessions_help'] = 'When this option is toggled, users can sign up for multiple events within a seminar, subject to the restrictions and limitations of the settings below.';

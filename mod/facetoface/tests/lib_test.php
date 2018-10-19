@@ -1347,7 +1347,7 @@ class mod_facetoface_lib_testcase extends facetoface_testcase {
         $this->assert_count_customfield_data('signup', [$signups[12]->id, $signups[22]->id], 5, 5);
         $this->assert_count_customfield_data('cancellation', [$signups[12]->id, $signups[22]->id], 1, 1);
 
-        $signupslist = new \mod_facetoface\signup_list(['sessionid' => (int)$session2->id]);
+        $signupslist = \mod_facetoface\signup_list::from_conditions(['sessionid' => (int)$session2->id]);
         $signupslist->delete();
 
         // Check data after deletion.

@@ -90,12 +90,46 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $mform->disabledIf('cancellationscutoffdefault[timeunit]', 'allowcancellationsdefault', 'notchecked', 2);
         }
 
-        $mform->addElement('advcheckbox', 'multiplesessions', get_string('multiplesessions', 'facetoface'), '',
-                array('group' => 1), array(0, 1));
+        $mform->addElement('advcheckbox', 'multiplesessions', get_string('multisignupenable', 'facetoface'), '', null, [0, 1]);
         $mform->setType('multiplesessions', PARAM_BOOL);
-        $mform->addHelpButton('multiplesessions', 'multiplesessions', 'facetoface');
-        $multiplesessions = get_config(null, 'facetoface_multiplesessions') ? 1 : 0;
+        $mform->addHelpButton('multiplesessions', 'multisignupenable', 'facetoface');
+        $multiplesessions = get_config(null, 'facetoface_multisignup_enable') ? 1 : 0;
         $mform->setDefault('multiplesessions', $multiplesessions);
+
+        $cbarray = array();
+        $cbarray[] = $mform->createElement('checkbox', 'multisignuprestrictfully', '', get_string('status_fully_attended', 'mod_facetoface'), 0);
+        $cbarray[] = $mform->createElement('checkbox', 'multisignuprestrictpartly', '', get_string('status_partially_attended', 'mod_facetoface'), 1);
+        $cbarray[] = $mform->createElement('checkbox', 'multisignuprestrictnoshow', '', get_string('status_no_show', 'mod_facetoface'), 2);
+        $mform->addGroup($cbarray, 'multisignuprestrictions', get_string('multisignuprestrict', 'mod_facetoface'), ['<br/>'], false);
+        $mform->disabledIf('multisignuprestrictions', 'multiplesessions', 'noteq', 1);
+        $mform->setType('multisignuprestrictions', PARAM_INT);
+        $mform->addHelpButton('multisignuprestrictions', 'multisignuprestrict', 'facetoface');
+        $restrictdefaults = explode(',', get_config(null, 'facetoface_multisignup_restrict'));
+        $mform->setDefault('multisignuprestrictfully', in_array('multisignuprestrict_fully', $restrictdefaults));
+        $mform->setDefault('multisignuprestrictpartly', in_array('multisignuprestrict_partially', $restrictdefaults));
+        $mform->setDefault('multisignuprestrictnoshow', in_array('multisignuprestrict_noshow', $restrictdefaults));
+
+        $rbarray = array();
+        $rbarray[] =& $mform->createElement('radio', 'multisignup_limit', '', get_string('multisignupmaximum_none', 'mod_facetoface'), 'limitnone');
+        $rbarray[] =& $mform->createElement('radio', 'multisignup_limit', '', '', 'limitamount');
+        $rbarray[] =& $mform->createElement('text', 'multisignup_limitamount', '', '');
+        $mform->addGroup($rbarray, 'multisignuplimitations', get_string('multisignupmaximum', 'mod_facetoface'), ['<br/>', ''], false);
+        $mform->disabledIf('multisignup_limit', 'multiplesessions', 'noteq', 1);
+        $mform->disabledIf('multisignup_limitamount', 'multisignup_limit', 'noteq', 'limitamount');
+        $mform->disabledIf('multisignup_limitamount', 'multiplesessions', 'noteq', 1);
+        $mform->setType('multisignuplimitations', PARAM_INT);
+        $mform->setType('multisignup_limitamount', PARAM_INT);
+        $mform->addHelpButton('multisignuplimitations', 'multisignupmaximum', 'facetoface');
+        $amountdefault = get_config(null, 'facetoface_multisignup_maximum');
+        $enabledefault = empty($amountdefault) ? 'limitnone' : 'limitamount';
+        $mform->setDefault('multisignup_limit', $enabledefault);
+        $mform->setDefault('multisignup_limitamount', $amountdefault);
+
+        $mform->addElement('advcheckbox', 'waitlistautoclean', get_string('waitlistautoclean', 'mod_facetoface'), '', array('group' => 1), array(0, 1));
+        $mform->setType('waitlistautoclean', PARAM_BOOL);
+        $mform->addHelpButton('waitlistautoclean', 'waitlistautoclean', 'facetoface');
+        $autocleandefault = get_config(null, 'facetoface_waitlistautoclean') ? 1 : 0;
+        $mform->setDefault('waitlistautoclean', $autocleandefault);
 
         $declareinterestops = array(
             0 => get_string('declareinterestnever', 'facetoface'),
@@ -471,6 +505,19 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $data->forceselectjobassignment = 0;
         }
 
+        // Multiple sign-up settings.
+        $data->multiplesessions = empty($data->multiplesessions) ? 0 : 1;
+        $data->multisignupfully = empty($data->multisignuprestrictfully) ? 0 : 1;
+        $data->multisignuppartly = empty($data->multisignuprestrictpartly) ? 0 : 1;
+        $data->multisignupnoshow = empty($data->multisignuprestrictnoshow) ? 0 : 1;
+        if ($data->multisignup_limit == 'limitamount') {
+            $data->multisignupmaximum = $data->multisignup_limitamount;
+        } else {
+            $data->multisignupmaximum = 0; // Unlimited signups.
+        }
+
+        $data->waitlistautoclean = empty($data->waitlistautoclean) ? 0 : 1;
+
         return $data;
     }
 
@@ -503,6 +550,19 @@ class mod_facetoface_mod_form extends moodleform_mod {
 
             // Convert interest flags to option.
             $defaultvalues['declareinterest'] = ($defaultvalues['interestonlyiffull'] == 1) ? 2 : $defaultvalues['declareinterest'];
+
+            // Translate the multiple signup values from db to form.
+            $defaultvalues['multisignuprestrictfully'] = $defaultvalues['multisignupfully'];
+            $defaultvalues['multisignuprestrictpartly'] = $defaultvalues['multisignuppartly'];
+            $defaultvalues['multisignuprestrictnoshow'] = $defaultvalues['multisignupnoshow'];
+
+            if (empty($defaultvalues['multisignupmaximum'])) {
+                $defaultvalues['multisignup_limit'] = 'limitnone';
+                $defaultvalues['multisignup_limitamount'] = 2;
+            } else {
+                $defaultvalues['multisignup_limit'] = 'limitamount';
+                $defaultvalues['multisignup_limitamount'] = $defaultvalues['multisignupmaximum'];
+            }
         }
 
         parent::set_data($defaultvalues);
@@ -511,61 +571,69 @@ class mod_facetoface_mod_form extends moodleform_mod {
     public function validation($data, $files) {
         global $DB;
         $errors = parent::validation($data, $files);
-        if (empty($data['selectedapprovers'])) {
-            return $errors;
-        }
-        $selectedapprovers = explode(',', $data['selectedapprovers']);
 
-        $systemapprovers = get_users_from_config(
-                get_config(null, 'facetoface_adminapprovers'),
-                'mod/facetoface:approveanyrequest'
-        );
+        if (!empty($data['selectedapprovers'])) {
+            $selectedapprovers = explode(',', $data['selectedapprovers']);
 
-        $guest = guest_user();
-        $usernamefields = get_all_user_name_fields(true, 'u');
-        list($selectedsql, $selectedparam) = $DB->get_in_or_equal($selectedapprovers, SQL_PARAMS_NAMED);
-        $selectedusers = $DB->get_records_sql("
-            SELECT
-                u.id, {$usernamefields}, u.email
-            FROM
-                {user} u
-            WHERE
-                u.deleted = 0
-            AND u.suspended = 0
-            AND u.id != :guestid
-            AND u.id $selectedsql
-            ORDER BY
-                u.firstname,
-                u.lastname
-        ", array_merge(array('guestid' => $guest->id), $selectedparam));
+            $systemapprovers = get_users_from_config(
+                    get_config(null, 'facetoface_adminapprovers'),
+                    'mod/facetoface:approveanyrequest'
+            );
 
-        $exists = array();
-        $suberrors = array();
-        foreach ($selectedapprovers as $selected) {
-            // Check for non-guest active users.
-            if (!isset($selectedusers[$selected])) {
-                $suberrors[] = html_writer::tag('li', get_string('error:approverinactive', 'facetoface', $selected));
-                continue;
+            $guest = guest_user();
+            $usernamefields = get_all_user_name_fields(true, 'u');
+            list($selectedsql, $selectedparam) = $DB->get_in_or_equal($selectedapprovers, SQL_PARAMS_NAMED);
+            $selectedusers = $DB->get_records_sql("
+                SELECT
+                    u.id, {$usernamefields}, u.email
+                FROM
+                    {user} u
+                WHERE
+                    u.deleted = 0
+                AND u.suspended = 0
+                AND u.id != :guestid
+                AND u.id $selectedsql
+                ORDER BY
+                    u.firstname,
+                    u.lastname
+            ", array_merge(array('guestid' => $guest->id), $selectedparam));
+
+            $exists = array();
+            $suberrors = array();
+            foreach ($selectedapprovers as $selected) {
+                // Check for non-guest active users.
+                if (!isset($selectedusers[$selected])) {
+                    $suberrors[] = html_writer::tag('li', get_string('error:approverinactive', 'facetoface', $selected));
+                    continue;
+                }
+                $username = fullname($selectedusers[$selected]);
+
+                // Check for duplicates.
+                if (isset($exists[$selected])) {
+                    $suberrors[] = html_writer::tag('li', get_string('error:approverselected', 'facetoface', $username));
+                    continue;
+                }
+                $exists[$selected] = 1;
+
+                // Check for system wide approvers.
+                if (isset($systemapprovers[$selected])) {
+                    $suberrors[] = html_writer::tag('li', get_string('error:approversystem', 'facetoface', $username));
+                    continue;
+                }
             }
-            $username = fullname($selectedusers[$selected]);
 
-            // Check for duplicates.
-            if (isset($exists[$selected])) {
-                $suberrors[] = html_writer::tag('li', get_string('error:approverselected', 'facetoface', $username));
-                continue;
-            }
-            $exists[$selected] = 1;
-
-            // Check for system wide approvers.
-            if (isset($systemapprovers[$selected])) {
-                $suberrors[] = html_writer::tag('li', get_string('error:approversystem', 'facetoface', $username));
-                continue;
+            if (!empty($suberrors)) {
+                $errors['approvaloptions'] = html_writer::tag('ul', implode("\n", $suberrors));
             }
         }
 
-        if (!empty($suberrors)) {
-            $errors['approvaloptions'] = html_writer::tag('ul', implode("\n", $suberrors));
+        // Check there is a sensible maximum defined if limitations are enabled.
+        if (!empty($data['multiplesessions']) && $data['multisignup_limit'] == 'limitamount') {
+            if ($data['multisignup_limitamount'] < 2) {
+               $errors['multisignuplimitations'] = get_string('multisignupmaximum_validation', 'facetoface');
+            }
         }
+
         return $errors;
     }
 }

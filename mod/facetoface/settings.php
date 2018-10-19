@@ -144,7 +144,35 @@ if ($ADMIN->fulltree) { // Improve performance.
 $settings = new admin_settingpage('modfacetofacactivitydefaults', get_string('activitydefaults', 'mod_facetoface'), 'totara/core:modconfig', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configcheckbox('facetoface_multiplesessions', get_string('setting:multiplesessions_caption', 'facetoface'), get_string('setting:multiplesessions', 'facetoface'), 0));
+    $settings->add(new admin_setting_heading('facetoface_multisignup_header', new lang_string('multisignup_header', 'facetoface'), ''));
+
+    $settings->add(new admin_setting_configcheckbox('facetoface_multisignup_enable',
+        new lang_string('multisignupenable', 'facetoface'),
+        new lang_string('multisignupenable_desc', 'facetoface'), 1));
+
+    $options = [];
+    $options['multisignuprestrict_fully'] = new lang_string('status_fully_attended', 'facetoface');
+    $options['multisignuprestrict_partially'] = new lang_string('status_partially_attended', 'facetoface');
+    $options['multisignuprestrict_noshow'] = new lang_string('status_no_show', 'facetoface');
+    $settings->add(new admin_setting_configmulticheckbox('facetoface_multisignup_restrict',
+        new lang_string('multisignuprestrict', 'facetoface'),
+        new lang_string('multisignuprestrict_help', 'facetoface'),
+        ['multisignuprestrict_fully' => 0,
+         'multisignuprestrict_partially' => 1,
+         'multisignuprestrict_noshow' => 1],
+        $options
+    ));
+
+    $settings->add(new admin_setting_configtext('facetoface_multisignup_maximum',
+        new lang_string('multisignupmaximum', 'mod_facetoface'),
+        new lang_string('multisignupmaximum_help', 'mod_facetoface'),
+        2,
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configcheckbox('facetoface_waitlistautoclean',
+        new lang_string('waitlistautoclean', 'mod_facetoface'),
+        new lang_string('waitlistautoclean_help', 'mod_facetoface'), 1));
 
     $settings->add(new admin_setting_heading('facetoface_signupapproval_header', new lang_string('setting:signupapproval_header', 'facetoface'), ''));
 

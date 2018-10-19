@@ -150,7 +150,7 @@ final class reservations {
 
         $params = ['userid' => 0, 'sessionid' => $seminarevent->get_id(), 'bookedby' => $managerid];
         $transaction = $DB->start_delegated_transaction();
-        $signups = new signup_list($params);
+        $signups = signup_list::from_conditions($params);
         $signups->delete();
         $transaction->allow_commit();
 

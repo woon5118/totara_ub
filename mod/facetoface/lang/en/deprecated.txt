@@ -89,3 +89,7 @@ missingdefaultsfix,mod_facetoface
 error:couldnotaddsession,mod_facetoface
 error:couldnotupdatesession,mod_facetoface
 status_session_cancelled,mod_facetoface
+setting:multiplesessions,mod_facetoface
+setting:multiplesessions_caption,mod_facetoface
+multiplesessions,mod_facetoface
+multiplesessions_help,mod_facetoface

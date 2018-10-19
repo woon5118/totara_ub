@@ -27,6 +27,7 @@ Feature: Take attendance for a seminar with multiple sessions
       | Completion tracking                     | Show activity as complete when conditions are met |
       | completionstatusrequired[100]           | 1                                                 |
       | Users can sign-up to multiple events    | 1                                                 |
+      | Fully attended                          | 1                                                 |
 
     # Set course completion to f2f completion.
     And I navigate to "Course completion" node in "Course administration"

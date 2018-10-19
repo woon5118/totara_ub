@@ -127,6 +127,14 @@ trait seminar_iterator {
     }
 
     /**
+     * Check if the items list is empty
+     * @return int
+     */
+    public function is_empty() : bool {
+        return empty($this->items);
+    }
+
+    /**
      * @param int $ttemid
      * @return \item - An instance of the specified object matching the given id
      */

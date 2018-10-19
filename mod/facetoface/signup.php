@@ -173,6 +173,11 @@ if ($fromform = $mform->get_data()) {
             }
         }
     } else {
+        // Note - We can't use the renderer_signup_failures() function here, but this is the same.
+        $failures = signup_helper::get_failures($signup);
+        reset($failures);
+        $message = current($failures);
+
         $cssclass = 'notifyerror';
     }
 

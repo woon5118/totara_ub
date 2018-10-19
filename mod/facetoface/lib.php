@@ -230,7 +230,6 @@ function facetoface_add_instance($facetoface) {
 
     $facetoface->timemodified = time();
 
-
     if ($facetoface->id = $DB->insert_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
     }
@@ -675,7 +674,7 @@ function facetoface_delete_session($session) {
     }
 
     // Delete signups and related data.
-    $signups = new \mod_facetoface\signup_list(['sessionid' => (int)$session->id]);
+    $signups = \mod_facetoface\signup_list::from_conditions(['sessionid' => (int)$session->id]);
     $signups->delete();
 
     // Notifications.
@@ -1843,25 +1842,46 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         // If the user can sign up for multiple events, we should show all upcoming events in this seminar.
         // Otherwise it doesn't make sense to do so because the user has already signedup for the instance.
         if ($facetoface->multiplesessions) {
-            $allsessions = facetoface_get_sessions($facetoface->id);
-            $numberofeventstodisplay = isset($facetoface->display) ? (int)$facetoface->display : 0;
-            $index = 0;
-            foreach ($allsessions as $id => $session) {
-                if (array_key_exists($id, $sessions)) {
-                    continue;
-                }
-                // Don't show events that are over.
-                if (facetoface_is_session_over($session, $timenow)) {
-                    continue;
-                }
 
-                // Displaying the seminar's event base on the config ($facetoface->display) within seminar setting.
-                // Break the loop, if the number of events ($index) reaches to the number from config ($numberofeventstodisplay)
-                if ($index == $numberofeventstodisplay) {
-                    break;
+            // If state restrictions are enabled and not met, only display the current signup.
+            $checkremaining = true;
+            $restrictions = $seminar->get_multisignup_states();
+            if (!empty($restrictions)) {
+                foreach ($submissions as $signupdata) {
+                    $signup = new signup($signupdata->id);
+                    $state = $signup->get_state();
+                    $code = $state::get_code();
+                    if (empty($restrictions[$code])) {
+                        // We have a sign-up who's current state is not matching restrictions.
+                        // Display that sign-up and nothing else.
+                        // $sessions[$session->id] = $session; // This should already be there (see above) just skip the next bit.
+                        $checkremaining = false;
+                    }
                 }
-                $sessions[$session->id] = $session;
-                $index++;
+            }
+
+            $maximum = $seminar->get_multisignup_maximum();
+            if ($checkremaining && (empty($maximum) || count($submissions) < $maximum)) {
+                $allsessions = facetoface_get_sessions($facetoface->id);
+                $numberofeventstodisplay = isset($facetoface->display) ? (int)$facetoface->display : 0;
+                $index = 0;
+                foreach ($allsessions as $id => $session) {
+                    if (array_key_exists($id, $sessions)) {
+                        continue;
+                    }
+                    // Don't show events that are over.
+                    if (facetoface_is_session_over($session, $timenow)) {
+                        continue;
+                    }
+
+                    // Displaying the seminar's event base on the config ($facetoface->display) within seminar setting.
+                    // Break the loop, if the number of events ($index) reaches to the number from config ($numberofeventstodisplay)
+                    if ($index == $numberofeventstodisplay) {
+                        break;
+                    }
+                    $sessions[$session->id] = $session;
+                    $index++;
+                }
             }
         }
 

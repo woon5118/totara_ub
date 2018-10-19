@@ -72,6 +72,7 @@ define('MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED',    32768);
 define('MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE',         65536);
 define('MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN',        131072);
 define('MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS',     262144);
+define('MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN',           524288);
 
 /**
  * Notification sent state
@@ -1297,6 +1298,7 @@ class facetoface_notification extends data_object {
             'rolerequest' => MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE,
             'adminrequest' => MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN,
             'registrationclosure' => MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS,
+            'waitlistautoclean' => MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN,
         );
     }
 }
@@ -2710,6 +2712,22 @@ function facetoface_get_default_notifications($facetofaceid) {
         $notifications[MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS] = $registrationclosure;
     } else {
         $missingtemplates[] = 'registrationclosure';
+    }
+
+    if (isset($templates['waitlistautoclean'])) {
+        $template = $templates['waitlistautoclean'];
+        $waitlistautoclean = new facetoface_notification($defaults, false);
+        $waitlistautoclean->title = $template->title;
+        $waitlistautoclean->body = $template->body;
+        $waitlistautoclean->managerprefix = $template->managerprefix;
+        $waitlistautoclean->conditiontype = MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN;
+        $waitlistautoclean->ccmanager = $template->ccmanager;
+        $waitlistautoclean->status = $template->status;
+        $waitlistautoclean->requested = 1;
+        $waitlistautoclean->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN] = $waitlistautoclean;
+    } else {
+        $missingtemplates[] = 'waitlistautoclean';
     }
 
     return array($notifications, $missingtemplates);

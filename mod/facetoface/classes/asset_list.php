@@ -26,7 +26,7 @@ namespace mod_facetoface;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class signup_list represents signups in seminar event
+ * Class asset_list represents seminar assets
  */
 final class asset_list implements \Iterator {
 

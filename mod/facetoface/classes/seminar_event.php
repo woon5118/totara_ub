@@ -210,7 +210,7 @@ final class seminar_event {
         \mod_facetoface\calendar::remove_all_entries($this);
 
         // Change all user sign-up statuses, the only exceptions are previously cancelled users and declined users.
-        $signups = new signup_list(['sessionid' => $this->get_id()]);
+        $signups = signup_list::from_conditions(['sessionid' => $this->get_id()]);
         foreach ($signups as $signup) {
             if ($signup->can_switch(\mod_facetoface\signup\state\event_cancelled::class)) {
                 $signup->switch_state(\mod_facetoface\signup\state\event_cancelled::class);
@@ -267,7 +267,7 @@ final class seminar_event {
         $sessiondates = new seminar_session_list(['sessionid' => $this->get_id()]);
         $sessiondates->delete();
 
-        $seminarsignups = new signup_list(['sessionid' => $this->get_id()]);
+        $seminarsignups = signup_list::from_conditions(['sessionid' => $this->get_id()]);
         $seminarsignups->delete();
 
         $seminarroles = new role_list(['sessionid' => $this->get_id()]);

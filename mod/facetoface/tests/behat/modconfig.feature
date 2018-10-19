@@ -32,7 +32,7 @@ Feature: Configure seminar settings
     Then I should see "facetoface_fromaddress"
 
     When I navigate to "Activity defaults" node in "Site administration > Seminars"
-    Then I should see "facetoface_multiplesessions"
+    Then I should see "facetoface_multisignup_enable"
 
     When I navigate to "Event defaults" node in "Site administration > Seminars"
     Then I should see "defaultdaysskipweekends"

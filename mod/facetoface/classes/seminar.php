@@ -25,6 +25,7 @@
 namespace mod_facetoface;
 
 use Dompdf\Exception;
+use mod_facetoface\signup\state\{no_show, partially_attended, fully_attended, declined, not_set};
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -73,6 +74,10 @@ final class seminar {
      */
     private $thirdpartywaitlist = "";
     /**
+     * @var int {facetoface}.waitlistautoclean
+     */
+    private $waitlistautoclean = 0;
+    /**
      * @var int {facetoface}.display
      */
     private $display = 0;
@@ -97,9 +102,27 @@ final class seminar {
      */
     private $usercalentry = 1;
     /**
+     * Note: saved in the database as multiplesessions,
+     *       referred to elsewhere as multiplesignups.
      * @var int {facetoface}.multiplesessions
      */
     private $multiplesessions = 0;
+    /**
+     * @var int {facetoface}.multisignupfully
+     */
+    private $multisignupfully = 0;
+    /**
+     * @var int {facetoface}.multisignuppartly
+     */
+    private $multisignuppartly = 0;
+    /**
+     * @var int {facetoface}.multisignupnoshow
+     */
+    private $multisignupnoshow = 0;
+    /**
+     * @var int {facetoface}.multisignupmaximum
+     */
+    private $multisignupmaximum = 0;
     /**
      * @var string {facetoface}.completionstatusrequired
      */
@@ -341,8 +364,8 @@ final class seminar {
         $params = [
             'facetofaceid' => $this->id,
             'userid' => $userid,
-            'statusdeclined' => \mod_facetoface\signup\state\declined::get_code(),
-            'statusnotset' => \mod_facetoface\signup\state\not_set::get_code()
+            'statusdeclined' => declined::get_code(),
+            'statusnotset' => not_set::get_code()
         ];
 
         // Check if user is already signed up to a session in the facetoface and it has not been archived.
@@ -452,6 +475,20 @@ final class seminar {
     }
 
     /**
+     * @return bool
+     */
+    public function get_waitlistautoclean(): bool {
+        return (bool)$this->waitlistautoclean;
+    }
+    /**
+     * @param bool $waitlistautoclean
+     */
+    public function set_waitlistautoclean(bool $waitlistautoclean) : seminar {
+        $this->waitlistautoclean = (int) $waitlistautoclean;
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function get_display(): int {
@@ -536,16 +573,82 @@ final class seminar {
     }
 
     /**
+     * Note: saved in the database as multiplesessions,
+     *       referred to elsewhere as multiplesignups.
      * @return int
      */
     public function get_multiplesessions(): int {
         return (int)$this->multiplesessions;
     }
     /**
+     * Note: saved in the database as multiplesessions,
+     *       referred to elsewhere as multiplesignups.
      * @param int $multiplesessions
      */
-    public function set_multiplesessions(int $multiplesessions) : seminar {
-        $this->multiplesessions = $multiplesessions;
+    public function set_multiplesessions(int $multiplesignups) : seminar {
+        $this->multiplesessions = $multiplesignups;
+        return $this;
+    }
+
+    /**
+     * Group all the state restrictions settings into one array
+     * @return []
+     */
+    public function get_multisignup_states() : array {
+        $states = [];
+
+        if (!empty($this->multisignupfully)) {
+            $states[fully_attended::get_code()] = fully_attended::class;
+        }
+
+        if (!empty($this->multisignuppartly)) {
+            $states[partially_attended::get_code()] = partially_attended::class;
+        }
+
+        if (!empty($this->multisignupnoshow)) {
+            $states[no_show::get_code()] = no_show::class;
+        }
+
+        return $states;
+    }
+
+    public function get_multisignup_maximum() : int {
+        return $this->multisignupmaximum;
+    }
+
+    /**
+     * @param int $multisignupfully
+     * @return this
+     */
+    public function set_multisignupfully(bool $multisignupfully) : seminar {
+        $this->multisignupfully = (int)$multisignupfully;
+        return $this;
+    }
+
+    /**
+     * @param int $multisignuppartly
+     * @return this
+     */
+    public function set_multisignuppartly(bool $multisignuppartly) : seminar {
+        $this->multisignuppartly = (int)$multisignuppartly;
+        return $this;
+    }
+
+    /**
+     * @param int $multisignupnoshow
+     * @return this
+     */
+    public function set_multisignupnoshow(bool $multisignupnoshow) : seminar {
+        $this->multisignupnoshow = (int)$multisignupnoshow;
+        return $this;
+    }
+
+    /**
+     * @param int $multisignupmaximum
+     * @return this
+     */
+    public function set_multisignupmaximum(int $multisignupmaximum) : seminar {
+        $this->multisignupmaximum = $multisignupmaximum;
         return $this;
     }
 

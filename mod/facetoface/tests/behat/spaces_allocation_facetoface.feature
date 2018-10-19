@@ -47,6 +47,9 @@ Feature: Allocate spaces for team in seminar
       | Name                                    | Test seminar name        |
       | Description                             | Test seminar description |
       | Users can sign-up to multiple events    | 1                        |
+      | Fully attended                          | 0                        |
+      | Partially attended                      | 0                        |
+      | No show                                 | 0                        |
       | Allow manager reservations              | Yes                      |
       | Maximum reservations                    | 10                       |
     And I follow "View all events"

@@ -198,6 +198,22 @@ class notice_sender {
     }
 
     /**
+     * Send a message to a user who has just had their waitlisted signup cancelled due to the event starting
+     * and the automatic waitlist cleaner cancelling all waitlisted records.
+     *
+     * @param \signup        $signup
+     * @return string
+     */
+    public static function signup_waitlist_autoclean(signup $signup) : string {
+        $params = [
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN
+        ];
+
+        return static::send($signup, $params);
+    }
+
+    /**
      * Send a confirmation email to the trainer
      *
      * @param integer $recipientid ID of the recipient of the email
@@ -283,6 +299,7 @@ class notice_sender {
         $icalattachmenttype = (empty($CFG->facetoface_disableicalcancel) && $attachical) ? MDL_F2F_BOTH : MDL_F2F_TEXT;
         return static::send_event($recipientid, $seminarevent, $params, $icalattachmenttype, MDL_F2F_CANCEL);
     }
+
     /**
      * Send message to signed up attendee
      * @param signup $signup

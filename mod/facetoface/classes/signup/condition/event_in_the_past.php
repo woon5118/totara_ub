@@ -40,7 +40,8 @@ class event_in_the_past extends condition {
         $now = time();
         $sql = 'SELECT MAX(d.timefinish)
                   FROM {facetoface_sessions_dates} d
-                 WHERE d.sessionid = :sessid';
+                 WHERE d.sessionid = :sessid
+              GROUP BY d.sessionid';
         $timefinish = $DB->get_field_sql($sql, ['sessid' => $this->signup->get_sessionid()]);
 
         return $timefinish < $now;

@@ -745,6 +745,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $signuplink .= get_string('none', 'facetoface');
             } else {
                 $seminar = new \mod_facetoface\seminar($session->facetoface);
+                $seminarevent = new \mod_facetoface\seminar_event($session->id);
+                $signup = \mod_facetoface\signup::create($USER->id, $seminarevent);
                 if (empty($session->cancelledstatus) && $registrationopen == true && $registrationclosed == false) {
                     if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions() == 1) {
                         // Ok to register.
@@ -1748,7 +1750,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         // Display first failure as the most relevant
         reset($failures);
         $failure = current($failures);
-        return $this->output->notification($failure, 'error');
+        return $this->output->notification($failure, 'info');
     }
 
     /**
