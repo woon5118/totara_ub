@@ -73,9 +73,6 @@ abstract class rb_base_source {
     /** @var bool true if reports with this source are compatible with report caching */
     public $cacheable = true;
 
-    /** @var string report aggregation setting */
-    public $grouptype = 'none';
-
     /** @var string extra WHERE statement for source */
     public $sourcewhere = '';
 
@@ -84,12 +81,6 @@ abstract class rb_base_source {
 
     /** @var rb_column[] columns that must be always present (not recommended to be used) */
     public $requiredcolumns = array();
-
-    /** @var string preprocessor name (not recommended to be used) */
-    public $preproc = null;
-
-    /** @var mixed group report id (not recommended to be used) */
-    public $groupid = null;
 
     // === Internal properties, do not modify in child classes directly ===
 

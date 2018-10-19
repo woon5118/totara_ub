@@ -52,14 +52,8 @@ $report = new reportbuilder($id, null, false, null, null, true);
 // Check filterheadings and searchcolumnheadings for multilang spans. Need to set context to use format_string.
 $PAGE->set_context(context_user::instance($USER->id));
 
-// Are we handling a 'group' source?
-if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $report->source, $matches)) {
-    // Use original source name (minus any suffix).
-    $sourcename = $matches[1];
-} else {
-    // Standard source.
-    $sourcename = $report->source;
-}
+// Standard source.
+$sourcename = $report->source;
 
 $filterheadings = array();
 foreach ($report->filteroptions as $option) {

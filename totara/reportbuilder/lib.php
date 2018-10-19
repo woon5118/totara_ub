@@ -650,34 +650,6 @@ class reportbuilder {
     }
 
     /**
-     * Searches for and returns an instance of the specified preprocessor class
-     * for a particular activity group
-     *
-     * @param string $preproc The name of the preproc class to return
-     *                       (excluding the rb_preproc prefix)
-     * @param integer $groupid The group id to create the preprocessor for
-     * @return object An instance of the preproc. Returns false if
-     *                the preproc can't be found
-     */
-    static function get_preproc_object($preproc, $groupid) {
-        if (!$preproc) {
-            return false;
-        }
-        $sourcepaths = self::find_source_dirs();
-        foreach ($sourcepaths as $sourcepath) {
-            $classfile = $sourcepath . 'rb_preproc_' . $preproc . '.php';
-            if (is_readable($classfile)) {
-                include_once($classfile);
-                $classname = 'rb_preproc_' . $preproc;
-                if (class_exists($classname)) {
-                    return new $classname($groupid);
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * Custom uniqueid setting to apply during reportbuiler instantiation.
      *
      * Call this method right before every reportbuilder instantiation that requires custom uniqueid.
@@ -760,49 +732,6 @@ class reportbuilder {
                         self::$sourceobjects[$USER->id][$source] = $instance;
                     }
                     return $instance;
-                }
-            }
-        }
-
-        // if exact match not found, look for match with group suffix
-        // of the form: [sourcename]_grp_[grp_id]
-        // if found, call the base source passing the groupid as an argument
-        if (preg_match('/^(.+)_grp_([0-9]+)$/', $source, $matches)) {
-            $basesource = $matches[1];
-            $groupid = $matches[2];
-            foreach ($sourcepaths as $sourcepath) {
-                $classfile = $sourcepath . 'rb_source_' . $basesource . '.php';
-                if (is_readable($classfile)) {
-                    include_once($classfile);
-                    $classname = 'rb_source_' . $basesource;
-                    if (class_exists($classname)) {
-                        $instance = new $classname($groupid, $globalrestrictionset);
-                        if (!$globalrestrictionset) {
-                            self::$sourceobjects[$USER->id][$source] = $instance;
-                        }
-                        return $instance;
-                    }
-                }
-            }
-        }
-
-        // if still not found, look for match with group suffix
-        // of the form: [sourcename]_grp_all
-        // if found, call the base source passing a groupid of 0 as an argument
-        if (preg_match('/^(.+)_grp_all$/', $source, $matches)) {
-            $basesource = $matches[1];
-            foreach ($sourcepaths as $sourcepath) {
-                $classfile = $sourcepath . 'rb_source_' . $basesource . '.php';
-                if (is_readable($classfile)) {
-                    include_once($classfile);
-                    $classname = 'rb_source_' . $basesource;
-                    if (class_exists($classname)) {
-                        $instance = new $classname(0, $globalrestrictionset);
-                        if (!$globalrestrictionset) {
-                            self::$sourceobjects[$USER->id][$source] = $instance;
-                        }
-                        return $instance;
-                    }
                 }
             }
         }
@@ -1015,13 +944,7 @@ class reportbuilder {
                     $sourcename = $src->sourcetitle;
 
                     if ($src->selectable || $includenonselectable) {
-                        if ($src->grouptype == 'all') {
-                            $sourcestr = $source . '_grp_all';
-                            $output[$sourcestr] = $sourcename;
-                        } else {
-                            // Otherwise, just create a single source.
-                            $output[$source] = $sourcename;
-                        }
+                        $output[$source] = $sourcename;
                     }
                 }
                 closedir($dh);
@@ -1833,14 +1756,8 @@ class reportbuilder {
      * @return string
      */
     public function get_type_heading($type) {
-        // Are we handling a 'group' source?
-        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
-            // Use original source name (minus any suffix).
-            $sourcename = $matches[1];
-        } else {
-            // Standard source.
-            $sourcename = $this->source;
-        }
+        // Standard source.
+        $sourcename = $this->source;
 
         $langstr = 'type_' . $type;
         if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
