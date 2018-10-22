@@ -102,7 +102,7 @@ class rb_source_comp_status_history extends rb_base_source {
         );
 
         $this->add_core_user_tables($joinlist, 'base', 'userid');
-        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid', 'INNER');
 
         return $joinlist;
     }

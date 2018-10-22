@@ -907,7 +907,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should return an array
         $this->assertTrue((bool)is_array($columns));
         // the array should contain the correct number of columns
-        $this->assertEquals(5, count($columns));
+        $this->assertEquals(7, count($columns));
         $userjoin = new rb_join(
             'auser',
             'LEFT',

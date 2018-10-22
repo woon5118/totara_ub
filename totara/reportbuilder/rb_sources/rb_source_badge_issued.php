@@ -98,7 +98,7 @@ class rb_source_badge_issued extends rb_base_source {
         $this->add_core_course_category_tables($joinlist,
             'course', 'category');
 
-        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid', 'INNER');
         $this->add_core_tag_tables('core', 'course', $joinlist, 'badge', 'courseid');
         $this->add_totara_cohort_course_tables($joinlist, 'badge', 'courseid');
 

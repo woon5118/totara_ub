@@ -206,7 +206,7 @@ class rb_source_user extends rb_base_source {
             null,
             'user_extra');
 
-        $this->add_totara_job_tables($joinlist, 'base', 'id');
+        $this->add_totara_job_tables($joinlist, 'base', 'id', 'INNER');
 
         return $joinlist;
     }

@@ -113,7 +113,7 @@ class rb_source_competency_evidence extends rb_base_source {
 
         // include some standard joins
         $this->add_core_user_tables($joinlist, 'base', 'userid');
-        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid', 'INNER');
 
         return $joinlist;
     }

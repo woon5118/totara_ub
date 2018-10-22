@@ -179,15 +179,6 @@ abstract class rb_base_source {
             foreach ($this->columnoptions as $k => $option) {
                 if ($option->issubquery) {
                     unset($this->columnoptions[$k]);
-                    // Also remove relevant filter if present.
-                    foreach ($this->filteroptions as $fk => $foptions) {
-                        if ($foptions->type === $option->type and $foptions->value === $option->value) {
-                            if (empty($foptions->field)) {
-                                unset($this->filteroptions[$fk]);
-                            }
-                            break;
-                        }
-                    }
                 }
             }
         }
