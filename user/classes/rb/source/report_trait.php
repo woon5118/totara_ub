@@ -775,12 +775,8 @@ trait report_trait {
                     $groupname,
                     'usercohortids',
                     get_string('userincohort', 'totara_reportbuilder'),
-                    'correlated_subquery_number',
+                    'correlated_subquery_cohort',
                     array(
-                        'searchfield' => 'cm.cohortid',
-                        'subquery' => "EXISTS(SELECT 'x'
-                                        FROM {cohort_members} cm
-                                       WHERE cm.userid = (%1\$s) AND (%2\$s) )",
                         array('addtypetoheading' => $addtypetoheading),
                         'cachingcompatible' => false,
                     ),
