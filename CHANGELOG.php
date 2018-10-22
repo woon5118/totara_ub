@@ -3,6 +3,526 @@
 
 Totara Learn Changelog
 
+Release Evergreen (25th October 2018):
+======================================
+
+Key:           + Evergreen only
+
+Security issues:
+
+    TL-18957       Fixed permission checks for learning plans
+
+                   Prior to this patch all plan templates were being checked to see if a user
+                   had a permission (e.g. update plan). Now only the template that the plan is
+                   based off is checked for the permission.
+
+New features:
+
+    TL-16649   +   Added reusable select and region UI components
+
+                   The new select components are:
+                    * Multi select - Similar to a multiple select and can return multiple options
+                    * Single select tree - Similar to a single select dropdown that allows nestable options
+                    * Text search - A stylised text input field with search icon
+
+                   These are designed for use inside the added region container which has
+                   'clear all' functionality. Initially these will be used in the new
+                   catalogue.
+
+    TL-17603   +   Added reusable UI grid component
+
+                   Added a reusable UI component for displaying content in a grid format. The
+                   component includes events for setting an active tile state based on user
+                   clicks.
+
+    TL-19014       Implemented new capabilities for controlling the access to SCORM content
+
+                   Previously all users who could enter a course were able to launch SCORM
+                   activities.
+                   The only way to limit access was to make the activity hidden and then to
+                   use the moodle/course:viewhiddenactivities capability to grant access.
+
+                   Two new capabilities have been added to allow better control of access to
+                   SCORM activities.
+                    * mod/scorm:view
+                    * mod/scorm:launch
+
+Improvements:
+
+    TL-6152    +   Added an RPL note column to the Course completion report source
+
+                   A new column "RPL note" has been added to the Course completion report
+                   source.
+                   This column contains the note provided when users were manually awarded an
+                   RPL completion.
+                   If it is not an RPL completion, or if no note was provided then the column
+                   will be empty.
+                   The new column was added to the course completion report source only.
+
+    TL-8092    +   Added a 'Date Completed' filter to the program overview report source
+    TL-12955   +   Added a dynamic audience rule for user's authentication method
+    TL-17580   +   Refactored and simplified the Flex icon AMD JavaScript module
+    TL-17586       Greatly improved the performance of the update competencies scheduled task
+
+                   The scheduled task to reaggregate the competencies
+                   "\totara_hierarchy\task\update_competencies_task" was refactored to fix a
+                   memory leak. The scheduled task now loops through the users and loads and
+                   reaggregates items per user and not in one huge query as before. This
+                   minimises impact on memory but increases number of queries and runtime.
+
+    TL-17719   +   Converted front page content to use the new centre block region
+
+                   The following blocks have been introduced for backward compatibility:
+                    * Course progress report
+                    * Courses and categories
+                    * Course search
+
+                   "Course progress report" and "Courses and categories" blocks are disabled
+                   by default in new installations, and only enabled on upgrade if the
+                   respective front page content settings were enabled.
+
+    TL-17835   +   Improved calendar popover
+
+                   Previously this was using a YUI module. This has now been updated to use
+                   the Bootstrap popover.
+
+    TL-17850   +   Improved colour of text input placeholders in Totara forms
+    TL-17974   +   Site-wide settings for HR Import can now be overridden by element
+
+                   The HR Import page for 'General settings' has been renamed to 'Default
+                   settings'. This page includes the same settings as previously, but will
+                   also list which elements are using a given setting area.
+
+                   Element setting pages now contain settings relating to file access,
+                   notifications and scheduling. These settings allow you to select the
+                   default settings to apply or to override them with values that will apply
+                   to that element.
+
+                   Following the upgrade, values from 'General settings' will remain unchanged
+                   in the 'Default settings' page. Any enabled elements will use the default
+                   settings until changed.
+
+    TL-18554   +   Introduced common block settings and API to manage those
+
+                   The idea of the common block settings API is to allow core developers to
+                   have predictable common settings storage for all the blocks and if
+                   necessary,  introduce properties which cover all block types without
+                   interfering with settings provided the by third-party block developers.
+                   It also includes a few minor changes for block configuration: hiding,
+                   docking and show header/border settings now use checkboxes instead of radio
+                   buttons. Moreover, to provide better backwards compatibility a setting
+                   "Override default block title" has been introduced and unless it is checked
+                   the block retains pre-patch behaviour for the title supplied by the block
+                   developer.
+
+    TL-18565       Moved 'Override user conflicts' action out of the seminar event setting page and into a 'save' modal dialog
+
+                   The 'Override user scheduling conflicts' setting was initially intended for
+                   use with new events where the assigned roles resulted in conflicts with
+                   existing events. It was not originally designed to work with existing
+                   events.
+                   We improved the wording to clarify this feature without
+                   further changes in the UI and workflow.
+
+    TL-18575   +   A limitation of 255 characters is now consistently applied when validating course shortname
+
+                   The course shortname field in the database has always been 255 characters.
+                   However the course creation form arbitrarily limited course shortname
+                   length to 100 characters.
+                   As of this change the course shortname form now checks that the
+                   user-entered value is no longer than 255 characters, matching the database
+                   limitation.
+
+    TL-18666   +   Improved AMD module loading by converting the core/first AMD module to use RequireJS bundling instead
+    TL-18713   +   Reduced space between the main navigation and blocks when there are no breadcrumbs
+    TL-18757       Send notifications to new appraisees for an already activated appraisal
+
+                   Previously the appraisals module only sent out notifications to learners
+                   when the appraisal was activated. If new learners are added to the
+                   appraisal after activation, they did not receive any notification.
+
+                   With this patch, notifications are sent out when new learners are added to
+                   the appraisal after activation.
+
+    TL-18770       Disabled the site policy translation interface language selector when only a single language is available
+    TL-18852       Database table prefix is now required for all new installations
+
+                   Previously MySQL did not require database prefix to be set in config.php,
+                   since MySQL 8.0 the prefix is however required. To prevent problems in
+                   future upgrades Totara now requires table prefix for all databases.
+
+    TL-18896   +   Date pickers in forms now use the same order of day, month and year fields as current language full date and time display format
+    TL-18909       Fixed compatibility issues with PHP 7.3RC1
+    TL-18929   +   Added two indexes to speed up queries accessing the block_totara_stats table
+
+                   In quite a few places throughout the code we query the table
+                   'block_totara_stats' using two combinations of columns. In adding indexes
+                   on these column combinations query speed will be improved, especially with
+                   a lot of entries in the table.
+
+    TL-18978   +   Improved the validation display for dynamic audience rules that use a date selector
+    TL-18983       Added workaround for missing support for PDF embedding on iOS devices
+
+                   Web browsers on iOS devices have very limited support for embedding PDF
+                   files – for example, only the first page is displayed and users cannot
+                   scroll to next page. A new workaround was added to PDF embedding in File
+                   resource to allow iPhone and iPad users to open a PDF in full-screen mode
+                   after clicking on an embedded PDF.
+
+    TL-18998       Improved performance of language pack installation by changing to gzip
+
+                   Language pack installation and updates now utilise gzip instead of zip.
+                   Extract of gzip files is much quicker than zip files within Totara.
+                   Manual installation and updates using zip files are still supported and
+                   will continue to operate.
+                   All online installations and updates will now use tgz files exclusively.
+
+    TL-19053   +   Improved the performance of full text searches within PostgreSQL
+    TL-19066   +   Database table context_temp is now a  real temporary table
+
+                   The original context_temp table has now been dropped.
+                   This table was only ever intended as an internal store, and should not have
+                   been used by anything other than the access API.
+
+    TL-19084       Enrolment type column in course completion report source is now using subqueries to improve compatibility of other general columns in the same report
+
+Bug fixes:
+
+    TL-14204       Updated the inline helper text for course completion tracking
+
+                   Prior to this patch, there was a misleading inline helper text on the
+                   course view page next to 'Your progress'.
+                   With this patch, the inline helper text is updated to reflect with the
+                   change of the completion icon.
+
+    TL-16539       Fixed capacity reporting when viewing Seminar event information on the course page
+
+                   Previously a wait-list seminar event with 1 booked user and 1 wait-listed
+                   user reported the capacity wrongly as '2 wait-listed'.
+                   With this patch, the capacity is now reported correctly.
+
+    TL-17584       Fixed the default heading location for Featured links block gallery tiles
+
+                   Heading location for Gallery tiles now defaults to 'Top' like the default
+                   tile. Any tiles created without setting the heading location will be set to
+                   'Top'.
+
+    TL-17629       Fixed failures in the Seminar send_notification_task when performed under high load
+
+                   Some sites with large number of Seminar activities (100 000+) experienced
+                   'out of memory' failures during execution of the scheduled task
+                   (send_notifications_task). This task has now been optimised to use less
+                   memory.
+
+    TL-17652   +   Removed 'Update activities' checkbox from Seminar notification template form when new customer notification template is added
+    TL-17658       MSSQL 2016 and below now correctly sort aggregated course columns in the program overview report
+
+                   The program overview report was using SQL group_concat to ensure
+                   concatenated columns such as course name, and course status were ordered
+                   correctly and consistently.
+                   However the group_concat functionality in MSSQL 2016 and below does not
+                   support sorting, and there is no alternative.
+                   The fix for this was to shift sorting from the database to Totara if the
+                   site is running on MSSQL 2016 or below.
+                   This will have a small impact on performance, but will ensure for those
+                   sites that the columns are correctly and consistently sorted.
+                   Our recommendation is to upgrade MSSQL 2017 is possible.
+
+    TL-17773       Fixed the rendering of visibility controls within the course management interface for hidden categories
+
+                   The issue happened within 'Manage courses and categories' page alongside
+                   the enabled setting 'Audience visibility'.
+
+                   When rendering the page, the course checks for the setting 'Audience
+                   visible' (global) before 'Visible' (module) setting, to determine whether
+                   the 'Eye Icon' should be marked as hidden or not.
+
+                   Previously, when the 'Course category' was marked as hidden, all the
+                   courses within that category were also marked as hidden. However, after
+                   reloading the page, these courses were not marked as hidden. This was due
+                   to the fact that the same behaviour of rendering the page was not applied
+                   to AJAX interface.
+
+                   With this the patch, the behaviour applied when rendering the page is now
+                   also applied to the AJAX interface and therefore results in the same
+                   behaviour.
+
+    TL-17919   +   Fixed the display of the main region in core themes
+    TL-18706   +   Fixed the incompatible version message shown when attempting to restore an old backup
+
+                   The "This backup file has been created with Totara ..." error message was
+                   incorrectly referring to Moodle version instated of Totara version
+
+    TL-18727   +   Fixed galleries in the featured links block not being reinstated after update
+    TL-18776       Fixed a bug causing the Atto editor to lose track of the user's selection in IE11 and Edge
+
+                   Prior this change if heavily editing content in the Atto editor will
+                   occasionally result in the wrong content being formatted.
+                   This occurred only when formatting selected text, and occurred because the
+                   browser would lose track of the user's selection.
+                   This only affected IE11 and Edge.
+
+    TL-18790       Fixed the Organisation content restriction within the 'Record of Learning: Certifications' report source
+
+                   Before: within a report using 'Record of Learning: Certifications' source
+                   and content restriction as 'Staff at or below any of the user's assigned
+                   organisations', the User's Organisation(s) filter had an issue with its SQL
+                   query.
+
+                   After the patch: this issue is now fixed, the Organisations will display,
+                   if there are any.
+
+    TL-18802       Changed the date format of Session Date related columns within Seminar Sign-ups report source
+
+                   Previously the report columns 'Session Start' and 'Session Finish' were
+                   formatted differently than the 'Session Start (linked to activity)' column.
+                   These columns are now formatted consistently.
+
+    TL-18839       The 'Blocks editing on' button has been put back onto the 'Browse list of users' report page
+
+                   Prior to this page being converted to an embedded report it had a button to
+                   turn editing on.
+                   That button was unintentionally removed during the conversion.
+                   It has now been put back.
+
+    TL-18846       User's preference 'email bounce count' is reset when user requests to change their email address
+
+                   Prior to this patch, when the user requested to change their email address
+                   and the user's email bounce count preference reached the threshold, the
+                   confirmation email could not be sent to the user.
+
+                   With this patch, given the same scenario, the email will be sent to the
+                   user for the confirmation of change request.
+
+    TL-18864       Fixed the population of the template field value when editing a Seminar's notification
+
+                   Prior to this patch, when adding a new notification using a custom
+                   notification template the user was not able to see the Template field
+                   populated when editing it. Now, the field Template will be populated with
+                   the right value used for the notification.
+
+    TL-18866       Fixed the way the add-on list is displayed on the Totara registration page
+
+                   Prior to this patch, on the Totara registration page, all the add-on
+                   components were rendered without spaces separating them, preventing the
+                   text from wrapping and forcing the need for horizontal scrolling in the
+                   browser.
+
+                   After the patch, there is a word wrap in place to make the text fit on the
+                   screen.
+
+    TL-18867       Fixed exported status of cancelled events in the Seminar attendance report
+    TL-18880       Fixed Seminar 'Job assignment on sign up' column to exclude html text when exporting to other format
+    TL-18887       Fixed resetting of course type when uploading courses using a CSV file that does not contain the column
+
+                   This is a regression from TL-17920 which added Course type as a supported
+                   column when uploading courses via CSV.
+                   Totara 10.12, 10.13, 11.6, and 11.7 are affected.
+
+    TL-18897       Added a link on Appraisal stage interfaces for navigation back to the Appraisal
+    TL-18904   +   Fixed up the context level of the totara/contentmarketplace:add capability
+
+                   It now shares the same configuration as the moodle/course:create
+                   capability.
+
+                   Coding style within the component and single plugin was tidied up at the
+                   same time.
+
+    TL-18908       Fixed window resize functionality when viewing the grader report
+    TL-18922       Fixed the overlapping text within Select Assets dialog box
+    TL-18941       Changed z-index of Totara dialogs to match Bootstrap 3 modal levels
+
+                   Previously the modal had a z-index of 1 (and the backdrop 0) which caused
+                   some content to be displayed above them. This sets the level to 1050 (with
+                   the backdrop at 1040).
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-18942       Fixed the email subject line format for emails sent from the Certificate module
+
+                   Prior to this change the subject lines used for emails sent by the
+                   Certificate module were being formatted for HTML, not for emails.
+                   This led to characters being escaped and converted to entities.
+                   As of this fix the subject is formatted correctly, and should no longer end
+                   up with HTML entities within it.
+
+    TL-18959       Fixed the double escaping of Report names when viewing the list of my reports
+
+                   The report name was being passed once through format_string() and once
+                   through s() when displaying the list of reports to the user on the My
+                   reports page.
+                   The fix for this change involved modifying templates, see
+                   totara/core/upgrade.txt for technical details.
+
+    TL-18965       Changed the embedded URL of User's name within Seminar's event Cancellation
+    TL-19009       Fixed incorrectly deprecated filter language strings on "Bulk user actions" page
+
+                   Strings datelabelisafter, datelabelisbefore, datelabelisbetween were
+                   deprecated in Totara 10.0 while still being used on the "Bulk user
+                   actions" page. This has now been corrected and these strings were removed
+                   from the deprecated list.
+
+    TL-19010       Removed incorrectly deprecated function message_page_type_list() from the deprecatedlib.php
+    TL-19017       Added styles to display Appraisal content correctly on mobile devices
+
+                   Added styles for correctly displaying an individual Appraisal selected from
+                   the 'My appraisals' page on mobile devices. Previously content had layout
+                   issues and was incorrectly cropped.
+
+    TL-19018       Fixed problems with forced redirect for new required custom profile fields
+    TL-19030       Fixed the duplicate submit request for the course page when enroling
+
+                   Double clicking the Enrol button on courses with self enrolment enabled no
+                   longer submits duplicate requests.
+
+    TL-19043   +   Fixed php undefined property notice in assignment grading when changing 'Enrolment ends' to a date in the past
+    TL-19046       Course completion's cache is now being cleared after user deletes the course completion
+
+                   Prior to this patch, when a manager with the
+                   'totara/program:markstaffcoursecomplete' capability, marked a course as a
+                   incomplete on a user's 'Record of Learning > Programs' page, the cache
+                   would not be fully cleared. Causing the page to still render with the
+                   course marked as complete.
+                   With this patch, given the same scenario, the course completion cache of a
+                   user will be reset when the manager removes the course completion for that
+                   course. This will result in the completion being rendered correctly.
+
+    TL-19072       Fixed wait-listed attendees not being automatically added to the Seminar's attendees list after a reservation is deleted
+
+API changes:
+
+    TL-6630    +   Added functionality to perform capability checks directly against the database
+
+                   A new get_has_capability_sql() function has been introduced that returns an
+                   SQL snippet to resolve capability checks against the database.
+                   Among other uses this allows Totara to resolve visibility state much more
+                   efficiently than before without sacrificing accuracy.
+
+                   As part of this change a new table containing flattened context data will
+                   be created and maintained.
+                   There are a couple of important things to note about this:
+
+                   During upgrade to this release the table will be created and populated.
+                   This upgrade step could take several minutes on large sites.
+                   The table is kept up-to-date automatically by the access API. If you have
+                   third party plugins or customisations that are directly manipulating access
+                   data then you will need to review these.
+                   We have extensively tested the performance of this change during our QA
+                   process and are confident with the results. If you experience any problems
+                   please let us know immediately.
+
+    TL-15818   +   Refactored Seminar code to allow multi-language notifications and consistent booking state processing
+
+                   Multi-language:
+                   Added support for the "Multi-Language Content" filter plugin in Seminar
+                   notifications. Notification content will now be filtered according to each
+                   recipient's language settings.
+
+                   Booking system:
+                   The main target of refactoring was to bring consistency to the bookings
+                   state changes throughout all related code, leading to predictable and
+                   controllable rules for each state transition. For this purpose we have
+                   implemented a simplified Finite State Machine with a definition for each
+                   state, following states and rules that must be matched for state transition
+                   to happen. This will greatly reduce complexity during further changes to
+                   how booking states are managed.
+
+                   Despite our efforts to maintain existing behaviour, some inconsistencies in
+                   old code forced some minor changes in behaviour. We have identified the
+                   following changes:
+
+                   1) Enable waitlist and overbooking - Previously when a Seminar's event had
+                   the setting 'Enable Waitlist' enabled, then all the attendees that got
+                   signed up by an admin or any user that has capability would have a status
+                   as booked. Now users will be booked until the event's room capacity has
+                   been reached, the rest of the users will be added to the waitlist. Later on
+                   an admin or another user with the "mod/facetoface:signupwaitlist"
+                   capability will be able to confirm users on the waitlist, overbooking the
+                   event.
+
+                   2) Events without session - Administrators could previously book users onto
+                   events without sessions by confirming users on the waitlist. Now as the
+                   booked state requires a session to be set, this attempt will return error
+                   until a session is created.
+
+                   3) Action buttons labels -  Removed some inconsistencies with "Sign-up",
+                   "Join waitlist" buttons and added "Request approval" when approval is
+                   required. Previously calendar and upcoming events block would display a
+                   "sign-up" button, while the sign-up page would offer "Join waitlist". These
+                   inconsistencies were largely removed by using the same prediction logic for
+                   all three source of actions (course view, calendar, and sign-up page).
+                   Also, when approval is required, the user is now properly informed that
+                   approval will be required.
+
+                   API changes:
+                   The API has been significantly changed. We have moved to a proper class
+                   structure for all Seminar entities and their relationships. Along with that
+                   we didn't change the database structure, except for some varchar fields
+                   that were converted to text to allow the multi-language filter to work
+                   properly. We have also minimised front-end changes as much as possible. All
+                   functions that were likely to be used by third-party code have been kept in
+                   the code base and deprecated. Deprecated functions from main lib.php file
+                   were moved to deprecatedlib.php file (which is required by lib.php file).
+
+                   In order to reduce API changes we've deprecated mostly functions that were
+                   relevant to state machine (booking states), and functions that were
+                   completely covered by OOP (e.g. rooms, assets, reservations, calendar).
+
+    TL-18845       Removed a superfluous unique index on the job_assignment.id column
+    TL-18899   +   Added additional PHPdocs and return value declarations in workflow classes
+
+                   The following method signatures have been modified to enforce the expected
+                   return types:
+                    * workflow_manager\base->add_workflow_manager_form_elements() returns
+                   void
+                    * workflow_manager\base->split_classname() returns array
+                    * workflow_manager\base->get_workflow() can no longer return null
+                    * workflow_manager\base->set_params() returns void
+                    * workflow\base->__construct() returns void
+                    * workflow\base->split_classname() returns array
+                    * workflow\base->add_workflow_form_elements() returns void
+                    * workflow\base->define_form() returns void
+                    * workflow\base->process_form() returns void
+                    * workflow\base->enable() returns void
+                    * workflow\base->disable() returns void
+                    * workflow\base->set_params() returns void
+                    * workflow\base->get_workflow_manager_data() returns array
+
+                   3rd party workflow and workflow manager classes which extend the base
+                   classes will need to update their message signatures, but behaviour is
+                   unchanged.
+
+                   In addition:
+                    * workflow\base->get_form_name() is now final
+
+
+
+    TL-18921   +   Removed the Memcache cache store from core
+
+                   Not to be confused with the Memcached cache store.
+                   The Memcache PHP extension is not compatible with PHP7, and as such the
+                   Memcache cache store could not be used.
+                   It has now been removed from core.
+
+                   If you are currently using the Memcache cache store and plan to upgrade in
+                   future, this may be an issue.
+
+    TL-18927       Totara form load deferred object now resolves after the form initialise JavaScript is called
+
+                   Previously, the Totara form initialise code was run after the load deferred
+                   object had been resolved. This meant that calls to getFormInstance(formid)
+                   would return null on load.done(), and not the form that was requested.
+
+    TL-18944   +   MDL-53848: Added hideIf functionality to Moodle forms
+
+                   Elements can now be hidden based on the value of another element. Usage
+                   matches that of the disabledIf functionality that was already available in
+                   the Moodle forms.
+
+    TL-18985       Unit tests may now override lang strings
+
+
 Release Evergreen (19th September 2018):
 ========================================
 
