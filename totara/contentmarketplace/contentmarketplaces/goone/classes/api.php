@@ -148,6 +148,7 @@ final class api {
     public function get_learning_objects(array $params = []) {
         $this->check_processing_cache_timer();
 
+        $this->apply_common_params_for_get_learning_objects($params);
         $cachekey = $this->gen_cache_key($params);
         $data = $this->bulklearningobjectcache->get($cachekey);
         if ($data === false) {
@@ -218,6 +219,7 @@ final class api {
         unset($params["subscribed"]);
         unset($params["collection"]);
         $params["limit"] = 0;
+        $this->apply_common_params_for_get_learning_objects($params);
         $cachekey = $this->gen_count_cache_key('total', $params);
 
         $data = $this->countcache->get($cachekey);
@@ -236,6 +238,7 @@ final class api {
         $params["subscribed"] = "true";
         unset($params["collection"]);
         $params["limit"] = 0;
+        $this->apply_common_params_for_get_learning_objects($params);
         $cachekey = $this->gen_count_cache_key('subscribed', $params);
         $data = $this->countcache->get($cachekey);
         if ($data === false) {
@@ -255,6 +258,7 @@ final class api {
         unset($params["subscribed"]);
         $params['collection'] = $collectionid;
         $params["limit"] = 0;
+        $this->apply_common_params_for_get_learning_objects($params);
         $cachekey = $this->gen_count_cache_key('collection', $params);
         $data = $this->countcache->get($cachekey);
         if ($data === false) {
@@ -282,6 +286,14 @@ final class api {
             }
         }
         return $ids;
+    }
+
+    /**
+     * Apply filter options that are common across all uses of get_learning_objects.
+     * @param array $params
+     */
+    private function apply_common_params_for_get_learning_objects(array &$params) {
+        $params['event'] = "false"; // Exclude events from API calls as we can't really handle them in the UI.
     }
 
     /**

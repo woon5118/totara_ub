@@ -28,22 +28,22 @@ defined('MOODLE_INTERNAL') || die();
 final class mock_curl {
 
     const MOCK_REQUESTS = [
-        'GET /account'                                                                                                    => '/account/GET.json',
-        'GET /configuration'                                                                                              => '/configuration/GET.json',
-        'PUT /configuration'                                                                                              => '/configuration/PUT.json',
-        'GET /learning-objects/1873868/scorm'                                                                             => '/learning-objects/1873868/scorm/GET.zip',
-        'GET /learning-objects/29271/scorm'                                                                               => '/learning-objects/29271/scorm/GET.zip',
-        'GET /learning-objects/1916572/scorm'                                                                             => '/learning-objects/1916572/scorm/GET.zip',
-        'GET /learning-objects/1881379/scorm'                                                                             => '/learning-objects/1881379/scorm/GET.zip',
-        'GET /learning-objects/1868492/scorm'                                                                             => '/learning-objects/1868492/scorm/GET.zip',
-        'GET /learning-objects?limit=0'                                                                                   => '/learning-objects/GET-count-all.json',
-        'GET /learning-objects?collection=default&limit=0'                                                                => '/learning-objects/GET-count-collection.json',
-        'GET /learning-objects?subscribed=true&limit=0'                                                                   => '/learning-objects/GET-count-subscription.json',
-        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&collection=default'  => '/learning-objects/GET-count-with-facets-collection.json',
-        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&subscribed=true'     => '/learning-objects/GET-count-with-facets-subscription.json',
-        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance'                     => '/learning-objects/GET-count-with-facets-all.json',
-        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=48&facets=tag%2Clanguage%2Cinstance'                    => '/learning-objects/GET-listing-all.json',
-        'POST /oauth/token'                                                                                               => '/oauth/token/POST.json',
+        'GET /account'                                                                                                                => '/account/GET.json',
+        'GET /configuration'                                                                                                          => '/configuration/GET.json',
+        'PUT /configuration'                                                                                                          => '/configuration/PUT.json',
+        'GET /learning-objects/1873868/scorm'                                                                                         => '/learning-objects/1873868/scorm/GET.zip',
+        'GET /learning-objects/29271/scorm'                                                                                           => '/learning-objects/29271/scorm/GET.zip',
+        'GET /learning-objects/1916572/scorm'                                                                                         => '/learning-objects/1916572/scorm/GET.zip',
+        'GET /learning-objects/1881379/scorm'                                                                                         => '/learning-objects/1881379/scorm/GET.zip',
+        'GET /learning-objects/1868492/scorm'                                                                                         => '/learning-objects/1868492/scorm/GET.zip',
+        'GET /learning-objects?limit=0&event=false'                                                                                   => '/learning-objects/GET-count-all.json',
+        'GET /learning-objects?collection=default&limit=0&event=false'                                                                => '/learning-objects/GET-count-collection.json',
+        'GET /learning-objects?subscribed=true&limit=0&event=false'                                                                   => '/learning-objects/GET-count-subscription.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&collection=default&event=false'  => '/learning-objects/GET-count-with-facets-collection.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&subscribed=true&event=false'     => '/learning-objects/GET-count-with-facets-subscription.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=0&facets=tag%2Clanguage%2Cinstance&event=false'                     => '/learning-objects/GET-count-with-facets-all.json',
+        'GET /learning-objects?sort=created%3Adesc&offset=0&limit=48&facets=tag%2Clanguage%2Cinstance&event=false'                    => '/learning-objects/GET-listing-all.json',
+        'POST /oauth/token'                                                                                                           => '/oauth/token/POST.json',
     ];
 
     public static function get_base_filename($url, $options) {
