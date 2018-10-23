@@ -24,6 +24,7 @@
  */
 
 use mod_facetoface\task\send_user_message_adhoc_task;
+use mod_facetoface\notification\notification_map;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -1166,13 +1167,6 @@ class facetoface_notification extends data_object {
     public function get_condition_description() {
         $html = '';
 
-        $time = $this->scheduleamount;
-        if ($time == 1) {
-            $unit = get_string('schedule_unit_'.$this->scheduleunit.'_singular', 'facetoface');
-        } elseif ($time > 1) {
-            $unit = get_string('schedule_unit_'.$this->scheduleunit, 'facetoface', $time);
-        }
-
         // Generate note
         switch ($this->type) {
             case MDL_F2F_NOTIFICATION_MANUAL:
@@ -1186,33 +1180,8 @@ class facetoface_notification extends data_object {
 
             case MDL_F2F_NOTIFICATION_SCHEDULED:
             case MDL_F2F_NOTIFICATION_AUTO:
-
-                switch ($this->conditiontype) {
-                    case MDL_F2F_CONDITION_BEFORE_SESSION:
-                        $html .= get_string('occursxbeforesession', 'facetoface', $unit);
-                        break;
-                    case MDL_F2F_CONDITION_AFTER_SESSION:
-                        $html .= get_string('occursxaftersession', 'facetoface', $unit);
-                        break;
-                    case MDL_F2F_CONDITION_BOOKING_CONFIRMATION:
-                        $html .= get_string('occurswhenuserbookssession', 'facetoface');
-                        break;
-                    case MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION:
-                        $html .= get_string('occurswhenusersbookingiscancelled', 'facetoface');
-                        break;
-                    case MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION:
-                        $html .= get_string('occurswhenuserwaitlistssession', 'facetoface');
-                        break;
-                    case MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER:
-                    case MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE:
-                    case MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN:
-                        $html .= get_string('occurswhenuserrequestssessionwithmanagerapproval', 'facetoface');
-                        break;
-                    case MDL_F2F_CONDITION_DECLINE_CONFIRMATION:
-                        $html .= get_string('occurswhenuserrequestssessionwithmanagerdecline', 'facetoface');
-                        break;
-                }
-
+                $notificationmap = new notification_map($this);
+                $html .= $notificationmap->get_condition_description($this->conditiontype);
                 break;
         }
 
@@ -1249,6 +1218,14 @@ class facetoface_notification extends data_object {
         if (!empty($this->cancelled)) {
             $recips[] = get_string('status_user_cancelled', 'facetoface');
         }
+
+        if (!empty($this->requested)) {
+            $recips[] = get_string('status_pending_requests', 'facetoface');
+        }
+
+        $notificationmap = new notification_map($this);
+        $recipients = $notificationmap->get_recipients($this->conditiontype);
+        $recips = array_unique(array_merge($recips, $recipients));
 
         return implode(', ', $recips);
     }

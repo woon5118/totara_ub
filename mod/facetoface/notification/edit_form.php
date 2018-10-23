@@ -34,6 +34,7 @@ class mod_facetoface_notification_form extends moodleform {
 
         $mform =& $this->_form;
 
+        /** @var facetoface_notification $notification */
         $notification = $this->_customdata['notification'];
 
         $isfrozen = $notification->is_frozen();
@@ -48,8 +49,12 @@ class mod_facetoface_notification_form extends moodleform {
             $description = $notification->get_condition_description();
             $recipients = $notification->get_recipient_description();
 
-            $mform->addElement('static', '', get_string('scheduling', 'facetoface'), $description);
-            $mform->addElement('static', '', get_string('recipients', 'facetoface'), $recipients);
+            if (!empty($description)) {
+                $mform->addElement('static', '', get_string('scheduling', 'facetoface'), $description);
+            }
+            if (!empty($recipients)) {
+                $mform->addElement('static', '', get_string('recipients', 'facetoface'), $recipients);
+            }
             $mform->addElement('hidden', 'type', $notification->type);
             $mform->setType('type', PARAM_INT);
         } else {

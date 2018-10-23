@@ -145,6 +145,8 @@ foreach ($notifications as $note) {
     $notification->booked = $note->booked;
     $notification->waitlisted = $note->waitlisted;
     $notification->cancelled = $note->cancelled;
+    $notification->requested = $note->requested;
+    $notification->conditiontype = $note->conditiontype;
 
     $row[] = $notification->get_recipient_description();
 
