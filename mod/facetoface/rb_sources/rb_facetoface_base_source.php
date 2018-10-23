@@ -40,7 +40,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * @param string $joinsessions
      */
     public function add_facetoface_common_to_columns(&$columnoptions, $joinsessions = 'sessions') {
-                $columnoptions[] = new rb_column_option(
+        $columnoptions[] = new rb_column_option(
             'facetoface',
             'facetofaceid',
             get_string('ftfid', 'rb_source_facetoface_room_assignments'),
@@ -99,12 +99,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * @param string $sessiondatejoin Join that provides {facetoface_sessions_dates}
      */
     public function add_session_common_to_columns(&$columnoptions, $sessiondatejoin = 'base') {
-        global $CFG;
-
-        $intimezone = '';
-        if (!empty($CFG->facetoface_displaysessiontimezones)) {
-            $intimezone = '_in_timezone';
-        }
 
         $columnoptions[] = new rb_column_option(
             'facetoface',

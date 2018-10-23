@@ -103,7 +103,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'sessiondate',
                 'LEFT',
                 '{facetoface_sessions_dates}',
-                '(sessiondate.sessionid = base.sessionid)',
+                '(sessiondate.sessionid = sessions.id)',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
                 'sessions'
             ),
@@ -226,11 +226,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     }
 
     protected function define_columnoptions() {
-        global $DB, $CFG;
-        $intimezone = '';
-        if (!empty($CFG->facetoface_displaysessiontimezones)) {
-            $intimezone = '_in_timezone';
-        }
+        global $DB;
 
         $usernamefieldscreator = totara_get_all_user_name_fields_join('creator');
         $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby');
@@ -275,10 +271,13 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'sessions.registrationtimestart',
                 array(
                     'joins' => array('sessions','sessiondate'),
+                    'outputformat' => 'text',
                     'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_two_datetime_in_timezone',
-                    'extrafields' => array('finishdate' => 'sessions.registrationtimefinish', 'timezone' => 'sessiondate.sessiontimezone'),
-                    'outputformat' => 'text'
+                    'displayfunc' => 'event_dates_period',
+                    'extrafields' => array(
+                        'finishdate' => 'sessions.registrationtimefinish',
+                        'timezone' => 'sessiondate.sessiontimezone'
+                    )
                 )
             ),
             new rb_column_option(
@@ -289,7 +288,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => array('sessions','sessiondate'),
                     'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'displayfunc' => 'event_date',
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'outputformat' => 'text'
                 )            ),
@@ -301,7 +300,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => array('sessions','sessiondate'),
                     'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'displayfunc' => 'event_date',
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'outputformat' => 'text'
 )            ),
@@ -382,11 +381,13 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessdatefinish', 'rb_source_facetoface_sessions'),
                 'sessiondate.timefinish',
                 array(
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
                     'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp')
+                    'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'
+                    )
+                )
             ),
             new rb_column_option(
                 'date',
@@ -394,11 +395,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessstart', 'rb_source_facetoface_sessions'),
                 'sessiondate.timestart',
                 array(
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time' . $intimezone,
-                    'dbdatatype' => 'timestamp'
+                    'displayfunc' => 'event_time',
+                    'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'
+                    )
                 )
             ),
             new rb_column_option(
@@ -407,11 +409,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessfinish', 'rb_source_facetoface_sessions'),
                 'sessiondate.timefinish',
                 array(
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time' . $intimezone,
-                    'dbdatatype' => 'timestamp'
+                    'displayfunc' => 'event_time',
+                    'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'
+                    )
                 )
             ),
             new rb_column_option(
@@ -419,7 +422,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'cancellationdate',
                 get_string('cancellationdate', 'rb_source_facetoface_sessions'),
                 'cancellationstatus.timecreated',
-                array('joins' => 'cancellationstatus', 'displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
+                array(
+                    'joins' => 'cancellationstatus',
+                    'displayfunc' => 'event_date',
+                    'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'
+                    ),
+                )
             ),
             new rb_column_option(
                 'session',
@@ -459,8 +469,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     FROM {facetoface_signups_status}
                     WHERE signupid = base.id AND statuscode IN ('.\mod_facetoface\signup\state\booked::get_code().', '.\mod_facetoface\signup\state\waitlisted::get_code().'))',
                 array(
-                    'displayfunc' => 'nice_datetime',
-                    'dbdatatype' => 'timestamp'
+                    'joins' => 'sessiondate',
+                    'displayfunc' => 'event_date',
+                    'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'
+                    ),
                 )
             ),
             new rb_column_option(
@@ -484,8 +498,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'approvaltime',
                 get_string('approvertime', 'mod_facetoface'),
                 'approver.approvaltime',
-                array('joins' => 'approver',
-                      'displayfunc' => 'nice_datetime')
+                array(
+                    'joins' => 'approver',
+                    'displayfunc' => 'event_date',
+                    'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'
+                    )
+                )
             ),
             new rb_column_option(
                 'session',
@@ -531,9 +551,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'discountcode',
                     get_string('discountcode', 'rb_source_facetoface_sessions'),
                     'base.discountcode',
-                    array('dbdatatype' => 'text',
+                    array(
+                        'dbdatatype' => 'text',
                         'outputformat' => 'text',
-                        'displayfunc' => 'format_string')
+                        'displayfunc' => 'format_string'
+                    )
                 );
             }
         }

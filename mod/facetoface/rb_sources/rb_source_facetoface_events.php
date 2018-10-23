@@ -335,8 +335,12 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             get_string('eventtimecreated', 'rb_source_facetoface_events'),
             "base.timecreated",
             array(
-                'displayfunc' => 'nice_datetime',
+                'joins' => 'sessiondate',
+                'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp',
+                'extrafields' => array(
+                    'timezone' => 'sessiondate.sessiontimezone'
+                )
             )
         );
 
@@ -346,8 +350,12 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             get_string('lastupdated', 'rb_source_facetoface_events'),
             "base.timemodified",
             array(
-                'displayfunc' => 'nice_datetime',
+                'joins' => 'sessiondate',
+                'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp',
+                'extrafields' => array(
+                    'timezone' => 'sessiondate.sessiontimezone'
+                )
             )
         );
 

@@ -288,7 +288,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time_in_timezone',
+                    'displayfunc' => 'event_time',
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -300,7 +300,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time_in_timezone',
+                    'displayfunc' => 'event_time',
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -357,9 +357,11 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                     'discountcode',
                     get_string('discountcode', 'rb_source_facetoface_signin'),
                     'base.discountcode',
-                    array('dbdatatype' => 'text',
+                    array(
+                        'dbdatatype' => 'text',
                         'outputformat' => 'text',
-                        'displayfunc' => 'format_string')
+                        'displayfunc' => 'format_string'
+                    )
                 );
             }
         }

@@ -116,15 +116,9 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     }
 
     public function define_columnoptions() {
-
-        global $CFG, $DB;
+        global $DB;
 
         $usernamefieldscreator = totara_get_all_user_name_fields_join('modifiedby');
-
-        $intimezone = '';
-        if (!empty($CFG->facetoface_displaysessiontimezones)) {
-            $intimezone = '_in_timezone';
-        }
 
         $columnoptions = array(
             new rb_column_option(
@@ -248,10 +242,13 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'sessions.registrationtimestart',
                 array(
                     'joins' => array('sessions'),
+                    'outputformat' => 'text',
                     'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_two_datetime_in_timezone',
-                    'extrafields' => array('finishdate' => 'sessions.registrationtimefinish', 'timezone' => 'base.sessiontimezone'),
-                    'outputformat' => 'text'
+                    'displayfunc' => 'event_dates_period',
+                    'extrafields' => array(
+                        'finishdate' => 'sessions.registrationtimefinish',
+                        'timezone' => 'base.sessiontimezone'
+                    ),
                 )
             ),
             new rb_column_option(
@@ -262,7 +259,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('sessions'),
                     'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'displayfunc' => 'event_date',
                     'extrafields' => array('timezone' => 'base.sessiontimezone'),
                     'outputformat' => 'text'
                 )
@@ -275,7 +272,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => array('sessions'),
                     'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'displayfunc' => 'event_date',
                     'extrafields' => array('timezone' => 'base.sessiontimezone'),
                     'outputformat' => 'text'
                 )
@@ -341,8 +338,11 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 "sessions.timecreated",
                 array(
                     'joins' => 'sessions',
-                    'displayfunc' => 'nice_datetime',
+                    'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'base.sessiontimezone',
+                    ),
                 )
             );
             $columnoptions[] = new rb_column_option(
@@ -352,8 +352,11 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 "sessions.timemodified",
                 array(
                     'joins' => 'sessions',
-                    'displayfunc' => 'nice_datetime',
+                    'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp',
+                    'extrafields' => array(
+                        'timezone' => 'base.sessiontimezone',
+                    ),
                 )
             );
             $columnoptions[] = new rb_column_option(
