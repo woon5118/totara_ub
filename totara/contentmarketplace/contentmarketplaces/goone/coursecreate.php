@@ -28,8 +28,6 @@ require_once($CFG->dirroot . '/mod/scorm/locallib.php');
 use contentmarketplace_goone\contentmarketplace;
 use contentmarketplace_goone\form\create_course_form;
 use contentmarketplace_goone\form\create_course_controller;
-use contentmarketplace_goone\subscription;
-use contentmarketplace_goone\unavailable_learning_object_exception;
 
 $category = optional_param('category', 0, PARAM_INT);
 $selection = required_param_array('selection', PARAM_ALPHANUMEXT);
@@ -67,7 +65,7 @@ $PAGE->set_title(get_string('addcourse', 'contentmarketplace_goone'));
 $PAGE->set_pagelayout('noblocks');
 
 /**
- * Check that current user has suitable access to the given learning objects in the given context.
+ * Check this GO1 account can access the learning object.
  * (Used to guard against unexpected learning objects being used to create content.)
  *
  * @param array $ids
@@ -76,23 +74,10 @@ $PAGE->set_pagelayout('noblocks');
  * @return bool always true
  */
 function check_availability_of_learning_objects($ids, $context) {
-    $availablityoptions = contentmarketplace::content_availability_options($context);
-    $subscription = new subscription();
     $api = new \contentmarketplace_goone\api();
     foreach ($ids as $id) {
-        // Check this GO1 account can access the learning object.
-        $learningobject = $api->get_learning_object($id);
-        // Check if learning object should be visible according to the availability configuration.
-        if (in_array('all', $availablityoptions)) {
-            continue;
-        }
-        if (in_array('collection', $availablityoptions) && $learningobject->portal_collection) {
-            continue;
-        }
-        if (in_array('subscribed', $availablityoptions) && $subscription->does_include_learning_object($id)) {
-            continue;
-        }
-        throw new unavailable_learning_object_exception($id);
+        // Throws API exception if learning object $id does not exist or is not available.
+        $api->get_learning_object($id);
     }
     return true;
 }
