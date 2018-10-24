@@ -95,3 +95,6 @@ setting:multiplesessions,mod_facetoface
 setting:multiplesessions_caption,mod_facetoface
 multiplesessions,mod_facetoface
 multiplesessions_help,mod_facetoface
+setting:fromaddress_caption,mod_facetoface
+setting:fromaddress,mod_facetoface
+setting:fromaddressdefault,mod_facetoface

@@ -760,10 +760,7 @@ class facetoface_notification extends data_object {
             $this->_facetoface->approvalrole = (int)$DB->get_field('facetoface', 'approvalrole', array('id' => $this->_facetoface->id));
         }
 
-        // If Facetoface from address is set, then all f2f messages should come from there.
-        if (!empty($CFG->facetoface_fromaddress)) {
-            $fromuser = \mod_facetoface\facetoface_user::get_facetoface_user();
-        }
+        $fromuser = \mod_facetoface\facetoface_user::get_facetoface_user();
         // We need a real user id to display an attendee name in task/alert report builder.
         $fromuser->realid = $user->id;
 

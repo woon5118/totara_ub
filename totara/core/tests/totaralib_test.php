@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Yuliya Bozhko <yuliya.bozhko@totaralms.com>
- * @package totara
- * @subpackage totaracore
+ * @package totara_core
  */
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
@@ -30,7 +29,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->dirroot . '/completion/cron.php');
 
-class totaralib_test extends advanced_testcase {
+class totara_core_totaralib_testcase extends advanced_testcase {
     protected $user, $manager, $teamleader, $appraiser, $invaliduserid = 9999;
 
     protected function tearDown() {
@@ -106,7 +105,7 @@ class totaralib_test extends advanced_testcase {
         $this->assertEquals('admin', totara_get_sender_from_user_by_id('')->username);
 
         $this->assertEquals('noreply', totara_get_sender_from_user_by_id(core_user::NOREPLY_USER)->username);
-        $this->assertEquals('facetoface', totara_get_sender_from_user_by_id(\mod_facetoface\facetoface_user::FACETOFACE_USER)->username);
+        $this->assertEquals('noreply', totara_get_sender_from_user_by_id(\mod_facetoface\facetoface_user::FACETOFACE_USER)->username);
 
         $user1 = $this->getDataGenerator()->create_user(array('username' => 'testuser1'));
         $user2 = $this->getDataGenerator()->create_user(array('email' => 'testuser2@test.com'));

@@ -1992,9 +1992,6 @@ $string['setting:displaysessiontimezones'] = 'When enabled the timezone of the S
 $string['setting:displaysessiontimezones_caption'] = 'Display event timezones';
 $string['setting:disableicalcancel'] = 'Disable cancellation emails with an iCalendar information.';
 $string['setting:disableicalcancel_caption'] = 'Disable iCalendar cancellations:';
-$string['setting:fromaddress'] = 'What will appear in the From field of email reminders sent by this module, unless "Always send email from the no-reply address" is set.';
-$string['setting:fromaddress_caption'] = 'Sender address:';
-$string['setting:fromaddressdefault'] = 'totara@example.com';
 $string['setting:lotteryenabled_caption'] = 'Waitlist lottery';
 $string['setting:lotteryenabled'] = 'Enable or disable waitlist lottery';
 $string['setting:managerreserve'] = 'Allow reserve/assign';
@@ -2539,3 +2536,7 @@ $string['multiplesessions'] = 'Users can sign-up to multiple events';
 $string['multiplesessions_help'] = 'When this option is toggled, users can sign up for multiple events within a seminar, subject to the restrictions and limitations of the settings below.';
 $string['setting:signupapproval_header'] = 'Signup Approvals';
 $string['approvaloptionsheader'] = 'Approval Options';
+$string['setting:fromaddress_caption'] = 'Sender address:';
+$string['setting:fromaddress'] = 'What will appear in the From field of email reminders sent by this module, unless "Always send email from the no-reply address" is set.';
+$string['setting:fromaddressdefault'] = 'totara@example.com';
+

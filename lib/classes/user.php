@@ -156,10 +156,18 @@ class core_user {
      */
     protected static function get_dummy_user_record() {
         global $CFG;
+        // Make sure that we fall back onto some reasonable no-reply address.
+        // Using the default setting and
+        // mimicking the email_to_user behaviour to ensure it is consistently.
+        if (empty($CFG->noreplyaddress) || !validate_email($CFG->noreplyaddress)) {
+            $noreplyaddress = 'noreply@' . get_host_from_url($CFG->wwwroot);
+        } else {
+            $noreplyaddress = $CFG->noreplyaddress;
+        }
 
         $dummyuser = new stdClass();
         $dummyuser->id = self::NOREPLY_USER;
-        $dummyuser->email = $CFG->noreplyaddress;
+        $dummyuser->email = $noreplyaddress;
         $dummyuser->firstname = get_string('noreplyname');
         $dummyuser->username = 'noreply';
         $dummyuser->lastname = '';

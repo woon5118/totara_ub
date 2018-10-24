@@ -196,7 +196,7 @@ function facetoface_generate_ical($f2f, $session, $method, $user, $dates = null,
         // Possibility of multiple commas, replaced with the single one.
         $LOCATION = preg_replace("/{$delimiter}+/", $delimiter, $location);
 
-        $ORGANISEREMAIL = $CFG->facetoface_fromaddress;
+        $ORGANISEREMAIL = \mod_facetoface\facetoface_user::get_facetoface_user()->email;
 
         if ($method & MDL_F2F_CANCEL) {
             $ROLE = 'NON-PARTICIPANT';
@@ -427,7 +427,7 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user, a
         $pattern = "/{$delimiter}+/";
         $LOCATION = preg_replace($pattern, $delimiter, $locationstring);
 
-        $ORGANISEREMAIL = $CFG->facetoface_fromaddress;
+        $ORGANISEREMAIL = \mod_facetoface\facetoface_user::get_facetoface_user()->email;
 
         $ROLE = 'REQ-PARTICIPANT';
         $CANCELSTATUS = '';

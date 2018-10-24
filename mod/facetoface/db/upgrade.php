@@ -401,5 +401,11 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018102900, 'facetoface');
     }
 
+    if ($oldversion < 2018120701) {
+        // Remove facetoface_fromaddress config as we use noreply address only, see TL-13943.
+        unset_config('facetoface_fromaddress');
+        upgrade_mod_savepoint(true, 2018120701, 'facetoface');
+    }
+
     return true;
 }

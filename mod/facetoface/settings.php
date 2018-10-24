@@ -102,10 +102,6 @@ if ($ADMIN->fulltree) { // Improve performance.
     $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'),
         new lang_string('setting:notificationdisable', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_configtext('facetoface_fromaddress', new lang_string('setting:fromaddress_caption', 'facetoface'),
-        new lang_string('setting:fromaddress', 'facetoface'), new lang_string('setting:fromaddressdefault', 'facetoface'),
-        PARAM_EMAIL, 30));
-
     $settings->add(new admin_setting_pickroles('facetoface_session_rolesnotify', new lang_string('setting:sessionrolesnotify_caption', 'facetoface'),
         new lang_string('setting:sessionrolesnotify', 'facetoface'), array('editingteacher')));
 

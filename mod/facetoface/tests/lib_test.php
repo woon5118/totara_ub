@@ -94,7 +94,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
     public function setUp() {
         parent::setUp();
         $this->resetAfterTest();
-
+        set_config('noreplyaddress', 'noreply@example.com');
         $this->facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
         $this->customfield_generator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
     }
@@ -3109,9 +3109,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
      */
     public function facetoface_messaging_settings() {
         $data = array(
-            array('no-reply@example.com', ''),
-            array('no-reply@example.com', 'facetofacesender@example.com'),
-            array('', ''),
+            array('noreply@example.com', null),
+            array('', null),
         );
         return $data;
     }
@@ -3123,7 +3122,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
      * @param string $senderfrom Sender from setting in Face to face
      * @dataProvider facetoface_messaging_settings
      */
-    public function test_facetoface_messages($noreplyaddress, $senderfrom) {
+    public function test_facetoface_messages($noreplyaddress, $senderfrom = null) {
         global $DB;
 
         $this->init_sample_data();
@@ -3146,7 +3145,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $manager2ja->id));
 
         set_config('noreplyaddress', $noreplyaddress);
-        set_config('facetoface_fromaddress', $senderfrom);
 
         // Create a facetoface activity and assign it to the course.
         $course = $this->getDataGenerator()->create_course();
@@ -3170,7 +3168,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $seminarevent = new seminar_event($sessionid);
-        $session = facetoface_get_session($sessionid);
 
         // Grab any messages that get sent.
         $sink = $this->redirectMessages();
@@ -3190,18 +3187,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->execute_adhoc_tasks();
         $emails = $sink->get_messages();
         $this->assertCount(4, $emails); // Learners and managers.
-
-        // Set userfrom used for the assertion.
-        $userfrom = (!empty($senderfrom)) ? \mod_facetoface\facetoface_user::get_facetoface_user() : $user3;
-
-        $checkformat = '%s %s (%s)';
-        $expectedemail = $noreplyaddress;
-        $expected = sprintf($checkformat, $userfrom->firstname, $userfrom->lastname, $expectedemail);
-
-        foreach ($emails as $email) {
-            $actual = sprintf($checkformat, $email->fromfirstname, $email->fromlastname, $email->fromemail);
-            $this->assertEquals($expected, $actual);
-        }
         $sink->clear();
     }
 

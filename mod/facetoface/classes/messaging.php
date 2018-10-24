@@ -153,7 +153,7 @@ final class messaging {
             // Possibility of multiple commas, replaced with the single one.
             $LOCATION = preg_replace("/{$delimiter}+/", $delimiter, $location);
 
-            $ORGANISEREMAIL = $CFG->facetoface_fromaddress;
+            $ORGANISEREMAIL = \mod_facetoface\facetoface_user::get_facetoface_user()->email;
 
             if ($method & MDL_F2F_CANCEL) {
                 $ROLE = 'NON-PARTICIPANT';

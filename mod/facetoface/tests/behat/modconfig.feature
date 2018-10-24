@@ -28,9 +28,6 @@ Feature: Configure seminar settings
   Scenario: Access all seminar activity settings with modconfig capability
     Given I log in as "configurator"
 
-    When I navigate to "Global settings" node in "Site administration > Seminars"
-    Then I should see "facetoface_fromaddress"
-
     When I navigate to "Activity defaults" node in "Site administration > Seminars"
     Then I should see "multisignupamount"
 
