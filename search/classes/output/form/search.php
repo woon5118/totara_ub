@@ -76,7 +76,6 @@ class search extends \moodleform {
             'multiple' => true,
             'limittoenrolled' => !is_siteadmin(),
             'noselectionstring' => get_string('allcourses', 'search'),
-            'currentdata' => $this->_customdata['courseids'],
         );
         $mform->addElement('course', 'courseids', get_string('courses', 'core'), $options);
         $mform->setType('courseids', PARAM_INT);

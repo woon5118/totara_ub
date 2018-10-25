@@ -55,17 +55,8 @@ if (\core_search\manager::is_global_search_enabled() === false) {
 
 $search = \core_search\manager::instance();
 
-// Current course ids need to be passed to the form during creation.
-$courseids = optional_param('courseids', '', PARAM_RAW);
-if (!empty($courseids)) {
-    $courseids = explode(',', $courseids);
-    $courseids = clean_param_array($courseids, PARAM_INT);
-} else {
-    $courseids = [];
-}
-
 // We first get the submitted data as we want to set it all in the page URL.
-$mform = new \core_search\output\form\search(null, array('searchengine' => $search->get_engine()->get_plugin_name(), 'courseids' => $courseids));
+$mform = new \core_search\output\form\search(null, array('searchengine' => $search->get_engine()->get_plugin_name()));
 
 $data = $mform->get_data();
 if (!$data && $q) {
@@ -79,7 +70,14 @@ if (!$data && $q) {
         $areaids = explode(',', $areaids);
         $data->areaids = clean_param_array($areaids, PARAM_ALPHANUMEXT);
     }
+
+    // Totara: if the form is not submitted, and the query (`q`) is not empty, then probably,
+    // we should check for the `coruseids` as an optional param from $_GET here. Otherwise, if
+    // it is a form submitted, then we will let the form dealing with the data filtering itself.
+    $courseids = optional_param('courseids', '', PARAM_RAW);
     if (!empty($courseids)) {
+        $courseids = explode(',', $courseids);
+        $courseids = clean_param_array($courseids, PARAM_INT);
         $data->courseids = $courseids;
     }
     $data->timestart = optional_param('timestart', 0, PARAM_INT);
