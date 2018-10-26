@@ -17,6 +17,7 @@ information provided here is intended especially for developers.
  * core_course_renderer::frontpage_my_courses() has been deprecated
  * core_course_renderer::frontpage_available_courses() has been deprecated
  * core_course_renderer::frontpage_combo_list() has been deprecated
+ * Column course.completionstartonenrol has been deprecated and will be removed from the course table in Totara 13
 
 === 11 ===
 

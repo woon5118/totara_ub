@@ -6,10 +6,10 @@ Feature: Instant completion
 
   Background:
     Given the following "courses" exist:
-      | fullname | shortname | category | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 0        | 1                | 1                      |
-      | Course 2 | C2        | 0        | 1                | 1                      |
-      | Course 3 | C3        | 0        | 1                | 1                      |
+      | fullname | shortname | category | enablecompletion |
+      | Course 1 | C1        | 0        | 1                |
+      | Course 2 | C2        | 0        | 1                |
+      | Course 3 | C3        | 0        | 1                |
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | Frist | teacher1@example.com |

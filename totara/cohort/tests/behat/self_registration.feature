@@ -13,10 +13,10 @@ Feature: Verify self registration updates audience membership and enrolled learn
       | manual002 | fname002  | lname002 | Wellington | NZ      |
       | manual003 | fname003  | lname003 | Wellington | NZ      |
     And the following "courses" exist:
-      | fullname | shortname | format | enablecompletion | completionstartonenrol |
-      | Course 1 | Crs1      | topics | 1                | 1                      |
-      | Course 2 | Crs2      | topics | 1                | 1                      |
-      | Course 3 | Crs3      | topics | 1                | 1                      |
+      | fullname | shortname | format | enablecompletion |
+      | Course 1 | Crs1      | topics | 1                |
+      | Course 2 | Crs2      | topics | 1                |
+      | Course 3 | Crs3      | topics | 1                |
     And the following "programs" exist in "totara_program" plugin:
       | fullname  | shortname |
       | Program 1 | prog1     |

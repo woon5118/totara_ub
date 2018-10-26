@@ -9,12 +9,12 @@ Feature: Test aggregated user columns can be added and viewed by the admin
     Given I am on a totara site
     # Set up some courses with unlikely characters in the short names.
     And the following "courses" exist:
-      | fullname         | shortname | format | enablecompletion | completionstartonenrol |
-      | CourseFullname-A | C+r+s-A   | topics | 1                | 1                      |
-      | CourseFullname-B | C,r,s-B   | topics | 1                | 1                      |
-      | CourseFullname-C | C.r.s-C   | topics | 1                | 1                      |
-      | CourseFullname-D | C/r\s-D   | topics | 1                | 1                      |
-      | CourseFullname-E | C_r^s-E   | topics | 1                | 1                      |
+      | fullname         | shortname | format | enablecompletion |
+      | CourseFullname-A | C+r+s-A   | topics | 1                |
+      | CourseFullname-B | C,r,s-B   | topics | 1                |
+      | CourseFullname-C | C.r.s-C   | topics | 1                |
+      | CourseFullname-D | C/r\s-D   | topics | 1                |
+      | CourseFullname-E | C_r^s-E   | topics | 1                |
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | user      | one      | user1@example.com |

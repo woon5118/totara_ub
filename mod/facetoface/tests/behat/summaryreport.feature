@@ -17,9 +17,9 @@ Feature: Seminar sessions report overview
       | student6  | Sam6      | Student6 | student6@example.com |
       | student7  | Sam7      | Student7 | student7@example.com |
     And the following "courses" exist:
-      | fullname | shortname | category | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 0        | 1                | 1                      |
-      | Course 2 | C2        | 0        | 1                | 1                      |
+      | fullname | shortname | category | enablecompletion |
+      | Course 1 | C1        | 0        | 1                |
+      | Course 2 | C2        | 0        | 1                |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |

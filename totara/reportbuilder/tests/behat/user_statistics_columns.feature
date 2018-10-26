@@ -13,10 +13,10 @@ Feature: Statistics columns in user reports should show data correctly
       | learner3 | Learner3   | Three     | learner3@example.com |
       | learner4 | Learner4   | Four      | learner4@example.com |
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 1                | 1                      |
-      | Course 2 | C2        | 1                | 1                      |
-      | Course 3 | C3        | 1                | 1                      |
+      | fullname | shortname | enablecompletion |
+      | Course 1 | C1        | 1                |
+      | Course 2 | C2        | 1                |
+      | Course 3 | C3        | 1                |
     And the following "course enrolments" exist:
       | user     | course | role    |
       | learner1 | C1     | student |

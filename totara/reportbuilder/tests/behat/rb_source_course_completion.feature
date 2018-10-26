@@ -10,9 +10,9 @@ Feature: Check that course completion reports don't show multiple enrolment type
       | learner2 | Learner   | Two      | learner2@example.com |
       | learner3 | Learner   | Three    | learner3@example.com |
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 1                | 1                      |
-      | Course 2 | C2        | 1                | 1                      |
+      | fullname | shortname | enablecompletion |
+      | Course 1 | C1        | 1                |
+      | Course 2 | C2        | 1                |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | trainer1 | C1     | editingteacher |

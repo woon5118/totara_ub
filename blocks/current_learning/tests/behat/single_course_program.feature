@@ -10,8 +10,8 @@ Feature: Check to see that programs with only a single course are displayed as e
       | username | firstname | lastname | email |
       | user001 | fn_001 | ln_001 | user001@example.com |
     And the following "courses" exist:
-      | fullname   | shortname | format | enablecompletion | completionstartonenrol |
-      | Course 1   | C1        | topics | 1                | 1                      |
+      | fullname   | shortname | format | enablecompletion |
+      | Course 1   | C1        | topics | 1                |
     And I log in as "admin"
     And I set the following administration settings values:
       | menulifetime | 0 |

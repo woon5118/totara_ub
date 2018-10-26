@@ -13,8 +13,8 @@ Feature: The competencies can be disabled
       | framework | fullname      | idnumber |
       | CFW001    | Competency 1  | COMP001  |
     And the following "courses" exist:
-      | fullname | shortname | format | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | topics | 1                | 1                      |
+      | fullname | shortname | format | enablecompletion |
+      | Course 1 | C1        | topics | 1                |
     And the following "programs" exist in "totara_program" plugin:
       | fullname  | shortname  |
       | Program 1 | program1   |

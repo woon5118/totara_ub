@@ -8,10 +8,10 @@ Feature: Adding competencies to program content
   Background:
     Given I am on a totara site
     And the following "courses" exist:
-      | fullname | shortname | format | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | topics | 1                | 1                      |
-      | Course 2 | C2        | topics | 1                | 1                      |
-      | Course 3 | C3        | topics | 1                | 1                      |
+      | fullname | shortname | format | enablecompletion |
+      | Course 1 | C1        | topics | 1                |
+      | Course 2 | C2        | topics | 1                |
+      | Course 3 | C3        | topics | 1                |
     And the following "programs" exist in "totara_program" plugin:
       | fullname              | shortname  |
       | Program Content Tests | conttest   |

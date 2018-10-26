@@ -8,9 +8,9 @@ Feature: The Certification Completion report displays correctly for a learner.
       | user001  | fn_001    | ln_001   | user001@example.com |
       | user002  | fn_002    | ln_002   | user002@example.com |
     And the following "courses" exist:
-      | fullname         | shortname | format | enablecompletion | completionstartonenrol |
-      | Certify Course   | CC1       | topics | 1                | 1                      |
-      | Recertify Course | RC1       | topics | 1                | 1                      |
+      | fullname         | shortname | format | enablecompletion |
+      | Certify Course   | CC1       | topics | 1                |
+      | Recertify Course | RC1       | topics | 1                |
     And I log in as "admin"
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category

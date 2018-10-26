@@ -195,16 +195,9 @@ class core_course_edit_form {
             }
         }
 
-        // Now completion starts on enrol option, and the progress view option.
+        // Now the progress view option.
         if (\completion_info::is_enabled_for_site()) {
-            // Ok we know where to insert our new elements, now create and insert them.
-            $mform->insertElementBefore(
-                $mform->createElement('advcheckbox', 'completionstartonenrol', get_string('completionstartonenrol', 'completion')),
-                $beforename
-            );
-            $mform->setDefault('completionstartonenrol', $courseconfig->completionstartonenrol);
-            $mform->disabledIf('completionstartonenrol', 'enablecompletion', 'eq', 0);
-
+            // Ok we know where to insert our new element, now create and insert it.
             $mform->insertElementBefore(
                 $mform->createElement('advcheckbox', 'completionprogressonview', get_string('completionprogressonview', 'completion')),
                 $beforename
@@ -213,15 +206,16 @@ class core_course_edit_form {
             $mform->disabledIf('completionprogressonview', 'enablecompletion', 'eq', 0);
             $mform->addHelpButton('completionprogressonview', 'completionprogressonview', 'completion');
         } else {
-            // We're not worried about where we insert these, just do it at the end.
-            $mform->addElement('hidden', 'completionstartonenrol');
-            $mform->setType('completionstartonenrol', PARAM_INT);
-            $mform->setDefault('completionstartonenrol',0);
-
+            // We're not worried about where we insert this, just do it at the end.
             $mform->addElement('hidden', 'completionprogressonview');
             $mform->setType('completionprogressonview', PARAM_INT);
             $mform->setDefault('completionprogressonview', 0);
         }
+
+        // Completion starts on enrol option is deprecated, setting as hidden field to remove the option from settings form.
+        $mform->addElement('hidden', 'completionstartonenrol');
+        $mform->setType('completionstartonenrol', PARAM_INT);
+        $mform->setDefault('completionstartonenrol', 0);
     }
 
     /**

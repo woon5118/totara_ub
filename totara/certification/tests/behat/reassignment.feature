@@ -12,9 +12,9 @@ Feature: User reassignment to a certification
       | jimmy       | Jimmy     | Jim      | jimmy@example.com  |
       | timmy       | Timmy     | Tim      | timmy@example.com  |
     And the following "courses" exist:
-      | fullname         | shortname | format | enablecompletion | completionstartonenrol |
-      | Certify Course   | CC1       | topics | 1                | 1                      |
-      | Recertify Course | RC1       | topics | 1                | 1                      |
+      | fullname         | shortname | format | enablecompletion |
+      | Certify Course   | CC1       | topics | 1                |
+      | Recertify Course | RC1       | topics | 1                |
     And the following "certifications" exist in "totara_program" plugin:
       | fullname       | shortname |
       | Reassign Tests | reasstst  |

@@ -10,8 +10,8 @@ Feature: My Future Bookings seminar sessions report overview
       | username | firstname | lastname | email                   | timezone         |
       | alice    | Alice     | Smith    | alice.smith@example.com | America/New_York |
     And the following "courses" exist:
-      | fullname | shortname | category | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 0        | 1                | 1                      |
+      | fullname | shortname | category | enablecompletion |
+      | Course 1 | C1        | 0        | 1                |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | alice | C1     | student |

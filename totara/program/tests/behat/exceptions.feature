@@ -13,8 +13,8 @@ Feature: Generation of program assignment exceptions
       | user003  | fn_003    | ln_003   | user003@example.com |
       | user004  | fn_004    | ln_004   | user004@example.com |
     And the following "courses" exist:
-      | fullname | shortname | format | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | topics | 1                | 1                      |
+      | fullname | shortname | format | enablecompletion |
+      | Course 1 | C1        | topics | 1                |
     And the following "programs" exist in "totara_program" plugin:
       | fullname                 | shortname |
       | Program Exception Tests  | exctest   |

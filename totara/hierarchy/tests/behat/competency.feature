@@ -11,8 +11,8 @@ Feature: Test competencies achieved is updated
       | bilbo    | Bilbo     | Baggins  | bilbo.baggins@example.com    |              |         |
       | gandalf  | Gandalf   | the Grey | gandalf.the.grey@example.com | staffmanager | system  |
     And the following "courses" exist:
-      | fullname              | shortname | format |enablecompletion | completionstartonenrol |
-      | An Unexpected Journey | C1        | weeks  | 1               | 1                      |
+      | fullname              | shortname | format |enablecompletion |
+      | An Unexpected Journey | C1        | weeks  | 1               |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | bilbo | C1     | student |

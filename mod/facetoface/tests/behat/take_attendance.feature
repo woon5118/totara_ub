@@ -14,8 +14,8 @@ Feature: Take attendance for seminar sessions
       | student3  | Sam3      | Student3 | student3@example.com |
       | student4  | Sam4      | Student4 | student4@example.com |
     And the following "courses" exist:
-      | fullname | shortname | category | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 0        | 1                | 1                      |
+      | fullname | shortname | category | enablecompletion |
+      | Course 1 | C1        | 0        | 1                |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |

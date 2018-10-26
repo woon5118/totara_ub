@@ -10,11 +10,11 @@ Feature: User certifications and their courses appear correctly in the current l
       | username | firstname | lastname | email |
       | user001 | fn_001 | ln_001 | user001@example.com |
     And the following "courses" exist:
-      | fullname           | shortname | format | enablecompletion | completionstartonenrol |
-      | Certify Course 1   | CC1       | topics | 1                | 1                      |
-      | Certify Course 2   | CC2       | topics | 1                | 1                      |
-      | Recertify Course 1 | RC1       | topics | 1                | 1                      |
-      | Recertify Course 2 | RC2       | topics | 1                | 1                      |
+      | fullname           | shortname | format | enablecompletion |
+      | Certify Course 1   | CC1       | topics | 1                |
+      | Certify Course 2   | CC2       | topics | 1                |
+      | Recertify Course 1 | RC1       | topics | 1                |
+      | Recertify Course 2 | RC2       | topics | 1                |
     And I log in as "admin"
     And I set the following administration settings values:
       | menulifetime | 0 |

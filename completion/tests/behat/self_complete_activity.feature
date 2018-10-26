@@ -9,8 +9,8 @@ Feature: User can self complete an activity from within an activity
       | username | email             |
       | user1    | user1@example.com |
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol |
-      | Course 1 | c1        | 1                | 1                      |
+      | fullname | shortname | enablecompletion |
+      | Course 1 | c1        | 1                |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | user1 | c1     | student |

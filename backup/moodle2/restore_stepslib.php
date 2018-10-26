@@ -1889,7 +1889,7 @@ class restore_course_structure_step extends restore_structure_step {
         }
         if (empty($CFG->enablecompletion)) {
             $data->enablecompletion = 0;
-            $data->completionstartonenrol = 0;
+            $data->completionstartonenrol = 1;
             $data->completionprogressonview = 0;
             $data->completionnotify = 0;
         }
@@ -3953,11 +3953,11 @@ class restore_block_instance_structure_step extends restore_structure_step {
                 self::$duplicatedblocks[$key]['counter']++;
             } else {
                 $sql = "SELECT COUNT(id)
-                     FROM {block_instances} 
-                     WHERE blockname = :blockname 
-                       AND parentcontextid = :parentcontextid 
+                     FROM {block_instances}
+                     WHERE blockname = :blockname
+                       AND parentcontextid = :parentcontextid
                        AND showinsubcontexts = :showinsubcontexts
-                       AND pagetypepattern = :pagetypepattern 
+                       AND pagetypepattern = :pagetypepattern
                        AND defaultregion = :defaultregion
                        AND {$DB->sql_compare_text('configdata')} = :configdata";
 

@@ -18,8 +18,8 @@ Feature: Check attendees actions are performed by users with the right permissio
       | student1 | Job Assignment One | 1        | manager1  |
       | student2 | Job Assignment One | 1        | manager1  |
     And the following "courses" exist:
-      | fullname | shortname | category | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 0        | 1                | 1                      |
+      | fullname | shortname | category | enablecompletion |
+      | Course 1 | C1        | 0        | 1                |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | trainer1 | C1     | editingteacher |

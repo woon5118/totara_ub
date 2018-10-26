@@ -10,9 +10,9 @@ Feature: User recertification and expiry of certification
       | username | firstname | lastname | email |
       | user001 | fn_001 | ln_001 | user001@example.com |
     And the following "courses" exist:
-      | fullname         | shortname | format | enablecompletion | completionstartonenrol |
-      | Certify Course   | CC1       | topics | 1                | 1                      |
-      | Recertify Course | RC1       | topics | 1                | 1                      |
+      | fullname         | shortname | format | enablecompletion |
+      | Certify Course   | CC1       | topics | 1                |
+      | Recertify Course | RC1       | topics | 1                |
     And I log in as "admin"
     And I set the following administration settings values:
       | menulifetime   | 0       |

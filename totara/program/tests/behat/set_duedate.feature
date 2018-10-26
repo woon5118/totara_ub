@@ -14,9 +14,9 @@ Feature: Set due date for program assignments
       | datatype | shortname | name                     | param1      |
       | text     | pfti      | Profile field text input |             |
     And the following "courses" exist:
-      | fullname               | shortname     | format | enablecompletion | completionstartonenrol |
-      | Course search result x | coursesearchx | topics | 1                | 1                      |
-      | Course search result y | coursesearchy | topics | 1                | 1                      |
+      | fullname               | shortname     | format | enablecompletion |
+      | Course search result x | coursesearchx | topics | 1                |
+      | Course search result y | coursesearchy | topics | 1                |
     And the following "programs" exist in "totara_program" plugin:
       | fullname                | shortname   |
       | Set Due Date Tests      | duedatetest |

@@ -10,8 +10,8 @@ Feature: Certification completion date is based on course completion time
       | username | firstname | lastname | email                |
       | learner1 | Learner   | One      | learner1@example.com |
     And the following "courses" exist:
-      | fullname   | shortname | format | enablecompletion | completionstartonenrol |
-      | Course One | course1   | topics | 1                | 1                      |
+      | fullname   | shortname | format | enablecompletion |
+      | Course One | course1   | topics | 1                |
     And the following "certifications" exist in "totara_program" plugin:
       | fullname          | shortname | activeperiod | windowperiod | recertifydatetype |
       | Certification One | cert1     | 1 month      | 1 month      | 1                 |

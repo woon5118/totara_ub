@@ -10,9 +10,9 @@ Feature: Test competencies are updated when linked courses are deleted
       | framework | fullname       | idnumber | description                           |
       | CFrame    | Competency101  | Comp101  | Competency with linked courses        |
     And the following "courses" exist:
-      | fullname | shortname | format | enablecompletion | completionstartonenrol |
-      | Test 1   | tst1      | topics | 1                | 1                      |
-      | Test M   | tst2      | topics | 1                | 1                      |
+      | fullname | shortname | format | enablecompletion |
+      | Test 1   | tst1      | topics | 1                |
+      | Test M   | tst2      | topics | 1                |
     And I log in as "admin"
 
     #link courses
@@ -56,9 +56,9 @@ Feature: Test competencies are updated when linked courses are deleted
       | CFrame    | Competency101  | Comp101  | Competency with linked courses        |
       | CFrame    | Competency102  | Comp102  | Second Competency with linked courses |
     And the following "courses" exist:
-      | fullname | shortname | format | enablecompletion | completionstartonenrol |
-      | Test 1   | tst1      | topics | 1                | 1                      |
-      | Test M   | tst2      | topics | 1                | 1                      |
+      | fullname | shortname | format | enablecompletion |
+      | Test 1   | tst1      | topics | 1                |
+      | Test M   | tst2      | topics | 1                |
     And I log in as "admin"
 
     #link courses

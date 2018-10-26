@@ -12,9 +12,9 @@ Feature: Generation of certification assignment exceptions
       | user002  | fn_002    | ln_002   | user002@example.com |
       | user003  | fn_003    | ln_003   | user003@example.com |
     And the following "courses" exist:
-      | fullname | shortname | format | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | topics | 1                | 1                      |
-      | Course 2 | C2        | topics | 1                | 1                      |
+      | fullname | shortname | format | enablecompletion |
+      | Course 1 | C1        | topics | 1                |
+      | Course 2 | C2        | topics | 1                |
     And the following "certifications" exist in "totara_program" plugin:
       | fullname                       | shortname |
       | Certification Filler           | filtest   |

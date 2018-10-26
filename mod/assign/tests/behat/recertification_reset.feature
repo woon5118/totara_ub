@@ -7,8 +7,8 @@ Feature: Learners can submit assignments again when certification is expired
   Background:
     Given I am on a totara site
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 1                | 1                      |
+      | fullname | shortname | enablecompletion |
+      | Course 1 | C1        | 1                |
     And the following "users" exist:
       | username | firstname | lastname | email |
       | student1 | Student | 1 | student1@example.com |

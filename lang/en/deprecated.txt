@@ -65,3 +65,6 @@ nativesqlsrvnonwindows,core_install
 loginpasswordautocomplete,core_admin
 loginpasswordautocomplete_help,core_admin
 visible_help,core
+completionstartonenrol,core_completion
+completionstartonenrolhelp,core_completion
+completionstartonenrol_help,core_completion

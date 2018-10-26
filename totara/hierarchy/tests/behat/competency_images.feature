@@ -10,8 +10,8 @@ Feature: Test use of images in competencies and competency custom fields
       | username | firstname | lastname | email                        |
       | learner1 | Learner   | One      | learner1@example.com         |
     And the following "courses" exist:
-      | fullname              | shortname | format |enablecompletion | completionstartonenrol |
-      | An Unexpected Journey | C1        | weeks  | 1               | 1                      |
+      | fullname              | shortname | format |enablecompletion |
+      | An Unexpected Journey | C1        | weeks  | 1               |
     And the following "course enrolments" exist:
       | user      | course | role    |
       | learner1  | C1     | student |

@@ -11,8 +11,8 @@ Feature: User can self complete an activity from within a single activity course
 
   Scenario Outline: Confirm single activity courses have self completion avaliable inside the activity
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol | format         | activitytype |
-      | Course 1 | c1        | 1                | 1                      | singleactivity | <activity>   |
+      | fullname | shortname | enablecompletion | format         | activitytype |
+      | Course 1 | c1        | 1                | singleactivity | <activity>   |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | user1 | c1     | student |
@@ -60,8 +60,8 @@ Feature: User can self complete an activity from within a single activity course
 
   Scenario: Confirm the book single activity course has self completion available inside itself
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol | format         | activitytype |
-      | Course 1 | c1        | 1                | 1                      | singleactivity | book         |
+      | fullname | shortname | enablecompletion | format         | activitytype |
+      | Course 1 | c1        | 1                | singleactivity | book         |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | user1 | c1     | student |
@@ -88,8 +88,8 @@ Feature: User can self complete an activity from within a single activity course
   @_file_upload
   Scenario: Confirm the SCORM single activity course has self completion available inside itself
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol | format         | activitytype  |
-      | Course 1 | c1        | 1                | 1                      | singleactivity | SCORM package |
+      | fullname | shortname | enablecompletion | format         | activitytype  |
+      | Course 1 | c1        | 1                | singleactivity | SCORM package |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | user1 | c1     | student |
@@ -116,8 +116,8 @@ Feature: User can self complete an activity from within a single activity course
   @_file_upload
   Scenario: Confirm the IMS single activity course has self completion available inside itself
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol | format         | activitytype        |
-      | Course 1 | c1        | 1                | 1                      | singleactivity | IMS content package |
+      | fullname | shortname | enablecompletion | format         | activitytype        |
+      | Course 1 | c1        | 1                | singleactivity | IMS content package |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | user1 | c1     | student |
@@ -146,8 +146,8 @@ Feature: User can self complete an activity from within a single activity course
   @_file_upload
   Scenario Outline: Confirm the file single activity course has self completion available inside itself
     And the following "courses" exist:
-      | fullname | shortname | enablecompletion | completionstartonenrol | format         | activitytype |
-      | Course 1 | c1        | 1                | 1                      | singleactivity | File         |
+      | fullname | shortname | enablecompletion | format         | activitytype |
+      | Course 1 | c1        | 1                | singleactivity | File         |
     And the following "course enrolments" exist:
       | user  | course | role    |
       | user1 | c1     | student |

@@ -13,8 +13,8 @@ Feature: Delete a course with a seminar
       | student1 | Sam1      | Student1 | student1@example.com |
       | student2 | Sam2      | Student2 | student2@example.com |
     And the following "courses" exist:
-      | fullname | shortname | category | enablecompletion | completionstartonenrol |
-      | Course 1 | C1        | 0        | 1                | 1                      |
+      | fullname | shortname | category | enablecompletion |
+      | Course 1 | C1        | 0        | 1                |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |

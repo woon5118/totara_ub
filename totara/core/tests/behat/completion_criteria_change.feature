@@ -17,10 +17,10 @@ Feature: Test reaggregating completion data when changing course completion sett
     | user2    | user      | two      | u2@example.com |
     | user3    | user      | three    | u3@example.com |
     And the following "courses" exist:
-    | fullname | shortname | summary          | format | enablecompletion | completionstartonenrol |
-    | Course 1 | C1        | Course summary 1 | topics | 1                | 1                      |
-    | Course 2 | C2        | Course summary 2 | topics | 1                | 0                      |
-    | Course 3 | C3        | Course summary 3 | topics | 1                | 1                      |
+    | fullname | shortname | summary          | format | enablecompletion |
+    | Course 1 | C1        | Course summary 1 | topics | 1                |
+    | Course 2 | C2        | Course summary 2 | topics | 1                |
+    | Course 3 | C3        | Course summary 3 | topics | 1                |
     And the following "course enrolments" exist:
     | user  | course | role    |
     | user1 | C1     | student |
