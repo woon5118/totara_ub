@@ -41,7 +41,15 @@
     padding: @selectSearchText-spacing_small @selectSearchText-spacing_x_small;
 
     &__header {
-        margin: auto 2rem auto 0;
+        height: 100%;
+        margin: auto @selectSearchText-spacing_medium auto 0;
+    }
+
+    &__hint {
+        height: 100%;
+        left: -@selectSearchText-spacing_x_small;
+        margin: auto @selectSearchText-spacing_small auto 0;
+        position: relative;
     }
 
     &__field {
@@ -71,13 +79,20 @@
         }
 
         &_clear {
+            align-items: center;
+            display: flex;
             font-size: 1.3rem;
+            height: 100%;
             padding: @selectSearchText-spacing_small;
             position: absolute;
             right: 0;
 
+            &:hover {
+                text-decoration: none;
+            }
+
             .flex-icon {
-                vertical-align: baseline;
+                margin: auto 0;
             }
         }
     }

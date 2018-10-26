@@ -43,6 +43,8 @@
     * placeholder_show: bool, if true and if the title is hidden then show the title as a placeholder
     * title: string, Title for selector
     * title_hidden: bool, true to hide the title
+    * has_hint_icon: bool, has hint icon
+    * hint_icon: template data for displaying help icon with popover
 
 }}
 <div class="tw-selectSearchText"
@@ -53,6 +55,13 @@
     <label for="{{key}}_input" class="tw-selectSearchText__header{{#title_hidden}} sr-only{{/title_hidden}}">
         {{title}}
     </label>
+
+    {{#has_hint_icon}}
+     <div class="tw-selectSearchText__hint">
+         {{#hint_icon}}{{> core/help_icon}}{{/hint_icon}}
+     </div>
+    {{/has_hint_icon}}
+
     <div class="tw-selectSearchText__field">
         <input type="text" value="{{current_val}}"
         {{#placeholder_show}}{{#title_hidden}}placeholder="{{title}}"{{/title_hidden}}{{/placeholder_show}}

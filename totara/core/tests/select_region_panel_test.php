@@ -91,6 +91,7 @@ class select_region_panel_test extends advanced_testcase {
                         'title_hidden' => true,
                         'current_val' => null,
                         'placeholder_show' => true,
+                        'has_hint_icon' => false,
                     ],
                 ],
                 2 => (object)[

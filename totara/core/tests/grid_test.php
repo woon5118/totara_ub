@@ -48,7 +48,8 @@ class grid_test extends advanced_testcase {
                         'title' => 'Tile 1',
                         'title_hidden' => true,
                         'current_val' => null,
-                        'placeholder_show' => true
+                        'placeholder_show' => true,
+                        'has_hint_icon' => false,
                     ],
                 ],
                 1 => (object)[
@@ -58,7 +59,8 @@ class grid_test extends advanced_testcase {
                         'title' => 'Tile 2',
                         'title_hidden' => true,
                         'current_val' => null,
-                        'placeholder_show' => true
+                        'placeholder_show' => true,
+                        'has_hint_icon' => false,
                     ],
                 ],
                 2 => (object)[
@@ -68,7 +70,8 @@ class grid_test extends advanced_testcase {
                         'title' => 'Tile 3',
                         'title_hidden' => true,
                         'current_val' => null,
-                        'placeholder_show' => true
+                        'placeholder_show' => true,
+                        'has_hint_icon' => false,
                     ],
                 ],
             ]

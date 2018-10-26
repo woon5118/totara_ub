@@ -70,6 +70,7 @@ class select_region_primary_test extends advanced_testcase {
                         'title_hidden' => true,
                         'current_val' => null,
                         'placeholder_show' => true,
+                        'has_hint_icon' => false,
                     ],
                 ],
             ],

@@ -56,7 +56,10 @@ $searchtext1 = \totara_core\output\select_search_text::create(
     'testsearchtext1',
     'Test full text search title 1',
     false,
-    'Test start text 1'
+    'Test start text 1',
+    false,
+    'menuitem:accessmode',
+    'totara_core'
 );
 
 $searchtext2 = \totara_core\output\select_search_text::create(

@@ -43,6 +43,7 @@ class select_search_text_test extends advanced_testcase {
             'title_hidden' => true,
             'current_val' => null,
             'placeholder_show' => true,
+            'has_hint_icon' => false,
         ];
 
         $actual1 = $searchtext1->get_template_data();
@@ -64,6 +65,7 @@ class select_search_text_test extends advanced_testcase {
             'title_hidden' => false,
             'current_val' => 'asdf',
             'placeholder_show' => true,
+            'has_hint_icon' => false,
         ];
 
         $actual2 = $searchtext2->get_template_data();

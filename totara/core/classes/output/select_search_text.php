@@ -35,6 +35,8 @@ class select_search_text extends select {
      * @param bool $titlehidden true if the title should be hidden
      * @param string|null $currentvalue the current text to display in the text box
      * @param bool $showplaceholder if true and title is hidden then the title will appear as the placeholder
+     * @param string $hintidentifier if provided then a help icon with popup will be shown beside the text input, using string $hintidentifier . '_help'
+     * @param string $hintcomponent component for the hint identifier
      * @return select_search_text
      */
     public static function create(
@@ -42,12 +44,22 @@ class select_search_text extends select {
         string $title,
         bool $titlehidden = false,
         string $currentvalue = null,
-        bool $showplaceholder = true
+        bool $showplaceholder = true,
+        string $hintidentifier = "",
+        string $hintcomponent = ""
     ) : select_search_text {
+        global $OUTPUT;
+
         $data = parent::get_base_template_data($key, $title, $titlehidden);
 
         $data->current_val = $currentvalue;
         $data->placeholder_show = $showplaceholder;
+        $data->has_hint_icon = !empty($hintidentifier) && !empty($hintcomponent);
+
+        if ($data->has_hint_icon) {
+            $icon = new \help_icon($hintidentifier, $hintcomponent);
+            $data->hint_icon = $icon->export_for_template($OUTPUT);
+        }
 
         return new static((array)$data);
     }
