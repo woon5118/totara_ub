@@ -121,12 +121,6 @@ class rb_source_program_completion extends rb_base_source {
                 'completion_position.id = base.positionid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
-            new rb_join(
-                'prog_user_assignment',
-                'LEFT',
-                '{prog_user_assignment}',
-                'prog_user_assignment.programid = base.programid AND prog_user_assignment.userid = base.userid'
-            ),
             // This join is required to keep the joining of program custom fields happy.
             new rb_join(
                 'prog',
@@ -310,11 +304,13 @@ class rb_source_program_completion extends rb_base_source {
             'progcompletion',
             'isassigned',
             get_string('isuserassigned', 'rb_source_program_completion'),
-            'CASE WHEN prog_user_assignment.id IS NOT NULL THEN 1 ELSE 0 END',
+            '(SELECT CASE WHEN COUNT(pua.id) >= 1 THEN 1 ELSE 0 END
+                FROM {prog_user_assignment} pua
+               WHERE pua.programid = base.programid AND pua.userid = base.userid)',
             array(
-                'joins' => 'prog_user_assignment',
                 'displayfunc' => 'yes_or_no',
                 'dbdatatype' => 'boolean',
+                'issubquery' => true,
                 'defaultheading' => get_string('isuserassigned', 'rb_source_program_completion')
             )
         );
@@ -552,11 +548,6 @@ class rb_source_program_completion extends rb_base_source {
             new rb_param_option(
                 'userid',
                 'base.userid'
-            ),
-            new rb_param_option(
-                'assignmentid',
-                'prog_user_assignment.assignmentid',
-                'prog_user_assignment'
             ),
         );
         return $paramoptions;
