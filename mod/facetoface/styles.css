@@ -307,3 +307,14 @@ ul.assetlist {
 .f2f-usersbox {
     margin-bottom: 48px;
 }
+
+.f2f-booked-type-error {
+    border: 1px solid #bb4247;
+    display: inline-block;
+}
+
+.f2f-booked-type-error-hint {
+    color: #bb4247;
+    display: inline-block;
+    width: 50%;
+}

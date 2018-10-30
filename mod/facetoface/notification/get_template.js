@@ -97,6 +97,37 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                 }
             });
 
+            // Detecting element error here
+            var f2fbookedtypeelement = $('select#f2f-booked-type'),
+                container = f2fbookedtypeelement.parent('div'),
+                errormsgbox = null;
+
+            if (f2fbookedtypeelement.attr('data-error') == 'error') {
+                // Idicating that it has an error here, and it is going to input message with an icon
+                f2fbookedtypeelement.addClass('f2f-booked-type-error');
+
+                var errormsg = $('<span></span>');
+                errormsg.text(M.util.get_string('required', 'core'));
+
+                errormsgbox = $('<div></div>');
+                errormsgbox.addClass('f2f-booked-type-error-hint').append(errormsg);
+
+                container.append(errormsgbox);
+            }
+
+            // Just remove the error outline when user is changing the value to
+            // something else.
+            f2fbookedtypeelement.change(function() {
+                var self = $(this);
+                if (self.val() != 0) {
+                    self.removeClass('f2f-booked-type-error');
+
+                    // Removing the text here, only if it exist
+                    if (errormsgbox) {
+                        errormsgbox.remove();
+                    }
+                }
+            });
         });
 
         // We want to listen to changes, however when the editor processes the body and manager copy it may
