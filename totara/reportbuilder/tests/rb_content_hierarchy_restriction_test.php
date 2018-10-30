@@ -192,15 +192,18 @@ class totara_rb_content_hierarchy_restrictions_testcase extends advanced_testcas
                     }
                 }
 
-                // We can already add to the 'equal*' pos and org expected results
+                // We can already add current pos and org to the expected results
                 if (!in_array($pos->id, $userhierarchy['pos']['equal'])) {
                     $userhierarchy['pos']['equal'][] = $pos->id;
                 }
                 if (!in_array($pos->id, $userhierarchy['pos']['equalbelow'])) {
                     $userhierarchy['pos']['equalbelow'][] = $pos->id;
                 }
+                if (!in_array($pos->id, $userhierarchy['pos']['below'])) {
+                    $userhierarchy['pos']['below'][] = $pos->id;
+                }
                 // Look up the pos hierarchy in database directly.
-                $belowposs = $DB->get_records_SELECT('pos', "path LIKE " . $DB->sql_concat(':path', "'/%'"), array('path' => $pos->path));
+                $belowposs = $DB->get_records_select('pos', "path LIKE " . $DB->sql_concat(':path', "'/%'"), array('path' => $pos->path));
                 foreach ($belowposs as $belowpos) {
                     if (!in_array($belowpos->id, $userhierarchy['pos']['equalbelow'])) {
                         $userhierarchy['pos']['equalbelow'][] = $belowpos->id;
@@ -210,7 +213,7 @@ class totara_rb_content_hierarchy_restrictions_testcase extends advanced_testcas
                     }
                 }
                 // Dialogs need the parents up to the top, no matter if they are above the user restricted positions.
-                $aboveposs = $DB->get_records_SELECT('pos', ":path LIKE " . $DB->sql_concat('path', "'/%'"), array('path' => $pos->path));
+                $aboveposs = $DB->get_records_select('pos', ":path LIKE " . $DB->sql_concat('path', "'/%'"), array('path' => $pos->path));
                 foreach ($aboveposs as $abovepos) {
                     if (!in_array($abovepos->id, $userhierarchy['pos']['equal'])) {
                         $userhierarchy['pos']['equal'][] = $abovepos->id;
@@ -229,8 +232,11 @@ class totara_rb_content_hierarchy_restrictions_testcase extends advanced_testcas
                 if (!in_array($org->id, $userhierarchy['org']['equalbelow'])) {
                     $userhierarchy['org']['equalbelow'][] = $org->id;
                 }
+                if (!in_array($org->id, $userhierarchy['org']['below'])) {
+                    $userhierarchy['org']['below'][] = $org->id;
+                }
                 // Look up the org hierarchy in database directly.
-                $beloworgs = $DB->get_records_SELECT('org', "path LIKE " . $DB->sql_concat(':path', "'/%'"), array('path' => $org->path));
+                $beloworgs = $DB->get_records_select('org', "path LIKE " . $DB->sql_concat(':path', "'/%'"), array('path' => $org->path));
                 foreach ($beloworgs as $beloworg) {
                     if (!in_array($beloworg->id, $userhierarchy['org']['equalbelow'])) {
                         $userhierarchy['org']['equalbelow'][] = $beloworg->id;
@@ -240,7 +246,7 @@ class totara_rb_content_hierarchy_restrictions_testcase extends advanced_testcas
                     }
                 }
                 // Dialogs need the parents up to the top, no matter if they are above the user restricted organisations.
-                $aboveorgs = $DB->get_records_SELECT('org', ":path LIKE " . $DB->sql_concat('path', "'/%'"), array('path' => $org->path));
+                $aboveorgs = $DB->get_records_select('org', ":path LIKE " . $DB->sql_concat('path', "'/%'"), array('path' => $org->path));
                 foreach ($aboveorgs as $aboveorg) {
                     if (!in_array($aboveorg->id, $userhierarchy['org']['equal'])) {
                         $userhierarchy['org']['equal'][] = $aboveorg->id;

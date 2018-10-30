@@ -102,7 +102,6 @@ class rb_current_pos_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_POS_EQUAL) {
             $wheresql = "$field IN (
-            
             SELECT ja.userid
               FROM {job_assignment} ja
               JOIN {pos} viewerpos ON viewerpos.id = ja.positionid
@@ -113,11 +112,10 @@ class rb_current_pos_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_POS_BELOW) {
             $wheresql = "$field IN (
-            
             SELECT ja.userid
               FROM {job_assignment} ja
               JOIN {pos} pos ON pos.id = ja.positionid
-              JOIN {pos} viewerpos ON pos.path LIKE $viewpospath  
+              JOIN {pos} viewerpos ON pos.path LIKE $viewpospath
              WHERE viewerpos.id $possql)";
 
             return array($wheresql, $params);
@@ -125,11 +123,10 @@ class rb_current_pos_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_POS_EQUALANDBELOW) {
             $wheresql = "$field IN (
-            
             SELECT ja.userid
               FROM {job_assignment} ja
               JOIN {pos} pos ON pos.id = ja.positionid
-              JOIN {pos} viewerpos ON pos.path LIKE $viewpospath OR viewerpos.id = pos.id  
+              JOIN {pos} viewerpos ON pos.path LIKE $viewpospath OR viewerpos.id = pos.id
              WHERE viewerpos.id $possql)";
 
             return array($wheresql, $params);
@@ -179,7 +176,7 @@ class rb_current_pos_content extends rb_base_content {
         }
 
         if (empty($posids)) {
-            // There will be no match, NULL is not equal to anything, not event NULL.
+            // There will be no match, NULL is not equal to anything, not even NULL.
             return array("{$field} = NULL", array());
         }
 
@@ -196,25 +193,17 @@ class rb_current_pos_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_POS_EQUAL) {
             $itemids = $posids;
-
-        } else if ($restriction == self::CONTENT_POS_BELOW) {
-            $sql = "SELECT pos.id
-                      FROM {pos} pos
-                      JOIN {pos} viewerpos ON pos.path LIKE $viewpospath 
-                     WHERE viewerpos.id $possql";
-            $items = $DB->get_records_sql($sql, $params);
-            $itemids = array_keys($items);
-
-        } else if ($restriction == self::CONTENT_POS_EQUALANDBELOW) {
+        } else if ($restriction == self::CONTENT_POS_BELOW || $restriction == self::CONTENT_POS_EQUALANDBELOW) {
+            // Hierarchy has to include full tree from parent to the current restriction,
+            // otherwise we won't be able to build a selector dialog.
             $sql = "SELECT pos.id
                       FROM {pos} pos
                       JOIN {pos} viewerpos ON pos.path LIKE $viewpospath OR viewerpos.id = pos.id
                      WHERE viewerpos.id $possql";
             $items = $DB->get_records_sql($sql, $params);
             $itemids = array_keys($items);
-
         } else {
-            // Invalid restriction, NULL is not equal to anything, not event NULL.
+            // Invalid restriction, NULL is not equal to anything, not even NULL.
             debugging('Invalid restriction type detected', DEBUG_DEVELOPER);
             return array("{$field} = NULL", array());
         }
@@ -374,7 +363,6 @@ class rb_current_org_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_ORG_EQUAL) {
             $wheresql = "$field IN (
-            
             SELECT ja.userid
               FROM {job_assignment} ja
               JOIN {org} viewerorg ON viewerorg.id = ja.organisationid
@@ -385,11 +373,10 @@ class rb_current_org_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_ORG_BELOW) {
             $wheresql = "$field IN (
-            
             SELECT ja.userid
               FROM {job_assignment} ja
               JOIN {org} org ON org.id = ja.organisationid
-              JOIN {org} viewerorg ON org.path LIKE $vieworgpath  
+              JOIN {org} viewerorg ON org.path LIKE $vieworgpath
              WHERE viewerorg.id $orgsql)";
 
             return array($wheresql, $params);
@@ -397,11 +384,10 @@ class rb_current_org_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_ORG_EQUALANDBELOW) {
             $wheresql = "$field IN (
-            
             SELECT ja.userid
               FROM {job_assignment} ja
               JOIN {org} org ON org.id = ja.organisationid
-              JOIN {org} viewerorg ON org.path LIKE $vieworgpath OR viewerorg.id = org.id  
+              JOIN {org} viewerorg ON org.path LIKE $vieworgpath OR viewerorg.id = org.id
              WHERE viewerorg.id $orgsql)";
 
             return array($wheresql, $params);
@@ -451,7 +437,7 @@ class rb_current_org_content extends rb_base_content {
         }
 
         if (empty($orgids)) {
-            // There will be no match, NULL is not equal to anything, not event NULL.
+            // There will be no match, NULL is not equal to anything, not even NULL.
             return array("{$field} = NULL", array());
         }
 
@@ -468,25 +454,17 @@ class rb_current_org_content extends rb_base_content {
 
         if ($restriction == self::CONTENT_ORG_EQUAL) {
             $itemids = $orgids;
-
-        } else if ($restriction == self::CONTENT_ORG_BELOW) {
-            $sql = "SELECT org.id
-                      FROM {org} org
-                      JOIN {org} viewerorg ON org.path LIKE $vieworgpath 
-                     WHERE viewerorg.id $orgsql";
-            $items = $DB->get_records_sql($sql, $params);
-            $itemids = array_keys($items);
-
-        } else if ($restriction == self::CONTENT_ORG_EQUALANDBELOW) {
+        } else if ($restriction == self::CONTENT_ORG_BELOW || $restriction == self::CONTENT_ORG_EQUALANDBELOW) {
+            // Hierarchy has to include full tree from parent to the current restriction,
+            // otherwise we won't be able to build a selector dialog.
             $sql = "SELECT org.id
                       FROM {org} org
                       JOIN {org} viewerorg ON org.path LIKE $vieworgpath OR viewerorg.id = org.id
                      WHERE viewerorg.id $orgsql";
             $items = $DB->get_records_sql($sql, $params);
             $itemids = array_keys($items);
-
         } else {
-            // Invalid restriction, NULL is not equal to anything, not event NULL.
+            // Invalid restriction, NULL is not equal to anything, not even NULL.
             debugging('Invalid restriction type detected', DEBUG_DEVELOPER);
             return array("{$field} = NULL", array());
         }
