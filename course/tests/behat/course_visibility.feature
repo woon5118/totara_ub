@@ -66,7 +66,6 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should see "Calculus"
     When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -80,7 +79,6 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     When I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -99,7 +97,6 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -118,7 +115,6 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -179,7 +175,6 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -198,7 +193,6 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -217,7 +211,6 @@ Feature: Test course visibility
     And I should see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -237,7 +230,6 @@ Feature: Test course visibility
     And I should not see "Physics"
     And I should not see "Calculus"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
     Then I should see "Biology"
     And I should not see "Chemistry"
     And I should not see "Physics"

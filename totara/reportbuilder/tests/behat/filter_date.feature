@@ -120,6 +120,8 @@ Feature: Use the reportbuilder date filter
       | Course 18 | C18       | 1484726400 |
       | Course 19 | C19       | 1484737200 |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | Catalogue type | enhanced |
     And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I press "Edit this report"
@@ -251,6 +253,8 @@ Feature: Use the reportbuilder date filter
   Scenario: Report builder date filter validation
     Given I am on a totara site
     And I log in as "admin"
+    And I set the following administration settings values:
+      | Catalogue type | enhanced |
     And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"
@@ -268,6 +272,8 @@ Feature: Use the reportbuilder date filter
   Scenario: Report builder date filter validation for range of dates
     Given I am on a totara site
     And I log in as "admin"
+    And I set the following administration settings values:
+      | Catalogue type | enhanced |
     And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"

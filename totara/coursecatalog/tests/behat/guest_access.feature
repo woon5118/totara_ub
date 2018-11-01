@@ -8,7 +8,7 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | Enhanced catalog | 1 |
+      | Catalogue type | enhanced |
       | Guest login button | Show |
     And I log out
     Given the following "users" exist:

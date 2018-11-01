@@ -76,10 +76,6 @@ Alternatively you can choose to keep all existing completion records and accept 
 $string['completionexcludefailuresoff'] = 'Users may complete activities in any way, failures are acceptable.';
 $string['completionexcludefailureson'] = 'Users have to complete activities without failures.';
 $string['configdynamicappraisals'] = 'This setting allows you to specify whether appraisals lock on activation and no longer update assignments and roles or continue to update after activation';
-$string['configenhancedcatalog'] = 'This setting allows you to specify if the enhanced catalog appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
-    The enhanced catalog supports faceted search by multiple criteria using custom fields instead of relying on a single category.
-    When disabled, the standard catalog (i.e., the hierarchical category system configured in the \'Manage categories\' administration area) appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
-    Note: When enabled, the standard catalog remains available for Admins to manage course and program/certification administration in the "backend" (e.g., to assign Instructors to courses and course categories).';
 $string['configforcelogintotara'] = 'Normally, the entire site is only available to logged in users. If you would like to make the front page and the course listings (but not the course contents) available without logging in, then you should uncheck this setting.';
 $string['core:appearance'] = 'Configure site appearance settings';
 $string['core:coursemanagecustomfield'] = 'Manage a course custom field';
@@ -189,7 +185,6 @@ $string['enableteam_desc'] = 'This option will let you: Enable(show)/Disable Tea
 * If Disable is chosen, Team will disappear from any menu on the site and will not be accessible.';
 $string['enableprogramextensionrequests'] = 'Enable program extension requests';
 $string['enableprogramextensionrequests_help'] = 'When enabled extension requests can be turned on for individual programs. This allows the program assignee to request an extension to the due date for a program. This extension can then be accepted or denied by the assignees manager.';
-$string['enhancedcatalog'] = 'Enhanced catalog';
 $string['enrolled'] = 'Enrolled';
 $string['error:assigncannotdeletegrouptypex'] = 'You cannot delete groups of type {$a}';
 $string['error:assignmentbadparameters'] = 'Bad parameter array passed to dialog set_parameters';
@@ -705,3 +700,8 @@ $string['totaranavigation'] = 'Main menu';
 // Deprecated in 12
 
 $string['numberofactiveusers'] = '{$a} users have logged in to this site in the last year';
+$string['enhancedcatalog'] = 'Enhanced catalog';
+$string['configenhancedcatalog'] = 'This setting allows you to specify if the enhanced catalog appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
+    The enhanced catalog supports faceted search by multiple criteria using custom fields instead of relying on a single category.
+    When disabled, the standard catalog (i.e., the hierarchical category system configured in the \'Manage categories\' administration area) appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
+    Note: When enabled, the standard catalog remains available for Admins to manage course and program/certification administration in the "backend" (e.g., to assign Instructors to courses and course categories).';

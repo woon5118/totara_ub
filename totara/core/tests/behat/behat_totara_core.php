@@ -73,7 +73,7 @@ class behat_totara_core extends behat_base {
         set_config('enablecompletion', 1, 'moodlecourse');
         set_config('completionstartonenrol', 1, 'moodlecourse');
         set_config('enrol_plugins_enabled', 'manual,guest,self,cohort,totara_program');
-        set_config('enhancedcatalog', 1);
+        set_config('catalogtype', 'totara');
         set_config('preventexecpath', 1);
         set_config('debugallowscheduledtaskoverride', 1); // Include dev interface for resetting scheduled task "Next run".
         $DB->set_field('role', 'name', 'Site Manager', array('shortname' => 'manager'));
@@ -631,6 +631,43 @@ class behat_totara_core extends behat_base {
         \behat_hooks::set_step_readonly(false);
         $url = new moodle_url("/{$path}/tests/fixtures/{$name}.php");
         $this->getSession()->visit($url->out(false));
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * @Then /^I should see the "([^"]*)" catalog page$/
+     * @param string $name
+     * @param string $path
+     */
+    public function i_should_see_catalog_page($catalogtype) {
+        \behat_hooks::set_step_readonly(true);
+        $this->wait_for_pending_js();
+        switch ($catalogtype) {
+            case "totara":
+                $this->execute('behat_general::assert_page_contains_text', 'Find learning');
+                $this->execute('behat_general::assert_page_contains_text', 'Search all learning');
+                break;
+            case "enhanced":
+                $this->execute('behat_general::assert_page_contains_text', 'Search Courses:');
+                $this->execute('behat_general::assert_element_contains_text', ["records shown", ".rb-record-count", "css_element"]);
+                break;
+            case "moodle":
+                $this->execute(
+                    'behat_general::assert_element_contains_text',
+                    ["Search courses", "form[id='coursesearch']", "css_element"]
+                );
+                break;
+            default:
+                throw new Exception("The specified catalog type '{$catalogtype}' does not exist.'");
+        }
+    }
+
+    /**
+     * @Given /^I am on totara catalog page$/
+     */
+    public function i_am_on_totara_catalog_page() {
+        \behat_hooks::set_step_readonly(false);
+        $this->getSession()->visit($this->locate_path('totara/catalog/index.php'));
         $this->wait_for_pending_js();
     }
 }

@@ -78,8 +78,8 @@ Feature: Check that searching for hidden programs when toggling course catalog w
   Scenario: Search for hidden programs in the old catalog
     # Configure visibility to normal vis.
     Given I set the following administration settings values:
-      | audiencevisibility | 0 |
-      | Enhanced catalog   | 0 |
+      | audiencevisibility | 0      |
+      | Catalogue type     | moodle |
     And I log out
 
     # Seeing the program catalog as sys manager.
@@ -175,8 +175,8 @@ Feature: Check that searching for hidden programs when toggling course catalog w
   Scenario: Search for hidden programs in the enhanced catalog
   # Configure visibility to normal vis.
     Given I set the following administration settings values:
-      | audiencevisibility | 0 |
-      | Enhanced catalog   | 1 |
+      | audiencevisibility | 0        |
+      | Catalogue type     | enhanced |
     And I log out
 
   # Seeing the enhanced catalog as sys manager.
@@ -256,8 +256,8 @@ Feature: Check that searching for hidden programs when toggling course catalog w
   Scenario: Search for hidden programs in the enhanced catalog with audience visibility on
     # Configure visibility audience visibility.
     Given I set the following administration settings values:
-      | audiencevisibility | 1 |
-      | Enhanced catalog   | 1 |
+      | audiencevisibility | 1        |
+      | Catalogue type     | enhanced |
     And I log out
 
     # Seeing the enhanced catalog as sys manager.
@@ -310,8 +310,8 @@ Feature: Check that searching for hidden programs when toggling course catalog w
   Scenario: Search for hidden certifications in the old catalog
     # Configure visibility to normal vis.
     Given I set the following administration settings values:
-      | audiencevisibility | 0 |
-      | Enhanced catalog   | 0 |
+      | audiencevisibility | 0      |
+      | Catalogue type     | moodle |
     And I log out
 
     # Seeing the certification catalog as sys manager.
@@ -407,8 +407,8 @@ Feature: Check that searching for hidden programs when toggling course catalog w
   Scenario: Search for hidden certifications in the enhanced catalog
 # Configure visibility to normal vis.
     Given I set the following administration settings values:
-      | audiencevisibility | 0 |
-      | Enhanced catalog   | 1 |
+      | audiencevisibility | 0        |
+      | Catalogue type     | enhanced |
     And I log out
 
 # Seeing the enhanced catalog as sys manager.
@@ -488,8 +488,8 @@ Feature: Check that searching for hidden programs when toggling course catalog w
   Scenario: Search for hidden programs in the enhanced catalog with audience visibility on
     # Configure visibility audience visibility.
     Given I set the following administration settings values:
-      | audiencevisibility | 1 |
-      | Enhanced catalog   | 1 |
+      | audiencevisibility | 1        |
+      | Catalogue type     | enhanced |
     And I log out
 
     # Seeing the enhanced catalog as sys manager.

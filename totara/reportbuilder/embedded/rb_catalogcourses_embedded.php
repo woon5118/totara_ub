@@ -88,7 +88,7 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
      */
     public function is_ignored() {
         global $CFG;
-        return empty($CFG->enhancedcatalog);
+        return ($CFG->catalogtype !== 'enhanced');
     }
 
     /**

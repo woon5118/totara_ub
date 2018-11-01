@@ -1760,6 +1760,13 @@ $icons = array(
                         ),
                 ),
         ),
+    'share-link' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-share-alt',
+                ),
+        ),
     /* Use for action icons that unhide something */
     'show' =>
         array(
@@ -2070,6 +2077,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-users',
+                ),
+        ),
+    'view-grid' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-th-large',
                 ),
         ),
     'view-large' =>

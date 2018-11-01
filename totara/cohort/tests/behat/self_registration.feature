@@ -349,10 +349,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I click on "Save and display" "button"
     And I trigger cron
-    And I am on site homepage
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should see "fnameman lnameman" in the "userenrolment" "table"
     And I should see "fname001 lname001" in the "userenrolment" "table"
@@ -383,10 +380,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I click on "Save and display" "button"
     And I trigger cron
-    And I am on site homepage
-    And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     Then I should not see "fnameman lnameman" in the "userenrolment" "table"
     And I should see "fname001 lname001" in the "userenrolment" "table"

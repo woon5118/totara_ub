@@ -16,7 +16,7 @@ Feature: Users can auto-enrol themselves in courses where self enrolment is allo
       | Course 3 | C3        | topics |
     And I log in as "admin"
     And I set the following administration settings values:
-      | Enhanced catalog   | 1    |
+      | Catalogue type | enhanced |
       | Guest login button | Show |
 #    Make self-enrolment available for C1. Enrolment plugins for a Course 1: manual, self, program.
     And I click on "Find Learning" in the totara menu

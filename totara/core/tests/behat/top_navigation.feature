@@ -7,6 +7,8 @@ Feature: Totara Top Navigation
   Background:
     Given I am on a totara site
     And I log in as "admin"
+    And I set the following administration settings values:
+      | Catalogue type | enhanced |
     And I navigate to "Top navigation" node in "Site administration > Appearance"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:

@@ -405,4 +405,64 @@ class totara_core_menu_testcase extends advanced_testcase {
         $this->assertEquals('node2a', $result[0]->linktext);
         $this->assertEquals('node2c', $result[1]->linktext);
     }
+
+    public function visible_child_data_provider() {
+        // 1a => 2a => 3a
+        //          => 3b
+        //    => 2b => 3c
+        //          => [3d] (not visible because sitepolicy is disabled by default)
+        //    => 2c
+        // 1b => [2d]
+        // 1c
+        // 1d
+        return [
+            ['1a', true],
+            ['1b', false],
+            ['1c', false],
+            ['1d', false],
+            ['2a', true],
+            ['2b', true],
+            ['2c', false],
+            ['2d', false],
+            ['3a', false],
+            ['3b', false],
+            ['3c', false],
+            ['3d', false],
+        ];
+    }
+
+    /**
+     * @dataProvider visible_child_data_provider
+     */
+    public function test_has_visible_child($node, $expected) {
+        $data = $this->setup_tree_data();
+        $node = menu::node_instance($data->noderecords['node' . $node]);
+        $this->assertEquals($expected, $node->has_visible_child());
+    }
+
+    public function visible_sibling_data_provider() {
+        return [
+            ['1a', true],
+            ['1b', true],
+            ['1c', true],
+            ['1d', true],
+            ['2a', true],
+            ['2b', true],
+            ['2c', true],
+            ['2d', false],
+            ['3a', true],
+            ['3b', true],
+            ['3c', false],
+            ['3d', true],
+        ];
+    }
+
+    /**
+     * @dataProvider visible_sibling_data_provider
+     */
+    public function test_has_visible_sibling($node, $expected) {
+        $data = $this->setup_tree_data();
+        $node = menu::node_instance($data->noderecords['node' . $node]);
+        $this->assertEquals($expected, $node->has_visible_sibling());
+    }
 }

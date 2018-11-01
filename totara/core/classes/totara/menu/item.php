@@ -204,7 +204,7 @@ class item {
     }
 
     /**
-     * Returns node original parent class name, wihtout namespace string.
+     * Returns node original parent class name, without namespace string.
      *
      * @return string node parent class name
      */
@@ -539,5 +539,46 @@ class item {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Find out if this item has at least one visible child.
+     *
+     * @return bool
+     */
+    public function has_visible_child(): bool {
+        $records = menu::get_records('tn.parentid = :parentid', ['parentid' => $this->get_id()]);
+        if (empty($records)) {
+            return false;
+        }
+        foreach ($records as $record) {
+            $child_node = menu::node_instance($record);
+            if ($child_node->get_visibility() > menu::HIDE_ALWAYS) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Find out if this item has at least one visible sibling.
+     *
+     * @return bool
+     */
+    public function has_visible_sibling(): bool {
+        $records = menu::get_records('tn.parentid = :parentid', ['parentid' => $this->get_parentid()]);
+        if (empty($records)) {
+            return false;
+        }
+        foreach ($records as $record) {
+            if ($record->id == $this->get_id()) {
+                continue;
+            }
+            $child_node = menu::node_instance($record);
+            if ($child_node->get_visibility() > menu::HIDE_ALWAYS) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,10 +1,12 @@
 recordoflearningfor,totara_core
 choosetempmanager,totara_core
 choosetempmanager_help,totara_core
+configenhancedcatalog,totara_core
 enablemyteam,totara_core
 enablemyteam_desc,totara_core
 enabletempmanagers,totara_core
 enabletempmanagersdesc,totara_core
+enhancedcatalog,totara_core
 error:appraisernotselected,totara_core
 error:datenotinfuture,totara_core
 error:itemhaschildren,totara_core

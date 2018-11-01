@@ -37,10 +37,12 @@ class courses extends \totara_core\totara\menu\item {
     protected function get_default_url() {
         global $CFG;
 
-        if (!empty($CFG->enhancedcatalog)) {
+        if ($CFG->catalogtype === 'enhanced') {
             return '/totara/coursecatalog/courses.php';
-        } else {
+        } else if ($CFG->catalogtype === 'moodle') {
             return '/course/index.php';
+        } else {
+            return '/totara/catalog/index.php';
         }
     }
 
@@ -54,5 +56,14 @@ class courses extends \totara_core\totara\menu\item {
 
     protected function get_default_parent() {
         return '\totara_coursecatalog\totara\menu\findlearning';
+    }
+
+    protected function check_visibility() {
+        global $CFG;
+        // Don't show this item when totara_catalog is activated (unless this is a parent node).
+        if ($CFG->catalogtype === 'totara' && !$this->has_visible_child()) {
+            return menu::HIDE_ALWAYS;
+        }
+        return menu::SHOW_ALWAYS;
     }
 }

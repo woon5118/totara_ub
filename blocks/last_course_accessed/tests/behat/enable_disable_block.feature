@@ -16,10 +16,7 @@ Feature: Site Administrator can enable and disable the LCA block.
     Given I log in as "admin"
     When I navigate to "Manage blocks" node in "Site administration > Plugins > Blocks"
     And I click on "Hide" "link" in the "Last Course Accessed" "table_row"
-
-    And I follow "Find Learning"
-    And I follow "Courses"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should not see "Last Course Accessed"
     And I log out
 

@@ -37,10 +37,12 @@ class certifications extends \totara_core\totara\menu\item {
     protected function get_default_url() {
         global $CFG;
 
-        if (!empty($CFG->enhancedcatalog)) {
+        if ($CFG->catalogtype === 'enhanced') {
             return '/totara/coursecatalog/certifications.php';
-        } else {
+        } else if ($CFG->catalogtype === 'moodle') {
             return '/totara/program/index.php?viewtype=certification';
+        } else {
+            return '/totara/catalog/index.php';
         }
     }
 
@@ -53,11 +55,14 @@ class certifications extends \totara_core\totara\menu\item {
     }
 
     protected function check_visibility() {
+        global $CFG;
         if (totara_feature_visible('certifications')) {
-            return menu::SHOW_ALWAYS;
-        } else {
-            return menu::HIDE_ALWAYS;
+            // Don't show this item when totara_catalog is activated (unless this is a parent node).
+            if ($CFG->catalogtype !== 'totara' || $this->has_visible_child()) {
+                return menu::SHOW_ALWAYS;
+            }
         }
+        return menu::HIDE_ALWAYS;
     }
 
     protected function get_default_parent() {

@@ -661,7 +661,7 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     # learner1 can not see the program or access the course
     When I log in as "learner1"
     Then I should not see "Test Program 1"
-    When I click on "Programs" in the totara menu
+    When I click on "Find Learning" in the totara menu
     Then I should not see "Test Program 1"
     When I am on "Course 1" course homepage
     Then I should see "You can not enrol yourself in this course"

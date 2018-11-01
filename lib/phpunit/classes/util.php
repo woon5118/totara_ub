@@ -223,6 +223,7 @@ class phpunit_util extends testing_util {
             // Appraisal detail report source class exists, reset its caches just in case they have been used.
             rb_source_appraisal_detail::reset_cache();
         }
+        \totara_catalog\cache_handler::reset_all_caches();
 
         \core_search\manager::clear_static();
         core_user::reset_caches();

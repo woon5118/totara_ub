@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="totara/core/db" VERSION="20180304" COMMENT="XMLDB file for Moodle totara/catalog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="catalog" COMMENT="Catalog table">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objectid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objecttype" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="ftshigh" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="High search content data"/>
+        <FIELD NAME="ftsmedium" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Medium search content data"/>
+        <FIELD NAME="ftslow" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Low search content data"/>
+        <FIELD NAME="sorttext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Field used for alphabetical sorting"/>
+        <FIELD NAME="sorttime" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Field used for 'Latest' sorting"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="high" UNIQUE="false" FIELDS="ftshigh" HINTS="full_text_search"/>
+        <INDEX NAME="medium" UNIQUE="false" FIELDS="ftsmedium" HINTS="full_text_search"/>
+        <INDEX NAME="low" UNIQUE="false" FIELDS="ftslow" HINTS="full_text_search"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

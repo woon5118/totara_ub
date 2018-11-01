@@ -30,9 +30,9 @@ $debug = optional_param('debug', 0, PARAM_INT);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('noblocks');
 
-$enhancedcatalogenabled = get_config('core', 'enhancedcatalog');
+$catalogtype = get_config('core', 'catalogtype');
 
-if ($enhancedcatalogenabled) {
+if ($catalogtype === 'enhanced') {
     $PAGE->set_totara_menu_selected('courses');
 }
 

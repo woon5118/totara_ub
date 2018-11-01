@@ -88,21 +88,26 @@ define([], function() {
          * @param {node} tile
          */
         setActive: function(tile) {
-            var tileID = tile.getAttribute('data-tw-grid-item-ID'),
-                tileActiveHeight = tile.querySelector('[data-tw-grid-item-active-height]');
+            var tileID = tile.getAttribute('data-tw-grid-item-ID');
 
             tile.setAttribute('data-tw-grid-item-active', '');
             tile.classList.add(this.activeClass);
-            tile.scrollIntoView({block: 'end'});
-            if (tileActiveHeight) {
-                var extraOffset = tileActiveHeight.getAttribute('data-tw-grid-item-active-height');
-                window.scrollBy(0, +extraOffset);
-            }
-
+            this.setVisibleView();
             this.triggerEvent('add', {
                 key: 'id',
                 val: tileID
             });
+        },
+
+        /**
+         * Set viewport to active tile
+         *
+         */
+        setVisibleView: function() {
+            var activeTile = this.widget.querySelector('[data-tw-grid-item-active]');
+            if (activeTile) {
+                activeTile.scrollIntoView(false);
+            }
         },
 
         /**

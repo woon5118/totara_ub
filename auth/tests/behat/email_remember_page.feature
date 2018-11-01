@@ -29,4 +29,4 @@ Feature: Email base self registation page redirection
     And confirm self-registered login as user "bob"
     Then I should see "Your registration has been confirmed"
     When I press "Continue"
-    Then I should see "Search Courses"
+    Then I should see the "totara" catalog page

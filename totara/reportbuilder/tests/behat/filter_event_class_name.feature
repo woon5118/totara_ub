@@ -7,7 +7,7 @@ Feature: Event Name Site Logs report filter
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | Enhanced catalog | 1 |
+      | Catalogue type | enhanced |
     And I press "Save changes"
     And I log out
     And the following "users" exist:
@@ -22,7 +22,7 @@ Feature: Event Name Site Logs report filter
   @javascript
   Scenario: Test site logs event name filter
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     When I add "Self enrolment" enrolment method with:
       | Custom instance name | Self enrolment |
 

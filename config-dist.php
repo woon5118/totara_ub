@@ -949,7 +949,29 @@ $CFG->directorypermissions = 02777;
 // $CFG->sitetype = 'production'; // Options are 'production', 'qa', 'demo' or 'development'.
 // $CFG->registrationcode = 'xxxxxxxxxxxxxxxx'; // Unique alphanumeric code, 16 characters.
 //
-
+//=========================================================================
+// 15. COURSE CATALOG SETTINGS
+//=========================================================================
+// Catalog full text search relevance weight.
+//
+//      $CFG->catalogrelevanceweight = ['high'=>20, 'medium'=> 4 , 'low'=>1];
+//
+// Catalog full text search indexing method.
+//
+// Enable this setting to use an alternate full text search indexing system. This is applicable
+// to sites which use a DB which uses implicit AND between search terms, such as pgsql and
+// mssql. Using the default method, with the AND behaviour, if a user searches for multiple
+// words which occur in a learning item spread over more than one Catalog FTS "bucket", then
+// the records will not match (score zero). The alternate method ensures these records will be
+// included (score non-zero), but has some side-effects: Relevance ordering may not be accurate
+// in some situations, and more DB storage space is used to index the data.
+//
+// After changing this setting, run
+//     /totara/catalog/cli/populate_catalog_data.php --purge_catalog_first
+// to repopulate the Catalog FTS data.
+//
+//      $CFG->catalog_use_and_compatible_buckets = true;
+//
 //=========================================================================
 // ALL DONE!  To continue installation, visit your main page with a browser
 //=========================================================================

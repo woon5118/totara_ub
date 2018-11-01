@@ -109,20 +109,6 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $setting->set_updatedcallback('totara_rb_purge_ignored_reports');
     $optionalsubsystems->add($setting);
 
-    // Enchanced catalog.
-    // Was upgrade - old catalog by default, otherwise - new catalog.
-    $defaultenhanced = 1;
-    $setting = new admin_setting_configcheckbox('enhancedcatalog',
-            new lang_string('enhancedcatalog', 'totara_core'),
-            new lang_string('configenhancedcatalog', 'totara_core'), $defaultenhanced);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
-
-    // Content Marketplaces.
-    $optionalsubsystems->add(new admin_setting_configcheckbox('enablecontentmarketplaces',
-            new lang_string('enablecontentmarketplaces', 'totara_contentmarketplace'),
-            new lang_string('enablecontentmarketplacesdesc', 'totara_contentmarketplace'), 1));
-
     // Dynamic Appraisals.
     $optionalsubsystems->add(new admin_setting_configcheckbox('dynamicappraisals',
             new lang_string('dynamicappraisals', 'totara_core'),
@@ -221,4 +207,21 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablesitepolicies',
         new lang_string('enablesitepolicies', 'tool_sitepolicy'),
         new lang_string('configenablesitepolicies', 'tool_sitepolicy'), 0));
+
+    // Catalog type.
+    $defaultcatalogtype = 'totara';
+    $options = [
+        'moodle' => get_string('catalog_old', 'totara_catalog'),
+        'enhanced' => get_string('catalog_enhanced', 'totara_catalog'),
+        'totara' => get_string('catalog_totara', 'totara_catalog'),
+    ];
+    $setting = new admin_setting_configselect(
+        'catalogtype',
+        new lang_string('catalogtype', 'totara_catalog'),
+        new lang_string('configcatalogtype', 'totara_catalog'),
+        $defaultcatalogtype,
+        $options
+    );
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 }

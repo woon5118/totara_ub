@@ -416,6 +416,17 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
         $generator = $this->getDataGenerator();
         $category = $generator->create_category();
+
+        try {
+            // Enable the multilang filter and set it to apply to headings and content.
+            filter_manager::reset_caches();
+            filter_set_global_state('multilang', TEXTFILTER_ON);
+            filter_set_applies_to_strings('multilang', true);
+            $multilang = true;
+        } catch (coding_exception $ex) {
+            $multilang = false;
+        }
+
         $course1 = $generator->create_course(array(
             'category' => $category->id,
             'idnumber' => '006-01',
@@ -459,15 +470,12 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $this->assertTrue($coursecat->resort_courses('timecreated'));
         $this->assertSame(array($c1, $c2, $c3, $c4), array_keys($coursecat->get_courses()));
 
-        try {
-            // Enable the multilang filter and set it to apply to headings and content.
-            filter_manager::reset_caches();
-            filter_set_global_state('multilang', TEXTFILTER_ON);
-            filter_set_applies_to_strings('multilang', true);
+        if ($multilang) {
             $expected = array($c3, $c4, $c1, $c2);
-        } catch (coding_exception $ex) {
+        } else {
             $expected = array($c3, $c4, $c2, $c1);
         }
+
         $this->assertTrue($coursecat->resort_courses('fullname'));
         $this->assertSame($expected, array_keys($coursecat->get_courses()));
     }

@@ -28,8 +28,7 @@ Feature: Seminar actions in upcoming block are correct
     And I press "Save changes"
     And I log out
     When I log in as "student1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Sign-up" in the "Booking open" "table_row"
     And I should see "Sign-up" in the "Upcoming events" "block"
 
@@ -60,8 +59,7 @@ Feature: Seminar actions in upcoming block are correct
     And I log out
 
     When I log in as "student1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Join waitlist" in the "Booking open" "table_row"
     And I should see "Join waitlist" in the "Upcoming events" "block"
 

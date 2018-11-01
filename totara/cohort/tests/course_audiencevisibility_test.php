@@ -257,15 +257,14 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
         $user = $this->{$user};
 
         // Make the test toggling the new catalog.
-        for ($i = 1; $i <= 2; $i++) {
-            // Toggle enhanced catalog.
-            $newvalue = ($CFG->enhancedcatalog == 1) ? 0 : 1;
-            set_config('enhancedcatalog', $newvalue);
-            $this->assertEquals($CFG->enhancedcatalog, $newvalue);
+        foreach (['moodle', 'enhanced'] as $catalogtype) {
+            set_config('catalogtype', $catalogtype);
+            $this->assertEquals($catalogtype, $CFG->catalogtype);
+            $enhancedcatalog = ($catalogtype === 'enhanced');
 
             // Test #1: Login as $user and see what courses he can see.
             self::setUser($user);
-            if ($CFG->enhancedcatalog) {
+            if ($enhancedcatalog) {
                 $content = $this->get_report_result('catalogcourses', array(), false, array());
             } else {
                 /** @var core_course_renderer $courserenderer */
@@ -280,7 +279,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                 // Test #2: Try to access them.
                 $this->assertTrue($access);
                 // Test #3: Try to do a search for courses.
-                if ($CFG->enhancedcatalog) {
+                if ($enhancedcatalog) {
                     $this->assertCount(1, $search);
                     $r = array_shift($search);
                     $this->assertEquals($this->{$course}->fullname, $r->course_courseexpandlink);
@@ -296,7 +295,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                 // Test #2: Try to access them.
                 $this->assertFalse($access);
                 // Test #3: Try to do a search for courses.
-                if ($CFG->enhancedcatalog) {
+                if ($enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
                     $this->assertInternalType('int', strpos($search, 'No courses were found'));
@@ -312,7 +311,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                 // Test #2: Try to access them.
                 $this->assertTrue($access);
                 // Test #3: Try to do a search for courses.
-                if ($CFG->enhancedcatalog) {
+                if ($enhancedcatalog) {
                     $this->assertCount(1, $search);
                     $r = array_shift($search);
                     $this->assertEquals($this->{$course}->fullname, $r->course_courseexpandlink);
@@ -328,7 +327,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                 // Test #2: Try to access them.
                 $this->assertFalse($access);
                 // Test #3: Try to do a search for courses.
-                if ($CFG->enhancedcatalog) {
+                if ($enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
                     $this->assertInternalType('int', strpos($search, 'No courses were found'));
@@ -356,7 +355,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                 has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id), $userid);
         }
 
-        if ($CFG->enhancedcatalog) { // New catalog.
+        if ($CFG->catalogtype === 'enhanced') { // Enhanced catalog.
             $search = array();
             if (is_array($content)) {
                 $search = totara_search_for_value($content, 'course_courseexpandlink', TOTARA_SEARCH_OP_EQUAL, $course->fullname);

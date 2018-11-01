@@ -37,10 +37,12 @@ class findlearning extends \totara_core\totara\menu\item {
     protected function get_default_url() {
         global $CFG;
 
-        if (!empty($CFG->enhancedcatalog)) {
+        if ($CFG->catalogtype === 'enhanced') {
             return '/totara/coursecatalog/courses.php';
-        } else {
+        } else if ($CFG->catalogtype === 'moodle') {
             return '/course/index.php';
+        } else {
+            return '/totara/catalog/index.php';
         }
     }
 

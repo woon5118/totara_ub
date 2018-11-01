@@ -209,16 +209,46 @@ preferences,moodle|/user/preferences.php|preferences',
     $temp->add(new admin_setting_configcheckbox('courselistshortnames',
             new lang_string('courselistshortnames', 'admin'),
             new lang_string('courselistshortnames_desc', 'admin'), 0));
-    if (!empty($CFG->enhancedcatalog)) {
-        $temp->add(new admin_setting_nothing('coursesperpage', new lang_string('coursesperpage', 'admin'),
-                new lang_string('configcoursesperpageenhcatenabled', 'admin')));
-    } else {
-        $temp->add(new admin_setting_configtext('coursesperpage', new lang_string('coursesperpage', 'admin'),
-                new lang_string('configcoursesperpage', 'admin'), 20, PARAM_INT));
+
+    if (empty($CFG->catalogtype) || $CFG->catalogtype == 'moodle') {
+        $temp->add(
+            new admin_setting_configtext(
+                'coursesperpage',
+                new lang_string('coursesperpage', 'admin'),
+                new lang_string('configcoursesperpage', 'admin'),
+                20,
+                PARAM_INT
+            )
+        );
+    } else if ($CFG->catalogtype == 'enhanced') {
+        $temp->add(
+            new admin_setting_nothing(
+                'coursesperpage', new lang_string('coursesperpage', 'admin'),
+                new lang_string('configcoursesperpageenhcatenabled', 'admin')
+            )
+        );
+    } else if ($CFG->catalogtype == 'totara') {
+        $temp->add(
+            new admin_setting_nothing(
+                'coursesperpage', new lang_string('coursesperpage', 'admin'),
+                new lang_string('configcoursesperpagetotaracatenabled', 'totara_catalog')
+            )
+        );
     }
-    $temp->add(new admin_setting_configtext('courseswithsummarieslimit', new lang_string('courseswithsummarieslimit', 'admin'), new lang_string('configcourseswithsummarieslimit', 'admin'), 10, PARAM_INT));
-    $temp->add(new admin_setting_configtext('courseoverviewfileslimit', new lang_string('courseoverviewfileslimit'),
-            new lang_string('configcourseoverviewfileslimit', 'admin'), 1, PARAM_INT));
+    $temp->add(
+        new admin_setting_configtext(
+            'courseswithsummarieslimit',
+            new lang_string('courseswithsummarieslimit', 'admin'),
+            new lang_string('configcourseswithsummarieslimit', 'admin'),
+            10, PARAM_INT
+        )
+    );
+    $temp->add(
+        new admin_setting_configtext(
+            'courseoverviewfileslimit', new lang_string('courseoverviewfileslimit'),
+            new lang_string('configcourseoverviewfileslimit', 'admin'), 1, PARAM_INT
+        )
+    );
     $temp->add(new admin_setting_configtext('courseoverviewfilesext', new lang_string('courseoverviewfilesext'),
             new lang_string('configcourseoverviewfilesext', 'admin'), '.jpg,.gif,.png'));
     $ADMIN->add('appearance', $temp);
