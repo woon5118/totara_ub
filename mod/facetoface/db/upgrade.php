@@ -276,6 +276,7 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018101900, 'facetoface');
     }
 
+    // Multiple signups upgrade part 1 of 3.
     if ($oldversion < 2018102700) {
 
         // First set the activity default settings to maintain previous behaviour.
@@ -318,6 +319,7 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018102700, 'facetoface');
     }
 
+    // Multiple signups upgrade part 2 of 3.
     if ($oldversion < 2018102800) {
         // Create the default notification template for waitlistautoclean.
         $title = get_string('setting:defaultwaitlistautocleansubjectdefault', 'facetoface');
@@ -375,6 +377,28 @@ function xmldb_facetoface_upgrade($oldversion) {
         }
 
         upgrade_mod_savepoint(true, 2018102800, 'facetoface');
+    }
+
+    // Multiple signups upgrade part 3 of 3.
+    if ($oldversion < 2018102900) {
+        // Just to be safe, set maximum to 1 if multisignups is disabled.
+        $DB->execute('UPDATE {facetoface}
+                         SET multisignupmaximum = 1
+                       WHERE multiplesessions = 0');
+
+        // Quick change to the settings for the amount dropdown.
+        $enabled = (bool) get_config(null, 'facetoface_multiplesessions');
+
+        $amount = $enabled ? 0 : 1;
+        set_config('facetoface_multisignupamount', $amount);
+
+        // Now we have finally reached the final stage of multisignup upgrades.
+        // Unset the old setting, and the two new ones merged here.
+        unset_config('facetoface_multiplesessions');
+        unset_config('facetoface_multisignup_enable');
+        unset_config('facetoface_multisignup_maximum');
+
+        upgrade_mod_savepoint(true, 2018102900, 'facetoface');
     }
 
     return true;

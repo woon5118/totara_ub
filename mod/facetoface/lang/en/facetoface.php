@@ -100,7 +100,6 @@ $string['approvaloptions_help'] = 'Available options are defined by the approval
 * **Event role*: All user\'s assigned to the role in the event will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the event.
 * **Manager approval**: The learner\'s manager will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the event.
 * **Manager and Administrative approval**: All users selected as an approver will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the event. Approval can then be given by the Manager followed by the Administrator, or the Administrator may finalise the request without Manager approval.';
-$string['approvaloptionsheader'] = 'Approval Options';
 $string['approvalrequiredby'] = 'Approval required by: ';
 $string['approvalterms'] = 'Terms and conditions';
 $string['approvaltime'] = 'Time approved';
@@ -1066,6 +1065,7 @@ $string['sentreminderuser'] = 'Sent reminder email to user';
 $string['sessionattendees'] = 'Session attendees';
 $string['sessioncancelled'] = 'Event cancellation';
 $string['sessioncustomfieldtab'] = 'Event';
+$string['signupworkflowheader'] = 'Sign-up Workflow';
 $string['roomcustomfieldtab'] = 'Room';
 $string['roomhide'] = 'Hide from users when choosing a room on the Add/Edit event page';
 $string['roomshow'] = 'Show to users when choosing a room on the Add/Edit event page';
@@ -1117,7 +1117,6 @@ Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
 $string['sessionvenue'] = 'Event venue';
 $string['setactive'] = 'Set active';
 $string['setinactive'] = 'Set inactive';
-$string['setting:signupapproval_header'] = 'Signup Approvals';
 $string['setting:approvaloptions_caption'] = 'Available Approval Options';
 $string['setting:approvaloptions_default'] = 'The options selected above will be available in the \'require approval by\' setting for all seminar activities. Text entered below the \'Learner accepts terms and conditions\' option will be default for all activities and can be edited for each activity. Selected \'site level administrative approvers\' are automatically added to all seminar activities and can not be removed from within any given activity (note: other administrative approvers can be added to each seminar activity)';
 $string['setting:managerselect_caption'] = 'Users Select Manager';
@@ -1883,8 +1882,8 @@ $string['setting:defaulttrainersessionunassignedsubject_caption'] = 'Trainer eve
 $string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Face-to-face session trainer unassigned';
 $string['setting:defaulttrainersessionunassignedsubjectdefault_v9'] = 'Seminar event trainer unassigned';
 $string['setting:defaultvalue'] = 'Default value';
-$string['setting:defaultwaitlistautocleansubjectdefault'] = 'Waitlist auto-cancellation';
-$string['setting:defaultwaitlistautocleanmessagedefault'] = 'This is to advise you that your waitlisted signup for the following course has been automatically cancelled due to the event starting:
+$string['setting:defaultwaitlistautocleansubjectdefault'] = 'Waitlisted signup expired';
+$string['setting:defaultwaitlistautocleanmessagedefault'] = 'This is to advise you that your waitlisted signup for the following course has been cancelled due to the event starting:
 
 ***WAITLIST CANCELLATION***
 
@@ -2224,8 +2223,8 @@ $string['viewdetails'] = 'View details';
 $string['viewresults'] = 'View results';
 $string['viewroom'] = 'View room';
 $string['viewsubmissions'] = 'View submissions';
-$string['waitlistautoclean'] = 'Auto-clear expired event waitlists';
-$string['waitlistautoclean_help'] = 'The waitlist for events gets cleared when they start, allowing users to signup to a new event. The waitlistautoclean notification can be used to inform users about this happening.';
+$string['waitlistautoclean'] = 'Clear expired waitlists';
+$string['waitlistautoclean_help'] = 'The waitlist for events gets cleared when they start, allowing users to signup to a new event. The "Waitlisted signup expired" notification can be used to inform users about this happening.';
 $string['waitlistedmessage'] = 'Wait-listed message';
 $string['waitlisteveryone'] = 'Send all bookings to the waiting list';
 $string['waitlisteveryone_help'] = 'Everyone who signs up for this event will be added to the waiting list.';
@@ -2295,17 +2294,12 @@ $string['mods_help'] = 'Seminar activities are used to keep track of in-person t
 Each activity is offered in one or more identical events. These events can be given over multiple days.
 
 Reminder messages are sent to users and their managers a few days before the event is scheduled to start. Confirmation messages are sent when users sign-up for an event or cancel.';
-$string['multisignup_header'] = 'Multiple Sign-up Settings';
-$string['multisignupenable'] = 'Users can sign-up to multiple events';
-$string['multisignupenable_desc'] = 'This setting allows users to sign up to more than one event in a seminar, restricted by the settings below';
-$string['multisignupenable_help'] = 'This setting allows users to sign up to more than one event in the seminar, restricted by the settings below';
 $string['multisignupfailure_common'] = 'Existing sign-up(s) for this seminar';
 $string['multisignupfailure_limitation'] = ', have already reached the maximum of {$a} signup(s)';
 $string['multisignupfailure_restriction'] = ', are not in the required attendance state(s)';
-$string['multisignupmaximum'] = 'Maximum number of sign-ups';
-$string['multisignupmaximum_help'] = 'Limits the total number of sign-ups a user can have within the seminar. A value of Zero for this setting means an unlimited number of sign-ups. Note: This setting does not take cancelled sign-ups into consideration.';
-$string['multisignupmaximum_validation'] = 'Please enter a maximum limit of 2 or higher';
-$string['multisignupmaximum_none'] = 'Unlimited';
+$string['multisignupamount'] = 'How many times the user can sign-up?';
+$string['multisignupamount_help'] = 'Limits the total number of sign-ups a user can have within the seminar. A value of 1 for this setting disables multiple signups. Note: This setting does not take cancelled sign-ups into consideration.';
+$string['multisignupamount_unlimited'] = 'Unlimited';
 $string['multisignuprestrict'] = 'Restrict subsequent sign-ups to';
 $string['multisignuprestrict_desc'] = 'Restrict subsequent sign-ups based on the state of previous signups. Enabling any of these state restrictions will limit users to a single concurrent sign-up within a single seminar, as they will not be able to sign-up to another event until their current sign-up has its attendance set to one of the selected states. If none of these restrictions are enabled users can have as many concurrent sign-ups within the seminar as the maximum limitation allows. Note: Cancelled signups are not taken into consideration.';
 $string['multisignuprestrict_help'] = 'Restrict subsequent sign-ups based on the state of previous signups. Enabling any of these state restrictions will limit users to a single concurrent sign-up within the seminar, as they will not be able to sign-up to another event until their current sign-up has its attendance set to one of the selected states. If none of these restrictions are enabled users can have as many concurrent sign-ups within the seminar as the maximum limitation allows. Note: Cancelled signups are not taken into consideration.';
@@ -2404,7 +2398,7 @@ $string['signupstartsonly'] = 'After {$a->startdate} {$a->starttime} {$a->timezo
 $string['signupendsonly'] = 'Before {$a->enddate} {$a->endtime} {$a->timezone}';
 $string['waitlistcancelled'] = 'Your place on the waitlist has been cancelled.';
 $string['waitlistcancellationconfirm'] = 'Are you sure you want to cancel your place on the waiting list for this event?';
-$string['waitlistautocleantask'] = 'Clear seminar event waitlists after the event has started';
+$string['waitlistautocleantask'] = 'Clear the waitlist for seminar events after the event has started';
 $string['waitlistedforsession'] = 'Waitlisted for event {$a}';
 $string['waitlistfor'] = 'Waitlist for {$a}';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following event';
@@ -2544,3 +2538,5 @@ $string['setting:multiplesessions_caption'] = 'Multiple events default';
 $string['multiplesessionsheading'] = 'Multiple events signup settings';
 $string['multiplesessions'] = 'Users can sign-up to multiple events';
 $string['multiplesessions_help'] = 'When this option is toggled, users can sign up for multiple events within a seminar, subject to the restrictions and limitations of the settings below.';
+$string['setting:signupapproval_header'] = 'Signup Approvals';
+$string['approvaloptionsheader'] = 'Approval Options';

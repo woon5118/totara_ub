@@ -208,7 +208,7 @@ class mod_facetoface_seminar_multiple_signups_testcase extends \advanced_testcas
 
         // Check subject line to make sure these are auto-cancellation emails.
         foreach ($emails as $email) {
-            $this->assertEquals('Waitlist auto-cancellation', $email->subject);
+            $this->assertEquals('Waitlisted signup expired', $email->subject);
         }
 
         // Make sure event11 gets waitlisted signups cleaned, but booked ones are left alone.
@@ -234,6 +234,7 @@ class mod_facetoface_seminar_multiple_signups_testcase extends \advanced_testcas
 
         // Make sure the first seminar has multiple signups enabled.
         $seminar1->set_multiplesessions(1); // Note: Multiple sign ups enabled.
+        $seminar1->set_multisignupmaximum(0);
         $seminar1->save();
 
         // Check the settings are what we are expecting.

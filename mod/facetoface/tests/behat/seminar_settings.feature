@@ -46,10 +46,10 @@ Feature: Disabling approval options in global settings would
     And I follow "Course101"
     And I follow "Seminar 1"
     And I follow "Edit settings"
-    And I click on "Approval Options" "link"
+    And I expand all fieldsets
     Then I should see "Training"
     And I set the field "No Approval" to "1"
     And I click on "Save and display" "button"
     And I follow "Edit settings"
-    And I click on "Approval Options" "link"
+    And I expand all fieldsets
     And I should not see "Training"

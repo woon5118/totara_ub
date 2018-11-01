@@ -16,7 +16,7 @@ Feature: Displaying seminar's events with settings overlapping
     And I add a "Seminar" to section "1" and I fill the form with:
         | Name                                 | Seminar 1           |
         | Description                          | This is description |
-        | Users can sign-up to multiple events | 1                   |
+        | How many times the user can sign-up? | Unlimited           |
         | Events displayed on course page      | 2                   |
     And I follow "Seminar 1"
     #Creating Event 1 - future event

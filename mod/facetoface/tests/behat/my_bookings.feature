@@ -24,7 +24,7 @@ Feature: Check My bookings displays the right information for future and past ev
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                    | seminar1                   |
       | Description                             | Test seminar description   |
-      | Users can sign-up to multiple events    | 1                          |
+      | How many times the user can sign-up?    | Unlimited                  |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link" in the "Select room" "table_row"
@@ -79,7 +79,7 @@ Feature: Check My bookings displays the right information for future and past ev
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                    | seminar2                   |
       | Description                             | Test seminar description2  |
-      | Users can sign-up to multiple events    | 1                          |
+      | How many times the user can sign-up?    | Unlimited                  |
     And I click on "seminar2" "link"
 
     # Past event.

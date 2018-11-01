@@ -22,7 +22,7 @@ Feature: Check previous and upcomings sections are right populated
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                 | Test seminar in progress |
       | Description                          | Test seminar in progress |
-      | Users can sign-up to multiple events | 1                        |
+      | How many times the user can sign-up? | Unlimited                |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit session" "link"
@@ -137,7 +137,8 @@ Feature: Check previous and upcomings sections are right populated
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I navigate to "Edit settings" in current page administration
-    And I set the field "Users can sign-up to multiple events" to "0"
+    And I expand all fieldsets
+    And I set the field "How many times the user can sign-up?" to "1"
     And I press "Save and return to course"
     And I log out
 

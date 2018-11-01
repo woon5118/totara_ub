@@ -46,7 +46,7 @@ Feature: Allocate spaces for team in seminar
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                                    | Test seminar name        |
       | Description                             | Test seminar description |
-      | Users can sign-up to multiple events    | 1                        |
+      | How many times the user can sign-up?    | Unlimited                |
       | Fully attended                          | 0                        |
       | Partially attended                      | 0                        |
       | No show                                 | 0                        |

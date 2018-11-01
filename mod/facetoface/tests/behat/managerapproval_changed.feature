@@ -46,7 +46,7 @@ Feature: Seminar Approval required
       | Description       | Test seminar description |
     And I click on "Test seminar name" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
-    And I click on "Approval Options" "link"
+    And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
     And I follow "Add a new event"
@@ -104,7 +104,7 @@ Feature: Seminar Approval required
     And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
 
     Then I navigate to "Edit settings" node in "Seminar administration"
-    And I click on "Approval Options" "link"
+    And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_none" "css_element"
     And I press "Save and display"
 
@@ -133,7 +133,7 @@ Feature: Seminar Approval required
       | Description       | Test seminar description |
     And I click on "Test seminar name" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
-    And I click on "Approval Options" "link"
+    And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
     And I follow "Add a new event"
@@ -185,7 +185,7 @@ Feature: Seminar Approval required
     And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
 
     Then I navigate to "Edit settings" node in "Seminar administration"
-    And I click on "Approval Options" "link"
+    And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_none" "css_element"
     And I press "Save and display"
 

@@ -144,11 +144,19 @@ if ($ADMIN->fulltree) { // Improve performance.
 $settings = new admin_settingpage('modfacetofacactivitydefaults', get_string('activitydefaults', 'mod_facetoface'), 'totara/core:modconfig', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_heading('facetoface_multisignup_header', new lang_string('multisignup_header', 'facetoface'), ''));
+    $settings->add(new admin_setting_heading('facetoface_signupworkflow_header', new lang_string('signupworkflowheader', 'facetoface'), ''));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_multisignup_enable',
-        new lang_string('multisignupenable', 'facetoface'),
-        new lang_string('multisignupenable_desc', 'facetoface'), 1));
+    $amounts = [];
+    for ($i = 1; $i <= 10; $i++) {
+        $amounts[$i] = $i;
+    }
+    $amounts[0] = new lang_string('multisignupamount_unlimited', 'facetoface');
+    $settings->add(new admin_setting_configselect('facetoface_multisignupamount',
+        new lang_string('multisignupamount', 'facetoface'),
+        new lang_string('multisignupamount_help', 'facetoface'),
+        2,
+        $amounts
+    ));
 
     $options = [];
     $options['multisignuprestrict_fully'] = new lang_string('status_fully_attended', 'facetoface');
@@ -163,18 +171,9 @@ if ($ADMIN->fulltree) {
         $options
     ));
 
-    $settings->add(new admin_setting_configtext('facetoface_multisignup_maximum',
-        new lang_string('multisignupmaximum', 'mod_facetoface'),
-        new lang_string('multisignupmaximum_help', 'mod_facetoface'),
-        2,
-        PARAM_INT
-    ));
-
     $settings->add(new admin_setting_configcheckbox('facetoface_waitlistautoclean',
         new lang_string('waitlistautoclean', 'mod_facetoface'),
         new lang_string('waitlistautoclean_help', 'mod_facetoface'), 1));
-
-    $settings->add(new admin_setting_heading('facetoface_signupapproval_header', new lang_string('setting:signupapproval_header', 'facetoface'), ''));
 
     $settings->add(new admin_setting_configtextarea('facetoface_termsandconditions', new lang_string('setting:termsandconditions_caption', 'facetoface'),
         new lang_string('setting:termsandconditions_format', 'facetoface'), new lang_string('setting:termsandconditions_default', 'facetoface')));

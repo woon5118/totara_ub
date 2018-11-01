@@ -44,7 +44,7 @@ Feature: The sign-up status is not changing when the approval type is changed
     And I click on "Confirm" "button"
     And I follow "f2f one"
     And I follow "Edit settings"
-    And I follow "Approval Options"
+    And I expand all fieldsets
     And I set the field "Manager Approval" to "1"
     And I click on "Save and display" "button"
     And I follow "Attendees"

@@ -74,7 +74,7 @@ Feature: Seminar Manager signup approval changes
     And I am on "Classroom Connect Course" course homepage
     And I follow "Test seminar name"
     And I navigate to "Edit settings" in current page administration
-    And I click on "Approval Options" "link"
+    And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
     And I log out

@@ -29,9 +29,9 @@ Feature: Add and remove seminar Administrators
     # Test I can open the dialog and close it without selecting anyone
     When I click on "Add approver" "button"
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
-    Then I should not see "Admin One (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Two (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Three (activity level approver)" in the "Approval Options" "fieldset"
+    Then I should not see "Admin One (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Two (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Three (activity level approver)" in the "Sign-up Workflow" "fieldset"
 
     # Select admin one as our starting point now.
     When I click on "Add approver" "button"
@@ -40,31 +40,31 @@ Feature: Add and remove seminar Administrators
     And I click on "Save and display" "button"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
-    Then I should see "Admin One (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Two (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Three (activity level approver)" in the "Approval Options" "fieldset"
+    Then I should see "Admin One (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Two (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Three (activity level approver)" in the "Sign-up Workflow" "fieldset"
 
     # Remove an admin
-    When I click on "Remove" "link" in the "Approval Options" "fieldset"
-    Then I should not see "Admin One (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Two (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Three (activity level approver)" in the "Approval Options" "fieldset"
+    When I click on "Remove" "link" in the "Sign-up Workflow" "fieldset"
+    Then I should not see "Admin One (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Two (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Three (activity level approver)" in the "Sign-up Workflow" "fieldset"
 
     # Add an admin
     When I click on "Add approver" "button"
     And I click on "Admin Two (admin2@example.com)" "link" in the "Select activity level approvers" "totaradialogue"
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
-    Then I should not see "Admin One (activity level approver)" in the "Approval Options" "fieldset"
-    And I should see "Admin Two (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Three (activity level approver)" in the "Approval Options" "fieldset"
+    Then I should not see "Admin One (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should see "Admin Two (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Three (activity level approver)" in the "Sign-up Workflow" "fieldset"
 
     # Confirm that it is displayed correctly after a save
     When I click on "Save and display" "button"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
-    Then I should not see "Admin One (activity level approver)" in the "Approval Options" "fieldset"
-    And I should see "Admin Two (activity level approver)" in the "Approval Options" "fieldset"
-    And I should not see "Admin Three (activity level approver)" in the "Approval Options" "fieldset"
+    Then I should not see "Admin One (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should see "Admin Two (activity level approver)" in the "Sign-up Workflow" "fieldset"
+    And I should not see "Admin Three (activity level approver)" in the "Sign-up Workflow" "fieldset"
 
   Scenario: Seminar - enable/disable add approver button depending on whether approval option is on.
     When I set the following fields to these values:
