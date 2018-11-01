@@ -73,10 +73,6 @@ $PAGE->set_url('/mod/facetoface/room/ajax/sessionrooms.php', array(
     'timefinish' => $timefinish
 ));
 
-$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
-$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-$PAGE->requires->strings_for_js(array('chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet', 'createnewroom', 'editroom'), 'facetoface');
-
 if (empty($timestart) || empty($timefinish)) {
     print_error('notimeslotsspecified', 'facetoface');
 }

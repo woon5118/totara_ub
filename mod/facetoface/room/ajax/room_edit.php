@@ -74,11 +74,6 @@ if ($data = $form->get_data()) {
     $room = \mod_facetoface\room_helper::save($data);
     echo json_encode(array('id' => $room->get_id(), 'name' => $room->get_name(), 'custom' => $room->get_custom()));
 } else {
-    $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
-    $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-    $PAGE->requires->strings_for_js(array('chooseroom', 'dateselect', 'nodatesyet',
-        'createnewroom', 'editroom', 'createnewroom'), 'facetoface');
-
     // This is required because custom fields may use AMD module for JS and we can't re-initialise AMD
     // which will happen if we call get_end_code() without setting the first arg to false.
     // It must be called before form->display and importantly before get_end_code.

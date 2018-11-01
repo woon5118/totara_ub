@@ -1041,7 +1041,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $details[] = get_string('reservations', 'mod_facetoface', $session->reservations);
             }
             $details += $session->bookings;
-            $details = '<li>' . implode('</li><li>', $details) . '</li>';
+            $details = html_writer::alist($details); //'<li>' . implode('</li><li>', $details) . '</li>';
             $details = html_writer::tag('ul', $details);
             $row = new html_table_row(array($session->dates, $details));
             $table->data[] = $row;
