@@ -64,10 +64,13 @@ final class seminar_event_list implements \Iterator {
         global $DB;
 
         // SQL that gets all events that have started, but still have at least one waitlisted user.
-        $sql = 'SELECT fs.*, MIN(fsd.timestart) as mintimestart
+        $sql = 'SELECT fs.*, ( SELECT MIN(fsd.timestart)
+                                 FROM {facetoface_sessions_dates} fsd
+                                 WHERE fsd.sessionid = fs.id)
+                    AS mintimestart
                   FROM {facetoface_sessions} fs
                   JOIN {facetoface_sessions_dates} fsd
-                    on fsd.sessionid = fs.id
+                    ON fsd.sessionid = fs.id
                   JOIN {facetoface} f
                     ON fs.facetoface = f.id
                  WHERE f.waitlistautoclean = 1
@@ -77,8 +80,7 @@ final class seminar_event_list implements \Iterator {
                                     ON fst.signupid = fss.id
                                  WHERE fss.sessionid = fs.id
                                    AND fst.statuscode = :wcode
-                       )
-              GROUP BY fs.id';
+                       )';
 
         $now = time();
         $list = new static();
