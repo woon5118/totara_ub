@@ -650,7 +650,6 @@ class core_user_userlib_testcase extends advanced_testcase {
         $this->setUser($user8);
         $this->assertFalse(user_can_view_profile($user1));
 
-        $allroles = $DB->get_records_menu('role', array(), 'id', 'archetype, id');
         // Let us test with guest user.
         $this->setGuestUser();
         $CFG->forceloginforprofiles = 1;
