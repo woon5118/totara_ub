@@ -63,20 +63,23 @@ Feature: Generation of program assignment exceptions
     And I set the following fields to these values:
         | timeamount | 2 |
     And I click on "Set time relative to event" "button"
-    And I wait "2" seconds
     And I click on "Save changes" "button"
     And I click on "Save all changes" "button"
     Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
+    And I wait "1" seconds
+    And I run the scheduled task "\totara_program\task\send_messages_task"
 
     When I log out
     And I log in as "user001"
     Then I should not see "Required Learning" in the totara menu
+    And I should not see "You have been enrolled on program Program Exception Tests"
 
     When I click on "Record of Learning" in the totara menu
     Then I should not see "Program Exception Tests"
 
     When I log out
     And I log in as "user002"
+    And I should see "You have been enrolled on program Program Exception Tests"
     And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
     And I should see "Course 1" in the "#program-content" "css_element"
@@ -102,7 +105,6 @@ Feature: Generation of program assignment exceptions
     And I click on "Add individuals to program" "button"
     And I click on "fn_003 ln_003 (user003@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I wait "2" seconds
     And I click on "Set due date" "link" in the ".completionlink_5" "css_element"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype.eventtype" "css_element"
@@ -112,9 +114,12 @@ Feature: Generation of program assignment exceptions
     And I click on "Save changes" "button"
     And I click on "Save all changes" "button"
     Then I should see "3 learner(s) assigned: 3 active, 0 exception(s)"
+    And I wait "1" seconds
+    And I run the scheduled task "\totara_program\task\send_messages_task"
 
     When I log out
     And I log in as "user001"
+    And I should see "You have been enrolled on program Program Exception Tests"
     And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
     And I should see "Course 1" in the "#program-content" "css_element"
@@ -150,13 +155,15 @@ Feature: Generation of program assignment exceptions
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I wait "2" seconds
     And I click on "Save changes" "button"
     And I click on "Save all changes" "button"
     Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
+    And I wait "1" seconds
+    And I run the scheduled task "\totara_program\task\send_messages_task"
 
     When I log out
     And I log in as "user001"
+    And I should not see "You have been enrolled on program Program Exception Tests"
     Then I should not see "Required Learning" in the totara menu
 
     When I click on "Record of Learning" in the totara menu
@@ -164,6 +171,7 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "user002"
+    And I should see "You have been enrolled on program Program Exception Tests"
     And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
 
@@ -188,13 +196,15 @@ Feature: Generation of program assignment exceptions
     And I click on "Add individuals to program" "button"
     And I click on "fn_003 ln_003 (user003@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I wait "2" seconds
     And I click on "Save changes" "button"
     And I click on "Save all changes" "button"
     Then I should see "3 learner(s) assigned: 3 active, 0 exception(s)"
+    And I wait "1" seconds
+    And I run the scheduled task "\totara_program\task\send_messages_task"
 
     When I log out
     And I log in as "user001"
+    And I should see "You have been enrolled on program Program Exception Tests"
     And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
 
