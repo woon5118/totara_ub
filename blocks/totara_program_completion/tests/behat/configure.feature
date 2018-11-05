@@ -26,7 +26,6 @@ Feature: Configure the totara program completion block
     And I configure the "Program completions" block
     And I expand all fieldsets
     And I press "Add programs"
-    And I wait "2" seconds
     And I click on "Miscellaneous" "link" in the "Add programs" "totaradialogue"
     And I click on "Program 1" "link" in the "Add programs" "totaradialogue"
     And I click on "Program 2" "link" in the "Add programs" "totaradialogue"
