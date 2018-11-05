@@ -60,7 +60,7 @@ class f2f_actions extends base {
         }
 
         return \html_writer::link(
-            new \moodle_url('/mod/facetoface/attendeess/view.php', array('s' => $value)),
+            new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $value)),
             $OUTPUT->pix_icon('t/cohort', get_string("attendees", "facetoface"))
         );
     }
