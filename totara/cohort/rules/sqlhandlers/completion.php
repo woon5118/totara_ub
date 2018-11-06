@@ -243,6 +243,34 @@ class cohort_rule_sqlhandler_completion_date_program extends cohort_rule_sqlhand
     }
 }
 
+/**
+ * Rule for checking whether user has certified all the certifications in a list before a fixed date
+ */
+class cohort_rule_sqlhandler_completion_date_certification extends cohort_rule_sqlhandler_completion_date {
+    protected function construct_sql_snippet($certnum, $comparison, $lov) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdp'.$this->ruleid);
+        $sqlhandler->sql = "{$certnum} =
+                  (
+                    SELECT count(DISTINCT(p.id))
+                      FROM {prog} p
+                      JOIN {certif} c ON c.id = p.certifid
+                 LEFT JOIN {certif_completion} cc ON cc.certifid = c.id
+                 LEFT JOIN {certif_completion_history} cch ON cch.certifid = c.id
+                     WHERE p.id {$sqlin}
+                       AND (
+                            (cc.userid = u.id AND cc.timecompleted != 0 AND  cc.timecompleted {$comparison})
+                            OR
+                            (cch.userid = u.id AND cch.timecompleted != 0 AND cch.timecompleted {$comparison})
+                           )
+                 )";
+
+        $sqlhandler->params = $params;
+        return $sqlhandler;
+    }
+}
+
 
 /**
  * Rule for checking whether user took longer than a specified duration to complete all

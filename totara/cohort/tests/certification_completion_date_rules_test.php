@@ -25,28 +25,23 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
-require_once($CFG->dirroot . '/totara/cohort/lib.php');
+require_once($CFG->dirroot . '/totara/cohort/tests/certification_testcase.php');
 
 /**
  * Test certificate status completion rules.
  *
  */
-class totara_cohort_certification_date_rules_testcase extends reportcache_advanced_testcase {
+class totara_cohort_certification_date_rules_testcase extends totara_cohort_certification_testcase {
 
-    const TEST_GROUP_USER_COUNT         = 5;
-    const TEST_PROGRAMS_COUNT           = 7;
-    const TEST_CERTIFICATIONS_COUNT     = 5;
-
-    private $program_generator          = null;
-    private $cohort_generator           = null;
-    private $user_groups                = [];
-    private $adminuser                  = null;
-    private $programs                   = [];
-    private $courses                    = [];
-    private $certifications             = [];
-    private $cohort                     = null;
-    private $ruleset                    = null;
+    public $program_generator          = null;
+    public $cohort_generator           = null;
+    public $user_groups                = [];
+    public $adminuser                  = null;
+    public $programs                   = [];
+    public $courses                    = [];
+    public $certifications             = [];
+    public $cohort                     = null;
+    public $ruleset                    = null;
 
     protected function tearDown() {
         $this->program_generator        = null;
@@ -240,62 +235,7 @@ class totara_cohort_certification_date_rules_testcase extends reportcache_advanc
     }
 
     /**
-     * Create users and add to the specified group
-     *
-     * @param $group
-     */
-    public function add_users_to_group($group) {
-        for ($i = 1; $i <= self::TEST_GROUP_USER_COUNT; $i++) {
-            $user = $this->getDataGenerator()->create_user();
-            $this->user_groups[$group][$user->id] = $user;
-        }
-        $this->assertEquals(self::TEST_GROUP_USER_COUNT, count($this->user_groups[$group]));
-    }
-
-    /**
-     * Assign users to all certifications
-     *
-     * @param $users
-     */
-    public function assign_users($users, $certifications = []) {
-        foreach ($users as $user) {
-            foreach ($certifications as $certification) {
-                $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
-            }
-        }
-    }
-
-    /**
-     * Unassign users from all certifications they are assigned to
-     *
-     * @param $users
-     */
-    public function unassign_users($users) {
-        global $DB;
-
-        foreach ($users as $user) {
-            $DB->delete_records('prog_user_assignment', ['userid' => $user->id]);
-            $DB->delete_records('prog_assignment', ['assignmenttypeid' => $user->id]);
-        }
-    }
-
-    /**
-     * Certify users
-     *
-     * @param array $users
-     * @param int $courseid
-     * @param null | int $timecomplete
-     */
-    public function certify_users($users, $courseid, $timecomplete = null) {
-        foreach ($users as $user) {
-            $completion = new completion_completion(['userid' => $user->id, 'course' => $courseid]);
-            $completion->mark_inprogress();
-            $completion->mark_complete($timecomplete);
-        }
-    }
-
-    /**
-     * Data provider for course completion date rule.
+     * Data provider.
      */
     public function data_certification_status_date() {
 
@@ -484,7 +424,7 @@ class totara_cohort_certification_date_rules_testcase extends reportcache_advanc
     /**
      * @dataProvider data_certification_status_date
      */
-    public function test_coursecompletion_date_rule($name, $certifications, $params, $usergroups) {
+    public function test_certification_date_rule($name, $certifications, $params, $usergroups) {
         global $DB;
 
         // Users that should be in this audience.

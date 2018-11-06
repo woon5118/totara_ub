@@ -628,6 +628,17 @@ function cohort_rules_list($reset = false){
                 ),
                 new cohort_rule_sqlhandler_certification_status()
             );
+
+            // Certification completion date.
+            $rules[] = new cohort_rule_option(
+                'learning',
+                'certificationcompletiondate',
+                new cohort_rule_ui_picker_certification_completion_date(
+                    get_string('ruledesc-learning-certificationcompletiondate', 'totara_cohort'),
+                    COHORT_PICKER_CERTIFICATION_COMPLETION
+                ),
+                new cohort_rule_sqlhandler_completion_date_certification()
+            );
         }
 
         // Cohort member
