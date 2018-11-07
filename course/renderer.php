@@ -1108,11 +1108,8 @@ class core_course_renderer extends plugin_renderer_base {
         }
         $content = '';
         $classes = trim('panel panel-default coursebox clearfix '. $additionalclasses);
-        if ($chelper->get_show_courses() >= self::COURSECAT_SHOW_COURSES_EXPANDED) {
-            $nametag = 'h3';
-        } else {
+        if ($chelper->get_show_courses() < self::COURSECAT_SHOW_COURSES_EXPANDED) {
             $classes .= ' collapsed';
-            $nametag = 'div';
         }
 
         // .coursebox
@@ -1135,7 +1132,7 @@ class core_course_renderer extends plugin_renderer_base {
             $coursename,
             array('class' => $dimmed, 'style' => 'background-image:url(' . totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE) . ')')
         );
-        $content .= html_writer::tag($nametag, $coursenamelink, array('class' => 'coursename'));
+        $content .= html_writer::tag('div', $coursenamelink, array('class' => 'coursename'));
 
         // If we display course in collapsed form but the course has summary or course contacts, display the link to the info page.
         $content .= html_writer::start_tag('div', array('class' => 'moreinfo'));

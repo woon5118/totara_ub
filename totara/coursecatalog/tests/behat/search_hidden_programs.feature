@@ -7,7 +7,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
       | username   | firstname  | lastname    | email                  |
       | user1      | user1      | user1       | user1@example.com      |
       | sysmanager | sysmanager | sysmanager  | sysmanager@example.com |
-      | catmanager | catmanager | catmanager  | sysmanager@example.com |
+      | catmanager | catmanager | catmanager  | catmanager@example.com |
 
     # Create category hierarchy.
     And the following "categories" exist:
@@ -133,7 +133,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     And I should not see "cat2_program3"
 
     When I set the field "coursesearchbox" to "cat0_program3"
-    And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"
+    And I press "Go"
     Then I should see "No programs were found with the words 'cat0_program3'"
     When I set the field "coursesearchbox" to "cat0_program2"
     And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"
@@ -162,7 +162,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     And I should see "cat2_program3"
 
     When I set the field "coursesearchbox" to "cat0_program3"
-    And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"
+    And I press "Go"
     Then I should see "No programs were found with the words 'cat0_program3'"
     When I set the field "coursesearchbox" to "cat1_program1"
     And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"
@@ -365,7 +365,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     And I should not see "cat2_cert3"
 
     When I set the field "coursesearchbox" to "cat0_cert3"
-    And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"
+    And I press "Go"
     Then I should see "No programs were found with the words 'cat0_cert3'"
     When I set the field "coursesearchbox" to "cat0_cert2"
     And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"
@@ -394,7 +394,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     And I should see "cat2_cert3"
 
     When I set the field "coursesearchbox" to "cat0_cert3"
-    And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"
+    And I press "Go"
     Then I should see "No programs were found with the words 'cat0_cert3'"
     When I set the field "coursesearchbox" to "cat1_cert1"
     And I click on "Go" "link_or_button" in the "#coursesearch2" "css_element"

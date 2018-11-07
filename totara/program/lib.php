@@ -537,7 +537,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
  *
  */
 function prog_get_category_breadcrumbs($categoryid, $viewtype = 'program') {
-    global $CFG, $DB;
+    global $DB;
 
     $category = $DB->get_record('course_categories', array('id' => $categoryid));
 
@@ -1788,12 +1788,11 @@ class program_in_list implements IteratorAggregate {
     public function has_program_overviewfiles() {
         global $CFG;
         if (empty($CFG->courseoverviewfileslimit)) {
-            return 0;
+            return false;
         }
-        require_once($CFG->libdir. '/filestorage/file_storage.php');
         $fs = get_file_storage();
         $context = context_program::instance($this->id);
-        return $fs->is_area_empty($context->id, 'program', 'overviewfiles');
+        return !$fs->is_area_empty($context->id, 'program', 'overviewfiles');
     }
 
     /**
