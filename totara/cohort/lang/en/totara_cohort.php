@@ -324,6 +324,7 @@ $string['failedtoclone'] = 'Failed to clone audience';
 $string['failedtodeleted'] = 'Failed to delete audience';
 $string['globalsettings'] = 'Global settings';
 $string['globalsettingsupdated'] = 'Global settings updated';
+$string['goals'] = 'Goals';
 $string['history'] = 'History';
 $string['idnumber'] = 'Id';
 $string['includechildren'] = 'Include children';

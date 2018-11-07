@@ -88,7 +88,7 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
     navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
 }
 $strheading = get_string('viewmembers', 'totara_cohort');
-totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
+totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);
 
 /** @var totara_reportbuilder_renderer $output */
 $output = $PAGE->get_renderer('totara_reportbuilder');

@@ -94,7 +94,7 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
     navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
 }
 if ($id && $cohort->name) {
-    $PAGE->navbar->add(s($cohort->name), $CFG->wwwroot.'/cohort/view.php?id='.$id);
+    $PAGE->navbar->add(format_string($cohort->name), $CFG->wwwroot.'/cohort/view.php?id='.$id);
 }
 
 if ($delete and $cohort->id) {
