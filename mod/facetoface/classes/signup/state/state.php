@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\signup\state;
 
+use mod_facetoface\exception\signup_exception;
 use mod_facetoface\signup as signup;
 use mod_facetoface\signup\transition as transition;
 
@@ -77,7 +78,7 @@ abstract class state {
                 return $stateclass;
             }
         }
-        throw new \coding_exception("Cannot find booking state with code: $code");
+        throw new signup_exception("Cannot find booking state with code: $code");
     }
 
     /**
@@ -90,7 +91,7 @@ abstract class state {
             $this->switch_to(...$desiredstates);
             return true;
         }
-        catch(\coding_exception $e) {
+        catch (signup_exception $e) {
             return false;
         }
     }
@@ -100,7 +101,7 @@ abstract class state {
      *
      * @param string ...$desiredstateclasses target state.
      * @return state first possible of $desiredstates
-     * @throws \coding_exception If not possbile to move
+     * @throws signup_exception If not possbile to move
      */
     final public function switch_to(string ...$desiredstateclasses) : state {
         // Iteratively search for desired state
@@ -117,7 +118,7 @@ abstract class state {
             }
         }
         $fromclassname = get_class($this);
-        throw new \coding_exception("Cannot move from {$fromclassname} to any of requested states");
+        throw new signup_exception("Cannot move from {$fromclassname} to any of requested states");
     }
 
     /**

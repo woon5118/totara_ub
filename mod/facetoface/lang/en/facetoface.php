@@ -2057,7 +2057,6 @@ $string['state_actorcanoverbook_fail'] = 'You do not have capability to overbook
 $string['state_actorcansignuppastevents_desc'] = 'The current user has capability to signup on events in progress and past events';
 $string['state_actorcansignuppastevents_fail'] = 'The current user does not have capability to signup on events in progress and past events';
 $string['state_actorhasrole_desc'] = 'The current user has the approval role for the event';
-$string['state_actorhasrole_fail'] = 'The current does not have the approval role when expected';
 $string['state_actorisadmin_desc'] = 'The current user is an administrator for the event';
 $string['state_actorisadmin_fail'] = 'The current user is not an administrator for the event';
 $string['state_actorismanager_desc'] = 'The current user is the manager for the signup user';

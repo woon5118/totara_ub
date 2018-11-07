@@ -36,7 +36,8 @@ class approval_manager_required extends condition {
      */
     public function pass() : bool {
         if ($this->signup->get_skipapproval()) {
-            return true;
+            // Approval manager is not required when we skip approval.
+            return false;
         }
 
         if ($this->signup->get_seminar_event()->get_seminar()->is_manager_required()) {

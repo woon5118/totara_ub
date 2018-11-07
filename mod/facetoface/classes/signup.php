@@ -22,6 +22,7 @@
 */
 
 namespace mod_facetoface;
+use mod_facetoface\exception\signup_exception;
 use mod_facetoface\signup\state\state;
 use mod_facetoface\signup\state\not_set;
 use mod_facetoface\signup\state\interface_event;
@@ -114,7 +115,7 @@ final class signup {
         global $DB;
 
         if (empty($seminarevent->get_id())) {
-            throw new coding_exception("Cannot create signup: Seminar event id is not set (it must be saved before signup created)");
+            throw new signup_exception("Cannot create signup: Seminar event id is not set (it must be saved before signup created)");
         }
 
         $signup = new signup();

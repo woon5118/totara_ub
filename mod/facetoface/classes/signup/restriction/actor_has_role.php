@@ -50,6 +50,6 @@ class actor_has_role extends restriction {
     }
 
     public function get_failure() : array {
-        return ['actor_has_role' => get_string('state_actorhasrole_fail', 'mod_facetoface')];
+        return [];
     }
 }

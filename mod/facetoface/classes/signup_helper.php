@@ -23,6 +23,7 @@
 
 namespace mod_facetoface;
 
+use mod_facetoface\exception\signup_exception;
 use \stdClass;
 use mod_facetoface\signup\state\state as state;
 use mod_facetoface\signup\state\booked as booked;
@@ -48,7 +49,7 @@ final class signup_helper {
 
         // User cannot signup - no effect.
         if (!self::can_signup($signup)) {
-            throw new \coding_exception("Cannot signup.");
+            throw new signup_exception("Cannot signup.");
         }
 
         $trans = $DB->start_delegated_transaction();
@@ -122,7 +123,7 @@ final class signup_helper {
 
         // User cannot cancel their own signup - no effect.
         if (!self::can_user_cancel($signup)) {
-            throw new \coding_exception("Cannot cancel signup.");
+            throw new signup_exception("Cannot cancel signup.");
         }
 
         $seminarevent = $signup->get_seminar_event();

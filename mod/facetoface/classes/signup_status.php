@@ -22,6 +22,7 @@
 */
 
 namespace mod_facetoface;
+use mod_facetoface\exception\signup_exception;
 use mod_facetoface\signup\state\state;
 
 defined('MOODLE_INTERNAL') || die();
@@ -93,13 +94,13 @@ final class signup_status {
     public function save() : signup_status {
         global $DB;
         if ($this->id || $this->superceded) {
-            throw new \coding_exception('Cannot update status that was already saved or superceded');
+            throw new signup_exception('Cannot update status that was already saved or superceded');
         }
         if (empty($this->statuscode)) {
-            throw new \coding_exception('Cannot update status without state set');
+            throw new signup_exception('Cannot update status without state set');
         }
         if (empty($this->signupid)) {
-            throw new \coding_exception('Cannot update status without signup set');
+            throw new signup_exception('Cannot update status without signup set');
         }
 
         $trans = $DB->start_delegated_transaction();

@@ -1,29 +1,30 @@
 <?php
 /*
-* This file is part of Totara Learn
-*
-* Copyright (C) 2018 onwards Totara Learning Solutions LTD
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-* @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
-* @package mod_facetoface
-*/
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @package mod_facetoface
+ */
 
 namespace mod_facetoface;
 
 use \context_course;
+use mod_facetoface\exception\signup_exception;
 use \moodle_exception;
 
 
@@ -409,19 +410,21 @@ final class reservations {
      * @param seminar_event $seminarevent
      * @param int $bookedby
      * @param int[] $userids
-     * @throws moodle_exception
+     * @return string[] errors
      */
-    public static function allocate_spaces(seminar_event $seminarevent, int $bookedby, array $userids) {
+    public static function allocate_spaces(seminar_event $seminarevent, int $bookedby, array $userids): array {
         global $CFG;
 
         $courseid = $seminarevent->get_seminar()->get_course();
+        $errors = [];
 
         foreach ($userids as $userid) {
             // Make sure that the user is enroled in the course
             $context = \context_course::instance($courseid);
             if (!is_enrolled($context, $userid)) {
                 if (!enrol_try_internal_enrol($courseid, $userid, $CFG->learnerroleid, time())) {
-                    throw new moodle_exception('unabletoenrol', 'mod_facetoface');
+                    $errors[] = get_string('unabletoenrol', 'mod_facetoface');
+                    continue;
                 }
             }
 
@@ -430,8 +433,14 @@ final class reservations {
             $signup->set_skipapproval();
             if (signup_helper::can_signup($signup)) {
                 signup_helper::signup($signup);
+            } else {
+                $failures = signup_helper::get_failures($signup);
+                if ($failures) {
+                    $errors[] = current($failures);
+                }
             }
         }
+        return $errors;
     }
 
     /**
@@ -469,7 +478,11 @@ final class reservations {
                     $book = 0;
                     $waitlist = 1;
                 }
-                self::add($seminarevent, $managerid, $book, $waitlist);
+                try {
+                    self::add($seminarevent, $managerid, $book, $waitlist);
+                } catch (signup_exception $e) {
+                    // We cannot create reservation anymore, but we can live with that.
+                }
             }
             $transaction->allow_commit();
 

@@ -131,8 +131,14 @@ if (empty($team->potential) && empty($team->current)) {
             if ($replacereservations) {
                 $newallocations = reservations::replace($seminarevent, $USER->id, $newallocations);
             }
-            reservations::allocate_spaces($seminarevent, $USER->id, $newallocations);
-            redirect($redir);
+            $errors = reservations::allocate_spaces($seminarevent, $USER->id, $newallocations);
+            $message = "";
+            $notifytype = \core\output\notification::NOTIFY_INFO;
+            if ($errors) {
+                $message = \html_writer::alist($errors);
+                $notifytype = \core\output\notification::NOTIFY_ERROR;
+            }
+            redirect($redir, $message, null, $notifytype);
         }
 
     } else if (optional_param('remove', false, PARAM_BOOL)) {
