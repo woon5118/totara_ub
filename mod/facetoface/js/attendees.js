@@ -322,39 +322,37 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
          * @param href The desired contents of the panel
          */
         function editJobAssignmentModalForm(href) {
-            this.Y.use('panel', function(Y) {
-                var panel = new Y.Panel({
-                    headerContent: null,
-                    bodyContent  : href,
-                    width        : 600,
-                    zIndex       : 5,
-                    centered     : true,
-                    modal        : true,
-                    render       : true
-                });
-                var $content = $('#' + panel.get('id'));
-                $content.find('input[type="text"]').eq(0).focus();
-                $content.find('#id_submitbutton').on('click', function() {
-                    var $theFrm = $content.find('form.mform');
-                    var apprObj = $theFrm.serialize();
-                    apprObj += ('&submitbutton=' + $(this).attr('value'));
-                    $.post($theFrm.attr('action'), apprObj).done(function(data){
-                        if (data.result == 'success') {
-                            var span = "#jobassign"+data.id;
-                            $(span).html(data.jobassignmentdisplayname);
-                            panel.destroy(true);
-                        } else {
-                            $("#attendee_job_assignment_err").text(data.error);
-                        }
-                    });
-                    return false;
-                });
-                $content.find('#id_cancel').on('click', function() {
-                    panel.destroy(true);
-                    return false;
-                });
-                panel.show();
+            var dialogue = new M.core.dialogue({
+                headerContent: null,
+                bodyContent  : href,
+                width        : 600,
+                zIndex       : 5,
+                centered     : true,
+                modal        : true,
+                render       : true
             });
+            var $content = $('#' + dialogue.get('id'));
+            $content.find('input[type="text"]').eq(0).focus();
+            $content.find('#id_submitbutton').on('click', function() {
+                var $theFrm = $content.find('form.mform');
+                var apprObj = $theFrm.serialize();
+                apprObj += ('&submitbutton=' + $(this).attr('value'));
+                $.post($theFrm.attr('action'), apprObj).done(function(data){
+                    if (data.result == 'success') {
+                        var span = "#jobassign"+data.id;
+                        $(span).html(data.jobassignmentdisplayname);
+                        dialogue.destroy(true);
+                    } else {
+                        $("#attendee_job_assignment_err").text(data.error);
+                    }
+                });
+                return false;
+            });
+            $content.find('#id_cancel').on('click', function() {
+                dialogue.destroy(true);
+                return false;
+            });
+            dialogue.show();
         }
 
         // Handle actions drop down.

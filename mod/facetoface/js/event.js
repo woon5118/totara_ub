@@ -168,7 +168,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
     init_dates: function() {
         var url = this.url;
             // Select date dialog.
-        $('.show-selectdate-dialog').each(function() {
+        $('.mod_facetoface-show-selectdate-dialog').each(function() {
             var offset = $(this).data('offset');
             var $dateitem = $('#timeframe-text' + offset);
 

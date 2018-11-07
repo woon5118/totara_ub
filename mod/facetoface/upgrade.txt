@@ -12,6 +12,8 @@ information provided here is intended especially for developers.
 * seminar_event::set_normalcost() used to expect an integer as the only argument, now expects a string
 * seminar_event::get_discountcost() used to return an integer, now returns a string
 * seminar_event::set_discountcost() used to expect an integer as the only argument, now expects a string
+* Converted styles.css to less
+* Deprecated room and room_details CSS classes
 
 === 12.0 ===
 

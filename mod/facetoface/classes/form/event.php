@@ -366,7 +366,7 @@ class event extends \moodleform {
         $streditdate = get_string('editdate', 'facetoface');
 
         $editicon = $OUTPUT->action_icon('#', new \pix_icon('t/edit', $streditdate), null,
-            array('id' => "show-selectdate{$offset}-dialog", 'class' => 'action-icon show-selectdate-dialog', 'data-offset' => $offset));
+            array('id' => "show-selectdate{$offset}-dialog", 'class' => 'action-icon mod_facetoface-show-selectdate-dialog', 'data-offset' => $offset));
         $row[] = $editicon . \html_writer::span($dateshtml, 'timeframe-text', array('id' => 'timeframe-text' . $offset));
 
         // Room.
@@ -386,7 +386,7 @@ class event extends \moodleform {
         // Assets items will be loaded by js.
         $row[] =  \html_writer::tag('ul', '', array(
                 'id' => 'assetlist' . $offset,
-                'class' => 'assetlist nonempty',
+                'class' => 'mod_facetoface-assetlist nonempty',
                 'data-offset' => $offset
             )) . $selectassets;
 

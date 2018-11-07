@@ -1,0 +1,170 @@
+@mod_facetoface-error-colour: @state-danger-text;
+@mod_facetoface-overbooked: #f2d9b3;
+@mod_facetoface-cancelled: #e6bdbc;
+@mod_facetoface-upcomming: #daead3;
+@mod_facetoface-warning: #ffffc0;
+@mod_facetoface-full: #b3dab6;
+
+.f2fsessionlinks,
+.f2fsessionnotice {
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 14px;
+    display: block;
+    padding: 3px;
+}
+
+.f2factivityname {
+    line-height: @line-height-small;
+}
+
+body#page-mod-facetoface-room div.row-fluid {
+    margin: 0;
+}
+
+body#page-mod-facetoface-view div#page-content table.sessions {
+    width: 100%;
+}
+
+body.path-mod-facetoface table.mod-facetoface-attendees {
+    width: 100%;
+}
+
+body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
+    margin-left: 15px;
+}
+
+.mod_facetoface-addremove button {
+    min-width: 100px;
+}
+
+.f2f dt {
+    word-wrap: break-word;
+}
+
+.mod_facetoface-room {
+    display: block;
+}
+
+/** This is a hack to get full height divs for the status columns with background colours */
+.reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
+.reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
+.reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+    height: 1px;
+}
+
+/** Firefox requires a different hack **/
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+    height: 100%;
+}
+
+/** IE requires quite a bit more hacking! **/
+.ie .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
+.ie .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
+.ie .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+    height: 100%;
+}
+
+.ie .reportbuilder-table td.session_bookingstatus,
+.ie .reportbuilder-table td.session_overallstatus {
+    overflow: hidden;
+}
+
+.ie .reportbuilder-table td.session_bookingstatus div,
+.ie .reportbuilder-table td.session_overallstatus div {
+    padding-bottom: 9999px;
+    margin-bottom: -9999px;
+}
+
+.reportbuilder-table td.session_bookingstatus,
+.reportbuilder-table td.session_overallstatus {
+    padding: 0;
+    /** Part of the full-height hack mentioned above **/
+    height: inherit;
+}
+
+.reportbuilder-table td.session_bookingstatus > div,
+.reportbuilder-table td.session_overallstatus > div {
+    text-align: center;
+    /** Part of the full-height hack mentioned above **/
+    height: 100%;
+}
+
+.reportbuilder-table .session_bookingstatus > div > span,
+.reportbuilder-table .session_overallstatus > div > span {
+    display: inline-block;
+    margin: @totara_style-spacing_small;
+}
+
+.reportbuilder-table .session_bookingstatus .underbooked,
+.reportbuilder-table .session_overallstatus .ended {
+    background-color: @mod_facetoface-warning;
+}
+
+.reportbuilder-table .session_bookingstatus .available,
+.reportbuilder-table .session_overallstatus .upcoming {
+    background-color: @mod_facetoface-upcomming;
+}
+
+.reportbuilder-table .session_bookingstatus .overbooked {
+    background-color: @mod_facetoface-overbooked;
+}
+
+.reportbuilder-table .session_overallstatus .cancelled {
+    background-color: @mod_facetoface-cancelled;
+}
+
+.reportbuilder-table .session_bookingstatus .fullybooked,
+.reportbuilder-table .session_overallstatus .started {
+    background-color: @mod_facetoface-full;
+}
+
+#page-mod-facetoface-attendees-list-addlist textarea[name="csvinput"] {
+    min-height: 200px;
+}
+
+.mod_facetoface-noshow {
+    display: none;
+}
+
+.mod_facetoface-show-selectdate-dialog {
+    float: right;
+}
+
+.mod_facetoface-assetlist {
+    list-style-type: none;
+    margin: 0;
+}
+
+.ui-dialog [id^='selectassets'][id$='-dialog'] .select,
+.ui-dialog [id^='selectroom'][id$='-dialog'] .select {
+    overflow: auto;
+}
+
+.ui-dialog [id^='selectassets'][id$='-dialog'] .dialog-footer,
+.ui-dialog [id^='selectroom'][id$='-dialog'] .dialog-footer {
+    padding-top: 0.5em;
+    display: block;
+    float: left;
+}
+
+.f2f-ignoreconflicts-checkbox {
+    padding: 10px;
+}
+
+.f2f-usersbox {
+    margin-bottom: 48px;
+}
+
+.f2f-booked-type-error {
+    border: 1px solid @mod_facetoface-error-colour;
+    display: inline-block;
+}
+
+.f2f-booked-type-error-hint {
+    color: @mod_facetoface-error-colour;
+    display: inline-block;
+    width: 50%;
+}

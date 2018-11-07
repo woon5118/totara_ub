@@ -75,9 +75,9 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
         </select>
         <label for="searchtoremovetext" class="accesshide"><?php p($strsearch) ?></label>
         <input type="text" name="searchtoremovetext" id="searchtoremovetext" size="20" placeholder="<?php p($strsearch) ?>" value=""/>
-        <button name="searchtoremovereset" id="searchtoremovereset" class="search noshow"><?php p($strshowall) ?></button>
+        <button name="searchtoremovereset" id="searchtoremovereset" class="search mod_facetoface-noshow"><?php p($strshowall) ?></button>
     </div>
-    <div class="span2 controls addremove">
+    <div class="span2 controls mod_facetoface-addremove">
         <button name="add" id="add"><?php echo $OUTPUT->larrow().'&nbsp;'.$strlarrow; ?></button>
         <button name="remove" id="remove"><?php echo $OUTPUT->rarrow().'&nbsp;'.$strrarrow; ?></button>
     </div>

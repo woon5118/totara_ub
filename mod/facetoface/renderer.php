@@ -1365,7 +1365,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $popupurl->param('popup', 1);
         $action = new popup_action('click', $popupurl, 'popup', array('width' => 800, 'height' => 600));
         $link = $this->output->action_link($url, get_string('roomdetails', 'facetoface'), $action);
-        $roomhtml[] = html_writer::span('(' . $link . ')', 'room room_details');
+        /* both room and room_details CSS classes should be considered @deprecated as of t13 */
+        $roomhtml[] = html_writer::span('(' . $link . ')', '.mod_facetoface-room room room_details');
 
         $roomhtml = implode('', $roomhtml);
 
