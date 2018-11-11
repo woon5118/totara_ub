@@ -7126,7 +7126,7 @@ class admin_setting_manageantiviruses extends admin_setting {
                     $updownimg = $OUTPUT->pix_icon('t/up', get_string('moveup'));
                     $updown = html_writer::link($updownurl, $updownimg);
                 } else {
-                    $updown .= $OUTPUT->pix_icon('spacer');
+                    $updown .= $OUTPUT->pix_icon('spacer', '');
                 }
                 if ($updowncount < $antiviruscount) {
                     $updownurl = $baseurl;
@@ -7134,7 +7134,7 @@ class admin_setting_manageantiviruses extends admin_setting {
                     $updownimg = $OUTPUT->pix_icon('t/down', get_string('movedown'));
                     $updown = html_writer::link($updownurl, $updownimg);
                 } else {
-                    $updown .= $OUTPUT->pix_icon('spacer');
+                    $updown .= $OUTPUT->pix_icon('spacer', '');
                 }
                 ++ $updowncount;
             }
