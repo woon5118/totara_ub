@@ -39,9 +39,11 @@ final class asset_helper {
     public static function save($data) {
         global $TEXTAREA_OPTIONS;
 
+        $existing_asset = true;
         if ($data->id) {
             $asset = new asset($data->id);
         } else {
+            $existing_asset = false;
             if (isset($data->custom) && $data->custom == 1) {
                 $asset = asset::create_custom_asset();
             } else {
@@ -50,6 +52,9 @@ final class asset_helper {
         }
         $asset->set_name($data->name);
         $asset->set_allowconflicts($data->allowconflicts);
+        if (empty($data->custom) && $existing_asset) {
+            $asset->publish();
+        }
 
         // We need to make sure the asset exists before formatting the customfields and description.
         if (!$asset->exists()) {

@@ -127,7 +127,7 @@ class asset_edit extends \moodleform {
             'name' => $asset->get_name(),
             'allowconflicts' => $asset->get_allowconflicts(),
             'description_editor' => ['text' => $asset->get_description()],
-            'notcustom' => $asset->get_custom(),
+            'notcustom' => $asset->get_custom() ? 0 : 1,
             'description' => $asset->get_description(),
             'descriptionformat' => FORMAT_HTML,
         ];
