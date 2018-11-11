@@ -105,6 +105,11 @@ define([], function() {
                 } else if (e.target.closest('[data-tw-selectTree-toggle]')) {
                     var toggleNode = e.target.closest('[data-tw-selectTree-toggle]'),
                         toggleList = toggleNode.parentNode.nextElementSibling;
+
+                    if (toggleNode.hasAttribute('data-tw-selecttree-label')) {
+                        toggleNode = toggleNode.previousElementSibling;
+                    }
+
                     that.toggleTreeList(toggleList, toggleNode);
 
                 // If tree item clicked
@@ -170,9 +175,9 @@ define([], function() {
 
                 if (!found) {
                     // Just gone into a single entry list
-                    for (var i = 0; i < nodeList.length; ++i) {
-                        if (nodeList[i].classList.contains('tw-selectTree__active')) {
-                            activeNodeIndex = i;
+                    for (var s = 0; s < nodeList.length; ++s) {
+                        if (nodeList[s].classList.contains('tw-selectTree__active')) {
+                            activeNodeIndex = s;
                             break;
                         }
                     }
@@ -208,9 +213,9 @@ define([], function() {
 
                         // Find next visible node
                         for (var a = activeNodeIndex + 1; a < nodeList.length; ++a) {
-                            var node = nodeList[a].getElementsByClassName('tw-selectTree__list_row_link')[0];
-                            if (node && node.offsetHeight !== 0) {
-                                node.focus();
+                            var nodeA = nodeList[a].getElementsByClassName('tw-selectTree__list_row_link')[0];
+                            if (nodeA && nodeA.offsetHeight !== 0) {
+                                nodeA.focus();
                                 return;
                             }
                         }
@@ -218,16 +223,16 @@ define([], function() {
                     case 'ArrowLeft':
                     case 'Left':
                         e.preventDefault();
-                        var node = nodeList[activeNodeIndex].getElementsByClassName('tw-selectTree__list_row_icon_expand')[0];
-                        if (node && node.classList.contains('tw-selectTree__hidden')) {
+                        var nodeB = nodeList[activeNodeIndex].getElementsByClassName('tw-selectTree__list_row_icon_expand')[0];
+                        if (nodeB && nodeB.classList.contains('tw-selectTree__hidden')) {
                             nodeList[activeNodeIndex].querySelector('[data-tw-selecttree-toggle]').click();
                         }
                     break;
                     case 'ArrowRight':
                     case 'Right':
                         e.preventDefault();
-                        var node = nodeList[activeNodeIndex].getElementsByClassName('tw-selectTree__list_row_icon_expanded')[0];
-                        if (node && node.classList.contains('tw-selectTree__hidden')) {
+                        var nodeC = nodeList[activeNodeIndex].getElementsByClassName('tw-selectTree__list_row_icon_expanded')[0];
+                        if (nodeC && nodeC.classList.contains('tw-selectTree__hidden')) {
                             nodeList[activeNodeIndex].querySelector('[data-tw-selecttree-toggle]').click();
                         }
                     break;
@@ -280,6 +285,10 @@ define([], function() {
             var activeNode = this.widget.querySelector('[' + this.activeSelector + ']');
 
             if (!activeNode) {
+                var defaultNode = this.widget.querySelector('[data-tw-selectTree-default] [data-tw-selectTree-urlVal]');
+                if (defaultNode) {
+                    this.setEventType(defaultNode.getAttribute('data-tw-selectTree-urlVal'));
+                }
                 return;
             }
 
@@ -298,7 +307,9 @@ define([], function() {
             var list = this.widget.querySelectorAll('[data-tw-selectTree-tree] [' + this.activeSelector + ']'),
                 def = this.widget.querySelector('[data-tw-selectTree-default]');
 
-            def.classList.remove(this.activeClass);
+            if (def) {
+                def.classList.remove(this.activeClass);
+            }
             for (var i = 0; i < list.length; i++) {
                 list[i].classList.remove(this.activeClass);
                 list[i].removeAttribute(this.activeSelector);
@@ -329,7 +340,8 @@ define([], function() {
             } else {
                 this.triggerEvent('add', {
                     key: this.key,
-                    val: value
+                    val: value,
+                    widget: this.widget
                 });
             }
         },
@@ -357,18 +369,27 @@ define([], function() {
         *
         */
         setToDefault: function() {
-            var defaultNode = this.widget.querySelector('[data-tw-selectTree-default] [data-tw-selectTree-urlVal]'),
-                label = defaultNode.getAttribute('data-tw-selectTree-label'),
-                value = defaultNode.getAttribute('data-tw-selectTree-urlVal'),
-                parent = defaultNode.parentNode;
+            var defaultNode = this.widget.querySelector('[data-tw-selectTree-default] [data-tw-selectTree-urlVal]');
 
             // Update UI
             this.removeActive();
             this.closeLists();
-            this.expandActiveLists(parent);
-            this.setCurrentLabel(label);
-            parent.classList.add(this.activeClass);
-            this.setEventType(value);
+
+            if (defaultNode) {
+                var label = defaultNode.getAttribute('data-tw-selectTree-label'),
+                    value = defaultNode.getAttribute('data-tw-selectTree-urlVal'),
+                    parent = defaultNode.parentNode;
+
+                this.expandActiveLists(parent);
+                this.setCurrentLabel(label);
+                parent.classList.add(this.activeClass);
+                this.setEventType(value);
+            } else {
+                var fallbackLabel = this.widget.querySelector('[data-tw-selecttree-defaultLabel]');
+                if (fallbackLabel) {
+                    this.setCurrentLabel(fallbackLabel.getAttribute('data-tw-selecttree-defaultLabel'));
+                }
+            }
         },
 
         /**
@@ -427,8 +448,10 @@ define([], function() {
 
                 var activeItem = tree.querySelector('[' + this.activeSelector + '] [data-tw-selectTree-label]'),
                     currentItem = activeItem ? activeItem : tree.querySelector('[data-tw-selectTree-default]');
-                this.expandActiveLists(currentItem);
-                currentItem.focus();
+                if (currentItem) {
+                    this.expandActiveLists(currentItem);
+                    currentItem.focus();
+                }
             }
         },
 

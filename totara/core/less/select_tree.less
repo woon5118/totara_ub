@@ -125,7 +125,7 @@
                 flex-grow: 1;
                 min-width: 0;
                 overflow: hidden;
-                padding: @selectTree-spacing_small @selectTree-spacing_small @selectTree-spacing_small 0;
+                padding: @selectTree-spacing_x_small @selectTree-spacing_small @selectTree-spacing_x_small 0;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 padding-left: @selectTree-spacing_x_small;
@@ -143,7 +143,7 @@
             &_icon {
                 flex-shrink: 0;
                 margin-right: @selectTree-spacing_x_small;
-                padding: @selectTree-spacing_small 0;
+                padding: @selectTree-spacing_x_small 0;
 
                 &:active,
                 &:focus,
@@ -180,6 +180,10 @@
                     background-color: inherit;
                 }
             }
+        }
+
+        &_flat .tw-selectTree__active .tw-selectTree__list_row_link {
+            padding: @selectTree-spacing_small;
         }
 
         &_flat &_row {

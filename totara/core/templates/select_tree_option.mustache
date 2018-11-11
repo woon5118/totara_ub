@@ -43,6 +43,7 @@
     * has_children: bool, true if this tree option has children tree options
     * key: string, unique ID for this select
     * name: string, name of this tree option
+    * parents_are_selectable: bool, true if clicking a parent name selects the option, false if it behaves like a chevron
 
 }}
 
@@ -52,7 +53,7 @@
     {{#default}}data-tw-selectTree-default=""{{/default}}>
         {{#has_children}}
         <a role="treeitem" aria-expanded="false" href="#" class="tw-selectTree__list_row_icon"
-        data-tw-selectTree-toggle="">{{!
+        data-tw-selectTree-toggle="{{key}}">{{!
           }}<span class="tw-selectTree__list_row_icon_expand">
                 {{#flex_icon}}tree-list-collapsed, expand, core{{/flex_icon}}
             </span>{{!
@@ -67,7 +68,14 @@
         </span>
         {{/has_children}}
         <a role="treeitem" href="#" class="tw-selectTree__list_row_link"
-        data-tw-selectTree-urlVal="{{key}}" data-tw-selectTree-label="{{name}}">
+            {{#has_children}}
+                {{#parents_are_selectable}}data-tw-selectTree-urlVal="{{key}}"{{/parents_are_selectable}}
+                {{^parents_are_selectable}}data-tw-selectTree-toggle="{{key}}"{{/parents_are_selectable}}
+            {{/has_children}}
+            {{^has_children}}
+                data-tw-selectTree-urlVal="{{key}}"
+            {{/has_children}}
+            data-tw-selectTree-label="{{name}}">
             {{name}}
         </a>
     </div>

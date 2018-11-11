@@ -25,6 +25,22 @@ Feature: Test tree select element
     And I should see "All"
     And I should see "Self Combustion"
     And I should see "Earthquake"
+    Then I click on "Earthquake" "link"
+
+    # Call to action text
+    Then I should see "Please select colour"
+    When I click on "Please select colour" "text"
+    Then I should see "Blue"
+    When I click on "Blue" "link"
+    Then I should not see "Please select colour"
+
+    # Toggle on tree label
+    When I click on "Blue" "text"
+    Then I should see "Rainbow"
+    When I click on "Rainbow" "link"
+    Then I should see "Yellow"
+    When I click on "Yellow" "link"
+    Then I should not see "Rainbow"
 
     # Close popup
     When I click on "Test tree" "text"

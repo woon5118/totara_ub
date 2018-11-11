@@ -167,7 +167,43 @@ $treelist3 = \totara_core\output\select_tree::create(
     $options3
 );
 
+$options4 = [
+    (object)[
+        'name' => 'Red',
+        'key' => 'red'
+    ],
+    (object)[
+        'name' => 'Blue',
+        'key' => 'blue',
+    ],
+    (object)[
+        'name' => 'Rainbow',
+        'key' => 'rainbow',
+        'children' => [
+            (object)[
+                'name' => 'Green',
+                'key' => 'green',
+            ],
+            (object)[
+                'name' => 'Yellow',
+                'key' => 'yellow',
+            ],
+        ],
+    ],
+];
+$treelist4 = \totara_core\output\select_tree::create(
+    'testtreelist4',
+    'Which colour',
+    false,
+    $options4,
+    '',
+    false,
+    false,
+    'Please select colour'
+);
+
 echo $OUTPUT->render($treelist1);
 echo $OUTPUT->render($treelist2);
 echo $OUTPUT->render($treelist3);
+echo $OUTPUT->render($treelist4);
 echo $OUTPUT->footer();

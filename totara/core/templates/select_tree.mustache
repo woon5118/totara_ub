@@ -49,6 +49,7 @@
     * title: string, Title for this select
     * title_hidden: bool, true to hide the title
     * options: array containing select_tree_option data
+    * parents_are_selectable: bool, true if clicking a parent name selects the option, false if it behaves like a chevron
 
 }}
 <div class="tw-selectTree"
@@ -65,14 +66,15 @@
 
     <div class="tw-selectTree__expandable">
         <a href="#" class="tw-selectTree__current" data-tw-selectTree-trigger="">
-            <span class="tw-selectTree__current_label" data-tw-selectTree-current="">
-                {{active_name}}
+            <span class="tw-selectTree__current_label" data-tw-selectTree-current=""
+                {{#calltoaction}}data-tw-selectTree-callToActionLabel="{{call_to_action}}"{{/calltoaction}}>
+                {{#active_name}}{{active_name}}{{/active_name}}
+                {{^active_name}}{{call_to_action}}{{/active_name}}
             </span>
             {{#flex_icon}}expandable, expand, core, tw-selectTree__current_icon{{/flex_icon}}
         </a>
 
-        <div aria-hidden="true" class="tw-selectTree__option tw-selectTree__hidden"
-        data-tw-selectTree-tree="">
+        <div aria-hidden="true" class="tw-selectTree__option tw-selectTree__hidden" data-tw-selectTree-tree="">
             <ul role="tree" aria-labelledby="title_{{key}}"
             class="tw-selectTree__list {{#flat_tree}}tw-selectTree__list_flat{{/flat_tree}}">
                 {{#options}}{{> totara_core/select_tree_option }}{{/options}}

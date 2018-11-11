@@ -86,10 +86,12 @@ class select_tree extends select {
      * @param string $key
      * @param string $title
      * @param bool $titlehidden true if the title should be hidden
-     * @param array $rawoptions array of \stdClass objects containing key, name, children (optional array
-     *                          of $rawoptions), default (optional, should be on one option only)
+     * @param array $rawoptions array of \stdClass objects containing key, name, children (optional array of $rawoptions),
+     *                          default (optional, should be on one option only, except when calltoaction is specified)
      * @param string|null $activekey the key of the active node (defaults to the default node)
      * @param bool $flattree true to indicate that the tree should be styled as one level only
+     * @param bool $parentsareselectable true if clicking a parent name selects the option, false if it behaves like a chevron
+     * @param string $calltoaction if specified then displayed as the default (and default must not be specified in options)
      * @return select_tree
      */
     public static function create(
@@ -98,7 +100,9 @@ class select_tree extends select {
         bool $titlehidden,
         array $rawoptions,
         string $activekey = null,
-        bool $flattree = false
+        bool $flattree = false,
+        bool $parentsareselectable = true,
+        string $calltoaction = null
     ) : select_tree {
         $data = parent::get_base_template_data($key, $title, $titlehidden);
 
@@ -113,16 +117,34 @@ class select_tree extends select {
             $activeoption = $activeoption ?? $childactiveoption;
         }
 
-        if (empty($defaultfound)) {
-            throw new \coding_exception('No default option specified in select tree: ' . $key);
+        // We have to have either default or call to action.
+        if (!empty($defaultfound) && !empty($calltoaction)) {
+            throw new \coding_exception('Default and call to action cannot both be specified: ' . $key);
         }
 
-        if (empty($activeoption)) {
-            throw new \coding_exception('Invalid active option specified in select tree: ' . $key);
+        // Also, we can't have both, because it would be confusing.
+        if (empty($defaultfound) && empty($calltoaction)) {
+            throw new \coding_exception('No default option or call to action specified in select tree: ' . $key);
         }
 
-        $data->active_name = $activeoption->name;
+        // We need either an active option or a call to action (maybe from default), so that we can be sure that there is
+        // something to show. Because we can't have both default AND call to action, when no active option was specified/found,
+        // we can be sure that we will have active default XOR a call to action.
+        if (empty($activeoption) && empty($calltoaction)) {
+            throw new \coding_exception('Invalid active option specified and no call to action in select tree: ' . $key);
+        }
+
+        if (!empty($calltoaction)) {
+            $data->call_to_action = $calltoaction;
+        }
+
+        if (!empty($activeoption)) {
+            $data->active_name = $activeoption->name;
+        }
+
         $data->flat_tree = $flattree;
+
+        $data->parents_are_selectable = $parentsareselectable;
 
         return new static((array)$data);
     }
