@@ -286,7 +286,7 @@ foreach ($records as $record) {
             $record->extratext = get_string('deletedactivity', 'moodle', '');
             break;
         default:
-            continue; // The action was not recognised.
+            break; // The action was not recognised.
     }
     $record->user = $DB->get_record('user', array('id' => $record->userid));
     $record->type = 'structural';

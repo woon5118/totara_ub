@@ -10,6 +10,11 @@ Description of dompdf import
     - totara/appraisal/dompdf/src/Css/Stylesheet.php - set ```$this->_page_styles = ["base" => new Style($this)]``` in constructor
         - Pull request to upstream DomPDF: <https://github.com/dompdf/dompdf/pull/1705>
         - Totara ticket: TL-16853
+    - Convert continue statements within switch statements for PHP 7.3 compatibility.
+        - totara/appraisal/dompdf/src/Dompdf.php
+        - totara/appraisal/dompdf/lib/Cpdf.php
+        - totara/appraisal/dompdf/src/Renderer/Text.php
+        - totara/appraisal/dompdf/src/Css/Stylesheet.php
 
 3. Bump up version in totara/appraisal/thirdpartylibs.xml
 

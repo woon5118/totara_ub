@@ -138,7 +138,7 @@ class Text extends AbstractRenderer
 
             switch ($text_deco) {
                 default:
-                    continue;
+                    break; // TOTARA: Converted into a break for PHP 7.3 compatibility.
 
                 case "underline":
                     $deco_y += $base - $descent + $underline_offset + $line_thickness / 2;

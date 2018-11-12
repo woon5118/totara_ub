@@ -1337,7 +1337,7 @@ class Stylesheet
                                 $key = $page_selector;
 
                             default:
-                                continue;
+                                break; // TOTARA: converted continue statement in switch.
                         }
 
                         // Store the style for later...

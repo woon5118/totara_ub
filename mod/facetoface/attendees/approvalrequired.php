@@ -148,7 +148,7 @@ if ($form = data_submitted()) {
                     break;
                 case 0:
                 default:
-                    continue;
+                    continue 2;
             }
         }
 

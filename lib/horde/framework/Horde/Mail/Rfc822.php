@@ -764,7 +764,7 @@ class Horde_Mail_Rfc822
             switch ($chr) {
             case '(':
                 ++$level;
-                continue;
+                break; // TOTARA: converted for PHP 7.3 compatibility.
 
             case ')':
                 if (--$level == 0) {

@@ -1656,7 +1656,7 @@ class X509
                     case 'id-ce-certificatePolicies':
                         for ($j = 0; $j < count($value); $j++) {
                             if (!isset($value[$j]['policyQualifiers'])) {
-                                continue;
+                                break; // TOTARA: converted to a break for PHP 7.3 compatibility, probably meant to be continue 2 but too late now.
                             }
                             for ($k = 0; $k < count($value[$j]['policyQualifiers']); $k++) {
                                 $subid = $value[$j]['policyQualifiers'][$k]['policyQualifierId'];

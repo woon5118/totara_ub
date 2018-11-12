@@ -89,8 +89,18 @@ if (!$returnurl) {
     $returnurl = $component->get_url();
 }
 
-$mform = new totara_competency_evidence_form(null, compact('id','evidenceid','competencyid','positionid',
-    'organisationid','userid','user','s','nojs','returnurl'));
+$customdata = [
+    'id' => $id,
+    'evidenceid' => $evidenceid,
+    'competencyid' => $competencyid,
+    'positionid' => $positionid,
+    'organisationid' => $organisationid,
+    'userid' => $userid,
+    'nojs' => $nojs,
+    'returnurl' => $returnurl
+];
+
+$mform = new totara_competency_evidence_form(null, $customdata);
 $mform->set_data($competency_record);
 
 if ($mform->is_cancelled()) {

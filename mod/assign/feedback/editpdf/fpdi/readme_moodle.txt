@@ -19,6 +19,12 @@ Installation
 3) Update mod/assign/feedback/editpdf/fpdi/fpdi_bridge.php (or the replacement file) to extend 'pdf' instead of 'TCPDF'.
 4) Make a note below of any changes made.
 
+2018/11/13
+
+1) mod/assign/feedback/editpdf/fpdi/pdf_parser.php Converted continue calls within switch statements for PHP 7.3 compatibility.
+
+Updated by Sam Hemelryk (TL-19330)
+
 2016/11/15
 ----------
 

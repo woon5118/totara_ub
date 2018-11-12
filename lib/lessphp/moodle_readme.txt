@@ -10,5 +10,9 @@ this directory. Only exception made for the directory
 
 Also copy the license file from the project root.
 
+Make the following changes:
+
+* TL-19330: Convert calls to continue within switch statments for PHP 7.3 compatibility within lib/lessphp/Exception/Chunk.php
+
 Licensed under the Apache license 2.0.
 
