@@ -21,6 +21,7 @@
  * @package totara_reportbuilder
  */
 
+require_once($CFG->dirroot . '/cohort/lib.php');
 /*
  * Restrict the report content by a particular audience
  */

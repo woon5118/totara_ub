@@ -75,6 +75,8 @@ if ($ADMIN->fulltree) {
     );
 
     //Audience settings
+    require_once($CFG->dirroot . '/cohort/lib.php');
+
     $cohorts = cohort_get_all_cohorts(0, 0);
     $cohortoptions = [0 => get_string('no_audience_defined', 'rb_source_user')];
     foreach ($cohorts['cohorts'] as $cohort) {
