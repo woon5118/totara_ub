@@ -153,7 +153,7 @@ class tool_totara_sync_jobassignment_db_emptyfields_setting_testcase extends tot
 
         // Drop table first, if it exists
         if ($dbman->table_exists($this->dbtable)) {
-            $dbman->droptable($table);
+            $dbman->drop_table($table);
         }
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
