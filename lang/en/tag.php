@@ -37,8 +37,6 @@ $string['component'] = 'Component';
 $string['confirmdeletetag'] = 'Are you sure you want to delete this tag?';
 $string['confirmdeletetags'] = 'Are you sure you want to delete selected tags?';
 $string['count'] = 'Count';
-$string['coursetagging'] = 'Course Tagging';
-$string['coursetagginghelp'] = 'Enable this option to allow course tagging.';
 $string['coursetags'] = 'Course tags';
 $string['defautltagcoll'] = 'Default collection';
 $string['delete'] = 'Delete';
@@ -172,3 +170,8 @@ $string['othertags'] = 'Other tags';
 $string['settypeofficial'] = 'Make official';
 $string['taggedwith'] = 'tagged with "{$a}"';
 $string['tagtype'] = 'Tag type';
+
+// Deprecated since Totara 12.
+
+$string['coursetagging'] = 'Course Tagging';
+$string['coursetagginghelp'] = 'Enable this option to allow course tagging.';

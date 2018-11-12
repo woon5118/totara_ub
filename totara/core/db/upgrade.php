@@ -480,5 +480,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018102600, 'totara', 'core');
     }
 
+    if ($oldversion < 2018111200) {
+        // Clean up the old coursetagging setting
+        unset_config('coursetagging', 'moodlecourse');
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018111200, 'totara', 'core');
+    }
+
     return true;
 }

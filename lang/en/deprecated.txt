@@ -68,3 +68,5 @@ visible_help,core
 completionstartonenrol,core_completion
 completionstartonenrolhelp,core_completion
 completionstartonenrol_help,core_completion
+coursetagging,core_tag
+coursetagginghelp,core_tag

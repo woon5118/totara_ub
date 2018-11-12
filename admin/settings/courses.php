@@ -179,8 +179,6 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $languages += get_string_manager()->get_list_of_translations();
     $temp->add(new admin_setting_configselect('moodlecourse/lang', new lang_string('forcelanguage'), '',key($languages),$languages));
 
-    $temp->add(new admin_setting_configcheckbox('moodlecourse/coursetagging', new lang_string('coursetagging','tag'), new lang_string('coursetagginghelp','tag'), 0));
-
     $ADMIN->add('courses', $temp);
 
 

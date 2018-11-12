@@ -218,7 +218,6 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
         $this->resetAfterTest();
         // Enable and create tags
         $CFG->usetags = true;
-        set_config('coursetagging', 1, 'moodlecourse');
 
         $objects = core_tag_tag::create_if_missing(core_tag_collection::get_default(), ['taga', 'tagb', 'tagc'], true);
         $tags = [];
@@ -305,8 +304,6 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
 
         // Enable and create tags
         $CFG->usetags = true;
-        set_config('coursetagging', 1, 'moodlecourse');
-
 
         $objects = core_tag_tag::create_if_missing(core_tag_collection::get_default(), ['taga', 'tagb', 'tagc'], true);
         $tags = [];
