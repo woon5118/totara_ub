@@ -88,4 +88,4 @@ Feature: Learners can submit assignments again when certification is expired
     And I set the following fields to these values:
       | Online text | I'm the student second submission |
     When I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"

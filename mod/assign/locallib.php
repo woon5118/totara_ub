@@ -53,6 +53,7 @@ define('ASSIGN_UNLIMITED_ATTEMPTS', -1);
 // Grading states.
 define('ASSIGN_GRADING_STATUS_GRADED', 'graded');
 define('ASSIGN_GRADING_STATUS_NOT_GRADED', 'notgraded');
+define('ASSIGN_GRADING_STATUS_GRADING_NOT_REQUIRED', 'gradingnotrequired');
 
 // Marking workflow states.
 define('ASSIGN_MARKING_WORKFLOW_STATE_NOTMARKED', 'notmarked');
@@ -4432,6 +4433,15 @@ class assign {
     }
 
     /**
+     * Grading not required for this assignment
+     *
+     * @return bool
+     */
+    public function grading_not_required() {
+        return $this->get_instance()->grade == 0 ? true : false;
+    }
+
+    /**
      * See if this assignment has a grade yet.
      *
      * @param int $userid
@@ -5203,7 +5213,8 @@ class assign {
                                                   $this->count_submissions_need_grading(),
                                                   $instance->teamsubmission,
                                                   $warnofungroupedusers,
-                                                  $this->can_grade());
+                                                  $this->can_grade(),
+                                                  $this->grading_not_required());
         } else {
             // The active group has already been updated in groups_print_activity_menu().
             $countparticipants = $this->count_participants($activitygroup);
@@ -5218,7 +5229,8 @@ class assign {
                                                   $this->count_submissions_need_grading(),
                                                   $instance->teamsubmission,
                                                   false,
-                                                  $this->can_grade());
+                                                  $this->can_grade(),
+                                                  $this->grading_not_required());
 
         }
 
@@ -8514,6 +8526,11 @@ class assign {
             }
             return ASSIGN_MARKING_WORKFLOW_STATE_NOTMARKED;
         } else {
+
+            if ($this->grading_not_required()) {
+                return ASSIGN_GRADING_STATUS_GRADING_NOT_REQUIRED;
+            }
+
             $attemptnumber = optional_param('attemptnumber', -1, PARAM_INT);
             $grade = $this->get_user_grade($userid, false, $attemptnumber);
 

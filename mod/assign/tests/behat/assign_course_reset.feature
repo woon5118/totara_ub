@@ -41,7 +41,7 @@ Feature: Assign reset
     And I set the following fields to these values:
       | Online text | I'm the student first submission |
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
     And I should see "I'm the student first submission"
     And I should see "Not graded"
     And I log out
@@ -49,7 +49,7 @@ Feature: Assign reset
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
-    And I should see "Submitted for grading"
+    Then "Sam1 Student1" row "Status" column of "generaltable" table should contain "Submitted"
     And I navigate to "Reset" node in "Course administration"
     And I set the following fields to these values:
         | Delete all submissions | 1  |
@@ -58,7 +58,7 @@ Feature: Assign reset
     And I follow "Course 1"
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
-    Then I should not see "Submitted for grading"
+    Then "Sam1 Student1" row "Status" column of "generaltable" table should contain "No submission"
 
   @javascript
   Scenario: Use course reset to remove user overrides.

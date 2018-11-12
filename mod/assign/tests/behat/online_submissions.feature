@@ -38,14 +38,14 @@ Feature: In an assignment, students can add and edit text online
     And I set the following fields to these values:
       | Online text | I'm the student first submission |
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
     And I should see "I'm the student first submission"
     And I should see "Not graded"
     And I press "Edit submission"
     And I set the following fields to these values:
       | Online text | I'm the student second submission |
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
     And I should see "I'm the student second submission"
     And I should not see "I'm the student first submission"
 

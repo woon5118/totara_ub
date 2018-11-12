@@ -41,7 +41,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
     And I press "Add submission"
     And I upload "mod/assign/feedback/editpdf/tests/fixtures/submission.pdf" file to "File submissions" filemanager
     And I press "Save changes"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And I should see "submission.pdf"
     And I should see "Not graded"
     And I log out
@@ -49,7 +49,7 @@ Feature: In a group assignment, teacher can annotate PDF files for all users
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
-    And I click on "Grade" "link" in the "Submitted for grading" "table_row"
+    And I click on "Grade" "link" in the "Submitted" "table_row"
     And I wait until the page is ready
     And I click on ".navigate-next-button" "css_element"
     And I wait until the page is ready

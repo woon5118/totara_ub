@@ -32,14 +32,14 @@ Feature: In an assignment, students can upload files for assessment
     When I press "Add submission"
     And I upload "lib/tests/fixtures/empty.txt" file to "File submissions" filemanager
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
     And I should see "Not graded"
     And "empty.txt" "link" should exist
     And I press "Edit submission"
     And I upload "lib/tests/fixtures/upload_users.csv" file to "File submissions" filemanager
     And ".ffilemanager .fm-maxfiles .fp-btn-add" "css_element" should not be visible
     And I press "Save changes"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And "empty.txt" "link" should exist
     And "upload_users.csv" "link" should exist
     And I press "Edit submission"

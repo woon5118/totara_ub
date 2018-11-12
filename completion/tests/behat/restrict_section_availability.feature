@@ -81,7 +81,7 @@ Feature: Restrict sections availability through completion or grade conditions
     And I set the following fields to these values:
       | Online text | I'm the student submission |
     And I press "Save changes"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage

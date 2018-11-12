@@ -152,7 +152,7 @@ Feature: availability_time_since_completion
     And I set the following fields to these values:
       | Online text | I'm the learners submission |
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
 
     # Log in as Trainer 1 to give a pass grade.
     When I log out
@@ -224,7 +224,7 @@ Feature: availability_time_since_completion
     And I set the following fields to these values:
       | Online text | I'm the learners submission |
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
 
     # Log in as Trainer 1 to give a pass grade.
     When I log out
@@ -296,7 +296,7 @@ Feature: availability_time_since_completion
     And I set the following fields to these values:
       | Online text | I'm the learners submission |
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
 
     # Log in as Trainer 1 to give a pass grade.
     When I log out
@@ -368,7 +368,7 @@ Feature: availability_time_since_completion
     And I set the following fields to these values:
       | Online text | I'm the learners submission |
     And I press "Save changes"
-    Then I should see "Submitted for grading"
+    Then I should see "Submitted"
 
     # Log in as Trainer 1 to give a pass grade.
     When I log out

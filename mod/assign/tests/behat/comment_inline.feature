@@ -51,7 +51,7 @@ Feature: In an assignment, teachers can edit a students submission inline
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
     Then I should see "50.00" in the "Student 1" "table_row"
-    And I should see "Submitted for grading" in the "Student 1" "table_row"
+    And I should see "Submitted" in the "Student 1" "table_row"
     And I should see "Graded" in the "Student 1" "table_row"
     And I should see "I'm the student first submission" in the "Student 1" "table_row"
     And I should see "I'm the teacher feedback" in the "Student 1" "table_row"
@@ -60,7 +60,7 @@ Feature: In an assignment, teachers can edit a students submission inline
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "Submitted for grading" in the "Submission status" "table_row"
+    And I should see "Submitted" in the "Submission status" "table_row"
     And I should see "Graded" in the "Grading status" "table_row"
     And I should see "I'm the student first submission" in the "Online text" "table_row"
     And I should see "I'm the teacher feedback" in the "Feedback comments" "table_row"

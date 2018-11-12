@@ -44,7 +44,7 @@ Feature: In an assignment, teacher can submit feedback files during grading
     And I press "Add submission"
     And I upload "mod/assign/feedback/file/tests/fixtures/submission.txt" file to "File submissions" filemanager
     And I press "Save changes"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And I should see "submission.txt"
     And I should see "Not graded"
     And I log out

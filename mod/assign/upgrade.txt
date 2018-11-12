@@ -21,6 +21,7 @@ information provided here is intended especially for developers.
     * mod/assign/templates/grading_app.mustache
     * mod/assign/templates/grading_actions.mustache
 * render_editor_content added 6th argument $shortentext
+* assign_grading_summary class has a new 12th property $gradingnotrequired.
 
 === 11.2 ===
 

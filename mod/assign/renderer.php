@@ -343,7 +343,9 @@ class mod_assign_renderer extends plugin_renderer_base {
         if ($summary->cangrade) {
             $urlparams = array('id' => $summary->coursemoduleid, 'action' => 'grader');
             $url = new moodle_url('/mod/assign/view.php', $urlparams);
-            $o .= '<a href="' . $url . '" class="btn btn-primary">' . get_string('grade') . '</a>';
+
+            $str = $summary->gradingnotrequired ? 'review' : 'grade';
+            $o .= '<a href="' . $url . '" class="btn btn-primary">' . get_string($str, 'mod_assign') . '</a>';
         }
         $o .= $this->output->container_end();
 
@@ -513,7 +515,8 @@ class mod_assign_renderer extends plugin_renderer_base {
         $statusstr = '';
         $classname = 'gradingstatus';
         if ($status->gradingstatus == ASSIGN_GRADING_STATUS_GRADED ||
-            $status->gradingstatus == ASSIGN_GRADING_STATUS_NOT_GRADED) {
+            $status->gradingstatus == ASSIGN_GRADING_STATUS_NOT_GRADED ||
+            $status->gradingstatus == ASSIGN_GRADING_STATUS_GRADING_NOT_REQUIRED) {
             $statusstr = get_string($status->gradingstatus, 'assign');
         } else {
             $gradingstatus = 'markingworkflowstate' . $status->gradingstatus;
@@ -766,7 +769,8 @@ class mod_assign_renderer extends plugin_renderer_base {
         $cell1 = new html_table_cell(get_string('gradingstatus', 'assign'));
 
         if ($status->gradingstatus == ASSIGN_GRADING_STATUS_GRADED ||
-            $status->gradingstatus == ASSIGN_GRADING_STATUS_NOT_GRADED) {
+            $status->gradingstatus == ASSIGN_GRADING_STATUS_NOT_GRADED ||
+            $status->gradingstatus == ASSIGN_GRADING_STATUS_GRADING_NOT_REQUIRED) {
             $cell2 = new html_table_cell(get_string($status->gradingstatus, 'assign'));
         } else {
             $gradingstatus = 'markingworkflowstate' . $status->gradingstatus;

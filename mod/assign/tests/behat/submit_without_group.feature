@@ -56,7 +56,7 @@ Feature: Submit assignment without group
     And I press "Save changes"
     And I press "Submit assignment"
     And I press "Continue"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And I follow "Course 1"
     And I follow "Require group membership"
     And I should see "None" in the "Group" "table_row"
@@ -73,17 +73,17 @@ Feature: Submit assignment without group
     And I press "Save changes"
     And I press "Submit assignment"
     And I press "Continue"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And I log out
-    # Student 2 should see submitted for grading.
+    # Student 2 should see submitted.
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Allow default group"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And I am on homepage
     And I follow "Course 2"
     And I follow "Require group membership"
-    And I should see "Submitted for grading"
+    And I should see "Submitted"
     And I log out
     # Teacher should see student 1 and student 2 has submitted assignment.
     And I log in as "teacher1"
@@ -94,8 +94,8 @@ Feature: Submit assignment without group
     And I navigate to "View all submissions" in current page administration
     And I should see "Default group" in the "Student 1" "table_row"
     And I should see "Default group" in the "Student 2" "table_row"
-    And I should see "Submitted for grading" in the "Student 1" "table_row"
-    And I should see "Submitted for grading" in the "Student 2" "table_row"
+    And I should see "Submitted" in the "Student 1" "table_row"
+    And I should see "Submitted" in the "Student 2" "table_row"
     And I am on homepage
     And I follow "Course 1"
     And I follow "Require group membership"
@@ -104,8 +104,9 @@ Feature: Submit assignment without group
     And I navigate to "View all submissions" in current page administration
     And I should see "Not a member of any group, so unable to make submissions." in the "Student 1" "table_row"
     And I should see "Not a member of any group, so unable to make submissions." in the "Student 2" "table_row"
-    And I should not see "Submitted for grading" in the "Student 1" "table_row"
-    And I should not see "Submitted for grading" in the "Student 2" "table_row"
+    And I should not see "Submitted" in the "Student 1" "table_row"
+    And I should not see "Submitted" in the "Student 2" "table_row"
+    And I am on homepage
     And I am on "Course 2" course homepage
     And I follow "Require group membership"
     And I should see "1" in the "Groups" "table_row"
@@ -113,8 +114,8 @@ Feature: Submit assignment without group
     And I navigate to "View all submissions" in current page administration
     And I should see "Group 1" in the "Student 1" "table_row"
     And I should see "Group 1" in the "Student 2" "table_row"
-    And I should see "Submitted for grading" in the "Student 1" "table_row"
-    And I should see "Submitted for grading" in the "Student 2" "table_row"
+    And I should see "Submitted" in the "Student 1" "table_row"
+    And I should see "Submitted" in the "Student 2" "table_row"
     And I log out
     # Test student 3 (in multiple groups) should not be able to submit.
     And I log in as "student3"

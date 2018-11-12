@@ -951,7 +951,8 @@ class assign_grading_table extends table_sql implements renderable {
             }
 
             $url = new moodle_url('/mod/assign/view.php', $urlparams);
-            $link = '<a href="' . $url . '" class="btn btn-default">' . get_string('grade') . '</a>';
+            $str = $this->assignment->grading_not_required() ? 'review' : 'grade';
+            $link = '<a href="' . $url . '" class="btn btn-default">' . get_string($str, 'assign') . '</a>';
             $grade .= $link . $separator;
         }
 

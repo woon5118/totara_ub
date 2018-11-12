@@ -111,8 +111,8 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     When I navigate to "View all submissions" in current page administration
-    Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
-    And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"
+    Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted"
+    And "Student 2" row "Status" column of "generaltable" table should contain "Submitted"
     And "Student 3" row "Status" column of "generaltable" table should contain "No submission"
     And "Student 4" row "Status" column of "generaltable" table should contain "No submission"
     And I click on "Quick grading" "checkbox"
@@ -142,8 +142,8 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I navigate to "View all submissions" in current page administration
     And "Student 1" row "Status" column of "generaltable" table should contain "Reopened"
     And "Student 2" row "Status" column of "generaltable" table should contain "Reopened"
-    And "Student 3" row "Status" column of "generaltable" table should contain "Submitted for grading"
-    And "Student 4" row "Status" column of "generaltable" table should contain "Submitted for grading"
+    And "Student 3" row "Status" column of "generaltable" table should contain "Submitted"
+    And "Student 4" row "Status" column of "generaltable" table should contain "Submitted"
     And I click on "Grade" "link" in the "Student 3" "table_row"
     And I set the following fields to these values:
       | Allow another attempt | 1 |
