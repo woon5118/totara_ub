@@ -133,17 +133,56 @@ $options1 = [
         'key' => 'volcano'
     ],
 ];
+
+$options2 = [
+    (object)[
+        'name' => 'Red',
+        'key' => 'red'
+    ],
+    (object)[
+        'name' => 'Blue',
+        'key' => 'blue',
+    ],
+    (object)[
+        'name' => 'Rainbow',
+        'key' => 'rainbow',
+        'children' => [
+            (object)[
+                'name' => 'Green',
+                'key' => 'green',
+            ],
+            (object)[
+                'name' => 'Yellow',
+                'key' => 'yellow',
+            ],
+        ],
+    ],
+];
+
 $treelist1 = \totara_core\output\select_tree::create(
     'testtreelist1',
     'Test tree list title 1',
     true,
     $options1,
-    'level4'
+    'level4',
+    false,
+    true
+);
+
+$treelist2 = \totara_core\output\select_tree::create(
+    'testtreelist1',
+    'Test tree list title 2',
+    true,
+    $options2,
+    '',
+    false,
+    false,
+    'Please select colour'
 );
 
 $regionpanel = \totara_core\output\select_region_panel::create(
     'Test filter region panel main title',
-    [$multiselect1, $searchtext1, $treelist1],
+    [$multiselect1, $searchtext1, $treelist1, $treelist2],
     true,
     true,
     false

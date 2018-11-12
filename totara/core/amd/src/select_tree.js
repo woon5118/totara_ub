@@ -385,9 +385,9 @@ define([], function() {
                 parent.classList.add(this.activeClass);
                 this.setEventType(value);
             } else {
-                var fallbackLabel = this.widget.querySelector('[data-tw-selecttree-defaultLabel]');
+                var fallbackLabel = this.widget.querySelector('[data-tw-selecttree-callToActionLabel]');
                 if (fallbackLabel) {
-                    this.setCurrentLabel(fallbackLabel.getAttribute('data-tw-selecttree-defaultLabel'));
+                    this.setCurrentLabel(fallbackLabel.getAttribute('data-tw-selecttree-callToActionLabel'));
                 }
             }
         },
