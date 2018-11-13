@@ -26,26 +26,25 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
 require_once($CFG->dirroot . '/admin/tool/totara_sync/tests/source_csv_testcase.php');
-require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_org_csv.php');
+require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_pos_csv.php');
 
 /**
  * @group tool_totara_sync
  */
-class tool_totara_sync_org_csv_check_sanity_testcase extends totara_sync_csv_testcase {
+class tool_totara_sync_pos_csv_check_sanity_testcase extends totara_sync_csv_testcase {
 
     protected $filedir      = null;
     protected $configcsv    = [];
     protected $config       = [];
-
-    protected $elementname  = 'org';
-    protected $sourcename   = 'totara_sync_source_org_csv';
+    protected $elementname  = 'pos';
+    protected $sourcename   = 'totara_sync_source_pos_csv';
     protected $source       = null;
 
-    protected $org_framework_data1 = [
-        'id'                => 1,
-        'fullname'          => 'Organisation Framework 1',
-        'shortname'         => 'OFW1',
-        'idnumber'          => 'OF1',
+    protected $pos_framework_data1 = [
+        'id' => 1,
+        'fullname'          => 'Position Framework 1',
+        'shortname'         => 'PFW1',
+        'idnumber'          => 'PF1',
         'description'       => 'Description 1',
         'sortorder'         => 1,
         'visible'           => 1,
@@ -59,9 +58,7 @@ class tool_totara_sync_org_csv_check_sanity_testcase extends totara_sync_csv_tes
         $this->filedir                      = null;
         $this->configcsv                    = null;
         $this->config                       = null;
-        $this->org_framework_data1          = null;
-        $this->org_framework_data2          = null;
-        $this->org_data1                    = null;
+        $this->pos_framework_data1          = null;
         $this->type_data1                   = null;
         $this->source                       = null;
         parent::tearDown();
@@ -80,14 +77,14 @@ class tool_totara_sync_org_csv_check_sanity_testcase extends totara_sync_csv_tes
         $this->filedir = $CFG->dataroot . '/totara_sync';
         mkdir($this->filedir . '/csv/ready', 0777, true);
 
-        set_config('element_org_enabled', 1, 'totara_sync');
-        set_config('source_org', 'totara_sync_source_org_csv', 'totara_sync');
+        set_config('element_pos_enabled', 1, 'totara_sync');
+        set_config('source_pos', 'totara_sync_source_pos_csv', 'totara_sync');
         set_config('fileaccess', FILE_ACCESS_DIRECTORY, 'totara_sync');
         set_config('filesdir', $this->filedir, 'totara_sync');
 
-        // Create a Organisation framework.
+        // Create a Position framework.
         $this->loadDataSet($this->createArrayDataset([
-            'org_framework' => [$this->org_framework_data1]
+            'pos_framework' => [$this->pos_framework_data1]
         ]));
 
         $this->configcsv = [
@@ -132,85 +129,33 @@ class tool_totara_sync_org_csv_check_sanity_testcase extends totara_sync_csv_tes
         return $importfields;
     }
 
-    public function test_sync_parent_with_sourceallrecords_on() {
+    public function test_pos_csv_field_mappings_incorrect() {
         global $DB;
 
-        // Set the config.
-        $additional_fields = ['import_parentidnumber' => 1];
-        $config = array_merge($this->configcsv, $this->importfields(), $additional_fields);
-        $this->set_source_config($config);
-        $config = array_merge($this->config, ['csvsaveemptyfields' => true, 'sourceallrecords' => true]);
-        $this->set_element_config($config);
-
-        $this->assertCount(0, $DB->get_records('org'));
-
-        // Load fixture CSV with missing parent.
-        $this->add_csv('organisations_parent_zero_3.csv', 'org');
-        $result = $this->check_sanity();
-        $this->assertFalse($result);
-        $info = 'parent 0 does not exist in HR Import file';
-        $this->assertTrue($DB->record_exists('totara_sync_log', ['logtype' => 'error', 'info' => $info]));
-        $this->assertCount(0, $DB->get_records('org'));
-
-        // Do the sync with correct parent.
-        $this->add_csv('organisations_parent_zero_4.csv', 'org');
-        $this->sync();
-        $this->assertCount(4, $DB->get_records('org'));
-    }
-
-    public function test_sync_parent_with_sourceallrecords_off() {
-        global $DB;
-
-        // Set the config.
-        $additional_fields = ['import_parentidnumber' => 1, 'import_deleted' => 1];
-        $config = array_merge($this->configcsv, $this->importfields(), $additional_fields);
-        $this->set_source_config($config);
-        $config = array_merge($this->config, ['csvsaveemptyfields' => true, 'sourceallrecords' => false]);
-        $this->set_element_config($config);
-
-        $this->assertCount(0, $DB->get_records('org'));
-
-        // Load fixture CSV with missing parent.
-        $this->add_csv('organisations_parent_zero_3.csv', 'org');
-        $result = $this->check_sanity();
-        $this->assertFalse($result);
-        $info = 'parent 0 does not exist';
-        $this->assertTrue($DB->record_exists('totara_sync_log', ['logtype' => 'error', 'info' => $info]));
-        $this->assertCount(0, $DB->get_records('org'));
-
-        // Do the sync with correct parent.
-        $this->add_csv('organisations_parent_zero_4.csv', 'org');
-        $this->sync();
-        $this->assertCount(4, $DB->get_records('org'));
-    }
-
-    public function test_org_csv_field_mappings_incorrect() {
-        global $DB;
-
-        $this->assertCount(0, $DB->get_records('org'));
+        $this->assertCount(0, $DB->get_records('pos'));
 
         // Set the element config.
         $this->set_element_config($this->config);
 
         // Using a mapping of fullname to name.
-        $additional_fields = ['fieldmapping_fullname' => 'orgname'];
+        $additional_fields = ['fieldmapping_fullname' => 'posname'];
         $config = array_merge($this->configcsv, $this->importfields(), $additional_fields);
         $this->set_source_config($config);
-        $this->add_csv('organisations_field_mapping_1.csv', 'org');
+        $this->add_csv('positions_field_mapping_1.csv', 'pos');
         $error = '';
         try {
             $this->sync();
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
-        $this->assertEquals("CSV file not valid, missing field \"fullname\" (mapping for \"orgname\")", $error);
-        $this->assertCount(0, $DB->get_records('org'));
+        $this->assertEquals("CSV file not valid, missing field \"fullname\" (mapping for \"posname\")", $error);
+        $this->assertCount(0, $DB->get_records('pos'));
     }
 
-    public function test_org_csv_field_mappings_correct() {
+    public function test_pos_csv_field_mappings_correct() {
         global $DB;
 
-        $this->assertCount(0, $DB->get_records('org'));
+        $this->assertCount(0, $DB->get_records('pos'));
 
         // Set the element config.
         $this->set_element_config($this->config);
@@ -219,12 +164,12 @@ class tool_totara_sync_org_csv_check_sanity_testcase extends totara_sync_csv_tes
         $additional_fields = ['fieldmapping_fullname' => 'name'];
         $config = array_merge($this->configcsv, $this->importfields(), $additional_fields);
         $this->set_source_config($config);
-        $this->add_csv('organisations_field_mapping_1.csv', 'org');
+        $this->add_csv('positions_field_mapping_1.csv', 'pos');
         $this->sync();
 
-        $records = $DB->get_records('org');
+        $records = $DB->get_records('pos');
         $this->assertCount(1, $records);
-        $this->assertEquals('Organisation 1', current($records)->fullname);
+        $this->assertEquals('Position 1', current($records)->fullname);
     }
 
 }

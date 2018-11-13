@@ -125,7 +125,7 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
 
         // Ensure necessary fields are present
         foreach ($fieldmappings as $field => $mapping) {
-            if (!in_array($mapping, $fields)) {
+            if (!in_array($field, $fields) && !in_array($mapping, $customfields)) {
                 // typeidnumber field can be optional if no custom fields specified
                 if (($field == 'typeidnumber') && empty($customfields)) {
                     continue;
