@@ -122,7 +122,15 @@ class block_html extends block_base {
     }
 
     function content_is_trusted() {
-        return (bool) context::instance_by_id($this->instance->parentcontextid, IGNORE_MISSING);
+        // Totara: do not allow self-XSS in user related pages.
+        $instance = context::instance_by_id($this->instance->parentcontextid, IGNORE_MISSING);
+        if (!$instance) {
+            return false;
+        }
+        if ($instance->contextlevel == CONTEXT_USER) {
+            return false;
+        }
+        return true;
     }
 
     /**

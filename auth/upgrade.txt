@@ -3,6 +3,10 @@ information provided here is intended especially for developers.
 
 === 12 ===
 
+* $CFG->alternateloginurl setting is deprecated and will be removed in Totara 13,
+  you need to enable $CFG->allowlogincsrf in config.php if you want to keep using it
+* /login/weblinkauth.php is deprecated and it will be ignored in Totara 13,
+  you need to enable $CFG->allowlogincsrf in config.php if you want to keep using it
 * all upstream plugins received full backports from v3.4.2
 * auth_none plugin was removed for potential security reasons,
   this plugin was never intended for production servers

@@ -39,6 +39,7 @@
         "signupurl": "http://localhost/stable_master/login/signup.php",
         "cookieshelpiconformatted": "",
         "username": ""
+        "logintoken": "asoifvaldshk"
     }
 }}
 {{#hasinstructions}}
@@ -82,6 +83,7 @@
                     <div class="form-input">
                         <input type="password" name="password" id="password" size="15" value="">
                     </div>
+                    <input type="hidden" name="logintoken" value="{{logintoken}}" />
                 </div>
 
                 <div class="clearer"><!-- --></div>
@@ -114,6 +116,7 @@
                     <div class="guestform">
                         <input type="hidden" name="username" value="guest" />
                         <input type="hidden" name="password" value="guest" />
+                        <input type="hidden" name="logintoken" value="{{logintoken}}" />
                         <input type="submit" value={{#quote}}{{#str}} loginguest {{/str}}{{/quote}} />
                     </div>
                 </form>

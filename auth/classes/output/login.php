@@ -181,6 +181,8 @@ class login implements renderable, templatable {
         $data->signupurl = $this->signupurl->out(false);
         $data->username = $this->username;
         $data->skiplinktext = get_string('skipa', 'access', get_string('login', 'core'));
+        // Totara: add CSRF protection
+        $data->logintoken = sesskey();
 
         return $data;
     }

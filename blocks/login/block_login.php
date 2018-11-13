@@ -99,6 +99,7 @@ class block_login extends block_base {
             }
 
             $this->content->text .= '<input type="submit" class="btn btn-primary btn-block" value="'.get_string('login').'" />';
+            $this->content->text .= '<input type="hidden" name="logintoken" value="' . s(sesskey()) . '" />'; // Totara: add CSRF protection.
             $this->content->text .= '</div>';
 
             $this->content->text .= "</form>\n";
