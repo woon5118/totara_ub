@@ -110,23 +110,6 @@ class core_badges_external_testcase extends externallib_advanced_testcase {
         $endorsement->dateissued = $now;
         $badge->save_endorsement($endorsement);
 
-        // Add 2 competencies.
-        $competency = new stdClass();
-        $competency->badgeid = $badgeid;
-        $competency->targetname = 'Competency 1';
-        $competency->targeturl = 'http://c1-target-url.domain.co.nz';
-        $competency->targetdescription = 'C1 target description';
-        $competency->targetframework = 'C1 framework';
-        $competency->targetcode = 'C1 code';
-        $badge->save_alignment($competency);
-
-        $competency->targetname = 'Competency 2';
-        $competency->targeturl = 'http://c2-target-url.domain.co.nz';
-        $competency->targetdescription = 'C2 target description';
-        $competency->targetframework = 'C2 framework';
-        $competency->targetcode = 'C2 code';
-        $badge->save_alignment($competency);
-
         // Now a course badge.
         $badge->id = null;
         $badge->name = "Test badge course";
@@ -155,6 +138,7 @@ class core_badges_external_testcase extends externallib_advanced_testcase {
 
         $badges = (array) badges_get_user_badges($this->student->id);
         $expectedbadges = array();
+        $coursebadge = null;
 
         foreach ($badges as $badge) {
             $context = ($badge->type == BADGE_TYPE_SITE) ? context_system::instance() : context_course::instance($badge->courseid);
@@ -164,24 +148,11 @@ class core_badges_external_testcase extends externallib_advanced_testcase {
             // Get the endorsement, competencies and related badges.
             $badgeinstance = new badge($badge->id);
             $endorsement = $badgeinstance->get_endorsement();
-            $competencies = $badgeinstance->get_alignment();
             $relatedbadges = $badgeinstance->get_related_badges();
-            $badge->competencies = array();
             $badge->relatedbadges = array();
 
             if ($endorsement) {
                 $badge->endorsement = (array) $endorsement;
-            }
-
-            if (!empty($competencies)) {
-                foreach ($competencies as $competency) {
-                    // Students cannot see some fields of the competencies.
-                    unset($competency->targetdescription);
-                    unset($competency->targetframework);
-                    unset($competency->targetcode);
-
-                    $badge->competencies[] = (array) $competency;
-                }
             }
 
             if (!empty($relatedbadges)) {
@@ -196,6 +167,10 @@ class core_badges_external_testcase extends externallib_advanced_testcase {
             }
 
             $expectedbadges[] = (array) $badge;
+            if (isset($badge->courseid)) {
+                // Save the course badge to be able to compare it in our tests.
+                $coursebadge = (array) $badge;
+            }
         }
 
         $result = core_badges_external::get_user_badges();
@@ -206,7 +181,7 @@ class core_badges_external_testcase extends externallib_advanced_testcase {
         $result = core_badges_external::get_user_badges(0, $this->course->id, 0, 1, '', true);
         $result = external_api::clean_returnvalue(core_badges_external::get_user_badges_returns(), $result);
         $this->assertCount(1, $result['badges']);
-        $this->assertEquals($expectedbadges[1], $result['badges'][0]);
+        $this->assertEquals($coursebadge, $result['badges'][0]);
     }
 
     /**
@@ -226,11 +201,7 @@ class core_badges_external_testcase extends externallib_advanced_testcase {
             if (isset($badge['type']) and $badge['type'] == BADGE_TYPE_COURSE) {
                 $this->assertTrue(isset($badge['message']));
 
-                // Check that we have permissions to see all the data in competencies and related badges.
-                foreach ($badge['competencies'] as $competency) {
-                    $this->assertTrue(isset($competency['targetdescription']));
-                }
-
+                // Check that we have permissions to see all the data in related badges.
                 foreach ($badge['relatedbadges'] as $relatedbadge) {
                     $this->assertTrue(isset($relatedbadge['type']));
                 }

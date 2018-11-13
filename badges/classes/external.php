@@ -151,19 +151,10 @@ class core_badges_external extends external_api {
             // Create a badge instance to be able to get the endorsement and other info.
             $badgeinstance = new badge($badge->id);
             $endorsement = $badgeinstance->get_endorsement();
-            $competencies = $badgeinstance->get_alignment();
             $relatedbadges = $badgeinstance->get_related_badges();
 
             if (!$canconfiguredetails) {
                 // Return only the properties visible by the user.
-
-                if (!empty($competencies)) {
-                    foreach ($competencies as $competency) {
-                        unset($competency->targetdescription);
-                        unset($competency->targetframework);
-                        unset($competency->targetcode);
-                    }
-                }
 
                 if (!empty($relatedbadges)) {
                     foreach ($relatedbadges as $relatedbadge) {
@@ -177,7 +168,6 @@ class core_badges_external extends external_api {
             $related = array(
                 'context' => $context,
                 'endorsement' => $endorsement ? $endorsement : null,
-                'competencies' => $competencies,
                 'relatedbadges' => $relatedbadges,
             );
 
