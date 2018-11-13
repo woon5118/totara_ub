@@ -699,6 +699,13 @@ class HTML_QuickForm extends HTML_Common {
             if (isset($this->_elements[$i])) {
                 $currentName = $this->_elements[$i]->getName();
                 $this->_elements[$i + 1] =& $this->_elements[$i];
+                if (empty($currentName)) {
+                    // Totara: giving it a hint to the developers here, because
+                    // not all form's element does have a name, for example, the form element
+                    // `HTML_QuickForm_html` does not have a name given at constructor.
+                    debugging("There is an empty name for element at index {$i}, please give it a name", DEBUG_DEVELOPER);
+                }
+
                 if ($this->_elementIndex[$currentName] == $i) {
                     $this->_elementIndex[$currentName] = $i + 1;
                 } else {

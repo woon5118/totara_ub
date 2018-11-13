@@ -331,10 +331,10 @@ class core_course_edit_form {
         // Audience deletion warning message.
         $warning = $OUTPUT->notification(get_string('cohortdeletionwarning', 'totara_cohort'), 'warning');
 
-        $mform->insertElementBefore(
-            $mform->createElement('html', $warning),
-            $beforename
-        );
+        /** @var \HTML_QuickForm_html $cohortdeletionwarning */
+        $cohortdeletionwarning = $mform->createElement('html', $warning);
+        $cohortdeletionwarning->setName('cohortdeletionwarning');
+        $mform->insertElementBefore($cohortdeletionwarning, $beforename);
 
         if (empty($course->id)) {
             $cohorts = '';
@@ -347,10 +347,11 @@ class core_course_edit_form {
         $mform->setType('cohortsenrolled', PARAM_SEQUENCE);
         $cohortsclass = new \totara_cohort_course_cohorts(COHORT_ASSN_VALUE_ENROLLED);
         $cohortsclass->build_table(!empty($course->id) ? $course->id : 0);
-        $mform->insertElementBefore(
-            $mform->createElement('html', $cohortsclass->display(true)),
-            $beforename
-        );
+
+        /** @var \HTML_QuickForm_html $cohorttable */
+        $cohorttable = $mform->createElement('html', $cohortsclass->display(true));
+        $cohorttable->setName('cohorttable');
+        $mform->insertElementBefore($cohorttable, $beforename);
 
         $mform->insertElementBefore(
             $mform->createElement('button', 'cohortsaddenrolled', get_string('cohortsaddenrolled', 'totara_cohort')),
@@ -424,10 +425,11 @@ class core_course_edit_form {
         $instanceid = !empty($course->id) ? $course->id : 0;
         $instancetype = COHORT_ASSN_ITEMTYPE_COURSE;
         $cohortsclass->build_visible_learning_table($instanceid, $instancetype);
-        $mform->insertElementBefore(
-            $mform->createElement('html', $cohortsclass->display(true, 'visible')),
-            $beforename
-        );
+
+        /** @var \HTML_QuickForm_html $cohortvisibilityelement */
+        $cohortvisibilityelement = $mform->createElement('html', $cohortsclass->display(true, 'visible'));
+        $cohortvisibilityelement->setName('cohortvisibility');
+        $mform->insertElementBefore($cohortvisibilityelement, $beforename);
 
         $mform->insertElementBefore(
             $mform->createElement('button', 'cohortsaddvisible', get_string('cohortsaddvisible', 'totara_cohort')),
