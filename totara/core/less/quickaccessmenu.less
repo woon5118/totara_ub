@@ -10,16 +10,18 @@
 @totara_core__QuickAccessMenu_padding-outer: @totara_style-spacing_medium;
 
 @totara_core__QuickAccessMenu_section_title-size: @font-size-h5;
-@totara_core__QuickAccessMenu_section_title-margin: @totara_style-spacing_small;
+@totara_core__QuickAccessMenu_spacing: @totara_style-spacing_small;
 @totara_core__QuickAccessMenu_section_title-max-width: 25ch;
-@totara_core__QuickAccessMenu_section_item-indent: 2rem;
+@totara_core__QuickAccessMenu_section_item-indent: @totara_style-spacing_medium;
 @totara_core__QuickAccessMenu_empty_icon-size: @totara_style-size_32;
+@totara_core__QuickAccessMenu_item-color: @totara_style-color_neutral_1;
 
 @totara_core__QuickAccessMenu_empty_link-padding: 0.1em 0.3em;
 @totara_core__QuickAccessMenu_empty_link-border-radius: 0.7em;
 @totara_core__QuickAccessMenu_empty_link-color-bg: @totara_style-color_neutral_6;
 @totara_core__QuickAccessMenu_empty_link-color: @totara_style-color_neutral_1;
-@totara_core__QuickAccessMenu_empty_link-font-size: 0.9em;
+@totara_core__QuickAccessMenu_empty_link-font-size: @totara_style-font_body_small_size;
+@totara_core__QuickAccess__transition-time: 200ms;
 
 @totara_core__QuickAccessMenu__shadow: @totara_style-shadow_1;
 
@@ -105,11 +107,11 @@
     padding: @totara_core__QuickAccessMenu_padding-outer @totara_core__QuickAccessMenu_padding-outer 0 @totara_core__QuickAccessMenu_padding-outer;
 
     //Fade in timings
-    transition: transform 250ms ease, visibility 250ms linear;
+    transition: transform @totara_core__QuickAccess__transition-time ease, visibility @totara_core__QuickAccess__transition-time linear;
 
     .collapsed& {
       //Fade out timings
-      transition: transform 250ms ease 100ms, visibility 150ms linear 200ms;
+      transition: transform @totara_core__QuickAccess__transition-time ease @totara_core__QuickAccess__transition-time, visibility @totara_core__QuickAccess__transition-time linear @totara_core__QuickAccess__transition-time;
       visibility: hidden;
 
       @media (min-width: @quickaccess_desktop_breakpoint) {
@@ -142,11 +144,11 @@
     //Content fade animation
     > * {
       opacity: 1;
-      transition: opacity 100ms ease 200ms;
+      transition: opacity @totara_core__QuickAccess__transition-time ease @totara_core__QuickAccess__transition-time;
 
       .collapsed& {
         opacity: 0;
-        transition: opacity 100ms ease;
+        transition: opacity @totara_core__QuickAccess__transition-time ease;
       }
     }
 
@@ -178,7 +180,7 @@
 
     &-header {
 
-      margin-bottom: 0.5em;
+      margin-bottom: @totara_core__QuickAccessMenu_spacing;
       line-height: 2.5em;
 
       @media (max-width: @quickaccess_mobile_breakpoint) {
@@ -199,7 +201,7 @@
           .sr-only
         }
 
-        font-size: 1.2rem;
+        font-size: @totara_style-font_heading_label_small_size;
         margin: 0;
         display: inline-block;
       }
@@ -223,7 +225,7 @@
     overflow: auto;
 
     @media (max-width: @quickaccess_mobile_breakpoint) {
-      flex-direction: column;
+      display: block;
       flex: 1 1 auto;
     }
 
@@ -231,7 +233,7 @@
       padding-top: 1em;
 
       @media (max-width: @quickaccess_mobile_breakpoint) {
-        flex-direction: row;
+        display: flex;
       }
     }
   }
@@ -239,13 +241,9 @@
   & &_group {
     flex: 1 1 auto;
 
-    @media (max-width: @quickaccess_mobile_breakpoint) {
-      flex: 0 1 auto;
-    }
-
     &-title {
       font-size: @totara_core__QuickAccessMenu_section_title-size;
-      margin: @totara_core__QuickAccessMenu_section_title-margin 0;
+      margin: @totara_core__QuickAccessMenu_spacing 0;
       min-height: 1em; //Set this to the font-size to make sure that empty titles still have height
 
       max-width: @totara_core__QuickAccessMenu_section_title-max-width;
@@ -257,10 +255,9 @@
 
     &-list {
       margin: 0;
-      font-weight: 100;
 
       li {
-        margin: 0.5em 0;
+        margin: @totara_core__QuickAccessMenu_spacing 0;
 
         @media (min-width: @quickaccess_desktop_breakpoint) {
           width: 20ch;
@@ -271,7 +268,7 @@
         }
 
         a {
-          color: #fff;
+          color: @totara_core__QuickAccessMenu_item-color;
         }
       }
     }
@@ -282,7 +279,7 @@
       flex: 0 0 auto;
     }
 
-    margin-top: 0.5em;
+    margin-top: @totara_core__QuickAccessMenu_spacing;
     line-height: 2.5em;
 
     //Horizontal rule

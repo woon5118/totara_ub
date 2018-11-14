@@ -79,6 +79,7 @@ define(['core/str'], function(str) {
         var self = this;
 
         this.controller.addEventListener('click', function(e) {
+            e.preventDefault();
             e.stopPropagation();
 
             self.edit();

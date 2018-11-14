@@ -407,9 +407,9 @@ final class external extends \external_api {
      *
      * @param string|null $groupname
      * @param int|null $userid
-     * @return bool
+     * @return array
      */
-    public static function add_group(string $groupname = null, $userid = null): bool {
+    public static function add_group(string $groupname = null, $userid = null): array {
         $userid = self::normalise_userid_parameter($userid);
         self::ensure_user_can_customise_menu($userid);
 
@@ -427,8 +427,7 @@ final class external extends \external_api {
         }
 
         $result = helper::add_group($userid, $groupname);
-
-        return $result;
+        return \totara_core\output\quickaccesssettings::get_group_data($result->get_key());
     }
     public static function add_group_parameters() {
         return new external_function_parameters([
@@ -437,7 +436,20 @@ final class external extends \external_api {
         ]);
     }
     public static function add_group_returns() {
-        return new external_value(PARAM_BOOL, 'Success or failure');
+//        return new external_value(PARAM_BOOL, 'Success or failure');
+        return new external_single_structure([
+            'key'   => new external_value(PARAM_ALPHANUMEXT, 'The group key'),
+            'title'  => new external_value(PARAM_TEXT, 'The display name for the group'),
+            'has_items'  => new external_value(PARAM_BOOL, 'Whether the group has any items'),
+            'item_count' => new external_value(PARAM_INT, 'Number of items in the group'),
+            'items' => new external_multiple_structure(new external_single_structure([
+                'key'   => new external_value(PARAM_ALPHANUMEXT, 'The item key'),
+                'page'  => new external_value(PARAM_TEXT, 'The display name for the item page'),
+                'label' => new external_value(PARAM_TEXT, 'The label displayed in the menu'),
+                'url'   => new external_value(PARAM_URL, 'URL of referred page')
+            ], 'The context object for the newly created item'), ''),
+            'tree_selector'   => new external_value(PARAM_RAW, 'Rendered tree selector')
+        ], 'The context object for the newly created item');
     }
 
     /**

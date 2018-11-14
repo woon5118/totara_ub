@@ -218,13 +218,11 @@ final class helper {
      *
      * @param int $userid
      * @param string|null $groupname
-     * @return bool
+     * @return group
      */
-    public static function add_group(int $userid, ?string $groupname): bool {
+    public static function add_group(int $userid, ?string $groupname): group {
         // Create a group and save the preferences.
-        group::create_group($groupname, $userid);
-
-        return true;
+        return group::create_group($groupname, $userid);;
     }
 
     /**

@@ -4,6 +4,7 @@
 @totara_core__QuickAccessSettings__item-border-color: @totara_core__QuickAccessSettings__accordion-border-color;
 @totara_core__QuickAccessSettings__spacing: @totara_style-spacing_medium;
 @totara_core__QuickAccessSettings__heading-icons-size: @totara_style-font_heading_medium_size * .85;
+@totara_core__QuickAccess__transition-time: 200ms;
 
 @quickaccess_desktop_breakpoint: @totara_style-screen_sm_min;
 @quickaccess_mobile_breakpoint: (@quickaccess_desktop_breakpoint - 1px);
@@ -87,11 +88,11 @@
 
     //Animations to swap up and down
     &-swap-up {
-      transition-duration: 200ms;
+      transition-duration: @totara_core__QuickAccess__transition-time;
       transform: translateY(-100%);
     }
     &-swap-down {
-      transition-duration: 200ms;
+      transition-duration: @totara_core__QuickAccess__transition-time;
       transform: translateY(100%);
     }
 

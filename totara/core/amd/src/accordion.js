@@ -29,7 +29,7 @@ define(['core/templates'], function(templates) {
     function AccordionController(element) {
         this.element = element;
 
-        this.alwaysOpen = this.element.getAttribute('data-always-open') === "false"; // default true
+        this.alwaysOpen = this.element.getAttribute('data-always-open') !== "false"; // default true
         this.allowMultiple = this.element.getAttribute('data-allow-multiple') === "true"; // default false
 
         // If we're always open, and nothing is open, open the first element

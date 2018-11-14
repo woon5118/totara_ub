@@ -79,7 +79,14 @@ define(['core/templates', 'core/str', 'core/ajax'], function(template, str, ajax
 
             if (group) {
                 action = e.target.closest('[data-quickaccesssettings-group-action]');
+
                 if (action !== null) {
+
+                    // Close the accordion
+                    group.dispatchEvent(new CustomEvent('totara_core/accordion:close', {
+                        bubbles: true
+                    }));
+
                     action = action.getAttribute('data-quickaccesssettings-group-action');
                     switch (action) {
                         case 'moveup':
@@ -188,8 +195,12 @@ define(['core/templates', 'core/str', 'core/ajax'], function(template, str, ajax
         function addGroup() {
             self.save('totara_core_quickaccessmenu_add_group', {
                 groupname: ''
-            }).done(function() {
-                window.location.reload();
+            }).done(function(res) {
+                template.render('totara_core/quickaccesssettings_group', res).done(function(item) {
+                    var groupList = self.element.querySelector('.totara_core__QuickAccessSettings__group-list');
+                    groupList.insertAdjacentHTML('beforeend', item);
+                    template.runTemplateJS();
+                });
             }).fail(function() {
                 window.location.reload();
             });
@@ -212,11 +223,6 @@ define(['core/templates', 'core/str', 'core/ajax'], function(template, str, ajax
             }
             var groupkey = group.getAttribute('data-quickaccesssettings-group-key');
             var prevkey = prev.getAttribute('data-quickaccesssettings-group-key');
-
-            // Close the accordion
-            group.dispatchEvent(new CustomEvent('totara_core/accordion:close', {
-                bubbles: true
-            }));
 
             self.save('totara_core_quickaccessmenu_move_group_before', {
                 key: groupkey,

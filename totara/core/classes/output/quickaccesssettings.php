@@ -47,13 +47,15 @@ final class quickaccesssettings extends \core\output\template {
      * @return quickaccesssettings
      */
     public static function create_from_menu(menu $menu): quickaccesssettings {
-        global $USER;
+        global $USER, $OUTPUT;
 
         $data = [];
         $groups = [];
 
+        $treeWidget = new select_tree(self::get_tree_selector_data());
+
         $allgroups = group::get_groups($USER->id);
-        $tree_selector = self::get_tree_selector_data();
+        $tree_selector = $OUTPUT->render($treeWidget);
         $adminroot = self::get_admin_root();
 
         foreach (self::organise_items_by_group($menu->get_items(), $allgroups) as $group => $items) {
@@ -112,6 +114,51 @@ final class quickaccesssettings extends \core\output\template {
         }
 
         return [];
+    }
+
+    /**
+     * Returns the group data for the given key
+     * @param $key
+     * @return array
+     */
+    public static function get_group_data($key): array {
+        global $USER, $OUTPUT;
+        $menu = helper::get_user_menu();
+
+        $treeWidget = new select_tree(self::get_tree_selector_data());
+
+        $allgroups = group::get_groups($USER->id);
+        $tree_selector = $OUTPUT->render($treeWidget);
+        $adminroot = self::get_admin_root();
+
+        $groups = [
+            $key => [] //ensure non-null return
+        ];
+        foreach (self::organise_items_by_group($menu->get_items(), $allgroups) as $group => $items) {
+            $groups[$group] = [
+                'key'           => $group,
+                'title'         => (string)$allgroups[$group]->get_label(),
+                'has_items'     => !empty($items),
+                'item_count'    => count($items),
+                'items'         => [],
+                'tree_selector' => $tree_selector,
+            ];
+            /** @var item $item */
+            foreach ($items as $item) {
+                $page = $adminroot->locate($item->get_key());
+
+                $itemdata = [
+                    'key'   => $item->get_key(),
+                    'page'  => $page->visiblename,
+                    'label' => $item->get_label(),
+                    'url'   => $item->get_url()->out(),
+                ];
+
+                $groups[$group]['items'][] = $itemdata;
+            }
+        }
+
+        return $groups[$key];
     }
 
     /**

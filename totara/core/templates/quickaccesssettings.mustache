@@ -83,7 +83,9 @@
      data-core-autoinitialise-amd="totara_core/quickaccesssettings"
      aria-live="polite">
 {{< totara_core/accordion}}
-    {{$allow_multiple}}true{{/allow_multiple}}
+    {{$allow_multiple}}false{{/allow_multiple}}
+    {{$always_open}}true{{/always_open}}
+    {{$classes}}totara_core__QuickAccessSettings__group-list{{/classes}}
     {{$accordion_body}}
         {{#groups}}
             {{> totara_core/quickaccesssettings_group }}
