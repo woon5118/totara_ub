@@ -50,7 +50,8 @@ class totara_catalog_datasearch_like_testcase extends advanced_testcase {
         $filter = new \totara_catalog\datasearch\like('testfilter');
 
         if ($expectsexception) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('like filter only accepts null, int, string or bool data');
         }
 
         // The make_compare function for 'like' calls validate_current_data.
@@ -106,7 +107,8 @@ class totara_catalog_datasearch_like_testcase extends advanced_testcase {
         $filter->set_current_data($data);
 
         if (!$isactive) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('Tried to apply \'like\' filter with no value specified');
         }
 
         list($join, $where, $params) = $filter->make_sql();

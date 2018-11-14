@@ -268,7 +268,8 @@ class totara_catalog_merge_select_tree_testcase extends advanced_testcase {
 
         $tree->add_all_option('xtestallname', 'testoptionkey1');
 
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Tried to add an \'all\' option with a key already in use');
         $tree->get_options();
     }
 
@@ -359,7 +360,8 @@ class totara_catalog_merge_select_tree_testcase extends advanced_testcase {
         $tree2 = new \totara_catalog\merge_select\tree('testmergeselectkey', 'testtitle', $optionsloader2);
 
         $this->assertFalse($tree1->can_merge($tree2));
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Tried to merge two selectors that are not identical');
         $tree1->merge($tree2);
     }
 

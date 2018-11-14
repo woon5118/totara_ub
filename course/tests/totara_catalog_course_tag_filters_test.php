@@ -172,6 +172,9 @@ class core_course_totara_catalog_course_tag_filters_testcase extends \advanced_t
 
         // Test filter with invalid tag value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage(
+            'in or equal search filter only accepts null or array data of int, string or bool'
+        );
         $filter_data->set_current_data(123);
     }
 
@@ -223,6 +226,7 @@ class core_course_totara_catalog_course_tag_filters_testcase extends \advanced_t
 
         // Test filter with invalid tag value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('equal filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($courses_by_tags));
     }
 }

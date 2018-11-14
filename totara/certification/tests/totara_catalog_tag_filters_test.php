@@ -186,6 +186,7 @@ class totara_certification_totara_catalog_tag_filters_testcase extends \advanced
 
         // Test filter with invalid tag value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('in or equal search filter only accepts null or array data of int, string or bool');
         $filter_data->set_current_data(123);
     }
 
@@ -236,6 +237,7 @@ class totara_certification_totara_catalog_tag_filters_testcase extends \advanced
 
         // Test filter with invalid tag value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('equal filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($certifications_by_tag));
     }
 }

@@ -50,7 +50,8 @@ class totara_catalog_datasearch_equal_testcase extends advanced_testcase {
         $filter = new \totara_catalog\datasearch\equal('testfilter');
 
         if ($expectsexception) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('equal filter only accepts null, int, string or bool data');
         }
 
         // The make_compare function for 'equal' calls validate_current_data.
@@ -104,7 +105,8 @@ class totara_catalog_datasearch_equal_testcase extends advanced_testcase {
         $filter->set_current_data($data);
 
         if (!$isactive) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('Tried to apply \'equal\' filter with no value specified');
         }
 
         list($join, $where, $params) = $filter->make_sql();

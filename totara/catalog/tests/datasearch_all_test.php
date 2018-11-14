@@ -50,7 +50,7 @@ class totara_catalog_datasearch_all_testcase extends advanced_testcase {
         $filter = new \totara_catalog\datasearch\all('testfilter');
 
         if ($expectsexception) {
-            $this->expectException('coding_exception');
+            // No exception expected here for datasearch\all
         }
 
         // The make_compare function for 'all' calls validate_current_data.

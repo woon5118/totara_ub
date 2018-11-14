@@ -136,7 +136,8 @@ class totara_catalog_merge_select_testcase extends advanced_testcase {
         $single1 = new \totara_catalog\merge_select\single('testmergeselectkey1', 'testtitle');
         $single2 = new \totara_catalog\merge_select\single('testmergeselectkey2', 'testtitle');
 
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Tried to merge two selectors that are not identical');
         $single1->merge($single2);
     }
 }

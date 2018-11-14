@@ -174,6 +174,7 @@ class core_course_totara_catalog_course_activity_type_filters_testcase extends \
 
         // Test filter with invalid module value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('in or equal search filter only accepts null or array data of int, string or bool');
         $filter_data->set_current_data(123);
     }
 
@@ -220,6 +221,7 @@ class core_course_totara_catalog_course_activity_type_filters_testcase extends \
 
         // Test filter with invalid module value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('equal filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($activity_courses));
     }
 }

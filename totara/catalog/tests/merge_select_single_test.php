@@ -249,7 +249,8 @@ class totara_catalog_merge_select_single_testcase extends advanced_testcase {
 
         $single->add_all_option('xtestallname', 'testoptionkey1');
 
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Tried to add an \'all\' option with a key already in use');
         $single->get_options();
     }
 

@@ -56,7 +56,8 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
             ['testfield1', 'testfield2', 'testfield3']
         );
 
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('$joinons must contain the same keys as $this->joinonbasefields');
         $filter->add_source(
             'testsourcefield'
         );
@@ -67,7 +68,8 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
             'testalias'
         );
 
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('$joinons must contain the same keys as $this->joinonbasefields');
         $filter->add_source(
             'testsourcefield',
             'testsourcetable',
@@ -204,7 +206,8 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
             ['testfield1', 'testfield2']
         );
         $filter->set_current_data('testdata');
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Shouldn\'t be checking if filters can be merged if data has already been set');
         $filter->can_merge($otherfilter);
     }
 
@@ -220,7 +223,8 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
             ['testfield1', 'testfield2']
         );
         $otherfilter->set_current_data('testdata');
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Shouldn\'t be checking if filters can be merged if data has already been set');
         $filter->can_merge($otherfilter);
     }
 
@@ -236,7 +240,8 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
             ['testfield1', 'testfield3']
         );
         $this->assertFalse($filter->can_merge($otherfilter)); // Can_merge says false...
-        $this->expectException('coding_exception');
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Tried to merge datasearch filters which don\'t match');
         $filter->merge($otherfilter); // But we ignore it, to our own demise.
     }
 

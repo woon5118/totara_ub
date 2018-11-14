@@ -52,7 +52,8 @@ class totara_catalog_datasearch_in_or_equal_testcase extends advanced_testcase {
         $filter = new \totara_catalog\datasearch\in_or_equal('testfilter');
 
         if ($expectsexception) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('in or equal search filter only accepts int, string or bool data in an array');
         }
 
         // The make_compare function for 'in_or_equal' calls validate_current_data.
@@ -113,7 +114,8 @@ class totara_catalog_datasearch_in_or_equal_testcase extends advanced_testcase {
         $filter->set_current_data($data);
 
         if (!$isactive) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('Tried to apply \'in_or_equal\' filter with no values specified');
         }
 
         list($join, $where, $params) = $filter->make_sql();

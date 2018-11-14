@@ -114,6 +114,7 @@ class totara_catalog_category_filters_testcase extends advanced_testcase {
 
         // Test filter with invalid category value.
         $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('it must be fixed by a programmer: equal filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($category_courses));
     }
 

@@ -224,6 +224,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
 
         // Test filter with invalid option value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('in or equal search filter only accepts null or array data of int, string or bool');
         $filter_data->set_current_data(123);
     }
 
@@ -276,6 +277,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
 
         // Test filter with invalid option value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('equal filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($courses_by_cf));
     }
 
@@ -398,6 +400,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
 
         // Test filter with invalid option value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('like or search filter only accepts null or array data');
         $filter_data->set_current_data(123);
     }
 
@@ -450,6 +453,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
 
         // Test filter with invalid option value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('like filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($courses_by_cf));
     }
 
@@ -561,6 +565,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
 
         // Test filter with invalid option value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('in or equal search filter only accepts null or array data of int, string or bool');
         $filter_data->set_current_data(123);
     }
 
@@ -613,6 +618,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
 
         // Test filter with invalid option value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('equal filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($courses_by_cf));
     }
 }

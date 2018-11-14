@@ -31,6 +31,8 @@ use totara_catalog\merge_select\multi;
 use totara_catalog\merge_select\single;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once("{$CFG->dirroot}/course/lib.php");
 
 /**
  * @group totara_catalog
@@ -149,6 +151,7 @@ class core_course_totara_catalog_course_format_filters_testcase extends \advance
 
         // Test filter with invalid format value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('in or equal search filter only accepts null or array data of int, string or bool');
         $filter_data->set_current_data(123);
     }
 
@@ -195,6 +198,7 @@ class core_course_totara_catalog_course_format_filters_testcase extends \advance
 
         // Test filter with invalid module value.
         $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('equal filter only accepts null, int, string or bool data');
         $filter_data->set_current_data(array_keys($format_courses));
     }
 }

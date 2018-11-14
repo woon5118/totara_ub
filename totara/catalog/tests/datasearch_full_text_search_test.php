@@ -49,7 +49,8 @@ class totara_catalog_datasearch_full_text_search_testcase extends advanced_testc
         $filter = new \totara_catalog\datasearch\full_text_search('testfilter');
 
         if ($expectsexception) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('full text search filter only accepts null or string data');
         }
 
         // The make_compare function for 'full_text_search' calls validate_current_data.
@@ -109,7 +110,8 @@ class totara_catalog_datasearch_full_text_search_testcase extends advanced_testc
         $filter->set_current_data($data);
 
         if (!$isactive) {
-            $this->expectException('coding_exception');
+            $this->expectException(\coding_exception::class);
+            $this->expectExceptionMessage('Tried to do full text search without specifying some text');
         }
 
         list($join, $where, $params) = $filter->make_sql();
