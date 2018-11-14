@@ -66,7 +66,7 @@ class totara_catalog_catalog_menu_item_testcase extends advanced_testcase {
         $mock_item->method('has_visible_sibling')
             ->willReturn($has_visible_sibling);
 
-        $rm = new ReflectionMethod('totara_catalog\totara\menu\catalog', 'check_visibility');
+        $rm = new ReflectionMethod(catalog::class, 'check_visibility');
         $rm->setAccessible(true);
 
         $this->assertSame($expected, $rm->invoke($mock_item));

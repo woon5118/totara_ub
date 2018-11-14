@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package totara_catalog
  */
 
@@ -25,7 +25,7 @@ namespace totara_catalog\dataformatter;
 
 defined('MOODLE_INTERNAL') || die();
 
-class text extends formatter {
+class strip_tags extends formatter {
 
     /**
      * @param string $textfield the database field containing the text
@@ -36,14 +36,12 @@ class text extends formatter {
 
     public function get_suitable_types(): array {
         return [
-            formatter::TYPE_PLACEHOLDER_TEXT,
-            formatter::TYPE_PLACEHOLDER_TITLE,
-            formatter::TYPE_SORT_TIME,
+            formatter::TYPE_SORT_TEXT,
         ];
     }
 
     /**
-     * Given a text string, returns it.
+     * Given a text string possibly containing html tags, strip them out.
      *
      * @param array $data
      * @param \context $context
@@ -52,9 +50,9 @@ class text extends formatter {
     public function get_formatted_value(array $data, \context $context): string {
 
         if (!array_key_exists('text', $data)) {
-            throw new \coding_exception("Text data formatter expects 'text'");
+            throw new \coding_exception("Strip tags data formatter expects 'text'");
         }
 
-        return format_string($data['text'], true, ['context' => $context]);
+        return strip_tags($data['text']);
     }
 }

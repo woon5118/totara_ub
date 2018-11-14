@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\dataformatter\formatter;
 use totara_catalog\dataformatter\fts;
+use totara_catalog\dataformatter\strip_tags;
 use totara_catalog\dataformatter\text;
 use totara_catalog\dataholder;
 use totara_catalog\dataholder_factory;
@@ -49,7 +50,7 @@ class shortname extends dataholder_factory {
                     formatter::TYPE_PLACEHOLDER_TEXT => new text(
                         'base.shortname'
                     ),
-                    formatter::TYPE_SORT_TEXT => new text(
+                    formatter::TYPE_SORT_TEXT => new strip_tags(
                         'base.shortname'
                     ),
                 ]

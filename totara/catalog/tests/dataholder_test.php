@@ -252,7 +252,6 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
             formatter::TYPE_FTS,
             formatter::TYPE_PLACEHOLDER_TITLE,
             formatter::TYPE_PLACEHOLDER_TEXT,
-            formatter::TYPE_SORT_TEXT,
         ];
 
         foreach ($all_types as $type) {

@@ -25,7 +25,6 @@ use core_course\totara_catalog\course\feature_factory\format;
 use totara_catalog\catalog_retrieval;
 use totara_catalog\local\config;
 use totara_catalog\local\filter_handler;
-use totara_catalog\local\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,6 +36,27 @@ class totara_catalog_catalog_retrieval_testcase extends advanced_testcase {
     public function setUp() {
         parent::setUp();
         $this->resetAfterTest(true);
+    }
+
+    public function test_alphabetical_sorting_enabled() {
+        global $CFG;
+
+        // Check that it is enabled when only one language is installed.
+        $catalog = new catalog_retrieval();
+        $this->assertEquals(true, $catalog->alphabetical_sorting_enabled());
+
+        // Create a second language and see that it is disabled.
+        make_writable_directory($CFG->phpunit_dataroot . '/lang/de');
+        copy(
+            $CFG->dirroot . "/install/lang/de/langconfig.php",
+            $CFG->phpunit_dataroot . "/lang/de/langconfig.php"
+        );
+        get_string_manager()->reset_caches();
+        $this->assertEquals(false, $catalog->alphabetical_sorting_enabled());
+
+        // Set the config override and see that it is enabled.
+        set_config('catalog_enable_alpha_sorting_with_multiple_languages', true);
+        $this->assertEquals(true, $catalog->alphabetical_sorting_enabled());
     }
 
     /**
@@ -87,24 +107,22 @@ class totara_catalog_catalog_retrieval_testcase extends advanced_testcase {
      * @param string $ordered_by
      * @param array $snippets
      * @param bool $enable_feature
-     * @param bool $enable_filter
+     * @param bool $enable_fts
      */
     public function test_get_sql_orderby(
-        string $ordered_by, array $snippets, bool $enable_feature, bool $enable_filter
+        string $ordered_by, array $snippets, bool $enable_feature, bool $enable_fts
     ): void {
         $columns = 'catalog.id, catalog.objecttype, catalog.objectid, catalog.contextid';
         $joins = "";
         $wheres = "";
-        $params = [];
 
-        if ($enable_filter) {
-            $filter = filter_handler::instance()->get_full_text_search_filter()->datafilter;
-            $filter->set_current_data("some search text");
+        if ($enable_fts) {
+            $fts = filter_handler::instance()->get_full_text_search_filter()->datafilter;
+            $fts->set_current_data("some search text");
 
-            [$filter_joins, $filter_wheres, $filter_params] = $filter->make_sql();
-            $joins .= $filter_joins;
-            $wheres .= $filter_wheres;
-            $params = array_merge($params, $filter_params);
+            [$fts_joins, $fts_wheres, $fts_params] = $fts->make_sql();
+            $joins .= $fts_joins;
+            $wheres .= $fts_wheres;
         }
 
         if ($enable_feature) {
@@ -119,13 +137,9 @@ class totara_catalog_catalog_retrieval_testcase extends advanced_testcase {
                 ]
             );
 
-            // This forces providers to be reloaded => features available.
-            provider_handler::instance()->get_all_provider_classes();
-
             [$feature_joins, $feature_wheres, $feature_params] = $feature->datafilter->make_sql();
             $joins .= $feature_joins;
             $wheres .= $feature_wheres;
-            $params = array_merge($params, $feature_params);
         }
 
         [$extra_columns, $order] = $snippets;
@@ -146,6 +160,50 @@ class totara_catalog_catalog_retrieval_testcase extends advanced_testcase {
 
         $actual_sql = $this->normalized($actual_sql);
         $this->assertSame($expected_sql, $actual_sql, "wrong generated SQL");
+    }
+
+    public function test_get_sql_orderby_with_multilang() {
+        // Create a reflection of the private method that can be run directly.
+        $rm = new ReflectionMethod(catalog_retrieval::class, 'get_order_by_sql');
+        $rm->setAccessible(true);
+
+        // Confirm that get_orderby_sql is using the ordering specified.
+        $catalog = new catalog_retrieval();
+        list($orderbycolumns, $orderbysort) = $rm->invoke($catalog, 'alpha');
+        $this->assertEquals('catalog.sorttext', $orderbycolumns);
+        $this->assertEquals('catalog.sorttext ASC', $orderbysort);
+
+        // Mock the catalog retrieval class to think that alphabetical sorting is disabled.
+        $mockedcatalog = $this->getMockBuilder(catalog_retrieval::class)
+            ->setMethods(['alphabetical_sorting_enabled'])
+            ->getMock();
+        $mockedcatalog->method('alphabetical_sorting_enabled')
+            ->willReturn(false);
+
+        // See that 'alpha' is ignored'.
+        list($orderbycolumns, $orderbysort) = $rm->invoke($mockedcatalog, 'alpha');
+        $this->assertEquals('catalog.sorttime', $orderbycolumns);
+        $this->assertEquals('catalog.sorttime DESC', $orderbysort);
+
+        // See that 'featured' is always used when featured learning is enabled.
+        $feature = format::get_features()[0];
+        config::instance()->update(
+            [
+                'featured_learning_enabled' => true,
+                'featured_learning_value' => 'some test featured learning',
+                'featured_learning_source' => $feature->key
+            ]
+        );
+        list($orderbycolumns, $orderbysort) = $rm->invoke($mockedcatalog, 'time');
+        $this->assertEquals('catalog.sorttime', $orderbycolumns);
+        $this->assertEquals('COALESCE(featured, 0) DESC, catalog.sorttime DESC', $orderbysort);
+
+        // See that 'score' is always used when full text search is active.
+        $fts = filter_handler::instance()->get_full_text_search_filter()->datafilter;
+        $fts->set_current_data("some search text");
+        list($orderbycolumns, $orderbysort) = $rm->invoke($mockedcatalog, 'featured');
+        $this->assertEquals('catalogfts.score, catalog.sorttime', $orderbycolumns);
+        $this->assertEquals('catalogfts.score DESC, catalog.sorttime DESC', $orderbysort);
     }
 
     private function normalized(string $in): string {

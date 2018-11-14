@@ -130,21 +130,24 @@ class catalog extends template {
         $data->panel_region_template_data = $panelregiontemplate->get_template_data();
 
         // Order by.
-        $orderbyoptions = static::get_order_by_options();
-        if (empty($orderbyoptions[$orderbykey])) {
-            reset($orderbyoptions);
-            $orderbykey = key($orderbyoptions);
+        $data->order_by_enabled = $catalog->alphabetical_sorting_enabled();
+        if ($data->order_by_enabled) {
+            $orderbyoptions = static::get_order_by_options();
+            if (empty($orderbyoptions[$orderbykey])) {
+                reset($orderbyoptions);
+                $orderbykey = key($orderbyoptions);
+            }
+            $orderbytemplate = select_tree::create(
+                'orderbykey',
+                get_string('sort_by', 'totara_catalog'),
+                false,
+                $orderbyoptions,
+                $orderbykey,
+                true
+            );
+            $data->order_by_template_name = $orderbytemplate->get_template_name();
+            $data->order_by_template_data = $orderbytemplate->get_template_data();
         }
-        $orderbytemplate = select_tree::create(
-            'orderbykey',
-            get_string('sort_by', 'totara_catalog'),
-            false,
-            $orderbyoptions,
-            $orderbykey,
-            true
-        );
-        $data->order_by_template_name = $orderbytemplate->get_template_name();
-        $data->order_by_template_data = $orderbytemplate->get_template_data();
 
         // Debugging.
         if ($showdebugging && is_siteadmin()) {

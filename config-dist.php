@@ -1017,6 +1017,29 @@ $CFG->directorypermissions = 02777;
 //
 //      $CFG->catalog_use_and_compatible_buckets = true;
 //
+// Catalog multi-language alphabetical sorting override
+//
+// When a site has multiple languages installed, catalog automatically disables user sorting
+// options, and instead determines sorting based on the current context, such as sorting by
+// featured learning when it has been configured, by relevance when a user enters a text
+// search term, otherwise by "time".
+//
+// This change happens because sorting with multi-language data is unreliable. Sorting data
+// in real-time isn't feasible due to performance considerations, so the only possibility is
+// to pre-calculate the sorting data. It is likewise infeasible to pre-calculate sorting for
+// each individual user. Thus sorting can only be done for one language. The result would be
+// that users in a language different from the site language would not see items ordered in
+// their language when using "Alphabetical" sorting.
+//
+// This setting allows you to force the sorting options to be available again. This might be
+// useful for sites that have more than one language pack installed, but predominantly use
+// just one language, or sites that use multiple languages but define separate learning items
+// for each language (e.g. one course for German users, another course for French users) and
+// don't use the "Multi-language Content" filter or a similar filter which can modify the
+// data that users see.
+//
+//      $CFG->catalog_enable_alpha_sorting_with_multiple_languages = true;
+//
 //=========================================================================
 // ALL DONE!  To continue installation, visit your main page with a browser
 //=========================================================================

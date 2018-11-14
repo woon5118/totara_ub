@@ -37,10 +37,49 @@ defined('MOODLE_INTERNAL') || die();
 class catalog_retrieval {
 
     /**
+     * Determines if alphabetical sorting should be allowed.
+     *
+     * @return bool
+     */
+    public function alphabetical_sorting_enabled(): bool {
+        global $CFG;
+
+        return
+            count(get_string_manager()->get_list_of_translations()) <= 1 ||
+            !empty($CFG->catalog_enable_alpha_sorting_with_multiple_languages);
+    }
+
+    /**
      * @param string $orderbykey
      * @return array [$orderbycolumns, $orderbysort]
      */
     private function get_order_by_sql(string $orderbykey): array {
+        if (!$this->alphabetical_sorting_enabled()) {
+            // Ignore specified sorting and instead choose sorting based on current catalog condition.
+
+            if (filter_handler::instance()->get_full_text_search_filter()->datafilter->is_active()) {
+                return [
+                    'catalogfts.score, catalog.sorttime',
+                    'catalogfts.score DESC, catalog.sorttime DESC'
+                ];
+            }
+
+            if (!empty(feature_handler::instance()->get_current_feature())) {
+                // Featured not required in columns list because it must already be there if it is enabled.
+                return [
+                    'catalog.sorttime',
+                    'COALESCE(featured, 0) DESC, catalog.sorttime DESC'
+                ];
+            }
+
+            return [
+                'catalog.sorttime',
+                'catalog.sorttime DESC'
+            ];
+        }
+
+        // Otherwise we figure out what the best sorting is given the input and current state.
+
         // Default featured.
         $orderbykey = trim($orderbykey);
         if (empty($orderbykey)) {

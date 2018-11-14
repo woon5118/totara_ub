@@ -34,41 +34,33 @@ require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
 /**
- * Class dataformatter_test
+ * Class dataformatter_text_test
  *
- * Tests the formatter dataformatter base class for catalog component.
+ * Tests all the dataformatters for catalog component.
  *
  * @package totara_catalog
  * @group totara_catalog
  */
-class totara_catalog_dataformatter_testcase extends dataformatter_test_base {
+class dataformatter_strip_tags_test extends dataformatter_test_base {
 
-    public function test_is_suitable_for_type() {
-        $df = new text('textfieldname');
+    public function test_text() {
+        $context = context_system::instance();
+
+        $df = new strip_tags('striptagsfieldname');
+        $this->assertCount(1, $df->get_required_fields());
+        $this->assertSame('striptagsfieldname', $df->get_required_fields()['text']);
+
         $this->assertSame(
             [
-                formatter::TYPE_PLACEHOLDER_TEXT,
-                formatter::TYPE_PLACEHOLDER_TITLE,
-                formatter::TYPE_SORT_TIME,
+                formatter::TYPE_SORT_TEXT,
             ],
             $df->get_suitable_types()
         );
 
-        $this->assertTrue($df->is_suitable_for_type(formatter::TYPE_PLACEHOLDER_TEXT));
-        $this->assertTrue($df->is_suitable_for_type(formatter::TYPE_PLACEHOLDER_TITLE));
-        $this->assertTrue($df->is_suitable_for_type(formatter::TYPE_SORT_TIME));
+        $test_params = ['text' => '<sometag attr="one">test_text</sometag>'];
+        $result = $df->get_formatted_value($test_params, $context);
+        $this->assertSame('test_text', $result);
 
-        $this->assertFalse($df->is_suitable_for_type(formatter::TYPE_FTS));
-    }
-
-    public function test_required_fields() {
-        $df = new duration('startfieldname', 'endfieldname');
-
-        $expectedfields = [
-            'start' => 'startfieldname',
-            'end' => 'endfieldname',
-        ];
-
-        $this->assertEquals($expectedfields, $df->get_required_fields());
+        $this->assert_exceptions($df, $test_params);
     }
 }

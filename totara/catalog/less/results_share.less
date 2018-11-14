@@ -40,7 +40,7 @@
 @catalogResultsShare-screen_sm_min: @totara_style-screen_sm_min;
 
 .tw-catalogResultsShare {
-    margin: auto @totara_style-spacing_x_small auto auto;
+    margin: auto 0 auto auto;
     position: relative;
 
     &__btn {
@@ -163,6 +163,8 @@
 /*!rtl:begin:ignore*/
 @media (min-width: @catalogResultsShare-screen_xsm_min) {
     .tw-catalogResultsShare {
+        margin-right: @totara_style-spacing_x_small;
+
         &__expanded {
             margin-left: 50%;
             right: initial;

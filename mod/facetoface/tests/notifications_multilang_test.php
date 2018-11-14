@@ -460,7 +460,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
             );
 
         }
-        cache_helper::purge_by_definition('core', 'langmenu');
+        get_string_manager()->reset_caches();
     }
 
     /**

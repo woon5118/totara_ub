@@ -63,6 +63,7 @@
         "panel_region_enabled": true,
         "panel_region_template_name": "totara_core\/select_region_panel",
         "panel_region_template_data": {...},
+        "order_by_enabled": true,
         "order_by_template_name": "totara_core\/select_tree",
         "order_by_template_data": {...}
         "request": "1538622255360"
@@ -107,8 +108,8 @@
                     {{> totara_catalog/results_count }}
                     {{> totara_catalog/results_share }}
                 </div>
-                <div class="tw-catalog__results_overview_row">
-                    {{> totara_catalog/results_sort }}
+                <div class="tw-catalog__results_overview_row {{^order_by_enabled}}tw-catalog__results_overview_row_narrow{{/order_by_enabled}}">
+                    {{#order_by_enabled}}{{> totara_catalog/results_sort }}{{/order_by_enabled}}
                     {{#item_style_toggle_enabled}}{{> totara_catalog/item_style_toggle }}{{/item_style_toggle_enabled}}
                 </div>
             </div>

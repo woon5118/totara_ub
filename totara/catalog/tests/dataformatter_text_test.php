@@ -54,7 +54,6 @@ class totara_catalog_dataformatter_text_testcase extends dataformatter_test_base
             [
                 formatter::TYPE_PLACEHOLDER_TEXT,
                 formatter::TYPE_PLACEHOLDER_TITLE,
-                formatter::TYPE_SORT_TEXT,
                 formatter::TYPE_SORT_TIME,
             ],
             $df->get_suitable_types()
