@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class rb_config
  */
-class rb_config {
+final class rb_config {
 
     /**
      * @var array data to be passed to the embedded object constructor

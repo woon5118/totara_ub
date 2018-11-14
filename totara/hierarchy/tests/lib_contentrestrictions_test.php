@@ -117,8 +117,7 @@ class totara_hierarchy_lib_contentrestrictions_testcase extends advanced_testcas
 
         // The Report for content restriction definition
         $data->reportid = $this->create_report('user', 'Test User Report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $data->report = reportbuilder::create($data->reportid, $config);
 
         $update = $DB->get_record('report_builder', ['id' => $data->reportid]);

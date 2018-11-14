@@ -52,8 +52,7 @@ $PAGE->set_totara_menu_selected('myreports');
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
-$config = new rb_config();
-$config->set_sid($sid);
+$config = (new rb_config())->set_sid($sid);
 $report = reportbuilder::create($id, $config);
 
 // Get info about the saved search we are dealing with.

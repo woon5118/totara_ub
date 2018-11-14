@@ -69,8 +69,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
 
         $rid = $this->create_report('appraisal_detail', 'Test report');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'appraisal', 'name', null, null, null, 0);
         $this->add_column($report, 'rolelearner', 'answers', null, null, null, 0);
@@ -183,8 +182,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         // Create report 1.
         $rid = $this->create_report('appraisal_detail', 'Test report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report1 = reportbuilder::create($rid, $config);
         $this->add_column($report1, 'appraisal', 'name', null, null, null, 0);
         $this->add_column($report1, 'rolelearner', 'answers', null, null, null, 0);
@@ -253,8 +251,7 @@ class totara_appraisal_rb_source_appraisal_detail_testcase extends appraisal_tes
         // Create report 2.
         $rid = $this->create_report('appraisal_detail', 'Test report 2');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report2 = reportbuilder::create($rid, $config);
         $this->add_column($report2, 'appraisal', 'name', null, null, null, 0);
         $this->add_column($report2, 'rolelearner', 'answers', null, null, null, 0);

@@ -5584,8 +5584,7 @@ function reportbuilder_generate_cache($reportid) {
 
     try {
         // Instantiate.
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($reportid, $config, false); // No permission check here, it is the responsibility of calling code.
 
         // Get caching query.
@@ -5833,10 +5832,10 @@ function reportbuilder_get_schduled_report(stdClass $sched, stdClass $reportreco
     );
 
     $config = new rb_config();
-    $config->set_sid($sched->savedsearchid);
-    $config->set_reportfor($sched->userid);
-    $config->set_embeddata(['userid' => $sched->userid]);
-    $config->set_global_restriction_set($allrestr);
+    $config->set_sid($sched->savedsearchid)
+        ->set_reportfor($sched->userid)
+        ->set_embeddata(['userid' => $sched->userid])
+        ->set_global_restriction_set($allrestr);
     return reportbuilder::create($sched->reportid, $config);
 }
 
@@ -6010,6 +6009,8 @@ function reportbuilder_get_embedded_report_object($embedname, $data=array()) {
  * This function is an alias to "new reportbuilder()", for use within embedded report pages. The embedded object
  * will be created within the reportbuilder constructor.
  *
+ * @deprecated since Totara 12
+ *
  * @param string $embedname Shortname of embedded report
  *                          e.g. X from rb_X_embedded.php
  * @param array $data Associative array of data needed by source (optional)
@@ -6021,6 +6022,7 @@ function reportbuilder_get_embedded_report_object($embedname, $data=array()) {
  */
 function reportbuilder_get_embedded_report($embedname, $data = array(), $nocache = false, $sid = 'nosidsupplied',
         rb_global_restriction_set $globalrestrictionset = null) {
+    debugging('Function reportbuilder_get_embedded_report is deprecated since Totara 12. Please use reportbuilder::create_embedded() instead.', DEBUG_DEVELOPER);
     if ($sid === 'nosidsupplied') {
         debugging('Call to reportbuilder_get_embedded_report without supplying $sid is probably an error - if you
             want to save searches on your embedded report then you must pass in $sid here, otherwise pass 0 to remove
@@ -6029,10 +6031,10 @@ function reportbuilder_get_embedded_report($embedname, $data = array(), $nocache
     }
 
     $config = new rb_config();
-    $config->set_sid($sid);
-    $config->set_nocache($nocache);
-    $config->set_embeddata($data);
-    $config->set_global_restriction_set($globalrestrictionset);
+    $config->set_sid($sid)
+        ->set_nocache($nocache)
+        ->set_embeddata($data)
+        ->set_global_restriction_set($globalrestrictionset);
     return reportbuilder::create_embedded($embedname, $config);
 }
 

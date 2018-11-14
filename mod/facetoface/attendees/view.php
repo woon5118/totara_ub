@@ -115,8 +115,12 @@ if ($actionallowed) {
 
     $attendancestatuses = array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\fully_attended::get_code(), \mod_facetoface\signup\state\not_set::get_code(),
         \mod_facetoface\signup\state\no_show::get_code(), \mod_facetoface\signup\state\partially_attended::get_code());
-    if (!$report = reportbuilder_get_embedded_report($shortname, array('sessionid' => $s, 'status' => $attendancestatuses),
-            false, $sid, $globalrestrictionset)) {
+
+    $config = (new rb_config())
+        ->set_embeddata(['sessionid' => $s, 'status' => $attendancestatuses])
+        ->set_sid($sid)
+        ->set_global_restriction_set($globalrestrictionset);
+    if (!$report = reportbuilder::create_embedded($shortname, $config)) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }
     $report->set_baseurl($baseurl);

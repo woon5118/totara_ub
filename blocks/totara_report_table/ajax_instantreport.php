@@ -70,8 +70,7 @@ $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($
 // Create the report object. Includes embedded report capability checks.
 $uniqueid = 'block_totara_report_table_' . $blockid;
 reportbuilder::overrideuniqueid($uniqueid);
-$config = new rb_config();
-$config->set_global_restriction_set($globalrestrictionset);
+$config = (new rb_config())->set_global_restriction_set($globalrestrictionset);
 $report = reportbuilder::create($id, $config, true);
 
 $PAGE->set_context($blockcontext);

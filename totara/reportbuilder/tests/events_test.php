@@ -34,8 +34,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $rid = $this->create_report('user', 'Test user report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -69,8 +68,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $rid = $this->create_report('user', 'Test user report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -96,8 +94,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $rid = $this->create_report('user', 'Test user report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -142,8 +139,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $rid = $this->create_report('user', 'Test user report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -170,8 +166,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $rid = $this->create_report('user', 'Test user report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -194,8 +189,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $rid = $this->create_report('user', 'Test user report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);

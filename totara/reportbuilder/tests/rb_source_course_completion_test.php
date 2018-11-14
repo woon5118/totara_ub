@@ -62,8 +62,7 @@ class totara_reportbuilder_rb_source_course_completion_testcase extends advanced
 
         $rid = $this->create_report('course_completion', 'Test course report');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'course', 'fullname', null, null, null, 0);
         $this->add_column($report, 'course', 'name_and_summary', null, null, null, 0);
@@ -93,8 +92,7 @@ class totara_reportbuilder_rb_source_course_completion_testcase extends advanced
 
         $this->delete_columns($report);
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'course', 'name_and_summary', null, null, null, 0);
         $this->add_column($report, 'course_completion', 'status', null, null, null, 0);

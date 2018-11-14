@@ -1092,7 +1092,8 @@ function totara_print_my_courses() {
     $sid = optional_param('sid', '0', PARAM_INT);
     $debug  = optional_param('debug', 0, PARAM_INT);
 
-    if (!$report = reportbuilder_get_embedded_report('course_progress', array(), false, $sid)) {
+    $config = (new rb_config())->set_sid($sid);
+    if (!$report = reportbuilder::create_embedded('course_progress', $config)) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }
 

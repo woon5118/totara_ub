@@ -108,7 +108,9 @@ class mod_facetoface_session_report_testcase extends advanced_testcase {
         $shortname = 'facetoface_sessions';
         $attendancestatuses = array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\fully_attended::get_code(), \mod_facetoface\signup\state\not_set::get_code(),
             \mod_facetoface\signup\state\no_show::get_code(), \mod_facetoface\signup\state\partially_attended::get_code());
-        $report = reportbuilder_get_embedded_report($shortname, array('sessionid' => $session->id, 'status' => $attendancestatuses), false, 0);
+        $config = (new rb_config())->set_embeddata(['sessionid' => $session->id, 'status' => $attendancestatuses]);
+        $report = reportbuilder::create_embedded($shortname, $config);
+
         list($sql, $params, $cache) = $report->build_query(false, true);
         $record = $DB->get_record_sql($sql, $params);
 

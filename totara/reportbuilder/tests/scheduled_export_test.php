@@ -42,8 +42,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -107,8 +106,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -263,8 +261,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -362,8 +359,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -469,8 +465,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -551,8 +546,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
         $DB->set_field('report_builder', 'accessmode', 1, array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
@@ -618,8 +612,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);

@@ -71,7 +71,7 @@ class totara_reportbuilder_observer {
         global $CFG;
         include_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
         $reportid = $event->objectid;
-        $report = new reportbuilder($reportid);
+        $report = reportbuilder::create($reportid);
 
         if (in_array('audience', $report->get_content_options())) {
             $restriction = new rb_audience_content();

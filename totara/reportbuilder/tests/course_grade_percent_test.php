@@ -46,8 +46,7 @@ class course_grade_percent_test extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('courses', 'Test');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $setupdata->report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.

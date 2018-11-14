@@ -44,8 +44,7 @@ class totara_reportbuilder_post_config_visibility_where_testcase extends advance
 
         // Create report. We use the user report, because we know it must include the visibility required columns.
         $rid = $this->create_report('program', 'Test program report 1');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Save a copy of all the required columns.

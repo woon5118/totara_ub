@@ -46,8 +46,7 @@ class totara_reportbuilder_clone_testcase extends advanced_testcase {
         // Add graph.
         $this->add_graph($rid, 'column', 0, 500, 'user-namelinkicon', '', array('statistics-coursescompleted'), '');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Add columns.
@@ -57,8 +56,7 @@ class totara_reportbuilder_clone_testcase extends advanced_testcase {
 
         // Clone.
         $newid = reportbuilder_clone_report($report, 'Clone report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $newreport = reportbuilder::create($newid, $config);
 
         // Test.

@@ -65,7 +65,8 @@ $canedit = has_capability('moodle/cohort:manage', context_system::instance());
 // NOTE: the manage capability is actually wrong here for courses because the enrolment changes are controlled with:
 //       enrol_is_enabled('cohort') and has_capability('moodle/course:enrolconfig', $coursecontext) and has_capability('enrol/cohort:config', $coursecontext)
 
-$report = reportbuilder_get_embedded_report('cohort_associations_enrolled', array('cohortid' => $id), false, $sid);
+$config = (new rb_config())->set_sid($sid)->set_embeddata(['cohortid' => $id]);
+$report = reportbuilder::create_embedded('cohort_associations_enrolled', $config);
 
 $url = new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $id));
 if ($context->contextlevel == CONTEXT_SYSTEM) {

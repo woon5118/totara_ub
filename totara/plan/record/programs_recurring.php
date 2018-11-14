@@ -105,7 +105,8 @@ $data = array(
     'userid' => $userid,
 );
 
-$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid);
+$config = (new rb_config())->set_sid($sid)->set_embeddata($data);
+$report = reportbuilder::create_embedded($shortname, $config);
 
 $logurl = $PAGE->url->out_as_local_url();
 if ($format != '') {

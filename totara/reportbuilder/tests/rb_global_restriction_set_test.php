@@ -145,8 +145,7 @@ class totara_reportbuilder_rb_global_restriction_set_testcase extends advanced_t
         $rid = $this->create_report('user', 'Test user report 1');
         $DB->set_field('report_builder', 'globalrestriction', '1', array('id' => $rid));
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
 

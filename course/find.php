@@ -45,7 +45,8 @@ $strheading = get_string('searchcourses', 'totara_core');
 $shortname = 'findcourses';
 $sid = optional_param('sid', '0', PARAM_INT);
 
-if (!$report = reportbuilder_get_embedded_report($shortname, null, false, $sid)) {
+$config = (new rb_config())->set_sid($sid);
+if (!$report = reportbuilder::create_embedded($shortname, $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 

@@ -78,8 +78,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
@@ -154,8 +153,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
@@ -229,8 +227,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
         // Remove all should result in null data.
         $rid = $this->create_report('user', 'Test user report 1');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
@@ -254,8 +251,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         // No empty series the data has to be the same (not exactly the same because there are static properties in svggraph).
 
         $rid = $this->create_report('user', 'Test user report 2a');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);

@@ -183,8 +183,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         }
 
         $this->reportid = $this->create_report('user', 'Test User Report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $this->report = reportbuilder::create($this->reportid, $config);
 
         $update = $DB->get_record('report_builder', array('id' => $this->reportid));

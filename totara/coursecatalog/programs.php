@@ -49,7 +49,7 @@ $renderer = $PAGE->get_renderer('totara_reportbuilder');
 $strheading = get_string('searchprograms', 'totara_program');
 $shortname = 'catalogprograms';
 
-if (!$report = reportbuilder_get_embedded_report($shortname, null, false, 0)) {
+if (!$report = reportbuilder::create_embedded($shortname)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 

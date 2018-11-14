@@ -69,8 +69,7 @@ class totara_reportbuilder_custom_fields_testcase extends advanced_testcase {
 
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);

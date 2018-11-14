@@ -32,7 +32,8 @@ $debug = optional_param('debug', 0, PARAM_INT);
 $syscontext = context_system::instance();
 admin_externalpage_setup('userdataexports');
 
-$report = reportbuilder_get_embedded_report('userdata_exports', array(), false, $sid);
+$config = (new rb_config())->set_sid($sid);
+$report = reportbuilder::create_embedded('userdata_exports', $config);
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);
 

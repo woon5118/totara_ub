@@ -36,11 +36,13 @@ class auth_approved_util_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Default should go to the pending requests.
-        $report = reportbuilder_get_embedded_report('auth_approved_pending_requests', array(), true, 0);
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create_embedded('auth_approved_pending_requests', $config);
         $this->assertEquals($report->report_url(), util::get_report_url(0));
 
         // When returning back to pending requests.
-        $report = reportbuilder_get_embedded_report('auth_approved_pending_requests', array(), true, 0);
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create_embedded('auth_approved_pending_requests', $config);
         $this->assertEquals($report->report_url(), util::get_report_url($report->_id));
 
         // Any other embedded report.
@@ -49,8 +51,7 @@ class auth_approved_util_testcase extends advanced_testcase {
 
         // Custom report.
         $rid = $this->create_report('user', 'User report');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->assertEquals($report->report_url(), util::get_report_url($report->_id));
 

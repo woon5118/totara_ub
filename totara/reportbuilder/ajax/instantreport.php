@@ -50,9 +50,7 @@ $reportrecord = $DB->get_record('report_builder', array('id' => $id), '*', MUST_
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 // Create the report object. Includes embedded report capability checks.
-$config = new rb_config();
-$config->set_sid($sid);
-$config->set_global_restriction_set($globalrestrictionset);
+$config = (new rb_config())->set_sid($sid)->set_global_restriction_set($globalrestrictionset);
 $report = reportbuilder::create($id, $config);
 
 // Decide if require_login should be executed.

@@ -38,8 +38,7 @@ require_login();
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/totara/reportbuilder/fusionexporter.php', array('id' => $id));
 
-$config = new rb_config();
-$config->set_sid($sid);
+$config = (new rb_config())->set_sid($sid);
 $report = reportbuilder::create($id, $config, true);
 
 $returnurl = new moodle_url('/totara/reportbuilder/fusionexporter.php', array('id' => $id, 'sid' => $sid));

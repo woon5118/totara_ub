@@ -39,8 +39,7 @@ class totara_reportbuilder_ignore_report_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $rid = $this->create_report('user', 'Test user report 1');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report1 = reportbuilder::create($rid, $config);
         $this->add_column($report1, 'user', 'id', null, null, null, 0);
         $this->add_column($report1, 'user', 'username', null, null, null, 0);

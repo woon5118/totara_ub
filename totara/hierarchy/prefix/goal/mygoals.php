@@ -64,7 +64,8 @@ $PAGE->set_pagelayout('standard');
 
 /* Define the "Custom Goals" embedded report */
 $shortname = 'goal_custom_fields';
-if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid)) {
+$config = (new rb_config())->set_sid($sid)->set_embeddata($data);
+if (!$report = reportbuilder::create_embedded($shortname, $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 

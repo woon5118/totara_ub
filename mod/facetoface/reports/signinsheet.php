@@ -63,8 +63,8 @@ $reportparams = array(
     'sessionid' => $session->id,
     'sessiondateid' => $sessiondate->id,
 );
-if (!$report = reportbuilder_get_embedded_report($shortname, $reportparams, false, 0,
-    $globalrestrictionset)) {
+$config = (new rb_config())->set_global_restriction_set($globalrestrictionset)->set_embeddata($reportparams);
+if (!$report = reportbuilder::create_embedded($shortname, $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 

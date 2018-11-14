@@ -59,7 +59,8 @@ if (rb_facetoface_summary_room_embedded::is_capable_static($USER->id)) {
     $shortname = 'facetoface_summary_room';
     $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
     $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
-    $report = reportbuilder_get_embedded_report($shortname, null, false, 0, $globalrestrictionset);
+    $config = (new rb_config())->set_global_restriction_set($globalrestrictionset);
+    $report = reportbuilder::create_embedded($shortname, $config);
     if (!$report) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }

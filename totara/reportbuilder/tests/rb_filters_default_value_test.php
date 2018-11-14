@@ -49,8 +49,7 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->add_filter($rid, 'user', 'fullname', 1, 'Name', 1, 1, ['operator' => 3, 'value' => 'default text']);
         $this->add_filter($rid, 'user', 'deleted', 1, 'User Status', 1, 1, ['operator'=> 1, 'value' => 0]);
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Assert filters.
@@ -86,8 +85,7 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->add_filter($rid, 'course_category', 'path', 1, 'Category', 0, 1, ['operator' => 1, 'value' => 1, 'recursive' => 1]);
         $this->add_filter($rid, 'course', 'startdate', 1, 'Course start date', 0, 1, ['after' => 0, 'before' => 0, 'daysafter'=> 22, 'daysbefore' => 13]);
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Assert filters.
@@ -126,8 +124,7 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->add_filter($rid, 'course', 'id', 1, '', 0, 1, ['operator'=> 1, 'value' => "{$course1->id},{$course2->id}"]);
         $this->add_filter($rid, 'cohort', 'enrolledcoursecohortids', 1, '', 0, 1, ['value' => "{$audience1->id},{$audience2->id}"]);
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Assert filters.

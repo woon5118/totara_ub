@@ -36,7 +36,8 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -66,7 +67,8 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -115,7 +117,8 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -164,7 +167,8 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -213,7 +217,8 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($rid, $config);
 
         // Two dates.
         // Mock objects to use in the display function.
@@ -296,7 +301,8 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $report = new reportbuilder($rid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($rid, $config);
 
         // Two dates.
         // Mock objects to use in the display function.

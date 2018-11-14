@@ -46,13 +46,15 @@ $renderer = $PAGE->get_renderer('totara_reportbuilder');
 if (!empty($program->certifid)) {
     $reportrecord = $DB->get_record('report_builder', array('shortname' => 'cert_assignment_duedates'));
     $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
-    if (!$report = reportbuilder_get_embedded_report('cert_assignment_duedates', null, false, 0, $globalrestrictionset)) {
+    $config = (new rb_config())->set_global_restriction_set($globalrestrictionset);
+    if (!$report = reportbuilder::create_embedded('cert_assignment_duedates', $config)) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }
 } else {
     $reportrecord = $DB->get_record('report_builder', array('shortname' => 'program_assignment_duedates'));
     $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
-    if (!$report = reportbuilder_get_embedded_report('program_assignment_duedates', null, false, 0, $globalrestrictionset)) {
+    $config = (new rb_config())->set_global_restriction_set($globalrestrictionset);
+    if (!$report = reportbuilder::create_embedded('program_assignment_duedates', $config)) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }
 }

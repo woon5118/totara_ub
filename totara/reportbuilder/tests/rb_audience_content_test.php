@@ -57,7 +57,8 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
         global $DB;
         $this->setup_report_data();
 
-        $this->report = new reportbuilder($this->reportid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($this->reportid, $config);
         $this->add_column($this->report, 'user', 'id', null, null, null, 0);
         $this->add_column($this->report, 'user', 'firstname', null, null, null, 0);
 
@@ -105,7 +106,7 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
 
         // Create the report and trigger the event
         $this->reportid = $this->create_report('user', 'Test User Restriction Report');
-        \totara_reportbuilder\event\report_created::create_from_report(new reportbuilder($this->reportid), false)->trigger();
+        \totara_reportbuilder\event\report_created::create_from_report(reportbuilder::create($this->reportid), false)->trigger();
 
         // Check default audience restrictions
         $settings = reportbuilder::get_all_settings($this->reportid, 'audience_content');
@@ -113,7 +114,7 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
         $this->assertSame(1, (int)$settings['enable']);
 
         // Check report data
-        $report = new reportbuilder($this->reportid); // Init report with new settings
+        $report = reportbuilder::create($this->reportid); // Init report with new settings
         list($sql, $params,) = $report->build_query();
         $records = $DB->get_records_sql($sql, $params);
 
@@ -138,7 +139,8 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
         cohort_add_member($this->audience[1]->id, $this->users[3]->id);
 
         $this->reportid = $this->create_report('user', 'Test User Report');
-        $this->report = new reportbuilder($this->reportid, null, false, null, null, true);
+        $config = (new rb_config())->set_nocache(true);
+        $this->report = reportbuilder::create($this->reportid, $config);
         $this->add_column($this->report, 'user', 'id', null, null, null, 0);
         $this->add_column($this->report, 'user', 'firstname', null, null, null, 0);
     }

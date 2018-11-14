@@ -115,8 +115,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstaccess', 'month', null, null, 0);
@@ -267,8 +266,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('courses', 'Test courses report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         $this->add_column($report, 'course', 'summary', null, null, null, 0);
@@ -341,8 +339,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('course_completion', 'Test courses report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         $this->add_column($report, 'user', 'institution', null, null, null, 0);
@@ -396,8 +393,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $rid = $this->create_report('course_completion', 'Test courses report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         $this->add_column($report, 'user', 'institution', null, null, null, 0);
@@ -426,8 +422,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -464,8 +459,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -492,8 +486,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -522,8 +515,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -574,8 +566,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -626,8 +617,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -678,8 +668,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         //
@@ -775,8 +764,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -827,8 +815,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -900,8 +887,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -932,8 +918,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -963,8 +948,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
@@ -1014,8 +998,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.

@@ -85,8 +85,7 @@ class mod_facetoface_rb_facetoface_rooms_reportbuilder_testcase extends advanced
         global $DB;
         $id = null;
 
-        $config = new rb_config();
-        $config->set_reportfor($user->id);
+        $config = (new rb_config())->set_reportfor($user->id);
 
         if ($userembedded) {
             return reportbuilder::create_embedded('facetoface_rooms', $config);

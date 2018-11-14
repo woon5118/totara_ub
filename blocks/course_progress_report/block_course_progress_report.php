@@ -83,7 +83,8 @@ class block_course_progress_report extends block_base {
             // Verify global restrictions.
             $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
             try {
-                $report = reportbuilder_get_embedded_report('course_progress', array(), false, $sid, $globalrestrictionset);
+                $config = (new rb_config())->set_sid($sid)->set_global_restriction_set($globalrestrictionset);
+                $report = reportbuilder::create_embedded('course_progress', $config);
             } catch (moodle_exception $e) {
                 // Don't break page if report became unavailable.
                 return $this->content;

@@ -67,8 +67,8 @@ if ($USER->id == $userid) {
     }
 }
 
-$reportfilters = array('userid' => $userid);
-$report = reportbuilder_get_embedded_report('plan_evidence', $reportfilters, false, $sid);
+$config = (new rb_config())->set_sid($sid)->set_embeddata(['userid' => $userid]);
+$report = reportbuilder::create_embedded('plan_evidence', $config);
 
 $logurl = $PAGE->url->out_as_local_url();
 if ($format != '') {

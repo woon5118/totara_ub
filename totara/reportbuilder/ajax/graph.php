@@ -43,8 +43,7 @@ $reportrecord = $DB->get_record('report_builder', array('id' => $id));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 $config = new rb_config();
-$config->set_sid($sid);
-$config->set_global_restriction_set($globalrestrictionset);
+$config->set_sid($sid)->set_global_restriction_set($globalrestrictionset);
 $report = reportbuilder::create($id, $config);
 
 if (!reportbuilder::is_capable($id)) {

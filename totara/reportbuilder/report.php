@@ -56,8 +56,7 @@ $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($
 
 // New report object.
 $config = new rb_config();
-$config->set_sid($sid);
-$config->set_global_restriction_set($globalrestrictionset);
+$config->set_sid($sid)->set_global_restriction_set($globalrestrictionset);
 $report = reportbuilder::create($id, $config, true);
 
 $report->handle_pre_display_actions();

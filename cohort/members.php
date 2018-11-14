@@ -71,7 +71,8 @@ $shortname = 'cohort_members';
 $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
-$report = reportbuilder_get_embedded_report($shortname, array('cohortid' => $id), false, $sid, $globalrestrictionset);
+$config = (new rb_config())->set_global_restriction_set($globalrestrictionset)->set_embeddata(['cohortid' => $id])->set_sid($sid);
+$report = reportbuilder::create_embedded($shortname, $config);
 
 if ($format != '') {
     $report->export_data($format);

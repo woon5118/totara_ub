@@ -588,8 +588,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
     function test_reportbuilder_restore_saved_search() {
         global $SESSION, $USER, $DB;
-        $config = new rb_config();
-        $config->set_sid($this->savedsearch->id);
+        $config = (new rb_config())->set_sid($this->savedsearch->id);
         $rb = reportbuilder::create($this->rb->_id, $config);
 
         // ensure that saved search belongs to current user
@@ -709,8 +708,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     // leaving get_current_admin_options() until after changes to capabilities
     function test_reportbuilder_get_current_params() {
         $userid = $this->user->id;
-        $config = new rb_config();
-        $config->set_embeddata(array('userid' => $userid));
+        $config = (new rb_config())->set_embeddata(array('userid' => $userid));
         $rb = reportbuilder::create_embedded($this->shortname, $config);
         $paramoption = new stdClass();
         $paramoption->name = 'userid';
@@ -761,8 +759,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     function test_reportbuilder_get_param_restrictions() {
-        $config = new rb_config();
-        $config->set_embeddata(array('userid' => $this->user->id));
+        $config = (new rb_config())->set_embeddata(array('userid' => $this->user->id));
         $rb = reportbuilder::create_embedded($this->shortname, $config);
         // should return the correct SQL fragment if a parameter restriction is set
         $restrictions = $rb->get_param_restrictions();
@@ -999,8 +996,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->add_column($report, 'certif_completion', 'progress', null, null, '', 0);
 
         // Get report.
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->assertFalse($report->grouped);
         $this->assertFalse($report->is_internally_grouped());
@@ -1564,8 +1560,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // Create report.
         $rid = $this->create_report('user', 'Test user report 1');
 
-        $config = new rb_config();
-        $config->set_nocache(true);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'namelinkicon', null, null, '', 0);
         $this->add_column($report, 'user', 'username', null, null, '', 0);
