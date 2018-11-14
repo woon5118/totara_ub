@@ -316,14 +316,20 @@ class feedback_item_multichoice extends feedback_item_base {
         $inputname = $item->typ . '_' . $item->id;
         $options = $this->get_options($item);
         $separator = !empty($info->horizontal) ? ' ' : '<br>';
-        $tmpvalue = $form->get_item_value($item);
+        $itemval = $form->get_item_value($item);
+        $tmpvalue = !is_null($itemval) ? $itemval : 0; // Used for element defaults, so must be a valid value (not null).
 
+        // Subtypes:
+        // r = radio
+        // c = checkbox
+        // d = dropdown.
         if ($info->subtype === 'd' || ($info->subtype === 'r' && $form->is_frozen())) {
             // Display as a dropdown in the complete form or a single value in the response view.
             $element = $form->add_form_element($item,
                     ['select', $inputname, $name, array(0 => '') + $options, array('class' => $class)],
                     false, false);
             $form->set_element_default($inputname, $tmpvalue);
+            $form->set_element_type($inputname, PARAM_INT);
         } else if ($info->subtype === 'c' && $form->is_frozen()) {
             // Display list of checkbox values in the response view.
             $objs = [];
@@ -354,8 +360,8 @@ class feedback_item_multichoice extends feedback_item_base {
             } else {
                 // Radio.
                 if (!array_key_exists(0, $options)) {
-                    // Always add '0' as hidden element, otherwise form submit data may not have this element.
-                    $objs[] = ['hidden', $inputname];
+                    // Always add a hidden element to the group to guarantee we get a value in the submit data.
+                    $objs[] = ['hidden', $inputname, 0];
                 }
                 foreach ($options as $idx => $label) {
                     $objs[] = ['radio', $inputname, '', $label, $idx];
@@ -371,7 +377,7 @@ class feedback_item_multichoice extends feedback_item_base {
         // Process 'required' rule.
         if ($item->required) {
             $elementname = $element->getName();
-            $form->add_validation_rule(function($values, $files) use ($elementname, $item) {
+            $form->add_validation_rule(function($values) use ($elementname, $item) {
                 $inputname = $item->typ . '_' . $item->id;
                 return empty($values[$inputname]) || (is_array($values[$inputname]) && !array_filter($values[$inputname])) ?
                     array($elementname => get_string('required')) : true;
@@ -385,11 +391,11 @@ class feedback_item_multichoice extends feedback_item_base {
      * @return string
      */
     public function create_value($value) {
-        if (is_array($value)) {
-            $value = array_unique(array_filter($value));
-            return join(FEEDBACK_MULTICHOICE_LINE_SEP, $value);
-        }
-        return parent::create_value($value);
+        // Could be an array (multichoice checkbox) or single value (multichoice radio or dropdown).
+        $value = is_array($value) ? $value : [$value];
+
+        $value = array_unique(array_filter($value));
+        return join(FEEDBACK_MULTICHOICE_LINE_SEP, $value);
     }
 
     /**
