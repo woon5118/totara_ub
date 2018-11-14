@@ -20,7 +20,7 @@ Feature: In a report, admin can see loglive data
 
   @javascript
   Scenario: Check loglive report entries and make sure the report works for standard and legacy reader
-    Given I navigate to "Live logs" node in "Site administration > System reports"
+    Given I navigate to "Live logs" node in "Site administration > Server"
     When I set the field "reader" to "Standard log"
     Then I should see "Course module created"
     And I should see "Test name"
@@ -33,7 +33,7 @@ Feature: In a report, admin can see loglive data
   @javascript @_switch_window
   Scenario: Check loglive report entries and make sure the pause/resume button works for standard reader along with ajax calls
     Given I am on site homepage
-    When I navigate to "Live logs" node in "Site administration > System reports"
+    When I navigate to "Live logs" node in "Site administration > Server"
     And I set the field "reader" to "Standard log"
     And I wait to be redirected
     And I should not see "Test name2"
@@ -59,7 +59,7 @@ Feature: In a report, admin can see loglive data
   @javascript @_switch_window
   Scenario: Check loglive report entries and make sure the pause/resume button works for legacy reader along with ajax calls
     Given I am on site homepage
-    When I navigate to "Live logs" node in "Site administration > System reports"
+    When I navigate to "Live logs" node in "Site administration > Server"
     And I set the field "reader" to "Legacy log"
     And I wait to be redirected
     And I should not see "Test name2"

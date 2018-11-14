@@ -25,7 +25,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
       | user    | cohort |
       | learner | AUD1   |
 
-    And I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I press "Add a new personal goal type"
     And I set the following fields to these values:
       | Type full name      | Personal Goal Type 1 |

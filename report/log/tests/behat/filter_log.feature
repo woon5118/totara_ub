@@ -30,7 +30,7 @@ Feature: In a report, admin can filter log data
     And I press "Continue"
     And I log out
     And I log in as "admin"
-    When I navigate to "Logs" node in "Site administration > System reports"
+    When I navigate to "Logs" node in "Site administration > Server"
     And I set the field "id" to "Acceptance test site (Site)"
     And I set the field "user" to "All participants"
     And I set the field "logreader" to "Standard log"
@@ -50,7 +50,7 @@ Feature: In a report, admin can filter log data
     And I press "Continue"
     And I log out
     And I log in as "admin"
-    When I navigate to "Logs" node in "Site administration > System reports"
+    When I navigate to "Logs" node in "Site administration > Server"
     And I set the field "id" to "Acceptance test site (Site)"
     And I set the field "user" to "All participants"
     And I press "Get these logs"
@@ -70,7 +70,7 @@ Feature: In a report, admin can filter log data
     And I press "Continue"
     And I log out
     And I log in as "admin"
-    When I navigate to "Logs" node in "Site administration > System reports"
+    When I navigate to "Logs" node in "Site administration > Server"
     And I set the field "id" to "Acceptance test site (Site)"
     And I set the field "user" to "All participants"
     And I press "Get these logs"

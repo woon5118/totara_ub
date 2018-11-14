@@ -51,7 +51,7 @@ Feature: Verify competencies completion status is updated when the associated co
     And I press "Save changes"
 
     # Create the competency scale.
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I press "Add a new competency scale"
     And I set the field "Name" to "Graded Scale 1-3"
     And I set the field "Scale values" to multiline:
@@ -237,7 +237,7 @@ Scale 1
     And I log out
 
     When I log in as "admin"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I follow "Competency Framework 1"
     And I click on "Edit" "link" in the "Competency 1" "table_row"
     And I set the field "Aggregation method" to "Any"

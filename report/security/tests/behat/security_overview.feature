@@ -8,13 +8,13 @@ Feature: security overview
   @javascript
   Scenario: Search for a status of critical on the security overview report
 
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     Then  ".statusok" "css_element" should exist
     And  ".statuscritical" "css_element" should not exist
 
   @javascript
   Scenario: Check status correct on security overview report
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "OK" in the "Insecure dataroot" "table_row"
     And I should see "OK" in the "No authentication" "table_row"
     And I should see "OK" in the "Allow EMBED and OBJECT" "table_row"
@@ -35,7 +35,7 @@ Feature: security overview
   Scenario: Check that Critical status is displayed when required in the security overview for issue, Allow EMBED and OBJECT
 
     # First, check the status is OK
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "OK" in the "Allow EMBED and OBJECT" "table_row"
 
     # Now change to create a Critical status
@@ -43,14 +43,14 @@ Feature: security overview
       | allowobjectembed | 1 |
 
     # Check the status is shown as Critical
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "Critical" in the "Allow EMBED and OBJECT" "table_row"
 
   @javascript
   Scenario: Check that Critical status is displayed when required in the security overview for issue, Guest role
 
     # First, check the status is OK
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "OK" in the "Guest role" "table_row"
 
     # Now change to create a Critical status
@@ -62,14 +62,14 @@ Feature: security overview
     And I click on "Save changes" "button"
 
     # Check the status is shown as Critical
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "Critical" in the "Guest role" "table_row"
 
   @javascript
   Scenario: Check that Critical status is displayed when required in the security overview for issue, Frontpage role
 
     # First, check the status is OK
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "OK" in the "Frontpage role" "table_row"
 
     # Now change to create a Critical status
@@ -84,14 +84,14 @@ Feature: security overview
     And I click on "Save changes" "button"
 
     # Check the status is shown as Critical
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "Critical" in the "Frontpage role" "table_row"
 
   @javascript
   Scenario: Check that the Critical status is displayed when httponly is disabled
 
     # To start with the security setting is off
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "Serious" in the "HTTP only cookies" "table_row"
 
     # Now change to create an OK status
@@ -100,5 +100,5 @@ Feature: security overview
       | cookiehttponly | 1 |
 
     # Check the status is OK now
-    Given I navigate to "Security overview" node in "Site administration > System reports"
+    Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "OK" in the "HTTP only cookies" "table_row"

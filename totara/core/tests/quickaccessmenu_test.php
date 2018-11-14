@@ -149,29 +149,34 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'userpolicies' => 'Permissions',
                 'positionmanage' => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'badgesettings' => 'Badges',
+                'managebadges' => 'Badges',
                 'competencymanage' => 'Competencies',
                 'rbmanagereports' => 'Reports',
-                'totaradashboard' => 'Dashboards',
-                'pluginsoverview' => 'Plugins',
             ],
             group::LEARN => [
-                'coursemgmt' => 'Manage courses and categories',
+                'coursemgmt' => 'Courses and categories',
                 'programmgmt' => 'Programs',
                 'managecertifications' => 'Certifications',
                 'modsettingfacetoface' => 'Seminars',
                 'gradessettings' => 'Grades',
                 'managetemplates' => 'Learning Plans',
             ],
+            group::PERFORM => [
+                'manageappraisals' => 'Appraisals',
+                'managefeedback360' => '360° Feedback',
+                'goalmanage' => 'Goals',
+            ],
             group::CONFIGURATION => [
                 'themesettings' => 'Appearance',
+                'navigation' => 'Navigation',
+                'pluginsoverview' => 'Plugins',
                 'sitepolicies' => 'Security',
+                'totarasyncsettings' => 'HR Import',
                 'langsettings' => 'Localisation',
                 'environment' => 'Server',
-                'totarasyncsettings' => 'HR Import',
                 'debugging' => 'Development',
                 'optionalsubsystems' => 'Advanced features',
-                'adminnotifications' => 'Notifications',
+                'adminnotifications' => 'System information',
             ]
         ], $user);
     }
@@ -194,17 +199,21 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts' => 'Audiences',
                 'positionmanage' => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'badgesettings' => 'Badges',
+                'managebadges' => 'Badges',
                 'competencymanage' => 'Competencies',
                 'rbmanagereports' => 'Reports',
-                'totaradashboard' => 'Dashboards',
             ],
             group::LEARN => [
-                'coursemgmt' => 'Manage courses and categories',
+                'coursemgmt' => 'Courses and categories',
                 'programmgmt' => 'Programs',
                 'managecertifications' => 'Certifications',
                 'gradessettings' => 'Grades',
                 'managetemplates' => 'Learning Plans',
+            ],
+            group::PERFORM => [
+                'manageappraisals' => 'Appraisals',
+                'managefeedback360' => '360° Feedback',
+                'goalmanage' => 'Goals',
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
@@ -247,7 +256,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
 
         self::assertMenuStructure([
             group::LEARN => [
-                'coursemgmt' => 'Manage courses and categories',
+                'coursemgmt' => 'Courses and categories',
             ]
         ], $user);
 
@@ -814,6 +823,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         self::assertEquals([
             group::PLATFORM,
             group::LEARN,
+            group::PERFORM,
             group::CONFIGURATION,
         ], group::get_group_keys(1));
     }
@@ -821,15 +831,17 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     public function test_group_get_group_strings() {
         self::assertEquals([
             'platform'      => 'Core platform',
-            'learn'         => 'Learn',
+            'learn'         => 'Learning',
             'configuration' => 'Configuration',
+            'perform'       => 'Performance'
         ], group::get_group_strings(1));
 
         // Check truncations.
         self::assertEquals([
             'platform'      => 'Core pl...',
-            'learn'         => 'Learn',
+            'learn'         => 'Learning',
             'configuration' => 'Configu...',
+            'perform'       => 'Perform...'
         ], group::get_group_strings(1, 10));
     }
 
@@ -869,6 +881,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'rbmanagereports' => 'Reports',
             ],
             group::LEARN         => [],
+            group::PERFORM       => [],
             group::CONFIGURATION => [],
             $group1->get_key()   => [],
             $group2->get_key()   => [],
@@ -958,17 +971,21 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
               'cohorts'            => 'Audiences',
               'positionmanage'     => 'Positions',
               'organisationmanage' => 'Organisations',
-              'badgesettings'      => 'Badges',
+              'managebadges'       => 'Badges',
               'competencymanage'   => 'Competencies',
               'rbmanagereports'    => 'Reports',
-              'totaradashboard'    => 'Dashboards',
             ],
             group::LEARN         => [
-              'coursemgmt'           => 'Manage courses and categories',
+              'coursemgmt'           => 'Courses and categories',
               'programmgmt'          => 'Programs',
               'managecertifications' => 'Certifications',
               'gradessettings'       => 'Grades',
               'managetemplates'      => 'Learning Plans',
+            ],
+            group::PERFORM => [
+                'manageappraisals'   => 'Appraisals',
+                'managefeedback360'  => '360° Feedback',
+                'goalmanage'         => 'Goals',
             ],
             group::CONFIGURATION => [
               'totarasyncsettings' => 'HR Import',
@@ -987,17 +1004,21 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts'            => 'Audiences',
                 'positionmanage'     => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'badgesettings'      => 'Badges',
+                'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
                 'rbmanagereports'    => 'Reports',
-                'totaradashboard'    => 'Dashboards',
             ],
             group::LEARN         => [
-                'coursemgmt'           => 'Manage courses and categories',
+                'coursemgmt'           => 'Courses and categories',
                 'programmgmt'          => 'Programs',
                 'managecertifications' => 'Certifications',
                 'gradessettings'       => 'Grades',
                 'managetemplates'      => 'Learning Plans',
+            ],
+            group::PERFORM => [
+                'manageappraisals'   => 'Appraisals',
+                'managefeedback360'  => '360° Feedback',
+                'goalmanage'         => 'Goals',
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
@@ -1024,17 +1045,21 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts'            => 'Audiences',
                 'positionmanage'     => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'badgesettings'      => 'Badges',
+                'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
                 'rbmanagereports'    => 'Reports',
-                'totaradashboard'    => 'Dashboards',
             ],
             group::LEARN         => [
-                'coursemgmt'           => 'Manage courses and categories',
+                'coursemgmt'           => 'Courses and categories',
                 'programmgmt'          => 'Programs',
                 'managecertifications' => 'Certifications',
                 'gradessettings'       => 'Grades',
                 'managetemplates'      => 'Learning Plans',
+            ],
+            group::PERFORM => [
+                'manageappraisals'   => 'Appraisals',
+                'managefeedback360'  => '360° Feedback',
+                'goalmanage'         => 'Goals',
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
@@ -1051,10 +1076,9 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts'            => 'Audiences',
                 'positionmanage'     => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'badgesettings'      => 'Badges',
+                'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
                 'rbmanagereports'    => 'Reports',
-                'totaradashboard'    => 'Dashboards',
             ],
             group::LEARN         => [
                 'programmgmt'          => 'Programs',
@@ -1062,10 +1086,15 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'gradessettings'       => 'Grades',
                 'managetemplates'      => 'Learning Plans',
             ],
+            group::PERFORM => [
+                'manageappraisals'   => 'Appraisals',
+                'managefeedback360'  => '360° Feedback',
+                'goalmanage'         => 'Goals',
+            ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
                 'restorecourse'      => 'Restore course',
-                'coursemgmt'         => 'Manage courses and categories',
+                'coursemgmt'         => 'Courses and categories',
             ],
         ], $user);
 
@@ -1091,6 +1120,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         self::assertMenuStructure([
             group::PLATFORM      => ['rbmanagereports' => 'Reports',],
             group::LEARN         => [],
+            group::PERFORM       => [],
             group::CONFIGURATION => [],
         ], $user, true);
 
@@ -1099,7 +1129,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         $group3 = group::create_group('Group 3', $user->id);
 
         self::assertTrue(helper::reorder_groups($user->id,
-            [group::CONFIGURATION, $group1->get_key(), $group3->get_key(), group::LEARN, group::PLATFORM, $group2->get_key()]
+            [group::CONFIGURATION, $group1->get_key(), $group3->get_key(), group::LEARN, group::PLATFORM, group::PERFORM, $group2->get_key()]
         ));
 
         self::assertMenuStructure([
@@ -1108,6 +1138,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             $group3->get_key()   => [],
             group::LEARN         => [],
             group::PLATFORM      => ['rbmanagereports' => 'Reports',],
+            group::PERFORM       => [],
             $group2->get_key()   => [],
         ], $user, true);
 
@@ -1119,6 +1150,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             $group3->get_key()   => [],
             group::LEARN         => [],
             group::PLATFORM      => ['rbmanagereports' => 'Reports',],
+            group::PERFORM       => [],
             $group2->get_key()   => [],
             group::CONFIGURATION => [],
         ], $user, true);
@@ -1130,12 +1162,13 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             group::PLATFORM      => ['rbmanagereports' => 'Reports',],
             $group3->get_key()   => [],
             group::LEARN         => [],
+            group::PERFORM       => [],
             $group2->get_key()   => [],
             group::CONFIGURATION => [],
         ], $user, true);
 
         self::assertTrue(helper::reorder_groups($user->id,
-            [group::CONFIGURATION, $group1->get_key(), $group3->get_key(), group::PLATFORM, $group2->get_key(), group::LEARN]
+            [group::CONFIGURATION, $group1->get_key(), $group3->get_key(), group::PLATFORM, $group2->get_key(), group::LEARN, group::PERFORM]
         ));
 
         self::assertMenuStructure([
@@ -1145,14 +1178,15 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             group::PLATFORM      => ['rbmanagereports' => 'Reports',],
             $group2->get_key()   => [],
             group::LEARN         => [],
+            group::PERFORM       => [],
         ], $user, true);
 
         // Reorder with the wrong number of group keys.
         self::assertFalse(helper::reorder_groups($user->id, ['green', 'blue', 'red']));
-        self::assertDebuggingCalled('Invalid number of groups provided, expected 6 got 3');
+        self::assertDebuggingCalled('Invalid number of groups provided, expected 7 got 3');
 
         // Reorder with invalid group keys.
-        self::assertFalse(helper::reorder_groups($user->id, ['green', 'blue', 'red', 'yellow', 'pink', 'black']));
+        self::assertFalse(helper::reorder_groups($user->id, ['green', 'blue', 'red', 'yellow', 'pink', 'black', 'orange']));
         self::assertDebuggingCalled('Given key is not presently in use, green');
 
         // Moving an unknown item before an unknown item.
@@ -1342,12 +1376,12 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                     ],
                 ],
                 [
-                    'title'      => 'Learn',
+                    'title'      => 'Learning',
                     'has_items'  => true,
                     'item_count' => 1,
                     'items'      => [
                         [
-                            'label' => 'Manage courses and categories',
+                            'label' => 'Courses and categories',
                             'url'   => 'https://www.example.com/moodle/course/management.php',
                         ],
                     ],
@@ -1428,5 +1462,23 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         $this->expectException(\coding_exception::class);
         $this->expectExceptionMessage('Preferences cannot be set for the guest user.');
         preference_helper::reset_for_user(guest_user()->id);
+    }
+
+    public function test_duplicate_weight_in_groups() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        admin_get_root(true, false); // Force the admin tree to reload.
+
+        $user = get_admin();
+        $groups = group::get_groups($user->id);
+        $weights = [];
+        foreach ($groups as $group) {
+            $weights[] = $group->get_weight();
+        }
+
+        // Remove duplicate weights if there are any.
+        $weights = array_unique($weights);
+
+        $this->assertEquals(count($groups), count($weights), 'Coding error: Two or more default groups have the same weight, this needs to be fixed!');
     }
 }

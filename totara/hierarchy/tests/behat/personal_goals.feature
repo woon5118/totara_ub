@@ -27,7 +27,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
     # Create a new Personal Goal Type
     Given I log in as "admin"
-    And I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I press "Add a new personal goal type"
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1             |
@@ -62,7 +62,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
     # Create a new Personal Goal Type
     Given I log in as "admin"
-    And I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I press "Add a new personal goal type"
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1                |
@@ -137,7 +137,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
     # Create a new Personal Goal Type
     Given I log in as "admin"
-    And I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I press "Add a new personal goal type"
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1                |
@@ -320,7 +320,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     Then I should see "Appraisal Appraisal 1 activated"
 
     # Create a new Personal Goal Type
-    When I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    When I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I press "Add a new personal goal type"
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1                |
@@ -571,7 +571,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     Then I should see "Appraisal Appraisal 1 activated"
 
     # Create a new Personal Goal Type
-    When I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    When I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I press "Add a new personal goal type"
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1                |

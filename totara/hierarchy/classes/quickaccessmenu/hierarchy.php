@@ -52,7 +52,13 @@ class hierarchy implements \totara_core\quickaccessmenu\provider {
                 group::get(group::PLATFORM),
                 new \lang_string('competencies', 'totara_hierarchy'),
                 6000
-            )
+            ),
+            item::from_provider(
+                'goalmanage',
+                group::get(group::PERFORM),
+                new \lang_string('goals', 'totara_hierarchy'),
+                3000
+            ),
         ];
     }
 }

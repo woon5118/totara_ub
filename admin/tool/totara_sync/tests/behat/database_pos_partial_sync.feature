@@ -45,7 +45,7 @@ Feature: Verify that partial position sync works correctly for database import.
 
   Scenario: Verify the positions are imported and show on the Positions admin page
 
-    Given I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    Given I navigate to "Manage positions" node in "Site administration > Positions"
     When I follow "Position Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Position 1 | 1 |
@@ -77,7 +77,7 @@ Feature: Verify that partial position sync works correctly for database import.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Position 1 | 1 |
@@ -111,7 +111,7 @@ Feature: Verify that partial position sync works correctly for database import.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Position 1 | 1 |

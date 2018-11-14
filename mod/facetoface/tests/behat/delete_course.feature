@@ -57,7 +57,7 @@ Feature: Delete a course with a seminar
     And I log out
 
     And I log in as "admin"
-    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    And I navigate to "Courses and categories" node in "Site administration > Courses"
     And I should see "Course 1" in the "#course-listing" "css_element"
     And I click on "delete" action for "Course 1" in management course listing
     And I should see "Delete C1"
@@ -67,6 +67,6 @@ Feature: Delete a course with a seminar
     Then I should see "Deleting C1"
     And I should see "C1 has been completely deleted"
     And I press "Continue"
-    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    And I navigate to "Courses and categories" node in "Site administration > Courses"
     And I should not see "Course 1" in the "#course-listing" "css_element"
 

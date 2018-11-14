@@ -55,7 +55,7 @@ Feature: Verify competencies are automatically added to plan according to job as
       | learner5 | Job 1    | manager2 |          | O3           |
 
     When I log in as "admin"
-    And I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    And I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     And I follow "Position 1"
     Then I should see "Position Framework 1 - Position 1"
@@ -92,7 +92,7 @@ Feature: Verify competencies are automatically added to plan according to job as
     And I click on "Save" "button" in the "Assign competencies" "totaradialogue"
     Then I should see "Remove" in the "Competency 3" "table_row"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     # Add Competency 2 to Organisation 2.
     And I follow "Organisation Framework 1"
     And I follow "Organisation 2"

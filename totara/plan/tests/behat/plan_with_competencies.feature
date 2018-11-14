@@ -157,7 +157,7 @@ Feature: Learner creates learning plan with competencies.
     Then I should see "Competency settings successfully updated"
 
     # Assign Competency 1 to Position 1.
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     And I follow "Position 1"
     And I press "Add Competency"
@@ -190,7 +190,7 @@ Feature: Learner creates learning plan with competencies.
 
     # Hide the competency and ensure it's hidden in the plan.
     When I am on homepage
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I follow "Competency Framework 1"
     And I click on "Hide" "link" in the "Competency 1" "table_row"
     And I navigate to "Browse list of users" node in "Site administration > Users"
@@ -208,7 +208,7 @@ Feature: Learner creates learning plan with competencies.
 
     # Hide the competency framework and make sure Competency 2 isn't added to the plan.
     When I am on homepage
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Hide" "link" in the "Competency Framework 1" "table_row"
     And I navigate to "Browse list of users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"

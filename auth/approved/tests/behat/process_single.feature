@@ -118,7 +118,7 @@ Feature: auth_approved: single signup ops
     Then I should see "Invalid login, please try again"
 
     When I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "jb007 (bond@example.gov) rejected for system access" row "Event name" column of "reportlog" table should contain "Account request was rejected"
 
@@ -164,7 +164,7 @@ Feature: auth_approved: single signup ops
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "jb007 (bond@example.gov) approved for system access" row "Event name" column of "reportlog" table should contain "Account request was approved"
 
@@ -257,7 +257,7 @@ Feature: auth_approved: single signup ops
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "jb007 (bond@example.gov) approved for system access" row "Event name" column of "reportlog" table should contain "Account request was approved"
 

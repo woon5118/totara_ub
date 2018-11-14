@@ -15,7 +15,7 @@ Feature: tool_monitor_rule
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "admin"
-    And I navigate to "Event monitoring rules" node in "Site administration > System reports"
+    And I navigate to "Event monitoring rules" node in "Site administration > Server"
     And I click on "Enable" "link"
     And I am on "Course 1" course homepage
     And I navigate to "Event monitoring rules" node in "Course administration > Reports"
@@ -29,7 +29,7 @@ Feature: tool_monitor_rule
       | minutes              | 1                                                 |
       | Notification message | The forum post was created. {modulelink}          |
     And I press "Save changes"
-    And I navigate to "Event monitoring rules" node in "Site administration > System reports"
+    And I navigate to "Event monitoring rules" node in "Site administration > Server"
     And I press "Add a new rule"
     And I set the following fields to these values:
       | name                 | New rule site level                               |
@@ -106,7 +106,7 @@ Feature: tool_monitor_rule
 
   Scenario: Add a rule on site level
     Given I log in as "admin"
-    And I navigate to "Event monitoring rules" node in "Site administration > System reports"
+    And I navigate to "Event monitoring rules" node in "Site administration > Server"
     When I press "Add a new rule"
     And I set the following fields to these values:
       | name                 | New rule                                          |
@@ -125,7 +125,7 @@ Feature: tool_monitor_rule
 
   Scenario: Delete a rule on site level
     Given I log in as "admin"
-    And I navigate to "Event monitoring rules" node in "Site administration > System reports"
+    And I navigate to "Event monitoring rules" node in "Site administration > Server"
     When I click on "Delete rule" "link"
     Then I should see "Are you sure you want to delete the rule \"New rule site level\"?"
     And I press "Continue"
@@ -134,7 +134,7 @@ Feature: tool_monitor_rule
 
   Scenario: Edit a rule on site level
     Given I log in as "admin"
-    And I navigate to "Event monitoring rules" node in "Site administration > System reports"
+    And I navigate to "Event monitoring rules" node in "Site administration > Server"
     When I click on "Edit rule" "link"
     And I set the following fields to these values:
       | name                 | New Rule Quiz                                  |

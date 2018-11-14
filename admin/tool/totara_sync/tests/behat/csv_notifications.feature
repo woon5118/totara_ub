@@ -72,7 +72,7 @@ Feature: Verify CSV notifications are displayed correctly.
 
   Scenario: Verify Organisation CSV notifications.
 
-    Given I navigate to "Manage types" node in "Site administration > Hierarchies > Organisations"
+    Given I navigate to "Manage types" node in "Site administration > Organisations"
     And I press "Add a new type"
     And I set the following fields to these values:
       | Type full name              | Organisation Type 1 |
@@ -145,7 +145,7 @@ Feature: Verify CSV notifications are displayed correctly.
 
   Scenario: Verify Position CSV notifications.
 
-    Given I navigate to "Manage types" node in "Site administration > Hierarchies > Positions"
+    Given I navigate to "Manage types" node in "Site administration > Positions"
     And I press "Add a new type"
     And I set the following fields to these values:
       | Type full name          | Position Type 1 |

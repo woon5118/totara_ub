@@ -43,7 +43,7 @@ Feature: The competencies can be disabled
     And I click on "Save" "button" in the "Add linked competencies" "totaradialogue"
 
   Scenario: Show competency feature. All links and options related to the feature should be in place.
-    Given I navigate to "Advanced features" node in "Site administration"
+    Given I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Competencies" to "Show"
     And I press "Save changes"
 
@@ -64,9 +64,9 @@ Feature: The competencies can be disabled
     And I should see "Competency 1"
 
     # Check competencies menu is visible.
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage competencies" node in "Site administration > Competencies"
     Then I should see "Competency frameworks"
-    When I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage types" node in "Site administration > Competencies"
     Then I should see "Types"
 
     # Check competencies could be add to the program's content.
@@ -76,7 +76,7 @@ Feature: The competencies can be disabled
     And the "contenttype_ce" select box should contain "Competency"
 
   Scenario: Disable competency feature. All links and options related to the feature should not be in available anywhere.
-    Given I navigate to "Advanced features" node in "Site administration"
+    Given I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Competencies" to "Disable"
     And I press "Save changes"
 

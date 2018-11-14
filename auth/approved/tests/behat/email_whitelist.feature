@@ -115,7 +115,7 @@ Feature: auth_approved: email whitelist
     Then I should see "There are no records in this report"
 
     # Successful registration outcome #2: audit trail created.
-    When I navigate to "Logs" node in "Site administration > System reports"
+    When I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "User added new account request" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) registered for system access"
     And "Account request email was confirmed" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) confirmed email address"
@@ -200,7 +200,7 @@ Feature: auth_approved: email whitelist
     Then I should see "There are no records in this report"
 
     # Successful registration outcome #2: audit trail created.
-    When I navigate to "Logs" node in "Site administration > System reports"
+    When I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "User added new account request" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) registered for system access"
     And "Account request email was confirmed" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) confirmed email address"
@@ -288,7 +288,7 @@ Feature: auth_approved: email whitelist
     And "jb007" row "Email confirmed" column of "auth_approved_pending_requests" table should contain "Yes"
 
     # Successful registration outcome #2: audit trail created.
-    When I navigate to "Logs" node in "Site administration > System reports"
+    When I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "User added new account request" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) registered for system access"
     And "Account request email was confirmed" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) confirmed email address"
@@ -359,7 +359,7 @@ Feature: auth_approved: email whitelist
     And "jb007" row "Email confirmed" column of "auth_approved_pending_requests" table should contain "Yes"
 
     # Successful registration outcome #2: audit trail created.
-    When I navigate to "Logs" node in "Site administration > System reports"
+    When I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "User added new account request" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) registered for system access"
     And "Account request email was confirmed" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) confirmed email address"

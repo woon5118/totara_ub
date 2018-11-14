@@ -34,14 +34,14 @@ Feature: Behat generators for hierarchies work
       | admin   | administrator  | 1        |         |          |              |
 
     When I log in as "admin"
-    And I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    And I navigate to "Manage positions" node in "Site administration > Positions"
     Then I should see "Position Framework"
 
     When I click on "Position Framework" "link" in the "#frameworkstable" "css_element"
     Then I should see "Position One"
     And I should see "Position Two"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     Then I should see "Organisation Framework"
 
     When I click on "Organisation Framework" "link" in the "#frameworkstable" "css_element"
@@ -59,7 +59,7 @@ Feature: Behat generators for hierarchies work
   Scenario: Verify the user interface works the same as hierarchy generators
     Given I log in as "admin"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I click on "Add new position framework" "button"
     And I set the following fields to these values:
         | fullname | Position Framework |
@@ -83,7 +83,7 @@ Feature: Behat generators for hierarchies work
     Then I should see "Position One"
     And I should see "Position Two"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I click on "Add new organisation framework" "button"
     And I set the following fields to these values:
         | fullname | Organisation Framework |
@@ -165,7 +165,7 @@ Feature: Behat generators for hierarchies work
       | Goal Two | goal2    | gframe         |
 
     When I log in as "admin"
-    And I navigate to "Manage goals" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage goals" node in "Site administration > Goals"
     Then I should see "Goal Framework"
 
     When I click on "Goal Framework" "link" in the "#frameworkstable" "css_element"

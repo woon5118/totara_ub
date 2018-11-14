@@ -16,7 +16,7 @@ Feature: Test competencies are updated when linked courses are deleted
     And I log in as "admin"
 
     #link courses
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And I click on "Competency101" "link"
     And I click on "Assign course completions" "button"
@@ -30,14 +30,14 @@ Feature: Test competencies are updated when linked courses are deleted
     Then "2" "link" should exist in the "Competency101" "table_row"
 
     #delete a linked course
-    When I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    When I navigate to "Courses and categories" node in "Site administration > Courses"
     And I click on "Miscellaneous" "text" in the ".category-listing" "css_element"
     And I go to the courses management page
     And I click on category "Miscellaneous" in the management interface
     And I click on "delete" action for "Test 1" in management course listing
     And I press "Delete"
     And I should see "tst1 has been completely deleted"
-    Then I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    Then I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And "1" "link" should exist in the "Competency101" "table_row"
     And I click on "Competency101" "link"
@@ -62,7 +62,7 @@ Feature: Test competencies are updated when linked courses are deleted
     And I log in as "admin"
 
     #link courses
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And I click on "Competency101" "link"
     And I click on "Assign course completions" "button"
@@ -87,14 +87,14 @@ Feature: Test competencies are updated when linked courses are deleted
     Then "1" "link" should exist in the "Competency102" "table_row"
 
     # delete the linked course
-    When I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    When I navigate to "Courses and categories" node in "Site administration > Courses"
     And I click on "Miscellaneous" "text" in the ".category-listing" "css_element"
     And I go to the courses management page
     And I click on category "Miscellaneous" in the management interface
     And I click on "delete" action for "Test M" in management course listing
     And I press "Delete"
     And I should see "tst2 has been completely deleted"
-    Then I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    Then I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And "1" "link" should exist in the "Competency101" "table_row"
     And "0" "link" should exist in the "Competency102" "table_row"

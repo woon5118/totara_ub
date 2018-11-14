@@ -15,7 +15,7 @@ Feature: Test Learning Plans menu item
   Scenario: Make sure Learning Plans is not in totara menu if feature disabled
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Learning Plans" to "Disable"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"

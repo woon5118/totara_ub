@@ -344,7 +344,7 @@ class totara_core_quickaccessmenu_external_testcase extends advanced_testcase {
     public function test_reorder_groups() {
         $user = $this->basic_setup();
 
-        $return = external::reorder_groups([['key' => group::PLATFORM], ['key' => group::LEARN], ['key' => group::CONFIGURATION]], $user->id);
+        $return = external::reorder_groups([['key' => group::PLATFORM], ['key' => group::LEARN], ['key' => group::PERFORM], ['key' => group::CONFIGURATION]], $user->id);
         self::assertTrue($return);
 
         $result = external::clean_returnvalue(external::reorder_groups_returns(), $return);

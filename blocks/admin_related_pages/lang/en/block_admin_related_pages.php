@@ -25,5 +25,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['admin_related_pages:addinstance'] = 'Add a new admin related pages block';
 $string['cachedef_map'] = 'Admin related pages map';
-$string['pluginname'] = 'Related pages';
-$string['related'] = 'Related';
+$string['pluginname'] = 'Admin related pages';
+$string['related'] = 'Related pages';

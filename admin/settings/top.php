@@ -8,29 +8,34 @@
 $systemcontext = context_system::instance();
 $hassiteconfig = has_capability('moodle/site:config', $systemcontext);
 
-$ADMIN->add('root', new admin_externalpage('adminnotifications', new lang_string('notifications'), "$CFG->wwwroot/$CFG->admin/index.php"));
+$ADMIN->add('root', new admin_category('systeminformation', new lang_string('systeminformation')));
+
+$ADMIN->add('systeminformation', new admin_externalpage('adminnotifications', new lang_string('notifications'), "$CFG->wwwroot/$CFG->admin/index.php"));
 
 // Totara: always show the registration page unless registration was disabled via config.php.
-$ADMIN->add('root', new admin_externalpage('totararegistration', new lang_string('totararegistration', 'totara_core'),
+$ADMIN->add('systeminformation', new admin_externalpage('totararegistration', new lang_string('totararegistration', 'totara_core'),
     "$CFG->wwwroot/$CFG->admin/register.php", 'moodle/site:config', empty($CFG->registrationenabled)));
 
 // Totara flavour overview.
 $hidden = (isset($CFG->showflavours) and empty($CFG->showflavours));
-$ADMIN->add('root', new admin_externalpage('flavouroverview', new lang_string('flavouroverview', 'totara_flavour'), "$CFG->wwwroot/totara/flavour/view.php", 'moodle/site:config', $hidden));
+$ADMIN->add('systeminformation', new admin_externalpage('flavouroverview', new lang_string('flavouroverview', 'totara_flavour'), "$CFG->wwwroot/totara/flavour/view.php", 'moodle/site:config', $hidden));
 
  // hidden upgrade script
 $ADMIN->add('root', new admin_externalpage('upgradesettings', new lang_string('upgradesettings', 'admin'), "$CFG->wwwroot/$CFG->admin/upgradesettings.php", 'moodle/site:config', true));
 
 if ($hassiteconfig) {
     $optionalsubsystems = new admin_settingpage('optionalsubsystems', new lang_string('advancedfeatures', 'admin'));
-    $ADMIN->add('root', $optionalsubsystems);
+    $ADMIN->add('systeminformation', $optionalsubsystems);
 }
 
 $ADMIN->add('root', new admin_category('users', new lang_string('users','admin')));
 $ADMIN->add('root', new admin_category('audiences', new lang_string('cohorts', 'totara_cohort')));
 $ADMIN->add('root', new admin_category('roles', new lang_string('permissions', 'role')));
 $ADMIN->add('root', new admin_category('userdata', new lang_string('pluginname', 'totara_userdata')));
-$ADMIN->add('root', new admin_category('hierarchies', new lang_string('hierarchies','totara_hierarchy')));
+$ADMIN->add('root', new admin_category('positions', get_string('positions', 'totara_hierarchy'), totara_feature_disabled('positions')));
+$ADMIN->add('root', new admin_category('organisations', get_string('organisations', 'totara_hierarchy')));
+$ADMIN->add('root', new admin_category('competencies', get_string('competencies', 'totara_hierarchy'), totara_feature_disabled('competencies')));
+$ADMIN->add('root', new admin_category('goals', get_string('goals', 'totara_hierarchy'), totara_feature_disabled('goals')));
 $ADMIN->add('root', new admin_category('totara_plan', new lang_string('learningplans', 'totara_plan'),
     totara_feature_disabled('learningplans')
 ));

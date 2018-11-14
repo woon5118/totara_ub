@@ -111,7 +111,7 @@ Feature: The course tile should work as expected
     And I click on "OK" "button" in the "Select course" "totaradialogue"
     And I click on "Save changes" "button"
 
-    When I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    When I navigate to "Courses and categories" node in "Site administration > Courses"
     And I follow "Miscellaneous"
     And I click on "//*[@title='Delete']" "xpath_element"
     And I click on "Delete" "button"

@@ -14,7 +14,7 @@ Feature: Test Required Learning menu item
   Scenario: Make sure Required learning is not in totara menu if both prorams and certifications are disabled
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Programs" to "Disable"
     And I set the field "Enable Certifications" to "Disable"
     And I press "Save changes"
@@ -22,7 +22,7 @@ Feature: Test Required Learning menu item
     Then I should see "Required Learning" in the "#totaramenutable" "css_element"
     And I should see "Feature disabled" in the "Required Learning" "table_row"
 
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Programs" to "Show"
     And I set the field "Enable Certifications" to "Disable"
     And I press "Save changes"

@@ -68,23 +68,13 @@ final class helper {
 
         $this->map = new map(
             [
-                // System.
-                new group(
-                    [
-                        new item('adminnotifications', 'notifications', ''),
-                        new item('totararegistration', 'totararegistration', 'totara_core'),
-                        new item('flavouroverview', 'flavouroverview', 'totara_flavour'),
-                        new item('optionalsubsystems', 'advancedfeatures', 'admin'),
-                    ]
-                ),
 
                 // Security.
                 new group(
                     [
-                        new item('optionalsubsystems', 'advancedfeatures', 'admin'),
-                        new item('environment', 'environment', 'admin', ['server']),
-                        new item('sitepolicies', 'securitysettings', 'tool_sitepolicy', ['security']),
-                        new item('reportsecurity', 'pluginname', 'report_security', ['reports']),
+                        new item('adminnotifications', 'systeminformation', '', ['systeminformation']),
+                        new item('environment', 'server', 'admin', ['server']),
+                        new item('reportsecurity', 'security', 'admin', ['security']),
                     ]
                 ),
 
@@ -107,6 +97,7 @@ final class helper {
                         new item('assignroles', 'permissions', 'role', ['roles']),
                         new item('manageauths', 'authentication', 'admin', ['authsettings']),
                         new item('userdatasettings', 'pluginname', 'totara_userdata', ['userdata']),
+                        new item('totaraconnectsettings', 'pluginname', 'totara_connect', ['userdata']),
                     ]
                 ),
 
@@ -125,11 +116,46 @@ final class helper {
                         new item('manage_content_marketplaces', 'contentmarketplace', 'totara_contentmarketplace'),
                     ]
                 ),
+
+                // Learning items.
+                new group(
+                    [
+                        new item('coursemgmt', 'courses', 'admin', ['courses']),
+                        new item('programmgmt', 'programs', 'totara_program', ['programs']),
+                        new item('managecertifications', 'certifications', 'totara_certification', ['certifications']),
+                        new item('managebadges', 'badges', 'badges', ['badges']),
+                        new item('managetemplates', 'learningplans', 'totara_plan', ['totara_plan']),
+                    ]
+                ),
+
+                // Learning items.
+                new group(
+                    [
+                        new item('themesettings', 'appearance', 'admin', ['appearance', 'themes']),
+                        new item('navigation', 'navigation', 'core', ['navigationcat']),
+                    ]
+                ),
+
+                // Performance
+                new group(
+                    [
+                        new item('manageappraisals', 'appraisals', 'totara_appraisal', ['appraisals']),
+                        new item('managefeedback360', 'feedback360:utf8', 'totara_feedback360', ['appraisals']),
+                        new item('goalmanage', 'goals', 'totara_hierarchy', ['goals']),
+                    ]
+                ),
+
+                // Hierarchies.
+                new group(
+                    [
+                        new item('positionmanage', 'positions', 'totara_hierarchy', ['positions']),
+                        new item('organisationmanage', 'organisations', 'totara_hierarchy', ['organisations']),
+                        new item('competencymanage', 'competencies', 'totara_hierarchy', ['competencies']),
+                    ]
+                ),
+
             ],
             [
-                // Link from courses to tags.
-                new item('managetags', 'tags', 'tag', ['courses']),
-
                 // Link from users, positions, and organisations to HR Import
                 new item('managesyncelements', 'pluginname', 'tool_totara_sync', ['users', 'positions', 'organisations', 'competencies']),
                 new item('editusers', 'users', 'admin', ['tool_totara_sync', 'syncelements']),
@@ -141,8 +167,20 @@ final class helper {
 
                 // Link from the system group to the security group.
                 new item('environment', 'environment', 'admin', ['adminnotifications', 'totararegistration', 'flavouroverview', 'optionalsubsystems']),
-                new item('sitepolicies', 'securitysettings', 'tool_sitepolicy', ['adminnotifications', 'totararegistration', 'flavouroverview', 'optionalsubsystems']),
-                new item('reportsecurity', 'pluginname', 'report_security', ['adminnotifications', 'totararegistration', 'flavouroverview', 'optionalsubsystems']),
+                new item('reportsecurity', 'security', 'admin', ['adminnotifications', 'totararegistration', 'flavouroverview', 'optionalsubsystems']),
+
+                // Link from certifications to upload completions.
+                new item('managecertifications', 'certifications', 'totara_certification', ['totara_completionimport']),
+                // Link from upload completions to certifications.
+                new item('competencymanage', 'competencies', 'totara_hierarchy', ['appraisals', 'goals']),
+                // LInk from performance group back to competencies
+                new item('manageappraisals', 'appraisals', 'totara_appraisal', ['competencies']),
+                new item('managefeedback360', 'feedback360:utf8', 'totara_feedback360', ['competencies']),
+                new item('goalmanage', 'goals', 'totara_hierarchy', ['competencies']),
+
+                // One way link for reports to old system reports categories.
+                new item('reportlog', 'server', 'admin', ['reportsmain']),
+                new item('reportsecurity', 'security', 'admin', ['reportsmain']),
             ]
         );
 

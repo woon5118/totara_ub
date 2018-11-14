@@ -32,10 +32,10 @@ Feature: See that audience based visibility doesn't effect a course showing in a
 
   Scenario: Audienced based visibility where learner can't see course.
     Given I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
-    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    And I navigate to "Courses and categories" node in "Site administration > Courses"
     And I click on "Miscellaneous" "link"
     And I click on "CourseVisibility Test Course 1" "link"
     And I click on "Edit" "link" in the ".course-detail-listing-actions" "css_element"

@@ -16,7 +16,7 @@ Feature: Manage language packs
     And I press "Install selected language pack(s)"
     Then I should see "Language pack 'en_ar' was successfully installed"
     And the "Installed language packs" select box should contain "en_ar"
-    And I navigate to "Live logs" node in "Site administration > System reports"
+    And I navigate to "Live logs" node in "Site administration > Server"
     And I should see "The language pack 'en_ar' was installed."
     # Check the language pack is visible by default in User menu.
     When I click on "Admin User" "link"
@@ -38,7 +38,7 @@ Feature: Manage language packs
     When I press "Update all installed language packs"
     Then I should see "Language pack 'en_ar' was successfully updated"
     And I should see "Language pack update completed"
-    And I navigate to "Live logs" node in "Site administration > System reports"
+    And I navigate to "Live logs" node in "Site administration > Server"
     And I should see "The language pack 'en_ar' was updated."
     And I log out
 
@@ -53,7 +53,7 @@ Feature: Manage language packs
     Then I should see "Language pack 'en_ar' was uninstalled"
     And the "Installed language packs" select box should not contain "en_ar"
     And the "Available language packs" select box should contain "en_ar"
-    And I navigate to "Live logs" node in "Site administration > System reports"
+    And I navigate to "Live logs" node in "Site administration > Server"
     And I should see "The language pack 'en_ar' was removed."
     And I should see "Language pack uninstalled"
     And I log out
@@ -64,6 +64,6 @@ Feature: Manage language packs
     When I set the field "Installed language packs" to "en"
     And I press "Uninstall selected language pack(s)"
     Then I should see "The English language pack cannot be uninstalled."
-    And I navigate to "Live logs" node in "Site administration > System reports"
+    And I navigate to "Live logs" node in "Site administration > Server"
     And I should not see "Language pack uninstalled"
     And I log out

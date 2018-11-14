@@ -41,12 +41,12 @@ Feature: Visit a workflow and experience the different possible behaviours
     When I click on "Create a multi-activity course" "link"
     Then I should see "Add a new course"
     And I should see "Course full name"
-    And I should see "Manage courses and categories"
+    And I should see "Courses and categories"
 
   @javascript @_switch_window
   Scenario: Pass through a workflow with multiple available options but only one enabled
     Given I am on a totara site
-    And I navigate to "Manage workflows" node in "Site administration > Appearance"
+    And I navigate to "Manage workflows" node in "Site administration > Navigation"
     And I click on "Disable" "link" in the "Add courses from the GO1 content marketplace" "table_row"
     And I click on "Courses" in the totara menu
     And I click on "Create Course" "button"
@@ -54,12 +54,12 @@ Feature: Visit a workflow and experience the different possible behaviours
     And I should not see "Add courses from the GO1 content marketplace"
     And I should see "Add a new course"
     And I should see "Course full name"
-    And I should see "Manage courses and categories"
+    And I should see "Courses and categories"
 
   @javascript @_switch_window
   Scenario: Attempt to use a workflow when none of the available options are enabled
     Given I am on a totara site
-    And I navigate to "Manage workflows" node in "Site administration > Appearance"
+    And I navigate to "Manage workflows" node in "Site administration > Navigation"
     And I click on "Disable" "link" in the "Add courses from the GO1 content marketplace" "table_row"
     And I click on "Disable" "link" in the "Create a multi-activity course" "table_row"
     And I click on "Courses" in the totara menu

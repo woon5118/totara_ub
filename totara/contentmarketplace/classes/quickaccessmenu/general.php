@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
@@ -17,13 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Alastair Munro <alastair.munro@totaralearning.com>
- * @package block_admin_subnav
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @package totara_contentmarketplace
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_contentmarketplace\quickaccessmenu;
 
-$string['admin_subnav:addinstance'] = 'Add a new Admin sub-navigation block';
-$string['admin_subnav:myaddinstance'] = 'Add a new Admin sub-navigation block to the page';
-$string['pluginname'] = 'Admin sub-navigation';
-$string['titlewhenediting'] = '{$a} (Admin sub-navigation)';
+use \totara_core\quickaccessmenu\group;
+use \totara_core\quickaccessmenu\item;
+
+class general implements \totara_core\quickaccessmenu\provider {
+
+    public static function get_items(): array {
+        return [
+            item::from_provider(
+                'contentmarketplace',
+                group::get(group::PLATFORM),
+                new \lang_string('contentmarketplace', 'totara_contentmarketplace'),
+                7000
+            ),
+        ];
+    }
+
+}

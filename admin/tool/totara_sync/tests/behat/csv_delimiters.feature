@@ -46,7 +46,7 @@ Feature: Verify different delimiters can be handled in Totara Sync
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see "Organisation 1"
     And I should see "Organisation 2"
@@ -81,7 +81,7 @@ Feature: Verify different delimiters can be handled in Totara Sync
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see "Organisation 1"
     And I should see "Organisation 2"
@@ -117,7 +117,7 @@ Feature: Verify different delimiters can be handled in Totara Sync
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     Then I should see "Position 1"
     And I should see "Position 2"
@@ -152,7 +152,7 @@ Feature: Verify different delimiters can be handled in Totara Sync
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     Then I should see "Position 1"
     And I should see "Position 2"

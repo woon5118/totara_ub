@@ -41,7 +41,7 @@ Feature: Suspend enrolled course users
 
 
     When I log in as "admin"
-    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    And I navigate to "Courses and categories" node in "Site administration > Courses"
     Then I should see "Course 1"
 
     When I follow "Course 1"

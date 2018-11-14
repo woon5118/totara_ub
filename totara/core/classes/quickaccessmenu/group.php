@@ -28,8 +28,9 @@ final class group {
     private const PREFERENCE = 'groups';
     private const __default = self::LEARN;
 
-    public const LEARN         = 'learn';
-    public const PLATFORM      = 'platform';
+    public const LEARN = 'learn';
+    public const PERFORM = 'perform';
+    public const PLATFORM = 'platform';
     public const CONFIGURATION = 'configuration';
 
     /**
@@ -290,9 +291,10 @@ final class group {
      */
     private static function get_defaults(): array {
         return [
-            self::PLATFORM      => new group(self::PLATFORM, new \lang_string('quickaccessmenu_group-' . self::PLATFORM, 'admin'), 1000, true),
-            self::LEARN         => new group(self::LEARN, new \lang_string('quickaccessmenu_group-' . self::LEARN, 'admin'), 2000, true),
-            self::CONFIGURATION => new group(self::CONFIGURATION, new \lang_string('quickaccessmenu_group-' . self::CONFIGURATION, 'admin'), 5000, true),
+            self::PLATFORM      => new group(self::PLATFORM, new \lang_string('quickaccessmenu_group-platform', 'admin'), 1000, true),
+            self::LEARN         => new group(self::LEARN, new \lang_string('quickaccessmenu_group-learn', 'admin'), 2000, true),
+            self::PERFORM       => new group(self::PERFORM, new \lang_string('quickaccessmenu_group-perform', 'admin'), 3000, true),
+            self::CONFIGURATION => new group(self::CONFIGURATION, new \lang_string('quickaccessmenu_group-configuration', 'admin'), 5000, true),
         ];
     }
 

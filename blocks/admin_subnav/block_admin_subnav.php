@@ -86,6 +86,9 @@ final class block_admin_subnav extends block_base {
         // Set title here, doing this in the specialization
         // function crashes the browser when moving the block
         $this->title = $node->text;
+        if ($this->page->user_is_editing()) {
+            $this->title = get_string('titlewhenediting', self::COMPONENT, $this->title);
+        }
 
         /** @var \block_admin_subnav\output\renderer $renderer */
         $renderer = $this->page->get_renderer(self::COMPONENT);

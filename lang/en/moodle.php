@@ -1868,6 +1868,7 @@ $string['switchroleto'] = 'Switch role to...';
 $string['switchroleto_help'] = 'Choose a role to get an idea of how someone with that role will see this course.
 
 Please note that this view may not be perfect.';
+$string['systeminformation'] = 'System information';
 $string['tag'] = 'Tag';
 $string['tagalready'] = 'This tag already exists';
 $string['tagmanagement'] = 'Add/delete tags ...';

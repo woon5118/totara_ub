@@ -72,7 +72,7 @@ Feature: Test audience with position checkbox profile field.
   @javascript
   Scenario: Test position with unchecked checkbox and audience with checked checkbox.
     Given I log in as "admin"
-    And I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    And I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position FW"
     And I should see "Position"
     Then I follow "Edit"
@@ -96,7 +96,7 @@ Feature: Test audience with position checkbox profile field.
   @javascript
   Scenario: Test position with unchecked checkbox and auidence with unchecked checkbox.
     Given I log in as "admin"
-    And I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    And I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position FW"
     And I should see "Position"
     Then I follow "Edit"

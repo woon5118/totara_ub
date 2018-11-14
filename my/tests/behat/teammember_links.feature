@@ -32,7 +32,7 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: Plans link is not available if learningplans feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Learning Plans" to "Disable"
     And I press "Save changes"
     And I log out
@@ -70,7 +70,7 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: Appraisals link is not available if appraisals feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Appraisals" to "Disable"
     And I press "Save changes"
     And I log out
@@ -95,7 +95,7 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: 360 Feedback link is not available if feedback360 feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable 360 Feedbacks" to "Disable"
     And I press "Save changes"
     And I log out
@@ -118,7 +118,7 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: Goals link is not available if goals feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Goals" to "Disable"
     And I press "Save changes"
     And I log out
@@ -141,7 +141,7 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: Required link is not available if programs and certifications features are not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Programs" to "Disable"
     And I set the field "Enable Certifications" to "Disable"
     And I press "Save changes"

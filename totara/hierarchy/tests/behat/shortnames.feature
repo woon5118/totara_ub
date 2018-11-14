@@ -19,7 +19,7 @@ Feature: Verify the display of the shortname field on Hierarchy forms
   Scenario: Verify enabling shortnames adds them to all Hierarchy forms.
     Given I am on a totara site
     And I log in as "admin"
-    And I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    And I navigate to "Manage positions" node in "Site administration > Positions"
     And I click on "Edit" "link" in the "Position Framework" "table_row"
     Then I should not see "Shortname"
 
@@ -29,12 +29,12 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should not see "Position short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Positions"
+    And I navigate to "Manage types" node in "Site administration > Positions"
     And I click on "Add a new type" "button"
     Then I should not see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I click on "Edit" "link" in the "Organisation Framework" "table_row"
     Then I should not see "Shortname"
 
@@ -44,12 +44,12 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should not see "Organisation short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Organisations"
+    And I navigate to "Manage types" node in "Site administration > Organisations"
     And I click on "Add a new type" "button"
     Then I should not see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Edit" "link" in the "Competency Framework" "table_row"
     Then I should not see "Shortname"
 
@@ -59,12 +59,12 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should not see "Competency short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage types" node in "Site administration > Competencies"
     And I click on "Add a new type" "button"
     Then I should not see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage goals" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage goals" node in "Site administration > Goals"
     And I click on "Edit" "link" in the "Goal Framework" "table_row"
     Then I should not see "Shortname"
 
@@ -74,22 +74,22 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should not see "Goal short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage company goal types" node in "Site administration > Goals"
     And I click on "Add a new company goal type" "button"
     Then I should not see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I click on "Add a new personal goal type" "button"
     Then I should not see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Display Hierarchy Shortnames" to "true"
     And I click on "Save changes" "button"
     Then I should see "Changes saved"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I click on "Edit" "link" in the "Position Framework" "table_row"
     Then I should see "Shortname"
 
@@ -99,12 +99,12 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should see "Position short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Positions"
+    And I navigate to "Manage types" node in "Site administration > Positions"
     And I click on "Add a new type" "button"
     Then I should see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I click on "Edit" "link" in the "Organisation Framework" "table_row"
     Then I should see "Shortname"
 
@@ -114,12 +114,12 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should see "Organisation short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Organisations"
+    And I navigate to "Manage types" node in "Site administration > Organisations"
     And I click on "Add a new type" "button"
     Then I should see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Edit" "link" in the "Competency Framework" "table_row"
     Then I should see "Shortname"
 
@@ -129,12 +129,12 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should see "Competency short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage types" node in "Site administration > Competencies"
     And I click on "Add a new type" "button"
     Then I should see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage goals" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage goals" node in "Site administration > Goals"
     And I click on "Edit" "link" in the "Goal Framework" "table_row"
     Then I should see "Shortname"
 
@@ -144,11 +144,11 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should see "Goal short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage company goal types" node in "Site administration > Goals"
     And I click on "Add a new company goal type" "button"
     Then I should see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I click on "Add a new personal goal type" "button"
     Then I should see "Type short name"

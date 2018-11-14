@@ -35,7 +35,7 @@ Feature: Test use of images in goals and goal custom fields
     And I should see "leaves-green.png"
 
     # Create text area custom field for Company goal type
-    When I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
+    When I navigate to "Manage company goal types" node in "Site administration > Goals"
     And I press "Add a new company goal type"
     And I set the following fields to these values:
     | Type full name | Comp goal type 1 |
@@ -65,7 +65,7 @@ Feature: Test use of images in goals and goal custom fields
     Then I should see "Custom file 1"
 
     # Create a Personal goal type
-    When I navigate to "Manage personal goal types" node in "Site administration > Hierarchies > Goals"
+    When I navigate to "Manage personal goal types" node in "Site administration > Goals"
     And I press "Add a new personal goal type"
     And I set the following fields to these values:
     | Type full name | Pers goal type 1 |
@@ -97,7 +97,7 @@ Feature: Test use of images in goals and goal custom fields
     Then I should see "Custom file 1"
 
     # Create goal using the company goal type
-    When I navigate to "Manage goals" node in "Site administration > Hierarchies > Goals"
+    When I navigate to "Manage goals" node in "Site administration > Goals"
     And I follow "Goal Framework"
     And I press "Add new goal"
     And I set the following fields to these values:

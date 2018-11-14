@@ -23,7 +23,7 @@ Feature: Adding competencies to program content
       | CFrame    | Competency101  | Comp101  | Competency with linked courses    |
       | CFrame    | Competency102  | Comp102  | Competency without linked courses |
     And I log in as "admin"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And I click on "Competency101" "link"
     And I click on "Assign course completions" "button"
@@ -52,7 +52,7 @@ Feature: Adding competencies to program content
 
     When I press "Save changes"
     And I click on "Save all changes" "button"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And I click on "Competency101" "link"
     And I click on "Remove" "link" in the "Course 2" "table_row"

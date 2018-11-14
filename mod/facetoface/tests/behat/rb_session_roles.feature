@@ -46,7 +46,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
       | facetoface | Seminar 11187B | C2     | S11187B  |
 
     And I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "id_s__enableglobalrestrictions" to "1"
     And I press "Save changes"
 

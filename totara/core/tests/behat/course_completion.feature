@@ -93,7 +93,7 @@ Feature: Users completion of courses
     Then I should see "No" in the "Course 1" "table_row"
     And I should see "No" in the "Course 2" "table_row"
     When I click on "Home" in the totara menu
-    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    And I navigate to "Courses and categories" node in "Site administration > Courses"
     And I should see "Course 1" in the "#course-listing" "css_element"
     And I click on "delete" action for "Course 1" in management course listing
     And I press "Delete"

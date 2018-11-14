@@ -7,7 +7,7 @@ Feature: It is possible to bulk add a hierarchy tree structure
       | fullname                  | idnumber | description           |
       | Test <hierarchy> framework   | FW001    | Framework description |
     When I log in as "admin"
-    And I navigate to "Manage <hierarchyplural>" node in "Site administration > Hierarchies > <hierarchypluralcapital>"
+    And I navigate to "Manage <hierarchyplural>" node in "Site administration > <hierarchypluralcapital>"
     And I click on "Test <hierarchy> framework" "link"
     And I select "Add" from the "jump" singleselect
     #redirect
@@ -38,7 +38,7 @@ Feature: It is possible to bulk add a hierarchy tree structure
       | fullname                  | idnumber | description           |
       | Test <hierarchy> framework   | FW001    | Framework description |
     When I log in as "admin"
-    And I navigate to "Manage <hierarchyplural>" node in "Site administration > Hierarchies > <hierarchypluralcapital>"
+    And I navigate to "Manage <hierarchyplural>" node in "Site administration > <hierarchypluralcapital>"
     And I click on "Test <hierarchy> framework" "link"
     And I select "Add" from the "jump" singleselect
     #redirect

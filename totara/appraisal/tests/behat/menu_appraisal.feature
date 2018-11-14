@@ -14,8 +14,8 @@ Feature: Test Appraisals menu item
   Scenario: Make sure Appraisals is not in totara menu if all features disabled
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration"
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Appraisals" to "Disable"
     And I set the field "Enable 360 Feedbacks" to "Disable"
     And I set the field "Enable Goals" to "Disable"

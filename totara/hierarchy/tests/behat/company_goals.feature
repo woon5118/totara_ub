@@ -18,7 +18,7 @@ Feature: Verify creation and use of company goal types and custom fields.
 
     # Create a new Company Goal Type
     Given I log in as "admin"
-    And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage company goal types" node in "Site administration > Goals"
     And I press "Add a new company goal type"
     And I set the following fields to these values:
       | Type full name         | Company Goal Type 1             |
@@ -47,7 +47,7 @@ Feature: Verify creation and use of company goal types and custom fields.
 
     # Create a new Company Goal Type
     Given I log in as "admin"
-    And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage company goal types" node in "Site administration > Goals"
     And I press "Add a new company goal type"
     And I set the following fields to these values:
       | Type full name         | Company Goal Type 1  |
@@ -134,7 +134,7 @@ Feature: Verify creation and use of company goal types and custom fields.
     Then I should see "URL 1"
 
     # Add some data to the custom fields on the company goals.
-    When I navigate to "Manage goals" node in "Site administration > Hierarchies > Goals"
+    When I navigate to "Manage goals" node in "Site administration > Goals"
     And I follow "Company Goal Framework 1"
     And I click on "Edit" "link" in the ".totaratable" "css_element"
     And I press "Change type"

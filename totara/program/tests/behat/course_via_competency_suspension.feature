@@ -47,7 +47,7 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
       | CFrame    | Competency 1   | Comp 1   | Competency with linked courses    |
 
     And I log in as "admin"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And I click on "Competency 1" "link"
     And I click on "Assign course completions" "button"

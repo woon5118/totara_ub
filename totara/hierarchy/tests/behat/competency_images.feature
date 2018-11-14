@@ -35,7 +35,7 @@ Feature: Test use of images in competencies and competency custom fields
     And I should see "learninglogo4.jpg"
 
     # Create text area custom field for Competency type
-    When I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage types" node in "Site administration > Competencies"
     And I press "Add a new type"
     And I set the following fields to these values:
     | Type full name | Competency type 1 |
@@ -65,7 +65,7 @@ Feature: Test use of images in competencies and competency custom fields
     Then I should see "Custom file 1"
 
     # Create competency using the competency type
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I follow "Test Comp Framework"
     And I press "Add new competency"
     And I set the following fields to these values:
@@ -124,7 +124,7 @@ Feature: Test use of images in competencies and competency custom fields
     And I click on "Choice - Help to Gandalf the Grey" "checkbox"
     And I press "Save changes"
     And I am on site homepage
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Test Comp Framework" "link"
     And I click on "My competency 1" "link"
     And I press "Assign course completions"

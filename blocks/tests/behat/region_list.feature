@@ -83,7 +83,7 @@ Feature: Ensure page layouts are listed correctly
     And the "Region" select box should not contain "Main"
 
   Scenario: Ensure editing a block on an admin page lists the admin layout options
-    When I navigate to "Notifications" node in "Site administration"
+    When I navigate to "Notifications" node in "Site administration > System information"
     And I click on "Blocks editing on" "button"
     And I add the "Navigation" block if not present
     And I configure the "Navigation" block
@@ -121,7 +121,7 @@ Feature: Ensure page layouts are listed correctly
     Then "#block-region-main.editing-region-border" "css_element" should not exist
 
     # On "Advanced features" page only the left region should have the region border displayed.
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I click on "Blocks editing on" "button"
     Then "#block-region-side-pre.editing-region-border" "css_element" should exist
     And "#block-region-main.editing-region-border" "css_element" should not exist

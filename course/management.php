@@ -139,7 +139,7 @@ if ($category && !has_any_capability($capabilities, $systemcontext)) {
     $PAGE->navbar->ignore_active(true);
     $PAGE->navbar->add(get_string('coursemgmt', 'admin'), $PAGE->url->out_omit_querystring());
 } else {
-    // If user has system capabilities, make sure the "Manage courses and categories" item in Administration block is active.
+    // If user has system capabilities, make sure the "Courses and categories" item in Administration block is active.
     navigation_node::require_admin_tree();
     navigation_node::override_active_url(new moodle_url('/course/management.php'));
 }

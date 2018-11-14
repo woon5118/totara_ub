@@ -166,7 +166,7 @@ Feature: Award badges
     And I log out
     # Ensure the badge is still awarded and visible after the course has been deleted.
     When I log in as "admin"
-    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    And I navigate to "Courses and categories" node in "Site administration > Courses"
     And I click on "Miscellaneous" "text" in the ".category-listing" "css_element"
     And I go to the courses management page
     And I click on category "Miscellaneous" in the management interface
@@ -245,7 +245,7 @@ Feature: Award badges
     And I log out
     # Ensure the badge is still awarded and visible after the course has been deleted.
     When I log in as "admin"
-    And I navigate to "Manage courses and categories" node in "Site administration > Courses"
+    And I navigate to "Courses and categories" node in "Site administration > Courses"
     And I click on "Miscellaneous" "text" in the ".category-listing" "css_element"
     And I go to the courses management page
     And I click on category "Miscellaneous" in the management interface

@@ -50,7 +50,7 @@ Feature: Test competencies achieved is updated
     And I click on "Gandalf the Grey" "link"
     And I click on "OK" "button" in the ".totara-dialog[aria-describedby=manager]" "css_element"
     And I click on "Add job assignment" "button"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Reclaim the Lonely Mountain" "link"
     And I click on "Kill the Smaug" "link"
     And I press "Assign course completions"

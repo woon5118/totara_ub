@@ -36,7 +36,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I press "Save changes"
 
     # Create the competency scale.
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I press "Add a new competency scale"
     And I set the field "Name" to "Graded Scale 1-5"
     And I set the field "Scale values" to multiline:

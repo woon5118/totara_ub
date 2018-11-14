@@ -28,7 +28,7 @@ Feature: Single hierarchy report filter
       | user3 | org1b        |
       | user4 | org2z        |
     And I log in as "admin"
-    And I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I click on "Org Fram" "link"
     And I set the field "jump" to "Move"
     And I click on "Organisation 1a" "option"

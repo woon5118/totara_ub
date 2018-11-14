@@ -45,7 +45,7 @@ Feature: Verify that parentid is set correctly for position database import.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Department Manager  | 1 |
@@ -76,7 +76,7 @@ Feature: Verify that parentid is set correctly for position database import.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Position Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Department Manager  | 1 |

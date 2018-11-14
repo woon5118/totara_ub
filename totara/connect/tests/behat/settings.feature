@@ -6,7 +6,7 @@ Feature: Test that Totara Connect may be enabled
   @javascript
   Scenario: Totara Connect server may be enabled
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Totara Connect server" to "1"
     And I press "Save changes"
 

@@ -43,7 +43,7 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Head Office       | 1 |
@@ -76,7 +76,7 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
 
     # Marketing is in the wrong place. It should be under UK Office. See TL-12671.
@@ -117,7 +117,7 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
 
     # The parentid for Marketing has been deleted so it's at the top level.
@@ -148,7 +148,7 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
     And I should see "Running HR Import cron...Done!"
 
     # All the records should have been added correctly.
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | org1  | 1 |
@@ -168,7 +168,7 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
     And I should see "Running HR Import cron...Done!"
 
     # The record should have been added correctly.
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | org1  | 1 |
@@ -215,7 +215,7 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
     And I should see "Running HR Import cron...Done!"
 
     # The records should have been added correctly.
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | org1  | 1 |

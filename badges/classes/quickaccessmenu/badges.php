@@ -35,7 +35,7 @@ class badges implements \totara_core\quickaccessmenu\provider {
     public static function get_items(): array {
         return [
             item::from_provider(
-                'badgesettings',
+                'managebadges',
                 group::get(group::PLATFORM),
                 new \lang_string('badges', 'badges'),
                 6000

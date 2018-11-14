@@ -241,10 +241,10 @@ Feature: Test persistent login feature
     Given I am on a totara site
     And I log in as "admin"
 
-    When I navigate to "Security overview" node in "Site administration > System reports"
+    When I navigate to "Security overview" node in "Site administration > Security"
     Then I should see "OK" in the "Persistent login" "table_row"
 
     When I set the following administration settings values:
       | Persistent login | 1 |
-    And I navigate to "Security overview" node in "Site administration > System reports"
+    And I navigate to "Security overview" node in "Site administration > Security"
     Then I should see "Warning" in the "Persistent login" "table_row"

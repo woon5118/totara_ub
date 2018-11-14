@@ -26,7 +26,7 @@ Feature: Test use of images in positions and position custom fields
     And I should see "learninglogo4.jpg"
 
     # Create text area custom field for Position type
-    When I navigate to "Manage types" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage types" node in "Site administration > Positions"
     And I press "Add a new type"
     And I set the following fields to these values:
     | Type full name | Position type 1 |
@@ -56,7 +56,7 @@ Feature: Test use of images in positions and position custom fields
     Then I should see "Custom file 1"
 
     # Create position using the position type
-    When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
+    When I navigate to "Manage positions" node in "Site administration > Positions"
     And I follow "Test Pos Framework"
     And I press "Add new position"
     And I set the following fields to these values:

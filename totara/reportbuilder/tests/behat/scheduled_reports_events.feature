@@ -47,7 +47,7 @@ Feature: Test the generation of scheduled reports events.
   Scenario: scheduled_report_event_00: scheduled report events from owner page
     # Creation event
     When I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
     Then "Scheduled report created" row "Description" column of "reportlog" table should contain "created a scheduled report"
     And "Scheduled report created" row "User full name" column of "reportlog" table should contain "User One"
@@ -62,7 +62,7 @@ Feature: Test the generation of scheduled reports events.
     And I press "Save changes"
     And I log out
     And I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
 
     When I press "Get these logs"
     Then "Scheduled report updated" row "Description" column of "reportlog" table should contain "updated a scheduled report"
@@ -76,7 +76,7 @@ Feature: Test the generation of scheduled reports events.
     And I press "Continue"
     And I log out
     And I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
 
     When I press "Get these logs"
     Then "Scheduled report deleted" row "Description" column of "reportlog" table should contain "deleted a scheduled report"
@@ -108,7 +108,7 @@ Feature: Test the generation of scheduled reports events.
     And I press "Save changes"
     And I log out
     And I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
 
     When I press "Get these logs"
     Then "Scheduled report updated" row "Description" column of "reportlog" table should contain "updated a scheduled report"
@@ -124,7 +124,7 @@ Feature: Test the generation of scheduled reports events.
     And I press "Continue"
     And I log out
     And I log in as "admin"
-    And I navigate to "Logs" node in "Site administration > System reports"
+    And I navigate to "Logs" node in "Site administration > Server"
 
     When I press "Get these logs"
     Then "Scheduled report deleted" row "Description" column of "reportlog" table should contain "deleted a scheduled report"

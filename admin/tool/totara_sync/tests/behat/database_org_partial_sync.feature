@@ -45,7 +45,7 @@ Feature: Verify that partial organisation sync works correctly for database impo
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Organisation 1 | 1 |
@@ -82,7 +82,7 @@ Feature: Verify that partial organisation sync works correctly for database impo
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Organisation 1 | 1 |
@@ -121,7 +121,7 @@ Feature: Verify that partial organisation sync works correctly for database impo
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Organisation 1 | 1 |

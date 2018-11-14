@@ -11,7 +11,7 @@ Feature: Upload competencies via HR Import using CSV file
       | Competency Framework 2 | compfw2  |
 
     And I log in as "admin"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage types" node in "Site administration > Competencies"
     And I press "Add a new type"
     And I set the following fields to these values:
       | Type full name            | Competency type |
@@ -56,14 +56,14 @@ Feature: Upload competencies via HR Import using CSV file
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
     And I should not see "Error" in the "#totarasynclog" "css_element"
 
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    When I navigate to "Manage competencies" node in "Site administration > Competencies"
     Then I should see "2" in the "Competency Framework 1" "table_row"
     And I should see "1" in the "Competency Framework 2" "table_row"
 
     When I follow "Competency Framework 1"
     And I follow "Competency 2"
     Then I should see "Other text"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     When I follow "Competency Framework 2"
     And I follow "Competency 3"
     Then I should see "So much text"

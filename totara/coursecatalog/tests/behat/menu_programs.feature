@@ -16,7 +16,7 @@ Feature: Test Programs menu item
     And I should see "Programs" in the totara menu
 
   Scenario: Make sure Programs is not in totara menu but is still in the editor if feature disabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Programs" to "Disable"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"

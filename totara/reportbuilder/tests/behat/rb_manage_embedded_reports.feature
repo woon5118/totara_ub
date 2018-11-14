@@ -6,7 +6,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     And I log in as "admin"
 
   Scenario: Verify Record of Learning appears in reportbuilder if enabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Record of Learning" to "Show"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -41,7 +41,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     And the "Source" select box should contain "Record of Learning: Recurring Programs"
 
   Scenario: Verify Record of Learning does not appear in reportbuilder if disabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Record of Learning" to "Disable"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -76,7 +76,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     And the "Source" select box should not contain "Record of Learning: Recurring Programs"
 
   Scenario: Verify Program Completion Editor reports appear in reportbuilder if enabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "program completion editor" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -91,7 +91,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     Then the "Source" select box should contain "Certification Membership"
 
   Scenario: Verify Program Completion Editor reports appear in reportbuilder if disabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "program completion editor" to "0"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -106,7 +106,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     Then the "Source" select box should contain "Certification Membership"
 
   Scenario: Verify Totara Connect server reports appear in reportbuilder if enabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Totara Connect server" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -121,7 +121,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     Then the "Source" select box should contain "Totara Connect clients"
 
   Scenario: Verify Totara Connect server reports appear in reportbuilder if disabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Totara Connect server" to "0"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -136,7 +136,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     Then the "Source" select box should not contain "Totara Connect clients"
 
   Scenario: Verify audience-based visibility reports appear in reportbuilder if enabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -151,7 +151,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
     Then the "Source" select box should contain "Audience: Visible Learning"
 
   Scenario: Verify audience-based visibility reports appear in reportbuilder if disabled
-    When I navigate to "Advanced features" node in "Site administration"
+    When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "audience-based visibility" to "0"
     And I press "Save changes"
     Then I should see "Changes saved"

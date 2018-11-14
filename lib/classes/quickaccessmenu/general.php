@@ -36,65 +36,59 @@ class general implements \totara_core\quickaccessmenu\provider {
                 1000
             ),
             item::from_provider(
+                'navigation',
+                group::get(group::CONFIGURATION),
+                new \lang_string('navigation', 'core'),
+                2000
+            ),
+            item::from_provider(
                 'sitepolicies',
                 group::get(group::CONFIGURATION),
                 new \lang_string('security', 'admin'),
-                2000
+                3000
             ),
             item::from_provider(
                 'userpolicies',
                 group::get(group::PLATFORM),
                 new \lang_string('permissions', 'role'),
-                3000
+                4000
             ),
             item::from_provider(
                 'langsettings',
                 group::get(group::CONFIGURATION),
                 new \lang_string('localisation', 'admin'),
-                3000
+                5000
             ),
             item::from_provider(
                 'environment',
                 group::get(group::CONFIGURATION),
                 new \lang_string('server', 'admin'),
-                4000
+                6000
             ),
             item::from_provider(
                 'debugging',
                 group::get(group::CONFIGURATION),
                 new \lang_string('development', 'admin'),
-                6000
+                7000
             ),
             item::from_provider(
                 'optionalsubsystems',
                 group::get(group::CONFIGURATION),
                 new \lang_string('advancedfeatures', 'admin'),
-                7000
+                8000
             ),
             item::from_provider(
                 'adminnotifications',
                 group::get(group::CONFIGURATION),
-                new \lang_string('notifications', 'admin'),
-                8000
-            ),
-            item::from_provider(
-                'totaradashboard',
-                group::get(group::PLATFORM),
-                new \lang_string('dashboards', 'totara_dashboard'),
-                8000
+                new \lang_string('systeminformation', 'core'),
+                9000
             ),
             item::from_provider(
                 'pluginsoverview',
-                group::get(group::PLATFORM),
-                new \lang_string('plugins', 'admin'),
-                9000
-            ),
-            item::from_provider(
-                'totararegistration',
                 group::get(group::CONFIGURATION),
-                new \lang_string('registration', 'core'),
-                9000
-            )
+                new \lang_string('plugins', 'admin'),
+                2500
+            ),
         ];
     }
 }

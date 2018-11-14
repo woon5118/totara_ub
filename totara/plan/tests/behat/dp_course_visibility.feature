@@ -121,7 +121,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # Switch the site setting, course is now set to all users (default).
     When I log out
     And I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -148,7 +148,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
   @javascript
   Scenario: Audience visibility, all users (default).
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -174,7 +174,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
   @javascript
   Scenario: Audience visibility, enrolled users and auds.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -206,7 +206,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
   @javascript
   Scenario: Audience visibility, enrolled users.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -238,7 +238,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
   @javascript
   Scenario: Audience visibility, no users.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -272,7 +272,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
   @javascript
   Scenario: Audience visibility, no users, 2nd course assigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration"
+    And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"

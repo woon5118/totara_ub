@@ -45,7 +45,7 @@ Feature: Verify that parentid is set correctly for organisation database import.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Head Office       | 1 |
@@ -76,7 +76,7 @@ Feature: Verify that parentid is set correctly for organisation database import.
     Then I should not see "Error"
     And I should see "Running HR Import cron...Done!"
 
-    When I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation Framework 1"
     Then I should see these hierarchy items at the following depths:
       | Head Office           | 1 |

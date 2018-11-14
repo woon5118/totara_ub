@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$ADMIN->add('appearance', new admin_externalpage('manageworkflows',
+$ADMIN->add('navigationcat', new admin_externalpage('manageworkflows',
     new lang_string('manageworkflows', 'totara_workflow'),
     new moodle_url('/totara/workflow/index.php'),
     'totara/workflow:manage')

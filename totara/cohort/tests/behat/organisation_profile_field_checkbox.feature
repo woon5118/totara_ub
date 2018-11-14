@@ -72,7 +72,7 @@ Feature: Test audience with organisation checkbox profile field.
   @javascript
   Scenario: Test organisation with unchecked checkbox and audience with checked checkbox.
     Given I log in as "admin"
-    And I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation FW"
     And I should see "Organisation"
     Then I follow "Edit"
@@ -96,7 +96,7 @@ Feature: Test audience with organisation checkbox profile field.
   @javascript
   Scenario: Test organisation with unchecked checkbox and auidence with unchecked checkbox.
     Given I log in as "admin"
-    And I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
+    And I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I follow "Organisation FW"
     And I should see "Organisation"
     Then I follow "Edit"

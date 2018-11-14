@@ -24,7 +24,7 @@ Feature: Verify competency course count within learning plan
 
     # Login as admin, create a competency and assign courses to it
     Given I log in as "admin"
-    And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
+    And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I follow "Competency Framework 1"
     And I follow "Competency 1"
     And I click on "Assign course completions" "button"
