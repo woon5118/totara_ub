@@ -99,13 +99,13 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             'associations',
             'INNER',
             "(SELECT c.id, c.id AS instanceid,
-                c.fullname AS name, c.icon, " . COHORT_ASSN_ITEMTYPE_COURSE . " AS instancetype, c.audiencevisible
+                c.fullname AS name, c.icon, c.shortname, " . COHORT_ASSN_ITEMTYPE_COURSE . " AS instancetype, c.audiencevisible
             FROM {course} c
 
             UNION
 
             SELECT p.id, p.id AS instanceid,
-            p.fullname AS name, p.icon, " .
+            p.fullname AS name, p.icon, p.shortname, " .
             " CASE WHEN p.certifid > 0 THEN " . COHORT_ASSN_ITEMTYPE_CERTIF .
             " ELSE " . COHORT_ASSN_ITEMTYPE_PROGRAM .
             " END AS instancetype, " .
@@ -146,7 +146,10 @@ class rb_source_cohort_associations_visible extends rb_base_source {
                 'displayfunc' => 'cohort_visibility_status',
                 'extrafields' => array(
                     'insid' => 'base.instanceid',
-                    'type' => 'base.instancetype'
+                    'type' => 'base.instancetype',
+                    'id' => 'base.id',
+                    'cohortid' => 'base.cohortid',
+                    'instanceshortname' => 'associations.shortname'
                 )
             )
         );

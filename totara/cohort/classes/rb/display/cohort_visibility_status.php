@@ -43,7 +43,7 @@ class cohort_visibility_status extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG, $COHORT_VISIBILITY;
+        global $CFG, $COHORT_VISIBILITY, $DB;
 
         $extrafields = self::get_extrafields_row($row, $column);
 
@@ -60,11 +60,20 @@ class cohort_visibility_status extends base {
         }
 
         if (isset($hascapability) && $hascapability) { // Has capability to change the visibility of learning contents.
-            $output = \html_writer::start_tag('form', array('id' => 'changevisibilityaudience' . $extrafields->insid));
-            $output .= \html_writer::select($COHORT_VISIBILITY,
-                '_' . $type . '_' . $extrafields->insid,
+            $cohortshortname = $DB->get_field('cohort', 'idnumber', ['id' => $extrafields->cohortid]);
+
+            // Adding a record id here, so that the id rendered into the browser will be a unique one
+            $output = \html_writer::start_tag(
+                'form',
+                array('id' => "changevisibilityaudience_{$extrafields->insid}_{$extrafields->id}")
+            );
+            $output .= \html_writer::select(
+                $COHORT_VISIBILITY,
+                "_{$type}_{$extrafields->insid}_{$extrafields->id}",
                 $value,
-                false);
+                false,
+                ['data-name' => "{$extrafields->instanceshortname}_{$cohortshortname}"]
+            );
             $output .= \html_writer::end_tag('form');
         } else {
             $output = $COHORT_VISIBILITY[$value];

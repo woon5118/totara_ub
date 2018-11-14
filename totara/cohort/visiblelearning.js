@@ -54,9 +54,10 @@ M.totara_cohortvisiblelearning = M.totara_cohortvisiblelearning || {
             throw new Error('M.totara_positionuser.init()-> jQuery dependency required for this module to function.');
         }
 
+        var tableselector = "[data-source='rb_source_cohort_associations_visible']";
         // Add hooks to visibility of learning content.
         // Update when visibility drop-down list change.
-        $(document).on('change', 'table#cohort_associations_visible form select', function() {
+        $(tableselector).on('change', 'form .custom-select', function() {
             var learningcontent = $(this).attr('id').split('_');
             var learningcontenttype = learningcontent[1];
             var learningcontentid = learningcontent[2];
@@ -72,10 +73,35 @@ M.totara_cohortvisiblelearning = M.totara_cohortvisiblelearning || {
                         value: learningvisibilityvalue,
                         sesskey: M.cfg.sesskey
                     })
+                }).done(function(response) {
+                    if (response.result && response.data.length) {
+                        var identifier, item;
+                        for (var i = 0; i < response.data.length; i++) {
+                            item = response.data[i];
+                            identifier = 'menu_' + learningcontenttype + '_' + learningcontentid + '_' + item;
+                            $('.' + identifier).val(learningvisibilityvalue);
+                        }
+                    }
                 });
             } else {
                 alert(M.util.get_string('invalidentry', 'error'));
             }
+        });
+
+        // Pressing the delete button should just sending an AJAX to the server here, and
+        // should remove the row after ajax has been done.
+        $(tableselector).on('click', ".learning-delete", function (event) {
+            event.preventDefault();
+            var self = this;
+            var url = $(self).attr('href');
+
+            $.ajax({
+                type: "GET",
+                url: url
+            }).done(function() {
+                // Deleting the row here
+                $(self).parents('tr').remove();
+            });
         });
     }
 };
