@@ -36,12 +36,7 @@ $PAGE->set_context($systemcontext);
 
 $output = $PAGE->get_renderer('totara_appraisal');
 
-$report = reportbuilder::create($detailreportid);
-
-// Check that the user has permission to view the report. Uses report builder access settings.
-if (!reportbuilder::is_capable($detailreportid)) {
-    print_error('nopermission', 'totara_reportbuilder');
-}
+$report = reportbuilder::create($detailreportid. null, true);
 
 $fullname = $report->fullname;
 

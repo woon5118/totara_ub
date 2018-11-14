@@ -221,7 +221,7 @@ class hierarchy {
 
         $config = new rb_config();
         $config->set_reportfor($userid);
-        $report = reportbuilder::create($reportid, $config);
+        $report = reportbuilder::create($reportid, $config, true);
         list($this->contentwhere, $this->contentparams) = $report->get_hierarchy_content_restrictions($this->shortprefix);
     }
 

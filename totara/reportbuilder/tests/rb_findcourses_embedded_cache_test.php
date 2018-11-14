@@ -169,6 +169,8 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
         $this->getDataGenerator()->enrol_user($this->user2->id, $this->course2->id);
         $this->getDataGenerator()->enrol_user($this->user3->id, $this->course2->id);
         $this->getDataGenerator()->enrol_user($this->user4->id, $this->course3->id);
+
+        $this->setAdminUser();
     }
 
     /**

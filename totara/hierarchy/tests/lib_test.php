@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 
 
-class hierarchylib_test extends advanced_testcase {
+class totara_hierarchy_lib_testcase extends advanced_testcase {
 
     /** @var  $competency competency */
     private $competency, $nofwid;

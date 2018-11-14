@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 
 
-class hierarchylib_contentrestrictions_test extends advanced_testcase {
+class totara_hierarchy_lib_contentrestrictions_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
     /**

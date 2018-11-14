@@ -32,6 +32,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
     public function test_useclonedb_off() {
         global $CFG, $DB;
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $this->getDataGenerator()->create_user();
 
@@ -84,6 +85,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
     public function test_useclonedb_on() {
         global $CFG, $DB;
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $this->getDataGenerator()->create_user();
 
@@ -139,6 +141,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
     public function test_useclonedb_on_cached() {
         global $CFG, $DB;
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $this->getDataGenerator()->create_user();
 

@@ -130,7 +130,8 @@ if ($fromform = $mform->get_data()) {
                 $DB->insert_record('report_builder_search_cols', $todb);
             }
         }
-        $report = reportbuilder::create($newid);
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($newid, $config, false); // No access control for managing of reports here.
         \totara_reportbuilder\event\report_created::create_from_report($report, false)->trigger();
         $transaction->allow_commit();
         redirect($CFG->wwwroot . '/totara/reportbuilder/general.php?id='.$newid);

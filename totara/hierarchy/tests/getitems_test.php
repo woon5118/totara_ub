@@ -33,7 +33,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 
-class getitemsexcludingchildren_test extends advanced_testcase {
+class totara_hierarchy_getitems_testcase extends advanced_testcase {
 
     private $orgs = array();
 

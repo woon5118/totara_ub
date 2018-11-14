@@ -55,9 +55,8 @@ switch ($action) {
         $customheading = required_param('customheading', PARAM_BOOL);
         $heading = optional_param('heading', '', PARAM_TEXT);
 
-        $config = new rb_config();
-        $config->set_nocache(true);
-        $report = reportbuilder::create($reportid, $config);
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($reportid, $config, false); // No access control for managing of reports here.
 
         $allowedadvanced = $report->src->get_allowed_advanced_column_options();
         $grouped = $report->src->get_grouped_column_options();

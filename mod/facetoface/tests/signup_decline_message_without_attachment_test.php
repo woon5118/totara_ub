@@ -30,7 +30,7 @@ require_once("{$CFG->dirroot}/mod/facetoface/notification/lib.php");
 /**
  * Class signup_decline_message_without_attachment_test
  */
-class signup_decline_message_without_attachment_test extends advanced_testcase {
+class mod_facetoface_signup_decline_message_without_attachment_testcase extends advanced_testcase {
 	/**
 	 * Setting up the database environment for the
 	 * test case. The steps are:

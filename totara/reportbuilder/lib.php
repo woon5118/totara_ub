@@ -114,8 +114,6 @@ define('REPORT_BUILDER_PDF_MARGIN_BOTTOM', 20);
  * Main report builder object class definition
  */
 class reportbuilder {
-    use \totara_reportbuilder\rb_deprecated_constructor; // To be removed in T13 when constructor is made private.
-
     /**
      * Available filter settings
      */
@@ -134,6 +132,13 @@ class reportbuilder {
      * @var string
      */
     private static $overrideuniquid = null;
+
+    /**
+     * Internal flag for detection of incorrect constructor use,
+     * this will be removed after we make constructor protected and type hinted.
+     * @var bool
+     */
+    private static $preventpublicconstructor = true;
 
     /** @var rb_base_source */
     public $src;
@@ -232,9 +237,9 @@ class reportbuilder {
     protected $ready = false;
 
     /**
-     * @var bool $intialised State variable. True when reportbuilder finished initialising its settings.
+     * @var bool $usercanaccess true means user many access report, this is used for performacne only
      */
-    protected $intialised = false;
+    protected $usercanaccess;
 
     /**
      * Please use {@link reportbuilder::can_display_total_count()}
@@ -254,56 +259,54 @@ class reportbuilder {
     public $useclonedb;
 
     /**
-     * Pseudo report used in initialisation
-     * @internal
-     * @var object
-     */
-    private static $_report;
-
-    /**
-     * Factory method for creating a report.
+     * Factory method for creating instance of report (both user and embedded reports ids are allowed).
      *
-     * @param int       $id
-     * @param rb_config $config
+     * NOTE: embedded reports often require extra embedded init data, developers must make sure
+     *       that the report does not leak sensitive information when embedded data is not supplied here!
+     *
+     * @param int $id report id
+     * @param rb_config|null $config
+     * @param bool $checkaccess true mans verify that report can be access by current user or the user specified in reportfor
      *
      * @return reportbuilder
      */
-    public static function create(int $id, rb_config $config = null) {
+    public static function create(int $id, rb_config $config = null, bool $checkaccess = true) {
         global $DB;
+
+        $report = $DB->get_record('report_builder', ['id' => $id], '*', IGNORE_MISSING);
+        if (!$report) {
+            print_error('reportwithidnotfound', 'totara_reportbuilder', $id);
+        }
 
         if ($config == null) {
             $config = new rb_config();
         }
 
-        self::$_report = $DB->get_record('report_builder', ['id' => $id], '*', IGNORE_MISSING);
-        if (!self::$_report) {
-            print_error('reportwithidnotfound', 'totara_reportbuilder', $id);
-        }
+        self::$preventpublicconstructor = false;
 
-        self::$_report->embed = null;
-
-        $reportObject = new reportbuilder();
-        $reportObject->initialise($config);
-
-        return $reportObject;
+        return new reportbuilder($report, $config, $checkaccess);
     }
 
     /**
-     * Factory method for creating an embedded report.
+     * Factory method for creating an instance of an embedded report,
+     * the report is created automatically if it does not exist yet.
      *
-     * Note: If a report is embedded then it is now guaranteed to have its embedded object loaded.
-     * This method will create the embedded object. The data required by the embedded object should be
-     * passed in the $embeddata rb_config setting.
+     * This is the only correct way to display embedded report on it's page.
      *
-     * @param string    $name
-     * @param rb_config $config
+     * @param string $name name of embedded report
+     * @param rb_config|null $config
+     * @param bool $checkaccess true mans verify that report can be access by current user or the user specified in reportfor
      *
      * @return reportbuilder
      */
-    public static function create_embedded(string $name, rb_config $config = null) {
+    public static function create_embedded(string $name, rb_config $config = null, bool $checkaccess = true) {
         global $DB;
 
-        self::$_report = $DB->get_record('report_builder', ['shortname' => $name], '*', IGNORE_MISSING);
+        if (is_numeric($name)) {
+            throw new coding_exception('Embedded report name cannot be a number');
+        }
+
+        $report = $DB->get_record('report_builder', ['shortname' => $name, 'embedded' => 1], '*', IGNORE_MISSING);
 
         if ($config == null) {
             $config = new rb_config();
@@ -311,132 +314,154 @@ class reportbuilder {
 
         // Handle if report not found in db.
         $embed = null;
-        if (!self::$_report) {
+        if (!$report) {
             $embed = reportbuilder_get_embedded_report_object($name, $config->get_embeddata());
             if ($embed) {
                 // Maybe this is the first time we have run it, so try to create it.
                 if (!$id = reportbuilder_create_embedded_record($name, $embed, $error)) {
                     print_error('error:creatingembeddedrecord', 'totara_reportbuilder', '', $error);
                 }
-                self::$_report = $DB->get_record('report_builder', ['id' => $id]);
+                $report = $DB->get_record('report_builder', ['id' => $id]);
             }
         }
 
-        if (!self::$_report) {
+        if (!$report) {
             print_error('reportwithnamenotfound', 'totara_reportbuilder', $name);
         }
 
-        self::$_report->embed = $embed;
+        self::$preventpublicconstructor = false;
 
-        $reportObject = new reportbuilder();
-        $reportObject->initialise($config);
-
-        return $reportObject;
+        return new reportbuilder($report, $config, $checkaccess);
     }
 
     /**
-     * Minimal constructor for the reportbuilder object.
+     * Constructor for the reportbuilder object.
      *
-     * Generates a new reportbuilder report instance.
+     * NOTE: do not use directly in code, use create() and create_embedded() factory methods instead.
      *
-     * This is not an initialisation. It is used to prepare the reportbuilder object for us.
-     * The report will be initialised with provided rb_config settings in initialise() when needed.
-     *
-     * @param integer $id ID of the report to generate
-     * @param string $shortname Shortname of the report to generate
-     * @param stdClass|bool $embed_deprecated Object containing settings for an embedded report - see note above
-     * @param integer $sid Saved search ID if displaying a saved search
-     * @param integer $reportfor User ID of user who is viewing the report
-     *                           (or null to use the current user)
-     * @param bool $nocache Force no cache usage. Only works if cache for current report is enabled
-     *                       and generated
-     * @param array $embeddata data to be passed to the embedded object constructor
-     * @param rb_global_restriction_set $globalrestrictionset global report restrictions info
-     *
+     * @param \stdClass $report report record
+     * @param rb_config $config report configuration
+     * @param bool $checkaccess true mans verify that report can be access by current user or the user specified in reportfor
      */
-    public function __construct($id=null, $shortname=null, $embed_deprecated=false, $sid=null, $reportfor=null,
-            $nocache = false, $embeddata = array(), rb_global_restriction_set $globalrestrictionset = null) {
+    public function __construct($report, $config = null, $checkaccess = true) {
+        global $DB;
 
-        if (func_num_args() > 0) {
-            debugging("From Totara 12, report constructor must not be called directly.", DEBUG_DEVELOPER);
-            $this->__old_construct($id, $shortname, $embed_deprecated, $sid, $reportfor, $nocache, $embeddata, $globalrestrictionset);
+        if (!is_object($report)) {
+            debugging("From Totara 12, report constructor must not be called directly, use reportbuilder::create() instead.", DEBUG_DEVELOPER);
+            if (!$report) {
+                throw new coding_exception('Report id must be specified!');
+            }
+
+            $report = $DB->get_record('report_builder', array('id' => $report), '*', MUST_EXIST);
+
+            $args = func_get_args();
+
+            $config = new rb_config();
+            if (!empty($args[3])) {
+                $config->set_sid((int)$args[3]);
+            }
+            if (!empty($args[4])) {
+                $config->set_reportfor($args[4]);
+            }
+            if (!empty($args[5])) {
+                $config->set_nocache(true);
+            }
+            if (!empty($args[6])) {
+                $config->set_embeddata($args[6]);
+            }
+            if (!empty($args[7])) {
+                $config->set_global_restriction_set($args[7]);
+            }
+            $checkaccess = true;
+
         } else {
-            $this->_id = self::$_report->id;
-            $this->source = self::$_report->source;
-            $this->shortname = self::$_report->shortname;
-            $this->fullname = self::$_report->fullname;
-            $this->hidden = self::$_report->hidden;
-            $this->initialdisplay = self::$_report->initialdisplay;
-            $this->toolbarsearch = self::$_report->toolbarsearch;
-            $this->description = self::$_report->description;
-            $this->globalrestriction = self::$_report->globalrestriction;
-            $this->globalrestrictionset = null;
-            $this->contentmode = self::$_report->contentmode;
-            $this->recordsperpage = self::$_report->recordsperpage;
-            $this->defaultsortcolumn = self::$_report->defaultsortcolumn;
-            $this->defaultsortorder = self::$_report->defaultsortorder;
-            $this->showtotalcount = (!empty(self::$_report->showtotalcount) && !empty(get_config('totara_reportbuilder', 'allowtotalcount')));
-            $this->useclonedb = self::$_report->useclonedb;
-            $this->embedded = self::$_report->embedded;
-            $this->embedobj = self::$_report->embed;
-            $this->cache = self::$_report->cache;
+            if (self::$preventpublicconstructor) {
+                throw new coding_exception('New reportbuilder constructor cannot be called directly, use reportbuilder::create() instead.');
+            }
+            self::$preventpublicconstructor = true;
 
-            // Assign a unique identifier for this report.
-            $this->uniqueid = self::$_report->id;
+            if ($config === null) {
+                throw new coding_exception('Missing report config');
+            } else if (!is_object($config) or !($config instanceof rb_config)) {
+                throw new coding_exception('Invalid report config object supplied');
+            }
 
-            $this->ready();
+            if (!is_bool($checkaccess)) {
+                throw new coding_exception('Invalid report constructor checkaccess value');
+            }
+        }
 
-            // Not needed any more, so reset.
-            self::$_report = null;
+        $this->_id = $report->id;
+        $this->source = $report->source;
+        $this->shortname = $report->shortname;
+        $this->fullname = $report->fullname;
+        $this->hidden = $report->hidden;
+        $this->initialdisplay = $report->initialdisplay;
+        $this->toolbarsearch = $report->toolbarsearch;
+        $this->description = $report->description;
+        $this->globalrestriction = $report->globalrestriction;
+        $this->contentmode = $report->contentmode;
+        $this->recordsperpage = $report->recordsperpage;
+        $this->defaultsortcolumn = $report->defaultsortcolumn;
+        $this->defaultsortorder = $report->defaultsortorder;
+        $this->showtotalcount = (!empty($report->showtotalcount) && !empty(get_config('totara_reportbuilder', 'allowtotalcount')));
+        $this->useclonedb = $report->useclonedb;
+        $this->embedded = $report->embedded;
+        $this->cache = $report->cache;
+
+        // Use config settings.
+        $this->_sid = $config->get_sid();
+        $this->reportfor = $config->get_reportfor();
+        $this->cacheignore = $config->get_nocache();
+        $this->globalrestrictionset = $config->get_global_restriction_set();
+
+        // Assign a unique identifier for this report.
+        $this->uniqueid = $report->id;
+
+        // If this is an embedded report then load the embedded report object.
+        if ($this->embedded) {
+            $embed = reportbuilder_get_embedded_report_object($this->shortname, $config->get_embeddata());
+            if (!$embed) {
+                throw new coding_exception('Embedded report definition not found');
+            }
+            $this->embedobj = $embed;
+            $this->embeddedurl = $this->embedobj->url;
+            unset($embed);
+        }
+
+        $this->initialise();
+        $this->ready = true;
+
+        if ($checkaccess) {
+            if (!$this->can_access()) {
+                throw new moodle_exception('nopermission', 'totara_reportbuilder');
+            }
         }
     }
 
     /**
      * Initialises the report with the configuration settings required.
-     *
-     * Note: If a report is embedded and it implements is_capable (all embedded reports SHOULD implement this, but are
-     * not required to) then is_capable will be called: If the user does not have access then an exception is thrown. If
-     * the function is not implemented then a debug warning is generated and an exception will NOT be thrown.
-     *
-     * @param rb_config $config
      */
-    public function initialise(rb_config $config = null) {
-        global $CFG, $DB, $USER;
+    private function initialise() {
+        global $CFG, $DB;
 
-        if (!$this->is_ready()) {
-            throw new coding_exception('This report instance is not ready to be initialised.');
-        }
-        if ($this->is_initialised()) {
-            throw new coding_exception('This report instance has already been initialised.');
+        if ($this->is_ready()) {
+            throw new coding_exception('This report instance cannot be initialised any more.');
         }
 
-        // If this is an embedded report then load the embedded report object.
-        $embedgrrsupport = true;
-        $embed = $this->embedobj;
-        if ($this->embedded && !$embed) {
-            $embed = reportbuilder_get_embedded_report_object($this->shortname, $config->get_embeddata());
-            if ($embed instanceof rb_base_embedded) {
-                $embedgrrsupport = $embed->embedded_global_restrictions_supported();
-            }
-            $this->embedobj = $embed;
-        }
-
-        $nocache = $config->get_nocache();
         // Load restriction set.
-        $this->globalrestrictionset = $config->get_global_restriction_set();
-        if (!empty($CFG->enableglobalrestrictions) && $embedgrrsupport) {
-            $nocache = true; // Caching cannot work together with restrictions, sorry.
-            $usesourcecache = false; // Cannot use the source cache if we have a restrictionset.
+        if (!empty($CFG->enableglobalrestrictions)) {
+            if ($this->embedobj and !$this->embedobj->embedded_global_restrictions_supported()) {
+                $usesourcecache = true; // There is no restrictionset so we can use the sourcecache.
+            } else {
+                $this->cacheignore = true; // Caching cannot work together with restrictions, sorry.
+                $usesourcecache = false; // Cannot use the source cache if we have a restrictionset.
+            }
         } else {
             $usesourcecache = true; // There is no restrictionset so we can use the sourcecache.
         }
 
         $this->src = self::get_source_object($this->source, $usesourcecache, true, $this->globalrestrictionset);
-        $this->_sid = $config->get_sid();
-        // Store the embedded URL for embedded reports only.
-        if ($this->embedded && $embed) {
-            $this->embeddedurl = $embed->url;
-        }
 
         // If uniqueid was overridden, apply it here and reset.
         if (isset(self::$overrideuniquid)) {
@@ -450,7 +475,6 @@ class reportbuilder {
             self::$overrideignoreparams = null;
         }
 
-        $this->cacheignore = $nocache;
         if ($this->src->cacheable) {
             $this->cacheschedule = $DB->get_record('report_builder_cache', array('reportid' => $this->_id), '*', IGNORE_MISSING);
         } else {
@@ -458,43 +482,16 @@ class reportbuilder {
             $this->cacheschedule = false;
         }
 
-        // Determine who is viewing or receiving the report.
-        // Used for access and content restriction checks.
-        $reportfor = $config->get_reportfor();
-        if (!empty($reportfor)) {
-            $this->reportfor = $reportfor;
-        } else {
-            $this->reportfor = $USER->id;
-        }
-
-        if ($config->get_sid()) {
+        if ($this->_sid) {
             $this->restore_saved_search();
         }
 
         $this->_paramoptions = $this->src->paramoptions;
 
-        if ($embed) {
-            $this->_embeddedparams = $embed->embeddedparams;
+        if ($this->embedobj) {
+            $this->_embeddedparams = $this->embedobj->embeddedparams;
         }
         $this->_params = $this->get_current_params();
-
-        // Run the embedded report's capability checks.
-        if ($embed) {
-            if (defined('REPORTBUIDLER_MANAGE_REPORTS_PAGE')) {
-                // The is_capable is intended for report viewing only!
-                require_capability('totara/reportbuilder:manageembeddedreports', context_system::instance());
-                if (!method_exists($embed, 'is_capable')) {
-                    debugging("Missing is_capable() method in embedded report {$embed->fullname}", DEBUG_DEVELOPER);
-                }
-            } else if (method_exists($embed, 'is_capable')) {
-                if (!$embed->is_capable($this->reportfor, $this)) {
-                    print_error('nopermission', 'totara_reportbuilder');
-                }
-            } else {
-                debugging('This report doesn\'t implement is_capable().
-                    Sidebar filters will only use form submission rather than instant filtering.', DEBUG_DEVELOPER);
-            }
-        }
 
         // Allow sources to modify itself based on params.
         $this->src->post_params($this);
@@ -508,10 +505,12 @@ class reportbuilder {
                 $this->requiredcolumns[$key] = $column;
             }
         }
-        if (!empty($embed->requiredcolumns)) {
-            foreach ($embed->requiredcolumns as $column) {
-                $key = $column->type . '-' . $column->value;
-                $this->requiredcolumns[$key] = $column;
+        if ($this->embedobj) {
+            if (!empty($this->embedobj->requiredcolumns)) {
+                foreach ($this->embedobj->requiredcolumns as $column) {
+                    $key = $column->type . '-' . $column->value;
+                    $this->requiredcolumns[$key] = $column;
+                }
             }
         }
 
@@ -563,15 +562,42 @@ class reportbuilder {
             throw new coding_exception('Report source ' . get_class($this->src) .
                                        '::post_config() must not change report columns!');
         }
-
-        $this->initialised();
     }
 
     /**
-     * Set reportbuilder object as ready.
+     * Can report user access this report?
+     *
+     * NOTE: the result is cached for performance reasons.
+     *
+     * @return bool
      */
-    public function ready() {
-        $this->ready = true;
+    public function can_access() {
+        if (isset($this->usercanaccess)) {
+            return $this->usercanaccess;
+        }
+
+        if ($this->needs_require_login() and $this->reportfor <= 0) {
+            $this->usercanaccess = false;
+            return $this->usercanaccess;
+        }
+
+        if ($this->embedobj) {
+            $this->usercanaccess = true;
+            // Run the embedded report's capability checks.
+            if (method_exists($this->embedobj, 'is_capable')) {
+                if (!$this->embedobj->is_capable($this->reportfor, $this)) {
+                    $this->usercanaccess = false;
+                }
+            } else {
+                debugging('This report doesn\'t implement is_capable(). Sidebar filters will only use form submission rather than instant filtering.', DEBUG_DEVELOPER);
+                $this->usercanaccess = false;
+            }
+
+        } else {
+            $this->usercanaccess = self::is_capable($this->_id, $this->reportfor);
+        }
+
+        return $this->usercanaccess;
     }
 
     /**
@@ -580,20 +606,6 @@ class reportbuilder {
      */
     public function is_ready() {
         return $this->ready;
-    }
-
-    /**
-     * Reportbuilder doesn't accept any more changes and is ready to be displayed.
-     */
-    public function initialised() {
-        $this->intialised = true;
-    }
-
-    /**
-     * Reportbuilder doesn't accept any more changes and is ready to be displayed.
-     */
-    public function is_initialised() {
-        return $this->intialised;
     }
 
     /**
@@ -635,6 +647,9 @@ class reportbuilder {
      * It should not be called when data will not be generated (e.g. report setup/config pages).
      */
     public function handle_pre_display_actions() {
+        if (!$this->can_access()) {
+            throw new moodle_exception('nopermission', 'totara_reportbuilder');
+        }
         $this->src->pre_display_actions();
     }
 
@@ -4038,6 +4053,10 @@ class reportbuilder {
     function get_full_count() {
         global $CFG;
 
+        if (!$this->can_access()) {
+            throw new moodle_exception('nopermission', 'totara_reportbuilder');
+        }
+
         // Don't do the calculation if the results are initially hidden.
         if ($this->is_initially_hidden()) {
             return 0;
@@ -4079,6 +4098,10 @@ class reportbuilder {
     public function get_filtered_count($nocache = false) {
         global $CFG;
 
+        if (!$this->can_access()) {
+            throw new moodle_exception('nopermission', 'totara_reportbuilder');
+        }
+
         // Don't do the calculation if the results are initially hidden.
         if ($this->is_initially_hidden()) {
             return 0;
@@ -4111,6 +4134,10 @@ class reportbuilder {
      * @return void No return but initiates save dialog
      */
     function export_data($format) {
+        if (!$this->can_access()) {
+            throw new moodle_exception('nopermission', 'totara_reportbuilder');
+        }
+
         // Release session lock and make sure abort is not ignored.
         \core\session\manager::write_close();
         ignore_user_abort(false);
@@ -4153,8 +4180,8 @@ class reportbuilder {
     public function display_table($return = false) {
         global $SESSION, $DB, $OUTPUT, $PAGE;
 
-        if (!$this->is_initialised()) {
-            throw new coding_exception('This report instance has not been initialised.');
+        if (!$this->can_access()) {
+            throw new moodle_exception('nopermission', 'totara_reportbuilder');
         }
 
         $initiallyhidden = $this->is_initially_hidden();
@@ -5522,7 +5549,9 @@ function reportbuilder_set_status($reportcache, $flag = RB_CACHE_FLAG_CHANGED) {
 }
 
 /**
- * Report cache (re-)generation
+ * Report cache (re-)generation.
+ *
+ * NOTE: calling code must make sure current user is allowed to regenerate the cache.
  *
  * @int $reportid Report id
  * @return bool Is cache generated
@@ -5555,13 +5584,9 @@ function reportbuilder_generate_cache($reportid) {
 
     try {
         // Instantiate.
-        if ($rawreport->embedded) {
-            $report = reportbuilder_get_embedded_report($rawreport->shortname, array(), true, 0);
-        } else {
-            $config = new rb_config();
-            $config->set_nocache(true);
-            $report = reportbuilder::create($reportid, $config);
-        }
+        $config = new rb_config();
+        $config->set_nocache(true);
+        $report = reportbuilder::create($reportid, $config, false); // No permission check here, it is the responsibility of calling code.
 
         // Get caching query.
         list($query, $params) = $report->build_create_cache_query();
@@ -5684,7 +5709,17 @@ function reportbuilder_send_scheduled_report($sched) {
         }
     }
 
-    $report = reportbuilder_get_schduled_report($sched, $reportrecord);
+    try {
+        $report = reportbuilder_get_schduled_report($sched, $reportrecord);
+    } catch (moodle_exception $e) {
+        if ($e->errorcode === "nopermission") {
+            mtrace("Error: Scheduled report {$sched->id} could not be created because user is not allowed to access it");
+            return false;
+        } else {
+            mtrace("Error: Scheduled report {$sched->id} could not be created, unknown exception: " . get_class($e));
+            return false;
+        }
+    }
     $tempfile = reportbuilder_export_schduled_report($sched, $report, $writerclassname);
     if (!$tempfile) {
         mtrace("Error: Scheduled report {$sched->id} could not be created");

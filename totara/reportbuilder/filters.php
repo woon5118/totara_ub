@@ -46,9 +46,8 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 
 $returnurl = new moodle_url('/totara/reportbuilder/filters.php', array('id' => $id));
 
-$config = new rb_config();
-$config->set_nocache(true);
-$report = reportbuilder::create($id, $config);
+$config = (new rb_config())->set_nocache(true);
+$report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
 
 // Check filterheadings and searchcolumnheadings for multilang spans. Need to set context to use format_string.
 $PAGE->set_context(context_user::instance($USER->id));
@@ -196,7 +195,10 @@ if ($fromform = $mform->get_data()) {
     if (build_filters($id, $fromform)) {
         $DB->set_field('report_builder', 'toolbarsearch', !$fromform->toolbarsearchdisabled, array('id' => $id));
         reportbuilder_set_status($id);
-        $report = reportbuilder::create($id);
+
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
+
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
         totara_set_notification(get_string('filters_updated', 'totara_reportbuilder'), $returnurl,
             array('class' => 'notifysuccess'));

@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/lib/accesslib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
-class positionassign_test extends advanced_testcase {
+class totara_hierarchy_positionassign_testcase extends advanced_testcase {
 
     protected $user1, $user2, $user3, $user4, $user5;
 

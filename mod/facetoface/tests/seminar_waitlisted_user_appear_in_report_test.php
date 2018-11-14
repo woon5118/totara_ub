@@ -33,79 +33,30 @@ require_once ($CFG->dirroot . "/mod/facetoface/lib.php");
  *
  * Class seminar_signup_user_test
  */
-class seminar_waitlisted_user_appear_in_report_test extends advanced_testcase
-{
-    private $source = "facetoface_sessions";
+class mod_facetoface_seminar_waitlisted_user_appear_in_report_testcase extends advanced_testcase {
+    use totara_reportbuilder\phpunit\report_testing;
 
     /**
-     * The array of value that required
-     * for column options
-     * @var array
+     * @return int report id
      */
-    private $columnsrequired = array(
-        'sessiondate',
-        'namelink',
-        'courselink',
-        'statuscode'
-    );
+    private function create_facetoface_session_report(): int {
+        $rid = $this->create_report('facetoface_sessions', 'Seminar Sign-ups test', false, 0);
+        $report = reportbuilder::create($rid, null, false);
 
-    /**
-     * @param stdClass $user
-     * @return reportbuilder
-     */
-    private function create_facetoface_session_report(stdClass $user): reportbuilder {
-        global $DB;
+        $columnsrequired = array(
+            'sessiondate',
+            'namelink',
+            'courselink',
+            'statuscode'
+        );
 
-        $data = [
-            'fullname' => "Seminar Sign-ups test",
-            'shortname' => "short",
-            'source' => $this->source,
-            'hidden' => 0,
-            'cache' => 0,
-            'accessmode' => 1,
-            'contentmode' => 0,
-            'description' => 'This is the report',
-            'globalrestriction' => 0,
-            'timemodified' => time(),
-        ];
-
-        $id = $DB->insert_record("report_builder", (object)$data, true);
-
-        $data['id'] = $id;
-        $reportdata = (object)$data;
-        $this->set_up_columns((object)$reportdata);
-
-        $config = new rb_config();
-        $config->set_reportfor($user->id);
-        return reportbuilder::create($id, $config);
-    }
-
-    /**
-     * @param stdClass $report
-     */
-    private function set_up_columns(stdClass $report): void {
-        global $DB;
-
-        /** @var rb_source_facetoface_sessions $source */
-        $source = reportbuilder::get_source_object($report->source);
-        $columnoptions = $source->columnoptions;
-        $sortorder = 1;
-
-        /** @var rb_column_option $columnoption */
-        foreach ($columnoptions as $columnoption) {
-            if (in_array($columnoption->value, $this->columnsrequired, false)) {
-                $DB->insert_record("report_builder_columns", (object)[
-                    'reportid' => $report->id,
-                    'type' => $columnoption->type,
-                    'value' => $columnoption->value,
-                    'sortorder' => $sortorder,
-                    'hidden' => 0,
-                    'customheading' => 0
-                ]);
-
-                $sortorder += 1;
+        foreach ($report->columnoptions as $columnoption) {
+            if (in_array($columnoption->value, $columnsrequired, false)) {
+                $this->add_column($report, $columnoption->type, $columnoption->value, null, null, null, 0);
             }
         }
+
+        return $report->_id;
     }
 
     /**
@@ -185,7 +136,9 @@ class seminar_waitlisted_user_appear_in_report_test extends advanced_testcase
         $this->setAdminUser();
 
         $this->generate_data($USER);
-        $reportbuilder = $this->create_facetoface_session_report($USER);
+        $rid = $this->create_facetoface_session_report();
+
+        $reportbuilder = reportbuilder::create($rid);
 
         $recordset = $this->query_records($reportbuilder);
         $this->assertEquals(2, $recordset->get_count_without_limits());
@@ -203,7 +156,9 @@ class seminar_waitlisted_user_appear_in_report_test extends advanced_testcase
         $this->setAdminUser();
 
         $this->generate_data($USER);
-        $reportbuilder = $this->create_facetoface_session_report($USER);
+        $rid = $this->create_facetoface_session_report();
+
+        $reportbuilder = reportbuilder::create($rid);
 
         $recordset = $this->query_records($reportbuilder);
         $expected = array("kian nguyen", "james lebron");

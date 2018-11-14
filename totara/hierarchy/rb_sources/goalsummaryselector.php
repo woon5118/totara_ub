@@ -36,12 +36,7 @@ $PAGE->set_context($systemcontext);
 
 $output = $PAGE->get_renderer('hierarchy_goal');
 
-$report = reportbuilder::create($summaryreportid);
-
-// Check that the user has permission to view the report. Uses report builder access settings.
-if (!reportbuilder::is_capable($summaryreportid)) {
-    print_error('nopermission', 'totara_reportbuilder');
-}
+$report = reportbuilder::create($summaryreportid, null, true);
 
 $fullname = $report->fullname;
 

@@ -63,7 +63,7 @@ if ($confirm == 1) {
         $DB->delete_records_select('report_builder_schedule_email_external', $select, array($scheduledreport->id));
         $DB->delete_records('report_builder_schedule', array('id' => $scheduledreport->id));
         \totara_reportbuilder\event\scheduled_report_deleted::create_from_schedule($scheduledreport)->trigger();
-        $report = reportbuilder::create($scheduledreport->reportid);
+        $report = reportbuilder::create($scheduledreport->reportid, null, true);
 
         // @deprecated : Triggering of "\totara_reportbuilder\event\report_updated" event for deletion of scheduled
         // reports has been deprecated. Use "\totara_reportbuilder\event\scheduled_report_deleted" instead

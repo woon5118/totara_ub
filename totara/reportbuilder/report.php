@@ -58,11 +58,8 @@ $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($
 $config = new rb_config();
 $config->set_sid($sid);
 $config->set_global_restriction_set($globalrestrictionset);
-$report = reportbuilder::create($id, $config);
+$report = reportbuilder::create($id, $config, true);
 
-if (!reportbuilder::is_capable($id)) {
-    print_error('nopermission', 'totara_reportbuilder');
-}
 $report->handle_pre_display_actions();
 
 if ($format != '') {

@@ -32,7 +32,7 @@ use mod_facetoface\signup\state\booked;
 /**
  * Class seminar_renderer_within_course_view_test
  */
-class seminar_renderer_within_course_view_test extends advanced_testcase {
+class mod_facetoface_seminar_renderer_within_course_view_testcase extends advanced_testcase {
     /**
      * @param int $approvaltype
      * @param int $approvaltype

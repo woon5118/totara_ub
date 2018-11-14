@@ -107,6 +107,8 @@ class block_totara_report_graph_util_testcase extends advanced_testcase {
      */
     public function test_get_svg_data() {
         $this->resetAfterTest();
+        $this->setAdminUser();
+
         $rid = $this->create_user_report_with_graph();
         $block = $this->create_report_graph_block_instance($rid);
 

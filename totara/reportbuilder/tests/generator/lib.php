@@ -302,6 +302,7 @@ class totara_reportbuilder_generator extends component_generator_base {
      * for the report
      *
      * @param array $record
+     * @return int $record id
      */
     public function create_default_standard_report($record) {
         global $DB;
@@ -359,6 +360,7 @@ class totara_reportbuilder_generator extends component_generator_base {
             $so+= 1;
         }
 
+        return $id;
     }
 }
 

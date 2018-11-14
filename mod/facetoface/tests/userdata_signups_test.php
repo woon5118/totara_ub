@@ -30,7 +30,7 @@ use context_course;
 use context_coursecat;
 use context_module;
 use context_system;
-use facetoface_testcase;
+use mod_facetoface_facetoface_testcase;
 use phpunit_util;
 use stdClass;
 use totara_core\event\user_suspended;
@@ -46,7 +46,7 @@ require_once($CFG->dirroot . '/mod/facetoface/tests/facetoface_testcase.php');
  *
  * @group totara_userdata
  */
-class mod_facetoface_userdata_signups_test extends facetoface_testcase {
+class mod_facetoface_userdata_signups_test extends mod_facetoface_facetoface_testcase {
 
     /**
      * Set up tests.
@@ -637,7 +637,7 @@ class mod_facetoface_userdata_signups_test extends facetoface_testcase {
         $this->assertEquals(2, signups::execute_count($targetuser2, $categorycontext1));
         $this->assertEquals(2, signups::execute_count($targetuser1, $categorycontext2));
         $this->assertEquals(1, signups::execute_count($targetuser2, $categorycontext2));
-        
+
         // Module context.
         $coursemodule3 = get_coursemodule_from_instance('facetoface', $session3->facetoface);
         $coursemodule4 = get_coursemodule_from_instance('facetoface', $session4->facetoface);

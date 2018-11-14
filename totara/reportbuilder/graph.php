@@ -49,9 +49,9 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 
 $returnurl = new moodle_url('/totara/reportbuilder/graph.php', array('reportid' => $id));
 
-$config = new rb_config();
-$config->set_nocache(true);
-$report = reportbuilder::create($id, $config);
+$config = (new rb_config())->set_nocache(true);
+$report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
+
 $graph = $DB->get_records('report_builder_graph', array('reportid' => $id));
 if (!$graph) {
     $graph = new stdClass();

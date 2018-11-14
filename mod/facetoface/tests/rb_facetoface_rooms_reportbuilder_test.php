@@ -26,19 +26,14 @@
 defined("MOODLE_INTERNAL") || die();
 
 global $CFG;
-
 require_once($CFG->dirroot . "/totara/reportbuilder/lib.php");
 
 /**
  * Unit test for facetoface_rooms reprot builder
  * and the test is testing the SQL query of custom report plust
  * embedded report
- *
- * Class reportbuilder_test
- * @method fail(string $message)
  */
-class rb_facetoface_rooms_reportbuilder_test extends advanced_testcase
-{
+class mod_facetoface_rb_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
     /**
      * Saving all the columns for the report builder
      * @param rb_source_facetoface_rooms    $src
@@ -103,7 +98,7 @@ class rb_facetoface_rooms_reportbuilder_test extends advanced_testcase
             'fullname'          => 'This is SPARTAN',
             'hidden'            => 0,
             'embed'             => 0,
-            'accessmode'        => 1,
+            'accessmode'        => 0,
             'contentmode'       => 0,
             'description'       => 'wowow',
             'recordsperpage'    => 40,

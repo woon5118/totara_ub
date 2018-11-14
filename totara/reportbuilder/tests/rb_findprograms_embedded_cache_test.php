@@ -82,6 +82,8 @@ class totara_reportbuilder_rb_findprograms_embedded_cache_testcase extends repor
         $this->program3 = $this->getDataGenerator()->create_program(array('fullname'=> 'Program level 3'));
 
         $this->user1 = $this->getDataGenerator()->create_user();
+
+        $this->setAdminUser();
     }
 
     /**

@@ -33,6 +33,7 @@ class totara_reportbuilder_advanced_column_testcase extends advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $users = array();
         $users[0] = $DB->get_record('user', array('username'=>'admin'));
@@ -216,6 +217,7 @@ class totara_reportbuilder_advanced_column_testcase extends advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $users = array();
         $users[] = $this->getDataGenerator()->create_user();
@@ -349,6 +351,7 @@ class totara_reportbuilder_advanced_column_testcase extends advanced_testcase {
         global $DB, $CFG;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         set_config('enablereportcaching', 1);
         $this->assertNotEmpty($CFG->enablereportcaching);

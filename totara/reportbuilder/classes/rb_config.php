@@ -39,13 +39,12 @@ class rb_config {
     private $sid = 0;
 
     /**
-     * @var int ID of a user the report is generated for.
+     * @var int|null ID of a user the report is generated for.
      */
-    private $reportfor = 0;
+    private $reportfor;
 
     /**
-     * @var bool Force no cache usage. Only works if cache for current report is enabled
-     *           and generated
+     * @var bool Force no cache usage even if cache for current report is enabled and generated
      */
     private $nocache = false;
 
@@ -57,61 +56,76 @@ class rb_config {
     /**
      * @return array
      */
-    public function get_embeddata(): ?array {
+    public function get_embeddata(): array {
         return $this->embeddata;
     }
 
     /**
      * @param array $embeddata
+     * @return rb_config
      */
-    public function set_embeddata(array $embeddata = null): void {
+    public function set_embeddata(array $embeddata): rb_config {
         $this->embeddata = $embeddata;
+        return $this;
     }
 
     /**
      * @return int
      */
-    public function get_sid(): ?int {
+    public function get_sid(): int {
         return $this->sid;
     }
 
     /**
-     * @param int $sid
+     * @param int|null $sid
+     * @return rb_config
      */
-    public function set_sid(int $sid = null): void {
+    public function set_sid(?int $sid): rb_config {
+        if ($sid === null) {
+            $sid = 0;
+        }
         $this->sid = $sid;
+        return $this;
     }
 
     /**
      * @return int
      */
-    public function get_reportfor(): ?int {
-        return $this->reportfor;
+    public function get_reportfor(): int {
+        global $USER;
+        if (isset($this->reportfor)) {
+            return $this->reportfor;
+        }
+        return $USER->id;
     }
 
     /**
      * @param int $reportfor
+     * @return rb_config
      */
-    public function set_reportfor(int $reportfor = null): void {
+    public function set_reportfor(?int $reportfor): rb_config {
         $this->reportfor = $reportfor;
+        return $this;
     }
 
     /**
      * @return bool
      */
-    public function get_nocache(): ?bool {
+    public function get_nocache(): bool {
         return $this->nocache;
     }
 
     /**
      * @param bool $nocache
+     * @return rb_config
      */
-    public function set_nocache(bool $nocache = null): void {
+    public function set_nocache(bool $nocache): rb_config {
         $this->nocache = $nocache;
+        return $this;
     }
 
     /**
-     * @return rb_global_restriction_set
+     * @return rb_global_restriction_set|null
      */
     public function get_global_restriction_set(): ?rb_global_restriction_set {
         return $this->globalrestrictionset;
@@ -119,8 +133,10 @@ class rb_config {
 
     /**
      * @param rb_global_restriction_set $globalrestrictionset
+     * @return rb_config
      */
-    public function set_global_restriction_set(rb_global_restriction_set $globalrestrictionset = null): void {
+    public function set_global_restriction_set(rb_global_restriction_set $globalrestrictionset = null): rb_config {
         $this->globalrestrictionset = $globalrestrictionset;
+        return $this;
     }
 }

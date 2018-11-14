@@ -33,7 +33,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 
-class movehierarchyitem_test extends advanced_testcase {
+class totara_hierarchy_moveitem_testcase extends advanced_testcase {
 //TODO: add tests for moving hierarchy items between frameworks
 
     private $frame1, $frame2;

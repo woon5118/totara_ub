@@ -30,7 +30,7 @@ require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
  *
  * Class room_search_with_distinct_record_test
  */
-class room_search_with_distinct_record_test extends advanced_testcase {
+class mod_facetoface_room_search_with_distinct_record_testcase extends advanced_testcase {
     /**
      * Creating a course, and a seminar activity for the course
      *

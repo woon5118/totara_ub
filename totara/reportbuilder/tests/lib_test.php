@@ -558,19 +558,19 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         // Test generic report.
         $rb = new reportbuilder($this->rb->_id);
-        $this->assertDebuggingCalled('From Totara 12, report constructor must not be called directly.');
+        $this->assertDebuggingCalled('From Totara 12, report constructor must not be called directly, use reportbuilder::create() instead.');
         $this->assertEquals('Test Report', $rb->fullname);
         $this->assertEquals('report_test', $rb->shortname);
         $this->assertEquals('competency_evidence', $rb->source);
         $this->assertEquals(0, $rb->hidden);
 
         // Test embedded report.
-        $rb = new reportbuilder(null, $this->shortname);
-        $this->assertDebuggingCalled('From Totara 12, report constructor must not be called directly.');
-        $this->assertEquals('Record of Learning: Competencies', $rb->fullname);
-        $this->assertEquals('plan_competencies', $rb->shortname);
-        $this->assertEquals('dp_competency', $rb->source);
-        $this->assertEquals(1, $rb->hidden);
+        try {
+            $rb = new reportbuilder(null, $this->shortname);
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+            $this->assertDebuggingCalled('From Totara 12, report constructor must not be called directly, use reportbuilder::create() instead.');
+        }
     }
 
     public function test_get_caching_problems() {
@@ -1363,7 +1363,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $report2->shortname = 'mycourses';
         $report2->source = 'courses';
         $report2->hidden = 1;
-        $report2->embedded = 1;
+        $report2->embedded = 0;
         $report2->id = $DB->insert_record('report_builder', $report2);
 
         $report3 = new stdclass();
@@ -1371,7 +1371,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $report3->shortname = 'mycourses2';
         $report3->source = 'courses';
         $report3->hidden = 1;
-        $report3->embedded = 1;
+        $report3->embedded = 0;
         $report3->id = $DB->insert_record('report_builder', $report3);
 
         // Add search columns to two reports.
@@ -1387,13 +1387,13 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             'report_builder_search_cols' => $rbsearchcolsdata)));
 
         // Test result for reports with/without search columns.
-        $report1 = reportbuilder::create_embedded('report_test');
+        $report1 = reportbuilder::create($this->rb->_id);
         $cols1 = $report1->get_search_columns();
         $this->assertCount(2, $cols1);
         $this->assertArrayHasKey(100, $cols1);
         $this->assertArrayHasKey(101, $cols1);
 
-        $report3 = reportbuilder::create_embedded('mycourses2');
+        $report3 = reportbuilder::create($report3->id);
         $cols3 = $report3->get_search_columns();
         $this->assertEmpty($cols3);
     }
@@ -1402,7 +1402,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $DB;
         // Add two reports.
         $rb2data = array(array('id' => 2, 'fullname' => 'Courses', 'shortname' => 'mycourses',
-                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1));
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 0));
 
         $rbsearchcolsdata = array(
                         array('id' => 100, 'reportid' => 2, 'type' => 'course', 'value' => 'coursetypeicon',
@@ -1416,7 +1416,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             'report_builder_search_cols' => $rbsearchcolsdata)));
 
         // Test result for reports with/without search columns.
-        $report2 = reportbuilder::create_embedded('mycourses');
+        $report2 = reportbuilder::create(2);
         $report2->delete_search_column(100);
         $cols2 = $report2->get_search_columns();
         $this->assertCount(1, $cols2);
@@ -1424,7 +1424,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_search_columns_select() {
-        $report1 = reportbuilder::create_embedded('report_test');
+        $report1 = reportbuilder::create($this->rb->_id);
         $cols1 = $report1->get_search_columns_select();
         // Current test report has at least three groups. Check some items inside aswell.
         $this->assertGreaterThanOrEqual(3, count($cols1));
@@ -1447,9 +1447,9 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $DB;
         // Add reports.
         $rb2data = array(array('id' => 59, 'fullname' => 'Courses', 'shortname' => 'mycourses',
-                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1),
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 0),
                          array('id' => 3, 'fullname' => 'Courses2', 'shortname' => 'mycourses2',
-                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1));
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 0));
         $rbfiltersdata = array(
             array('id' => 171, 'reportid' => 59, 'type' => 'course', 'value' => 'coursetype',
                   'sortorder' => 1, 'advanced' => 0, 'region' => rb_filter_type::RB_FILTER_REGION_SIDEBAR),
@@ -1466,7 +1466,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             'report_builder_filters' => $rbfiltersdata)));
 
         // Report 59 has two sidebar filters.
-        $report59 = reportbuilder::create_embedded('mycourses');
+        $report59 = reportbuilder::create(59);
         $side59 = $report59->get_sidebar_filters();
         $this->assertCount(2, $side59);
         $this->assertArrayHasKey('course-coursetype', $side59);
@@ -1479,7 +1479,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->assertArrayHasKey('course-name_and_summary', $std59);
 
         // Report 3 doesn't have filters.
-        $report3 = reportbuilder::create_embedded('mycourses2');
+        $report3 = reportbuilder::create(3);
         $side3 = $report3->get_sidebar_filters();
         $std3 = $report3->get_standard_filters();
         $this->assertEmpty($side3);
@@ -1487,7 +1487,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_all_filter_joins() {
-        $report = reportbuilder::create_embedded('report_test');
+        $report = reportbuilder::create($this->rb->_id);
         $joins = $report->get_all_filter_joins();
 
         $this->assertNotEmpty($joins);
@@ -1495,7 +1495,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_filters_select() {
-        $report = reportbuilder::create_embedded('report_test');
+        $report = reportbuilder::create($this->rb->_id);
         $filters = $report->get_filters_select();
 
         $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
@@ -1511,7 +1511,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_all_filters_select() {
-        $report1 = reportbuilder::create_embedded('report_test');
+        $report1 = reportbuilder::create($this->rb->_id);
         $filters = $report1->get_all_filters_select();
 
         $this->assertArrayHasKey('allstandardfilters', $filters);

@@ -32,6 +32,7 @@ class totara_reportbuilder_custom_fields_testcase extends advanced_testcase {
     public function test_profile_field_defaults() {
         global $DB;
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $this->assertCount(0, $DB->get_records('user_info_category'));
         $this->assertCount(0, $DB->get_records('user_info_field'));

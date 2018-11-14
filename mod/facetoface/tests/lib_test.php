@@ -43,7 +43,7 @@ require_once($CFG->dirroot . '/completion/cron.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
 require_once($CFG->dirroot . '/mod/facetoface/tests/facetoface_testcase.php');
 
-class mod_facetoface_lib_testcase extends facetoface_testcase {
+class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
     /** @var mod_facetoface_generator */
     protected $facetoface_generator;

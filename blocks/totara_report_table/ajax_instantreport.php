@@ -72,17 +72,7 @@ $uniqueid = 'block_totara_report_table_' . $blockid;
 reportbuilder::overrideuniqueid($uniqueid);
 $config = new rb_config();
 $config->set_global_restriction_set($globalrestrictionset);
-$report = reportbuilder::create($id, $config);
-
-// Decide if require_login should be executed.
-if ($report->needs_require_login() and !isloggedin()) {
-    require_login();
-}
-
-// Checks that the report is one that is returned by get_permitted_reports.
-if (!reportbuilder::is_capable($id)) {
-    print_error('nopermission', 'totara_reportbuilder');
-}
+$report = reportbuilder::create($id, $config, true);
 
 $PAGE->set_context($blockcontext);
 if (!empty($report->embeddedurl)) {

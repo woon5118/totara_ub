@@ -32,7 +32,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 
-class updatehierarchyitem_test extends advanced_testcase {
+class totara_hierarchy_updateitem_testcase extends advanced_testcase {
 
     private $frame1, $frame2;
     private $org1, $org2, $org3, $org4;

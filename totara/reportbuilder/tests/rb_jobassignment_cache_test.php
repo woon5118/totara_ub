@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
  *
  * @group totara_reportbuilder
  */
-class totara_reportbuilder_rb_jobassignment_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_jobassignment_cache_testcase extends reportcache_advanced_testcase {
 
     // Test case data
     protected $report_builder_data = array('id' => 6, 'fullname' => 'User Report', 'shortname' => 'userreport',
@@ -68,6 +68,7 @@ class totara_reportbuilder_rb_jobassignment_cache_test extends reportcache_advan
      */
     protected function setUp(){
         parent::setup();
+        $this->setAdminUser();
         $this->loadDataSet($this->createArrayDataSet(array('report_builder' => array($this->report_builder_data))));
     }
 

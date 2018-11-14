@@ -163,7 +163,7 @@ class util {
             $config->set_sid($rawreport->savedid);
             $config->set_reportfor($reportfor);
             $config->set_global_restriction_set($allrestr);
-            $report = \reportbuilder::create($rawreport->id, $config);
+            $report = \reportbuilder::create($rawreport->id, $config, true);
             $svgdata = self::get_svg($report);
 
             if (!$svgdata) {

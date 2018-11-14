@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
 class totara_program_rb_source_program_overview_testcase extends reportcache_advanced_testcase {
     protected $load = 0;
     protected $report_builder_data = array('id' => 123, 'fullname' => 'Program Overview', 'shortname' => 'report_program_overview',
-                                           'source' => 'program_overview', 'hidden' => 0, 'embedded' => 0, 'accessmode' => 1);
+                                           'source' => 'program_overview', 'hidden' => 0, 'embedded' => 0, 'accessmode' => 0);
 
 
     protected $report_builder_columns_data = array(
@@ -96,6 +96,7 @@ class totara_program_rb_source_program_overview_testcase extends reportcache_adv
     public function test_load_overview() {
         global $DB;
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $usernum = 10;
         $coursenum = 2;

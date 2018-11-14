@@ -38,6 +38,7 @@ class totara_reportbuilder_post_config_visibility_where_testcase extends advance
 
     public function test_post_config_visibility_where() {
         $this->resetAfterTest(true);
+        $this->setAdminUser();
 
         $user = $this->getDataGenerator()->create_user();
 

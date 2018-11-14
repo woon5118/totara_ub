@@ -42,7 +42,7 @@ use mod_facetoface\signup;
 use mod_facetoface\signup_helper;
 use mod_facetoface\seminar_event;
 
-class mod_facetoface_notifications_testcase extends facetoface_testcase {
+class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_testcase {
     /**
      * PhpUnit fixture method that runs before the test method executes.
      */

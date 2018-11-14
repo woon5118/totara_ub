@@ -44,7 +44,7 @@ final class util {
         }
 
         try {
-            $report = \reportbuilder::create($reportid);
+            $report = \reportbuilder::create($reportid, null, true);
         } catch (\moodle_exception $e) {
             // Most likely the silly acess control in constructor,
             // oh well..
