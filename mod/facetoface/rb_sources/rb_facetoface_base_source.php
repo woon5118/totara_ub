@@ -92,7 +92,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         );
     }
 
-   /**
+    /**
      * Add common facetoface session columns
      * Requires 'sessions' join and custom named join to {facetoface_sessions_dates} (by default 'base')
      * @param array $columnoptions
@@ -146,6 +146,32 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
                 'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'localsessionstartdate',
+            get_string('localsessstartdate', 'rb_source_facetoface_sessions'),
+            "{$sessiondatejoin}.timestart",
+            array(
+                'joins' => array($sessiondatejoin),
+                'displayfunc' => 'local_event_date',
+                'dbdatatype' => 'timestamp',
+                'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_room_assignments'),
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'localsessionfinishdate',
+            get_string('localsessfinishdate', 'rb_source_facetoface_sessions'),
+            "{$sessiondatejoin}.timefinish",
+            array(
+                'joins' => array($sessiondatejoin),
+                'displayfunc' => 'local_event_date',
+                'dbdatatype' => 'timestamp',
+                'defaultheading' => get_string('sessfinishdatetime', 'rb_source_facetoface_room_assignments'),
             )
         );
 
