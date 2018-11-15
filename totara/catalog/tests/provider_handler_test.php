@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/totara/catalog/tests/config_test_base.php');
  * @package totara_catalog
  * @group totara_catalog
  */
-class provider_handler_test extends config_base_testcase {
+class totara_catalog_provider_handler_testcase extends config_base_testcase {
 
     /**
      * @var provider_handler

@@ -35,7 +35,10 @@ global $CFG;
 require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_progressbar_test extends dataformatter_test_base {
+/**
+ * @group totara_catalog
+ */
+class core_course_totara_catalog_dataformatter_progressbar_testcase extends dataformatter_test_base {
 
     public function test_progressbar() {
         global $CFG, $DB;

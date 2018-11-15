@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_catalog
  * @group totara_catalog
  */
-class dataholder_test extends advanced_testcase {
+class totara_catalog_dataholder_testcase extends advanced_testcase {
 
     /**
      * Get an array of all customfield dataholder factories.

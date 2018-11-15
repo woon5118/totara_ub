@@ -29,7 +29,7 @@ use totara_catalog\filter;
 /**
  * @group totara_catalog
  */
-class full_text_search_filter_test extends advanced_testcase {
+class totara_catalog_full_text_search_filter_testcase extends advanced_testcase {
 
     /**
      * @var full_text_search_filter

@@ -35,22 +35,27 @@ global $CFG;
 require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_format_test extends dataformatter_test_base {
+/**
+ * @group totara_catalog
+ */
+class core_course_totara_catalog_dataformatter_type_testcase extends dataformatter_test_base {
 
-    public function test_format() {
+    public function test_type() {
+        global $TOTARA_COURSE_TYPES;
+
         $context = context_system::instance();
 
-        $df = new format('formatfield');
+        $df = new type('coursetypefield');
         $this->assertCount(1, $df->get_required_fields());
-        $this->assertSame('formatfield', $df->get_required_fields()['format']);
+        $this->assertSame('coursetypefield', $df->get_required_fields()['coursetype']);
 
         $this->assertSame([formatter::TYPE_PLACEHOLDER_TEXT, formatter::TYPE_FTS], $df->get_suitable_types());
 
-        $test_params = ['format' => 'weeks'];
+        $test_params = ['coursetype' => $TOTARA_COURSE_TYPES['elearning']];
         $result = $df->get_formatted_value($test_params, $context);
-        $this->assertSame('Weekly format', $result);
+        $this->assertSame('E-learning', $result);
 
-        $result = $df->get_formatted_value(['format' => ''], $context);
+        $result = $df->get_formatted_value(['coursetype' => ''], $context);
         $this->assertSame('', $result);
 
         $this->assert_exceptions($df, $test_params);

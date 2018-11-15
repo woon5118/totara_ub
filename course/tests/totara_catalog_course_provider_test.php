@@ -35,7 +35,7 @@ use core_course\totara_catalog\course as course_provider;
 /**
  * @group totara_catalog
  */
-class catalog_course_provider_test extends \advanced_testcase {
+class core_course_totara_catalog_course_provider_testcase extends \advanced_testcase {
 
     /**
      * @var course_provider

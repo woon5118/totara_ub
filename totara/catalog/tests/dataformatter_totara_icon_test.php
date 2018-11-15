@@ -41,7 +41,7 @@ require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php"
  * @package totara_catalog
  * @group totara_catalog
  */
-class dataformatter_totara_icon_test extends dataformatter_test_base {
+class totara_catalog_dataformatter_totara_icon_testcase extends dataformatter_test_base {
 
     /**
      * Tests for totara_icon and totara_icons dataformatter are very similar.

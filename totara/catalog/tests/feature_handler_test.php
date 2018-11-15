@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_catalog
  * @group totara_catalog
  */
-class feature_handler_test extends advanced_testcase {
+class totara_catalog_feature_handler_testcase extends advanced_testcase {
 
     /**
      * Test get_all_features() method.

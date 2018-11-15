@@ -35,32 +35,33 @@ global $CFG;
 require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_image_test extends dataformatter_test_base {
+/**
+ * @group totara_catalog
+ */
+class core_course_totara_catalog_dataformatter_type_icon_testcase extends dataformatter_test_base {
 
-    public function test_image() {
-        global $CFG;
-        $this->resetAfterTest();
+    public function test_type_icon() {
+        global $TOTARA_COURSE_TYPES;
 
         $context = context_system::instance();
 
-        $df = new image('courseidfield', 'altfield');
-        $this->assertCount(2, $df->get_required_fields());
-        $this->assertSame('courseidfield', $df->get_required_fields()['courseid']);
-        $this->assertSame('altfield', $df->get_required_fields()['alt']);
+        $df = new type_icon('coursetypefield');
+        $this->assertCount(1, $df->get_required_fields());
+        $this->assertSame('coursetypefield', $df->get_required_fields()['coursetype']);
 
-        $this->assertSame([formatter::TYPE_PLACEHOLDER_IMAGE], $df->get_suitable_types());
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_ICON], $df->get_suitable_types());
 
-        $course = $this->getDataGenerator()->create_course();
-        $test_params = [
-            'courseid' => $course->id,
-            'alt' => 'test_alt_text',
-        ];
+        $test_params = ['coursetype' => $TOTARA_COURSE_TYPES['elearning']];
         $result = $df->get_formatted_value($test_params, $context);
         $this->assertInstanceOf(stdClass::class, $result);
-        // Check that we get a url back that includes default icon in its path.
-        $this->assertContains($CFG->wwwroot, $result->url);
-        $this->assertContains('/course/defaultimage', $result->url);
-        $this->assertSame('test_alt_text', $result->alt);
+        $this->assertContains('flex-icon', $result->icon);
+        $this->assertContains('E-Learning', $result->icon);
+
+        $result = $df->get_formatted_value(['coursetype' => ''], $context);
+        $this->assertSame(null, $result);
+
+        $result = $df->get_formatted_value(['coursetype' => 'bad_type'], $context);
+        $this->assertSame(null, $result);
 
         $this->assert_exceptions($df, $test_params);
     }

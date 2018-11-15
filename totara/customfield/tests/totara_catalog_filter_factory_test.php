@@ -30,7 +30,11 @@ use totara_catalog\local\filter_handler;
 
 defined('MOODLE_INTERNAL') || die();
 
-class catalog_customfield_filters_test extends \advanced_testcase {
+/**
+ * @group totara_customfield
+ * @group totara_catalog
+ */
+class totara_customfield_totara_catalog_filter_factory_testcase extends \advanced_testcase {
 
     public function setUp() {
         parent::setUp();

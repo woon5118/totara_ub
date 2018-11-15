@@ -21,55 +21,52 @@
  * @package totara_catalog
  */
 
-namespace totara_catalog\dataformatter;
+namespace totara_program\totara_catalog\program\dataformatter;
 
+use advanced_testcase;
 use context_system;
-use DateTime;
-use DateTimeZone;
+use core_completion_generator;
+use stdClass;
+use totara_catalog\dataformatter\dataformatter_test_base;
+use totara_catalog\dataformatter\formatter;
+use totara_program_generator;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
 /**
- * Class dataformatter_totara_icons_test
- *
- * Tests all the dataformatters for catalog component.
- *
- * @package totara_catalog
  * @group totara_catalog
  */
-class totara_catalog_dataformatter_totara_icons_testcase extends dataformatter_test_base {
+class totara_program_totara_catalog_dataformatter_test extends dataformatter_test_base {
 
-    /**
-     * Tests for totara_icon and totara_icons dataformatter are very similar.
-     */
-    public function test_totara_icon() {
+    public function test_image() {
         global $CFG;
         $this->resetAfterTest();
+
         $context = context_system::instance();
 
-        $df = new totara_icons('idfield', 'altfield', TOTARA_ICON_TYPE_COURSE);
+        $df = new image('programidfield', 'altfield');
         $this->assertCount(2, $df->get_required_fields());
-        $this->assertSame('idfield', $df->get_required_fields()['id']);
+        $this->assertSame('programidfield', $df->get_required_fields()['programid']);
         $this->assertSame('altfield', $df->get_required_fields()['alt']);
 
-        $this->assertSame([formatter::TYPE_PLACEHOLDER_ICONS], $df->get_suitable_types());
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_IMAGE], $df->get_suitable_types());
 
-        $course = $this->getDataGenerator()->create_course();
+        /** @var totara_program_generator $program_generator */
+        $program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $program = $program_generator->create_program();
 
         $test_params = [
-            'id' => $course->id,
+            'programid' => $program->id,
             'alt' => 'test_alt_text',
         ];
         $result = $df->get_formatted_value($test_params, $context);
-        $result = $result[0];
-
+        $this->assertInstanceOf(stdClass::class, $result);
         // Check that we get a url back that includes default icon in its path.
         $this->assertContains($CFG->wwwroot, $result->url);
-        $this->assertContains('/courseicons/default', $result->url);
+        $this->assertContains('/program/defaultimage', $result->url);
         $this->assertSame('test_alt_text', $result->alt);
 
         $this->assert_exceptions($df, $test_params);

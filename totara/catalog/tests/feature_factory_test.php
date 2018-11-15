@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_catalog
  * @group totara_catalog
  */
-class feature_factory_test extends advanced_testcase {
+class totara_catalog_feature_factory_testcase extends advanced_testcase {
 
     /**
      * Get an array of all customfield feature factories.

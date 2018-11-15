@@ -37,7 +37,7 @@ require_once($CFG->dirroot.'/totara/catalog/tests/config_form_helper_test.php');
  * @package totara_catalog
  * @group totara_catalog
  */
-class form_controller_test extends config_base_testcase {
+class totara_catalog_form_controller_testcase extends config_base_testcase {
 
     public function setUp() {
         parent::setUp();

@@ -27,7 +27,7 @@ use totara_catalog\optional_param;
 /**
  * @group totara_catalog
  */
-class optional_param_test extends advanced_testcase {
+class totara_catalog_optional_param_testcase extends advanced_testcase {
 
     public function test_raw_type() {
         $raw_param = new optional_param('some-key', null, PARAM_RAW);

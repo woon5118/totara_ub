@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class datasearch_full_text_search_test extends advanced_testcase {
+class totara_catalog_datasearch_full_text_search_testcase extends advanced_testcase {
 
     public function validate_current_data_data_provider() {
         return [

@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_catalog
  * @group totara_catalog
  */
-class feature_test extends advanced_testcase {
+class totara_catalog_feature_testcase extends advanced_testcase {
 
     /**
      * Test get_options() method.

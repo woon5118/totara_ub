@@ -28,7 +28,7 @@ use \totara_catalog\task\provider_active_task;
 /**
  * @group totara_catalog
  */
-class provider_active_task_test extends advanced_testcase {
+class totara_catalog_provider_active_task_testcase extends advanced_testcase {
 
     private $provider_active_task = null;
 

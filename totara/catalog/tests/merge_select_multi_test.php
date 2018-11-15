@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group totara_catalog
  */
-class merge_select_multi_test extends advanced_testcase {
+class totara_catalog_merge_select_multi_testcase extends advanced_testcase {
 
     public function test_get_options() {
         $multi = new \totara_catalog\merge_select\multi('testmergeselectkey', 'testtitle');

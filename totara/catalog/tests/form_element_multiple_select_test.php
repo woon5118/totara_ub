@@ -31,7 +31,7 @@ use totara_catalog\form\element\multiple_select,
     totara_form\test\test_definition,
     totara_form\test\test_form;
 
-class form_element_multiple_select_test extends advanced_testcase {
+class totara_catalog_form_element_multiple_select_testcase extends advanced_testcase {
     protected function setUp() {
         parent::setUp();
         require_once(__DIR__ . '/../../form/tests/fixtures/test_form.php');

@@ -35,30 +35,40 @@ global $CFG;
 require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_type_icon_test extends dataformatter_test_base {
+/**
+ * @group totara_catalog
+ */
+class core_course_totara_catalog_dataformatter_activity_type_icons_testcase extends dataformatter_test_base {
 
-    public function test_type_icon() {
-        global $TOTARA_COURSE_TYPES;
-
+    public function test_activity_type_icons() {
         $context = context_system::instance();
 
-        $df = new type_icon('coursetypefield');
+        $df = new activity_type_icons('modulesfield');
         $this->assertCount(1, $df->get_required_fields());
-        $this->assertSame('coursetypefield', $df->get_required_fields()['coursetype']);
+        $this->assertSame('modulesfield', $df->get_required_fields()['modules']);
 
-        $this->assertSame([formatter::TYPE_PLACEHOLDER_ICON], $df->get_suitable_types());
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_ICONS], $df->get_suitable_types());
 
-        $test_params = ['coursetype' => $TOTARA_COURSE_TYPES['elearning']];
+        $test_params = ['modules' => 'forum,book,assign,resource'];
         $result = $df->get_formatted_value($test_params, $context);
-        $this->assertInstanceOf(stdClass::class, $result);
-        $this->assertContains('flex-icon', $result->icon);
-        $this->assertContains('E-Learning', $result->icon);
+        $this->assertCount(4, $result);
+        foreach ($result as $icon_object) {
+            $this->assertInstanceOf(stdClass::class, $icon_object);
+            $this->assertContains('flex-icon', $icon_object->icon);
+        }
+        // Result should be sorted predictably.
+        $this->assertContains('Assignment', $result[0]->icon);
+        $this->assertContains('Book', $result[1]->icon);
+        $this->assertContains('File', $result[2]->icon);
+        $this->assertContains('Forum', $result[3]->icon);
 
-        $result = $df->get_formatted_value(['coursetype' => ''], $context);
-        $this->assertSame(null, $result);
+        $result = $df->get_formatted_value(['modules' => ''], $context);
+        $this->assertSame([], $result);
 
-        $result = $df->get_formatted_value(['coursetype' => 'bad_type'], $context);
-        $this->assertSame(null, $result);
+        $result = $df->get_formatted_value(['modules' => ',,,forum ,,,book ,,,'], $context);
+        $this->assertCount(2, $result);
+        $this->assertContains('Book', $result[0]->icon);
+        $this->assertContains('Forum', $result[1]->icon);
 
         $this->assert_exceptions($df, $test_params);
     }

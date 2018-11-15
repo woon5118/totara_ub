@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Murali Nair <murali.nair@totaralearning.com>
- * @package totara_certification
+ * @package totara_program
  * @category totara_catalog
  */
 
-namespace totara_certification\totara_catalog\certification;
+namespace totara_program\totara_catalog\program;
 
 use totara_catalog\catalog_retrieval;
 use totara_catalog\filter;
@@ -32,7 +32,10 @@ use totara_catalog\merge_select\single;
 
 defined('MOODLE_INTERNAL') || die();
 
-class certification_tag_filters_test extends \advanced_testcase {
+/**
+ * @group totara_catalog
+ */
+class totara_program_totara_catalog_tag_filters_testcase extends \advanced_testcase {
 
     public function setUp() {
         parent::setUp();
@@ -42,12 +45,12 @@ class certification_tag_filters_test extends \advanced_testcase {
     /**
      * Generates test data.
      *
-     * @param int $certification_count
-     * @param int $tags_per_certification
-     * @return array ("attached" tag names, mapping of tag ids to certifications,
-     *         tag filters, all certifications, tagged certifications) tuple.
+     * @param int $program_count
+     * @param int $tags_per_program
+     * @return array ("attached" tag names, mapping of tag ids to programs, tag
+     *         filters, all programs, tagged programs) tuple.
      */
-    private function generate($certification_count = 15, $tags_per_certification = 3): array {
+    private function generate($program_count = 15, $tags_per_program = 3): array {
         $this->setAdminUser();
 
         $available_tags = [];
@@ -57,37 +60,36 @@ class certification_tag_filters_test extends \advanced_testcase {
             $available_tags[] = $tag;
         }
 
-        $certifications_by_tag = [];
-        $all_certifications = [];
-        $tagged_certifications = [];
+        $programs_by_tag = [];
+        $all_programs = [];
+        $tagged_programs = [];
         $attached_tags = [];
 
         /** @var \totara_program_generator $program_generator */
         $program_generator = $generator->get_plugin_generator('totara_program');
-        for ($i = 0; $i < $certification_count; $i++) {
-            $fullname = "tagged test certification name $i";
-            $certification_id = $program_generator->create_certification(
+        for ($i = 0; $i < $program_count; $i++) {
+            $program = $program_generator->create_program(
                 [
-                    'fullname' => $fullname
+                    'fullname' => "tagged test program name $i"
                 ]
             );
-            $all_certifications[] = $fullname;
-            $tagged_certifications[] = $fullname;
+            $all_programs[] = $program->fullname;
+            $tagged_programs[] = $program->fullname;
 
-            $context = \context_program::instance($certification_id);
-            for ($j = 0; $j < $tags_per_certification; $j++) {
+            $context = \context_program::instance($program->id);
+            for ($j = 0; $j < $tags_per_program; $j++) {
                 $k = rand(1, count($available_tags));
                 $tag = $available_tags[$k - 1];
-                \core_tag_tag::add_item_tag('totara_prog', 'prog', $certification_id, $context, $tag->rawname);
+                \core_tag_tag::add_item_tag('totara_program', 'prog', $program->id, $context, $tag->rawname);
 
-                $certifications = array_key_exists($tag->id, $certifications_by_tag)
-                           ? $certifications_by_tag[$tag->id]
+                $programs = array_key_exists($tag->id, $programs_by_tag)
+                           ? $programs_by_tag[$tag->id]
                            : [];
 
-                if (!in_array($fullname, $certifications)) {
-                    $certifications[] = $fullname;
+                if (!in_array($program->fullname, $programs)) {
+                    $programs[] = $program->fullname;
                 }
-                $certifications_by_tag[$tag->id] = $certifications;
+                $programs_by_tag[$tag->id] = $programs;
 
                 if (!in_array($tag->name, $attached_tags)) {
                     $attached_tags[] = $tag->name;
@@ -95,22 +97,15 @@ class certification_tag_filters_test extends \advanced_testcase {
             }
         }
 
-        // Create some certifications with no tags. These should not be picked
-        // during the filtering although the catalog will still know of them.
+        // Create some programs with no tags. These should not be picked during
+        // the filtering although the catalog will still know of them.
         for ($i = 0; $i < 10; $i++) {
-            $fullname = "untagged test certification name $i";
-            $all_certifications[] = $fullname;
-
-            $program_generator->create_certification(
-                [
-                    'fullname' => $fullname
-                ]
-            );
+            $all_programs[] = $program_generator->create_program()->fullname;
         }
 
         // Filters were removed in setUp(); the line below indirectly loads the
-        // certification_tag_filter among other certification filters. All the
-        // filters are initially inactive.
+        // program_tag_filter among other program filters. All the filters are
+        // initially inactive.
         $panel_filter = null;
         $browse_filter = null;
         $all_filters = filter_handler::instance()->get_all_filters();
@@ -124,15 +119,15 @@ class certification_tag_filters_test extends \advanced_testcase {
             }
         }
 
-        $this->assertNotNull($panel_filter, "certification tag panel filter not loaded");
-        $this->assertNotNull($browse_filter, "certification tag browse filter not loaded");
+        $this->assertNotNull($panel_filter, "program tag panel filter not loaded");
+        $this->assertNotNull($browse_filter, "program tag browse filter not loaded");
         $filters = [$panel_filter, $browse_filter];
 
-        return [$attached_tags, $certifications_by_tag, $filters, $all_certifications, $tagged_certifications];
+        return [$attached_tags, $programs_by_tag, $filters, $all_programs, $tagged_programs];
     }
 
     public function test_tag_panel_filter() {
-        [$attached_tags, $certifications_by_tag, $filters, $all_certifications, $tagged_certifications] = $this->generate();
+        [$attached_tags, $programs_by_tag, $filters, $all_programs, $tagged_programs] = $this->generate();
 
         /** @var filter $filter */
         $filter = $filters[0]; // Panel filter.
@@ -150,31 +145,31 @@ class certification_tag_filters_test extends \advanced_testcase {
         // Test filtering by a single, specific tag.
         $catalog = new catalog_retrieval();
         $filter_data = $filter->datafilter;
-        foreach ($certifications_by_tag as $tag => $certifications) {
+        foreach ($programs_by_tag as $tag => $programs) {
             $filter_data->set_current_data([$tag]);
             $result = $catalog->get_page_of_objects(1000, 0);
 
-            $this->assertCount(count($certifications), $result->objects, "wrong program count");
+            $this->assertCount(count($programs), $result->objects, "wrong program count");
             foreach ($result->objects as $retrieved) {
-                $this->assertContains($retrieved->sorttext, $certifications, "wrong certifications for tag");
+                $this->assertContains($retrieved->sorttext, $programs, "wrong programs for tag");
             }
         }
 
         // Test multiple filter selection.
-        $filter_data->set_current_data(array_keys($certifications_by_tag));
+        $filter_data->set_current_data(array_keys($programs_by_tag));
         $result = $catalog->get_page_of_objects(1000, 0);
-        $this->assertCount(count($tagged_certifications), $result->objects, "wrong program count");
+        $this->assertCount(count($tagged_programs), $result->objects, "wrong program count");
         foreach ($result->objects as $retrieved) {
-            $this->assertContains($retrieved->sorttext, $tagged_certifications, "wrong certifications for multi selected tags");
+            $this->assertContains($retrieved->sorttext, $tagged_programs, "wrong programs for multi selected tags");
         }
 
         // Test empty filter selection. This should disable the filter and thus
         // returns all programs *including untagged ones*.
         $filter_data->set_current_data(null);
         $result = $catalog->get_page_of_objects(1000, 0);
-        $this->assertCount(count($all_certifications), $result->objects, "wrong program count");
+        $this->assertCount(count($all_programs), $result->objects, "wrong program count");
         foreach ($result->objects as $retrieved) {
-            $this->assertContains($retrieved->sorttext, $all_certifications, "wrong certifications for empty tag");
+            $this->assertContains($retrieved->sorttext, $all_programs, "wrong programs for empty tag");
         }
         // Test filter with non existent tag.
         $filter_data->set_current_data([123]);
@@ -187,7 +182,7 @@ class certification_tag_filters_test extends \advanced_testcase {
     }
 
     public function test_tag_browse_filter() {
-        [$attached_tags, $certifications_by_tag, $filters, $all_certifications, ] = $this->generate();
+        [$attached_tags, $programs_by_tag, $filters, $all_programs, ] = $this->generate();
 
         /** @var filter $filter */
         $filter = $filters[1]; // Browse filter.
@@ -206,24 +201,25 @@ class certification_tag_filters_test extends \advanced_testcase {
         // Test filtering by a single, specific tag.
         $catalog = new catalog_retrieval();
         $filter_data = $filter->datafilter;
-        foreach ($certifications_by_tag as $tag => $certifications) {
+        foreach ($programs_by_tag as $tag => $programs) {
             // Unlike the panel filter, the browse filter expects a single value
             // for matching.
             $filter_data->set_current_data($tag);
             $result = $catalog->get_page_of_objects(1000, 0);
 
+            $this->assertCount(count($programs), $result->objects, "wrong program count");
             foreach ($result->objects as $retrieved) {
-                $this->assertContains($retrieved->sorttext, $certifications, "wrong certifications for tag");
+                $this->assertContains($retrieved->sorttext, $programs, "wrong programs for tag");
             }
         }
 
         // Test empty filter selection. This should disable the filter and thus
-        // returns all certifications *including untagged ones*.
+        // returns all programs *including untagged ones*.
         $filter_data->set_current_data(null);
         $result = $catalog->get_page_of_objects(1000, 0);
-        $this->assertCount(count($all_certifications), $result->objects, "wrong program count");
+        $this->assertCount(count($all_programs), $result->objects, "wrong program count");
         foreach ($result->objects as $retrieved) {
-            $this->assertContains($retrieved->sorttext, $all_certifications, "wrong certifications for empty tag");
+            $this->assertContains($retrieved->sorttext, $all_programs, "wrong programs for empty tag");
         }
 
         // Test filter with non existent tag.
@@ -233,6 +229,6 @@ class certification_tag_filters_test extends \advanced_testcase {
 
         // Test filter with invalid tag value.
         $this->expectException(\coding_exception::class);
-        $filter_data->set_current_data(array_keys($certifications_by_tag));
+        $filter_data->set_current_data(array_keys($programs_by_tag));
     }
 }

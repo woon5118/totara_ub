@@ -27,7 +27,7 @@ use \totara_catalog\task\refresh_catalog_data;
 /**
  * @group totara_catalog
  */
-class refresh_catalog_data_test extends advanced_testcase {
+class totara_catalog_refresh_catalog_data_testcase extends advanced_testcase {
 
     private $refresh_catalog_task = null;
 

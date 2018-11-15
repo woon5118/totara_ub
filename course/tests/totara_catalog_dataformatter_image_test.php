@@ -35,31 +35,35 @@ global $CFG;
 require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_activity_types_test extends dataformatter_test_base {
+/**
+ * @group totara_catalog
+ */
+class core_course_totara_catalog_dataformatter_image_testcase extends dataformatter_test_base {
 
-    public function test_activity_types() {
+    public function test_image() {
+        global $CFG;
+        $this->resetAfterTest();
+
         $context = context_system::instance();
 
-        $df = new activity_types('modulesfield');
-        $this->assertCount(1, $df->get_required_fields());
-        $this->assertSame('modulesfield', $df->get_required_fields()['modules']);
+        $df = new image('courseidfield', 'altfield');
+        $this->assertCount(2, $df->get_required_fields());
+        $this->assertSame('courseidfield', $df->get_required_fields()['courseid']);
+        $this->assertSame('altfield', $df->get_required_fields()['alt']);
 
-        $this->assertSame([formatter::TYPE_PLACEHOLDER_TEXT, formatter::TYPE_FTS], $df->get_suitable_types());
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_IMAGE], $df->get_suitable_types());
 
-        // Results should come from translations and get sorted.
-        $test_params = ['modules' => 'forum,book,assign,resource'];
+        $course = $this->getDataGenerator()->create_course();
+        $test_params = [
+            'courseid' => $course->id,
+            'alt' => 'test_alt_text',
+        ];
         $result = $df->get_formatted_value($test_params, $context);
-        $this->assertSame('Assignment, Book, File, Forum', $result);
-
-        $result = $df->get_formatted_value(['modules' => ''], $context);
-        $this->assertSame('', $result);
-
-        $result = $df->get_formatted_value(['modules' => ',,,forum ,,,book ,,,'], $context);
-        $this->assertSame('Book, Forum', $result);
-
-        // Activity types that are not in translations just get uppercased.
-        $result = $df->get_formatted_value(['modules' => 'orangutan,resource,assign'], $context);
-        $this->assertSame('Assignment, File, Orangutan', $result);
+        $this->assertInstanceOf(stdClass::class, $result);
+        // Check that we get a url back that includes default icon in its path.
+        $this->assertContains($CFG->wwwroot, $result->url);
+        $this->assertContains('/course/defaultimage', $result->url);
+        $this->assertSame('test_alt_text', $result->alt);
 
         $this->assert_exceptions($df, $test_params);
     }

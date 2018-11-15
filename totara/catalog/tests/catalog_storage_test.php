@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class catalog_storage_test extends advanced_testcase {
+class totara_catalog_catalog_storage_testcase extends advanced_testcase {
 
     public function setUp() {
         parent::setUp();

@@ -41,7 +41,7 @@ require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php"
  * @package totara_catalog
  * @group totara_catalog
  */
-class dataformatter_ordered_list_test extends dataformatter_test_base {
+class totara_catalog_dataformatter_ordered_list_testcase extends dataformatter_test_base {
 
     public function test_ordered_list() {
         $context = context_system::instance();

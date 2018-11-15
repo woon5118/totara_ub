@@ -33,7 +33,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_test extends dataformatter_test_base {
+/**
+ * @group totara_customfield
+ * @group totara_catalog
+ */
+class totara_customfield_totara_catalog_dataformatters_testcase extends dataformatter_test_base {
 
     public function customfield_dataformatter_provider() {
         return [

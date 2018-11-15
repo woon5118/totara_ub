@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class requried_dataholder_test extends advanced_testcase {
+class totara_catalog_requried_dataholder_testcase extends advanced_testcase {
 
     public function test_constructor() {
         $ft = \totara_catalog\dataformatter\formatter::TYPE_FTS;

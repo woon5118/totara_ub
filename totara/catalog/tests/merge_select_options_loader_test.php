@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group totara_catalog
  */
-class merge_select_options_loader_test extends advanced_testcase {
+class totara_catalog_merge_select_options_loader_testcase extends advanced_testcase {
 
     public function test_add_options_loader() {
         $single = new \totara_catalog\merge_select\single('testkey', 'testtile');

@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group totara_catalog
  */
-class merge_select_single_test extends advanced_testcase {
+class totara_catalog_merge_select_single_testcase extends advanced_testcase {
 
     public function test_add_all_option() {
         // Default params.

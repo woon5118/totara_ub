@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class catalog_certification_provider_test extends \advanced_testcase {
+class totara_certification_totara_catalog_provider_testcase extends \advanced_testcase {
 
     /**
      * @var certification_provider

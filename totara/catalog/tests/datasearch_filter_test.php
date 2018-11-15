@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class datasearch_filter_test extends advanced_testcase {
+class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
 
     public function test_get_alias() {
         $filter = new \totara_catalog\datasearch\like('testalias');

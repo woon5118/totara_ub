@@ -35,37 +35,29 @@ global $CFG;
 require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_activity_type_icons_test extends dataformatter_test_base {
+/**
+ * @group totara_catalog
+ */
+class core_course_totara_catalog_dataformatter_language_testcase extends dataformatter_test_base {
 
-    public function test_activity_type_icons() {
+    public function test_language() {
         $context = context_system::instance();
 
-        $df = new activity_type_icons('modulesfield');
+        $df = new language('languagefield');
         $this->assertCount(1, $df->get_required_fields());
-        $this->assertSame('modulesfield', $df->get_required_fields()['modules']);
+        $this->assertSame('languagefield', $df->get_required_fields()['language']);
 
-        $this->assertSame([formatter::TYPE_PLACEHOLDER_ICONS], $df->get_suitable_types());
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_TEXT, formatter::TYPE_FTS], $df->get_suitable_types());
 
-        $test_params = ['modules' => 'forum,book,assign,resource'];
+        $test_params = ['language' => 'en'];
         $result = $df->get_formatted_value($test_params, $context);
-        $this->assertCount(4, $result);
-        foreach ($result as $icon_object) {
-            $this->assertInstanceOf(stdClass::class, $icon_object);
-            $this->assertContains('flex-icon', $icon_object->icon);
-        }
-        // Result should be sorted predictably.
-        $this->assertContains('Assignment', $result[0]->icon);
-        $this->assertContains('Book', $result[1]->icon);
-        $this->assertContains('File', $result[2]->icon);
-        $this->assertContains('Forum', $result[3]->icon);
+        // Remove left-to-right marks, so we can compare it with our simple string.
+        $lrm = json_decode('"\u200E"');
+        $result = str_replace($lrm, '', $result);
+        $this->assertSame('English (en)', $result);
 
-        $result = $df->get_formatted_value(['modules' => ''], $context);
-        $this->assertSame([], $result);
-
-        $result = $df->get_formatted_value(['modules' => ',,,forum ,,,book ,,,'], $context);
-        $this->assertCount(2, $result);
-        $this->assertContains('Book', $result[0]->icon);
-        $this->assertContains('Forum', $result[1]->icon);
+        $result = $df->get_formatted_value(['language' => ''], $context);
+        $this->assertSame('', $result);
 
         $this->assert_exceptions($df, $test_params);
     }

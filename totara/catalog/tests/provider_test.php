@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_catalog
  * @group totara_catalog
  */
-class provider_test extends advanced_testcase {
+class totara_catalog_provider_testcase extends advanced_testcase {
 
     public function provider_object_type_data_provider() {
         return [

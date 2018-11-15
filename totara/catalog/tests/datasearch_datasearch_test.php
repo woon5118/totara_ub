@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class datasearch_datasearch_test extends advanced_testcase {
+class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
 
     public function test_add_filter_unique_keys() {
         // Make sure that two filters with different keys are treated separately.

@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group totara_catalog
  */
-class merge_select_search_text_test extends advanced_testcase {
+class totara_catalog_merge_select_search_text_testcase extends advanced_testcase {
 
     public function test_set_placeholder_hidden() {
         $search = new \totara_catalog\merge_select\search_text('testmergeselectkey', 'testtitle');

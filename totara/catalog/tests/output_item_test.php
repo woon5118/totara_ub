@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_catalog
  * @group totara_catalog
  */
-class output_item_test extends advanced_testcase {
+class totara_catalog_output_item_testcase extends advanced_testcase {
 
     /**
      * Example item data.

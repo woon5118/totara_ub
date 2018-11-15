@@ -30,7 +30,7 @@ use \core\event\course_created;
 /**
  * @group totara_catalog
  */
-class catalog_course_object_update_observer extends \advanced_testcase {
+class core_course_totara_catalog_course_object_update_observer_testcase extends \advanced_testcase {
 
     /**
      * @var \stdClass

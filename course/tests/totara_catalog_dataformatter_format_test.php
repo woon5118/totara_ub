@@ -21,50 +21,40 @@
  * @package totara_catalog
  */
 
-namespace totara_program\totara_catalog\program\dataformatter;
+namespace core_course\totara_catalog\course\dataformatter;
 
-use advanced_testcase;
 use context_system;
 use core_completion_generator;
 use stdClass;
 use totara_catalog\dataformatter\dataformatter_test_base;
 use totara_catalog\dataformatter\formatter;
-use totara_program_generator;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . "/course/lib.php");
 require_once($CFG->dirroot . "/totara/catalog/tests/dataformatter_test_base.php");
 
-class dataformatter_test extends dataformatter_test_base {
+/**
+ * @group totara_catalog
+ */
+class core_course_totara_catalog_dataformatter_format_testcase extends dataformatter_test_base {
 
-    public function test_image() {
-        global $CFG;
-        $this->resetAfterTest();
-
+    public function test_format() {
         $context = context_system::instance();
 
-        $df = new image('programidfield', 'altfield');
-        $this->assertCount(2, $df->get_required_fields());
-        $this->assertSame('programidfield', $df->get_required_fields()['programid']);
-        $this->assertSame('altfield', $df->get_required_fields()['alt']);
+        $df = new format('formatfield');
+        $this->assertCount(1, $df->get_required_fields());
+        $this->assertSame('formatfield', $df->get_required_fields()['format']);
 
-        $this->assertSame([formatter::TYPE_PLACEHOLDER_IMAGE], $df->get_suitable_types());
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_TEXT, formatter::TYPE_FTS], $df->get_suitable_types());
 
-        /** @var totara_program_generator $program_generator */
-        $program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
-        $program = $program_generator->create_program();
-
-        $test_params = [
-            'programid' => $program->id,
-            'alt' => 'test_alt_text',
-        ];
+        $test_params = ['format' => 'weeks'];
         $result = $df->get_formatted_value($test_params, $context);
-        $this->assertInstanceOf(stdClass::class, $result);
-        // Check that we get a url back that includes default icon in its path.
-        $this->assertContains($CFG->wwwroot, $result->url);
-        $this->assertContains('/program/defaultimage', $result->url);
-        $this->assertSame('test_alt_text', $result->alt);
+        $this->assertSame('Weekly format', $result);
+
+        $result = $df->get_formatted_value(['format' => ''], $context);
+        $this->assertSame('', $result);
 
         $this->assert_exceptions($df, $test_params);
     }

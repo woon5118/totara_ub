@@ -40,7 +40,7 @@ require_once($CFG->dirroot . "/totara/catalog/tests/output_test_base.php");
  * @package totara_catalog
  * @group totara_catalog
  */
-class output_details_test extends output_test_base {
+class totara_catalog_output_details_testcase extends output_test_base {
 
     /**
      * Example details data.

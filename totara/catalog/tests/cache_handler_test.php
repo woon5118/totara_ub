@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group totara_catalog
  */
-class cache_handler_test extends advanced_testcase {
+class totara_catalog_cache_handler_testcase extends advanced_testcase {
 
     public function test_reset_all_caches() {
         $this->resetAfterTest();

@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class catalog_tag_filters_test extends \advanced_testcase {
+class core_tag_totara_catalog_tag_filters_testcase extends \advanced_testcase {
 
     public function setUp() {
         parent::setUp();

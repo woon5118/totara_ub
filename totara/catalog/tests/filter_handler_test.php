@@ -31,7 +31,7 @@ use totara_catalog\filter;
 /**
  * @group totara_catalog
  */
-class filter_handler_test extends advanced_testcase {
+class totara_catalog_filter_handler_testcase extends advanced_testcase {
 
     /**
      * @var filter_handler

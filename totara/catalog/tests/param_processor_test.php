@@ -28,7 +28,7 @@ use totara_catalog\local\param_processor;
 /**
  * @group totara_catalog
  */
-class param_processor_test extends advanced_testcase {
+class totara_catalog_param_processor_testcase extends advanced_testcase {
 
     /**
      * @var param_processor

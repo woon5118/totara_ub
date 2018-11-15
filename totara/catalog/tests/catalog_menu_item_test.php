@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_catalog
  * @group totara_catalog
  */
-class catalog_menu_item_test extends advanced_testcase {
+class totara_catalog_catalog_menu_item_testcase extends advanced_testcase {
 
     public function visibility_data_provider() {
         return [
