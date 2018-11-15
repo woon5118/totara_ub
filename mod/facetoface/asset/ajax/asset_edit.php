@@ -78,6 +78,9 @@ $customdata = ['asset' => $asset, 'seminar' => $seminar, 'event' => $seminareven
 $form = new \mod_facetoface\form\asset_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($data = $form->get_data()) {
+    if (!isset($data->notcustom)) {
+        $data->notcustom = 0;
+    }
     $data->custom = $data->notcustom ? 0 : 1;
     $asset = \mod_facetoface\asset_helper::save($data);
     echo json_encode(array('id' => $asset->get_id(), 'name' => $asset->get_name(), 'custom' => $asset->get_custom()));

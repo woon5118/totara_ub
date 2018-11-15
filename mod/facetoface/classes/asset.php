@@ -234,13 +234,15 @@ final class asset {
     /**
      * Switch an asset from a single use custom asset to a site wide reusable asset.
      * Note: that this function is instead of the set_custom() function, and it enforces
-     *       the behaviour that an asset can only become more public not less.
+     *       the behaviour that an asset can not be republished if it is currently published.
      *
      * @return asset this
      */
     public function publish() : asset {
-        if ($this->custom == false) {
-            print_error(get_string('error:cannotrepublishasset', 'facetoface'));
+        // Utilising identical check to prevent false positives when custom not yet set.
+        if ($this->custom === false) {
+            debugging(get_string('error:cannotrepublishasset', 'facetoface'), DEBUG_DEVELOPER);
+            return $this;
         }
 
         $this->custom = (int)false;
