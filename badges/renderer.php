@@ -395,17 +395,18 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $dl[get_string('evidence', 'badges')] = get_string('completioninfo', 'badges') . html_writer::alist($items, array(), 'ul');
         $output .= $this->definition_list($dl);
-        $output .= self::print_badge_endorsement($badge);
+        $endorsement = $badge->get_endorsement();
+        if (!empty($endorsement)) {
+            $output .= self::print_badge_endorsement($badge);
+        }
         $relatedbadges = $badge->get_related_badges();
-        $output .= $this->heading(get_string('relatedbages', 'badges'), 3);
         if (!empty($relatedbadges)) {
+            $output .= $this->heading(get_string('relatedbages', 'badges'), 3);
             $items = array();
             foreach ($relatedbadges as $related) {
                 $items[] = $related->name;
             }
             $output .= html_writer::alist($items, array(), 'ul');
-        } else {
-            $output .= get_string('norelated', 'badges');
         }
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
