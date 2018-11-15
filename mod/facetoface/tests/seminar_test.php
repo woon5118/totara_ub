@@ -25,9 +25,6 @@ namespace mod_facetoface;
 
 defined('MOODLE_INTERNAL') || die();
 
-//use mod_facetoface\seminar;
-//use mod_facetoface\seminar_event
-
 class mod_facetoface_seminar_testcase extends \advanced_testcase {
 
     /**

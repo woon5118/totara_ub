@@ -30,10 +30,8 @@ require_once ($CFG->dirroot . "/mod/facetoface/lib.php");
  * Unit test of assuring the users that are waitlisted
  * in an event of a seminar would still appear in
  * the report querying
- *
- * Class seminar_signup_user_test
  */
-class mod_facetoface_seminar_waitlisted_user_appear_in_report_testcase extends advanced_testcase {
+class mod_facetoface_seminar_waitlisted_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
     /**

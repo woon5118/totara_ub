@@ -34,7 +34,7 @@ use mod_facetoface\signup_list;
 use mod_facetoface\signup_helper;
 use mod_facetoface\signup\state\{not_set, waitlisted, booked, no_show, partially_attended, fully_attended};
 
-class mod_facetoface_seminar_multiple_signups_testcase extends \advanced_testcase {
+class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
 
     /**
      * Set up tests.

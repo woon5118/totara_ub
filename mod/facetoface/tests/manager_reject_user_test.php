@@ -35,10 +35,11 @@ use mod_facetoface\signup_list;
 
 
 /**
- * Class manager_reject_user_should_not_sendingemail_on_booked_state
+ * Class mod_facetoface_manager_reject_user_testcase
  * @group mod_facetoface
  */
-class mod_facetoface_manager_reject_user_should_not_sendingemail_on_booked_state_testcase extends advanced_testcase {
+class mod_facetoface_manager_reject_user_testcase extends advanced_testcase {
+
     /**
      * @return seminar
      */

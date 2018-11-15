@@ -25,10 +25,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Test suite of searching the asset with distinct records, and pagination is correcly rendered
- *
- * Class asset_search_with_distinct_record_test
  */
-class mod_facetoface_asset_search_with_distinct_record_testcase extends advanced_testcase {
+class mod_facetoface_asset_search_testcase extends advanced_testcase {
+
     /**
      * Creating a course, and a seminar activity for the course
      * @return array

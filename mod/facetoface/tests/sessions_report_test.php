@@ -28,7 +28,7 @@ use \mod_facetoface\signup\state\{fully_attended};
 use \mod_facetoface\signup_helper;
 use \mod_facetoface\seminar_event;
 
-class mod_facetoface_session_report_testcase extends advanced_testcase {
+class mod_facetoface_sessions_report_testcase extends advanced_testcase {
 
     protected $facetofacegenerator = null;
     protected $facetoface = null;

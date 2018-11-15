@@ -28,9 +28,9 @@ require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 use totara_job\job_assignment;
 
 /**
- * Class mod_facetoface_render_waitlist_event_with_booked_user_test
+ * Class mod_facetoface_waitlist_event_testcase
  */
-class mod_facetoface_render_waitlist_event_with_booked_user_test extends advanced_testcase {
+class mod_facetoface_waitlist_event_testcase extends advanced_testcase {
 
     /**
      * @return stdClass

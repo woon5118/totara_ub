@@ -28,9 +28,9 @@ use totara_job\job_assignment;
 
 
 /**
- * Class declined_user_is_able_to_signup_again_testcase
+ * Class mod_facetoface_signup_approval_manager_testcase
  */
-class mod_facetoface_declined_user_is_able_to_signup_again_testcase extends advanced_testcase {
+class mod_facetoface_signup_approval_manager_testcase extends advanced_testcase {
     /**
      * @return seminar
      */

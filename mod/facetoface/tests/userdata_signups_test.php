@@ -46,7 +46,8 @@ require_once($CFG->dirroot . '/mod/facetoface/tests/facetoface_testcase.php');
  *
  * @group totara_userdata
  */
-class mod_facetoface_userdata_signups_test extends mod_facetoface_facetoface_testcase {
+class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface_testcase {
+
 
     /**
      * Set up tests.

@@ -33,7 +33,7 @@ require_once($CFG->dirroot . "/totara/reportbuilder/lib.php");
  * and the test is testing the SQL query of custom report plust
  * embedded report
  */
-class mod_facetoface_rb_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
+class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
     /**
      * Saving all the columns for the report builder
      * @param rb_source_facetoface_rooms    $src

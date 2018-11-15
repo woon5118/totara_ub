@@ -31,9 +31,9 @@ use totara_job\job_assignment;
  * Unit test of sending a notification email should not add up the message content and the $eventdata should be reset
  * everytime one message got sent out to a single recipient
  *
- * Class mod_facetoface_notify_under_capacity_tes
+ * Class mod_facetoface_notify_under_capacity_testcase
  */
-class mod_facetoface_notify_under_capacity_test extends advanced_testcase {
+class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
     /**
      * The method of setting up the environment for the unit test, and the steps are:
      * + Create course

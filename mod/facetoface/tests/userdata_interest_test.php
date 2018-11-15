@@ -39,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group totara_userdata
  */
-class mod_facetoface_userdata_interest_test extends advanced_testcase {
+class mod_facetoface_userdata_interest_testcase extends advanced_testcase {
 
     protected $user1;
     protected $user2;

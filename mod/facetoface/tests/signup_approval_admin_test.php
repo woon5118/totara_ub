@@ -33,9 +33,9 @@ use totara_job\job_assignment;
  * A unit test of checking whether the sign-up's state is going to switch or not, when the approval type of
  * seminar is switching in between the type of admin approval and manager approval.
  *
- * Class mod_facetoface_sign_up_is_not_changing_state_when_approval_role_change_testcase
+ * Class mod_facetoface_signup_approval_admin_testcase
  */
-class mod_facetoface_sign_up_is_not_changing_state_when_approval_role_change_testcase extends advanced_testcase {
+class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
     /**
      * Creating a seminar with approval type as the managers and administrative approval here, with the admin Id
      * @return seminar

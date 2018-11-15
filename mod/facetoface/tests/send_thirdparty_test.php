@@ -38,9 +38,9 @@ use core\task\manager;
  * Unit test of checking whether an email should be sending to the third party or not when both of the options
  * `notifyuser` and `notifymanager` are being disabled
  *
- * Class mod_facetoface_sending_message_to_third_party_email_adhoc_task_testcase
+ * Class mod_facetoface_send_thirdparty_testcase
  */
-class mod_facetoface_sending_message_to_third_party_email_adhoc_task_testcase extends advanced_testcase {
+class mod_facetoface_send_thirdparty_testcase extends advanced_testcase {
     /**
      * Creating the number of users with one manager
      * @param int $numberofusers

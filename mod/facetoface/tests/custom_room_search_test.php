@@ -23,10 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * Class custom_room_searchability_test
- */
-class mod_facetoface_custom_room_searchability_testcase extends advanced_testcase {
+class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
+
     /**
      * Creating a seminar
      * @param stdClass $course

@@ -30,9 +30,10 @@ use totara_job\job_assignment;
 use mod_facetoface\signup\state\booked;
 
 /**
- * Class seminar_renderer_within_course_view_test
+ * Class mod_facetoface_seminar_renderer_testcase
  */
-class mod_facetoface_seminar_renderer_within_course_view_testcase extends advanced_testcase {
+class mod_facetoface_seminar_renderer_testcase extends advanced_testcase {
+
     /**
      * @param int $approvaltype
      * @param int $approvaltype
