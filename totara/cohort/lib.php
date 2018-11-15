@@ -1020,6 +1020,7 @@ function totara_cohort_check_and_update_dynamic_cohort_members($courseid, progre
     if (empty($courseid)) {
         if (empty($cohortid)) {
             $dcohorts = $DB->get_records('cohort', array('cohorttype' => cohort::TYPE_DYNAMIC), 'idnumber');
+            $dcohorts = \totara_cohort\cohort_dependency_helper::order_cohorts($dcohorts);
         } else {
             $dcohorts = $DB->get_records('cohort', array('id' => $cohortid), 'idnumber');
         }
@@ -1081,8 +1082,8 @@ function totara_cohort_check_and_update_dynamic_cohort_members($courseid, progre
         }
         try {
             $timenow = time();
-            $trace->output(date("H:i:s", $timenow)." updating {$cohort->idnumber} members...");
-            $result = totara_cohort_update_dynamic_cohort_members($cohort->id);
+            $trace->output(date("H:i:s", $timenow)." updating {$cohort->name} ({$cohort->idnumber}) members...");
+            $result = totara_cohort_update_dynamic_cohort_members($cohort->id, 0, false, false);
             if (is_array($result) && array_key_exists('add', $result) && array_key_exists('del', $result)) {
                 $trace->output("{$result['add']} members added; {$result['del']} members deleted");
             } else {
