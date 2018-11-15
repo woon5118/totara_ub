@@ -133,7 +133,7 @@ function get_customfield_type_instace($prefix, $sitecontext, $extrainfo) {
 }
 
 /**
- * Set custom field hidden property.
+ * Toggles custom field hidden property depending on its current value.
  *
  * @param string $tableprefix The database table prefix
  * @param int $id The record id to update the data
