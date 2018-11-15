@@ -31,6 +31,7 @@
 
 require_once('../config.php');
 require_once($CFG->dirroot.'/course/lib.php');
+require_once($CFG->dirroot.'/course/switchrole_form.php');
 
 $id         = required_param('id', PARAM_INT);
 $switchrole = optional_param('switchrole', -1, PARAM_INT);
@@ -58,14 +59,19 @@ if (!$course = $DB->get_record('course', array('id'=>$id))) {
 
 $context = context_course::instance($course->id);
 
-// Remove any switched roles before checking login.
-if ($switchrole == 0) {
-    role_switch(0, $context);
-}
 require_login($course);
 
-// Switchrole - sanity check in cost-order...
-if ($switchrole > 0 && has_capability('moodle/role:switchroles', $context)) {
+// TOTARA: Moved form declaration and inserted is_cancelled check to fix bug TL-19249
+$form = new switchrole_form(null, ['course' => $course]);
+
+if ($form->is_cancelled()) {
+    redirect($returnurl);
+}
+
+if ($switchrole == 0) {
+    role_switch(0, $context);
+} else if ($switchrole > 0 && has_capability('moodle/role:switchroles', $context)) {
+    // Switchrole - sanity check in cost-order...
     // Is this role assignable in this context?
     // inquiring minds want to know...
     $aroles = get_switchable_roles($context);
@@ -81,8 +87,6 @@ if ($switchrole > 0 && has_capability('moodle/role:switchroles', $context)) {
     echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('switchroleto'));
 
-    require_once($CFG->dirroot.'/course/switchrole_form.php');
-    $form = new switchrole_form(null, ['course' => $course]);
     $form->display();
 
     echo $OUTPUT->footer();
