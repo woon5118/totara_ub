@@ -72,4 +72,12 @@ class core_course_totara_catalog_dataformatter_activity_type_icons_testcase exte
 
         $this->assert_exceptions($df, $test_params);
     }
+
+    public function test_type_icons_with_customdelimiter(): void {
+        $context = context_system::instance();
+
+        $df = new activity_type_icons('modulesfield', "+");
+        $params = $df->get_formatted_value(['modules' => "forum+assign"], $context);
+        $this->assertCount(2, $params);
+    }
 }

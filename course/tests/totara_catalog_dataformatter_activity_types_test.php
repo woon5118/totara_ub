@@ -66,4 +66,12 @@ class core_course_totara_catalog_dataformatter_activity_types_testcase extends d
 
         $this->assert_exceptions($df, $test_params);
     }
+
+    public function test_activity_types_with_delimiter(): void {
+        $context = context_system::instance();
+
+        $df = new activity_types('modulesfield', '+', '\n');
+        $result = $df->get_formatted_value(['modules' => 'form+book+assign+resource'], $context);
+        $this->assertSame('Assignment\nBook\nFile\nForm', $result);
+    }
 }

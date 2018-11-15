@@ -29,12 +29,21 @@ defined('MOODLE_INTERNAL') || die();
 use totara_catalog\dataformatter\formatter;
 
 class activity_type_icons extends formatter {
+    /**
+     * @var string
+     */
+    private $sourcedelimiter;
 
     /**
      * @param string $modulesfield the database field containing the array of module ids, comma separated (use $DB->group_concat)
+     * @param string $sourcedelimiter
      */
-    public function __construct(string $modulesfield) {
+    public function __construct(
+        string $modulesfield,
+        string $sourcedelimiter = ','
+    ) {
         $this->add_required_field('modules', $modulesfield);
+        $this->sourcedelimiter = $sourcedelimiter;
     }
 
     public function get_suitable_types(): array {
@@ -57,7 +66,7 @@ class activity_type_icons extends formatter {
             throw new \coding_exception("Course activity type icons data formatter expects 'modules'");
         }
 
-        $modules = explode(',', $data['modules']);
+        $modules = explode($this->sourcedelimiter, $data['modules']);
         $modules = array_map('trim', $modules);
         $mods = array();
 

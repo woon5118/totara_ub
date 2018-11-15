@@ -31,10 +31,28 @@ use totara_catalog\dataformatter\formatter;
 class activity_types extends formatter {
 
     /**
-     * @param string $modulesfield the database field containing the array of module ids, comma separated (use $DB->group_concat)
+     * @var string
      */
-    public function __construct(string $modulesfield) {
+    private $sourcedelimiter;
+
+    /**
+     * @var string
+     */
+    private $resultdelimiter;
+
+    /**
+     * @param string $modulesfield the database field containing the array of module ids, comma separated (use $DB->group_concat)
+     * @param string $sourcedelimiter
+     * @param string $resultdelimiter
+     */
+    public function __construct(
+        string $modulesfield,
+        string $sourcedelimiter = ',',
+        string $resultdelimiter =', '
+    ) {
         $this->add_required_field('modules', $modulesfield);
+        $this->sourcedelimiter = $sourcedelimiter;
+        $this->resultdelimiter = $resultdelimiter;
     }
 
     public function get_suitable_types(): array {
@@ -56,7 +74,7 @@ class activity_types extends formatter {
             throw new \coding_exception("Course activity types data formatter expects 'modules'");
         }
 
-        $modules = explode(',', $data['modules']);
+        $modules = explode($this->sourcedelimiter, $data['modules']);
         $modules = array_map('trim', $modules);
         $mods = array();
 
@@ -75,6 +93,6 @@ class activity_types extends formatter {
         // Sort module list before displaying to make cells all consistent.
         sort($mods);
 
-        return implode(", ", $mods);
+        return implode($this->resultdelimiter, $mods);
     }
 }
