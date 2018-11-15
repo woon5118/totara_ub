@@ -70,7 +70,7 @@ class category_updated extends object_update_observer {
             $data = new \stdClass();
             $data->objectid = $affectedprogram->id;
             $data->contextid = $this->event->contextid;
-            $this->add_update_object($data);
+            $this->register_for_update($data);
         }
     }
 

@@ -48,7 +48,7 @@ class customfield_delete extends object_update_observer {
             $data = new \stdClass();
             $data->objectid = $eventdata['other']['field_data']['courseid'];
             $data->contextid = $this->event->contextid;
-            $this->add_update_object($data);
+            $this->register_for_update($data);
         }
     }
 }

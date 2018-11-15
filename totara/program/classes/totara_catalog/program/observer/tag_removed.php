@@ -49,7 +49,7 @@ class tag_removed extends object_update_observer {
             if ($this->is_applicable_change($programid)) {
                 $data->objectid = $programid;
                 $data->contextid = $this->event->contextid;
-                $this->add_update_object($data);
+                $this->register_for_update($data);
             }
         }
     }

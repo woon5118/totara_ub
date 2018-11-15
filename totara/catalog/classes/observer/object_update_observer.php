@@ -64,7 +64,7 @@ abstract class object_update_observer {
      *
      * This function should calculate changes that need to occur in the catalog when the event occurs. The event
      * may result in zero, one or more changes. Adding and updating catalog records should be flagged by calling
-     * $this->add_update_object, while removing catalog records is done by calling $this->add_remove_object_id.
+     * $this->register_for_update, while removing catalog records is done by calling $this->register_for_delete.
      */
     abstract protected function init_change_objects(): void;
 
@@ -73,7 +73,7 @@ abstract class object_update_observer {
      *
      * @param \stdClass $object
      */
-    protected function add_update_object(\stdClass $object): void {
+    protected function register_for_update(\stdClass $object): void {
         if (empty($object->objecttype)) {
             $object->objecttype = $this->objecttype;
         } else if ($object->objecttype != $this->objecttype) {
@@ -87,16 +87,8 @@ abstract class object_update_observer {
      *
      * @param int $id
      */
-    protected function add_remove_object_id(int $id): void {
+    protected function register_for_delete(int $id): void {
         $this->deleteobjectids[] = $id;
-    }
-
-    /**
-     * Get provider object type
-     * @return string
-     */
-    final protected function get_object_type(): string {
-        return $this->objecttype;
     }
 
     /**
@@ -107,32 +99,14 @@ abstract class object_update_observer {
             return;
         }
 
-        if (!empty($this->get_update_objects())) {
+        $this->init_change_objects();
+
+        if (!$this->updateobjects) {
             catalog_storage::update_records($this->updateobjects);
         }
 
-        if (!empty($this->get_delete_object_ids())) {
+        if (!$this->deleteobjectids) {
             catalog_storage::delete_records($this->objecttype, $this->deleteobjectids);
         }
-    }
-
-    /**
-     * Get update objects
-     *
-     * @return array
-     */
-    public function get_update_objects(): array {
-        $this->init_change_objects();
-        return $this->updateobjects;
-    }
-
-    /**
-     * Get delete object ids
-     *
-     * @return array
-     */
-    public function get_delete_object_ids(): array {
-        $this->init_change_objects();
-        return $this->deleteobjectids;
     }
 }

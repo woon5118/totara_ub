@@ -41,7 +41,7 @@ class program_deleted extends object_update_observer {
      */
     protected function init_change_objects(): void {
         if ($this->is_applicable_change($this->event->objectid)) {
-            $this->add_remove_object_id($this->event->objectid);
+            $this->register_for_delete($this->event->objectid);
         }
     }
 

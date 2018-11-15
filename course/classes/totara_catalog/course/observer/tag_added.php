@@ -56,7 +56,7 @@ class tag_added extends object_update_observer {
         foreach ($eventdata as $updatetag) {
             $data->objectid = $updatetag->itemid;
             $data->contextid = $updatetag->contextid;
-            $this->add_update_object($data);
+            $this->register_for_update($data);
         }
     }
 }

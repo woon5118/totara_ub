@@ -44,6 +44,6 @@ class course_delete extends object_update_observer {
      */
     protected function init_change_objects(): void {
 
-        $this->add_remove_object_id($this->event->objectid);
+        $this->register_for_delete($this->event->objectid);
     }
 }

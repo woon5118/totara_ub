@@ -51,7 +51,7 @@ class tag_removed extends object_update_observer {
         if ($eventdata['other']['itemtype'] == 'course') {
             $data->objectid = $eventdata['other']['itemid'];
             $data->contextid = $this->event->contextid;
-            $this->add_update_object($data);
+            $this->register_for_update($data);
         }
     }
 }
