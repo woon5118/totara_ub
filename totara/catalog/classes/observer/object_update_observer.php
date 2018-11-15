@@ -101,11 +101,11 @@ abstract class object_update_observer {
 
         $this->init_change_objects();
 
-        if (!$this->updateobjects) {
+        if (!empty($this->updateobjects)) {
             catalog_storage::update_records($this->updateobjects);
         }
 
-        if (!$this->deleteobjectids) {
+        if (!empty($this->deleteobjectids)) {
             catalog_storage::delete_records($this->objecttype, $this->deleteobjectids);
         }
     }

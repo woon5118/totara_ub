@@ -24,8 +24,9 @@
 
 namespace core_course\totara_catalog\course;
 
+use core\event\course_deleted;
 use core_course\totara_catalog\course as course_provider;
-use \core\event\course_created;
+use core\event\course_created;
 
 /**
  * @group totara_catalog
@@ -57,15 +58,70 @@ class core_course_totara_catalog_course_object_update_observer_testcase extends 
     }
 
     public function test_update_object() {
-        $updateobjects = $this->get_update_observers()['course']->get_update_objects();
+        global $DB;
 
-        $this->assertSame($this->course->id, $updateobjects[0]->objectid);
-        $this->assertSame(course_provider::get_object_type(), $updateobjects[0]->objecttype);
+        // Delete the course from the catalog if it is there already.
+        $DB->delete_records('catalog', ['objectid' => $this->course->id, 'objecttype' => 'course']);
+
+        // Create course created event (without actually creating the course - it was created earlier).
+        $event = course_created::create(
+            [
+                'objectid' => $this->course->id,
+                'context'  => \context_course::instance($this->course->id),
+                'other'    => [
+                    'shortname' => $this->course->shortname,
+                    'fullname'  => $this->course->fullname,
+                ],
+            ]
+        );
+
+        // Get the observer.
+        $observer = new course_provider\observer\course('course', $event);
+
+        // Process the observer. This should cause init_change_objects to be called, which in turn marks the course
+        // for creation in the catalog, then the creations are processed.
+        $observer->process();
+
+        // Check that the record has been created in the catalog.
+        $this->assertEquals(
+            1,
+            $DB->count_records('catalog', ['objectid' => $this->course->id, 'objecttype' => 'course'])
+        );
     }
 
     public function test_delete_object() {
-        $deleteobjects = $this->get_update_observers()['course_delete']->get_delete_object_ids();
-        $this->assertTrue(in_array($this->course->id, $deleteobjects));
+        global $DB;
+
+        // Check that the course is in the catalog.
+        $this->assertEquals(
+            1,
+            $DB->count_records('catalog', ['objectid' => $this->course->id, 'objecttype' => 'course'])
+        );
+
+        // Create course deleted event (without actually deleting the course).
+        $event = course_deleted::create(
+            [
+                'objectid' => $this->course->id,
+                'context'  => \context_course::instance($this->course->id),
+                'other'    => [
+                    'shortname' => $this->course->shortname,
+                    'fullname'  => $this->course->fullname,
+                ],
+            ]
+        );
+
+        // Get the observer.
+        $observer = new course_provider\observer\course_delete('course', $event);
+
+        // Process the observer. This should cause init_change_objects to be called, which in turn marks the course
+        // for deletion from the catalog, then the deletions are processed.
+        $observer->process();
+
+        // Check that the record has been deleted from the catalog.
+        $this->assertEquals(
+            0,
+            $DB->count_records('catalog', ['objectid' => $this->course->id, 'objecttype' => 'course'])
+        );
     }
 
     public function test_process() {
