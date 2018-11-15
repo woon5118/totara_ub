@@ -60,7 +60,7 @@ class config_filters_controller extends base_config_form_controller {
         $panel_filter_data = [];
         $panel_filter_keys = [];
         foreach (filter_handler::instance()->get_region_filters(filter::REGION_PANEL) as $filter) {
-            $panel_filter_data[$this->get_optgroup_name($filter->category)][$filter->key] = $filter->selector->get_title();
+            $panel_filter_data[(string)$filter->category][$filter->key] = $filter->selector->get_title();
             $panel_filter_keys[] = $filter->key;
         }
 

@@ -182,7 +182,7 @@ class totara_catalog_feature_testcase extends advanced_testcase {
         $this->assertSame('cat_cgry_ftrd', $feature->key);
         $this->assertSame('Category', $feature->title);
         $this->assertInstanceOf(filter::class, $feature->datafilter);
-        $this->assertSame('', $feature->category);
+        $this->assertEquals(get_string('default_option_group', 'totara_catalog'), $feature->category);
 
         // Check get_options() method.
         $options = $feature->get_options();

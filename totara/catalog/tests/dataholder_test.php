@@ -105,7 +105,7 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
         }
         $this->assertInternalType('array', $dataholder->datajoins);
         $this->assertInternalType('array', $dataholder->dataparams);
-        $this->assertInternalType('string', $dataholder->category);
+        $this->assertTrue($dataholder->category instanceof lang_string || is_string($dataholder->category));
     }
 
     /**
@@ -203,7 +203,7 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
         $this->assertArrayHasKey($dataholder_key, $dataholder->datajoins);
         $this->assertCount(1, $dataholder->dataparams);
         $this->assertArrayHasKey($dataholder_key . '_data', $dataholder->dataparams);
-        $this->assertEquals('customfields', $dataholder->category);
+        $this->assertEquals(get_string('customfields', 'totara_customfield'), $dataholder->category);
     }
 
     /**
@@ -283,7 +283,7 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
         $this->assertInstanceOf(static_text::class, $dataholder->formatters[formatter::TYPE_PLACEHOLDER_TEXT]);
         $this->assertCount(0, $dataholder->datajoins);
         $this->assertCount(0, $dataholder->dataparams);
-        $this->assertSame('', $dataholder->category);
+        $this->assertEquals(get_string('default_option_group', 'totara_catalog'), $dataholder->category);
 
         $this->assertEquals(
             'test_name',

@@ -70,7 +70,7 @@ final class dataholder {
         array $formatters,
         array $datajoins = [],
         array $dataparams = [],
-        string $category = ''
+        string $category = null
     ) {
         if ($key != clean_param($key, PARAM_ALPHANUMEXT)) {
             throw new \coding_exception('Tried to create a dataholder with invalid key type: ' . $key);
@@ -89,7 +89,7 @@ final class dataholder {
         $this->formatters = $formatters;
         $this->datajoins = $datajoins;
         $this->dataparams = $dataparams;
-        $this->category = $category;
+        $this->category = $category ?? new \lang_string('default_option_group', 'totara_catalog');
     }
 
     /**

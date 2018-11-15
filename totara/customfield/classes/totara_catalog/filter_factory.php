@@ -205,7 +205,7 @@ class filter_factory {
             $filterregion,
             $datafilter,
             $selector,
-            filter::CATEGORY_CUSTOMFIELDS
+            new \lang_string('customfields', 'totara_customfield')
         );
     }
 

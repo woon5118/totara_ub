@@ -73,13 +73,13 @@ class config_general_controller extends base_config_form_controller {
             if ($filter->key == category_filters::FILTER_KEY_CATEGORY_BROWSE) {
                 continue;
             }
-            $browse_filter_data[$this->get_optgroup_name($filter->category)][$filter->key] = $filter->selector->get_title();
+            $browse_filter_data[(string)$filter->category][$filter->key] = $filter->selector->get_title();
         }
 
         $features = [];
         $featurenames = [];
         foreach (feature_handler::instance()->get_all_features() as $feature) {
-            $featurenames[$this->get_optgroup_name($feature->category)][$feature->key] = $feature->title;
+            $featurenames[(string)$feature->category][$feature->key] = $feature->title;
             $features[$feature->key] = $feature;
         }
 

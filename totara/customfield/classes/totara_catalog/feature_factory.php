@@ -177,7 +177,7 @@ class feature_factory {
             format_string($customfield->fullname, true, ['context' => \context_system::instance()]),
             $datafilter,
             $options,
-            feature::CATEGORY_CUSTOMFIELDS
+            new \lang_string('customfields', 'totara_customfield')
         );
     }
 

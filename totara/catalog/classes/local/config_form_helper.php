@@ -286,7 +286,7 @@ class config_form_helper {
      * @return int
      */
     public static function custom_sort_optgroups(string $a, string $b): int {
-        $always_first = get_string('optgroup_none', 'totara_catalog');
+        $always_first = get_string('default_option_group', 'totara_catalog');
         if ($a === $always_first) {
             return -1;
         }

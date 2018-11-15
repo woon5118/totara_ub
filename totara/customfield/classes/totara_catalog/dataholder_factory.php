@@ -34,8 +34,6 @@ use totara_customfield\totara_catalog\dataformatter\customfield_fts;
 
 class dataholder_factory {
 
-    const CATEGORY_CUSTOMFIELDS = 'customfields';
-
     /**
      * Create placeholders for custom fields that belong to the plugin (identified by the $tableprefix).
      *
@@ -151,7 +149,7 @@ class dataholder_factory {
                                           AND {$tablealias}.fieldid = :{$tablealias}_data",
                 ],
                 [$tablealias . '_data' => $customfield->id],
-                self::CATEGORY_CUSTOMFIELDS
+                new \lang_string('customfields', 'totara_customfield')
             );
         }
 

@@ -34,8 +34,6 @@ use totara_catalog\datasearch\filter as datafilter;
  */
 final class feature {
 
-    const CATEGORY_CUSTOMFIELDS = 'customfields';
-
     /** @var string */
     public $key;
 
@@ -64,15 +62,15 @@ final class feature {
      * @param string $title
      * @param datafilter $datafilter
      * @param array $options
-     * @param string $category
+     * @param string $category optional, used for sectioning of select lists in admin config form
      */
-    public function __construct(string $key, string $title, datafilter $datafilter, array $options, string $category = '') {
+    public function __construct(string $key, string $title, datafilter $datafilter, array $options, string $category = null) {
         $this->key = $key;
         $this->title = $title;
         $this->datafilter = $datafilter;
         $this->options = $options;
         $this->options_are_sorted = false;
-        $this->category = $category;
+        $this->category = $category ?? new \lang_string('default_option_group', 'totara_catalog');
     }
 
     /**

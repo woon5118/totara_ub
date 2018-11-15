@@ -133,19 +133,6 @@ abstract class base_config_form_controller extends form_controller {
     }
 
     /**
-     * Fetch the translation for an option group.
-     *
-     * @param string $category_key
-     * @return string
-     */
-    protected function get_optgroup_name(string $category_key): string {
-        if (empty($category_key)) {
-            $category_key = 'none';
-        }
-        return get_string('optgroup_' . $category_key, 'totara_catalog');
-    }
-
-    /**
      * Get current_data and params commonly used by all forms.
      *
      * @return array
@@ -232,7 +219,7 @@ abstract class base_config_form_controller extends form_controller {
             foreach ($formatter_types as $placeholder_type => $formatter_type) {
                 $placeholder_data[$object_type][$placeholder_type] = [];
                 foreach ($provider->get_dataholders($formatter_type) as $placeholder) {
-                    $optgroup_name = $this->get_optgroup_name($placeholder->category);
+                    $optgroup_name = (string)$placeholder->category;
                     $placeholder_data[$object_type][$placeholder_type][$optgroup_name][$placeholder->key] = $placeholder->name;
                 }
             }

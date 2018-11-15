@@ -37,8 +37,6 @@ final class filter {
     const REGION_BROWSE = 2;
     const REGION_FTS = 3;
 
-    const CATEGORY_CUSTOMFIELDS = 'customfields';
-
     /** @var string */
     public $key;
 
@@ -59,14 +57,14 @@ final class filter {
      * @param int $region the region on the screen (or FTS index) where the filter should appear
      * @param datafilter $datafilter an object used to produce sql used to filter database records
      * @param merge_select $selector an object containing a front end selector element which can be merged with others
-     * @param string $category TODO: TL-19356 Investigate what this does and remove if unused
+     * @param string $category optional, used for sectioning of select lists in admin config form
      */
-    public function __construct(string $key, int $region, datafilter $datafilter, merge_select $selector, string $category = '') {
+    public function __construct(string $key, int $region, datafilter $datafilter, merge_select $selector, string $category = null) {
         $this->key = $key;
         $this->region = $region;
         $this->datafilter = $datafilter;
         $this->selector = $selector;
-        $this->category = $category;
+        $this->category = $category ?? new \lang_string('default_option_group', 'totara_catalog');
     }
 
     /**
