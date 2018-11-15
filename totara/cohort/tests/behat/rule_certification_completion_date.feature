@@ -35,8 +35,7 @@ Feature: Test the certification completion date rule in dynamic audiences
       | menulifetime   | 0       |
       | enableprograms | Disable |
     And I set self completion for "Course One" in the "Miscellaneous" category
-    And I click on "Certifications" in the totara menu
-    And I follow "Certification 1"
+    And I am on "Certification 1" certification homepage
     And I press "Edit certification details"
     And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
@@ -133,8 +132,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     # Now certify learner 1 on cert 1
     And I log out
     And I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course One"
+    And I am on "Course One" course homepage
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     Then I should see "You have already completed this course"
@@ -217,8 +215,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     # Now certify learner 1 on cert 1
     And I log out
     And I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course One"
+    And I am on "Course One" course homepage
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     Then I should see "You have already completed this course"
@@ -283,8 +280,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     # Now certify learner 1 on cert 1
     And I log out
     And I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course One"
+    And I am on "Course One" course homepage
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     Then I should see "You have already completed this course"
@@ -331,8 +327,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     # Now certify learner 1 on cert 1
     And I log out
     And I log in as "learner1"
-    And I click on "Courses" in the totara menu
-    And I follow "Course One"
+    And I am on "Course One" course homepage
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     Then I should see "You have already completed this course"

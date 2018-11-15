@@ -178,7 +178,7 @@ Feature: Test course visibility
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
-    And I should not see "Calculus"
+    And I should see "Calculus"
 
     When I click on "Home" in the totara menu
     When I click on "Home" "link" in the "Navigation" "block"
