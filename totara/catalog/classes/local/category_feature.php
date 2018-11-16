@@ -53,25 +53,20 @@ class category_feature {
             ['cat_cgry_ftrd_id' => config::instance()->get_value('featured_learning_value')]
         );
 
-        return new feature(
+        $feature = new feature(
             'cat_cgry_ftrd',
             new \lang_string('category'),
-            $datafilter,
-            static::get_options()
+            $datafilter
         );
-    }
 
-    /**
-     * @return string[]
-     */
-    private static function get_options(): array {
-        global $CFG;
+        $feature->add_options_loader(
+            function () {
+                $topcat = \coursecat::get(0);
+                return self::make_tree_options($topcat->get_children(), '');
+            }
+        );
 
-        require_once($CFG->dirroot . '/lib/coursecatlib.php');
-
-        $topcat = coursecat::get(0);
-
-        return self::make_tree_options($topcat->get_children(), '');
+        return $feature;
     }
 
     /**

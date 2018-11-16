@@ -47,41 +47,58 @@ final class feature {
     public $category;
 
     /** @var string[] */
-    protected $options;
+    private $options;
 
-    /** @var bool */
-    private $options_are_sorted;
+    /** @var callable[] */
+    protected $optionsloaders = [];
 
     /**
      * Create a feature container.
      *
-     * Note that all keys and values in $options MUST be clean! If they come from user input then they must have
-     * been passed through format_string or something similar, so that they are safe to display in the browser.
-     *
      * @param string $key
      * @param string $title
      * @param datafilter $datafilter
-     * @param array $options
      * @param string $category optional, used for sectioning of select lists in admin config form
      */
-    public function __construct(string $key, string $title, datafilter $datafilter, array $options, string $category = null) {
+    public function __construct(string $key, string $title, datafilter $datafilter, string $category = null) {
         $this->key = $key;
         $this->title = $title;
         $this->datafilter = $datafilter;
-        $this->options = $options;
-        $this->options_are_sorted = false;
         $this->category = $category ?? new \lang_string('default_option_group', 'totara_catalog');
     }
 
     /**
-     * Gets the list of options. This is hidden inside a function because we want to sort before we return it.
+     * Add an options loader, which can be called to produce a list of options
+     *
+     * Note that all keys and values returned MUST be clean! If they come from user input then they must have
+     * been passed through format_string or something similar, so that they are safe to display in the browser.
+     *
+     * @param callable $optionsloader
+     */
+    public function add_options_loader(callable $optionsloader): void {
+        $this->options = null;
+        $this->optionsloaders[] = $optionsloader;
+    }
+
+    /**
+     * Gets the list of options.
      *
      * @return string[]
      */
     public function get_options(): array {
-        if (!$this->options_are_sorted) {
+        if (is_null($this->options)) {
+            $options = [];
+
+            foreach ($this->optionsloaders as $optionsloader) {
+                $loadedoptions = $optionsloader();
+                foreach ($loadedoptions as $key => $name) {
+                    $options[$key] = $name;
+                }
+            }
+
+            $this->options = $options;
+
             asort($this->options);
-            $this->options_are_sorted = true;
         }
 
         return $this->options;
@@ -98,12 +115,6 @@ final class feature {
             return false;
         }
 
-        foreach ($otherfeature->get_options() as $otherkey => $othervalue) {
-            if (isset($this->options[$otherkey]) && $this->options[$otherkey] != $othervalue) {
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -114,7 +125,9 @@ final class feature {
      */
     public function merge(feature $otherfeature): void {
         $this->datafilter->merge($otherfeature->datafilter);
-        $this->options = $this->options + $otherfeature->options;
-        $this->options_are_sorted = false;
+
+        foreach ($otherfeature->optionsloaders as $optionsloader) {
+            $this->add_options_loader($optionsloader);
+        }
     }
 }

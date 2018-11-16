@@ -59,24 +59,25 @@ class type extends feature_factory {
             ]
         );
 
-        return [
-            new feature(
-                'course_type_ftrd',
-                new \lang_string('coursetype', 'totara_core'),
-                $datafilter,
-                self::get_options()
-            )
-        ];
-    }
+        $feature = new feature(
+            'course_type_ftrd',
+            new \lang_string('coursetype', 'totara_core'),
+            $datafilter
+        );
 
-    private static function get_options() {
-        global $TOTARA_COURSE_TYPES;
+        $feature->add_options_loader(
+            function () {
+                global $TOTARA_COURSE_TYPES;
 
-        $options = [];
-        foreach ($TOTARA_COURSE_TYPES as $stringkey => $intkey) {
-            $options[$intkey] = new \lang_string($stringkey, 'totara_core');
-        }
+                $options = [];
+                foreach ($TOTARA_COURSE_TYPES as $stringkey => $intkey) {
+                    $options[$intkey] = new \lang_string($stringkey, 'totara_core');
+                }
 
-        return $options;
+                return $options;
+            }
+        );
+
+        return [$feature];
     }
 }

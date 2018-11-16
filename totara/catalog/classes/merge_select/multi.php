@@ -52,9 +52,9 @@ class multi extends options_loader_merge_select {
             }
 
             $this->options = $options;
-        }
 
-        asort($this->options);
+            asort($this->options);
+        }
 
         return $this->options;
     }

@@ -43,17 +43,20 @@ class totara_catalog_feature_testcase extends advanced_testcase {
     public function test_get_options() {
         /** @var filter $datafilter */
         $datafilter = $this->get_mock_filter();
-        $options = [
-            0 => 'c_option',
-            1 => 'a_option',
-            2 => 'b_option'
-        ];
+        $optionsloader = function () {
+            return [
+                0 => 'c_option',
+                1 => 'a_option',
+                2 => 'b_option'
+            ];
+        };
         $sorted_options = [
             1 => 'a_option',
             2 => 'b_option',
             0 => 'c_option'
         ];
-        $feature = new feature('test_feature', 'Test feature', $datafilter, $options, 'test_category');
+        $feature = new feature('test_feature', 'Test feature', $datafilter, 'test_category');
+        $feature->add_options_loader($optionsloader);
         $this->assertSame($sorted_options, $feature->get_options());
     }
 
@@ -62,43 +65,41 @@ class totara_catalog_feature_testcase extends advanced_testcase {
      */
     public function test_can_merge() {
         // Datafilters can't merge, so features can't merge.
-        $options = [
-            'key1' => 'a_option',
-            'key2' => 'b_option',
-            'key3' => 'c_option',
-        ];
+        $optionsloader = function () {
+            return [
+                'key1' => 'a_option',
+                'key2' => 'b_option',
+                'key3' => 'c_option',
+            ];
+        };
         $datafilter = $this->get_mock_filter(false);
-        $feature1 = new feature('test_feature1', 'Test feature1', $datafilter, $options, 'test_category1');
-        $feature2 = new feature('test_feature2', 'Test feature2', $datafilter, $options, 'test_category2');
+        $feature1 = new feature('test_feature1', 'Test feature1', $datafilter, 'test_category1');
+        $feature1->add_options_loader($optionsloader);
+        $feature2 = new feature('test_feature2', 'Test feature2', $datafilter, 'test_category2');
+        $feature2->add_options_loader($optionsloader);
         $this->assertFalse($feature1->can_merge($feature2));
         $this->assertFalse($feature2->can_merge($feature1));
 
-        // Datafilters can merge, but different option values for the same key, so features can't merge.
+        // Datafilters can merge, and different option values for the same key doesn't prevent this.
         $datafilter = $this->get_mock_filter(true);
-        $options1 = [
-            'key1' => 'a_option',
-            'key2' => 'b_option',
-            'key3' => 'c_option',
-        ];
-        $options2 = [
-            'key1' => 'a_option',
-            'key2' => 'b_option',
-            'key3' => 'orangutan',
-        ];
-        $feature1 = new feature('test_feature1', 'Test feature1', $datafilter, $options1, 'test_category1');
-        $feature2 = new feature('test_feature2', 'Test feature2', $datafilter, $options2, 'test_category2');
-        $this->assertFalse($feature1->can_merge($feature2));
-        $this->assertFalse($feature2->can_merge($feature1));
-
-        // Datafilters can merge and same options, so features can merge.
-        $datafilter = $this->get_mock_filter(true);
-        $options = [
-            'key1' => 'a_option',
-            'key2' => 'b_option',
-            'key3' => 'c_option',
-        ];
-        $feature1 = new feature('test_feature1', 'Test feature1', $datafilter, $options, 'test_category1');
-        $feature2 = new feature('test_feature2', 'Test feature2', $datafilter, $options, 'test_category2');
+        $optionsloader1 = function () {
+            return [
+                'key1' => 'a_option',
+                'key2' => 'b_option',
+                'key3' => 'c_option',
+            ];
+        };
+        $optionsloader2 = function () {
+            return [
+                'key1' => 'a_option',
+                'key2' => 'b_option',
+                'key3' => 'orangutan',
+            ];
+        };
+        $feature1 = new feature('test_feature1', 'Test feature1', $datafilter, 'test_category1');
+        $feature1->add_options_loader($optionsloader1);
+        $feature2 = new feature('test_feature2', 'Test feature2', $datafilter, 'test_category2');
+        $feature2->add_options_loader($optionsloader2);
         $this->assertTrue($feature1->can_merge($feature2));
         $this->assertTrue($feature2->can_merge($feature1));
     }
@@ -109,18 +110,24 @@ class totara_catalog_feature_testcase extends advanced_testcase {
     public function test_merge() {
         $datafilter = $this->get_mock_filter(true);
 
-        $options1 = [
-            'key1' => 'a_option',
-            'key2' => 'b_option',
-            'unique_key1' => 'orangutan',
-        ];
-        $options2 = [
-            'key1' => 'a_option',
-            'key2' => 'b_option',
-            'unique_key2' => 'jones',
-        ];
-        $feature1 = new feature('test_feature1', 'Test feature1', $datafilter, $options1, 'test_category1');
-        $feature2 = new feature('test_feature2', 'Test feature2', $datafilter, $options2, 'test_category2');
+        $optionsloader1 = function () {
+            return [
+                'key1' => 'a_option',
+                'key2' => 'b_option',
+                'unique_key1' => 'orangutan',
+            ];
+        };
+        $optionsloader2 = function () {
+            return [
+                'key1' => 'a_option',
+                'key2' => 'b_option',
+                'unique_key2' => 'jones',
+            ];
+        };
+        $feature1 = new feature('test_feature1', 'Test feature1', $datafilter, 'test_category1');
+        $feature1->add_options_loader($optionsloader1);
+        $feature2 = new feature('test_feature2', 'Test feature2', $datafilter, 'test_category2');
+        $feature2->add_options_loader($optionsloader2);
 
         $datafilter->expects($this->once())
             ->method('merge')

@@ -85,37 +85,44 @@ class feature_factory {
             ]
         );
 
-        return [
-            new feature(
-                'tag',
-                new \lang_string('tags', 'moodle'),
-                $datafilter,
-                self::get_options($itemtype)
-            )
-        ];
+        $feature = new feature(
+            'tag',
+            new \lang_string('tags', 'moodle'),
+            $datafilter
+        );
+
+        $feature->add_options_loader(self::get_options_loader($itemtype));
+
+        return [$feature];
     }
 
-    private static function get_options(string $itemtype): array {
-        global $DB;
+    /**
+     * @param string $itemtype
+     * @return callable
+     */
+    private static function get_options_loader(string $itemtype): callable {
+        return function () use ($itemtype) {
+            global $DB;
 
-        $sql = "
-            SELECT DISTINCT tag.id, tag.name
-              FROM {tag_instance} tag_instance
-              JOIN {tag} tag
-                ON tag_instance.tagid = tag.id
-             WHERE tag_instance.itemtype = :itemtype
-        ";
-        $params = ['itemtype' => $itemtype];
+            $sql = "
+                SELECT DISTINCT tag.id, tag.name
+                  FROM {tag_instance} tag_instance
+                  JOIN {tag} tag
+                    ON tag_instance.tagid = tag.id
+                 WHERE tag_instance.itemtype = :itemtype
+            ";
+            $params = ['itemtype' => $itemtype];
 
-        $records = $DB->get_records_sql($sql, $params);
+            $records = $DB->get_records_sql($sql, $params);
 
-        $systemcontext = \context_system::instance();
+            $systemcontext = \context_system::instance();
 
-        $options = [];
-        foreach ($records as $record) {
-            $options[$record->id] = format_string($record->name, true, ['context' => $systemcontext]);
-        }
+            $options = [];
+            foreach ($records as $record) {
+                $options[$record->id] = format_string($record->name, true, ['context' => $systemcontext]);
+            }
 
-        return $options;
+            return $options;
+        };
     }
 }

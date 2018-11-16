@@ -169,16 +169,16 @@ class feature_factory {
             ]
         );
 
-        $optionsloaderfunction = 'get_' . $datatype . '_options';
-        $options = self::$optionsloaderfunction($customfield, $tableprefix, $prefix);
-
-        return new feature(
+        $feature = new feature(
             $alias,
             format_string($customfield->fullname, true, ['context' => \context_system::instance()]),
             $datafilter,
-            $options,
             new \lang_string('customfields', 'totara_customfield')
         );
+        $optionsloaderfunction = 'get_' . $datatype . '_options_loader';
+        $feature->add_options_loader(self::$optionsloaderfunction($customfield, $tableprefix, $prefix));
+
+        return $feature;
     }
 
     /**
@@ -189,23 +189,25 @@ class feature_factory {
      * @param string $prefix the prefix to use in front of 'id' as the column containing the item id
      * @return callable
      */
-    private static function get_menu_options(\stdClass $customfield, string $tableprefix, string $prefix) {
-        global $CFG;
+    private static function get_menu_options_loader(\stdClass $customfield, string $tableprefix, string $prefix) {
+        return function () use ($customfield, $tableprefix, $prefix) {
+            global $CFG;
 
-        require_once($CFG->dirroot . '/totara/customfield/field/menu/field.class.php');
+            require_once($CFG->dirroot . '/totara/customfield/field/menu/field.class.php');
 
-        // This is a bit hacky - we should be passing a real item.
-        $item = new \stdClass();
-        $item->id = 0;
-        $field = new \customfield_menu($customfield->id, $item, $prefix, $tableprefix);
+            // This is a bit hacky - we should be passing a real item.
+            $item = new \stdClass();
+            $item->id = 0;
+            $field = new \customfield_menu($customfield->id, $item, $prefix, $tableprefix);
 
-        $options = [];
-        foreach ($field->options as $option) {
-            $safeoption = format_string($option, true, ['context' => \context_system::instance()]);
-            $options[$safeoption] = $safeoption;
-        }
+            $options = [];
+            foreach ($field->options as $option) {
+                $safeoption = format_string($option, true, ['context' => \context_system::instance()]);
+                $options[$safeoption] = $safeoption;
+            }
 
-        return $options;
+            return $options;
+        };
     }
 
     /**
@@ -216,23 +218,25 @@ class feature_factory {
      * @param string $prefix the prefix to use in front of 'id' as the column containing the item id
      * @return callable
      */
-    private static function get_multiselect_options(\stdClass $customfield, string $tableprefix, string $prefix) {
-        global $CFG;
+    private static function get_multiselect_options_loader(\stdClass $customfield, string $tableprefix, string $prefix) {
+        return function () use ($customfield, $tableprefix, $prefix) {
+            global $CFG;
 
-        require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
+            require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
 
-        // This is a bit hacky - we should be passing a real item.
-        $item = new \stdClass();
-        $item->id = 0;
-        $field = new \customfield_multiselect($customfield->id, $item, $prefix, $tableprefix);
+            // This is a bit hacky - we should be passing a real item.
+            $item = new \stdClass();
+            $item->id = 0;
+            $field = new \customfield_multiselect($customfield->id, $item, $prefix, $tableprefix);
 
-        $options = [];
-        foreach ($field->options as $option) {
-            $safeoption = format_string($option['option'], true, ['context' => \context_system::instance()]);
-            $options[$safeoption] = $safeoption;
-        }
+            $options = [];
+            foreach ($field->options as $option) {
+                $safeoption = format_string($option['option'], true, ['context' => \context_system::instance()]);
+                $options[$safeoption] = $safeoption;
+            }
 
-        return $options;
+            return $options;
+        };
     }
 
     /**
@@ -240,11 +244,13 @@ class feature_factory {
      *
      * @return callable
      */
-    private static function get_checkbox_options() {
-        return [
-            1 => 'Yes',
-            0 => 'No',
-        ];
+    private static function get_checkbox_options_loader() {
+        return function () {
+            return [
+                1 => 'Yes',
+                0 => 'No',
+            ];
+        };
     }
 
     /**

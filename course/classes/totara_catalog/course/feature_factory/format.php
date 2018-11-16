@@ -59,25 +59,26 @@ class format extends feature_factory {
             ]
         );
 
-        return [
-            new feature(
-                'course_format_ftrd',
-                new \lang_string('format', 'moodle'),
-                $datafilter,
-                self::get_options()
-            )
-        ];
-    }
+        $feature = new feature(
+            'course_format_ftrd',
+            new \lang_string('format', 'moodle'),
+            $datafilter
+        );
 
-    private static function get_options() {
-        global $CFG;
-        require_once($CFG->dirroot . '/course/lib.php');
+        $feature->add_options_loader(
+            function () {
+                global $CFG;
+                require_once($CFG->dirroot . '/course/lib.php');
 
-        $formats = get_sorted_course_formats(true);
-        $options = [];
-        foreach ($formats as $name) {
-            $options[$name] = new \lang_string('pluginname', "format_{$name}");
-        }
-        return $options;
+                $formats = get_sorted_course_formats(true);
+                $options = [];
+                foreach ($formats as $name) {
+                    $options[$name] = new \lang_string('pluginname', "format_{$name}");
+                }
+                return $options;
+            }
+        );
+
+        return [$feature];
     }
 }

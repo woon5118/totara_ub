@@ -34,6 +34,9 @@ abstract class options_loader_merge_select extends merge_select {
     /**
      * Add an options loader, which can be called to produce a list of options
      *
+     * Note that all keys and values returned MUST be clean! If they come from user input then they must have
+     * been passed through format_string or something similar, so that they are safe to display in the browser.
+     *
      * @param callable $optionsloader
      */
     public function add_options_loader(callable $optionsloader): void {
