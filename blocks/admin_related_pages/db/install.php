@@ -35,6 +35,7 @@ function xmldb_block_admin_related_pages_install() {
     $added = $DB->record_exists('block_instances', ['blockname' => $blockname, 'pagetypepattern' => 'admin-*']);
     if (!$added && class_exists('moodle_page')) { // We need to be able to use moodle_page.
         $page = new moodle_page();
+        $page->set_context(context_system::instance());
         $page->blocks->add_blocks(['side-pre' => [$blockname]], 'admin-*', null, null, 3);
     }
 }
