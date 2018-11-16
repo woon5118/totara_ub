@@ -1613,9 +1613,14 @@ function totara_program_pluginfile($course, $cm, $context, $filearea, $args, $fo
     }
 
     $program = new program($programid);
-
-    // If the file is in summary, overview, user is site admin or user has capability to edit the program don't worry if they are assigned to the program.
-    if (!(is_siteadmin($USER) || has_capability('totara/program:configuredetails', $context)) && $filearea != 'summary' && $filearea != 'overviewfiles') {
+    // If the file is in summary, overview, user is site admin or user has capability to edit the program don't worry
+    // if they are assigned to the program.
+    if (!(is_siteadmin($USER) ||
+        has_capability('totara/program:configuredetails', $context)) &&
+        $filearea != 'summary' &&
+        $filearea != 'overviewfiles' &&
+        $filearea != 'images')
+    {
         if (!$program->user_is_assigned($USER->id)) {
             send_file_not_found();
         }
