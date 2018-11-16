@@ -32,12 +32,12 @@ class rb_catalogcertifications_embedded extends rb_base_embedded {
 
         $this->columns = array(
             array(
-                'type' => 'prog',
+                'type' => 'certif',
                 'value' => 'progexpandlink',
                 'heading' => get_string('certifname', 'totara_certification')
             ),
             array(
-                'type' => 'prog',
+                'type' => 'certif',
                 'value' => 'summary',
                 'heading' => get_string('programsummary', 'totara_certification')
             )
@@ -48,11 +48,11 @@ class rb_catalogcertifications_embedded extends rb_base_embedded {
 
         $this->toolbarsearchcolumns = array(
             array(
-                'type' => 'prog',
+                'type' => 'certif',
                 'value' => 'fullname'
             ),
             array(
-                'type' => 'prog',
+                'type' => 'certif',
                 'value' => 'summary'
             )
         );

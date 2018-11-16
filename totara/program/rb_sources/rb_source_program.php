@@ -33,9 +33,7 @@ require_once($CFG->dirroot . '/totara/cohort/lib.php');
 class rb_source_program extends rb_base_source {
     use \core_course\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;
-    use \totara_program\rb\source\report_trait;
-
-    protected $instancetype = 'program';
+    use \totara_program\rb\source\program_trait;
 
     public function __construct() {
         $this->base = '{prog}';
@@ -51,6 +49,9 @@ class rb_source_program extends rb_base_source {
         $this->sourcewhere = $this->define_sourcewhere();
         $this->usedcomponents[] = "totara_program";
         $this->usedcomponents[] = 'totara_cohort';
+
+        $this->cacheable = false;
+
         parent::__construct();
     }
 
@@ -69,12 +70,6 @@ class rb_source_program extends rb_base_source {
     public function global_restrictions_supported() {
         return false;
     }
-
-    //
-    //
-    // Methods for defining contents of source
-    //
-    //
 
     protected function define_joinlist() {
         global $CFG;
@@ -141,7 +136,7 @@ class rb_source_program extends rb_base_source {
                 'type' => 'prog',
                 'value' => 'proglinkicon',
             ),
-        array(
+            array(
                 'type' => 'course_category',
                 'value' => 'namelink',
             ),
@@ -156,7 +151,7 @@ class rb_source_program extends rb_base_source {
                 'value' => 'fullname',
                 'advanced' => 0,
             ),
-        array(
+            array(
                 'type' => 'course_category',
                 'value' => 'path',
                 'advanced' => 0,
@@ -230,8 +225,7 @@ class rb_source_program extends rb_base_source {
 
     public function post_config(reportbuilder $report) {
         $reportfor = $report->reportfor; // ID of the user the report is for.
-        $report->set_post_config_restrictions($report->post_config_visibility_where($this->instancetype, 'base', $reportfor));
+        $report->set_post_config_restrictions($report->post_config_visibility_where('program', 'base', $reportfor));
     }
 
-} // End of rb_source_courses class.
-
+}

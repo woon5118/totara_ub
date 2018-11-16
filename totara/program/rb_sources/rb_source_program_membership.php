@@ -27,7 +27,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 class rb_source_program_membership extends rb_base_source {
-    use \totara_program\rb\source\report_trait;
+    use \totara_program\rb\source\program_trait;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -51,6 +51,8 @@ class rb_source_program_membership extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program_membership');
         $this->usedcomponents[] = 'totara_program';
         $this->usedcomponents[] = 'totara_cohort';
+
+        $this->cacheable = false;
 
         parent::__construct();
     }
@@ -110,7 +112,7 @@ class rb_source_program_membership extends rb_base_source {
         $columnoptions = array();
 
         $this->add_core_user_columns($columnoptions);
-        $this->add_totara_program_columns($columnoptions);
+        $this->add_totara_program_columns($columnoptions, 'program');
 
         $columnoptions[] = new rb_column_option(
             'progmembership',

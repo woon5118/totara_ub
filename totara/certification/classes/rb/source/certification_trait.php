@@ -18,15 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Alastair Munro <alastair.munro@totaralearning.com>
- * @package totara_program
+ * @package totara_certification
  */
 
-namespace totara_program\rb\source;
+namespace totara_certification\rb\source;
 
 defined('MOODLE_INTERNAL') || die();
 
-trait report_trait {
-
+trait certification_trait {
     /**
      * Adds the program table to the $joinlist array
      *
@@ -37,72 +36,73 @@ trait report_trait {
      *                     'program id' field
      * @param string $field Name of table containing program id field to join on
      */
-    protected function add_totara_program_tables(&$joinlist, $join, $field) {
+    protected function add_totara_certification_tables(&$joinlist, $join, $field) {
 
         $joinlist[] = new \rb_join(
-            'program',
-            'LEFT',
-            '{prog}',
-            "program.id = $join.$field",
+            'certif',
+            'INNER',
+            "(SELECT p.*, c.learningcomptype, c.activeperiod, c.minimumactiveperiod, c.windowperiod, c.recertifydatetype
+                FROM {prog} p
+                JOIN {certif} c ON c.id = p.certifid)",
+            "certif.id = $join.$field",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
     }
 
     /**
-     * Adds some common program info to the $columnoptions array
+     * Adds some common certification info to the $columnoptions array
      *
      * @param array &$columnoptions Array of current column options
      *                              Passed by reference and updated by
      *                              this method
-     * @param string $join Name of the join that provides the 'program' table
-     * @param string $langfile Source for translation, totara_program or totara_certification
+     * @param string $join Name of the join that provides the {prog}+{certif} virtual table, either 'certif' or 'base'
      *
-     * @return True
+     * @return Boolean
      */
-    protected function add_totara_program_columns(&$columnoptions, $join = 'program', $langfile = 'totara_program') {
+    protected function add_totara_certification_columns(&$columnoptions, $join) {
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'fullname',
-            get_string('programname', $langfile),
+            get_string('programname', 'totara_certification'),
             "$join.fullname",
             array('joins' => $join,
-                  'dbdatatype' => 'char',
-                  'outputformat' => 'text',
-                  'displayfunc' => 'format_string')
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string')
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'shortname',
-            get_string('programshortname', $langfile),
+            get_string('programshortname', 'totara_certification'),
             "$join.shortname",
             array('joins' => $join,
-                  'dbdatatype' => 'char',
-                  'outputformat' => 'text',
-                  'displayfunc' => 'format_string')
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string')
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'idnumber',
-            get_string('programidnumber', $langfile),
+            get_string('programidnumber', 'totara_certification'),
             "$join.idnumber",
             array('joins' => $join,
-                  'displayfunc' => 'plaintext',
-                  'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                'displayfunc' => 'plaintext',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text')
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'id',
-            get_string('programid', $langfile),
+            get_string('programid', 'totara_certification'),
             "$join.id",
             array('joins' => $join,
-                  'displayfunc' => 'integer')
+                'displayfunc' => 'integer')
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'summary',
-            get_string('programsummary', $langfile),
+            get_string('programsummary', 'totara_certification'),
             "$join.summary",
             array(
                 'joins' => $join,
@@ -119,9 +119,9 @@ trait report_trait {
             )
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'availablefrom',
-            get_string('availablefrom', $langfile),
+            get_string('availablefrom', 'totara_certification'),
             "$join.availablefrom",
             array(
                 'joins' => $join,
@@ -130,9 +130,9 @@ trait report_trait {
             )
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'availableuntil',
-            get_string('availableuntil', $langfile),
+            get_string('availableuntil', 'totara_certification'),
             "$join.availableuntil",
             array(
                 'joins' => $join,
@@ -141,14 +141,14 @@ trait report_trait {
             )
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'proglinkicon',
-            get_string('prognamelinkedicon', $langfile),
+            get_string('prognamelinkedicon', 'totara_certification'),
             "$join.fullname",
             array(
                 'joins' => $join,
                 'displayfunc' => 'program_icon_link',
-                'defaultheading' => get_string('programname', $langfile),
+                'defaultheading' => get_string('programname', 'totara_certification'),
                 'extrafields' => array(
                     'programid' => "$join.id",
                     'program_icon' => "$join.icon",
@@ -158,14 +158,14 @@ trait report_trait {
             )
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'progexpandlink',
-            get_string('programexpandlink', $langfile),
+            get_string('programexpandlink', 'totara_certification'),
             "$join.fullname",
             array(
                 'joins' => $join,
                 'displayfunc' => 'program_expand',
-                'defaultheading' => get_string('programname', $langfile),
+                'defaultheading' => get_string('programname', 'totara_certification'),
                 'extrafields' => array(
                     'prog_id' => "$join.id",
                     'prog_visible' => "$join.visible",
@@ -175,14 +175,14 @@ trait report_trait {
         );
         $audvisibility = get_config(null, 'audiencevisibility');
         if (empty($audvisibility)) {
-            $programvisiblestring = get_string('programvisible', $langfile);
+            $programvisiblestring = get_string('programvisible', 'totara_program');
             $audvisibilitystring = get_string('audiencevisibilitydisabled', 'totara_reportbuilder');
         } else {
-            $programvisiblestring = get_string('programvisibledisabled', $langfile);
+            $programvisiblestring = get_string('programvisibledisabled', 'totara_program');
             $audvisibilitystring = get_string('audiencevisibility', 'totara_reportbuilder');
         }
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'visible',
             $programvisiblestring,
             "$join.visible",
@@ -192,7 +192,7 @@ trait report_trait {
             )
         );
         $columnoptions[] = new \rb_column_option(
-            'prog',
+            'certif',
             'audvis',
             $audvisibilitystring,
             "$join.audiencevisible",
@@ -202,54 +202,107 @@ trait report_trait {
             )
         );
 
+        $columnoptions[] = new \rb_column_option(
+            'certif',
+            'recertifydatetype',
+            get_string('recertdatetype', 'totara_certification'),
+            "$join.recertifydatetype",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'certif_recertify_date_type',
+            )
+        );
+
+        $columnoptions[] = new \rb_column_option(
+            'certif',
+            'activeperiod',
+            get_string('activeperiod', 'totara_certification'),
+            "$join.activeperiod",
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text',
+                  'displayfunc' => 'plaintext')
+        );
+
+        $columnoptions[] = new \rb_column_option(
+            'certif',
+            'windowperiod',
+            get_string('windowperiod', 'totara_certification'),
+            "$join.windowperiod",
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text',
+                  'displayfunc' => 'plaintext')
+        );
+
         return true;
     }
 
     /**
-     * Adds some common program filters to the $filteroptions array
+     * Adds some common certification filters to the $filteroptions array
      *
      * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
-     * @param string $langfile Source for translation, totara_program or totara_certification
-     * @return True
+     * @return boolean
      */
-    protected function add_totara_program_filters(&$filteroptions, $langfile = 'totara_program') {
+    protected function add_totara_certification_filters(&$filteroptions) {
         $filteroptions[] = new \rb_filter_option(
-            'prog',
+            'certif',
             'fullname',
-            get_string('programname', $langfile),
+            get_string('programname', 'totara_certification'),
             'text'
         );
         $filteroptions[] = new \rb_filter_option(
-            'prog',
+            'certif',
             'shortname',
-            get_string('programshortname', $langfile),
+            get_string('programshortname', 'totara_certification'),
             'text'
         );
         $filteroptions[] = new \rb_filter_option(
-            'prog',
+            'certif',
             'idnumber',
-            get_string('programidnumber', $langfile),
+            get_string('programidnumber', 'totara_certification'),
             'text'
         );
         $filteroptions[] = new \rb_filter_option(
-            'prog',
+            'certif',
             'summary',
-            get_string('programsummary', $langfile),
+            get_string('programsummary', 'totara_certification'),
             'textarea'
         );
         $filteroptions[] = new \rb_filter_option(
-            'prog',
+            'certif',
             'availablefrom',
-            get_string('availablefrom', $langfile),
+            get_string('availablefrom', 'totara_certification'),
             'date'
         );
         $filteroptions[] = new \rb_filter_option(
-            'prog',
+            'certif',
             'availableuntil',
-            get_string('availableuntil', $langfile),
+            get_string('availableuntil', 'totara_certification'),
             'date'
+        );
+        $filteroptions[] = new \rb_filter_option(
+            'certif',
+            'recertifydatetype',
+            get_string('recertdatetype', 'totara_certification'),
+            'select',
+            array(
+                'selectfunc' => 'recertifydatetype',
+            )
+        );
+        $filteroptions[] = new \rb_filter_option(
+            'certif',
+            'activeperiod',
+            get_string('activeperiod', 'totara_certification'),
+            'text'
+        );
+        $filteroptions[] = new \rb_filter_option(
+            'certif',
+            'windowperiod',
+            get_string('windowperiod', 'totara_certification'),
+            'text'
         );
         return true;
     }

@@ -29,11 +29,9 @@ global $CFG;
 
 class rb_source_program_completion extends rb_base_source {
     use \core_course\rb\source\report_trait;
-    use \totara_program\rb\source\report_trait;
+    use \totara_program\rb\source\program_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;
-
-    protected $instancetype = 'program';
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -54,11 +52,13 @@ class rb_source_program_completion extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
-        $this->sourcetitle = get_string('sourcetitle','rb_source_program_completion');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_program_completion');
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->get_source_joins();
         $this->usedcomponents[] = "totara_program";
         $this->usedcomponents[] = 'totara_cohort';
+
+        $this->cacheable = false;
 
         parent::__construct();
     }
@@ -78,8 +78,6 @@ class rb_source_program_completion extends rb_base_source {
     public function global_restrictions_supported() {
         return true;
     }
-
-    // Methods for defining contents of source.
 
     protected function define_sourcewhere() {
          // Only consider whole programs - not courseset completion.
@@ -349,12 +347,11 @@ class rb_source_program_completion extends rb_base_source {
         $this->add_core_user_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_course_category_columns($columnoptions, 'course_category', 'program');
-        $this->add_totara_program_columns($columnoptions, 'program', "totara_{$this->instancetype}");
+        $this->add_totara_program_columns($columnoptions, 'program');
         $this->add_totara_cohort_program_columns($columnoptions);
 
         return $columnoptions;
     }
-
 
     protected function define_filteroptions() {
         $filteroptions = array();
@@ -511,8 +508,8 @@ class rb_source_program_completion extends rb_base_source {
         $this->add_core_user_filters($filteroptions);
         $this->add_core_course_category_filters($filteroptions, 'prog', 'category');
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
-        $this->add_totara_program_filters($filteroptions, "totara_{$this->instancetype}");
-        $this->add_totara_cohort_program_filters($filteroptions, "totara_{$this->instancetype}");
+        $this->add_totara_program_filters($filteroptions, "totara_program");
+        $this->add_totara_cohort_program_filters($filteroptions, "totara_program");
 
         return $filteroptions;
     }

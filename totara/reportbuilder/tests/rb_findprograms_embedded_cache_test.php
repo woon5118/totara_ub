@@ -93,14 +93,11 @@ class totara_reportbuilder_rb_findprograms_embedded_cache_testcase extends repor
      * - Find all programs
      * - Find programs with word 'level' in fullname
      *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_findprograms($usecache) {
+    public function test_findprograms() {
         $this->resetAfterTest();
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
+        $usecache = false;
+        $this->enable_caching($this->report_builder_data['id']);
 
         $result = $this->get_report_result($this->report_builder_data['shortname'], array(), $usecache);
         $this->assertCount(3, $result);

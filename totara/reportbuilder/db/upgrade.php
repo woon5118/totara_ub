@@ -329,5 +329,41 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018051700, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2018111900) {
+        // Fully separate certification reports from programs.
+
+        $sources = array('certification', 'certification_completion', 'certification_membership', 'certification_overview');
+        $types = array('prog' => 'certif', 'program_completion' => 'certif_completion', 'progcompletion' => 'certcompletion');
+
+        foreach ($sources as $source) {
+            foreach ($types as $oldtype => $newtype) {
+                // Fix columns.
+                $sql = "SELECT DISTINCT c.value
+                          FROM {report_builder_columns} c
+                          JOIN {report_builder} r ON r.id = c.reportid
+                         WHERE r.source = :source AND c.type = :type";
+                $values = $DB->get_recordset_sql($sql, array('source' => $source, 'type' => $oldtype));
+                foreach ($values as $value) {
+                    $value = $value->value;
+                    reportbuilder_rename_data('columns', $source, $oldtype, $value, $newtype, $value);
+                }
+                // Fix filters.
+                $sql = "SELECT DISTINCT f.value
+                          FROM {report_builder_filters} f
+                          JOIN {report_builder} r ON r.id = f.reportid
+                         WHERE r.source = :source AND f.type = :type";
+                $values = $DB->get_recordset_sql($sql, array('source' => $source, 'type' => $oldtype));
+                foreach ($values as $value) {
+                    $value = $value->value;
+                    reportbuilder_rename_data('filters', $source, $oldtype, $value, $newtype, $value);
+                    totara_reportbuilder_migrate_saved_searches($source, $oldtype, $value, $newtype, $value);
+                }
+            }
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2018111900, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

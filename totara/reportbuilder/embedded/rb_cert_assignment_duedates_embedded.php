@@ -43,7 +43,7 @@ class rb_cert_assignment_duedates_embedded extends rb_base_embedded {
                 'heading' => get_string('userfullname', 'totara_reportbuilder'),
             ),
             array(
-                'type' => 'progcompletion',
+                'type' => 'certcompletion',
                 'value' => 'duedate',
                 'heading' => get_string('actualduedate', 'totara_program'),
             ),
