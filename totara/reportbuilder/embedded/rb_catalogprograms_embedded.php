@@ -33,7 +33,7 @@ class rb_catalogprograms_embedded extends rb_base_embedded {
         $this->url = $this->url = '/totara/coursecatalog/programs.php';
         $this->source = 'program';
         $this->shortname = 'catalogprograms';
-        $this->fullname = get_string('catalogprograms', 'totara_coursecatalog');
+        $this->fullname = get_string('reportbasedprograms', 'totara_coursecatalog');
 
         $this->columns = array(
             array(

@@ -29,7 +29,7 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
         $this->url = '/totara/coursecatalog/courses.php';
         $this->source = 'courses';
         $this->shortname = 'catalogcourses';
-        $this->fullname = get_string('catalogcourses', 'totara_coursecatalog');
+        $this->fullname = get_string('reportbasedcourses', 'totara_coursecatalog');
         $this->defaultsortcolumn = 'course_courselinkicon';
 
         $this->columns = array(

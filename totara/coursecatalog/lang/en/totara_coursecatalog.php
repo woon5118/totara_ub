@@ -33,9 +33,6 @@ $string['backtocourselisting'] = 'Back to course listing';
 $string['backtoparent'] = '&laquo; Back to parent';
 $string['browsebycategory'] = 'Browse by category';
 $string['businessdays'] = 'Business days';
-$string['catalogcertifications'] = 'Enhanced catalog: certifications';
-$string['catalogcourses'] = 'Enhanced catalog: courses';
-$string['catalogprograms'] = 'Enhanced catalog: programs';
 $string['certifications'] = 'Certifications';
 $string['completiontotrack'] = 'Completion to track';
 $string['coursecatalog:manageaudiencevisibility'] = 'Manage audience-based visibility';
@@ -161,6 +158,9 @@ The subject can include a number of placeholders:
 * [days counter up] : Number of days since completion.
 * [days count down] : Number of days until deadline.';
 $string['remindersubjectdefault'] = 'Reminder to evaluate [coursename]';
+$string['reportbasedcertifications'] = 'Report-based catalogue: certifications';
+$string['reportbasedcourses'] = 'Report-based catalogue: courses';
+$string['reportbasedprograms'] = 'Report-based catalogue: programs';
 $string['requirement'] = 'Requirement';
 $string['requirement_help'] = 'The Required feedback activity that needs to be completed.';
 $string['sameday'] = 'Same day';
@@ -200,6 +200,9 @@ $string['viewallcertifications'] = 'View all certifications';
 $string['viewallcourses'] = 'View all courses';
 
 # Deprecated
+$string['catalogcertifications'] = 'Enhanced catalog: certifications';
+$string['catalogcourses'] = 'Enhanced catalog: courses';
+$string['catalogprograms'] = 'Enhanced catalog: programs';
 $string['placeholder:coursename'] = '[coursename]';
 $string['placeholder:coursepageurl'] = '[coursepageurl]';
 $string['placeholder:dayssincecompletion'] = '[days counter up]';

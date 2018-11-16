@@ -28,7 +28,7 @@ class rb_catalogcertifications_embedded extends rb_base_embedded {
         $this->url = '/totara/coursecatalog/certifications.php';
         $this->source = 'certification';
         $this->shortname = 'catalogcertifications';
-        $this->fullname = get_string('catalogcertifications', 'totara_coursecatalog');
+        $this->fullname = get_string('reportbasedcertifications', 'totara_coursecatalog');
 
         $this->columns = array(
             array(
