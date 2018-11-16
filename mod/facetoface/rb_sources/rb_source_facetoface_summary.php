@@ -66,7 +66,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     }
 
     public function define_joinlist() {
-        $global_restriction_join_su = $this->get_global_report_restriction_join('su', 'userid');
         $joinlist = array();
 
         $this->add_session_common_to_joinlist($joinlist);
@@ -88,25 +87,9 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             'assetdate'
         );
 
-        $joinlist[] = new rb_join(
-            'allattendees',
-            'LEFT',
-            "(SELECT su.sessionid, su.userid, ss.id AS ssid, ss.statuscode
-                FROM {facetoface_signups} su
-                {$global_restriction_join_su}
-                JOIN {facetoface_signups_status} ss
-                    ON su.id = ss.signupid
-                WHERE ss.superceded = 0)",
-            'allattendees.sessionid = sessions.id',
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'sessions'
-        );
-
         $this->add_session_status_to_joinlist($joinlist);
         $this->add_core_course_tables($joinlist, 'facetoface', 'course');
         $this->add_core_course_category_tables($joinlist, 'course', 'category');
-        $this->add_totara_job_tables($joinlist, 'allattendees', 'userid');
-        $this->add_core_user_tables($joinlist, 'allattendees', 'userid');
         $this->add_core_user_tables($joinlist, 'sessions', 'usermodified', 'modifiedby');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
         $this->add_facetoface_currentuserstatus_to_joinlist($joinlist);
@@ -119,102 +102,159 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         global $DB;
 
         $usernamefieldscreator = totara_get_all_user_name_fields_join('modifiedby');
+        $global_restriction_join_su = $this->get_global_report_restriction_join('su', 'userid');
 
         $columnoptions = array(
             new rb_column_option(
                 'session',
                 'totalnumattendees',
                 get_string('totalnumattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode >= ' . \mod_facetoface\signup\state\requested::get_code() . ' THEN 1 ELSE NULL END)',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  {$global_restriction_join_su}
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode >= " . \mod_facetoface\signup\state\requested::get_code() . ")",
                 array(
-                    'joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
                 'session',
                 'waitlistattendees',
                 get_string('waitlistattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\waitlisted::get_code() . ' THEN 1 ELSE NULL END)',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  {$global_restriction_join_su}
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode = " . \mod_facetoface\signup\state\waitlisted::get_code() . ")",
                 array(
-                    'joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
                 'session',
-                'numspaces',
+                'numspaces', // NOTE: ignore global report restrictions, free space is not affected by restrictions!
                 get_string('numspaces', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode >= ' . \mod_facetoface\signup\state\waitlisted::get_code() . ' THEN 1 ELSE NULL END)',
-                array('joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode >= " . \mod_facetoface\signup\state\waitlisted::get_code() . ")",
+                array(
+                    'joins' => array('sessions'),
                     'displayfunc' => 'f2f_session_spaces',
                     'extrafields' => array('overall_capacity' => 'sessions.capacity'),
-                    'dbdatatype' => 'integer'
+                    'dbdatatype' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
                 'session',
                 'cancelledattendees',
                 get_string('cancelledattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode IN (' . \mod_facetoface\signup\state\user_cancelled::get_code() . ', ' . \mod_facetoface\signup\state\event_cancelled::get_code() . ') THEN 1 ELSE NULL END)',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  {$global_restriction_join_su}
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode IN (" . \mod_facetoface\signup\state\user_cancelled::get_code() . ", " . \mod_facetoface\signup\state\event_cancelled::get_code() . "))",
                 array(
-                    'joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
                 'session',
                 'fullyattended',
                 get_string('fullyattended', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\fully_attended::get_code() . ' THEN 1 ELSE NULL END)',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  {$global_restriction_join_su}
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode = " . \mod_facetoface\signup\state\fully_attended::get_code() . ")",
                 array(
-                    'joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
                 'session',
                 'partiallyattended',
                 get_string('partiallyattended', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\partially_attended::get_code() . ' THEN 1 ELSE NULL END)',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  {$global_restriction_join_su}
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode = " . \mod_facetoface\signup\state\partially_attended::get_code() . ")",
                 array(
-                    'joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
                 'session',
                 'noshowattendees',
                 get_string('noshowattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\no_show::get_code() . ' THEN 1 ELSE NULL END)',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  {$global_restriction_join_su}
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode = " . \mod_facetoface\signup\state\no_show::get_code() . ")",
                 array(
-                    'joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
                 'session',
                 'declinedattendees',
                 get_string('declinedattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN allattendees.statuscode = ' . \mod_facetoface\signup\state\declined::get_code() . ' THEN 1 ELSE NULL END)',
+                "(SELECT COUNT('x')
+                  FROM {facetoface_signups} su
+                  {$global_restriction_join_su}
+                  JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                  WHERE ss.superceded = 0 AND su.sessionid = sessions.id
+                    AND ss.statuscode = " . \mod_facetoface\signup\state\declined::get_code() . ")",
                 array(
-                    'joins' => array('allattendees', 'sessions'),
-                    'grouping' => 'count',
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
                 )
             ),
             new rb_column_option(
