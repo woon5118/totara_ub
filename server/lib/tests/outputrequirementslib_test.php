@@ -105,6 +105,33 @@ class core_outputrequirementslib_testcase extends advanced_testcase {
     }
 
     /**
+     * Test AMD modules loading.
+     */
+    public function test_js_call_amd() {
+
+        $page = new moodle_page();
+
+        // Load an AMD module without a function call.
+        $page->requires->js_call_amd('theme_foobar/lightbox');
+
+        // Load an AMD module and call its function without parameters.
+        $page->requires->js_call_amd('theme_foobar/demo_one', 'init');
+
+        // Load an AMD module and call its function with some parameters.
+        $page->requires->js_call_amd('theme_foobar/demo_two', 'init', [
+            'foo',
+            'keyWillIgnored' => 'baz',
+            [42, 'xyz'],
+        ]);
+
+        $html = $page->requires->get_end_code();
+
+        $this->assertStringContainsString('require(["theme_foobar/lightbox"]);', $html);
+        $this->assertStringContainsString('require(["theme_foobar/demo_one"], function(amd) { amd.init(); });', $html);
+        $this->assertStringContainsString('require(["theme_foobar/demo_two"], function(amd) { amd.init("foo", "baz", [42,"xyz"]); });', $html);
+    }
+
+    /**
      * Test that function will not produce syntax error if provided values cannot be json encoded
      */
     public function test_js_call_amd_json() {
