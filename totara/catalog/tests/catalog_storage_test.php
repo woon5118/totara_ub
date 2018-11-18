@@ -32,13 +32,15 @@ defined('MOODLE_INTERNAL') || die();
 class totara_catalog_catalog_storage_testcase extends advanced_testcase {
 
     public function setUp() {
+        global $DB;
+
         parent::setUp();
+        $DB->delete_records('catalog');
         $this->resetAfterTest(true);
     }
 
     public function test_update_records() {
         global $DB;
-        $DB->delete_records('catalog');
         $this->assertSame(0, $DB->count_records('catalog'), "catalog records exist after delete");
 
         // The catalog listens for course/program/certification CRUD events and then invokes
@@ -89,9 +91,31 @@ class totara_catalog_catalog_storage_testcase extends advanced_testcase {
         $sink->close();
     }
 
+    public function test_update_records_for_same_object_data() {
+        global $DB;
+        $objects = [];
+        $type = 'course';
+        $context = context_system::instance();
+        for ($i = 0; $i < 3; $i++) {
+            $objects[] = (object)[
+                'contextid'  => $context->id,
+                'objectid'   => $this->getDataGenerator()->create_course()->id,
+                'objecttype' => $type,
+            ];
+        }
+
+        catalog_storage::update_records($objects);
+        $this->assertSame(count($objects), $DB->count_records('catalog'));
+
+        // repopulate same object data
+        $provider = provider_handler::instance()->get_provider($type);
+        catalog_storage::populate_provider_data($provider);
+
+        $this->assertSame(count($objects), $DB->count_records('catalog'));
+    }
+
     public function test_delete_records() {
         global $DB;
-        $DB->delete_records('catalog');
         $this->assertSame(0, $DB->count_records('catalog'), "catalog records exist after delete");
 
         // The algorithm for update/delete matches catalog records not by record id but the
@@ -139,7 +163,6 @@ class totara_catalog_catalog_storage_testcase extends advanced_testcase {
 
     public function test_populate_and_delete() {
         global $DB;
-        $DB->delete_records('catalog');
         $this->assertSame(0, $DB->count_records('catalog'), "catalog records exist after delete");
 
         $generator = $this->getDataGenerator();

@@ -191,7 +191,7 @@ class catalog_storage {
 
         list($insql, $params) = $DB->get_in_or_equal($objectids, SQL_PARAMS_NAMED);
 
-        $sql = "SELECT objectid, id
+        $sql = "SELECT objectid, id, ftshigh, ftsmedium, ftslow, sorttext, sorttime
                   FROM {catalog}
                  WHERE objecttype = :objecttype
                    AND objectid {$insql}";
@@ -206,15 +206,15 @@ class catalog_storage {
             $indexdata = static::get_data($object);
 
             $isinsert = empty($existingrecords[$object->objectid]);
-
+            $existingrecord = null;
+            $data = new \stdClass();
             if ($isinsert) {
-                $data = new \stdClass();
                 $data->objecttype = $objecttype;
                 $data->objectid = $object->objectid;
                 $data->contextid = $object->contextid;
             } else {
-                $data = $existingrecords[$object->objectid];
-                unset($data->objectid);
+                $existingrecord = $existingrecords[$object->objectid];
+                $data->id = $existingrecord->id;
             }
 
             if (!empty($CFG->catalog_use_and_compatible_buckets)) {
@@ -238,7 +238,16 @@ class catalog_storage {
             if ($isinsert) {
                 $insertbatch[] = $data;
             } else {
-                $DB->update_record('catalog', $data);
+                // check data is changed
+                if ($existingrecord->sorttime |= $data->sorttime ||
+                    $existingrecord->sorttext != $data->sorttext ||
+                    $existingrecord->ftshigh != $data->ftshigh ||
+                    $existingrecord->ftsmedium != $data->ftsmedium ||
+                    $existingrecord->ftslow != $data->ftslow
+
+                ) {
+                    $DB->update_record('catalog', $data);
+                }
             }
         }
 
