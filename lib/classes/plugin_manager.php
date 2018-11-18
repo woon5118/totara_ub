@@ -1139,9 +1139,10 @@ class core_plugin_manager {
     public static function is_deleted_standard_plugin($type, $name) {
         // TOTARA: Do not include plugins that were removed during upgrades to Totara 9 or Moodle 3.0 and earlier.
         $plugins = array(
-            // Moodle merge 3.3.7 removals.
+            // Moodle merge 3.3 removals.
             'block_myoverview', 'auth_oauth2', 'tool_oauth2', 'repository_onedrive',
             'fileconverter_googledrive', 'fileconverter_unoconv',
+            'tool_dataprivacy', 'tool_policy',
 
             // Totara 12.0 removals.
             'auth_fc', 'auth_imap', 'auth_nntp', 'auth_none', 'auth_pam', 'auth_pop3',

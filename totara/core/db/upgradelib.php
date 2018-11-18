@@ -335,6 +335,10 @@ function totara_core_upgrade_delete_moodle_plugins() {
     // NOTE: this should match \core_plugin_manager::is_deleted_standard_plugin() data.
 
     $deleteplugins = array(
+        // Moodle GDPR stuff.
+        'tool_dataprivacy',
+        'tool_policy',
+
         // Totara 10.0 removals.
         'theme_kiwifruitresponsive',
         'theme_customtotararesponsive',
@@ -377,6 +381,16 @@ function totara_core_upgrade_delete_moodle_plugins() {
         if (!get_config($deleteplugin, 'version')) {
             // Not installed.
             continue;
+        }
+        if ($deleteplugin === 'tool_dataprivacy') {
+            if ($DB->record_exists('tool_dataprivacy_request', array())) {
+                continue;
+            }
+        }
+        if ($deleteplugin === 'tool_policy') {
+            if ($DB->record_exists('tool_policy', array())) {
+                continue;
+            }
         }
         if ($deleteplugin === 'auth_radius') {
             if ($DB->record_exists('user', array('auth' => 'radius', 'deleted' => 0))) {
