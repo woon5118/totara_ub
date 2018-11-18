@@ -21,8 +21,14 @@
  * @package totara_catalog
  */
 
-defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2018112000;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_catalog';   // To check on upgrade, that module sits in correct place
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+}
+
+$observers = array(
+    array(
+        'eventname' => '\core\event\admin_settings_changed',
+        'callback'  => 'totara_catalog\observer\settings_observer::changed',
+    ),
+);
