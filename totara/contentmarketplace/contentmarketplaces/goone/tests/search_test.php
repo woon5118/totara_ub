@@ -26,11 +26,11 @@ use contentmarketplace_goone\search;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class search_testcase
+ * Test search class
  *
  * @group totara_contentmarketplace
  */
-class search_testcase extends basic_testcase {
+class contentmarketplace_goone_search_testcase extends basic_testcase {
 
     /**
      * @dataProvider pricing_provider

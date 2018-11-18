@@ -26,11 +26,11 @@ use totara_contentmarketplace\local;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class local_testcase
+ * Test local class
  *
  * @group totara_contentmarketplace
  */
-class local_testcase extends advanced_testcase {
+class totara_contentmarketplace_local_testcase extends advanced_testcase {
 
     /**
      * @dataProvider money_provider

@@ -29,11 +29,11 @@ use contentmarketplace_goone\mock_playback_curl;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class oauth_rest_client_testcase
+ * Test oauth_rest_client class
  *
  * @group totara_contentmarketplace
  */
-class oauth_rest_client_testcase extends basic_testcase {
+class contentmarketplace_goone_oauth_rest_client_testcase extends basic_testcase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();

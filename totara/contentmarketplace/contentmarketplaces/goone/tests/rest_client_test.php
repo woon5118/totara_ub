@@ -28,11 +28,11 @@ use contentmarketplace_goone\rest_client_timeout_exception;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class rest_client_testcase
+ * Test rest_client class
  *
  * @group totara_contentmarketplace
  */
-class rest_client_testcase extends basic_testcase {
+class contentmarketplace_goone_rest_client_testcase extends basic_testcase {
 
     public function test_get() {
         $curl = $this->createMock(\curl::class);

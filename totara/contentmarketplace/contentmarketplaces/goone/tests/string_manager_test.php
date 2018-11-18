@@ -26,11 +26,11 @@ use contentmarketplace_goone\string_manager;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class string_manager_testcase
+ * Test string_manager class
  *
  * @group totara_contentmarketplace
  */
-class string_manager_testcase extends basic_testcase {
+class contentmarketplace_goone_string_manager_testcase extends basic_testcase {
 
     /**
      * @dataProvider language_provider
