@@ -94,8 +94,8 @@ foreach ($plugins as $plugin) {
         $prov->fullname,
         $prov->descriptionhtml,
     ];
-    if (!$plugin->is_enabled()) {
-        $data[] = $prov->get_setup_html(get_string('enable', 'totara_contentmarketplace'));
+    if (\totara_contentmarketplace\local::is_enabled()) {
+        $data[] = !$plugin->is_enabled() ? $prov->get_setup_html(get_string('enable', 'totara_contentmarketplace')) : '';
     }
     $table->data[] = $data;
     $table->rowclasses[] = $plugin->component;
