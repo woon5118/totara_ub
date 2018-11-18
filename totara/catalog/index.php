@@ -40,7 +40,7 @@ $PAGE->set_pagelayout('noblocks');
 $pageurl = new moodle_url('/totara/catalog/index.php');
 $PAGE->set_url($pageurl);
 echo $OUTPUT->header();
-echo $OUTPUT->heading($heading);
+echo $OUTPUT->heading($heading, 2, 'tw-catalog__title');
 
 if ($CFG->catalogtype !== 'totara') {
     $redirect_url = $CFG->catalogtype === 'enhanced' ? '/totara/coursecatalog/courses.php' : '/course/index.php';
