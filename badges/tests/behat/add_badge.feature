@@ -79,7 +79,7 @@ Feature: Add badges to the system
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I follow "Related badges (0)"
-    And I should see "This badge does not have related badges."
+    And I should see "This badge does not have any related badges."
     And I press "Add related badge"
     And I follow "Related badges"
     And I wait until the page is ready
@@ -111,6 +111,6 @@ Feature: Add badges to the system
       | Email               | endorsement@example.com     |
       | Issuer URL          | http://example.com          |
       | Claim URL           | http://claimurl.example.com |
-      | Endorsement Comment | Test Endorsement Comment    |
+      | Endorsement comment | Test Endorsement comment    |
     And I press "Save changes"
     Then I should see "Changes saved"
