@@ -94,7 +94,7 @@ trait report_trait {
                 $joindata['custom_prog'] = ['jointable' => 'base', 'cf_prefix' => 'prog', 'joinfield' => 'programid'];
                 break;
             case '{org}':
-                $joindata['custom_organisation'] = ['jointable' => 'organisation', 'cf_prefix' => 'org_type', 'joinfield' => 'organisationid'];
+                $joindata['custom_organisation'] = ['jointable' => 'base', 'cf_prefix' => 'org_type', 'joinfield' => 'organisationid'];
                 break;
             case '{pos}':
                 $joindata['custom_position'] = ['jointable' => 'position', 'cf_prefix' => 'pos_type', 'joinfield' => 'positionid'];

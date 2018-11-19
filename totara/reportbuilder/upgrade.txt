@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 12.0 ===
 
+* rb_source_course_completion_by_org source was trimmed down due to conversion subqueries, it is recommended
+  to check all reports based on this source and update them or replace them with regular completion report using custom aggregation.
 * Function reportbuilder_get_embedded_report() has been deprecated, please use reportbuilder::create_embedded() instead.
 * Obsolete non-functional support for report groups was removed.
 * Display classes may now use repoert->displaycache array to improve performance

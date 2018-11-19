@@ -25,10 +25,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
+
+/**
+ * NOTE: this source makes little sense now, the columns defined here
+ * might as well be added directly to the organisation source or trait.
+ * Previously there were a lot more columns here, but it was just duplicating
+ * regular completion report with custom aggregation, anyway those columns
+ * and filters were removed because they were not compatible with subqueries.
+ */
 class rb_source_course_completion_by_org extends rb_base_source {
-    use \core_course\rb\source\report_trait;
-    use \core_tag\rb\source\report_trait;
-    use \totara_job\rb\source\report_trait;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -37,10 +44,7 @@ class rb_source_course_completion_by_org extends rb_base_source {
         // Remember the active global restriction set.
         $this->globalrestrictionset = $globalrestrictionset;
 
-        // Apply global user restrictions.
-        $this->add_global_report_restriction_join('base', 'userid');
-
-        $this->base = '{course_completions}';
+        $this->base = '{org}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -52,6 +56,8 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_course_completion_by_org');
         $this->usedcomponents[] = 'totara_hierarchy';
         $this->usedcomponents[] = 'totara_cohort';
+
+        $this->cacheable = false;
 
         parent::__construct();
     }
@@ -71,241 +77,208 @@ class rb_source_course_completion_by_org extends rb_base_source {
     //
 
     protected function define_joinlist() {
-        global $CFG;
-
-        // to get access to constants
-        require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
-
-        // joinlist for this source
-        $joinlist = array(
-            new rb_join(
-                'completion_organisation',
-                'LEFT',
-                '{org}',
-                'completion_organisation.id = base.organisationid',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
-            new rb_join(
-                'completion_position',
-                'LEFT',
-                '{pos}',
-                'completion_position.id = base.positionid',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
-            new rb_join(
-                'criteria',
-                'LEFT',
-                '{course_completion_criteria}',
-                '(criteria.course = base.course AND ' .
-                    'criteria.criteriatype = ' .
-                    COMPLETION_CRITERIA_TYPE_GRADE . ')',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
-            new rb_join(
-                'critcompl',
-                'LEFT',
-                '{course_completion_crit_compl}',
-                '(critcompl.userid = base.userid AND ' .
-                    'critcompl.criteriaid = criteria.id AND ' .
-                    '(critcompl.deleted IS NULL OR critcompl.deleted = 0))',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'criteria'
-            ),
-        );
-
-        // include some standard joins
-        $this->add_core_user_tables($joinlist, 'base', 'userid');
-        $this->add_core_course_tables($joinlist, 'base', 'course', 'INNER');
-        // requires the course join
-        $this->add_core_course_category_tables($joinlist,
-            'course', 'category');
-        $this->add_totara_job_tables($joinlist, 'base', 'userid');
-        $this->add_core_tag_tables('core', 'course', $joinlist, 'base', 'course');
-
+        $joinlist = array();
         return $joinlist;
     }
 
     protected function define_columnoptions() {
         global $DB;
 
-        $columnoptions = array(
-            // non-aggregated columns
-            new rb_column_option(
-                'course_completion',
-                'organisationid',
-                get_string('completionorgid', 'rb_source_course_completion_by_org'),
-                'base.organisationid',
-                array('displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'organisationpath',
-                get_string('completionorgpath', 'rb_source_course_completion_by_org'),
-                'completion_organisation.path',
-                array(
-                    'joins' => 'completion_organisation',
-                    'displayfunc' => 'plaintext',
-                )
-            ),
-            new rb_column_option(
-                'course_completion',
-                'organisationpathtext',
-                get_string('completionorgpathtext', 'rb_source_course_completion_by_org'),
-                'completion_organisation.path',
-                array(
-                    'joins' => 'completion_organisation',
-                    'displayfunc' => 'hierarchy_nice_path',
-                    'extrafields' => array('hierarchytype' => '\'org\'')
-                )
-            ),
-            new rb_column_option(
-                'course_completion',
-                'organisation',
-                get_string('completionorgname', 'rb_source_course_completion_by_org'),
-                'completion_organisation.fullname',
-                array('joins' => 'completion_organisation',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text',
-                      'displayfunc' => 'format_string')
-            ),
-            // aggregated columns
-            new rb_column_option(
-                'user',
-                'allparticipants',
-                get_string('participants', 'rb_source_course_completion_by_org'),
-                // Note: This technically should be changed to use fullname() but the effort and performance hit
-                //       to do that for just this column isn't justified.
-                $DB->sql_concat('auser.firstname', "' '", 'auser.lastname'),
-                array(
-                    'joins' => 'auser',
-                    'grouping' => 'comma_list_unique',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text',
-                    'displayfunc' => 'format_string'
-                )
-            ),
-            new rb_column_option(
-                'course_completion',
-                'total',
-                get_string('numofrecords', 'rb_source_course_completion_by_org'),
-                'base.id',
-                array('grouping' => 'count',
-                      'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'completed',
-                get_string('numcompleted', 'rb_source_course_completion_by_org'),
-                'CASE WHEN base.timecompleted > 0 AND ' .
-                    '(base.rpl IS NULL OR ' .
-                    $DB->sql_isempty('base', 'rpl', false, false) .
-                    ') THEN 1 ELSE NULL END',
-                array('grouping' => 'count',
-                      'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'perccompleted',
-                get_string('percentagecompleted', 'rb_source_course_completion_by_org'),
-                'CASE WHEN base.timecompleted > 0 AND ' .
-                    '(base.rpl IS NULL OR ' .
-                    $DB->sql_isempty('base', 'rpl', false, false) .
-                    ') THEN 1 ELSE 0 END',
-                array('grouping' => 'percent',
-                      'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'completedrpl',
-                get_string('numcompletedviarpl', 'rb_source_course_completion_by_org'),
-                'CASE WHEN base.timecompleted > 0 AND ' .
-                    '(base.rpl IS NOT NULL AND ' .
-                    $DB->sql_isnotempty('base', 'rpl', false, false) .
-                    ') THEN 1 ELSE NULL END',
-                array('grouping' => 'count',
-                      'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'perccompletedrpl',
-                get_string('percentagecompletedviarpl', 'rb_source_course_completion_by_org'),
-                'CASE WHEN base.timecompleted > 0 AND ' .
-                '(base.rpl IS NOT NULL AND ' .
-                $DB->sql_isnotempty('base', 'rpl', false, false) .
-                ') THEN 1 ELSE 0 END',
-                array('grouping' => 'percent',
-                      'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'inprogress',
-                get_string('numinprogress', 'rb_source_course_completion_by_org'),
-                'CASE WHEN base.timestarted > 0 AND ' .
-                    '(base.timecompleted IS NULL OR ' .
-                    'base.timecompleted = 0) ' .
-                    'THEN 1 ELSE NULL END',
-                array('grouping' => 'count',
-                      'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'notstarted',
-                get_string('numnotstarted', 'rb_source_course_completion_by_org'),
-                'CASE WHEN base.timeenrolled > 0 AND ' .
-                    '(base.timecompleted IS NULL OR ' .
-                    'base.timecompleted = 0) AND ' .
-                    '(base.timestarted IS NULL OR ' .
-                    'base.timestarted = 0) ' .
-                    'THEN 1 ELSE NULL END',
-                array('grouping' => 'count',
-                      'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'course_completion',
-                'earliest_completeddate',
-                get_string('earliestcompletiondate', 'rb_source_course_completion_by_org'),
-                'base.timecompleted',
-                array(
-                    'displayfunc' => 'nice_date',
-                    'dbdatatype' => 'timestamp',
-                    'grouping' => 'min',
-                )
-            ),
-            new rb_column_option(
-                'course_completion',
-                'latest_completeddate',
-                get_string('latestcompletiondate', 'rb_source_course_completion_by_org'),
-                'base.timecompleted',
-                array(
-                    'displayfunc' => 'nice_date',
-                    'dbdatatype' => 'timestamp',
-                    'grouping' => 'max',
-                )
-            ),
-        );
+        // Apply global user restrictions.
+        $global_restriction_join_cc = $this->get_global_report_restriction_join('cc', 'userid');
 
-        // include some standard columns
-        $this->add_core_user_columns($columnoptions);
-        $this->add_core_course_columns($columnoptions);
-        $this->add_core_course_category_columns($columnoptions);
-        $this->add_totara_job_columns($columnoptions);
-        $this->add_core_tag_columns('core', 'course', $columnoptions);
+        $columnoptions = array();
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'organisationid',
+            get_string('completionorgid', 'rb_source_course_completion_by_org'),
+            'base.id',
+            array('displayfunc' => 'integer')
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'organisationpath',
+            get_string('completionorgpath', 'rb_source_course_completion_by_org'),
+            'base.path',
+            array(
+                'displayfunc' => 'plaintext',
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'organisationpathtext',
+            get_string('completionorgpathtext', 'rb_source_course_completion_by_org'),
+            'base.path',
+            array(
+                'displayfunc' => 'hierarchy_nice_path',
+                'extrafields' => array('hierarchytype' => '\'org\'')
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'organisation',
+            get_string('completionorgname', 'rb_source_course_completion_by_org'),
+            'base.fullname',
+            array(
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text',
+                  'displayfunc' => 'format_string')
+        );
+        $concat = $DB->sql_group_concat($DB->sql_concat('u.firstname', "' '", 'u.lastname'), ', ', 'u.firstname ASC, u.lastname ASC');
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'allparticipants',
+            get_string('participants', 'rb_source_course_completion_by_org'),
+            // Note: This technically should be changed to use fullname() but the effort and performance hit
+            //       to do that for just this column isn't justified.
+            "(SELECT $concat
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+                JOIN {user} u ON u.id = cc.userid AND u.deleted = 0 
+               WHERE base.id = cc.organisationid
+            GROUP BY u.firstname, u.lastname)",
+            array(
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+                'displayfunc' => 'format_string',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'total',
+            get_string('numofrecords', 'rb_source_course_completion_by_org'),
+            "(SELECT COUNT('x')
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid)",
+            array(
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'completed',
+            get_string('numcompleted', 'rb_source_course_completion_by_org'),
+            "(SELECT COUNT('x')
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid AND cc.timecompleted > 0 AND (cc.rpl IS NULL OR cc.rpl = ''))",
+            array(
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'perccompleted',
+            get_string('percentagecompleted', 'rb_source_course_completion_by_org'),
+            "(SELECT " . $DB->sql_round("AVG(CASE WHEN cc.timecompleted > 0 AND (cc.rpl IS NULL OR cc.rpl = '') THEN 100.0 ELSE 0 END)", 0) . "
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid)",
+            array(
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'completedrpl',
+            get_string('numcompletedviarpl', 'rb_source_course_completion_by_org'),
+            "(SELECT COUNT('x')
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid AND cc.timecompleted > 0 AND cc.rpl IS NOT NULL AND cc.rpl <> '')",
+            array(
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'perccompletedrpl',
+            get_string('percentagecompletedviarpl', 'rb_source_course_completion_by_org'),
+            "(SELECT " . $DB->sql_round("AVG(CASE WHEN cc.timecompleted > 0 AND cc.rpl IS NOT NULL AND cc.rpl <> '' THEN 100.0 ELSE 0 END)", 0) . "
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid)",
+            array(
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'inprogress',
+            get_string('numinprogress', 'rb_source_course_completion_by_org'),
+            "(SELECT COUNT('x')
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid AND cc.timestarted > 0 AND (cc.rpl IS NULL OR cc.timecompleted = 0))",
+            array(
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'notstarted',
+            get_string('numnotstarted', 'rb_source_course_completion_by_org'),
+            "(SELECT COUNT('x')
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid AND (cc.timecompleted IS NULL OR cc.timecompleted = 0) AND (cc.timestarted IS NULL OR cc.timestarted = 0))",
+            array(
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'earliest_completeddate',
+            get_string('earliestcompletiondate', 'rb_source_course_completion_by_org'),
+            "(SELECT MIN(cc.timecompleted)
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid)",
+            array(
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'latest_completeddate',
+            get_string('latestcompletiondate', 'rb_source_course_completion_by_org'),
+            "(SELECT MAX(cc.timecompleted)
+                FROM {course_completions} cc
+                $global_restriction_join_cc
+               WHERE base.id = cc.organisationid)",
+            array(
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
 
         return $columnoptions;
     }
 
     protected function define_filteroptions() {
         $filteroptions = array(
-            /*
-            // array of rb_filter_option objects, e.g:
-            new rb_filter_option(
-                '',       // type
-                '',       // value
-                '',       // label
-                '',       // filtertype
-                array()   // options
-            )
-            */
             new rb_filter_option(
                 'course_completion',
                 'organisationid',
@@ -330,73 +303,33 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'course_completion',
                 'total',
                 get_string('totalcompletions', 'rb_source_course_completion_by_org'),
-                'number',
-                array(
-                    'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
-                )
-            ),
+                'number'),
             new rb_filter_option(
                 'course_completion',
                 'completed',
                 get_string('numcompleted', 'rb_source_course_completion_by_org'),
-                'number',
-                array(
-                    'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
-                )
-            ),
+                'number'),
             new rb_filter_option(
                 'course_completion',
                 'completedrpl',
                 get_string('numcompletedviarpl', 'rb_source_course_completion_by_org'),
-                'number',
-                array(
-                    'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
-                )
-            ),
+                'number'),
             new rb_filter_option(
                 'course_completion',
                 'inprogress',
                 get_string('numinprogress', 'rb_source_course_completion_by_org'),
-                'number',
-                array(
-                    'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
-                )
-            ),
+                'number'),
             new rb_filter_option(
                 'course_completion',
                 'notstarted',
                 get_string('numnotstarted', 'rb_source_course_completion_by_org'),
-                'number',
-                array(
-                    'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
-                )
-            ),
+                'number'),
             new rb_filter_option(
                 'user',
                 'allparticipants',
                 get_string('participants', 'rb_source_course_completion_by_org'),
-                'text',
-                array(
-                    'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
-                )
-            ),
-            new rb_filter_option(
-                'course_completion',
-                'enrolled',
-                get_string('isenrolled', 'rb_source_course_completion'),
-                'enrol',
-                array(),
-                // special enrol filter requires a composite field
-                array('course' => 'base.course', 'user' => 'base.userid')
-            ),
+                'text'),
         );
-
-        // include some standard filters
-        $this->add_core_user_filters($filteroptions);
-        $this->add_core_course_filters($filteroptions);
-        $this->add_core_course_category_filters($filteroptions);
-        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
-        $this->add_core_tag_filters('core', 'course', $filteroptions);
 
         return $filteroptions;
     }
@@ -410,31 +343,21 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $contentoptions[] = new rb_content_option(
             'completed_org',
             get_string('orgwhencompleted', 'rb_source_course_completion_by_org'),
-            'completion_organisation.path',
-            'completion_organisation'
+            'base.path'
         );
 
-        $contentoptions[] = new rb_content_option(
-            'date',
-            get_string('completiondate', 'rb_source_course_completion_by_org'),
-            'base.timecompleted'
-        );
-
+        // NOTE: aggregation by completion date is not supported here, use regular completion report for that.
         return $contentoptions;
     }
 
     protected function define_paramoptions() {
         $paramoptions = array(
             new rb_param_option(
-                'userid',       // parameter name
-                'base.userid',  // field
-                null            // joins
+                'userid',
+                'base.userid',
+                null
             ),
-            new rb_param_option(
-                'courseid',
-                'course.id',
-                'course'
-            ),
+            // NOTE: aggregation by course id is not supported here, use regular completion report for that.
         );
 
         return $paramoptions;
@@ -479,42 +402,9 @@ class rb_source_course_completion_by_org extends rb_base_source {
     }
 
     protected function define_requiredcolumns() {
-        $requiredcolumns = array(
-            /*
-            // array of rb_column objects, e.g:
-            new rb_column(
-                '',         // type
-                '',         // value
-                '',         // heading
-                '',         // field
-                array(),    // options
-            )
-            */
-        );
+        $requiredcolumns = array();
         return $requiredcolumns;
     }
 
-    //
-    //
-    // Source specific column display methods
-    //
-    //
-
-    // add methods here with [name] matching column option displayfunc
-    //function rb_display_[name]($item, $row) {
-        // variable $item refers to the current item
-        // $row is an object containing the whole row
-        // which will include any extrafields
-        //
-        // should return a string containing what should be displayed
-    //}
-
-    //
-    //
-    // Source specific filter display methods
-    //
-    //
-
-
-} // end of rb_source_course_completion class
+}
 
