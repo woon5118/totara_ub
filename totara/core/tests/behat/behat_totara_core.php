@@ -143,7 +143,8 @@ class behat_totara_core extends behat_base {
         $dropdown = !empty($dropdown);
         try {
             $node = $this->find_totara_menu_item($text, $submenu, $dropdown);
-            if (!$node->isVisible()) {
+            // Javascript needed to test visibility.
+            if ($this->running_javascript() && !$node->isVisible()) {
                 // Exists but is not visible.
                 return true;
             }
@@ -151,6 +152,7 @@ class behat_totara_core extends behat_base {
             // Does not exist.
             return true;
         }
+
         throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" has been found and is visible', $this->getSession());
     }
 

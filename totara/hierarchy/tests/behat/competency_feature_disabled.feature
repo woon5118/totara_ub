@@ -96,7 +96,6 @@ Feature: The competencies can be disabled
     # Check competencies menu is not visible because the feature is disabled.
     When I am on homepage
     And I expand "Site administration" node
-    And I expand "Hierarchies" node
     Then I should not see "Competencies"
 
     # Check competencies are not an option to be added in the program's content.
