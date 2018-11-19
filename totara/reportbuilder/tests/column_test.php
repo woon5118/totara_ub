@@ -884,6 +884,9 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
         $sortorder = 1;
         foreach ($src->columnoptions as $column) {
+            if (isset($column->grouping) and $column->grouping !== 'none') {
+                debugging("Column option grouping was deprecated, use subqueries instead in {$sourcename} {$column->type}-{$column->value}", DEBUG_DEVELOPER);
+            }
             // Create a report.
             $report = new stdClass();
             $report->fullname = $reportname;
@@ -949,6 +952,9 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $sortorder = 1;
 
         foreach ($src->filteroptions as $filter) {
+            if (isset($filter->grouping) and $filter->grouping !== 'none') {
+                debugging("Filter option grouping was deprecated, use subqueries instead in {$sourcename} {$column->type}-{$column->value}", DEBUG_DEVELOPER);
+            }
             // Create a report.
             $report = new stdClass();
             $report->fullname = $reportname;

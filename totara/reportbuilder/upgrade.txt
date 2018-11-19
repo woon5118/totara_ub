@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 12.0 ===
 
+* Column and filter option 'grouping' setting is now deprecated and will be removed in Totara 13, use subqueries instead.
 * rb_source_course_completion_by_org source was trimmed down due to conversion subqueries, it is recommended
   to check all reports based on this source and update them or replace them with regular completion report using custom aggregation.
 * Function reportbuilder_get_embedded_report() has been deprecated, please use reportbuilder::create_embedded() instead.

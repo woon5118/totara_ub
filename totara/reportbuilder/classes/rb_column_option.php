@@ -188,6 +188,7 @@ class rb_column_option {
      * Some common group functions are provided by {@link rb_base_source}, and more
      * can be created by the source that needs them.
      *
+     * @deprecated since Totara 12
      * @access public
      * @var string
      */
@@ -197,6 +198,7 @@ class rb_column_option {
      * Used to pass through the fields for ordering the grouping, for example:
      *
      * 'grouporder' => array('prog_courseset.sortorder', 'prog_courseset_course.id')
+     * @deprecated since Totara 12
      */
     public $grouporder;
 
@@ -368,8 +370,8 @@ class rb_column_option {
             'extrafields' => null,
             'capability' => null,
             'noexport' => false,
-            'grouping' => 'none',
-            'grouporder' => null,
+            'grouping' => 'none', // Deprecated since Totara 12
+            'grouporder' => null, // Deprecated since Totara 12
             'style' => null,
             'class' => null,
             'nosort' => false,
@@ -397,6 +399,12 @@ class rb_column_option {
         // assign optional properties
         foreach ($defaults as $property => $unused) {
             $this->$property = $options[$property];
+        }
+
+        if (!PHPUNIT_TEST) {
+            if (isset($this->grouping) and $this->grouping !== 'none') {
+                debugging("Column option grouping was deprecated, use subqueries instead in {$this->type}-{$this->value}", DEBUG_DEVELOPER);
+            }
         }
     }
 

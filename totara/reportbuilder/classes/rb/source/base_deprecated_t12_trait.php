@@ -95,6 +95,149 @@ trait base_deprecated_t12_trait {
 
     //
     //
+    // Generic grouping methods for aggregation
+    //
+    //
+
+    /**
+     * @deprecated since Totara 12
+     */
+    function rb_group_count($field) {
+        return "COUNT($field)";
+    }
+
+    /**
+     * @deprecated since Totara 12
+     */
+    function rb_group_unique_count($field) {
+        return "COUNT(DISTINCT $field)";
+    }
+
+    /**
+     * @deprecated since Totara 12
+     */
+    function rb_group_sum($field) {
+        return "SUM($field)";
+    }
+
+    /**
+     * @deprecated since Totara 12
+     */
+    function rb_group_average($field) {
+        return "AVG($field)";
+    }
+
+    /**
+     * @deprecated since Totara 12
+     */
+    function rb_group_max($field) {
+        return "MAX($field)";
+    }
+
+    /**
+     * @deprecated since Totara 12
+     */
+    function rb_group_min($field) {
+        return "MIN($field)";
+    }
+
+    /**
+     * @deprecated since Totara 12
+     */
+    function rb_group_stddev($field) {
+        return "STDDEV($field)";
+    }
+
+    /**
+     * can be used to 'fake' a percentage, if matching values return 1 and
+     * all other values return 0 or null
+     * @deprecated since Totara 12
+     */
+    function rb_group_percent($field) {
+        global $DB;
+
+        return $DB->sql_round("AVG($field*100.0)", 0);
+    }
+
+    /**
+     * This function calls the databases native implementations of
+     * group_concat where possible and requires an additional $orderby
+     * variable. If you create another one you should add it to the
+     * $sql_functions array() in the get_fields() function in the rb_columns class.
+     *
+     * @deprecated since Totara 12
+     * @param string $field         The expression to use as the select
+     * @param string $orderby       The comma deliminated fields to order by
+     * @return string               The native sql for a group concat
+     */
+    function rb_group_sql_aggregate($field, $orderby) {
+        global $DB;
+
+        return $DB->sql_group_concat($field, $this->uniquedelimiter, $orderby);
+    }
+
+    /**
+     * return list as single field, separated by commas
+     * @deprecated since Totara 12
+     */
+    function rb_group_comma_list($field) {
+        global $DB;
+
+        return $DB->sql_group_concat($field, ', ');
+    }
+
+    /**
+     * Return list as single field, without a separator delimiter.
+     * @deprecated since Totara 12
+     */
+    function rb_group_list_nodelimiter($field) {
+        global $DB;
+
+        return $DB->sql_group_concat($field, '');
+    }
+
+    /**
+     * return unique list items as single field, separated by commas
+     * @deprecated since Totara 12
+     */
+    function rb_group_comma_list_unique($field) {
+        global $DB;
+
+        return $DB->sql_group_concat_unique($field, ', ');
+    }
+
+    /**
+     * return list as single field, one per line
+     * @deprecated since Totara 12
+     */
+    function rb_group_list($field) {
+        global $DB;
+
+        return $DB->sql_group_concat($field, html_writer::empty_tag('br'));
+    }
+
+    /**
+     * return unique list items as single field, one per line
+     * @deprecated since Totara 12
+     */
+    function rb_group_list_unique($field) {
+        global $DB;
+
+        return $DB->sql_group_concat_unique($field, html_writer::empty_tag('br'));
+    }
+
+    /**
+     * return list as single field, separated by a line with - on (in HTML)
+     * @deprecated since Totara 12
+     */
+    function rb_group_list_dash($field) {
+        global $DB;
+
+        return $DB->sql_group_concat($field, html_writer::empty_tag('br') . '-' . html_writer::empty_tag('br'));
+    }
+
+    //
+    //
     // Generic column display methods
     //
     //
