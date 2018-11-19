@@ -37,14 +37,19 @@ class optional_param {
     /** @var string */
     public $type;
 
+    /** @var bool */
+    public $multiplevalues;
+
     /**
      * @param string $key
-     * @param mixed  $default
+     * @param mixed $default
      * @param string $type
+     * @param bool $multiplevalues
      */
-    public function __construct(string $key, $default, string $type) {
+    public function __construct(string $key, $default, string $type, bool $multiplevalues = false) {
         $this->key = $key;
         $this->default = $default;
         $this->type = $type;
+        $this->multiplevalues = $multiplevalues;
     }
 }

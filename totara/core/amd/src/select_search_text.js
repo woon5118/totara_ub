@@ -144,7 +144,7 @@ define([], function() {
         */
         preset: function() {
             var input = this.widget.querySelector('[data-tw-selectSearchText-urlkey]'),
-                inputVal = input.value;
+                inputVal = encodeURIComponent(input.value);
 
             // Edge case,value provided in template but user has cleared input & refreshed page
             if (inputVal === '' && input.getAttribute(this.activeSelector) === true) {
@@ -195,7 +195,7 @@ define([], function() {
         *
         */
         valueCheck: function() {
-            var inputVal = this.widget.querySelector('[data-tw-selectSearchText-urlkey]').value;
+            var inputVal = encodeURIComponent(this.widget.querySelector('[data-tw-selectSearchText-urlkey]').value);
 
             if (this.searchTerm === inputVal) {
                 return;

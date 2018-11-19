@@ -124,6 +124,10 @@ class single extends options_loader_merge_select {
     public function set_current_data(array $paramdata) {
         parent::set_current_data($paramdata);
 
+        if (!is_null($this->currentdata)) {
+            $this->currentdata = rawurldecode($this->currentdata);
+        }
+
         // Mark the filter as disabled if the 'All' option has been selected.
         if (!is_null($this->allname) && $this->currentdata == $this->allkey) {
             $this->currentdata = null;
@@ -140,12 +144,18 @@ class single extends options_loader_merge_select {
     }
 
     public function get_template() {
+        $options = [];
+        foreach ($this->get_options() as $key => $option) {
+            $option->key = rawurlencode($option->key);
+            $options[rawurlencode($key)] = $option;
+        }
+
         return select_tree::create(
             $this->key,
             $this->title,
             $this->titlehidden,
-            $this->get_options(),
-            $this->get_data(),
+            $options,
+            rawurlencode($this->get_data()),
             true
         );
     }

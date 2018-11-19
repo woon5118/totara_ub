@@ -54,13 +54,13 @@
 }}
 <div class="tw-selectTree"
     data-tw-selectorGroup=""
-    data-tw-selectTree-urlKey="{{key}}"
+    data-tw-selectTree-urlKey="{{{key}}}"
     data-core-autoinitialise="true"
     data-core-autoinitialise-amd="totara_core/select_tree">
 
     {{^title_hidden}}
-    <div class="tw-selectTree__label" id="title_{{key}}">
-        {{title}}
+    <div class="tw-selectTree__label" id="title_{{{key}}}">
+        {{{title}}}
     </div>
     {{/title_hidden}}
 
@@ -68,14 +68,14 @@
         <a href="#" class="tw-selectTree__current" data-tw-selectTree-trigger="">
             <span class="tw-selectTree__current_label" data-tw-selectTree-current=""
                 {{#call_to_action}}data-tw-selectTree-callToActionLabel="{{call_to_action}}"{{/call_to_action}}>
-                {{#active_name}}{{active_name}}{{/active_name}}
-                {{^active_name}}{{call_to_action}}{{/active_name}}
+                {{#active_name}}{{{active_name}}}{{/active_name}}
+                {{^active_name}}{{{call_to_action}}}{{/active_name}}
             </span>
             {{#flex_icon}}expandable, expand, core, tw-selectTree__current_icon{{/flex_icon}}
         </a>
 
         <div aria-hidden="true" class="tw-selectTree__option tw-selectTree__hidden" data-tw-selectTree-tree="">
-            <ul role="tree" aria-labelledby="title_{{key}}"
+            <ul role="tree" aria-labelledby="title_{{{key}}}"
             class="tw-selectTree__list {{#flat_tree}}tw-selectTree__list_flat{{/flat_tree}}">
                 {{#options}}{{> totara_core/select_tree_option }}{{/options}}
             </ul>

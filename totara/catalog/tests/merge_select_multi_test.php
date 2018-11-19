@@ -79,9 +79,7 @@ class totara_catalog_merge_select_multi_testcase extends advanced_testcase {
 
         $optionalparams = $multi->get_optional_params();
         $expectedoptionalparams = [
-            new \totara_catalog\optional_param('testmergeselectkey-testoptionkey1', null, PARAM_RAW),
-            new \totara_catalog\optional_param('testmergeselectkey-testoptionkey2', null, PARAM_RAW),
-            new \totara_catalog\optional_param('testmergeselectkey-testoptionkey3', null, PARAM_RAW),
+            new \totara_catalog\optional_param('testmergeselectkey', null, PARAM_RAW, true),
         ];
 
         $this->assertEquals($expectedoptionalparams, $optionalparams);
@@ -121,16 +119,23 @@ class totara_catalog_merge_select_multi_testcase extends advanced_testcase {
         $multi = new \totara_catalog\merge_select\multi('testmergeselectkey', 'testtitle');
         $multi->set_current_data(
             [
-                'testmergeselectkey-zero' => false,
-                'testmergeselectkey-one' => 1,
-                'testmergeselectkey-two' => true,
-                'testmergeselectkey-three' => 0,
+                'testmergeselectkey' => [
+                    false,
+                    1,
+                    true,
+                    0,
+                    'foo%20bar%40baz',
+                ]
             ]
         );
 
+        // We expect values to go through rawurldecode().
         $expecteddata = [
-            'one',
-            'two',
+            0 => '',
+            1 => '1',
+            2 => '1',
+            3 => '0',
+            4 => 'foo bar@baz',
         ];
 
         $this->assertEquals($expecteddata, $multi->get_data());
@@ -143,16 +148,19 @@ class totara_catalog_merge_select_multi_testcase extends advanced_testcase {
                 'testoptionkey3' => 'testoptionname3',
                 'testoptionkey1' => 'testoptionnamex',
                 'testoptionkey2' => 'testoptionname2',
+                'test & option key 4' => 'testoptionname4',
             ];
         };
         $multi->add_options_loader($optionsloader);
         $multi->set_title_hidden();
         $multi->set_current_data(
             [
-                'testmergeselectkey-unknown' => 1,
-                'testmergeselectkey-testoptionkey1' => 1,
-                'testmergeselectkey-testoptionkey2' => true,
-                'testmergeselectkey-testoptionkey3' => 0,
+                'testmergeselectkey' => [
+                    'unknown',
+                    'testoptionkey1',
+                    'testoptionkey2',
+                    'test%20%26%20option%20key%204'
+                ],
             ]
         );
 
@@ -168,17 +176,22 @@ class totara_catalog_merge_select_multi_testcase extends advanced_testcase {
             'options' => [
                 (object)[
                     'active' => true,
-                    'key' => 'testmergeselectkey-testoptionkey2',
+                    'key' => 'testoptionkey2',
                     'name' => 'testoptionname2',
                 ],
                 (object)[
                     'active' => false,
-                    'key' => 'testmergeselectkey-testoptionkey3',
+                    'key' => 'testoptionkey3',
                     'name' => 'testoptionname3',
                 ],
                 (object)[
                     'active' => true,
-                    'key' => 'testmergeselectkey-testoptionkey1',
+                    'key' => 'test%20%26%20option%20key%204',
+                    'name' => 'testoptionname4',
+                ],
+                (object)[
+                    'active' => true,
+                    'key' => 'testoptionkey1',
                     'name' => 'testoptionnamex',
                 ],
             ]

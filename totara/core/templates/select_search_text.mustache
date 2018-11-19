@@ -52,8 +52,8 @@
     data-core-autoinitialise="true"
     data-core-autoinitialise-amd="totara_core/select_search_text">
 
-    <label for="{{key}}_input" class="tw-selectSearchText__header{{#title_hidden}} sr-only{{/title_hidden}}">
-        {{title}}
+    <label for="{{{key}}}_input" class="tw-selectSearchText__header{{#title_hidden}} sr-only{{/title_hidden}}">
+        {{{title}}}
     </label>
 
     {{#has_hint_icon}}
@@ -65,8 +65,8 @@
     <div class="tw-selectSearchText__field">
         <input type="text" value="{{current_val}}"
         {{#placeholder_show}}{{#title_hidden}}placeholder="{{title}}"{{/title_hidden}}{{/placeholder_show}}
-        class="tw-selectSearchText__field_input" id="{{key}}_input"
-        data-tw-selectSearchText-urlkey="{{key}}"{{#current_val}} data-tw-selector-active="true"{{/current_val}}>
+        class="tw-selectSearchText__field_input" id="{{{key}}}_input"
+        data-tw-selectSearchText-urlkey="{{{key}}}"{{#current_val}} data-tw-selector-active="true"{{/current_val}}>
         <a href="#" class="tw-selectSearchText__field_clear tw-selectSearchText__hidden"
         data-tw-selectSearchText-clear="">
             {{#flex_icon}}close, remove, core,{{/flex_icon}}

@@ -232,7 +232,7 @@ class filter_factory {
             $options = [];
             foreach ($field->options as $option) {
                 $safeoption = format_string($option, true, ['context' => $systemcontent]);
-                $options[$safeoption] = $safeoption;
+                $options[$option] = $safeoption;
             }
 
             return $options;
@@ -261,7 +261,7 @@ class filter_factory {
             $options = [];
             foreach ($field->options as $option) {
                 $safeoption = format_string($option['option'], true, ['context' => \context_system::instance()]);
-                $options[$safeoption] = $safeoption;
+                $options[$option['option']] = $safeoption;
             }
 
             return $options;

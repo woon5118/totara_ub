@@ -46,8 +46,6 @@ class config_filters_controller extends base_config_form_controller {
             // Make sure we have an empty array when the form element's submission is empty.
             if (empty($data['filters']) || !is_array($data['filters'])) {
                 $data['filters'] = [];
-            } else {
-                $data['filters'] = array_map('clean_text', $data['filters']);
             }
         }
 
@@ -65,7 +63,7 @@ class config_filters_controller extends base_config_form_controller {
         }
 
         if ($params['is_submitted_or_reloaded']) {
-            $currentdata['filters'] = optional_param_array('filters', [], PARAM_CLEANHTML);
+            $currentdata['filters'] = optional_param_array('filters', [], PARAM_RAW);
         }
 
         // Configured filters may be invalid depending on enabled providers. Remove invalid ones.

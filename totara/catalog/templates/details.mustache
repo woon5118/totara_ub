@@ -89,7 +89,7 @@
     {{#flex_icon}}close, remove, core,{{/flex_icon}}
 </a>
 <h2 class="tw-catalogDetails__title">
-    {{title}}
+    {{{title}}}
 </h2>
 
 {{#has_manage_link}}{{#manage_link}}
@@ -122,7 +122,7 @@
         <div class="tw-catalogDetails__textarea_group">
             {{#text_placeholders}}
             <div class="tw-catalogDetails__textarea_group_item{{^data_exists}} tw-catalogDetails__empty{{/data_exists}}">
-                {{#show_label}}{{label}}: {{/show_label}}{{#data_exists}}{{data}}{{/data_exists}}
+                {{#show_label}}{{{label}}}: {{/show_label}}{{#data_exists}}{{{data}}}{{/data_exists}}
             </div>
             {{/text_placeholders}}
         </div>

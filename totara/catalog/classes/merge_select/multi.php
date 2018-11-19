@@ -65,13 +65,7 @@ class multi extends options_loader_merge_select {
      * @return array
      */
     public function get_optional_params(): array {
-        $params = [];
-
-        foreach ($this->get_options() as $optionkey => $name) {
-            $params[] = new optional_param($this->key . '-' . $optionkey, null, PARAM_RAW);
-        }
-
-        return $params;
+        return [new optional_param($this->key, null, PARAM_RAW, true)];
     }
 
     public function merge(merge_select $otherselector) {
@@ -84,22 +78,34 @@ class multi extends options_loader_merge_select {
     }
 
     public function set_current_data(array $paramdata) {
-        $this->currentdata = [];
+        parent::set_current_data($paramdata);
 
-        foreach ($paramdata as $key => $value) {
-            if ($value) {
-                $this->currentdata[] = substr($key, strlen($this->key) + 1);
-            }
+        if (empty($this->currentdata)) {
+            $this->currentdata = [];
+        }
+
+        foreach ($this->currentdata as $key => $value) {
+            $this->currentdata[$key] = rawurldecode($value);
         }
     }
 
     public function get_template() {
+        $activekeys = [];
+        foreach ($this->currentdata as $key) {
+            $activekeys[] = rawurlencode($key);
+        }
+
+        $options = [];
+        foreach ($this->get_options() as $key => $name) {
+            $options[rawurlencode($key)] = $name;
+        }
+
         return select_multi::create(
             $this->key,
             $this->title,
             $this->titlehidden,
-            $this->get_options(),
-            $this->get_data()
+            $options,
+            $activekeys
         );
     }
 }

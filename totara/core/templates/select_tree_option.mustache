@@ -53,7 +53,7 @@
     {{#default}}data-tw-selectTree-default=""{{/default}}>
         {{#has_children}}
         <a role="treeitem" aria-expanded="false" href="#" class="tw-selectTree__list_row_icon"
-        data-tw-selectTree-toggle="{{key}}">{{!
+        data-tw-selectTree-toggle="{{{key}}}">{{!
           }}<span class="tw-selectTree__list_row_icon_expand">
                 {{#flex_icon}}tree-list-collapsed, expand, core{{/flex_icon}}
             </span>{{!
@@ -69,14 +69,14 @@
         {{/has_children}}
         <a role="treeitem" href="#" class="tw-selectTree__list_row_link"
             {{#has_children}}
-                {{#parents_are_selectable}}data-tw-selectTree-urlVal="{{key}}"{{/parents_are_selectable}}
-                {{^parents_are_selectable}}data-tw-selectTree-toggle="{{key}}"{{/parents_are_selectable}}
+                {{#parents_are_selectable}}data-tw-selectTree-urlVal="{{{key}}}"{{/parents_are_selectable}}
+                {{^parents_are_selectable}}data-tw-selectTree-toggle="{{{key}}}"{{/parents_are_selectable}}
             {{/has_children}}
             {{^has_children}}
-                data-tw-selectTree-urlVal="{{key}}"
+                data-tw-selectTree-urlVal="{{{key}}}"
             {{/has_children}}
             data-tw-selectTree-label="{{name}}">
-            {{name}}
+            {{{name}}}
         </a>
     </div>
     {{#has_children}}

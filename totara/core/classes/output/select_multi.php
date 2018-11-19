@@ -52,7 +52,7 @@ class select_multi extends select {
             $option = new \stdClass();
 
             $option->active = in_array($optionkey, $activekeys);
-            $option->key = $key . '-' . $optionkey;
+            $option->key = $optionkey;
             $option->name = $name;
             $data->options[] = $option;
         }

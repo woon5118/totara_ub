@@ -539,8 +539,18 @@ define(['core/templates', 'core/ajax', 'core/notification'], function(templates,
                 if (key === 'filterparams') {
                     Object.keys(requestPathData.filterparams).forEach(function(filterKey) {
                         var filterValue = requestPathData.filterparams[filterKey];
-                        pathString += (pathString === '') ? '?' : '&';
-                        pathString += filterKey + '=' + filterValue;
+
+                        if (Array.isArray(filterValue)) {
+                            if (filterValue.length) {
+                                for (var i = 0; i < filterValue.length; i++) {
+                                    pathString += (pathString === '') ? '?' : '&';
+                                    pathString += filterKey + '[]=' + filterValue[i];
+                                }
+                            }
+                        } else {
+                            pathString += (pathString === '') ? '?' : '&';
+                            pathString += filterKey + '=' + filterValue;
+                        }
                     });
 
                 } else {
@@ -630,9 +640,14 @@ define(['core/templates', 'core/ajax', 'core/notification'], function(templates,
          * @param {string} filter
          */
         setFilterAdd: function(filter) {
-            // Prevent duplicate keys
-            this.setFilterRemove(filter);
-            this.requestData.filterparams[filter.key] = filter.val;
+            var filtersList = this.requestData.filterparams;
+            if (filter.groupValues) {
+                filtersList[filter.key] = filter.groupValues;
+            } else {
+                // Prevent duplicate keys
+                this.setFilterRemove(filter);
+                filtersList[filter.key] = filter.val;
+            }
         },
 
         /**
@@ -642,7 +657,11 @@ define(['core/templates', 'core/ajax', 'core/notification'], function(templates,
          */
         setFilterRemove: function(filter) {
             var filtersList = this.requestData.filterparams;
-            delete filtersList[filter.key];
+            if (filter.groupValues) {
+                filtersList[filter.key] = filter.groupValues;
+            } else {
+                delete filtersList[filter.key];
+            }
         },
 
         /**

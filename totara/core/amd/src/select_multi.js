@@ -36,6 +36,7 @@ define([], function() {
         this.activeSelector = 'data-tw-selector-active';
         this.clearSelector = 'data-tw-selectorgroup-clear';
         this.hideClass = 'tw-selectMulti__hidden';
+        this.key = '';
         this.widget = '';
     }
 
@@ -48,7 +49,7 @@ define([], function() {
         * @param {node} selector node
         */
         add: function(selector) {
-            var selectorKey = selector.getAttribute('data-tw-selectMulti-urlkey'),
+            var selectorKey = selector.getAttribute('data-tw-selectMulti-optionKey'),
                 iconTarget = selector.querySelector('[data-tw-selectMulti-close]');
 
             // Update selector UI
@@ -59,8 +60,9 @@ define([], function() {
 
             // Inform parent widget of this change
             this.triggerEvent('add', {
-                key: selectorKey,
-                val: 1
+                groupValues: this.getAllSelectedValues(),
+                key: this.key,
+                val: selectorKey
             });
         },
 
@@ -89,8 +91,8 @@ define([], function() {
                     return;
                 }
 
-                if (e.target.closest('[data-tw-selectMulti-urlkey]')) {
-                    var selector = e.target.closest('[data-tw-selectMulti-urlkey]');
+                if (e.target.closest('[data-tw-selectMulti-optionKey]')) {
+                    var selector = e.target.closest('[data-tw-selectMulti-optionKey]');
 
                     // toggle selector active state
                     if (selector.getAttribute(that.activeSelector)) {
@@ -121,6 +123,23 @@ define([], function() {
         },
 
         /**
+        * Get all selected values
+        *
+        * @returns {array} selectedValues
+        */
+        getAllSelectedValues: function() {
+            var itemKey,
+                nodeList = this.widget.querySelectorAll('[' + this.activeSelector + ']'),
+                selectedValues = [];
+
+            for (var i = 0; i < nodeList.length; i++) {
+                itemKey = nodeList[i].getAttribute('data-tw-selectMulti-optionKey');
+                selectedValues.push(itemKey);
+            }
+            return selectedValues;
+        },
+
+        /**
         * Inform parents of preset values
         *
         */
@@ -129,8 +148,9 @@ define([], function() {
 
             for (var i = 0; i < nodeList.length; i++) {
                 this.triggerEvent('add', {
-                    key: nodeList[i].getAttribute('data-tw-selectMulti-urlkey'),
-                    val: 1
+                    groupValues: this.getAllSelectedValues(),
+                    key: this.key,
+                    val: nodeList[i].getAttribute('data-tw-selectMulti-optionKey')
                 });
             }
         },
@@ -141,7 +161,7 @@ define([], function() {
         * @param {node} selector node
         */
         remove: function(selector) {
-            var selectorKey = selector.getAttribute('data-tw-selectMulti-urlkey'),
+            var selectorKey = selector.getAttribute('data-tw-selectMulti-optionKey'),
                 iconTarget = selector.querySelector('[data-tw-selectMulti-close]');
 
             // Update selector UI
@@ -151,8 +171,9 @@ define([], function() {
             iconTarget.classList.add(this.hideClass);
 
             this.triggerEvent('remove', {
-                key: selectorKey,
-                val: 0
+                groupValues: this.getAllSelectedValues(),
+                key: this.key,
+                val: selectorKey
             });
         },
 
@@ -163,6 +184,14 @@ define([], function() {
         */
         setParent: function(parent) {
             this.widget = parent;
+        },
+
+        /**
+        * Set widget key
+        *
+        */
+        setWidgetKey: function() {
+            this.key = this.widget.getAttribute('data-tw-selectMulti-key');
         },
 
         /**
@@ -190,6 +219,7 @@ define([], function() {
         return new Promise(function(resolve) {
             var wgt = new SelectMulti();
             wgt.setParent(parent);
+            wgt.setWidgetKey();
             wgt.preset();
             wgt.events();
             resolve(wgt);

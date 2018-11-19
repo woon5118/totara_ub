@@ -45,11 +45,19 @@ class param_processor {
             $optionalparams = $filter->selector->get_optional_params();
 
             foreach ($optionalparams as $optionalparam) {
-                $filterparams[$optionalparam->key] = optional_param(
-                    $optionalparam->key,
-                    $optionalparam->default,
-                    $optionalparam->type
-                );
+                if ($optionalparam->multiplevalues) {
+                    $filterparams[$optionalparam->key] = optional_param_array(
+                        $optionalparam->key,
+                        $optionalparam->default,
+                        $optionalparam->type
+                    );
+                } else {
+                    $filterparams[$optionalparam->key] = optional_param(
+                        $optionalparam->key,
+                        $optionalparam->default,
+                        $optionalparam->type
+                    );
+                }
             }
         }
 

@@ -55,12 +55,24 @@ class external extends \external_api {
         foreach (filter_handler::instance()->get_all_filters() as $filter) {
             $optionalparams = $filter->selector->get_optional_params();
             foreach ($optionalparams as $optionalparam) {
-                $filterparams[$optionalparam->key] = new \external_value(
-                    $optionalparam->type,
-                    $optionalparam->key,
-                    VALUE_OPTIONAL,
-                    $optionalparam->default
-                );
+                if ($optionalparam->multiplevalues) {
+                    $filterparams[$optionalparam->key] = new \external_multiple_structure(
+                        new \external_value(
+                            $optionalparam->type,
+                            $optionalparam->key,
+                            VALUE_OPTIONAL
+                        ),
+                        $optionalparam->key,
+                        VALUE_OPTIONAL
+                    );
+                } else {
+                    $filterparams[$optionalparam->key] = new \external_value(
+                        $optionalparam->type,
+                        $optionalparam->key,
+                        VALUE_OPTIONAL,
+                        $optionalparam->default
+                    );
+                }
             }
         }
 

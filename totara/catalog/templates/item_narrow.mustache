@@ -125,7 +125,7 @@
         {{#hero_data_text_enabled}}{{#hero_data_text}}
         <div class="tw-catalogItemNarrow__hero">
             <div class="tw-catalogItemNarrow__hero_text">
-                {{hero_data_text}}
+                {{{hero_data_text}}}
             </div>
         </div>
         {{/hero_data_text}}{{/hero_data_text_enabled}}
@@ -175,7 +175,7 @@
         <div class="tw-catalogItemNarrow__textarea_group">
             {{#text_placeholders}}
             <div class="tw-catalogItemNarrow__textarea_group_item">
-                {{#show_label}}{{label}}: {{/show_label}}{{#data_exists}}{{data}}{{/data_exists}}
+                {{#show_label}}{{{label}}}: {{/show_label}}{{#data_exists}}{{{data}}}{{/data_exists}}
             </div>
             {{/text_placeholders}}
         </div>

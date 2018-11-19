@@ -77,7 +77,7 @@ class select_region_panel_test extends advanced_testcase {
                         'options' => [
                             0 => (object)[
                                 'active' => false,
-                                'key' => 'testmultiselect-one',
+                                'key' => 'one',
                                 'name' => 'Test option one',
                             ],
                         ],

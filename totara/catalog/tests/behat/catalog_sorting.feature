@@ -32,7 +32,7 @@ Feature: Using the sorting feature of catalog
 
   Scenario: With two languages installed, sorting is changed automatically
     Given I am on a totara site
-    And I navigate to "Language packs" node in "Site administration > Language"
+    And I navigate to "Language packs" node in "Site administration > Localisation"
     And I set the field "Available language packs" to "fr"
     And I press "Install selected language pack(s)"
     When I click on "Find Learning" in the totara menu

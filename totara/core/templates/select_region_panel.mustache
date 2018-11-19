@@ -56,7 +56,7 @@
         {{! Display selector title }}
         {{#title}}
         <h2 class="tw-selectRegionPanel__heading_text">
-            {{title}}
+            {{{title}}}
             {{#display_active_count}}
             <span class="tw-selectRegionPanel__content_hidden">
                 (<span class="tw-selectRegionPanel__heading_count" data-tw-selectRegionPanel-count=""></span>)
@@ -81,8 +81,8 @@
         {{#selectors}}
         <section class="tw-selectRegionPanel__selector">
             {{#template_data}}
-            <h3 id="{{key}}" class="tw-selectRegionPanel__selector_header">
-                {{title}}
+            <h3 id="{{{key}}}" class="tw-selectRegionPanel__selector_header">
+                {{{title}}}
             </h3>
 
             {{> &&template_name }}

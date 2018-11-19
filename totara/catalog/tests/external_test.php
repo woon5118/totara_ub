@@ -69,31 +69,31 @@ class totara_catalog_external_testcase extends output_test_base {
         $filterparams = $params->keys['filterparams'];
         $this->assertInstanceOf(external_single_structure::class, $filterparams);
         $expected_filter_params = [
-            'course_acttyp_browse',
-            'course_format_panel-demo',
-            'course_format_panel-singleactivity',
-            'course_format_panel-social',
-            'course_format_panel-topics',
-            'course_format_panel-weeks',
-            'course_format_browse',
-            'tag_browse',
-            'course_type_panel-1',
-            'course_type_panel-0',
-            'course_type_panel-2',
-            'course_type_browse',
-            'catalog_cat_panel',
-            'catalog_cat_browse',
-            'catalog_fts',
-            'catalog_learning_type_panel-certification',
-            'catalog_learning_type_panel-course',
-            'catalog_learning_type_panel-program',
-            'catalog_learning_type_browse',
+            external_value::class => [
+                'course_acttyp_browse',
+                'course_format_browse',
+                'tag_browse',
+                'course_type_browse',
+                'catalog_cat_panel',
+                'catalog_cat_browse',
+                'catalog_fts',
+                'catalog_learning_type_browse',
+            ],
+            external_multiple_structure::class => [
+                'course_acttyp_panel',
+                'course_format_panel',
+                'tag_panel',
+                'course_type_panel',
+                'catalog_learning_type_panel',
+            ],
         ];
-        $this->assertCount(count($expected_filter_params), $filterparams->keys);
-        foreach ($expected_filter_params as $key) {
-            $this->assertArrayHasKey($key, $filterparams->keys);
-            $filterparam_key = $filterparams->keys[$key];
-            $this->assertInstanceOf(external_value::class, $filterparam_key);
+        $this->assertCount(13, $filterparams->keys);
+        foreach ($expected_filter_params as $expected_class => $keys) {
+            foreach ($keys as $key) {
+                $this->assertArrayHasKey($key, $filterparams->keys);
+                $filterparam_key = $filterparams->keys[$key];
+                $this->assertInstanceOf($expected_class, $filterparam_key);
+            }
         }
     }
 

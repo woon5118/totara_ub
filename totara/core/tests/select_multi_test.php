@@ -48,17 +48,17 @@ class select_multi_test extends advanced_testcase {
             'options' => [
                 0 => (object)[
                     'active' => false,
-                    'key' => 'testmultiselect-one',
+                    'key' => 'one',
                     'name' => 'Test option one',
                 ],
                 1 => (object)[
                     'active' => false,
-                    'key' => 'testmultiselect-two',
+                    'key' => 'two',
                     'name' => 'Test option two',
                 ],
                 2 => (object)[
                     'active' => false,
-                    'key' => 'testmultiselect-three',
+                    'key' => 'three',
                     'name' => 'Test option three',
                 ],
             ],
