@@ -26,6 +26,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     When I click on "Enrol users" "button"
     Then I should see "James First" in the ".user-enroller-panel" "css_element"
     And I should see "James Second" in the ".user-enroller-panel" "css_element"
+    And I click on "Finish enrolling users" "button"
     And I log out
     # Suspend user.
     When I log in as "admin"
@@ -39,6 +40,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     When I click on "Enrol users" "button"
     Then I should see "James First" in the ".user-enroller-panel" "css_element"
     And I should see "James Second" in the ".user-enroller-panel" "css_element"
+    And I click on "Finish enrolling users" "button"
     And I log out
     # Disable 'moodle/course:viewsuspendedusers' capability for the teacher role.
     When I log in as "admin"
