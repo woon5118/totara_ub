@@ -5,11 +5,6 @@ Feature: Event Name Site Logs report filter
 
   Background:
     Given I am on a totara site
-    And I log in as "admin"
-    And I set the following administration settings values:
-      | Enhanced catalog | 1 |
-    And I press "Save changes"
-    And I log out
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | teacher1 | Teacher   | 1        | teacher1@example.com |
@@ -38,17 +33,17 @@ Feature: Event Name Site Logs report filter
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on ".rb-display-expand" "css_element"
-    And I press "Enrol"
+    And I click on "Course 1" "link"
+    And I click on "Enrol" "link"
+    And I click on "Enrol me" "button"
     Then I should see "Topic 1"
     And I log out
 
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
-    And I click on ".rb-display-expand" "css_element"
-    And I press "Enrol"
+    And I click on "Course 1" "link"
+    And I click on "Enrol" "link"
+    And I click on "Enrol me" "button"
     Then I should see "Topic 1"
     And I log out
 

@@ -81,7 +81,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     And I should see "User's certification completion date is within the past 5 day(s) \"Certification 1\"" in the "Ruleset #1" "fieldset"
 
   Scenario: Ensure certification completion date rules are not created when certifications are not selected
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification completion date"
@@ -141,7 +141,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     And I log in as "admin"
 
     # User certified, check date before, date in future.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I should see "User's certification completion date is before 20/10/2050 \"Certification 1\"" in the "Ruleset #1" "fieldset"
@@ -173,7 +173,7 @@ Feature: Test the certification completion date rule in dynamic audiences
 
   Scenario: Use certification completion date rule, user completed after date
     # User not certified, check date before, date in past.
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     When I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification completion date"
@@ -224,7 +224,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     And I log in as "admin"
 
     # User certified, check date before, date in future.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I should see "User's certification completion date is on and after 20/10/2050 \"Certification 1\"" in the "Ruleset #1" "fieldset"
@@ -256,7 +256,7 @@ Feature: Test the certification completion date rule in dynamic audiences
 
   Scenario: Use certification completion date rule, user completed within the previous days
     # User not certified.
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     When I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification completion date"
@@ -289,7 +289,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     And I log in as "admin"
 
     # User certified.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I should see "User's certification completion date is within the past 5 day(s) \"Certification 1\"" in the "Ruleset #1" "fieldset"
@@ -303,7 +303,7 @@ Feature: Test the certification completion date rule in dynamic audiences
 
   Scenario: Use certification completion date rule, user completed before previous days
     # User not certified.
-    Given I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Given I navigate to "Audiences" node in "Site administration > Audiences"
     When I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "Certification completion date"
@@ -336,7 +336,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     And I log in as "admin"
 
     # User certified.
-    When I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
     And I should see "User's certification completion date is more than 5 day(s) ago \"Certification 1\"" in the "Ruleset #1" "fieldset"

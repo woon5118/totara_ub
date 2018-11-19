@@ -1,4 +1,4 @@
-@block @block_admin_bookmarks
+@block @block_admin_bookmarks @javascript
 Feature: Add a bookmarks to an admin pages
   In order to speed up common tasks
   As an admin
@@ -6,6 +6,14 @@ Feature: Add a bookmarks to an admin pages
 
   Background:
     Given I log in as "admin"
+    And I navigate to "Notifications" node in "Site administration > System information"
+    And I click on "Blocks editing on" "button"
+    And I add the "Admin bookmarks" block if not present
+    And I configure the "Admin bookmarks" block
+    And I set the following fields to these values:
+      | Display on page types | Any site administration page |
+    And I press "Save changes"
+    And I click on "Blocks editing off" "button"
     And I navigate to "Scheduled tasks" node in "Site administration > Server"
     And I click on "Bookmark this page" "link" in the "Admin bookmarks" "block"
     And I log out
