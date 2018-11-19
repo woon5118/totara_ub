@@ -81,6 +81,8 @@ final class rb_source_scheduled_reports extends rb_base_source {
         $this->requiredcolumns = [];
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_scheduled_reports');
 
+        $this->cacheable = false;
+
         parent::__construct();
     }
 
