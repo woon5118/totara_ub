@@ -146,7 +146,7 @@ final class preference_helper {
         $data = $itemcache->get($userid);
 
         // If the cache is not populated then load from database
-        if ($data == false) {
+        if ($data === false) {
             $data = $DB->get_records_menu('quickaccess_preferences', array('userid' => $userid), '', 'name,value'); // All values.
 
             $data = array_map('json_decode', $data);
