@@ -106,7 +106,7 @@ class rb_source_program extends rb_base_source {
 
         // include some standard filters
         $this->add_totara_program_filters($filteroptions);
-        $this->add_core_course_category_filters($filteroptions, 'base', 'category');
+        $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_cohort_program_filters($filteroptions, 'totara_program');
 
         return $filteroptions;

@@ -76,6 +76,9 @@ abstract class rb_base_source {
     /** @var string extra WHERE statement for source */
     public $sourcewhere = '';
 
+    /** @var string[] joins required for where, ignored if sourcewhere not specified */
+    public $sourcejoins = array();
+
     /** @var array sql parameters for sourcewhere */
     public $sourceparams = array();
 

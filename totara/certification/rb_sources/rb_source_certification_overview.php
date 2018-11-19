@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/certification/lib.php');
+require_once($CFG->dirroot . '/completion/completion_completion.php');
+require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php'); // Must be included in global scope!!!
 
 class rb_source_certification_overview extends rb_base_source {
     use \core_course\rb\source\report_trait;
@@ -56,7 +58,7 @@ class rb_source_certification_overview extends rb_base_source {
         $this->sourcejoins = $this->get_source_joins();
         $this->usedcomponents[] = 'totara_certification';
         $this->usedcomponents[] = 'totara_program';
-        $this->usedcomponents[] = 'totara_cohort';
+        $this->usedcomponents[] = 'totara_cohort';  // Needed for visibility.
 
         $this->cacheable = false;
 
@@ -88,121 +90,46 @@ class rb_source_certification_overview extends rb_base_source {
 
     protected function define_sourcewhere() {
         // Only consider whole certifications - not courseset completion.
-        $sourcewhere = 'base.coursesetid = 0';
-
-        return $sourcewhere;
+        return "base.coursesetid = 0 AND certif.id IS NOT NULL AND certif_completion.id IS NOT NULL";
     }
 
     protected function get_source_joins() {
-        // This enforces the INNER join defined for 'certif' and filters out all non-certification stuff in prog table.
-        return array('certif');
+        return array('certif', 'certif_completion');
     }
 
     protected function define_joinlist() {
-        global $CFG;
-
         $joinlist = array();
 
         $this->add_totara_certification_tables($joinlist, 'base', 'programid');
 
+        $joinlist[] = new rb_join(
+            'certif_completion',
+            'INNER',
+            '{certif_completion}',
+            "certif_completion.certifid = certif.certifid AND certif_completion.userid = base.userid",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'certif'
+        );
+
+        $joinlist[] = new rb_join(
+            'history',
+            'LEFT',
+            '{certif_completion_history}',
+            "certif_completion.userid = history.userid
+             AND certif_completion.certifid = history.certifid
+             AND history.timecompleted = (SELECT MAX(timecompleted)
+                                            FROM {certif_completion_history} cch
+                                           WHERE cch.userid = history.userid
+                                             AND cch.certifid = history.certifid)",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'certif_completion'
+        );
+
         $this->add_core_user_tables($joinlist, 'base', 'userid');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
-        $this->add_core_course_category_tables($joinlist, 'course', 'category');
+        $this->add_core_course_category_tables($joinlist, 'certif', 'category');
 
-        /* Psuedo Explaination:
- *
- * if (window is open) {
- *      Use current record
- * } else {
- *      if (history record exists) {
- *          use history certifpath
- *      } else {
- *          default to certif
- *      }
- * }
- */
-        $now = time();
-        $path = CERTIFPATH_CERT;
-        $joinlist[] = new rb_join(
-            'prog_courseset',
-            'INNER',
-            '{prog_courseset}',
-            "prog_courseset.programid = base.programid
-            AND base.coursesetid = 0
-            AND (
-                   (certif_completion.timewindowopens < {$now} AND prog_courseset.certifpath = certif_completion.certifpath)
-                OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NOT NULL AND prog_courseset.certifpath = history.certifpath)
-                OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NULL AND prog_courseset.certifpath = {$path})
-            )
-            ",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            array('base', 'certif_completion', 'history')
-        );
-
-        $joinlist[] = new rb_join(
-            'prog_completion',
-            'LEFT',
-            '{prog_completion}',
-            "prog_completion.programid = base.programid AND prog_completion.userid = base.userid AND prog_courseset.id = prog_completion.coursesetid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset'
-        );
-
-        $joinlist[] = new rb_join(
-            'prog_courseset_course',
-            'INNER',
-            '{prog_courseset_course}',
-            "prog_courseset_course.coursesetid = prog_courseset.id",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            'prog_courseset'
-        );
-
-        $joinlist[] = new rb_join(
-            'course',
-            'INNER',
-            '{course} ', // Intentional space to stop report builder adding unwanted custom course fields.
-            "prog_courseset_course.courseid = course.id",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset_course'
-        );
-
-        $joinlist[] = new rb_join(
-            'course_completions',
-            'LEFT',
-            '{course_completions}',
-            "course_completions.course = course.id AND course_completions.userid = base.userid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'course'
-        );
-
-        $joinlist[] = new rb_join(
-            'grade_items',
-            'LEFT',
-            '{grade_items}',
-            "grade_items.itemtype = 'course' AND grade_items.courseid = course.id",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'course'
-        );
-
-        $joinlist[] = new rb_join(
-            'grade_grades',
-            'LEFT',
-            '{grade_grades}',
-            "grade_grades.itemid = grade_items.id AND grade_grades.userid = base.userid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'grade_items'
-        );
-
-        require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
-
-        $joinlist[] = new rb_join(
-            'criteria',
-            'LEFT',
-            '{course_completion_criteria}',
-            "criteria.course = prog_courseset_course.courseid AND criteria.criteriatype = " . COMPLETION_CRITERIA_TYPE_GRADE,
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset_course'
-        );
+        // NOTE: the job stuff makes little sense here since the multiple jobs transition!
 
         $joinlist[] = new rb_join(
             'cplorganisation',
@@ -240,35 +167,32 @@ class rb_source_certification_overview extends rb_base_source {
             'cplposition'
         );
 
-        $joinlist[] = new rb_join(
-            'certif_completion',
-            'INNER',
-            '{certif_completion}',
-            "certif_completion.userid = base.userid AND certif_completion.certifid = certif.certifid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'certif'
-        );
-
-        $joinlist[] = new rb_join(
-            'history',
-            'LEFT',
-            '{certif_completion_history}',
-            "certif_completion.userid = history.userid
-             AND certif_completion.certifid = history.certifid
-             AND history.timecompleted = (SELECT MAX(timecompleted)
-                                            FROM {certif_completion_history} cch
-                                           WHERE cch.userid = history.userid
-                                             AND cch.certifid = history.certifid)",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'certif_completion'
-        );
-
         return $joinlist;
     }
 
     protected function define_columnoptions() {
-        global $DB, $CFG;
-        require_once($CFG->dirroot.'/completion/completion_completion.php');
+        global $DB;
+
+       /* Pseudo-explanation of famously incomprehensible certification logic:
+        *
+        * if (window is open) {
+        *      Use current record
+        * } else {
+        *      if (history record exists) {
+        *          use history certifpath
+        *      } else {
+        *          default to certif
+        *      }
+        * }
+        */
+
+        $now = time();
+        $path = CERTIFPATH_CERT;
+        $certifwhere = "
+        ((certif_completion.timewindowopens < {$now} AND prog_courseset.certifpath = certif_completion.certifpath)
+            OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NOT NULL AND prog_courseset.certifpath = history.certifpath)
+            OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NULL AND prog_courseset.certifpath = {$path})
+        )";
 
         $columnoptions = array();
 
@@ -276,6 +200,7 @@ class rb_source_certification_overview extends rb_base_source {
         $this->add_totara_certification_columns($columnoptions, 'certif');
         $this->add_core_user_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'certif');
 
         // Programe completion cols.
         $columnoptions[] = new rb_column_option(
@@ -400,167 +325,224 @@ class rb_source_certification_overview extends rb_base_source {
 
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition('course.shortname', 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'shortname',
+            get_string('courseshortname', 'rb_source_program_overview'),
+            "(SELECT $concat $from)",
+            array(
+                'joins' => ['certif', 'certif_completion', 'history'],
+                'nosort' => true, // You can't sort concatenated columns.
+                'displayfunc' => 'program_course_name_list',
+                'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.status'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'status',
+            get_string('coursecompletionstatus', 'rb_source_program_overview'),
+            "(SELECT $concat $from)",
+            array(
+                'joins' => ['certif', 'certif_completion', 'history'],
+                'nosort' => true, // You can't sort concatenated columns.
+                'displayfunc' => 'program_course_status_list',
+                'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
+            )
+        );
+
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timeenrolled'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'timeenrolled',
             get_string('coursecompletiontimeenrolled', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timeenrolled'), 'certif'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_completions'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timestarted'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'timestarted',
             get_string('coursecompletiontimestarted', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timestarted'), 'certif'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_completions'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timecompleted'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'timecompleted',
             get_string('coursecompletiontimecompleted', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timecompleted'), 'certif'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_completions'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
         // Course grade.
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+            LEFT JOIN {grade_items} grade_items ON grade_items.itemtype = 'course' AND grade_items.courseid = course.id
+            LEFT JOIN {grade_grades} grade_grades ON grade_grades.itemid = grade_items.id AND grade_grades.userid = base.userid
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('grade_grades.finalgrade'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'finalgrade',
             get_string('finalgrade', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('grade_grades.finalgrade'), 'certif'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['grade_grades', 'course'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
-                'groupinginfo' => array(
-                    'orderby' => array('prog_courseset.sortorder', 'prog_courseset_course.id'),
-                ),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completion_criteria} criteria ON criteria.course = prog_courseset_course.courseid AND criteria.criteriatype = " . COMPLETION_CRITERIA_TYPE_GRADE . "
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('criteria.gradepass'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'gradepass',
             get_string('gradepass', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('criteria.gradepass'), 'certif'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['criteria', 'course'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
-
         // Course category.
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_categories} course_category ON course_category.id = course.category
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.name', 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'name',
             get_string('coursecategory', 'totara_reportbuilder'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.name', 'certif'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_category'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_categories} course_category ON course_category.id = course.category
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition(
+                $DB->sql_concat_join("'|'", array( $DB->sql_cast_2char('course_category.id'), $DB->sql_cast_2char("course_category.visible"), 'course_category.name')), 'certif'),
+            $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'namelink',
             get_string('coursecategorylinked', 'totara_reportbuilder'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition(
-                $DB->sql_concat_join(
-                    "'|'",
-                    array(
-                        $DB->sql_cast_2char('course_category.id'),
-                        $DB->sql_cast_2char("course_category.visible"),
-                        'course_category.name'
-                    )
-                ), 'certif'
-            ),
+            "(SELECT $concat $from)",
             array(
-                'joins' => 'course_category',
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_category_link_list',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_categories} course_category ON course_category.id = course.category
+                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.idnumber', 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'id',
             get_string('coursecategoryid', 'totara_reportbuilder'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.idnumber', 'certif'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => array('course', 'course_category'),
+                'joins' => ['certif', 'certif_completion', 'history'],
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
@@ -673,7 +655,7 @@ class rb_source_certification_overview extends rb_base_source {
                     'stringexport' => 0,
                 ),
                 'displayfunc' => 'certif_completion_progress',
-                'joins' => array('prog_completion', 'certif_completion', 'history'),
+                'joins' => array('certif_completion', 'history'),
                 'nosort' => true,
             )
         );
@@ -695,44 +677,6 @@ class rb_source_certification_overview extends rb_base_source {
                 'joins' => array('certif_completion', 'history'),
                 'nosort' => true,
             )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'course',
-            'shortname',
-            get_string('courseshortname', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course.shortname', 'certif'),
-            array(
-                'joins' => ['course'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
-                'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'program_course_name_list',
-                'style' => array('white-space' => 'pre'),
-            )
-
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'course',
-            'status',
-            get_string('coursecompletionstatus', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.status'), 'certif'),
-            array(
-                'joins' => ['course_completions'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
-                'nosort' => true, // You can't sort concatenated columns.
-                'displayfunc' => 'program_course_status_list',
-                'style' => array('white-space' => 'pre'),
-            )
-
         );
 
         return $columnoptions;
@@ -862,16 +806,6 @@ class rb_source_certification_overview extends rb_base_source {
 
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
-        $requiredcolumns[] = new rb_column(
-            'certif',
-            'groupbycol',
-            '',
-            "certif.id",
-            array(
-                'joins' => 'certif',
-                'hidden' => true,
-            )
-        );
         return $requiredcolumns;
     }
 
@@ -917,20 +851,5 @@ class rb_source_certification_overview extends rb_base_source {
         }
 
         return $out;
-    }
-
-    /**
-     * Returns expected result for column_test.
-     * @param rb_column_option $columnoption
-     * @return int
-     */
-    public function phpunit_column_test_expected_count($columnoption) {
-        if (!PHPUNIT_TEST) {
-            throw new coding_exception('phpunit_column_test_expected_count() cannot be used outside of unit tests');
-        }
-        if ($columnoption->type === 'course' or "{$columnoption->type}_{$columnoption->value}" === 'certif_completion_progress') {
-            return 0;
-        }
-        return parent::phpunit_column_test_expected_count($columnoption);
     }
 }

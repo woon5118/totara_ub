@@ -64,7 +64,7 @@ trait report_trait {
                     $joindata['custom_course'] = ['jointable' => 'course', 'cf_prefix' => 'course', 'joinfield' => 'courseid'];
                     break;
                 case '{prog}':
-                    $joindata['custom_prog'] = ['jointable' => 'prog', 'cf_prefix' => 'prog', 'joinfield' => 'programid'];
+                    $joindata['custom_prog'] = ['jointable' => $join->name, 'cf_prefix' => 'prog', 'joinfield' => 'programid'];
                     break;
                 case '{comp}':
                     $joindata['custom_competency'] = ['jointable' => 'competency', 'cf_prefix' => 'comp_type', 'joinfield' => 'competencyid'];

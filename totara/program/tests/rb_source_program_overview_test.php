@@ -146,15 +146,5 @@ class totara_program_rb_source_program_overview_testcase extends reportcache_adv
         $duration = microtime_diff($startime, microtime());
         $this->output_log("Records: $total \n Report generated in: $duration sec");
         $this->assertEquals($usernum * $programnum, $total);
-
-        $this->output_log("Start report testing...");
-        $usecache = 1;
-        $this->enable_caching($this->report_builder_data['id']);
-        $startime = microtime();
-        $result = $this->get_report_result($this->report_builder_data['id'], array(), $usecache);
-        $total = count($result);
-        $duration = microtime_diff($startime, microtime());
-        $this->output_log("Records: $total \n Report generated in: $duration sec");
-        $this->assertEquals($usernum * $programnum, $total);
     }
 }

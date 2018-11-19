@@ -88,13 +88,11 @@ class rb_source_certification_completion extends rb_base_source {
 
     protected function define_sourcewhere() {
         // Only consider whole certifications - not courseset completion.
-        $sourcewhere = 'base.coursesetid = 0';
-
-        return $sourcewhere;
+        return 'base.coursesetid = 0 AND certif.id IS NOT NULL';
     }
 
     protected function get_source_joins() {
-        return array('certif', 'certif_completion');
+        return array('certif');
     }
 
     protected function define_joinlist() {

@@ -96,15 +96,6 @@ class rb_source_program_membership extends rb_base_source {
             REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
 
-        // This join is required to keep the joining of program custom fields happy.
-        $joinlist[] =  new rb_join(
-            'prog',
-            'LEFT',
-            '{prog}',
-            'prog.id = base.programid',
-            REPORT_BUILDER_RELATION_ONE_TO_ONE
-        );
-
         return $joinlist;
     }
 

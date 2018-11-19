@@ -26,6 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . '/completion/completion_completion.php');
+require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php'); // Must be included in global scope!!!
 
 class rb_source_program_overview extends rb_base_source {
     use \core_course\rb\source\report_trait;
@@ -55,7 +57,7 @@ class rb_source_program_overview extends rb_base_source {
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->get_source_joins();
         $this->usedcomponents[] = 'totara_program';
-        $this->usedcomponents[] = 'totara_cohort';
+        $this->usedcomponents[] = 'totara_cohort'; // Needed for visibility.
 
         $this->cacheable = false;
 
@@ -94,98 +96,14 @@ class rb_source_program_overview extends rb_base_source {
     }
 
     protected function define_joinlist() {
-        global $CFG;
-
         $joinlist = array();
 
         $this->add_totara_program_tables($joinlist, 'base', 'programid');
         $this->add_core_user_tables($joinlist, 'base', 'userid');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
-        $this->add_core_course_category_tables($joinlist, 'course', 'category');
+        $this->add_core_course_category_tables($joinlist, 'program', 'category');
 
-        $joinlist[] = new rb_join(
-            'prog_courseset',
-            'INNER',
-            '{prog_courseset}',
-            "prog_courseset.programid = base.programid AND base.coursesetid = 0",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            'base'
-        );
-
-        $joinlist[] = new rb_join(
-            'prog_completion',
-            'LEFT',
-            '{prog_completion}',
-            "prog_completion.programid = base.programid AND prog_completion.userid = base.userid AND prog_courseset.id = prog_completion.coursesetid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset'
-        );
-
-        // This join is required to keep the joining of program custom fields happy.
-        $joinlist[] =  new rb_join(
-            'prog',
-            'LEFT',
-            '{prog}',
-            'prog.id = base.programid',
-            REPORT_BUILDER_RELATION_ONE_TO_ONE
-        );
-
-
-        $joinlist[] = new rb_join(
-            'prog_courseset_course',
-            'INNER',
-            '{prog_courseset_course}',
-            "prog_courseset_course.coursesetid = prog_courseset.id",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            'prog_courseset'
-        );
-
-        $joinlist[] = new rb_join(
-            'course',
-            'INNER',
-            '{course} ', // Intentional space to stop report builder adding unwanted custom course fields.
-            "prog_courseset_course.courseid = course.id",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset_course'
-        );
-
-        $joinlist[] = new rb_join(
-            'course_completions',
-            'LEFT',
-            '{course_completions}',
-            "course_completions.course = course.id AND course_completions.userid = base.userid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'course'
-        );
-
-        $joinlist[] = new rb_join(
-            'grade_items',
-            'LEFT',
-            '{grade_items}',
-            "grade_items.itemtype = 'course' AND grade_items.courseid = course.id",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'course'
-        );
-
-        $joinlist[] = new rb_join(
-            'grade_grades',
-            'LEFT',
-            '{grade_grades}',
-            "grade_grades.itemid = grade_items.id AND grade_grades.userid = base.userid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'grade_items'
-        );
-
-        require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
-
-        $joinlist[] = new rb_join(
-            'criteria',
-            'LEFT',
-            '{course_completion_criteria}',
-            "criteria.course = prog_courseset_course.courseid AND criteria.criteriatype = " . COMPLETION_CRITERIA_TYPE_GRADE,
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset_course'
-        );
+        // NOTE: the job stuff makes little sense here since the multiple jobs transition!
 
         $joinlist[] = new rb_join(
             'cplorganisation',
@@ -227,8 +145,7 @@ class rb_source_program_overview extends rb_base_source {
     }
 
     protected function define_columnoptions() {
-        global $DB, $CFG;
-        require_once($CFG->dirroot.'/completion/completion_completion.php');
+        global $DB;
 
         $columnoptions = array();
 
@@ -236,6 +153,7 @@ class rb_source_program_overview extends rb_base_source {
         $this->add_totara_program_columns($columnoptions, 'program');
         $this->add_core_user_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions, 'course_category', 'program');
 
         // Programe completion cols.
         $columnoptions[] = new rb_column_option(
@@ -433,203 +351,215 @@ class rb_source_program_overview extends rb_base_source {
         );
 
         // Course completion cols.
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition('course.shortname'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'shortname',
             get_string('courseshortname', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course.shortname'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_name_list',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.status')), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'status',
             get_string('coursecompletionstatus', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.status')),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_completions', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_status_list',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timeenrolled')), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'timeenrolled',
             get_string('coursecompletiontimeenrolled', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timeenrolled')),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_completions', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timestarted')), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'timestarted',
             get_string('coursecompletiontimestarted', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timestarted')),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_completions', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timecompleted')), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'timecompleted',
             get_string('coursecompletiontimecompleted', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timecompleted')),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_completions', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline_date',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
         // Course grade.
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+            LEFT JOIN {grade_items} grade_items ON grade_items.itemtype = 'course' AND grade_items.courseid = course.id
+            LEFT JOIN {grade_grades} grade_grades ON grade_grades.itemid = grade_items.id AND grade_grades.userid = base.userid
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('grade_grades.finalgrade')), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'finalgrade',
             get_string('finalgrade', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('grade_grades.finalgrade')),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['grade_grades', 'course', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
-                'groupinginfo' => array(
-                    'orderby' => array('prog_courseset.sortorder', 'prog_courseset_course.id'),
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_completion_criteria} criteria ON criteria.course = prog_courseset_course.courseid AND criteria.criteriatype = " . COMPLETION_CRITERIA_TYPE_GRADE . "
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('criteria.gradepass')), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'gradepass',
             get_string('gradepass', 'rb_source_program_overview'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('criteria.gradepass')),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['criteria', 'course', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
 
         // Course category.
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_categories} course_category ON course_category.id = course.category
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.name'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'name',
             get_string('coursecategory', 'totara_reportbuilder'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.name'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => ['course_category', 'program'],
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_categories} course_category ON course_category.id = course.category
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(
+            \totara_program\rb_course_sortorder_helper::get_column_field_definition(
+                $DB->sql_concat_join("'|'", array( $DB->sql_cast_2char('course_category.id'), $DB->sql_cast_2char("course_category.visible"), 'course_category.name'))),
+            $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'namelink',
             get_string('coursecategorylinked', 'totara_reportbuilder'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition(
-                $DB->sql_concat_join(
-                    "'|'",
-                    array(
-                        $DB->sql_cast_2char('course_category.id'),
-                        $DB->sql_cast_2char("course_category.visible"),
-                        'course_category.name'
-                    )
-                )
-            ),
+            "(SELECT $concat $from)",
             array(
-                'joins' => 'course_category',
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_category_link_list',
                 'style' => array('white-space' => 'pre'),
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
+        $from = "FROM {prog_courseset} prog_courseset
+                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                 JOIN {course} course ON course.id = prog_courseset_course.courseid
+            LEFT JOIN {course_categories} course_category ON course_category.id = course.category
+                WHERE prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.idnumber'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
             'id',
             get_string('coursecategoryid', 'totara_reportbuilder'),
-            \totara_program\rb_course_sortorder_helper::get_column_field_definition('course_category.idnumber'),
+            "(SELECT $concat $from)",
             array(
-                'joins' => array('course', 'course_category'),
                 'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'program_course_newline',
-                'grouping' => 'sql_aggregate',
-                'grouporder' => array(
-                    'csorder'  => 'prog_courseset.sortorder',
-                    'cscid'    => 'prog_courseset_course.id'
-                ),
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'iscompound' => true,
+                'issubquery' => true,
             )
         );
 
@@ -640,7 +570,7 @@ class rb_source_program_overview extends rb_base_source {
         $filteroptions = array();
 
         $this->add_core_user_filters($filteroptions);
-        $this->add_totara_program_filters($filteroptions, "totara_program");
+        $this->add_totara_program_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
 
         $filteroptions[] = new rb_filter_option(
@@ -682,6 +612,8 @@ class rb_source_program_overview extends rb_base_source {
                 'noanychoice' => true,
             )
         );
+
+        $this->add_core_course_category_filters($filteroptions);
 
         return $filteroptions;
     }
@@ -752,16 +684,6 @@ class rb_source_program_overview extends rb_base_source {
 
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
-        $requiredcolumns[] = new rb_column(
-            'prog',
-            'groupbycol',
-            '',
-            "program.id",
-            array(
-                'joins' => 'program',
-                'hidden' => true,
-            )
-        );
         return $requiredcolumns;
     }
 

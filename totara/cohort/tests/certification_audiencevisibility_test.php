@@ -398,7 +398,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
                 if ($enhancedcatalog) {
                     $this->assertCount(1, $search);
                     $r = array_shift($search);
-                    $this->assertEquals($this->{$certification}->fullname, $r->prog_progexpandlink);
+                    $this->assertEquals($this->{$certification}->fullname, $r->certif_progexpandlink);
                 } else {
                     $this->assertInternalType('int', strpos($search, $this->{$certification}->fullname));
                 }
@@ -449,7 +449,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
         if ($CFG->catalogtype === 'enhanced') { // Enhanced catalog.
             $search = array();
             if (is_array($content)) {
-                $search = totara_search_for_value($content, 'prog_progexpandlink', TOTARA_SEARCH_OP_EQUAL,
+                $search = totara_search_for_value($content, 'certif_progexpandlink', TOTARA_SEARCH_OP_EQUAL,
                                                     $certification->fullname);
                 $visible = !empty($search);
             }

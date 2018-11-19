@@ -119,14 +119,6 @@ class rb_source_program_completion extends rb_base_source {
                 'completion_position.id = base.positionid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
-            // This join is required to keep the joining of program custom fields happy.
-            new rb_join(
-                'prog',
-                'LEFT',
-                '{prog}',
-                'prog.id = base.programid',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
         );
 
         $this->add_core_user_tables($joinlist, 'base', 'userid');
@@ -506,9 +498,9 @@ class rb_source_program_completion extends rb_base_source {
 
         // Include some standard filters.
         $this->add_core_user_filters($filteroptions);
-        $this->add_core_course_category_filters($filteroptions, 'prog', 'category');
+        $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
-        $this->add_totara_program_filters($filteroptions, "totara_program");
+        $this->add_totara_program_filters($filteroptions);
         $this->add_totara_cohort_program_filters($filteroptions, "totara_program");
 
         return $filteroptions;
