@@ -444,16 +444,29 @@ class totara_core_renderer extends plugin_renderer_base {
     public function masthead(bool $hasguestlangmenu = true, bool $nocustommenu = false) {
         global $USER;
 
-        $menudata = totara_build_menu();
-        $mastheadmenu = new totara_core\output\masthead_menu($menudata);
+        if ($nocustommenu || !empty($this->page->layout_options['nototaramenu']) || !empty($this->page->layout_options['nocustommenu'])) {
+            // No totara menu, or the old legacy no custom menu, in which case DO NOT generate the totara menu, its costly.
+            $mastheadmenudata = new stdClass;
+        } else {
+            $menudata = totara_build_menu();
+            $mastheadmenu = new totara_core\output\masthead_menu($menudata);
+            $mastheadmenudata = $mastheadmenu->export_for_template($this->output);
+        }
+
         $mastheadlogo = new totara_core\output\masthead_logo();
 
         $mastheaddata = new stdClass();
         $mastheaddata->masthead_lang = $hasguestlangmenu && (!isloggedin() || isguestuser()) ? $this->output->lang_menu() : '';
         $mastheaddata->masthead_logo = $mastheadlogo->export_for_template($this->output);
-        $mastheaddata->masthead_menu = $nocustommenu ? new stdClass() : $mastheadmenu->export_for_template($this->output);
-        $mastheaddata->masthead_plugins = $this->output->navbar_plugin_output();
+        $mastheaddata->masthead_menu = $mastheadmenudata;
+        if (!empty($this->page->layout_options['nonavbar'])) {
+            // There is no navbar, don't bother to generate anything for it.
+            $mastheaddata->masthead_plugins = '';
+        } else {
+            $mastheaddata->masthead_plugins = $this->output->navbar_plugin_output();
+        }
         $mastheaddata->masthead_search = $this->output->search_box();
+        // Even if we don't have a "navbar" we need this option, due to the poor design of the nonavbar option in the past.
         $mastheaddata->masthead_toggle = $this->output->navbar_button();
         $mastheaddata->masthead_usermenu = $this->output->user_menu();
 
