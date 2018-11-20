@@ -169,7 +169,7 @@ abstract class rb_base_source {
         }
 
         // Make sure that there are no column options using subqueries if report is grouped.
-        if ($this->get_grouped_column_options()) {
+        if ($this->get_grouped_column_options()) { // Deprecated since Totara 12
             foreach ($this->columnoptions as $k => $option) {
                 if ($option->issubquery) {
                     unset($this->columnoptions[$k]);
@@ -1096,21 +1096,6 @@ abstract class rb_base_source {
             }
         }
         return $allowed;
-    }
-
-    /**
-     * Get list of grouped columns.
-     *
-     * @return array of group select column values that are grouped
-     */
-    public function get_grouped_column_options() {
-        $grouped = array();
-        foreach ($this->columnoptions as $option) {
-            if ($option->grouping !== 'none') {
-                $grouped[] = $option->type . '-' . $option->value;
-            }
-        }
-        return $grouped;
     }
 
     /**

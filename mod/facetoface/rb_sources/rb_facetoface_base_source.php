@@ -306,14 +306,14 @@ abstract class rb_facetoface_base_source extends rb_base_source {
 
         // Fields.
         $usernamefields = totara_get_all_user_name_fields_join('role_user', null, true);
-        $userlistcolumn = $this->rb_group_comma_list($DB->sql_concat_join("' '", $usernamefields));
+        $userlistcolumn = $DB->sql_group_concat($DB->sql_concat_join("' '", $usernamefields), ', ');
         // Add id to fields.
         $usernamefieldsid = array_merge(array('role_user.id' => 'userid'), $usernamefields);
         // Length of resulted concatenated fields.
         $lengthfield = array('lengths' => $DB->sql_length($DB->sql_concat_join("' '", $usernamefieldsid)));
         // Final column: concat(strlen(concat(fields)),concat(fields)) so we know length of each username with id.
         $usernamefieldslink = array_merge($lengthfield, $usernamefieldsid);
-        $userlistcolumnlink = $this->rb_group_comma_list($DB->sql_concat_join("' '", $usernamefieldslink));
+        $userlistcolumnlink = $DB->sql_group_concat($DB->sql_concat_join("' '", $usernamefieldslink), ', ');
 
         foreach ($sessionroles as $role) {
             $field = $role->shortname;

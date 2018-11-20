@@ -100,9 +100,26 @@ trait base_deprecated_t12_trait {
     //
 
     /**
+     * Get list of grouped columns.
+     *
+     * @deprecated since Totara 12
+     * @return array of group select column values that are grouped
+     */
+    public function get_grouped_column_options() {
+        $grouped = array();
+        foreach ($this->columnoptions as $option) {
+            if ($option->grouping !== 'none') {
+                $grouped[] = $option->type . '-' . $option->value;
+            }
+        }
+        return $grouped;
+    }
+
+    /**
      * @deprecated since Totara 12
      */
     function rb_group_count($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         return "COUNT($field)";
     }
 
@@ -110,6 +127,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_unique_count($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         return "COUNT(DISTINCT $field)";
     }
 
@@ -117,6 +135,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_sum($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         return "SUM($field)";
     }
 
@@ -124,6 +143,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_average($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         return "AVG($field)";
     }
 
@@ -131,6 +151,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_max($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         return "MAX($field)";
     }
 
@@ -138,6 +159,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_min($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         return "MIN($field)";
     }
 
@@ -145,6 +167,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_stddev($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         return "STDDEV($field)";
     }
 
@@ -154,6 +177,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_percent($field) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_round("AVG($field*100.0)", 0);
@@ -171,6 +195,7 @@ trait base_deprecated_t12_trait {
      * @return string               The native sql for a group concat
      */
     function rb_group_sql_aggregate($field, $orderby) {
+        debugging('Column option grouping is deprecated since Totara 12, use subqueries instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_group_concat($field, $this->uniquedelimiter, $orderby);
@@ -181,6 +206,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_comma_list($field) {
+        debugging('rb_group_comma_list is deprecated since Totara 12, use $DB->sql_group_concat() instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_group_concat($field, ', ');
@@ -191,6 +217,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_list_nodelimiter($field) {
+        debugging('rb_group_list_nodelimiter is deprecated since Totara 12, use $DB->sql_group_concat() instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_group_concat($field, '');
@@ -201,6 +228,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_comma_list_unique($field) {
+        debugging('rb_group_comma_list_unique is deprecated since Totara 12, use $DB->sql_group_concat_unique() instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_group_concat_unique($field, ', ');
@@ -211,6 +239,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_list($field) {
+        debugging('rb_group_list is deprecated since Totara 12, use $DB->sql_group_concat() instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_group_concat($field, html_writer::empty_tag('br'));
@@ -221,6 +250,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_list_unique($field) {
+        debugging('rb_group_list_unique is deprecated since Totara 12, use $DB->sql_group_concat_unique() instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_group_concat_unique($field, html_writer::empty_tag('br'));
@@ -231,6 +261,7 @@ trait base_deprecated_t12_trait {
      * @deprecated since Totara 12
      */
     function rb_group_list_dash($field) {
+        debugging('rb_group_list_dash is deprecated since Totara 12, use $DB->sql_group_concat() instead', DEBUG_DEVELOPER);
         global $DB;
 
         return $DB->sql_group_concat($field, html_writer::empty_tag('br') . '-' . html_writer::empty_tag('br'));
