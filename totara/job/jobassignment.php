@@ -256,6 +256,7 @@ if ($submitted = $form->get_data()) {
 
     // Get temp manager.
     $data->tempmanagerjaid = null;
+    $data->tempmanagerexpirydate = null;
     if (!empty($submitted->tempmanagerid) && $submitted->tempmanagerid > 0) {
         // If there is a temp manager assigned, check it is valid.
         if ($submitted->tempmanagerid == $userid) {

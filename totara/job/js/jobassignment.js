@@ -165,6 +165,9 @@ totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaid
             deletebutton.click(function() {
                 $('input[name="' + useridKey + '"]').val('');
                 $('input[name="' + jaidKey + '"]').val('');
+                if ($("#id_tempmanagerexpirydate_enabled").is(":checked")) {
+                    $("#id_tempmanagerexpirydate_enabled").trigger("click");
+                }
             });
         }
     };
@@ -181,6 +184,9 @@ totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaid
             deletebutton.click(function () {
                 $('input[name="' + useridKey + '"]').val('');
                 $('input[name="' + jaidKey + '"]').val('');
+                if ($("#id_tempmanagerexpirydate_enabled").is(":checked")) {
+                    $("#id_tempmanagerexpirydate_enabled").trigger("click");
+                }
             });
         }
     }
