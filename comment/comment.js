@@ -457,12 +457,12 @@ M.core_comment = {
             select_all.on('click', function(e) {
                 var comments = document.getElementsByName('comments');
                 var checked = false;
-                for (var i in comments) {
+                for (var i = 0; i < comments.length; i++) {
                     if (comments[i].checked) {
                         checked=true;
                     }
                 }
-                for (i in comments) {
+                for (i = 0; i < comments.length; i++) {
                     comments[i].checked = !checked;
                 }
                 this.set('checked', !checked);
