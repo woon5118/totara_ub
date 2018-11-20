@@ -26,7 +26,7 @@ namespace totara_catalog\observer;
 defined('MOODLE_INTERNAL') || die();
 
 use core\event\admin_settings_changed;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 use totara_catalog\task\provider_active_task;
 use core\task\manager as task_manager;
 
@@ -54,7 +54,6 @@ class settings_observer {
             }
         }
     }
-
 
     /**
      * Check setting changed. Override in subclass.

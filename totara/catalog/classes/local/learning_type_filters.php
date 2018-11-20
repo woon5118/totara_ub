@@ -30,6 +30,7 @@ use totara_catalog\filter;
 use totara_catalog\merge_select\multi;
 use totara_catalog\merge_select\single;
 use totara_catalog\provider;
+use totara_catalog\provider_handler;
 
 /**
  * Creates the learning type filters.

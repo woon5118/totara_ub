@@ -26,7 +26,7 @@ namespace totara_program\totara_catalog\program\filter_factory;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\filter_factory;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 use totara_customfield\totara_catalog\filter_factory as customfield_filter_factory;
 
 class custom_fields extends filter_factory {

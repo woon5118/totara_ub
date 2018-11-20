@@ -21,12 +21,12 @@
  * @package totara_catalog
  */
 
-namespace totara_catalog\local;
+namespace totara_catalog;
+
+use totara_catalog\local\config;
+use totara_catalog\local\required_dataholder;
 
 defined('MOODLE_INTERNAL') || die();
-
-use totara_catalog\dataholder;
-use totara_catalog\provider;
 
 class provider_handler {
 

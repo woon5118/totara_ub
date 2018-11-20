@@ -26,7 +26,7 @@ namespace totara_certification\totara_catalog\certification\feature_factory;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\feature_factory;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 use totara_customfield\totara_catalog\feature_factory as customfield_feature_factory;
 
 class custom_fields extends feature_factory {

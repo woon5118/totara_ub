@@ -23,10 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_catalog\filter;
 use totara_catalog\local\config;
 use totara_catalog\local\filter_handler;
-use totara_catalog\local\provider_handler;
-use totara_catalog\filter;
+use totara_catalog\provider_handler;
 
 /**
  * @group totara_catalog

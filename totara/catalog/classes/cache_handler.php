@@ -26,7 +26,6 @@ namespace totara_catalog;
 use totara_catalog\local\config;
 use totara_catalog\local\feature_handler;
 use totara_catalog\local\filter_handler;
-use totara_catalog\local\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 

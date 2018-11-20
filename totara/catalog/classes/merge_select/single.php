@@ -57,7 +57,7 @@ class single extends options_loader_merge_select {
     /**
      * Add an 'All' option to the start of the options list.
      *
-     * @param string|null $label
+     * @param string|null $name
      * @param string $key
      */
     public function add_all_option(string $name = null, string $key = '') {

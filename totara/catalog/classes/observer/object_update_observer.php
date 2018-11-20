@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use core\event\base as event_base;
 use totara_catalog\local\catalog_storage;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 
 abstract class object_update_observer {
 

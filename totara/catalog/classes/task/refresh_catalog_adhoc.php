@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use \core\task\adhoc_task;
 use totara_catalog\local\catalog_storage;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 
 /**
  * This adhoc task refreshes all catalog data.

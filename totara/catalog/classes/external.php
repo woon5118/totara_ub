@@ -25,7 +25,6 @@ namespace totara_catalog;
 
 use context_system;
 use totara_catalog\local\filter_handler;
-use totara_catalog\local\provider_handler;
 use totara_catalog\output\catalog as catalog_template;
 use totara_catalog\output\details;
 

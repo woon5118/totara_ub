@@ -22,7 +22,7 @@
  */
 
 use totara_catalog\local\catalog_storage;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 

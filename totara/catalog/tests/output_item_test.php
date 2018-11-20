@@ -23,10 +23,10 @@
 
 use totara_catalog\dataformatter\formatter;
 use totara_catalog\local\config;
-use totara_catalog\local\provider_handler;
 use totara_catalog\local\required_dataholder;
 use totara_catalog\output\item;
 use totara_catalog\output\item_wide;
+use totara_catalog\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 

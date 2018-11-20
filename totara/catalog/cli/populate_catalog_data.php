@@ -25,7 +25,7 @@ define('CLI_SCRIPT', true);
 
 require(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->libdir.'/clilib.php');
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 use totara_catalog\local\catalog_storage;
 
 $help = "Populate catalog data

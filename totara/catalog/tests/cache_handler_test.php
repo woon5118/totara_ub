@@ -36,7 +36,7 @@ class totara_catalog_cache_handler_testcase extends advanced_testcase {
         // Providers are enabled by default, so there is some data.
         $this->assertGreaterThan(1, count(\totara_catalog\local\feature_handler::instance()->get_all_features()));
         $this->assertGreaterThan(5, count(\totara_catalog\local\filter_handler::instance()->get_all_filters()));
-        $this->assertNotEmpty(\totara_catalog\local\provider_handler::instance()->get_active_providers());
+        $this->assertNotEmpty(\totara_catalog\provider_handler::instance()->get_active_providers());
         $this->assertTrue(\totara_catalog\local\config::instance()->is_provider_active('course'));
 
         // Switch off the providers.
@@ -45,7 +45,7 @@ class totara_catalog_cache_handler_testcase extends advanced_testcase {
         // Check that the providers are still using the old cache (to prove our test is valid).
         $this->assertGreaterThan(1, count(\totara_catalog\local\feature_handler::instance()->get_all_features()));
         $this->assertGreaterThan(5, count(\totara_catalog\local\filter_handler::instance()->get_all_filters()));
-        $this->assertNotEmpty(\totara_catalog\local\provider_handler::instance()->get_active_providers());
+        $this->assertNotEmpty(\totara_catalog\provider_handler::instance()->get_active_providers());
         $this->assertTrue(\totara_catalog\local\config::instance()->is_provider_active('course'));
 
         // Reset the caches.
@@ -54,7 +54,7 @@ class totara_catalog_cache_handler_testcase extends advanced_testcase {
         // Show that the singletons now return the updated information, so must have been reset.
         $this->assertEquals(1, count(\totara_catalog\local\feature_handler::instance()->get_all_features()));
         $this->assertEquals(5, count(\totara_catalog\local\filter_handler::instance()->get_all_filters()));
-        $this->assertEmpty(\totara_catalog\local\provider_handler::instance()->get_active_providers());
+        $this->assertEmpty(\totara_catalog\provider_handler::instance()->get_active_providers());
         $this->assertFalse(\totara_catalog\local\config::instance()->is_provider_active('course'));
     }
 }

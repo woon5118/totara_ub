@@ -59,6 +59,7 @@ class totara_catalog_category_filters_testcase extends advanced_testcase {
         $filter_type = $filter->key;
 
         $all_option = $all_categories[0];
+        /** @var \totara_catalog\merge_select\tree $filter_selector */
         $filter_selector = $filter->selector;
         $filter_selector->add_all_option($all_option, $all_option);
 
@@ -79,6 +80,7 @@ class totara_catalog_category_filters_testcase extends advanced_testcase {
 
         $all_courses = [];
         $catalog = new catalog_retrieval();
+        /** @var \totara_catalog\datasearch\equal $filter_data */
         $filter_data = $filter->datafilter;
         foreach ($category_courses as $context_id => $courses) {
             $filter_data->set_current_data($context_id);

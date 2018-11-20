@@ -22,8 +22,11 @@
  */
 
 use totara_catalog\catalog_retrieval;
+use totara_catalog\filter;
 use totara_catalog\local\filter_handler;
-use totara_catalog\local\provider_handler;
+use totara_catalog\merge_select\multi;
+use totara_catalog\merge_select\single;
+use totara_catalog\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -141,7 +144,9 @@ class totara_catalog_learning_type_filters_testcase extends advanced_testcase {
     public function test_learning_type_panel_filter() {
         [$labels, $by_types, $filters, $all_items] = $this->generate();
 
+        /** @var filter $filter */
         $filter = $filters[0]; // Panel filter.
+        /** @var multi $filter_selector */
         $filter_selector = $filter->selector;
 
         $filter_types = $filter_selector->get_options();
@@ -190,7 +195,9 @@ class totara_catalog_learning_type_filters_testcase extends advanced_testcase {
     public function test_learning_type_browse_filter() {
         [$labels, $by_types, $filters, $all_items] = $this->generate();
 
+        /** @var filter $filter */
         $filter = $filters[1]; // Browse filter.
+        /** @var single $filter_selector */
         $filter_selector = $filter->selector;
 
         // Unlike the panel filter, the browse filter has an "all" option.

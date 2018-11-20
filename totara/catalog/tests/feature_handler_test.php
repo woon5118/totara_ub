@@ -25,7 +25,7 @@ use totara_catalog\datasearch\filter;
 use totara_catalog\feature;
 use totara_catalog\local\config;
 use totara_catalog\local\feature_handler;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 

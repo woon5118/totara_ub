@@ -26,7 +26,7 @@ namespace totara_certification\totara_catalog\certification\dataholder_factory;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\dataholder_factory;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 use totara_customfield\totara_catalog\dataholder_factory as customfield_dataholder_factory;
 
 class custom_fields extends dataholder_factory {

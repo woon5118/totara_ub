@@ -21,10 +21,10 @@
  * @package totara_catalog
  */
 
-use totara_catalog\local\config;
-use totara_catalog\local\provider_handler;
 use totara_catalog\dataformatter\formatter;
+use totara_catalog\local\config;
 use totara_catalog\local\required_dataholder;
+use totara_catalog\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -99,7 +99,7 @@ class totara_catalog_provider_handler_testcase extends config_base_testcase {
 
     public function test_instance() {
         $object = provider_handler::instance();
-        $this->assertInstanceOf('totara_catalog\\local\\provider_handler', $object);
+        $this->assertInstanceOf('totara_catalog\\provider_handler', $object);
     }
 
     public function test_reset_cache() {

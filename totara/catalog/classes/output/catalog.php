@@ -27,7 +27,7 @@ use core\output\template;
 use totara_catalog\catalog_retrieval;
 use totara_catalog\local\config;
 use totara_catalog\local\filter_handler;
-use totara_catalog\local\provider_handler;
+use totara_catalog\provider_handler;
 use totara_core\output\grid;
 use totara_core\output\select_region_panel;
 use totara_core\output\select_region_primary;

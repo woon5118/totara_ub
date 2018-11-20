@@ -23,7 +23,6 @@
 
 namespace totara_catalog\merge_select;
 
-use totara_catalog\optional_param;
 use totara_core\output\select_search_text;
 
 defined('MOODLE_INTERNAL') || die();

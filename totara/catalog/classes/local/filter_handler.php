@@ -24,6 +24,7 @@
 namespace totara_catalog\local;
 
 use totara_catalog\filter;
+use totara_catalog\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 

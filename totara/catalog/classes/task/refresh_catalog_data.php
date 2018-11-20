@@ -26,8 +26,8 @@ namespace totara_catalog\task;
 defined('MOODLE_INTERNAL') || die();
 
 use \core\task\scheduled_task;
-use totara_catalog\local\provider_handler;
 use totara_catalog\local\catalog_storage;
+use totara_catalog\provider_handler;
 
 /**
  * This scheduled task will populate all provider data

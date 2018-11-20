@@ -26,9 +26,9 @@ namespace core_course\totara_catalog\course;
 
 use totara_catalog\catalog_retrieval;
 use totara_catalog\filter;
-use totara_catalog\local\provider_handler;
 use totara_catalog\merge_select\multi;
 use totara_catalog\merge_select\single;
+use totara_catalog\provider_handler;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;

@@ -28,8 +28,8 @@ use moodle_url;
 use totara_catalog\dataformatter\formatter;
 use totara_catalog\local\config;
 use totara_catalog\local\config_form_helper;
-use totara_catalog\local\provider_handler;
 use totara_catalog\provider;
+use totara_catalog\provider_handler;
 use totara_form\form_controller;
 
 defined('MOODLE_INTERNAL') || die();
