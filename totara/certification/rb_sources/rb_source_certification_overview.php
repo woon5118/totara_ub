@@ -345,11 +345,21 @@ class rb_source_certification_overview extends rb_base_source {
             )
         );
 
-        $from = "FROM {prog_courseset} prog_courseset
-                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
-                 JOIN {course} course ON course.id = prog_courseset_course.courseid
-            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
-                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        if ($DB->get_dbfamily() === 'mysql') {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                     JOIN {user} u
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = u.id
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0 AND u.id = base.userid";
+
+        } else {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        }
         $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.status'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
@@ -366,11 +376,20 @@ class rb_source_certification_overview extends rb_base_source {
             )
         );
 
-        $from = "FROM {prog_courseset} prog_courseset
-                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
-                 JOIN {course} course ON course.id = prog_courseset_course.courseid
-            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
-                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        if ($DB->get_dbfamily() === 'mysql') {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                     JOIN {user} u
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = u.id
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0 AND u.id = base.userid";
+        } else {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        }
         $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timeenrolled'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
@@ -387,11 +406,20 @@ class rb_source_certification_overview extends rb_base_source {
             )
         );
 
-        $from = "FROM {prog_courseset} prog_courseset
-                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
-                 JOIN {course} course ON course.id = prog_courseset_course.courseid
-            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
-                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        if ($DB->get_dbfamily() === 'mysql') {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                     JOIN {user} u
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = u.id
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0 AND u.id = base.userid";
+        } else {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        }
         $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timestarted'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
@@ -408,11 +436,20 @@ class rb_source_certification_overview extends rb_base_source {
             )
         );
 
-        $from = "FROM {prog_courseset} prog_courseset
-                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
-                 JOIN {course} course ON course.id = prog_courseset_course.courseid
-            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
-                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        if ($DB->get_dbfamily() === 'mysql') {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                     JOIN {user} u
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = u.id
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0 AND u.id = base.userid";
+        } else {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        }
         $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('course_completions.timecompleted'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
@@ -430,13 +467,24 @@ class rb_source_certification_overview extends rb_base_source {
         );
 
         // Course grade.
-        $from = "FROM {prog_courseset} prog_courseset
-                 JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
-                 JOIN {course} course ON course.id = prog_courseset_course.courseid
-            LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
-            LEFT JOIN {grade_items} grade_items ON grade_items.itemtype = 'course' AND grade_items.courseid = course.id
-            LEFT JOIN {grade_grades} grade_grades ON grade_grades.itemid = grade_items.id AND grade_grades.userid = base.userid
-                WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        if ($DB->get_dbfamily() === 'mysql') {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                     JOIN {user} u
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = u.id
+                LEFT JOIN {grade_items} grade_items ON grade_items.itemtype = 'course' AND grade_items.courseid = course.id
+                LEFT JOIN {grade_grades} grade_grades ON grade_grades.itemid = grade_items.id AND grade_grades.userid = u.id
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0 AND u.id = base.userid";
+        } else {
+            $from = "FROM {prog_courseset} prog_courseset
+                     JOIN {prog_courseset_course} prog_courseset_course ON prog_courseset_course.coursesetid = prog_courseset.id
+                     JOIN {course} course ON course.id = prog_courseset_course.courseid
+                LEFT JOIN {course_completions} course_completions ON course_completions.course = course.id AND course_completions.userid = base.userid
+                LEFT JOIN {grade_items} grade_items ON grade_items.itemtype = 'course' AND grade_items.courseid = course.id
+                LEFT JOIN {grade_grades} grade_grades ON grade_grades.itemid = grade_items.id AND grade_grades.userid = base.userid
+                    WHERE {$certifwhere} AND prog_courseset.programid = base.programid AND base.coursesetid = 0";
+        }
         $concat = $DB->sql_group_concat(\totara_program\rb_course_sortorder_helper::get_column_field_definition($DB->sql_cast_2char('grade_grades.finalgrade'), 'certif'), $this->uniquedelimiter, 'prog_courseset.sortorder ASC');
         $columnoptions[] = new rb_column_option(
             'course',
