@@ -116,7 +116,7 @@ class feature_factory {
 
         if ($datatype == 'multiselect') {
             $value = '"option":"' . config::instance()->get_value('featured_learning_value') . '"';
-            $dataparamvalue = '%' . $value . '"%';
+            $dataparamvalue = '%' . $value . '%';
 
             if (strpos($customfield->defaultdata, $value) === false) {
                 $includedefault = false;
@@ -130,7 +130,7 @@ class feature_factory {
 
             if ($customfield->defaultdata != $dataparamvalue) {
                 $includedefault = false;
-                $compare = "{$objecttypealias}.data = :{$dataparamkey}";
+                $compare = "cfid.data = :{$dataparamkey}";
             } else {
                 $includedefault = true;
                 $compare = "(cfid.data = :{$dataparamkey} OR cfid.id IS NULL)";
@@ -144,11 +144,10 @@ class feature_factory {
                            ON cfs.{$provider->get_objectid_field()} = cfid.{$prefix}id
                           AND cfid.fieldid = :{$fieldidparamkey}
                         WHERE {$compare})";
-            $additionalcriteria = "";
         } else {
             $table = "(SELECT cfid.*, 1 AS featured
-                         FROM {{$tableprefix}_info_data} cfid)";
-            $additionalcriteria = "{$objecttypealias}.fieldid = :{$fieldidparamkey} AND {$compare}";
+                         FROM {{$tableprefix}_info_data} cfid
+                        WHERE {$compare} AND cfid.fieldid = :{$fieldidparamkey})";
         }
 
         $datafilter->add_source(
@@ -159,7 +158,7 @@ class feature_factory {
                 'objecttype' => "'{$provider->get_object_type()}'",
                 'objectid' => "{$objecttypealias}.{$prefix}id",
             ],
-            $additionalcriteria,
+            "",
             [
                 $fieldidparamkey => $customfield->id,
                 $dataparamkey => $dataparamvalue,
