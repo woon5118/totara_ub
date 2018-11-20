@@ -2653,7 +2653,7 @@ function blocks_add_default_course_blocks($course) {
         $pagetypepattern = 'site-index';
     } else {
         $pagetypepattern = 'course-view-*';
-        $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('course_navigation')), 'course-*', null, true);
+        $page->blocks->add_blocks(array(BLOCK_POS_LEFT => array('course_navigation')), 'course-*', null, true, -1);
     }
     $page->blocks->add_blocks($blocknames, $pagetypepattern);
 }
