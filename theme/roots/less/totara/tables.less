@@ -27,6 +27,14 @@ table.flexible,
     .table;
 }
 
+// Overwrite max-width so tables display correctly on Safari
+.safari {
+    table.flexible,
+    .generaltable {
+        max-width: none;
+    }
+}
+
 & when (@moodle-table-striped) {
     .path-rating .ratingtable,
     table#explaincaps,
