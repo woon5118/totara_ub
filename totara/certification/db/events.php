@@ -93,4 +93,12 @@ $observers = array(
         'eventname' => '\core\event\admin_settings_changed',
         'callback'  => 'totara_certification\totara_catalog\certification\observer\settings_observer::changed',
     ),
+    array(
+        'eventname' => '\totara_customfield\event\customfield_created',
+        'callback'  => 'totara_certification\totara_catalog\certification\observer\customfield_changed::update_default_data'
+    ),
+    array(
+        'eventname' => '\totara_customfield\event\customfield_updated',
+        'callback'  => 'totara_certification\totara_catalog\certification\observer\customfield_changed::update_default_data'
+    ),
 );
