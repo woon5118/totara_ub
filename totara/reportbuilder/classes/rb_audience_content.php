@@ -21,7 +21,6 @@
  * @package totara_reportbuilder
  */
 
-require_once($CFG->dirroot . '/cohort/lib.php');
 /*
  * Restrict the report content by a particular audience
  */
@@ -78,32 +77,29 @@ final class rb_audience_content extends rb_base_content {
      */
     public function form_template(&$mform, $reportid, $title) {
         global $OUTPUT;
+
         $mform->addElement(
             'header', 'user_audience_header',
             get_string('reportbuilderaudience', 'totara_reportbuilder')
         );
         $mform->setExpanded('user_audience_header');
+
         if ($this->has_audience_capability()) {
             $type = $this->get_type();
-            $audienceid = reportbuilder::get_setting($reportid, $type, 'audience');
-            $audienceenable = reportbuilder::get_setting($reportid, $type, 'enable');
-
-            $cohorts = cohort_get_all_cohorts(0, 0);
-            $cohortoptions = [0 => get_string('no_audience_defined', 'rb_source_user')];
-            foreach ($cohorts['cohorts'] as $cohort) {
-                $cohortoptions[$cohort->id] = format_string($cohort->name);
-            }
+            $cohortid = reportbuilder::get_setting($reportid, $type, 'audience');
+            $enable = reportbuilder::get_setting($reportid, $type, 'enable');
 
             $mform->addElement(
                 'checkbox', 'user_audience_enable', '',
                 get_string('reportbuilderaudience', 'totara_reportbuilder')
             );
-            $mform->setDefault('user_audience_enable', $audienceenable);
+            $mform->setDefault('user_audience_enable', $enable);
             $mform->addElement(
                 'select', 'user_audience',
-                get_string('includerecordsfrom', 'totara_reportbuilder'), $cohortoptions
+                get_string('includerecordsfrom', 'totara_reportbuilder'),
+                self::get_cohort_select_options()
             );
-            $mform->setDefault('user_audience', $audienceid);
+            $mform->setDefault('user_audience', $cohortid);
 
             $mform->disabledIf('user_audience', 'user_audience_enable', 'notchecked');
             $mform->disabledIf('user_audience_enable', 'contentenabled', 'eq', 0);
@@ -170,22 +166,41 @@ final class rb_audience_content extends rb_base_content {
      * Update default audience restrictions
      *
      * @param int $reportid
+     * @param int $cohortid
      */
-    public function set_default_restriction(int $reportid) {
+    public function set_default_restriction(int $reportid, int $cohortid) {
         global $DB;
-        $globalaudience = get_config('totara_reportbuilder', 'userrestrictaudience');
-        if (!empty($globalaudience)) {
-            $type = $this->get_type();
 
-            // update content mode to ANY criteria
-            $report = new stdClass();
-            $report->id = $reportid;
-            $report->contentmode = REPORT_BUILDER_CONTENT_MODE_ANY;
-            $DB->update_record('report_builder', $report);
+        $type = $this->get_type();
 
-            // enable audience and update global settings
-            reportbuilder::update_setting($reportid, $type, 'audience', $globalaudience);
-            reportbuilder::update_setting($reportid, $type, 'enable', 1);
-        }
+        // update content mode to ANY criteria
+        $report = new stdClass();
+        $report->id = $reportid;
+        $report->contentmode = REPORT_BUILDER_CONTENT_MODE_ANY;
+        $DB->update_record('report_builder', $report);
+
+        // enable audience and update global settings
+        reportbuilder::update_setting($reportid, $type, 'audience', $cohortid);
+        reportbuilder::update_setting($reportid, $type, 'enable', 1);
     }
+
+    /**
+     * get all options for an audience/cohort select box
+     *
+     * @return array
+     */
+    public static function get_cohort_select_options(): array {
+        global $DB;
+
+        $sql = "SELECT * FROM {cohort} ORDER BY name ASC, idnumber ASC";
+        $cohorts = $DB->get_records_sql($sql);
+
+        $options = [];
+        foreach ($cohorts as $cohort) {
+            $options[$cohort->id] = format_string("{$cohort->name} ({$cohort->idnumber})");
+        }
+
+        return [ get_string('no_audience_defined', 'rb_source_user') ] + $options;
+    }
+
 }

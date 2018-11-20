@@ -30,32 +30,31 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
 
     use totara_reportbuilder\phpunit\report_testing;
 
+    /**
+     * @var reportbuilder
+     */
     private $report   = null;
-    private $users    = null;
-    private $audience = null;
+    private $users    = [];
+    private $audience = [];
     private $reportid = null;
 
     protected function setUp() {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest();
-        $this->users = array();
-        $this->audience = array();
-        $this->report = null;
-        $this->reportid = null;
     }
 
     protected function tearDown() {
         $this->report = null;
-        $this->users = null;
-        $this->audience = null;
+        $this->users = [];
+        $this->audience = [];
         $this->reportid = null;
         parent::tearDown();
     }
 
     public function test_report_without_audience_restriction() {
         global $DB;
-        $this->setup_report_data();
+        $this->setup_report_data('user');
 
         $config = (new rb_config())->set_nocache(true);
         $this->report = reportbuilder::create($this->reportid, $config);
@@ -71,7 +70,7 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
 
     public function test_report_with_audience_restriction() {
         global $DB;
-        $this->setup_report_data();
+        $this->setup_report_data('user');
 
         // update settings to audience 001
         reportbuilder::update_setting($this->reportid, 'audience_content', 'enable', 1);
@@ -99,13 +98,26 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey($this->users[4]->id, $records);
     }
 
-    public function test_global_audience_setting_when_creating_user_report() {
+    public function test_global_audience_setting_when_creating_userunrelated_report() {
         global $DB;
-        $this->setup_report_data();
+        $this->setup_report_data('customlang');
         set_config('userrestrictaudience', $this->audience[1]->id, 'totara_reportbuilder');
 
         // Create the report and trigger the event
-        $this->reportid = $this->create_report('user', 'Test User Restriction Report');
+        \totara_reportbuilder\event\report_created::create_from_report(reportbuilder::create($this->reportid), false)->trigger();
+
+        // Check default audience restrictions
+        $settings = reportbuilder::get_all_settings($this->reportid, 'audience_content');
+        $this->assertArrayNotHasKey('audience', $settings);
+        $this->assertArrayNotHasKey('enable', $settings);
+    }
+
+    public function test_global_audience_setting_when_creating_user_report() {
+        global $DB;
+        $this->setup_report_data('user');
+        set_config('userrestrictaudience', $this->audience[1]->id, 'totara_reportbuilder');
+
+        // Create the report and trigger the event
         \totara_reportbuilder\event\report_created::create_from_report(reportbuilder::create($this->reportid), false)->trigger();
 
         // Check default audience restrictions
@@ -125,7 +137,34 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey($this->users[4]->id, $records);
     }
 
-    private function setup_report_data() {
+    public function test_no_global_audience_setting_when_creating_user_report() {
+        global $DB;
+        $this->setup_report_data('user');
+
+        // Create the report and trigger the event
+        \totara_reportbuilder\event\report_created::create_from_report(reportbuilder::create($this->reportid), false)->trigger();
+
+        // Check default audience restrictions
+        $settings = reportbuilder::get_all_settings($this->reportid, 'audience_content');
+        $this->assertArrayNotHasKey('audience', $settings);
+        $this->assertArrayNotHasKey('enable', $settings);
+
+        // Check report data
+        $report = reportbuilder::create($this->reportid); // Init report with new settings
+        list($sql, $params,) = $report->build_query();
+        $records = $DB->get_records_sql($sql, $params);
+
+        $this->assertArrayHasKey($this->users[0]->id, $records);
+        $this->assertArrayHasKey($this->users[1]->id, $records);
+        $this->assertArrayHasKey($this->users[2]->id, $records);
+        $this->assertArrayHasKey($this->users[3]->id, $records);
+        $this->assertArrayHasKey($this->users[4]->id, $records);
+    }
+
+    /**
+     * @param string $source
+     */
+    private function setup_report_data(string $source) {
         $this->users[] = $this->getDataGenerator()->create_user(['firstname' => 'Cherise', 'lastname' => 'Staten']);
         $this->users[] = $this->getDataGenerator()->create_user(['firstname' => 'Sidney', 'lastname' => 'Goguen']);
         $this->users[] = $this->getDataGenerator()->create_user(['firstname' => 'Darci', 'lastname' => 'Kocsis']);
@@ -138,10 +177,12 @@ class totara_rb_audience_restrictions_testcase extends advanced_testcase {
         cohort_add_member($this->audience[1]->id, $this->users[2]->id);
         cohort_add_member($this->audience[1]->id, $this->users[3]->id);
 
-        $this->reportid = $this->create_report('user', 'Test User Report');
+        $this->reportid = $this->create_report($source, 'Test Report');
         $config = (new rb_config())->set_nocache(true);
         $this->report = reportbuilder::create($this->reportid, $config);
-        $this->add_column($this->report, 'user', 'id', null, null, null, 0);
-        $this->add_column($this->report, 'user', 'firstname', null, null, null, 0);
+        if ($source == 'user') {
+            $this->add_column($this->report, 'user', 'id', null, null, null, 0);
+            $this->add_column($this->report, 'user', 'firstname', null, null, null, 0);
+        }
     }
 }

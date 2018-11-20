@@ -74,23 +74,16 @@ if ($ADMIN->fulltree) {
         )
     );
 
-    //Audience settings
-    require_once($CFG->dirroot . '/cohort/lib.php');
-
-    $cohorts = cohort_get_all_cohorts(0, 0);
-    $cohortoptions = [0 => get_string('no_audience_defined', 'rb_source_user')];
-    foreach ($cohorts['cohorts'] as $cohort) {
-        $cohortoptions[$cohort->id] = format_string($cohort->name);
+    if (has_capability("moodle/cohort:view", context_system::instance())) {
+        $rb->add(
+            new totara_reportbuilder_admin_settings_cohort_select(
+                'totara_reportbuilder/userrestrictaudience',
+                new lang_string('globalsettingaudiencename', 'totara_reportbuilder'),
+                new lang_string('globalsettingaudiencedescription', 'totara_reportbuilder'),
+                0
+            )
+        );
     }
-    $rb->add(
-        new admin_setting_configselect(
-            'totara_reportbuilder/userrestrictaudience',
-            new lang_string('globalsettingaudiencename', 'totara_reportbuilder'),
-            new lang_string('globalsettingaudiencedescription', 'totara_reportbuilder'),
-            0,
-            $cohortoptions
-        )
-    );
 
     $rb->add(
         new admin_setting_configcheckbox(

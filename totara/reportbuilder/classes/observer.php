@@ -69,13 +69,19 @@ class totara_reportbuilder_observer {
      */
     public static function add_default_restriction(\totara_reportbuilder\event\report_created $event) {
         global $CFG;
-        include_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-        $reportid = $event->objectid;
-        $report = reportbuilder::create($reportid);
 
-        if (in_array('audience', $report->get_content_options())) {
-            $restriction = new rb_audience_content();
-            $restriction->set_default_restriction($reportid);
+        $defaultcohortid = get_config('totara_reportbuilder', 'userrestrictaudience');
+        if (!empty($defaultcohortid)) {
+            include_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+
+            $reportid = $event->objectid;
+            // Skipping access control here as this is independent from the current user
+            $report = reportbuilder::create($reportid, null, false);
+
+            if (in_array('audience', $report->get_content_options())) {
+                $restriction = new rb_audience_content();
+                $restriction->set_default_restriction($reportid, $defaultcohortid);
+            }
         }
     }
 }
