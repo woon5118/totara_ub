@@ -47,6 +47,8 @@ class program_category_link_list extends program_course_base {
             return '';
         }
 
+        $isexport = ($format !== 'html');
+
         $output = array();
         $uniquedelimiter = $report->src->get_uniquedelimiter();
 
@@ -55,7 +57,7 @@ class program_category_link_list extends program_course_base {
         $programid = null;
         foreach ($items as $key => $item) {
             list($programid, $courseid, $catid, $visible, $catname) = explode('|', $item);
-            if ($visible) {
+            if ($visible && !$isexport) {
                 $url = new \moodle_url('/course/index.php', array('categoryid' => $catid));
                 $output[$key] = \html_writer::link($url, format_string($catname));
             } else {

@@ -47,14 +47,22 @@ class program_course_name_list extends program_course_base {
             return '';
         }
 
+        $isexport = ($format !== 'html');
+
         $uniquedelimiter = $report->src->get_uniquedelimiter();
         $items = explode($uniquedelimiter, $value);
         $reference = [];
         $programid = null;
         foreach ($items as $key => $item) {
             list($programid, $courseid, $coursename) = explode('|', $item);
-            $url = new \moodle_url('/course/view.php', array('id' => $courseid));
-            $items[$key] = \html_writer::link($url, format_string($coursename));
+
+            if ($isexport) {
+                $items[$key] = format_string($coursename);
+            } else {
+                $url = new \moodle_url('/course/view.php', array('id' => $courseid));
+                $items[$key] = \html_writer::link($url, format_string($coursename));
+            }
+
             $reference[$key] = $courseid;
         }
 
