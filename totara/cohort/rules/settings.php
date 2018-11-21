@@ -27,7 +27,7 @@
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
-require_once($CFG->dirroot . '/totara/cohort/rules/ui.php');
+
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandler.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/inlist.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/date.php');
@@ -38,6 +38,24 @@ require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/userstatus.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/cohortmember.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/option.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/custom_fields/custom_field_sqlhandler.php');
+
+use totara_cohort\rules\ui\text as cohort_rule_ui_text;
+use totara_cohort\rules\ui\menu as cohort_rule_ui_menu;
+use totara_cohort\rules\ui\checkbox as cohort_rule_ui_checkbox;
+use totara_cohort\rules\ui\authentication_type as cohort_rule_ui_authentication_type;
+use totara_cohort\rules\ui\date as cohort_rule_ui_date;
+use totara_cohort\rules\ui\date_no_timezone as cohort_rule_ui_date_no_timezone;
+use totara_cohort\rules\ui\base_selector_hierarchy as cohort_rule_ui_picker_hierarchy;
+use totara_cohort\rules\ui\manager as cohort_rule_ui_reportsto;
+use totara_cohort\rules\ui\course_completion_date as cohort_rule_ui_picker_course_date;
+use totara_cohort\rules\ui\program_completion_date as cohort_rule_ui_picker_program_date;
+use totara_cohort\rules\ui\certification_completion_date as cohort_rule_ui_picker_certification_completion_date;
+use totara_cohort\rules\ui\course_duration as cohort_rule_ui_picker_course_duration;
+use totara_cohort\rules\ui\program_duration as cohort_rule_ui_picker_program_duration;
+use totara_cohort\rules\ui\course_allanynotallnone as cohort_rule_ui_picker_course_allanynotallnone;
+use totara_cohort\rules\ui\program_allanynotallnone as cohort_rule_ui_picker_program_allanynotallnone;
+use totara_cohort\rules\ui\certification_status as cohort_rule_ui_picker_certification_status;
+use totara_cohort\rules\ui\cohort_member as cohort_rule_ui_cohortmember;
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -253,7 +271,7 @@ function cohort_rules_list($reset = false){
                     'usercustomfields',
                     "customfield{$id}_{$i}",
                     $dialog,
-                    (get_class($dialog) == 'cohort_rule_ui_text' ) ? $sqlhandler_text : $sqlhandler,
+                    (get_class($dialog) == 'totara_cohort\rules\ui\text' ) ? $sqlhandler_text : $sqlhandler,
                     !empty($dialog->selectoptionstr) ? $dialog->selectoptionstr : format_string($field->name)
                 );
             }
@@ -557,7 +575,7 @@ function cohort_rules_list($reset = false){
         $rules[] = new cohort_rule_option(
             'learning',
             'coursecompletiondate',
-            new cohort_rule_ui_picker_course_program_date(
+            new cohort_rule_ui_picker_course_date(
                 get_string('ruledesc-learning-coursecompletiondate', 'totara_cohort'),
                 COHORT_PICKER_COURSE_COMPLETION
             ),
@@ -588,7 +606,7 @@ function cohort_rules_list($reset = false){
             $rules[] = new cohort_rule_option(
                 'learning',
                 'programcompletiondate',
-                new cohort_rule_ui_picker_course_program_date(
+                new cohort_rule_ui_picker_program_date(
                     get_string('ruledesc-learning-programcompletiondate', 'totara_cohort'),
                     COHORT_PICKER_PROGRAM_COMPLETION
                 ),

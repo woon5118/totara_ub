@@ -54,8 +54,8 @@ Feature: Test the certification completion date rule in dynamic audiences
     And I click on "Certification 1" "link"
     Then I should not see "Please specify a valid date"
     And I should not see "Please specify a valid number of days"
-
     When I click on "Save" "button" in the "Add rule" "totaradialogue"
+    And I wait "1" seconds
     Then I should see "Please specify a valid date"
     And I should not see "Please specify a valid number of days"
 
