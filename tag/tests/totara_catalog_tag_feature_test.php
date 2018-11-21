@@ -76,8 +76,8 @@ class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
             $context = \context_course::instance($item_id);
 
             for ($j = 0; $j < $tags_per_item; $j++) {
-                $k = rand(1, count($all_tags));
-                $tag = $all_tags[$k - 1];
+                $k = $i % count($all_tags);
+                $tag = $all_tags[$k];
 
                 \core_tag_tag::add_item_tag(
                     'core',
@@ -151,8 +151,8 @@ class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
             $context = \context_program::instance($item_id);
 
             for ($j = 0; $j < $tags_per_item; $j++) {
-                $k = rand(1, count($all_tags));
-                $tag = $all_tags[$k - 1];
+                $k = $i % count($all_tags);
+                $tag = $all_tags[$k];
 
                 \core_tag_tag::add_item_tag(
                     'totara_program',
@@ -228,8 +228,8 @@ class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
             $context = \context_program::instance($item_id);
 
             for ($j = 0; $j < $tags_per_item; $j++) {
-                $k = rand(1, count($all_tags));
-                $tag = $all_tags[$k - 1];
+                $k = $i % count($all_tags);
+                $tag = $all_tags[$k];
 
                 \core_tag_tag::add_item_tag(
                     'totara_program',
@@ -277,9 +277,9 @@ class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
      *         items) tuple.
      */
     private function generate(
-        $course_count = 15,
-        $program_count = 15,
-        $certification_count = 15,
+        $course_count = 5,
+        $program_count = 3,
+        $certification_count = 1,
         $tags_per_item = 3
     ): array {
         $this->setAdminUser();
@@ -344,7 +344,7 @@ class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
      * @param bool $enabled whether the catalog featured learning facility is
      *        enabled.
      *
-     * @return stdClass retrieval result.
+     * @return \stdClass retrieval result.
      */
     private function featured_learning_result(
         string $source,
@@ -387,7 +387,6 @@ class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
         // UI, but nonetheless it is possible programmatically.
         $result = $this->featured_learning_result($feature->key, 123);
         $this->assertCount(count($all_items), $result->objects, "wrong retrieved count");
-
         foreach ($result->objects as $retrieved) {
             $this->assertContains($retrieved->sorttext, $all_items, "unknown item");
             $this->assertSame(0, (int)$retrieved->featured, "featured item exists");

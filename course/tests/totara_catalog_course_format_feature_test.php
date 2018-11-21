@@ -25,7 +25,6 @@
 namespace core_course\totara_catalog\course;
 
 use totara_catalog\catalog_retrieval;
-use totara_catalog\feature;
 use totara_catalog\cache_handler;
 use totara_catalog\local\config;
 use totara_catalog\local\feature_handler;
@@ -67,8 +66,8 @@ class core_course_totara_catalog_course_format_feature_testcase extends \advance
 
         $generator = $this->getDataGenerator();
         for ($i = 0; $i < $course_count; $i++) {
-            $j = rand(1, count($available_formats));
-            $format = $available_formats[$j - 1];
+            $j = $i % count($available_formats);
+            $format = $available_formats[$j];
 
             $course = $generator->create_course(['format' => $format]);
             $all_courses[] = $course->fullname;
@@ -102,7 +101,7 @@ class core_course_totara_catalog_course_format_feature_testcase extends \advance
      * @param bool $enabled whether the catalog featured learning facility is
      *        enabled.
      *
-     * @return stdClass retrieval result.
+     * @return \stdClass retrieval result.
      */
     private function featured_learning_result(
         string $source,
@@ -143,6 +142,10 @@ class core_course_totara_catalog_course_format_feature_testcase extends \advance
         // UI, but nonetheless it is possible programmatically.
         $result = $this->featured_learning_result($feature->key, 'unknown format');
         $this->assertCount(count($all_courses), $result->objects, "wrong retrieved count");
+        foreach ($result->objects as $retrieved) {
+            $this->assertContains($retrieved->sorttext, $all_courses, "unknown course");
+            $this->assertSame(0, (int)$retrieved->featured, "featured course present");
+        }
 
         // Test disabled feature selection even if a valid option is there.
         $result = $this->featured_learning_result($feature->key, $format_labels[0], false);

@@ -44,12 +44,10 @@ class totara_catalog_category_feature_testcase extends advanced_testcase {
      * @param int $category_count no of categories to generate.
      * @param int $course_count no of courses to generate.
      *
-     * @return array (mapping of categories to courses, feature, all courses
+     * @return array (mapping of categories to courses, feature, all courses)
      *         tuple.
      */
     private function generate(int $category_count = 5, int $course_count = 20): array {
-        global $DB;
-
         $generated_categories = [];
         $all_categories = [];
         for ($i = 0; $i < $category_count; $i++) {
@@ -99,7 +97,7 @@ class totara_catalog_category_feature_testcase extends advanced_testcase {
      * @param bool $enabled whether the catalog featured learning facility is
      *        enabled.
      *
-     * @return stdClass retrieval result.
+     * @return \stdClass retrieval result.
      */
     private function featured_learning_result(
         string $source,
@@ -140,6 +138,10 @@ class totara_catalog_category_feature_testcase extends advanced_testcase {
         // UI, but nonetheless it is possible programmatically.
         $result = $this->featured_learning_result($feature->key, 9922);
         $this->assertCount(count($all_courses), $result->objects, "wrong retrieved count");
+        foreach ($result->objects as $retrieved) {
+            $this->assertContains($retrieved->sorttext, $all_courses, "unknown course");
+            $this->assertSame(0, (int)$retrieved->featured, "featured course present");
+        }
 
         // Test disabled feature selection even if a valid option is there.
         $result = $this->featured_learning_result($feature->key, $all_categories[0], false);
