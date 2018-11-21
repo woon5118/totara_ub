@@ -76,8 +76,7 @@ trait report_trait {
         );
 
         // Create a join for each tag in the collection.
-        $tagcollectionid = \core_tag_area::get_collection($component, $itemtype);
-        $tags = \core_tag_collection::get_tags($tagcollectionid);
+        $tags = \core_tag\report_builder_tag_loader::get_tags($component, $itemtype);
         foreach ($tags as $tag) {
             $tagid = $tag->id;
             $name = "{$itemtype}_tag_$tagid";
@@ -128,8 +127,7 @@ trait report_trait {
         );
 
         // Only get the tags in the collection for this item type.
-        $tagcollectionid = \core_tag_area::get_collection($component, $itemtype);
-        $tags = \core_tag_collection::get_tags($tagcollectionid);
+        $tags = \core_tag\report_builder_tag_loader::get_tags($component, $itemtype);
 
         // Create a on/off field for every official tag.
         foreach ($tags as $tag) {
@@ -162,8 +160,7 @@ trait report_trait {
      */
     protected function add_core_tag_filters($component, $itemtype, &$filteroptions) {
         // Only get the tags in the collection for this item type.
-        $tagcollectionid = \core_tag_area::get_collection($component, $itemtype);
-        $tags = \core_tag_collection::get_tags($tagcollectionid);
+        $tags = \core_tag\report_builder_tag_loader::get_tags($component, $itemtype);
 
         // Create a yes/no filter for every official tag
         foreach ($tags as $tag) {

@@ -257,6 +257,10 @@ class phpunit_util extends testing_util {
         if (class_exists('reportbuilder', false)) {
             reportbuilder::reset_caches();
             reportbuilder::reset_source_object_cache();
+
+            // Reset source object helpers, these cache data used to create columms and filters.
+            \totara_customfield\report_builder_field_loader::reset();
+            \core_tag\report_builder_tag_loader::reset();
         }
 
         //TODO MDL-25290: add more resets here and probably refactor them to new core function

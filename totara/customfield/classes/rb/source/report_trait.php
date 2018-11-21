@@ -141,7 +141,6 @@ trait report_trait {
      */
     protected function add_totara_customfield_component($cf_prefix, $join, $joinfield, array &$joinlist,
                                                         array &$columnoptions, array &$filteroptions, $suffix = '', $nofilter = false) {
-        global $DB;
 
         if (strlen($suffix)) {
             if (!preg_match('/^[a-zA-Z]{1,5}$/', $suffix)) {
@@ -173,7 +172,7 @@ trait report_trait {
         }
 
         // Check if there are any visible custom fields of this type.
-        $items = $DB->get_recordset($cf_prefix . '_info_field', ['hidden' => '0']);
+        $items = \totara_customfield\report_builder_field_loader::get_visible_fields($cf_prefix);
 
         foreach ($items as $record) {
             // Add extra information to the record.
@@ -194,8 +193,6 @@ trait report_trait {
                 $this->$filter_function($record, $filteroptions);
             }
         }
-
-        $items->close();
 
         return true;
     }

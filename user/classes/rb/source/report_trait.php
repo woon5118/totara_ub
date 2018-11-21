@@ -824,7 +824,8 @@ trait report_trait {
         }
 
         // Check if there are any visible custom fields of this type.
-        $items = $DB->get_recordset('user_info_field');
+        $items = \totara_customfield\report_builder_field_loader::get_visible_fields('user');
+
         foreach ($items as $record) {
             $id = $record->id;
             $joinname = "{$basejoin}_cf_{$id}";
@@ -960,8 +961,6 @@ trait report_trait {
                 );
             }
         }
-
-        $items->close();
 
         return true;
     }

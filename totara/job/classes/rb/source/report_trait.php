@@ -175,10 +175,10 @@ trait report_trait {
         );
 
         // Set up the position and organisation custom field joins.
-        $posfields = $DB->get_records('pos_type_info_field', array('hidden' => '0'));
+        $posfields = \totara_customfield\report_builder_field_loader::get_visible_fields('pos_type');
         $this->add_totara_job_custom_field_tables('pos', $posfields, $join, $field, $joinlist);
 
-        $orgfields = $DB->get_records('org_type_info_field', array('hidden' => '0'));
+        $orgfields = \totara_customfield\report_builder_field_loader::get_visible_fields('org_type');
         $this->add_totara_job_custom_field_tables('org', $orgfields, $join, $field, $joinlist);
 
         return true;
@@ -606,10 +606,10 @@ trait report_trait {
         );
 
         // Set up the position and organisation custom field columns.
-        $posfields = $DB->get_records('pos_type_info_field', array('hidden' => '0'));
+        $posfields = \totara_customfield\report_builder_field_loader::get_visible_fields('pos_type');
         $this->add_totara_job_custom_field_columns('pos', $posfields, $columnoptions);
 
-        $orgfields = $DB->get_records('org_type_info_field', array('hidden' => '0'));
+        $orgfields = \totara_customfield\report_builder_field_loader::get_visible_fields('org_type');
         $this->add_totara_job_custom_field_columns('org', $orgfields, $columnoptions);
 
         return true;
@@ -983,10 +983,10 @@ trait report_trait {
         );
 
         // Set up the position and organisation custom field filters.
-        $posfields = $DB->get_records('pos_type_info_field', array('hidden' => '0'));
+        $posfields = \totara_customfield\report_builder_field_loader::get_visible_fields('pos_type');
         $this->add_totara_job_custom_field_filters('pos', $posfields, $filteroptions, $userjoin, $userfield);
 
-        $orgfields = $DB->get_records('org_type_info_field', array('hidden' => '0'));
+        $orgfields = \totara_customfield\report_builder_field_loader::get_visible_fields('org_type');
         $this->add_totara_job_custom_field_filters('org', $orgfields, $filteroptions, $userjoin, $userfield);
 
         return true;
