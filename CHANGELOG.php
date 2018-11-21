@@ -3,6 +3,365 @@
 
 Totara Learn Changelog
 
+Release candidate 1 (22nd November 2018):
+=========================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-18925   +   Workflow API changes
+
+                   This commit makes the following API changes:
+                    * Workflow files must now include manager component in their path
+                    * Workflow types no longer define an abstract workflow class to be
+                      extended - workflows now extend the base workflow directly
+                    * $workflow->get_manager_class() is now final instead of abstract
+                    * $workflow_manager->get_all_workflow_classes() is now final instead of
+                      abstract
+                    * Workflow settings moved from totara/workflow to component which defined
+                      the manager
+                    * Structure of workflow settings has changed from using class name as
+                      setting name to a comma separated list of enabled workflows per workflow
+                      manager
+                    * $workflow->split_classname() now also returns $managercomponent and the
+                      order of variables in the returned array has changed
+                    * New final methods for checking and setting workflow settings created
+                      within base workflow manager class
+
+Security issues:
+
+    TL-19028       SCORM package download protection is now on by default
+
+                   Previously this setting was off by default.
+                   Turning it on ensures that sites are more secure by default.
+
+    TL-19365       CSRF protection was added to the login page, and HTML blocks on user pages now prevent self-XSS
+
+                   Cross-site request forgery is now prevented on the login page. This means
+                   that alternate login pages cannot be supported anymore and as such this
+                   feature was deprecated. The change may also interfere with incorrectly
+                   designed custom authentication plugins.
+
+                   Previously configured alternate login pages would not work after upgrade;
+                   if attempting to log in on the alternate page, users would be directed to
+                   the regular login page and presented with an error message asking them to
+                   retry log in, where it will be successful. To keep using vulnerable
+                   alternate login pages, the administrator would need to disable CSRF
+                   protection on the login page in config.php.
+
+New features:
+
+    TL-17752   +   New course, program and certification catalogue
+
+                   Implemented a new modern media-rich catalogue focused on improving user
+                   experience while browsing for content.
+
+                   The new catalogue is intended as a replacement for the 'Enhanced catalogue'
+                   which has been renamed 'Report based catalogue'.
+
+                   Improvements include:
+                    * One area to search for courses, programs and certifications
+                    * Ability to search learning items by tile or list views
+                    * Flexibility for administrators to configure display of different metadata
+                    * Ability to show icons related to the learning item
+                    * Ability to show learning item images
+                    * Ability to search by tags
+                    * Ability to promote recommended training
+                    * Search beyond title and description using tags, metadata, summary, etc
+                    * Ability to share the url of a search criteria
+
+                   Please note that after upgrading cron must be run in order to populate the
+                   catalogue.
+
+    TL-17941   +   New administration menu
+
+                   The new quick access menu is a replacement for the old Site Administration
+                   menu and is customisable for each user. The menu will only be available if
+                   a user has capabilities to perform one or more administration tasks.
+
+Improvements:
+
+    TL-5964    +   Added settings to seminars that improve the control over multiple signups
+
+                   This change introduces three new settings to both the settings form and the
+                   activity defaults admin page for seminars. These new settings are:
+
+                   1)  How many times the user can sign-up? - This setting replaces the old
+                   'multiple signups enabled', it allows you to choose values between 1-10 or
+                   unlimited. To maintain current behaviour for existing sites, they will have
+                   this set to 1 if 'multiple signups enabled' was not ticked, or unlimited if
+                   it was ticket. Note: cancelled or declined sign-ups are not considered as
+                   part of this setting, neither are sign-ups that have been archived by
+                   certifications.
+
+                   2) Restrict subsequent sign-ups to - This setting restricts subsequent
+                   sign-ups to the seminar based on the state of the current sign-up, the
+                   options are the attendance states 'fully attended', 'partially attended',
+                   and 'no show'. Selecting any of these options will restrict users to a
+                   single concurrent sign-up, until the attendance has been taken for that
+                   event. Not selecting any of these options will allow users to have as many
+                   concurrent sign-up as they want, up to the limit specified by the setting
+                   above.
+
+                   3) Clear expired waitlists - If enabled waitlisted sign-ups to seminar
+                   events will be cancelled by a cron task after the event has begun, allowing
+                   those users to sign up for another seminar event. Along with this setting
+                   there is also a new notification added to seminars, the 'Waitlisted sign-up
+                   expired' notification. This can be used to inform users that their sign-up
+                   has been automatically cancelled, and prompt them to go and sign-up to
+                   another event.
+
+    TL-7918    +   Added a new dynamic audience rule for user's certification status
+    TL-10852   +   Improved footer appearance to fill bottom of the page
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-12253   +   Removed completionstartonenrol setting from course settings screen
+    TL-17872   +   Add audience based content restriction
+    TL-18686   +   Optimised the performance of dynamic audiences
+
+                   With this patch, the scheduled task (Dynamic Audiences update) is now
+                   sorting audiences in order of their dependencies on other audiences.
+                   Audiences that depend on other audiences will be updated after their
+                   dependencies updates.
+
+                   This allows faster and more consistent propagation of audience changes
+                   (ideally in one task run).
+
+    TL-18728   +   Included a loading UI for "add block" when an option has been selected
+
+                   The "add block" popover now provides a visual clue that something is
+                   happening once an option has been selected. Previously on slow renders it
+                   wasn't clear any action was happening in the background.
+
+    TL-18840   +   Added a new dynamic audience rule for user's certification completion date
+    TL-18931   +   Improved the behaviour of filters in the content marketplace
+
+                   Behaviour of content marketplace filters was improved by adding support for
+                   searching within faceted filters, making the loading state more obvious as
+                   well as improving the behaviour when making multiple rapid changes.
+
+    TL-18963       Improved the help text for the 'Enable messaging system' setting on the advanced settings page
+    TL-18995   +   Added a new block to link administrators of new sites to the Totara Community
+    TL-19002   +   Changed the legacy programs/certifications catalogue UI to be consistent with course catalogue as a model
+
+                   Changes are made for the legacy programs/certifications catalogue UI (it
+                   uses one base code) to be consistent with course catalogue as a model
+                   when enhanced catalogue is disabled
+                    # Search box is moved to the top-left of the catalogue page
+                    # Added 16px margin-bottom space for the top-left search box
+                    # Search box label is removed
+                    # The "Add new program/certification" button is moved to center of the page
+                    # Course/program/certification titles font is changed from H3 to standard font
+                    # Programs/Certifications dropdown box with the categories/sub-categories
+                      options is moved to the right of the page
+                    # Fixed program/certifications breadcrumbs
+                    # Fixed if program has any associated overview files
+                    # Fixed behat test after new UI applied
+
+
+
+    TL-19045   +   Centered login panel vertically
+    TL-19098   +   Automatic report builder data grouping was deprecated and affected report sources were rewritten to use subqueries
+    TL-19108   +   Removed unnecessary API calls within the GO1 content marketplace plugin
+    TL-19109   +   Removed course events from GO1 content marketplace
+
+                   Previously the GO1 content marketplace included one tile per event for
+                   courses with a date-based event. Those event items have now been filtered
+                   out so each course only appears once in the catalog.
+
+    TL-19111   +   Removed obsolete non-functional support for report builder report and source groups
+    TL-19145       Improved terminology for non-graded assignment strings
+    TL-19184   +   Improved the appearance of seminar's notification form to resolve the confusion of notification's recipients
+
+                   Prior to this patch, on a creating new seminar's notification page, the
+                   label 'All booked' within the recipients section was misaligned, causing
+                   confusion.
+
+                   After the patch, the label 'All booked' has been changed into 'All (past
+                   and present booked)'.
+                   Furthermore, there is an improvement on form's UI, in which the 'Booked
+                   type' option is no longer a checkbox, but a selection element instead.
+
+    TL-19188   +   Added optional help icon to search text component
+
+                   Allowed for an optional help icon to be included before the search input.
+                   A pop-over dialogue is displayed when clicking the icon.
+
+    TL-19264   +   Switched to using standardised URL querystring parameters for the multi select component
+    TL-19288   +   Increased z-index of YUI dialogs to match other dialogs
+    TL-19322   +   Added additional UX options to the select tree component
+
+                   Extended the select tree component to also support the following features:
+
+                   A select tree can be provided a call to action string value (e.g. 'Please
+                   select an option...' ) which isn't included in the select list & doesn't
+                   provide a value. This is an alternative to the default value.
+
+                   A select option with child nodes can either be:
+                   * A clickable link itself which provides a selected value
+                   * A click target for expanding/collapsing child nodes which provides no
+                     selected value
+
+    TL-19476   +   Added custom field 'created' and 'updated' events
+
+                   These new events are also observed by the new catalogue in order to update
+                   the search indexes when new fields are added, or existing fields are
+                   updated.
+
+Bug fixes:
+
+    TL-16529       Fixed Global Search to accept the parameter type of either 'string' or 'array'
+
+                   Prior to this patch: when user was trying to perform global search, the
+                   system would throw an error. It happened because the query from request was
+                   a string instead of an array and the global search handler was expecting
+                   array data type only.
+
+                   After this patch: the issue has been resolved, global search handler is now
+                   accepting either 'string' or 'array' parameter.
+
+    TL-16788       Fixed audience visible learning report's javascript
+
+                   Prior to this patch, with a report using source 'Audience: visible
+                   learning', when changing the visibility of an audience, the system would
+                   update nothing. This happened because the javascript for the report was
+                   looking into the wrong elements and it would not trigger any update to the
+                   server side when event triggered.
+
+                   With this patch, given the same scenario, audience visibility of
+                   course/program will be updated.
+
+    TL-17804       Fixed certification expiry date not being updated when a user is granted an extension
+    TL-18558       Fixed display activity restrictions for editing teachers.
+
+                   Editing teachers can see activity restrictions whether they match them or
+                   not.
+
+    TL-18806       Prevented prog_write_completion from being used with certification data
+    TL-18821       Fixed the rendering of course's topic restriction when using the 'Restriction Set'
+    TL-18895       Added warning text to the audience's rules if there are any rules that are referencing a deleted item
+
+                   Prior to the patch: when an item (for example: program, course, position
+                   and so on) that was referenced in an audience rule got deleted, there were
+                   no obvious way to tell the user that this item had been deleted.
+
+                   With this patch: there will be a warning text, when user is viewing the
+                   rule that is still referencing a deleted item.
+
+    TL-18932       Added an ability to detect the broken audience rules when scheduled task starts running to update the audience's members
+
+                   Prior to this patch, when the scheduled task
+                   (\totara_cohort\task\update_cohort_task) was running, there was no way that
+                   it could detect whether the rules were still referencing to the invalid
+                   instance records or not (for example: course, program, user's position, and
+                   so on). Therefore, if the rule had a reference to an invalid instance
+                   record, audience will not be able update its members correctly.
+
+                   With this patch, it will start checking whether the referenced instance
+                   records are valid or not before the process of updating members. If there
+                   are any invalid instance records, then the system will send an email out to
+                   notify the site administrator.
+
+    TL-19000       Fixed task block for Seminar event approver roles
+    TL-19026   +   Changed the date format of Seminar report builder Dates and Times related columns report source
+
+                   Previously the report columns 'Event created', 'Last Updated', 'Sign-up
+                   Period', 'Sign-up Start Date', 'Sign-up End Date', 'Cancellation date',
+                   'Time of sign-up', 'Event Start time', 'Event finish time' and 'Approval
+                   time' were formatted differently than the 'Session Start' and 'Session
+                   Finish' columns. These columns are now formatted consistently.
+
+    TL-19122       Fixed an issue in the recurring courses where after the course restarts the enrolment date remained the date from the original course
+    TL-19129   +   Reduced space between Totara menu & page content
+    TL-19149       Made sure completion editor form is submitted correctly when the site is running non-English language
+    TL-19157   +   Removed popper.js source map path
+
+                   The popper.js library included a path to a non-existent source map which
+                   caused a warning message in the browser console.
+
+    TL-19158       Fixed 'Hide/Show' actions on the course/program custom fields page
+    TL-19160       Clarified date filter label that 'today' means 'start of today'
+    TL-19190       Fixed duplicate rows in the Program Completion report when "Is user assigned?" column is included
+    TL-19215       Improved handling of text in autocomplete forms
+
+                   Previously when adding HTML tags to an autocomplete field, they would be
+                   interpreted by the browser. This issue ensures that they are displayed as
+                   plain text, with offending content being removed when the form being
+                   reloaded.
+
+                   This is not a security fix as the only person who could be affected is the
+                   person who is entering the data, when they are first entering the data (and
+                   not on subsequent visits).
+
+    TL-19247       Fixed race condition when adding programs to the program completion block
+    TL-19248       Report builder filters supply the report id when changing
+
+                   Previously there were some filters that did not supply the report id when
+                   changing the filter. This issue ensures the access checks are done
+                   correctly for the report
+
+    TL-19249       Fixed cancel button not working in switch role form in course
+
+                   Previously the cancel button had the same functionality as the 'Save
+                   changes' button, changing the users role.
+
+                   With this patch, the cancel button now just redirects back to the course
+                   view page.
+
+    TL-19250       Fixed Totara forms file manager element with disabled subdirectories bug when uploading one file only
+    TL-19256       Ensured enrolment messages are send correctly after user assignment exceptions have been resolved
+    TL-19297       Fixed errors when changing course format to different format on course's editing page
+    TL-19302   +   Navigation on audiences pages is now consistent across them all
+
+                   Multilang support was fixed on all pages at the same time.
+
+    TL-19325   +   Fixed enabling/disabling antivirus plugins
+    TL-19328   +   Custom assets can once again be published making them available to all Seminar events
+    TL-19334   +   Removed unused coursetagging admin setting
+
+                   Course tagging has been controlled since the general enable tags setting as
+                   of Totara 9.0.
+                   The setting was missed in the clean up and remained in the product but did
+                   nothing.
+                   It has now been removed.
+
+    TL-19350   +   Fixed an issue with hierarchy field mapping in HR Import
+    TL-19374       Removed a trailing space on the output of the certif_status Report Builder display
+    TL-19439       Fixed select all checkbox not working in comments report in IE11/Edge
+    TL-19462   +   The actions column in the GO1 marketplace interface is no longer shown when marketplaces are disabled
+    TL-19472       Fixed temporary manager expiry checkbox not being unchecked when temporary manager removed
+    TL-19495       Ensured the course shortname and category fields export correctly on the 'Program overview' Report Builder source
+
+API changes:
+
+    TL-16726   +   Refactored Report builder initialisation
+
+                   More information will be provided in the Totara 12 changelogs
+
+Miscellaneous Moodle fixes:
+
+    TL-19387   +   MDL-63050: Made session check compatible with Redis 4.0
+    TL-19392   +   MDL-63101: Improved accuracy of cache event invalidation
+    TL-19396   +   MDL-62880: Dropped support for legacy question import format
+    TL-19399   +   MDL-62497: Protect against QuickForm remote code execution
+
+                   This vulnerability had already been fixed in a previous Totara patch (see
+                   TL-18491 from previous releases of Totara).
+
+                   An additional fix was added from this set of Moodle fixes which ensures
+                   that the Feedback module uses the QuickForm API correctly and safely,
+                   making sure that type checking of values is done as specified.
+
+Contributions:
+
+    * Jo Jones at Kineo UK - TL-18686
+    * Joby Harding at 77 Gears Ltd - TL-10852, TL-19045
+    * Michael D at Androgogic - TL-18931
+
+
 Release Evergreen (25th October 2018):
 ======================================
 
