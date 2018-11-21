@@ -300,9 +300,9 @@ Feature: Report builder table block
     And I add the "Report table" block
     And I configure the "Report table" block
     And I set the following fields to these values:
-      | Override default block title | Yes                       |
-      | Block title                  | Course Catalog            |
-      | Report                       | Enhanced catalog: courses |
+      | Override default block title | Yes                             |
+      | Block title                  | Course Catalog                  |
+      | Report                       | Report-based catalogue: courses |
     And I press "Save changes"
     And I press "Stop customising this page"
     And I click on "View full report" "link" in the "Course Catalog" "block"
