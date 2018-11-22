@@ -459,12 +459,7 @@ class totara_core_renderer extends plugin_renderer_base {
         $mastheaddata->masthead_lang = $hasguestlangmenu && (!isloggedin() || isguestuser()) ? $this->output->lang_menu() : '';
         $mastheaddata->masthead_logo = $mastheadlogo->export_for_template($this->output);
         $mastheaddata->masthead_menu = $mastheadmenudata;
-        if (!empty($this->page->layout_options['nonavbar'])) {
-            // There is no navbar, don't bother to generate anything for it.
-            $mastheaddata->masthead_plugins = '';
-        } else {
-            $mastheaddata->masthead_plugins = $this->output->navbar_plugin_output();
-        }
+        $mastheaddata->masthead_plugins = $this->output->navbar_plugin_output();
         $mastheaddata->masthead_search = $this->output->search_box();
         // Even if we don't have a "navbar" we need this option, due to the poor design of the nonavbar option in the past.
         $mastheaddata->masthead_toggle = $this->output->navbar_button();
