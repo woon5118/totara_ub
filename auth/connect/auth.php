@@ -97,7 +97,6 @@ class auth_plugin_connect extends auth_plugin_base {
         global $DB, $SESSION;
 
         unset($SESSION->loginerrormsg);
-        unset($SESSION->authconnectssofailed);
 
         $ssosession = $DB->get_record('auth_connect_sso_sessions', array('sid' => session_id()));
         if (!$ssosession) {
@@ -112,7 +111,7 @@ class auth_plugin_connect extends auth_plugin_base {
      * This method is called from login/index.php page for all enabled auth plugins.
      */
     public function loginpage_hook() {
-        global $SESSION, $DB;
+        global $DB;
 
         if (isloggedin() and !isguestuser()) {
             // Nothing to do.
@@ -122,11 +121,6 @@ class auth_plugin_connect extends auth_plugin_base {
         // Add ?nosso=1 to the login page URL if you needs to log in without SSO to local site directly.
         $nosso = optional_param('nosso', 0, PARAM_BOOL);
         if ($nosso) {
-            return;
-        }
-
-        if (!empty($SESSION->authconnectssofailed)) {
-            // No automatic SSO.
             return;
         }
 

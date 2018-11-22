@@ -58,6 +58,44 @@ class util {
     );
 
     /**
+     * Log failed SSO attempt.
+     *
+     * @param string $message
+     */
+    public static function log_sso_attempt_error($message) {
+        error_log('TC SSO ERROR: ' . $message);
+    }
+
+    /**
+     * Show SSO error page and give them some instructions to retry or restart browser.
+     *
+     * NOTE: this method terminates script execution.
+     *
+     * @param string $error lang string name from auth_connect
+     * @param string|\moodle_url $retryurl
+     */
+    public static function sso_error_page($error, $retryurl) {
+        global $OUTPUT, $SESSION, $CFG;
+
+        // Prevent redirection back to SSO scripts!
+        if (empty($SESSION->wantsurl)) {
+            $SESSION->wantsurl = $CFG->wwwroot . '/';
+        }
+
+        if (PHPUNIT_TEST) {
+            // Needed for testing of finish_sso().
+            redirect($retryurl);
+        }
+
+        echo $OUTPUT->header();
+        echo $OUTPUT->heading(get_string('ssologinfailed', 'auth_connect'));
+        echo $OUTPUT->notification(get_string($error, 'auth_connect'), 'notifyproblem');
+        echo $OUTPUT->single_button($retryurl, get_string('retrylogin', 'auth_connect'), 'get');
+        echo $OUTPUT->footer();
+        die;
+    }
+
+    /**
      * Create unique hash for a field in a db table.
      *
      * @param string $table database table
@@ -1925,9 +1963,8 @@ class util {
         $result = jsend::request($url, $data);
 
         if ($result['status'] !== 'success') {
-            $SESSION->loginerrormsg = get_string('ssologinfailed', 'auth_connect');
-            $SESSION->authconnectssofailed = 1;
-            redirect(get_login_url());
+            util::log_sso_attempt_error("SSO error during finishing callback - " . $result['message']);
+            util::sso_error_page('ssoerrorgeneral', get_login_url());
         }
 
         $serveruser = $result['data'];
@@ -1935,9 +1972,8 @@ class util {
 
         if (!$user or $user->deleted != 0 or $user->suspended != 0) {
             // Cannot login on this client, sorry.
-            $SESSION->loginerrormsg = get_string('ssologinfailed', 'auth_connect');
-            $SESSION->authconnectssofailed = 1;
-            redirect(get_login_url());
+            util::log_sso_attempt_error("SSO server user {$serveruser->id} is not allowed to log in to this client");
+            util::sso_error_page('ssoerrornotallowed', get_login_url());
         }
 
         complete_user_login($user);
@@ -1961,31 +1997,8 @@ class util {
         // Clear all session flags.
         unset($SESSION->wantsurl);
         unset($SESSION->loginerrormsg);
-        unset($SESSION->authconnectssofailed);
 
         redirect($urltogo);
-    }
-
-    /**
-     * Validates the SSO may start, redirects if user already
-     * logged in.
-     */
-    public static function validate_sso_possible() {
-        global $CFG, $SESSION;
-
-        if (!is_enabled_auth('connect')) {
-            redirect($CFG->wwwroot . '/');
-        }
-
-        if (isloggedin() and !isguestuser()) {
-            if (isset($SESSION->wantsurl)) {
-                $urltogo = $SESSION->wantsurl;
-            } else {
-                $urltogo = $CFG->wwwroot . '/';
-            }
-            unset($SESSION->wantsurl);
-            redirect($urltogo);
-        }
     }
 
     /**
@@ -2007,6 +2020,7 @@ class util {
 
         if (!session_id()) {
             // This should not happen, every normal web request must have sid.
+            util::log_sso_attempt_error('Cannot start SSO session because session_id is missing');
             return null;
         }
 
