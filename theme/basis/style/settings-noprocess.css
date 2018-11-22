@@ -201,6 +201,8 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol, dl, input, textarea {
 }
 
 /** Navigation text colour **/
+.totara_core__QuickAccess .totara_core__QuickAccess_group-list li a,
+.totara_core__QuickAccess .totara_core__QuickAccess_footer > a,
 .totaraNav_prim--toggleNav a,
 .totaraNav_prim--toggleNav a:active,
 .totaraNav_prim--toggleNav a:hover,
@@ -217,6 +219,7 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol, dl, input, textarea {
 }
 
 /** Navigation background colour **/
+.totara_core__QuickAccess .totara_core__QuickAccess_menu,
 .totaraNav_prim--list .navExpand--list,
 .totaraNav_prim {
     background-color: [[setting:headerbgc]];
