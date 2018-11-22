@@ -129,8 +129,8 @@ class course extends provider {
 
         require_once($CFG->dirroot . '/course/lib.php');
 
-        $course = $DB->get_record('course', ['id' => $objectid]);
-        if (!can_access_course($course)) {
+        $coursecontext = \context_course::instance($objectid);
+        if (!has_capability('moodle/course:update', $coursecontext)) {
             return null;
         }
 
