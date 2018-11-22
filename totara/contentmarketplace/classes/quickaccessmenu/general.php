@@ -31,10 +31,18 @@ class general implements \totara_core\quickaccessmenu\provider {
     public static function get_items(): array {
         return [
             item::from_provider(
-                'contentmarketplace',
-                group::get(group::PLATFORM),
+                'setup_content_marketplaces',
+                group::get(group::LEARN),
                 new \lang_string('contentmarketplace', 'totara_contentmarketplace'),
                 7000
+            ),
+            // The same string is intentional here since only 'manage' will show in the admin tree
+            // after the initial contentmarketplace setup.
+            item::from_provider(
+                'manage_content_marketplaces',
+                group::get(group::LEARN),
+                new \lang_string('contentmarketplace', 'totara_contentmarketplace'),
+                8000
             ),
         ];
     }

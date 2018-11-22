@@ -160,6 +160,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'modsettingfacetoface' => 'Seminars',
                 'gradessettings' => 'Grades',
                 'managetemplates' => 'Learning Plans',
+                'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
                 'manageappraisals' => 'Appraisals',
@@ -209,6 +210,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'managecertifications' => 'Certifications',
                 'gradessettings' => 'Grades',
                 'managetemplates' => 'Learning Plans',
+                'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
                 'manageappraisals' => 'Appraisals',
@@ -981,6 +983,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
               'managecertifications' => 'Certifications',
               'gradessettings'       => 'Grades',
               'managetemplates'      => 'Learning Plans',
+              'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
                 'manageappraisals'   => 'Appraisals',
@@ -1014,6 +1017,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'managecertifications' => 'Certifications',
                 'gradessettings'       => 'Grades',
                 'managetemplates'      => 'Learning Plans',
+                'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
                 'manageappraisals'   => 'Appraisals',
@@ -1055,6 +1059,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'managecertifications' => 'Certifications',
                 'gradessettings'       => 'Grades',
                 'managetemplates'      => 'Learning Plans',
+                'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
                 'manageappraisals'   => 'Appraisals',
@@ -1085,6 +1090,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'managecertifications' => 'Certifications',
                 'gradessettings'       => 'Grades',
                 'managetemplates'      => 'Learning Plans',
+                'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
                 'manageappraisals'   => 'Appraisals',
