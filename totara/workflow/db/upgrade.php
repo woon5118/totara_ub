@@ -50,4 +50,6 @@ function xmldb_totara_workflow_upgrade($oldversion) {
         }
         upgrade_plugin_savepoint(true, 2018101900, 'totara', 'workflow');
     }
+
+    return true;
 }

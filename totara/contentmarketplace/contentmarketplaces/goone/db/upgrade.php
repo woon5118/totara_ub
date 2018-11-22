@@ -70,4 +70,5 @@ function xmldb_contentmarketplace_goone_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018101900, 'contentmarketplace', 'goone');
     }
 
+    return true;
 }
