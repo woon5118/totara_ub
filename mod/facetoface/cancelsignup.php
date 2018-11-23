@@ -50,6 +50,10 @@ if (!$seminarevent->get_allowcancellations()) {
     print_error('error:cancellationsnotallowed', 'facetoface');
 }
 
+// User might have an ability to render the settings_navigation, and with settings_navigation, it
+// requires the url of a page, therefore. PAGE should set url here first.
+$PAGE->set_url('/mod/facetoface/cancelsignup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions, 'confirm' => $confirm));
+
 require_login($course, false, $cm);
 require_capability('mod/facetoface:view', $context);
 
@@ -59,7 +63,6 @@ $pagetitle = format_string($seminar->get_name());
 
 $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
 
-$PAGE->set_url('/mod/facetoface/cancelsignup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions, 'confirm' => $confirm));
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
 
