@@ -1,17 +1,19 @@
 @totara @totara_catalog @javascript
 Feature: Course catalog item and details content
   Background:
-    Given the following "custom course fields" exist in "totara_core" plugin:
+    Given I am on a totara site
+    And the following "custom course fields" exist in "totara_core" plugin:
       | shortname | fullname | param1 | datatype |
       | input     | input    |        | text     |
     And the following "custom program fields" exist in "totara_core" plugin:
       | shortname | fullname | param1 | datatype |
       | input     | input    |        | text     |
     And the following "users" exist:
-      | firstname | lastname | username |
-      | jongsuk   | lee      | jongsuk  |
-      | shinhye   | park     | shinhye  |
-      | sarang    | kim      | sarang   |
+      | firstname | lastname    | username  |
+      | jongsuk   | lee         | jongsuk   |
+      | shinhye   | park        | shinhye   |
+      | sarang    | kim         | sarang    |
+      | joe       | notenrolled | notenrold |
     And the following "courses" exist:
       | fullname | shortname | category | enablecompletion | customfield_input         |
       | course1  | course1   | 0        | 1                | This is course input test |
@@ -28,8 +30,7 @@ Feature: Course catalog item and details content
       | cert1    | cert1     | 0        |
 
   Scenario: User viewing course catalog item and content
-    And I am on a totara site
-    And I log in as "admin"
+    When I log in as "admin"
     And I navigate to "Courses > Configure catalogue" in site administration
     And I follow "Templates"
     And I set the following Totara form fields to these values:
@@ -102,3 +103,12 @@ Feature: Course catalog item and details content
     And I log in as "shinhye"
     When I click on "Find Learning" in the totara menu
     Then I should see "0%"
+
+  Scenario: User without enrolment should still get a link to course page
+    When I log in as "notenrold"
+    And I click on "Find Learning" in the totara menu
+    And I follow "course1"
+    Then I should see "You are not enrolled in this course"
+
+    When I follow "Go to course"
+    Then I should see "You can not enrol yourself in this course."

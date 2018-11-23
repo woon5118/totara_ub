@@ -179,7 +179,11 @@ abstract class output_test_base extends advanced_testcase {
         switch ($provider) {
             case 'course':
                 $details_link = (object)[
-                    'description' => 'You cannot enrol yourself in this course',
+                    'description' => 'You are not enrolled in this course',
+                    'button' => (object)[
+                        'url' => 'https://www.example.com/moodle/course/view.php?id=' . $object_id,
+                        'label' => 'Go to course',
+                    ],
                 ];
                 break;
             case 'program':

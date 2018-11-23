@@ -144,7 +144,8 @@ Feature: Course enrolment through programs
     And I should see "Course 2"
 
     When I follow "Course 1"
-    Then I should see "You cannot enrol yourself in this course"
+    Then I should see "You are not enrolled in this course"
+
     When I am on "Course 2" course homepage
     Then I should see "Topic 1"
     And I log out
@@ -190,7 +191,7 @@ Feature: Course enrolment through programs
     And I should see "Course 2"
 
     When I follow "Course 1"
-    Then I should see "You cannot enrol yourself in this course"
+    Then I should see "You are not enrolled in this course"
 
     When I am on "Course 2" course homepage
     Then I should see "Topic 1"
@@ -237,7 +238,7 @@ Feature: Course enrolment through programs
     And I should see "Course 2"
 
     When I follow "Course 1"
-    Then I should see "You cannot enrol yourself in this course"
+    Then I should see "You are not enrolled in this course"
 
     When I am on "Course 2" course homepage
     Then I should see "Topic 1"
@@ -267,9 +268,9 @@ Feature: Course enrolment through programs
     And I should see "Course 2"
 
     When I follow "Course 1"
-    Then I should see "You cannot enrol yourself in this course"
+    Then I should see "You are not enrolled in this course"
     When I follow "Course 2"
-    Then I should see "You cannot enrol yourself in this course"
+    Then I should see "You are not enrolled in this course"
     And I log out
 
     # Now add teacher to both programs

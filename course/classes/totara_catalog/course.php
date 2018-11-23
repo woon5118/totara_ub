@@ -184,7 +184,13 @@ class course extends provider {
             return $link;
         }
 
-        $link->description = get_string('catalog_cannot_enrol', 'moodle');
+        $link->description = get_string('catalog_not_enrolled', 'moodle');
+
+        // We still have to include a link to the course in case there is auto-enrolment (e.g. programs, learning plans).
+        // There is no easy way to figure that out for all enrolment plugins at this point.
+        $link->button = new \stdClass();
+        $link->button->url = course_get_url($objectid)->out();
+        $link->button->label = get_string('catalog_go_to_course', 'moodle');
 
         return $link;
     }
