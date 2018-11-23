@@ -328,7 +328,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
                         newHeadingBox.attr('name', 'heading'+colid);
                         newHeadingBox.attr('id', 'id_heading'+colid);
-                        newHeadingBox.closest('tr').data('colid', colid);
+                        newHeadingBox.closest('tr').attr('data-colid', colid);
 
                         // Append a new col select box
                         newcolinput.find('input[name=newheading]').val('');
