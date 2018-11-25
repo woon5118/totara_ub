@@ -410,7 +410,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         var issidebarfilter = $('#id_all_sidebar_filters').find('option[value=' + o.type + '-' + o.value+']').length > 0;
 
                         // Add deleted filter to new standard filter selector.
-                        var standardoptgroup = $(".new_standard_filter_selector optgroup[label='" + nlabel + "']");
+                        var standardoptgroup = $(".new_standard_filter_selector optgroup[label='" + $.escapeSelector(nlabel) + "']");
                         if (standardoptgroup.length == 0) {
                             // Create optgroup and append to select.
                             standardoptgroup = $('<optgroup label="' + nlabel + '"></optgroup>');

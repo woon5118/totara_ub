@@ -412,7 +412,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
                         // Add deleted col to new col selector
                         var nlabel = rb_ucwords(delcol.optgroup_label);
-                        var optgroup = $(".new_column_selector optgroup[label='"+nlabel+"']");
+                        var optgroup = $(".new_column_selector optgroup[label='" + $.escapeSelector(nlabel) + "']");
                         if (optgroup.length == 0) {
                             // Create optgroup and append to select
                             optgroup = $('<optgroup label="'+nlabel+'"></optgroup>');
