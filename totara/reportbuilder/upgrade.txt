@@ -41,12 +41,12 @@ information provided here is intended especially for developers.
   * add_user_fields_to_columns instead use add_core_user_columns in \core_user\rb\source\report_trait
   * add_user_fields_to_filters instead use add_core_user_fields in \core_user\rb\source\report_trait
   * add_context_table_to_joinlist instead use add_context_tables in \totara_reportbuilder\rb\source\report_trait
-  * add_program_table_to_joinlist instead use add_totara_program_tables in \totara_program\rb\source\report_trait
-  * add_program_fields_to_columns instead use add_totara_program_columns in \totara_program\rb\source\report_trait
-  * add_program_fields_to_filters instead use add_totara_program_filters in \totara_program\rb\source\report_trait
-  * add_certification_table_to_joinlist instead use add_totara_certification_tables in \totara_certification\rb\source\report_trait
-  * add_certification_fields_to_columns instead use add_totara_certification_columns in \totara_certification\rb\source\report_trait
-  * add_certification_fields_to_filters instead use add_totara_certification_filters in \totara_certification\rb\source\report_trait
+  * add_program_table_to_joinlist instead use add_totara_program_tables in \totara_program\rb\source\program_trait
+  * add_program_fields_to_columns instead use add_totara_program_columns in \totara_program\rb\source\program_trait
+  * add_program_fields_to_filters instead use add_totara_program_filters in \totara_program\rb\source\program_trait
+  * add_certification_table_to_joinlist instead use add_totara_certification_tables in \totara_certification\rb\source\certification_trait
+  * add_certification_fields_to_columns instead use add_totara_certification_columns in \totara_certification\rb\source\certification_trait
+  * add_certification_fields_to_filters instead use add_totara_certification_filters in \totara_certification\rb\source\certification_trait
   * add_job_assignment_table_to_joinlist instead use add_totara_job_tables in \totara_job\rb\source\report_trait
   * add_job_assignment_fields_to_columns instead use add_totara_job_columns in \totara_job\rb\source\report_trait
   * add_job_assignment_fields_to_filters instead use add_totara_job_filters in \totara_job\rb\source\report_trait

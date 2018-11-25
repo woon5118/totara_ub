@@ -36,6 +36,8 @@ trait program_trait {
      * @param string $join Name of the join that provides the
      *                     'program id' field
      * @param string $field Name of table containing program id field to join on
+     *
+     * @retun bool always true
      */
     protected function add_totara_program_tables(&$joinlist, $join, $field) {
 
@@ -47,6 +49,7 @@ trait program_trait {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
+        return true;
     }
 
     /**
@@ -57,7 +60,7 @@ trait program_trait {
      *                              this method
      * @param string $join Name of the join that provides the {prog} table, either 'program' or 'base'
      *
-     * @return True
+     * @return bool
      */
     protected function add_totara_program_columns(&$columnoptions, $join) {
         $columnoptions[] = new \rb_column_option(
@@ -210,7 +213,7 @@ trait program_trait {
      * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
-     * @return True
+     * @return bool
      */
     protected function add_totara_program_filters(&$filteroptions) {
         $filteroptions[] = new \rb_filter_option(

@@ -43,7 +43,7 @@ trait base_deprecated_t12_trait {
      *
      * @internal
      *
-     * @return \core_user\rb\source\report_trait|\totara_cohort\rb\source\report_trait|\core_course\rb\source\report_trait|\totara_reportbuilder\rb\source\report_trait|\totara_program\rb\source\report_trait|\totara_certification\rb\source\report_trait|\core_course\rb\source\report_trait|\totara_job\rb\source\report_trait|\core_tag\rb\source\report_trait|\totara_cohort\rb\source\report_trait
+     * @return \core_user\rb\source\report_trait|\totara_cohort\rb\source\report_trait|\core_course\rb\source\report_trait|\totara_reportbuilder\rb\source\report_trait|\totara_program\rb\source\program_trait|\totara_certification\rb\source\certification_trait|\core_course\rb\source\report_trait|\totara_job\rb\source\report_trait|\core_tag\rb\source\report_trait|\totara_cohort\rb\source\report_trait
      */
     private function get_bc_trait_instance() {
         if (isset($this->bc_trait_instance)) {
@@ -54,10 +54,10 @@ trait base_deprecated_t12_trait {
             use \core_course\rb\source\report_trait,
                 \core_tag\rb\source\report_trait,
                 \totara_cohort\rb\source\report_trait,
-                \totara_certification\rb\source\report_trait,
+                \totara_certification\rb\source\certification_trait,
                 \totara_job\rb\source\report_trait,
                 \totara_reportbuilder\rb\source\report_trait,
-                \totara_program\rb\source\report_trait;
+                \totara_program\rb\source\program_trait;
 
             public function __construct() {
                 // Do not call parent constructor intentionally
@@ -1791,12 +1791,12 @@ trait base_deprecated_t12_trait {
      * @param string $join Name of the join that provides the
      *                     'program id' field
      * @param string $field Name of table containing program id field to join on
-     * @return boolean True
+     * @return bool True
      * @deprecated since Totara 12.0
      */
     protected function add_program_table_to_joinlist(&$joinlist, $join, $field) {
 
-        debugging('add_program_table_to_joinlist is deprecated. Please use add_totara_program_tables in \totara_program\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_program_table_to_joinlist is deprecated. Please use add_totara_program_tables in \totara_program\rb\source\program_trait instead', DEBUG_DEVELOPER);
 
         $trait = $this->get_bc_trait_instance();
         return $trait->add_totara_program_tables($joinlist, $join, $field);
@@ -1811,15 +1811,15 @@ trait base_deprecated_t12_trait {
      *                              this method
      * @param string $join Name of the join that provides the 'program' table
      * @param string $langfile Source for translation, totara_program or totara_certification
-     * @return True
+     * @return bool True
      * @deprecated since Totara 12.0
      */
     protected function add_program_fields_to_columns(&$columnoptions, $join = 'program', $langfile = 'totara_program') {
 
-        debugging('add_program_fields_to_columns is deprecated. Please use add_totara_program_columns in \totara_program\rb\source\report_trait instead');
+        debugging('add_program_fields_to_columns is deprecated. Please use add_totara_program_columns in \totara_program\rb\source\program_trait instead');
 
         $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_program_columns($columnoptions, $join, $langfile);
+        return $trait->add_totara_program_columns($columnoptions, $join);
     }
 
     /**
@@ -1829,15 +1829,15 @@ trait base_deprecated_t12_trait {
      *                              Passed by reference and updated by
      *                              this method
      * @param string $langfile Source for translation, totara_program or totara_certification
-     * @return True
+     * @return bool True
      * @deprecated since Totara 12.0
      */
     protected function add_program_fields_to_filters(&$filteroptions, $langfile = 'totara_program') {
 
-        debugging('add_program_fields_to_filters is deprecated. Please use add_totara_program_filters in \totara_program\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_program_fields_to_filters is deprecated. Please use add_totara_program_filters in \totara_program\rb\source\program_trait instead', DEBUG_DEVELOPER);
 
         $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_program_filters($filteroptions, $langfile);
+        return $trait->add_totara_program_filters($filteroptions);
     }
 
     /**
@@ -1849,11 +1849,12 @@ trait base_deprecated_t12_trait {
      * @param string $join Name of the join that provides the
      *                     'certif id' field
      * @param string $field Name of table containing program id field to join on
+     * @return bool True
      * @deprecated since Totara 12.0
      */
     protected function add_certification_table_to_joinlist(&$joinlist, $join, $field) {
 
-        debugging('add_certification_table_to_joinlist is deprecated. Please use add_totara_certification_tables in \totara_certification\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_certification_table_to_joinlist is deprecated. Please use add_totara_certification_tables in \totara_certification\rb\source\certification_trait instead', DEBUG_DEVELOPER);
 
         $trait = $this->get_bc_trait_instance();
         return $trait->add_totara_certification_tables($joinlist, $join, $field);
@@ -1867,15 +1868,15 @@ trait base_deprecated_t12_trait {
      *                              this method
      * @param string $join Name of the join that provides the 'program' table
      * @param string $langfile Source for translation, totara_program or totara_certification
-     * @return Boolean
+     * @return bool True
      * @deprecated since Totara 12.0
      */
     protected function add_certification_fields_to_columns(&$columnoptions, $join = 'certif', $langfile = 'totara_certification') {
 
-        debugging('add_certification_fields_to_columns is deprecated. Please use add_totara_certification_columns in \totara_certification\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_certification_fields_to_columns is deprecated. Please use add_totara_certification_columns in \totara_certification\rb\source\certification_trait instead', DEBUG_DEVELOPER);
 
         $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_certification_columns($columnoptions, $join, $langfile);
+        return $trait->add_totara_certification_columns($columnoptions, $join);
     }
 
     /**
@@ -1885,15 +1886,15 @@ trait base_deprecated_t12_trait {
      *                              Passed by reference and updated by
      *                              this method
      * @param string $langfile Source for translation, totara_program or totara_certification
-     * @return boolean
+     * @return bool True
      * @deprecated since Totara 12.0
      */
     protected function add_certification_fields_to_filters(&$filteroptions, $langfile = 'totara_certification') {
 
-        debugging('add_certification_fields_to_filters is deprecated. Please use add_totara_certification_filters in \totara_certification\rb\source\report_trait instead', DEBUG_DEVELOPER);
+        debugging('add_certification_fields_to_filters is deprecated. Please use add_totara_certification_filters in \totara_certification\rb\source\certification_trait instead', DEBUG_DEVELOPER);
 
         $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_certification_filters($filteroptions, $langfile);
+        return $trait->add_totara_certification_filters($filteroptions);
     }
 
 

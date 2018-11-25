@@ -35,6 +35,7 @@ trait certification_trait {
      * @param string $join Name of the join that provides the
      *                     'program id' field
      * @param string $field Name of table containing program id field to join on
+     * @return bool always true
      */
     protected function add_totara_certification_tables(&$joinlist, $join, $field) {
 
@@ -48,6 +49,8 @@ trait certification_trait {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
+
+        return true;
     }
 
     /**
@@ -58,7 +61,7 @@ trait certification_trait {
      *                              this method
      * @param string $join Name of the join that provides the {prog}+{certif} virtual table, either 'certif' or 'base'
      *
-     * @return Boolean
+     * @return bool always true
      */
     protected function add_totara_certification_columns(&$columnoptions, $join) {
         $columnoptions[] = new \rb_column_option(
@@ -244,7 +247,7 @@ trait certification_trait {
      * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
-     * @return boolean
+     * @return bool always true
      */
     protected function add_totara_certification_filters(&$filteroptions) {
         $filteroptions[] = new \rb_filter_option(
