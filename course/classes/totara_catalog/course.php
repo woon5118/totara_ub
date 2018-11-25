@@ -159,7 +159,7 @@ class course extends provider {
         $link = new \stdClass();
 
         if ($alreadycompleted) {
-            $link->description = get_string('catalog_already_complete', 'moodle');
+            $link->description = get_string('catalog_already_completed', 'moodle');
             $link->button = new \stdClass();
             $link->button->url = course_get_url($objectid)->out();
             $link->button->label = get_string('catalog_view', 'moodle');
