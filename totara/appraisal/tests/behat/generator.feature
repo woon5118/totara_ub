@@ -75,7 +75,7 @@ Feature: Verify appraisal data generators.
     And I follow "Appraisal 1"
     Then I should see "Appraisal 1"
 
-    When I follow "Content"
+    When I switch to "Content" tab
     Then I should see "Stage 1-1"
     And I should see "31 Dec 2035"
     And I should see "1 Jan 2036"

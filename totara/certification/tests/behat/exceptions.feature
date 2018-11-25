@@ -35,7 +35,7 @@ Feature: Generation of certification assignment exceptions
     And I click on "Miscellaneous" "link"
     And I click on "Certification Filler" "link"
     And I click on "Edit certification details" "button"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"
@@ -64,7 +64,7 @@ Feature: Generation of certification assignment exceptions
     And I click on "Miscellaneous" "link"
     And I click on "Certification Exception Tests" "link"
     And I click on "Edit certification details" "button"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"

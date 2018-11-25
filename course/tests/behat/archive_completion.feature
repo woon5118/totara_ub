@@ -63,7 +63,7 @@ Feature: Test we can manually archive course completion.
     And I press "Save changes"
     And I am on "Completion archive test" program homepage
     And I click on "Edit program details" "button"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#edit-program-content" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"

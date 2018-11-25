@@ -20,7 +20,7 @@ Feature: The Certification Completion report displays correctly for a learner.
       | Full name  | Test Certification |
       | Short name | tstcert            |
     And I press "Save changes"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Certify Course" "link" in the "addmulticourse" "totaradialogue"

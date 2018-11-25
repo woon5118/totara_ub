@@ -30,7 +30,7 @@ Feature: Learners can submit assignments again when certification is expired
         | Short name | tstcert            |
     And I press "Save changes"
 
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"

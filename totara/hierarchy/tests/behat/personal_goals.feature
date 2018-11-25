@@ -295,7 +295,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     When I log in as "admin"
     And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
     And I follow "Appraisal 1"
-    And I follow "Content"
+    And I switch to "Content" tab
     And I set the field "datatype" to "Goals"
     And I press "submitbutton"
     And I set the field "Question" to "Please review your personal goals"
@@ -539,7 +539,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     When I log in as "admin"
     And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
     And I follow "Appraisal 1"
-    And I follow "Content"
+    And I switch to "Content" tab
     And I set the field "datatype" to "Goals"
     And I press "submitbutton"
     And I set the field "Question" to "Please review your personal goals"

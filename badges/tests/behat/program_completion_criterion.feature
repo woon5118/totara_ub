@@ -46,7 +46,7 @@ Feature: Verify badge issue based on program completion criterion.
     When I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Program 1" "table_row"
-    And I follow "Content"
+    And I switch to "Content" tab
     And I press "Add"
     And I follow "Miscellaneous"
     And I follow "Course 1"
@@ -60,7 +60,7 @@ Feature: Verify badge issue based on program completion criterion.
     When I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Program 2" "table_row"
-    And I follow "Content"
+    And I switch to "Content" tab
     And I press "Add"
     And I follow "Miscellaneous"
     And I follow "Course 1"

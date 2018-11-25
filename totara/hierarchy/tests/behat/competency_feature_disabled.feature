@@ -72,7 +72,7 @@ Feature: The competencies can be disabled
     # Check competencies could be add to the program's content.
     When I am on "Program 1" program homepage
     And I click on "Edit program details" "button"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And the "contenttype_ce" select box should contain "Competency"
 
   Scenario: Disable competency feature. All links and options related to the feature should not be in available anywhere.
@@ -101,5 +101,5 @@ Feature: The competencies can be disabled
     # Check competencies are not an option to be added in the program's content.
     When I am on "Program 1" program homepage
     And I click on "Edit program details" "button"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And the "contenttype_ce" select box should not contain "Competency"

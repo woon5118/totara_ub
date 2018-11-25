@@ -110,7 +110,7 @@ Feature: Instant completion
     And I click on "Programs" in the totara menu
     And I click on "Program1" "link"
     And I press "Edit program details"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I set the following fields to these values:
       | contenttype_ce | Set of courses |
     And I press "Add"

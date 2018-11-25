@@ -58,7 +58,7 @@ Feature: Test Current Learning block
     And I press "Save changes"
 
     # Add the program content.
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#edit-program-content" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 2" "link" in the "addmulticourse" "totaradialogue"
@@ -107,7 +107,7 @@ Feature: Test Current Learning block
     And I click on "Miscellaneous" "link"
     And I click on "Test Program 1" "link"
     And I click on "Edit program details" "button"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#edit-program-content" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 2" "link" in the "addmulticourse" "totaradialogue"

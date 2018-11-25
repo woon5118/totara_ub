@@ -24,7 +24,7 @@ Feature: Check to see that programs with only a single course are displayed as e
     And I press "Save changes"
 
     # Add Courseset 1 with Course 1.
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"

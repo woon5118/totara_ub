@@ -64,7 +64,7 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I click on "Miscellaneous" "link"
     And I click on "Test Program 1" "link"
     And I click on "Edit program details" "button"
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I select "Competency" from the "Add a new" singleselect
     And I press "Add"
     And I click on "Competency 1" "link" in the "Add competency" "totaradialogue"

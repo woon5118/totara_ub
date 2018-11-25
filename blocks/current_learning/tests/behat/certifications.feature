@@ -30,7 +30,7 @@ Feature: User certifications and their courses appear correctly in the current l
     And I press "Save changes"
 
     # Add CS 1.
-    And I click on "Content" "link"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Certify Course 1" "link" in the "addmulticourse" "totaradialogue"
