@@ -28,6 +28,7 @@ information provided here is intended especially for developers.
   * rb_source_program_overview::rb_display_category_link_list(), please call totara_program\rb\display\program_category_link_list::display() instead.
   * rb_source_program_overview::rb_display_coursename_list(), please call totara_program\rb\display\program_course_name_list::display() instead.
 * Updated totara_program_renderer::coursecat_tree, removing a reference to an unnecessary JavaScript function call
+* totara_program_renderer::display_duedate_highlight_info() has changed, fixing a HTML validation issue
 
 === 10 ===
 

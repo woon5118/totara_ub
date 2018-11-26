@@ -583,7 +583,7 @@ class totara_program_renderer extends plugin_renderer_base {
         $out = '';
         $now = time();
         if (!empty($duedate)) {
-            $out .= html_writer::empty_tag('br') . html_writer::start_tag('span', array('class' => 'plan_highlight'));
+            $out .= html_writer::empty_tag('br');
 
             if ($duedate < $now) {
                     $out .= $this->notification(get_string('overdue', 'totara_plan'), 'notifyproblem');
@@ -595,7 +595,6 @@ class totara_program_renderer extends plugin_renderer_base {
                     $out .= $this->notification(get_string('dueinxdays', 'totara_plan', $days), 'notifynotice');
                 }
             }
-            $out .= html_writer::end_tag('span');
         }
         return $out;
     }
