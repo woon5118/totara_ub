@@ -87,7 +87,7 @@ class booking_common extends condition {
 
         $futureis = new event_not_in_the_past($this->signup);
         if (!$futureis->pass()) {
-            $reason[] = $futureis->get_failure();
+            $reason = array_merge($reason, $futureis->get_failure());
         }
 
         $register = new event_registration_is_available($this->signup);
