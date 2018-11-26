@@ -1525,6 +1525,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         if ($preview) {
             $stagestatus = 'appraisal-stage-inprogress';
             $context['textstatus'] = get_string('incomplete', 'totara_appraisal');
+            $context['status'] = "";
         } else if ((($appraisal->status == appraisal::STATUS_CLOSED && !$stage->is_completed($userassignment)) ||
                     ($userassignment->is_closed() && !$stage->is_completed($userassignment)))) {
             if ($stageinprogress) {
