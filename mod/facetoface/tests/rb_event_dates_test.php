@@ -37,7 +37,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
         $config = (new rb_config())->set_nocache(true);
-        $this->report = reportbuilder::create($rid, $config);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -68,7 +68,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
         $config = (new rb_config())->set_nocache(true);
-        $this->report = reportbuilder::create($rid, $config);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -118,7 +118,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
         $config = (new rb_config())->set_nocache(true);
-        $this->report = reportbuilder::create($rid, $config);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -168,7 +168,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
         $config = (new rb_config())->set_nocache(true);
-        $this->report = reportbuilder::create($rid, $config);
+        $report = reportbuilder::create($rid, $config);
 
         // Mock objects to use in the display function.
         $column = $this->getMockBuilder('\rb_column')
@@ -218,7 +218,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
         $config = (new rb_config())->set_nocache(true);
-        $this->report = reportbuilder::create($rid, $config);
+        $report = reportbuilder::create($rid, $config);
 
         // Two dates.
         // Mock objects to use in the display function.
@@ -302,7 +302,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         // Create report.
         $rid = $this->create_report('facetoface_events', 'Test f2f events');
         $config = (new rb_config())->set_nocache(true);
-        $this->report = reportbuilder::create($rid, $config);
+        $report = reportbuilder::create($rid, $config);
 
         // Two dates.
         // Mock objects to use in the display function.
@@ -323,15 +323,15 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Pacific/Auckland';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 4:25 PM to 28 December 2017, 4:25 PM', $display);
+        $this->assertEquals('27 December 2017, 11:25 AM to 28 December 2017, 11:25 AM', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
-        $this->assertEquals('Before 28 December 2017, 4:25 PM', $display);
+        $this->assertEquals('Before 28 December 2017, 11:25 AM', $display);
 
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Australia/Perth';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 11:25 AM to 28 December 2017, 11:25', $display);
+        $this->assertEquals('27 December 2017, 11:25 AM to 28 December 2017, 11:25 AM', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
         $this->assertEquals('Before 28 December 2017, 11:25 AM', $display);
@@ -358,7 +358,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Pacific/Auckland';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('After 27 December 2017, 4:25 PM', $display);
+        $this->assertEquals('After 27 December 2017, 11:25 AM', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
         $this->assertEquals('', $display);
