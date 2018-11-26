@@ -828,7 +828,7 @@ class rb_source_certification_overview extends rb_base_source {
 
     protected function define_defaultcolumns() {
         $defaultcolumns = array();
-        $defaultcolumns[] = array('type' => 'cerif', 'value' => 'shortname');
+        $defaultcolumns[] = array('type' => 'certif', 'value' => 'shortname');
         $defaultcolumns[] = array('type' => 'job_assignment', 'value' => 'allorganisationnames');
         $defaultcolumns[] = array('type' => 'job_assignment', 'value' => 'allpositionnames');
         $defaultcolumns[] = array('type' => 'user', 'value' => 'namelink');
