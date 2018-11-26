@@ -159,7 +159,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $CFG->clone_dbname = $CFG->dbname;
         $reportdb = totara_get_clone_db(true);
 
-        $config->set_nocache(false);
+        $config = (new rb_config())->set_nocache(false);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();

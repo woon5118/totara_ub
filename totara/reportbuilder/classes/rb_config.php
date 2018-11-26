@@ -27,6 +27,10 @@ defined('MOODLE_INTERNAL') || die();
  * Class rb_config
  */
 final class rb_config {
+    /**
+     * @var bool true means no changes.
+     */
+    private $finalised = false;
 
     /**
      * @var array data to be passed to the embedded object constructor
@@ -54,6 +58,23 @@ final class rb_config {
     private $globalrestrictionset;
 
     /**
+     * Constructor.
+     */
+    public function __construct() {
+        global $USER;
+        $this->reportfor = (int)$USER->id;
+    }
+
+    /**
+     * Called in report_builder constructor, no changes are allowed afterwards.
+     *
+     * NOTE: config can be reused, but not recycled with different parameters.
+     */
+    public function finalise() {
+        $this->finalised = true;
+    }
+
+    /**
      * @return array
      */
     public function get_embeddata(): array {
@@ -61,15 +82,22 @@ final class rb_config {
     }
 
     /**
+     * Set embedded report data.
+     *
      * @param array $embeddata
      * @return rb_config
      */
     public function set_embeddata(array $embeddata): rb_config {
+        if ($this->finalised) {
+            throw new \coding_exception('rb_config instance cannot be changed after first use');
+        }
         $this->embeddata = $embeddata;
         return $this;
     }
 
     /**
+     * Return saved search id.
+     *
      * @return int
      */
     public function get_sid(): int {
@@ -77,10 +105,18 @@ final class rb_config {
     }
 
     /**
+     * Set saved search id from page argument.
+     *
+     * NOTE: this should be supplied for most embedded reports,
+     *       without this saved searches will not work on embedded report.
+     *
      * @param int|null $sid
      * @return rb_config
      */
     public function set_sid(?int $sid): rb_config {
+        if ($this->finalised) {
+            throw new \coding_exception('rb_config instance cannot be changed after first use');
+        }
         if ($sid === null) {
             $sid = 0;
         }
@@ -89,26 +125,37 @@ final class rb_config {
     }
 
     /**
+     * Get user id looking at report.
+     *
      * @return int
      */
     public function get_reportfor(): int {
-        global $USER;
-        if (isset($this->reportfor)) {
-            return $this->reportfor;
-        }
-        return $USER->id;
+        return $this->reportfor;
     }
 
     /**
-     * @param int $reportfor
+     * Set idd of user looking at report,
+     * do not use if current user.
+     *
+     * @param int|null $reportfor user id, null means current user id
      * @return rb_config
      */
     public function set_reportfor(?int $reportfor): rb_config {
-        $this->reportfor = $reportfor;
+        global $USER;
+        if ($this->finalised) {
+            throw new \coding_exception('rb_config instance cannot be changed after first use');
+        }
+        if ($reportfor === null) {
+            $this->reportfor = (int)$USER->id;
+        } else {
+            $this->reportfor = $reportfor;
+        }
         return $this;
     }
 
     /**
+     * Should we prevent caching?
+     *
      * @return bool
      */
     public function get_nocache(): bool {
@@ -116,10 +163,15 @@ final class rb_config {
     }
 
     /**
+     * Set to true if all rb caching should be disabled.
+     *
      * @param bool $nocache
      * @return rb_config
      */
     public function set_nocache(bool $nocache): rb_config {
+        if ($this->finalised) {
+            throw new \coding_exception('rb_config instance cannot be changed after first use');
+        }
         $this->nocache = $nocache;
         return $this;
     }
@@ -136,6 +188,9 @@ final class rb_config {
      * @return rb_config
      */
     public function set_global_restriction_set(rb_global_restriction_set $globalrestrictionset = null): rb_config {
+        if ($this->finalised) {
+            throw new \coding_exception('rb_config instance cannot be changed after first use');
+        }
         $this->globalrestrictionset = $globalrestrictionset;
         return $this;
     }

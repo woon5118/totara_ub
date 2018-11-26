@@ -391,6 +391,9 @@ class reportbuilder {
             }
         }
 
+        // No more changes in rb_config instance.
+        $config->finalise();
+
         $this->_id = $report->id;
         $this->source = $report->source;
         $this->shortname = $report->shortname;
