@@ -67,7 +67,7 @@ Feature: Check My bookings displays the right information for future and past ev
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I set the following fields to these values:
       | searchtext | Sam2 Student2 |
-    And I press "Search"
+    And I click on "Search" "button" in the "#region-main" "css_element"
     And I click on "Sam2 Student2, student2@example.com" "option"
     And I press exact "add"
     And I wait "1" seconds

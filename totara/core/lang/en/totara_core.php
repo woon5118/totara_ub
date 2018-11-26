@@ -494,6 +494,7 @@ $string['quickaccessmenu:error:emptyitemlabel'] = 'Menu item labels cannot be em
 $string['quickaccessmenu:error:invalidaction'] = 'Invalid action "{$a}"';
 $string['quickaccessmenu:error:invalidgroup'] = 'Invalid menu group {$a}';
 $string['quickaccessmenu:error:invaliditem'] = 'Invalid menu group item {$a}';
+$string['quickaccessmenu:search'] = 'Search administration';
 $string['quickaccessmenu:showmenuwindow'] = 'Show admin menu window';
 $string['quickaccessmenu:success:itemadded'] = 'Page added to the admin menu';
 $string['quickaccessmenu:success:itemremoved'] = 'Page removed from the admin menu';

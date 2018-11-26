@@ -40,6 +40,6 @@ Feature: Using the sorting feature of catalog
     And "Course This is SPARTAN" "text" should appear before "Course Bolo bala" "text"
     And "Course This is SPARTAN" "text" should appear before "Course A Korean Drama" "text"
     And I set the field "Search all learning" to "course"
-    When I click on "Search" "button"
+    When I click on "Search" "button" in the "#region-main" "css_element"
     Then "Course Course Bolo bala" "text" should appear before "Course A Korean Drama" "text"
     Then "Course Course Bolo bala" "text" should appear before "Course This is SPARTAN" "text"

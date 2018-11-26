@@ -184,7 +184,7 @@ Feature: Use the multi-item hierarchy filter
     And I should see "Items to add"
     And I click on "First5 Last5 (user5@example.com)" "link" in the "Choose Managers" "totaradialogue"
     And I click on "Save" "button" in the "Choose Managers" "totaradialogue"
-    And I press "Search"
+    And I click on "Search" "button" in the "#region-main" "css_element"
 
     # check that when filter is applies and then unset - controls are disabled
     # Org

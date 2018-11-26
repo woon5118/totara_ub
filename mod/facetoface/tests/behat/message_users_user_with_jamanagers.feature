@@ -35,7 +35,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I set the following fields to these values:
       | searchtext | User One |
-    And I press "Search"
+    And I click on "Search" "button" in the "#region-main" "css_element"
     And I click on "User One, user1@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
@@ -66,7 +66,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I set the following fields to these values:
       | searchtext | User |
-    And I press "Search"
+    And I click on "Search" "button" in the "#region-main" "css_element"
     And I click on "User One, user1@example.com" "option"
     And I click on "User Two, user2@example.com" "option"
     And I press "Add"
