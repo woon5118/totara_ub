@@ -24,6 +24,7 @@
 @addBlockPopoverContent-font_heading_small_size: @totara_style-font_heading_small_size;
 @addBlockPopoverContent-font_heading_large_size: @totara_style-font_heading_large_size;
 @addBlockPopoverContent-spacing_small: @totara_style-spacing_small;
+@addBlockPopoverContent-spacing_medium: @totara_style-spacing_medium;
 @addBlockPopoverContent-spacing_xx_large: @totara_style-spacing_xx_large;
 @addBlockPopoverContent-screen_md_min: @totara_style-screen_md_min;
 
@@ -85,6 +86,7 @@
 // Needed to overwrite defaults
 .block .addBlockPopover {
     height: 250px;
+    overflow: hidden;
     padding: @addBlockPopoverContent-spacing_small;
     width: 250px;
 
@@ -165,6 +167,10 @@
                         outline: none;
                         text-decoration: none;
                     }
+                }
+
+                &:last-child {
+                    padding-bottom: @addBlockPopoverContent-spacing_medium;
                 }
             }
         }
