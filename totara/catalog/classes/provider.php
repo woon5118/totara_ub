@@ -340,6 +340,12 @@ abstract class provider {
      * @param event_base $event
      */
     final public static function object_update_observer(event_base $event) {
+        global $CFG;
+
+        if ($CFG->catalogtype != 'totara') {
+            return ;
+        }
+
         $currentclass = static::class;
         $namespace = substr($currentclass, strpos($currentclass, 'totara_catalog')) . '\\observer';
         $observers = \core_component::get_namespace_classes($namespace, 'totara_catalog\observer\object_update_observer');

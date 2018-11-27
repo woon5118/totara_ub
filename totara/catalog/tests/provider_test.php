@@ -35,6 +35,14 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_catalog_provider_testcase extends advanced_testcase {
 
+    public function setUp() {
+        global $DB;
+
+        $this->setAdminUser();
+        $DB->delete_records('catalog');
+        $this->resetAfterTest();
+    }
+
     public function provider_object_type_data_provider() {
         return [
             ['', false],
@@ -61,5 +69,35 @@ class totara_catalog_provider_testcase extends advanced_testcase {
      */
     public function test_is_valid_object_type($object_type, $expected) {
         $this->assertEquals($expected, provider::is_valid_object_type($object_type));
+    }
+
+    public function test_object_update_observer_when_catalog_enabled() {
+        global $DB;
+
+        $this->assertSame(0, $DB->count_records('catalog', []));
+        set_config('catalogtype', 'totara');
+        $this->create_catalog_objects();
+
+        $this->assertSame(3, $DB->count_records('catalog', []));
+    }
+
+    public function test_object_update_observer_when_catalog_disabled() {
+        global $DB;
+        set_config('catalogtype', 'enhanced');
+        $this->create_catalog_objects();
+
+        $this->assertSame(0, $DB->count_records('catalog', []));
+    }
+
+    private function create_catalog_objects() {
+        // create a program
+        $program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $program_generator->create_program();
+
+        // create a course
+        $this->getDataGenerator()->create_course();
+
+        // create a certification
+        $program_generator->create_certification();
     }
 }
