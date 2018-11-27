@@ -2627,6 +2627,7 @@ function facetoface_get_cancellations($sessionid) {
     $sql = "
             SELECT
                 u.id,
+                u.deleted,
                 su.id AS submissionid,
                 {$usernamefields},
                 su.jobassignmentid,
