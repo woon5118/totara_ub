@@ -68,12 +68,18 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
     }
 
     public function test_get_all_filters() {
+        // Disable course provider, to show that disabled provider fitlers are not included.
+        config::instance()->update(['learning_types_in_catalog' => ['program']]);
+
+        // Find progs and cert tag collection id.
+        $tagcollectionid = \core_tag_area::get_collection('totara_program', 'prog');
+
         $allfilters = $this->filter_handler->get_all_filters();
-        $this->assertArrayHasKey('course_acttyp_panel', $allfilters);
-        $this->assertArrayHasKey('course_acttyp_browse', $allfilters);
-        $this->assertArrayHasKey('course_format_multi', $allfilters);
-        $this->assertArrayHasKey('tag_panel', $allfilters);
-        $this->assertArrayHasKey('tag_browse', $allfilters);
+        $this->assertArrayNotHasKey('course_acttyp_panel', $allfilters);
+        $this->assertArrayNotHasKey('course_acttyp_browse', $allfilters);
+        $this->assertArrayNotHasKey('course_format_multi', $allfilters);
+        $this->assertArrayHasKey('tag_panel_' . $tagcollectionid, $allfilters);
+        $this->assertArrayHasKey('tag_browse_' . $tagcollectionid, $allfilters);
         $this->assertArrayHasKey('catalog_cat_panel', $allfilters);
         $this->assertArrayHasKey('catalog_cat_browse', $allfilters);
         $this->assertArrayHasKey('catalog_fts', $allfilters);
@@ -105,13 +111,22 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
         $this->assertCount(1, $fts_filters);
         $this->assertArrayHasKey('catalog_fts', $fts_filters);
 
+        // Find course tag collection id.
+        $tagcollectionid = \core_tag_area::get_collection('core', 'course');
+
         // browse region filters
         $filters = $this->filter_handler->get_region_filters(filter::REGION_BROWSE);
         $this->assertCount(6, $filters);
 
-        foreach (['course_acttyp_browse', 'course_format_tree', 'tag_browse',
-            'course_type_browse', 'catalog_cat_browse', 'catalog_learning_type_browse',
-        ] as $key) {
+        $keys = [
+            'course_acttyp_browse',
+            'course_format_tree',
+            'tag_browse_' . $tagcollectionid,
+            'course_type_browse',
+            'catalog_cat_browse',
+            'catalog_learning_type_browse',
+        ];
+        foreach ($keys as $key) {
             $this->assertArrayHasKey($key, $filters);
         }
 
@@ -119,9 +134,16 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
         $filters = $this->filter_handler->get_region_filters(filter::REGION_PANEL);
         $this->assertCount(6, $filters);
 
-        foreach (['course_acttyp_panel', 'course_format_multi', 'tag_panel',
-            'course_type_panel', 'catalog_cat_panel', 'catalog_learning_type_panel',
-        ] as $key) {
+        $keys = [
+            'course_acttyp_panel',
+            'course_format_multi',
+            'tag_panel_' . $tagcollectionid,
+            'course_type_panel',
+            'catalog_cat_panel',
+            'catalog_learning_type_panel',
+        ];
+
+        foreach ($keys as $key) {
             $this->assertArrayHasKey($key, $filters);
         }
     }

@@ -77,6 +77,9 @@ class totara_catalog_form_controller_testcase extends config_base_testcase {
     }
 
     public function unknown_values_removed_provider() {
+        // Find course tag collection id.
+        $tagcollectionid = \core_tag_area::get_collection('core', 'course');
+
         return [
             [
                 'contents',
@@ -103,11 +106,11 @@ class totara_catalog_form_controller_testcase extends config_base_testcase {
             [
                 'general',
                 [
-                    'featured_learning_source' => 'tag',
+                    'featured_learning_source' => 'tag_' . $tagcollectionid,
                     'featured_learning_value' => 'unknown',
                 ],
                 [
-                    'featured_learning_source' => 'tag',
+                    'featured_learning_source' => 'tag_' . $tagcollectionid,
                     'featured_learning_value' => '',
                 ],
             ],

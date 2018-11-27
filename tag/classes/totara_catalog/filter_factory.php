@@ -42,18 +42,24 @@ class filter_factory {
      * @return array
      */
     public static function get_filters(string $itemtype, string $objecttype): array {
-        global $CFG;
+        global $CFG, $DB;
 
         if (empty($CFG->usetags)) {
             return [];
         }
 
         $areas = \core_tag_area::get_areas();
+        // This makes the assumption that there is only one component for an itemtype, or that we can just use the
+        // first and can ignore the others.
         $component = array_keys($areas[$itemtype])[0];
 
         if (!\core_tag_area::is_enabled($component, $itemtype)) {
             return [];
         }
+
+        $collectionid = \core_tag_area::get_collection($component, $itemtype);
+        $coll = $DB->get_record('tag_coll', ['id' => $collectionid], '*', MUST_EXIST);
+        $displayname = \core_tag_collection::display_name($coll);
 
         $filters = [];
 
@@ -79,14 +85,15 @@ class filter_factory {
         };
 
         // The panel filter can appear in the panel region.
+        $tagpanelkey = 'tag_panel_' . $collectionid;
         $paneldatafilter = new in_or_equal(
-            'tag_panel',
+            $tagpanelkey,
             'catalog',
             ['objecttype', 'objectid']
         );
 
-        $itemtypeparamkey = 'tfip_type_' . $objecttype;
-        $paneltablealias = 'tfip_' . $objecttype;
+        $itemtypeparamkey = 'tfip_' . $collectionid . '_type_' . $objecttype;
+        $paneltablealias = 'tfip_' . $collectionid . '_' . $objecttype;
 
         $paneldatafilter->add_source(
             "{$paneltablealias}.tagid",
@@ -103,27 +110,28 @@ class filter_factory {
         );
 
         $panelselector = new multi(
-            'tag_panel',
-            new \lang_string('tags', 'tag')
+            $tagpanelkey,
+            new \lang_string('tagscollectionx', 'tag', $displayname)
         );
         $panelselector->add_options_loader($optionsloader);
 
         $filters[] = new filter(
-            'tag_panel',
+            $tagpanelkey,
             filter::REGION_PANEL,
             $paneldatafilter,
             $panelselector
         );
 
         // The browse filter can appear in the primary region.
+        $tagbrowsekey = 'tag_browse_' . $collectionid;
         $browsedatafilter = new equal(
-            'tag_browse',
+            $tagbrowsekey,
             'catalog',
             ['objecttype', 'objectid']
         );
 
-        $itemtypeparamkey = 'tfib_type_' . $objecttype;
-        $browsetablealias = 'tfib_' . $objecttype;
+        $itemtypeparamkey = 'tfib_' . $collectionid . '_type_' . $objecttype;
+        $browsetablealias = 'tfib_' . $collectionid . '_' . $objecttype;
 
         $browsedatafilter->add_source(
             "{$browsetablealias}.tagid",
@@ -140,14 +148,14 @@ class filter_factory {
         );
 
         $browseselector = new single(
-            'tag_browse',
-            new \lang_string('tags', 'tag')
+            $tagbrowsekey,
+            new \lang_string('tagscollectionx', 'tag', $displayname)
         );
         $browseselector->add_all_option();
         $browseselector->add_options_loader($optionsloader);
 
         $filters[] = new filter(
-            'tag_browse',
+            $tagbrowsekey,
             filter::REGION_BROWSE,
             $browsedatafilter,
             $browseselector

@@ -141,6 +141,7 @@ $string['tagcollections'] = 'Tag collections';
 $string['tagdescription'] = 'Tag description';
 $string['tags'] = 'Tags';
 $string['tagsaredisabled'] = 'Tags are disabled';
+$string['tagscollectionx'] = 'Tags ({$a})';
 $string['thingstaggedwith'] = '"{$a->name}" is used {$a->count} times';
 $string['thingtaggedwith'] = '"{$a->name}" is used once';
 $string['timemodified'] = 'Modified';

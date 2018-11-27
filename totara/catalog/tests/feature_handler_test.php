@@ -52,11 +52,15 @@ class totara_catalog_feature_handler_testcase extends advanced_testcase {
             $this->assertInstanceOf(feature::class, $feature);
             $keys[] = $feature->key;
         }
+
+        // Find course and prog tag collection id.
+        $tagcollectionid = \core_tag_area::get_collection('totara_program', 'prog');
+
         // Make sure the expected default features are there.
         $this->assertEquals(
             [
                 'course_format_ftrd',
-                'tag',
+                'tag_' . $tagcollectionid,
                 'course_type_ftrd',
                 'cat_cgry_ftrd',
             ],
@@ -77,7 +81,7 @@ class totara_catalog_feature_handler_testcase extends advanced_testcase {
         // Make sure no course features are there.
         $this->assertEquals(
             [
-                'tag',
+                'tag_' . $tagcollectionid,
                 'cat_cgry_ftrd',
             ],
             $keys

@@ -40,28 +40,34 @@ class feature_factory {
      * @return array
      */
     public static function get_features(string $itemtype, string $objecttype): array {
-        global $CFG;
+        global $CFG, $DB;
 
         if (empty($CFG->usetags)) {
             return [];
         }
 
         $areas = \core_tag_area::get_areas();
+        // This makes the assumption that there is only one component for an itemtype, or that we can just use the
+        // first and can ignore the others.
         $component = array_keys($areas[$itemtype])[0];
 
         if (!\core_tag_area::is_enabled($component, $itemtype)) {
             return [];
         }
 
+        $collectionid = \core_tag_area::get_collection($component, $itemtype);
+        $coll = $DB->get_record('tag_coll', ['id' => $collectionid], '*', MUST_EXIST);
+        $displayname = \core_tag_collection::display_name($coll);
+
         $datafilter = new all(
-            'tag_featured',
+            'tag_featured_' . $collectionid,
             'catalog',
             ['objecttype', 'objectid'],
             'LEFT JOIN'
         );
 
-        $tagidparamkey = 'tfe_tagid_' . $objecttype;
-        $itemtypeparamkey = 'tfe_type_' . $objecttype;
+        $tagidparamkey = 'tfe_' . $collectionid . '_tagid_' . $objecttype;
+        $itemtypeparamkey = 'tfe_' . $collectionid . '_type_' . $objecttype;
         $alias = 'tfe_' . $objecttype;
 
         $datafilter->add_source(
@@ -86,8 +92,8 @@ class feature_factory {
         );
 
         $feature = new feature(
-            'tag',
-            new \lang_string('tags', 'moodle'),
+            'tag_' . $collectionid,
+            new \lang_string('tagscollectionx', 'tag', $displayname),
             $datafilter
         );
 

@@ -97,17 +97,20 @@ class core_course_totara_catalog_course_tag_filters_testcase extends \advanced_t
             $all_courses[] = $generator->create_course()->fullname;
         }
 
+        // Find course tag collection id.
+        $tagcollectionid = \core_tag_area::get_collection('core', 'course');
+
         // Filters were removed in setUp(); the line below indirectly loads the
         // tag filter among other filters.
         $panel_filter = null;
         $browse_filter = null;
         $all_filters = filter_handler::instance()->get_all_filters();
         foreach ($all_filters as $filter) {
-            if ($filter->key === 'tag_panel') {
+            if ($filter->key === 'tag_panel_' . $tagcollectionid) {
                 $panel_filter = $filter;
             }
 
-            if ($filter->key === 'tag_browse') {
+            if ($filter->key === 'tag_browse_' . $tagcollectionid) {
                 $browse_filter = $filter;
             }
         }

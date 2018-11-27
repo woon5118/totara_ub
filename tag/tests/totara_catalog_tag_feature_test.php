@@ -322,10 +322,13 @@ class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
             $tags_per_item
         );
 
+        // Find course tag collection id.
+        $tagcollectionid = \core_tag_area::get_collection('core', 'course');
+
         /** @var \totara_catalog\feature $feature */
         $feature = null;
         foreach (feature_handler::instance()->get_all_features() as $existing) {
-            if ($existing->key === 'tag') {
+            if ($existing->key === 'tag_' . $tagcollectionid) {
                 $feature = $existing;
                 break;
             }

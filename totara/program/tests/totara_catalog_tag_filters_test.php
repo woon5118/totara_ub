@@ -103,6 +103,9 @@ class totara_program_totara_catalog_tag_filters_testcase extends \advanced_testc
             $all_programs[] = $program_generator->create_program()->fullname;
         }
 
+        // Find prog and cert tag collection id.
+        $tagcollectionid = \core_tag_area::get_collection('totara_program', 'prog');
+
         // Filters were removed in setUp(); the line below indirectly loads the
         // program_tag_filter among other program filters. All the filters are
         // initially inactive.
@@ -110,11 +113,11 @@ class totara_program_totara_catalog_tag_filters_testcase extends \advanced_testc
         $browse_filter = null;
         $all_filters = filter_handler::instance()->get_all_filters();
         foreach ($all_filters as $filter) {
-            if ($filter->key === 'tag_panel') {
+            if ($filter->key === 'tag_panel_' . $tagcollectionid) {
                 $panel_filter = $filter;
             }
 
-            if ($filter->key === 'tag_browse') {
+            if ($filter->key === 'tag_browse_' . $tagcollectionid) {
                 $browse_filter = $filter;
             }
         }

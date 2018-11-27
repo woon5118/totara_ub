@@ -66,28 +66,27 @@ class totara_catalog_external_testcase extends output_test_base {
             $this->assertNull($param_key->default);
         }
 
+        $expected_count = 0;
+        $expected_filter_params = [
+            external_value::class => [],
+            external_multiple_structure::class => [],
+        ];
+
+        foreach (\totara_catalog\local\filter_handler::instance()->get_all_filters() as $filter) {
+            $optionalparams = $filter->selector->get_optional_params();
+            foreach ($optionalparams as $optionalparam) {
+                if ($optionalparam->multiplevalues) {
+                    $expected_filter_params[external_multiple_structure::class][] = $optionalparam->key;
+                } else {
+                    $expected_filter_params[external_value::class][] = $optionalparam->key;
+                }
+                $expected_count++;
+            }
+        }
+
         $filterparams = $params->keys['filterparams'];
         $this->assertInstanceOf(external_single_structure::class, $filterparams);
-        $expected_filter_params = [
-            external_value::class => [
-                'course_acttyp_browse',
-                'course_format_browse',
-                'tag_browse',
-                'course_type_browse',
-                'catalog_cat_panel',
-                'catalog_cat_browse',
-                'catalog_fts',
-                'catalog_learning_type_browse',
-            ],
-            external_multiple_structure::class => [
-                'course_acttyp_panel',
-                'course_format_panel',
-                'tag_panel',
-                'course_type_panel',
-                'catalog_learning_type_panel',
-            ],
-        ];
-        $this->assertCount(13, $filterparams->keys);
+        $this->assertCount($expected_count, $filterparams->keys);
         foreach ($expected_filter_params as $expected_class => $keys) {
             foreach ($keys as $key) {
                 $this->assertArrayHasKey($key, $filterparams->keys);
