@@ -38,16 +38,5 @@
  * @param string $version the plugin version
  */
 function xmldb_block_navigation_totara_postupgrade($version) {
-    global $DB;
 
-    // Remove 'navigation' system-wide block from the required list.
-    $systemcontext = context_system::instance();
-    $systemblockconditions = [
-        'blockname'         => 'navigation',
-        'pagetypepattern'   => '*',
-        'parentcontextid'   => $systemcontext->id,
-        'showinsubcontexts' => 1,
-        'requiredbytheme'   => 1,
-    ];
-    $DB->set_field('block_instances', 'requiredbytheme', 0, $systemblockconditions);
 }
