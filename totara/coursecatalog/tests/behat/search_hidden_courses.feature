@@ -7,7 +7,7 @@ Feature: Check that searching for hidden course when toggling course catalog wor
       | username   | firstname  | lastname    | email                  |
       | user1      | user1      | user1       | user1@example.com      |
       | sysmanager | sysmanager | sysmanager  | sysmanager@example.com |
-      | catmanager | catmanager | catmanager  | sysmanager@example.com |
+      | catmanager | catmanager | catmanager  | catmanager@example.com |
 
     # Create category hierarchy.
     And the following "categories" exist:
@@ -288,5 +288,33 @@ Feature: Check that searching for hidden course when toggling course catalog wor
     Then I should see "cat0_course1" in the "#catalogcourses" "css_element"
     And I log out
 
-   # Scenario: Seeing the enhanced catalog as catmanager. As totara_visible_where does not look for permissions in the category
-   # level when audience visibility is on. Test that scenario would not make sense since permissions in sys ctx need to be assigned.
+  Scenario: Seeing the enhanced catalog as catmanager
+        # Configure visibility audience visibility.
+    Given I set the following administration settings values:
+      | audiencevisibility | 1        |
+      | Catalogue type     | enhanced |
+    And I log out
+
+    # Seeing the enhanced catalog as catmanager.
+    When I log in as "catmanager"
+    And I click on "Courses" in the totara menu
+
+    Then I should see "cat0_course1"
+    And I should not see "cat0_course2"
+    And I should not see "cat0_course3"
+    And I should see "cat1_course1"
+    And I should see "cat1_course2"
+    And I should see "cat1_course3"
+    And I should see "cat2_course1"
+    And I should see "cat2_course2"
+    And I should see "cat2_course3"
+
+    When I set the following fields to these values:
+      | Search by | cat1_course3 |
+    And I press "toolbarsearchbutton"
+    Then I should see "cat1_course3" in the "#catalogcourses" "css_element"
+    And I should not see "cat1_course2" in the "#catalogcourses" "css_element"
+    When I set the following fields to these values:
+      | Search by | cat0_course2 |
+    And I press "toolbarsearchbutton"
+    Then I should see "There are no records that match your selected criteria"

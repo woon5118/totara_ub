@@ -385,8 +385,13 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
                                     'tcvwreportforenrolledonly' => $userid);
         }
 
-        return array("{$sqlnousers} AND ({$sqlall} OR {$sqlselected} OR {$sqlenrolled})",
-                array_merge($paramsnousers, $paramsall, $paramsselected, $paramsenrolled));
+        // Condition above are overridden when user have capability to see hidden content in this context
+        list($capsql, $capparams) = totara_core\access::get_has_capability_sql($capability, "ctx{$separator}id", $userid);
+
+        return [
+            "({$sqlnousers} AND ({$sqlall} OR {$sqlselected} OR {$sqlenrolled}) OR {$capsql})",
+            array_merge($paramsnousers, $paramsall, $paramsselected, $paramsenrolled, $capparams)
+        ];
     }
 }
 
