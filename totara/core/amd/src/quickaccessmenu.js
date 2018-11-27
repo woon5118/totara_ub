@@ -69,16 +69,23 @@ define(['core/str', 'core/popover_region_controller'], function(str, PopoverRegi
             return false;
         });
 
-        window.addEventListener('load', function() {
-            // Check that the popover is still on the screen, otherwise add the --large class to pin it to the right
-            var popover = self.element.querySelector('#quickaccess-popover-content');
+        if (document.readyState === 'complete') {
+            self.checkLocation();
+        } else {
+            window.addEventListener('load', self.checkLocation.bind(self));
+        }
+    };
 
-            // If left is off-screen as well, it's probably intentional, so we don't need to mark it
-            if (popover.getBoundingClientRect().right > window.innerWidth
-                && popover.getBoundingClientRect().left < window.innerWidth) {
-                popover.classList.add('totara_core__QuickAccess_menu--large');
-            }
-        });
+    QuickAccessPopoverController.prototype.checkLocation = function() {
+        var popover = this.element.querySelector('#quickaccess-popover-content');
+        var boundingRect = popover.getBoundingClientRect();
+
+        // If left is off-screen as well, it's probably intentional, so we don't need to mark it
+        if (boundingRect.right > window.innerWidth && boundingRect.left < window.innerWidth) {
+            popover.classList.add('totara_core__QuickAccess_menu--large');
+        } else {
+            popover.classList.remove('totara_core__QuickAccess_menu--large');
+        }
     };
 
     /**
