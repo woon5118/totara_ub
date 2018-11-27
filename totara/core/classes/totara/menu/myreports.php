@@ -17,17 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Totara navigation edit page.
- *
- * @package    totara
+ * @package    totara_core
  * @subpackage navigation
  * @author     Oleg Demeshev <oleg.demeshev@totaralms.com>
  */
 namespace totara_core\totara\menu;
 
-use \totara_core\totara\menu\menu as menu;
-
-class myreports extends \totara_core\totara\menu\item {
+class myreports extends item {
 
     protected function get_default_title() {
         return get_string('reports', 'totara_core');
@@ -37,16 +33,16 @@ class myreports extends \totara_core\totara\menu\item {
         return '/my/reports.php';
     }
 
-    public function get_default_visibility() {
-        return menu::SHOW_WHEN_REQUIRED;
-    }
-
     public function get_default_sortorder() {
         return 60000;
     }
 
     protected function check_visibility() {
         global $CFG;
+
+        if (!isloggedin() or isguestuser()) {
+            return false;
+        }
 
         static $cache = null;
         if (isset($cache)) {
@@ -57,9 +53,9 @@ class myreports extends \totara_core\totara\menu\item {
         $reportbuilder_permittedreports = \reportbuilder::get_user_permitted_reports();
         $hasreports = (is_array($reportbuilder_permittedreports) && (count($reportbuilder_permittedreports) > 0));
         if ($hasreports) {
-            $cache = menu::SHOW_ALWAYS;
+            $cache = true;
         } else {
-            $cache = menu::HIDE_ALWAYS;
+            $cache = false;
         }
         return $cache;
     }

@@ -1,6 +1,6 @@
 @totara @totara_core @totara_core_menu
 Feature: Test visibility control of menu items
-  In order to test the visiblity controls for menu items
+  In order to test the visibility controls for menu items
   I must log in as admin and configure an advanced menu
   Then log in as various users to ensure expected visibility of the menu items
 
@@ -12,9 +12,9 @@ Feature: Test visibility control of menu items
       | Guest login button | Show |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
      | Menu title | Test one |
-     | Menu default url address | http://totaralms.com |
+     | Menu url address | http://totaralms.com |
     When I press "Add new menu item"
     And I click on "Edit" "link" in the "Test one" "table_row"
     Then I should see "Edit menu item"
@@ -26,9 +26,9 @@ Feature: Test visibility control of menu items
     And I log in as "admin"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Menu title | Test one |
-      | Menu default url address | http://totaralms.com |
+      | Menu url address | http://totaralms.com |
       | Visibility               | Use custom access rules |
     And I press "Add new menu item"
     And I should see "Edit menu item"
@@ -48,9 +48,9 @@ Feature: Test visibility control of menu items
     And I log in as "admin"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Menu title | Test one |
-      | Menu default url address | http://totaralms.com |
+      | Menu url address | http://totaralms.com |
       | Visibility               | Use custom access rules |
     And I press "Add new menu item"
     And I should see "Edit menu item"
@@ -85,7 +85,7 @@ Feature: Test visibility control of menu items
     And I set the following administration settings values:
       | Guest login button | Show |
     And I create the following totara menu items:
-      | Menu title          | Visibility              | Menu default url address | Restrict access by role | Context                            | Learner | Editing Trainer | Site Manager | Guest |
+      | Menu title          | Visibility              | Menu url address | Restrict access by role | Context                            | Learner | Editing Trainer | Site Manager | Guest |
       | Students only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       |                 |              |       |
       | Teachers only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         | 1               |              |       |
       | Managers only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         |                 | 1            |       |
@@ -140,7 +140,7 @@ Feature: Test visibility control of menu items
       | user3 | CH2    |
     When I log in as "admin"
     And I create the following totara menu items:
-      | Menu title          | Visibility              | Menu default url address | Restrict access by audience |
+      | Menu title          | Visibility              | Menu url address | Restrict access by audience |
       | CH1 members only    | Use custom access rules | http://totaralms.com     | 1                           |
       | CH2 members only    | Use custom access rules | http://totaralms.com     | 1                           |
     And I navigate to "Main menu" node in "Site administration > Navigation"

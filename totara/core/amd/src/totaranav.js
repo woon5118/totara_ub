@@ -168,30 +168,36 @@ define(['core/templates'], function(templates) {
 
             // Mobile / Desktop resize changes
             window.addEventListener('resize', function() {
+                var resizefunction = function() {
+                    resizeTimeout = null;
+
+                    var nav = that.widget.querySelector('[data-tw-totaraNav-list]'),
+                        chevron = that.widget.querySelectorAll('.totaraNav--icon_chevron');
+
+                    // Rerender chevron icons
+                    for (var i = 0; i < chevron.length; i++) {
+                        chevron[i].remove();
+                    }
+
+                    if (window.innerWidth > 991) {
+                        that.addExpandableIcons();
+                        nav.classList.remove('totaraNav_prim--list_hideMobile', 'totaraNav_prim--list_showMobile');
+                    } else {
+                        that.addExpandableIcons();
+                        if (!nav.classList.contains('totaraNav_prim--list_showMobile')) {
+                            nav.classList.add('totaraNav_prim--list_hideMobile');
+                        }
+                    }
+                };
+                if (M.cfg.behatsiterunning) {
+                    // Behat is more predictable without setTimeout.
+                    resizefunction();
+                    return;
+                }
                 var resizeTimeout;
                 if (!resizeTimeout) {
-                    resizeTimeout = setTimeout(function() {
-                        resizeTimeout = null;
-
-                        var nav = that.widget.querySelector('[data-tw-totaraNav-list]'),
-                            chevron = that.widget.querySelectorAll('.totaraNav--icon_chevron');
-
-                        // Rerender chevron icons
-                        for (var i = 0; i < chevron.length; i++) {
-                            chevron[i].remove();
-                        }
-
-                        if (window.innerWidth > 991) {
-                            that.addExpandableIcons();
-                            nav.classList.remove('totaraNav_prim--list_hideMobile', 'totaraNav_prim--list_showMobile');
-                        } else {
-                            that.addExpandableIcons();
-                            if (!nav.classList.contains('totaraNav_prim--list_showMobile')) {
-                                nav.classList.add('totaraNav_prim--list_hideMobile');
-                            }
-                        }
                     // Execute at a rate of 15fps
-                    }, 66);
+                    resizeTimeout = setTimeout(resizefunction, 66);
                 }
             });
         },

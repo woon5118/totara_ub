@@ -1,47 +1,53 @@
-@totara @totara_menu
-Feature: A basic test of the Totara custom menu
-  In order to limit access to menu items
-  As a user
-  I need to restrict by audience
-
+@totara @totara_core @totara_core_menu @javascript
+Feature: A basic test of the Totara Main menu
   Background:
     Given I am on a totara site
     And I log in as "admin"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
-      | Parent item              | Top       |
-      | Menu title               | Test item |
-      | Visibility               | Show      |
-      | Menu default url address | /my/      |
+    And I set the following Totara form fields to these values:
+      | Parent item              | Top        |
+      | Menu title               | Test item  |
+      | Visibility               | Show       |
+      | Menu url address         | /index.php |
     And I click on "Add new menu item" "button"
     And I should see "Test item" in the totara menu
 
-  Scenario: Reset to default
+  Scenario: Reset Main menu to default with custom backup
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Reset menu to default configuration" "button"
-    And I click on "Continue" "button"
-    Then I should see "Top navigation reset to default configuration"
+    And I set the following Totara form fields to these values:
+      | All custom items will be | Hidden from menu and available in menu settings |
+    And I press "Reset"
+    Then I should see "Main menu has been reset to default configuration"
     And I should not see "Test item" in the totara menu
+    And I should see "Test item" in the "#totaramenutable" "css_element"
 
-  Scenario: Change parent
+  Scenario: Reset Main menu to default with full delete
     Given I navigate to "Main menu" node in "Site administration > Navigation"
-    When I click on "Edit" "link" in the "Performance" "table_row"
-    And I set the field "Parent item" to "Courses"
-    And I click on "Save changes" "button"
-    Then I should see "You cannot move this item to the selected parent because it has descendants. Please move this item's descendants first."
-    When I set the field "Parent item" to "Find Learning"
-    And I click on "Save changes" "button"
-    Then I should see "Top navigation updated successfully"
+    When I click on "Reset menu to default configuration" "button"
+    And I set the following Totara form fields to these values:
+      | All custom items will be | Permanently deleted |
+    And I press "Reset"
+    Then I should see "Main menu has been reset to default configuration"
+    And I should not see "Test item" in the totara menu
+    And I should not see "Test item" in the "#totaramenutable" "css_element"
 
-  Scenario: Test visibility using form
+  Scenario: Change Main menu item parent
+    Given I navigate to "Main menu" node in "Site administration > Navigation"
+    When I click on "Edit" "link" in the "Test item" "table_row"
+    And I set the field "Parent item" to "Performance"
+    And I click on "Save changes" "button"
+    Then I should see "Main menu has been updated successfully"
+
+  Scenario: Test Main menu item visibility using form
     Given I click on "Edit" "link" in the "Test item" "table_row"
-    When I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Visibility | Hide |
     And I click on "Save changes" "button"
     Then I should not see "Test item" in the totara menu
     When I click on "Edit" "link" in the "Test item" "table_row"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Visibility | Show |
     And I click on "Save changes" "button"
     Then I should see "Test item" in the totara menu
@@ -53,14 +59,14 @@ Feature: A basic test of the Totara custom menu
     Then I should see "Test item" in the totara menu
 
   @javascript
-  Scenario: Move menu items
+  Scenario: Move Main menu items
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | Top          |
       | Menu title               | Another item |
       | Visibility               | Show         |
-      | Menu default url address | /my/         |
+      | Menu url address         | /index.php   |
     And I click on "Add new menu item" "button"
     And I should see "Another item" in the totara menu
     When I click on "Move up" "link" in the "Another item" "table_row"
@@ -69,7 +75,7 @@ Feature: A basic test of the Totara custom menu
     And I click on "Move down" "link" in the "Another item" "table_row"
     Then "Test item" "link" should appear before "Another item" "link"
 
-  Scenario: Delete menu items
+  Scenario: Delete Main menu items
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Delete" "link" in the "Test item" "table_row"
     And I click on "Continue" "button"

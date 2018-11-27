@@ -58,6 +58,7 @@ As you maybe aware your involvement with your staff member around this training 
 There are no further reminders of this but please be aware that the return rates are noted and reported at the business unit & business group level.';
 $string['escalationsubjectdefault'] = 'Outstanding Course evaluation from [firstname] [lastname]';
 $string['findlearning'] = 'Find Learning';
+$string['findlearningdisabled'] = 'Find Learning (Legacy catalogues)';
 $string['invitation'] = 'Invitation';
 $string['invitationmessage'] = 'Message';
 $string['invitationmessage_help'] = 'This is the message for the invitation email.

@@ -17,16 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Totara navigation edit page.
- *
- * @package    totara
+ * @package    totara_coursecatalogue
  * @subpackage navigation
  * @author     Oleg Demeshev <oleg.demeshev@totaralms.com>
  */
 
 namespace totara_coursecatalog\totara\menu;
-
-use \totara_core\totara\menu\menu as menu;
 
 class certifications extends \totara_core\totara\menu\item {
 
@@ -39,30 +35,13 @@ class certifications extends \totara_core\totara\menu\item {
 
         if ($CFG->catalogtype === 'enhanced') {
             return '/totara/coursecatalog/certifications.php';
-        } else if ($CFG->catalogtype === 'moodle') {
-            return '/totara/program/index.php?viewtype=certification';
         } else {
-            return '/totara/catalog/index.php';
+            return '/totara/program/index.php?viewtype=certification';
         }
     }
 
     public function get_default_sortorder() {
         return 73000;
-    }
-
-    public function get_default_visibility() {
-        return menu::SHOW_WHEN_REQUIRED;
-    }
-
-    protected function check_visibility() {
-        global $CFG;
-        if (totara_feature_visible('certifications')) {
-            // Don't show this item when totara_catalog is activated (unless this is a parent node).
-            if ($CFG->catalogtype !== 'totara' || $this->has_visible_child()) {
-                return menu::SHOW_ALWAYS;
-            }
-        }
-        return menu::HIDE_ALWAYS;
     }
 
     protected function get_default_parent() {

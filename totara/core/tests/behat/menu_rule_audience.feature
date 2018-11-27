@@ -1,4 +1,4 @@
-@totara @totara_menu @javascript
+@totara @totara_core @totara_core_menu @javascript
 Feature: Test restricting Totara custom menu access by audience
   In order to limit access to menu items
   As a user
@@ -23,11 +23,11 @@ Feature: Test restricting Totara custom menu access by audience
       | user1 | aud1   |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | Top                     |
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
-      | Menu default url address | /my/                    |
+      | Menu url address         | /my/teammembers.php     |
     And I click on "Add new menu item" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
@@ -55,11 +55,11 @@ Feature: Test restricting Totara custom menu access by audience
       | user3 | aud2   |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | Top                     |
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
-      | Menu default url address | /my/                    |
+      | Menu url address         | /my/teammembers.php     |
     And I click on "Add new menu item" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
@@ -93,11 +93,11 @@ Feature: Test restricting Totara custom menu access by audience
       | user2 | aud2   |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | Top                     |
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
-      | Menu default url address | /my/                    |
+      | Menu url address         | /my/teammembers.php     |
     And I click on "Add new menu item" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
@@ -127,11 +127,11 @@ Feature: Test restricting Totara custom menu access by audience
       | user2 | aud2   |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | Top                     |
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
-      | Menu default url address | /my/                    |
+      | Menu url address         | /my/teammembers.php     |
     And I click on "Add new menu item" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
@@ -154,11 +154,11 @@ Feature: Test restricting Totara custom menu access by audience
       | user2 | aud2   |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | Top                     |
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
-      | Menu default url address | /my/                    |
+      | Menu url address         | /my/teammembers.php     |
     And I click on "Add new menu item" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
@@ -169,6 +169,8 @@ Feature: Test restricting Totara custom menu access by audience
     And I click on "OK" "button"
     And I wait "1" seconds
     And I click on "Save changes" "button"
+    And I click on "Edit" "link" in the "test item" "table_row"
+    And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by audience" "text" in the "#fitem_id_audience_enable" "css_element"
     And I click on "Restrict access by role" "text" in the "#fitem_id_role_enable" "css_element"

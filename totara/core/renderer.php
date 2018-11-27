@@ -482,15 +482,12 @@ class totara_core_renderer extends plugin_renderer_base {
      * Renders the totara_menu and returns the HTML to display it.
      * @deprecated since 12.0
      *
-     * @param totara_menu $totaramenu
+     * @param totara_core\output\totara_menu $totaramenu
      * @return string HTML fragment
      */
     protected function render_totara_menu(totara_core\output\totara_menu $totaramenu) {
         debugging('totara_core_renderer::ender_totara_menu was deprecated in 12.0. Instead, use totara_core_renderer::masthead.');
-
-        $contextdata = $totaramenu->export_for_template($this);
-
-        return $this->render_from_template('totara_core/totara_menu', $contextdata);
+        return '';
     }
 
     /**
@@ -743,25 +740,28 @@ class totara_core_renderer extends plugin_renderer_base {
      * Render the tabs used when editing custom menu items.
      *
      * @param string $currenttab Name of the current tab.
-     * @param integer $item The item for linking to.
+     * @param stdClass|null $record The item for linking to.
      *
-     * @return HTML to render the tabs.
+     * @return string HTML to render the tabs.
      */
-    public function totara_menu_tabs($currenttab, $item = null) {
+    public function totara_menu_tabs($currenttab, $record = null) {
+        if (empty($record->id)) {
+            return '';
+        }
 
         // Setup the top row of tabs.
         $toprow = array();
 
         $disabled = array();
         // Disable the access tab unless the menu item has custom visibility.
-        if ($item->visibility != \totara_core\totara\menu\menu::SHOW_CUSTOM) {
+        if ($record->visibility != \totara_core\totara\menu\item::VISIBILITY_CUSTOM) {
             $disabled[] = 'rules';
         }
 
-        $toprow[] = new tabobject('edit', new moodle_url('/totara/core/menu/edit.php', array('id' => $item->id)),
+        $toprow[] = new tabobject('edit', new moodle_url('/totara/core/menu/edit.php', array('id' => $record->id)),
                 get_string('menuitem:edit', 'totara_core'));
 
-        $toprow[] = new tabobject('rules', new moodle_url('/totara/core/menu/rules.php', array('id' => $item->id)),
+        $toprow[] = new tabobject('rules', new moodle_url('/totara/core/menu/rules.php', array('id' => $record->id)),
                 get_string('menuitem:editaccess', 'totara_core'));
 
         return print_tabs(array($toprow), $currenttab, $disabled, null, true);

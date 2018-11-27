@@ -231,7 +231,7 @@ class behat_totara_core extends behat_base {
      */
     public function i_create_the_following_totara_menu_items(TableNode $table) {
         \behat_hooks::set_step_readonly(false);
-        $possiblemenufields = array('Parent item', 'Menu title', 'Visibility', 'Menu default url address', 'Open link in new window');
+        $possiblemenufields = array('Parent item', 'Menu title', 'Visibility', 'Menu url address', 'Open link in new window');
         $first = false;
 
         $menufields = array();
@@ -273,7 +273,7 @@ class behat_totara_core extends behat_base {
 
             $this->execute("behat_navigation::i_navigate_to_node_in", array("Main menu", "Site administration > Navigation"));
             $this->execute("behat_forms::press_button", "Add new menu item");
-            $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $menutable);
+            $this->execute("behat_totara_form::i_set_the_following_totara_form_fields_to_these_values", $menutable);
             $this->execute("behat_forms::press_button", "Add new menu item");
             $this->execute("behat_general::assert_page_contains_text", "Edit menu item");
             $this->execute("behat_general::i_click_on", array('Access', 'link'));

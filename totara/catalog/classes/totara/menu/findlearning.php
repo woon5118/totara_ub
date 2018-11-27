@@ -17,46 +17,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package totara_catalog
+ * @author Petr Skoda <petr.skoda@totaralearning.com>
  */
 
 namespace totara_catalog\totara\menu;
 
 defined('MOODLE_INTERNAL') || die();
 
-use \totara_core\totara\menu\item;
-use \totara_core\totara\menu\menu;
-
-class catalog extends item {
+/**
+ * New "Find learning" that replaces multiple items in old menu.
+ *
+ * This item is displayed only if grid catalogue is active.
+ */
+class findlearning extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
-        return get_string('catalog', 'totara_catalog');
+        global $CFG;
+        if ($CFG->catalogtype === 'totara') {
+            return get_string('menuitemfindlearning', 'totara_catalog');
+        } else {
+            return get_string('menuitemfindlearningdisabled', 'totara_catalog');
+        }
     }
 
     protected function get_default_url() {
         return '/totara/catalog/index.php';
     }
 
-    public function get_default_sortorder() {
-        return 70500;
-    }
-
-    public function get_default_visibility() {
-        return menu::SHOW_WHEN_REQUIRED;
-    }
-
-    protected function get_default_parent() {
-        return '\totara_coursecatalog\totara\menu\findlearning';
-    }
-
-    protected function check_visibility() {
+    public function is_disabled() {
         global $CFG;
-        // Only show this item when totara_catalog is activated and there are other visible items on the same level.
-        // Otherwise the parent "Find Learning" item will link to the catalog.
-        if ($CFG->catalogtype === 'totara' && $this->has_visible_sibling()) {
-            return menu::SHOW_ALWAYS;
-        }
-        return menu::HIDE_ALWAYS;
+        return ($CFG->catalogtype !== 'totara');
+    }
+
+    public function get_default_sortorder() {
+        return 70000;
     }
 }

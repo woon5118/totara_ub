@@ -18,6 +18,8 @@ error:positionvalidationfailed,totara_core
 error:tempmanagerexpirynotset,totara_core
 error:tempmanagernotselected,totara_core
 error:tempmanagernotset,totara_core
+menuitem:resettodefaultconfirm,totara_core
+menuitem:topnavigation,totara_core
 myreports,totara_core
 mysqlneedsbarracuda,totara_core
 mysqlneedsfilepertable,totara_core

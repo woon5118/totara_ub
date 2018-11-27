@@ -17,16 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Totara navigation edit page.
- *
- * @package    totara
- * @subpackage navigation
+ * @package    totara_coursecatalogue
  * @author     Oleg Demeshev <oleg.demeshev@totaralms.com>
  */
 
 namespace totara_coursecatalog\totara\menu;
-
-use \totara_core\totara\menu\menu as menu;
 
 class programs extends \totara_core\totara\menu\item {
 
@@ -39,30 +34,13 @@ class programs extends \totara_core\totara\menu\item {
 
         if ($CFG->catalogtype === 'enhanced') {
             return '/totara/coursecatalog/programs.php';
-        } else if ($CFG->catalogtype === 'moodle') {
-            return '/totara/program/index.php';
         } else {
-            return '/totara/catalog/index.php';
+            return '/totara/program/index.php';
         }
     }
 
     public function get_default_sortorder() {
         return 72000;
-    }
-
-    public function get_default_visibility() {
-        return menu::SHOW_WHEN_REQUIRED;
-    }
-
-    protected function check_visibility() {
-        global $CFG;
-        if (totara_feature_visible('programs')) {
-            // Don't show this item when totara_catalog is activated (unless this is a parent node).
-            if ($CFG->catalogtype !== 'totara' || $this->has_visible_child()) {
-                return menu::SHOW_ALWAYS;
-            }
-        }
-        return menu::HIDE_ALWAYS;
     }
 
     /**

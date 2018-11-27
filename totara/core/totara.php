@@ -1396,33 +1396,64 @@ function totara_get_nav_select_classes($navstructure, $primary_selected, $second
 }
 
 /**
- * Reset Totara menu caching.
+ * Deprecated Totara menu caching reset.
+ *
+ * Developers now need to decide if they want to reset current session only
+ * or force more expensive reset of menu caches of all logged-in-users.
+ *
+ * @deprecated since Totara 12.0
  */
 function totara_menu_reset_cache() {
+    debugging('totara_menu_reset_cache() was deprecated, use totara_menu_reset_all_caches() or totara_menu_reset_session_cache() instead', DEBUG_DEVELOPER);
+    totara_menu_reset_session_cache();
+}
+
+/**
+ * Force reset of all caches related to Main menu.
+ *
+ * This is intended to be used when the structure of menu changes
+ * or when a feature is enabled or disabled.
+ *
+ * This is called after every edit in Main menu administration.
+ */
+function totara_menu_reset_all_caches() {
+    \totara_core\totara\menu\helper::bump_cache_revision();
+}
+
+/**
+ * Reset Totara menu for current user session.
+ *
+ * This is intended to be called after current user state
+ * tested in item::check_visibility() changes.
+ *
+ * It is ok to call this function from event observers.
+ */
+function totara_menu_reset_session_cache() {
     global $SESSION;
     unset($SESSION->mymenu);
 }
 
 /**
  * Builds Totara menu, returns an array of objects that
- * represent the stucture of the menu
+ * represent the structure of the menu
  *
  * The parents must be defined before the children so we
  * can correctly figure out which items should be selected
  *
- * @return Array of menu item objects
+ * @return array tree of menu item objects
  */
 function totara_build_menu() {
-    global $SESSION, $USER, $CFG;
+    global $SESSION, $USER, $CFG, $DB;
 
+    $rev = \totara_core\totara\menu\helper::get_cache_revision();
     $lang = current_language();
-    if (!empty($CFG->menulifetime) and !empty($SESSION->mymenu['lang'])) {
-        if ($SESSION->mymenu['id'] == $USER->id and $SESSION->mymenu['lang'] === $lang) {
+    if (!empty($CFG->menulifetime) and !empty($SESSION->mymenu['lang']) and isset($SESSION->mymenu['rev'])) {
+        if ($SESSION->mymenu['id'] == $USER->id and $SESSION->mymenu['lang'] === $lang and $SESSION->mymenu['rev'] == $rev) {
             if ($SESSION->mymenu['c'] + $CFG->menulifetime > time()) {
                 $tree = $SESSION->mymenu['tree'];
                 foreach ($tree as $k => $node) {
                     $node = clone($node);
-                    $node->url = \totara_core\totara\menu\menu::replace_url_parameter_placeholders($node->url);
+                    $node->url = \totara_core\totara\menu\item::replace_url_parameter_placeholders($node->url);
                     $tree[$k] = $node;
                 }
                 return $tree;
@@ -1431,7 +1462,7 @@ function totara_build_menu() {
     }
     unset($SESSION->mymenu);
 
-    $allnodes = \totara_core\totara\menu\menu::get_nodes();
+    $allnodes = $DB->get_records('totara_navigation', array(), 'parentid ASC, sortorder ASC, id ASC');
     $tree = totara_build_menu_descendants(0, $allnodes);
 
     if (!empty($CFG->menulifetime)) {
@@ -1440,12 +1471,13 @@ function totara_build_menu() {
             'lang' => $lang,
             'c' => time(),
             'tree' => $tree,
+            'rev' => $rev,
         );
     }
 
     foreach ($tree as $k => $node) {
         $node = clone($node);
-        $node->url = \totara_core\totara\menu\menu::replace_url_parameter_placeholders($node->url);
+        $node->url = \totara_core\totara\menu\item::replace_url_parameter_placeholders($node->url);
         $tree[$k] = $node;
     }
 
@@ -1467,40 +1499,53 @@ function totara_build_menu_descendants($parentid, $allrecords, $parentdepth = 0)
 
     $currentdepth = $parentdepth + 1;
 
+    if ($currentdepth > \totara_core\totara\menu\item::MAX_DEPTH) {
+        // Respect max depth that can be displayed, this also prevents infinite loops.
+        // No debugging message necessary here, MAin menu admin UI shows items as 'Unused'.
+        return $tree;
+    }
+
     foreach ($allrecords as $id => $record) {
         // Search all records for nodes whose parent was the one specified.
         if ($record->parentid != $parentid) {
             continue;
         }
 
-        // In case the menu data somehow gets into a loop, prevent crashing the whole site.
-        if ($currentdepth > \totara_core\totara\menu\menu::MAX_DEPTH) {
-            debugging('Tried to construct a menu tree which is deeper than the maximum allowed or contains a cycle: ' . format_string($record->title));
+        if ($record->visibility == \totara_core\totara\menu\item::VISIBILITY_HIDE) {
+            // Shortcut, no need to create instance at all.
             continue;
         }
 
-        $node = \totara_core\totara\menu\menu::node_instance($record);
+        $node = \totara_core\totara\menu\item::create_instance($record);
 
-        // Silently ignore bad nodes - they might have been removed
-        // from the code but not purged from the DB yet.
-        if ($node === false) {
+        // Ignore bad nodes, they are now showed in admin UI as 'Unused'.
+        if (!$node) {
             continue;
         }
 
-        // If this node isn't visible, the descendants will be skipped as well.
-        // Note that get_visibility will return either HIDE_ALWAYS (0) or SHOW_ALWAYS (1) or true or false when
-        // the $calculated parameter is true (default), so just treat this as boolean.
-        if (!$node->get_visibility()) {
+        if ($node->is_disabled()) {
             continue;
         }
 
-        $descendants = totara_build_menu_descendants($record->id, $allrecords, $currentdepth);
+        // Is this item visible?
+        if (!$node->is_visible()) {
+            continue;
+        }
 
         $url = $node->get_url(false);
 
-        // We exclude leaf nodes (or empty group nodes) which don't have urls.
-        if (empty($url) && empty($descendants)) {
-            continue;
+        if (($node instanceof \totara_core\totara\menu\container)) {
+            $descendants = totara_build_menu_descendants($record->id, $allrecords, $currentdepth);
+            if (!$descendants) {
+                // Container without leafs makes no sense, ignore it.
+                continue;
+            }
+        } else {
+            $descendants = array();
+            if (!$url) {
+                // Leaf without URL makes no sense, ignore it.
+                continue;
+            }
         }
 
         $tree[] = (object)array(
@@ -1518,20 +1563,12 @@ function totara_build_menu_descendants($parentid, $allrecords, $parentdepth = 0)
 }
 
 
+/**
+ * Internal, to be called from upgrade process only.
+ */
 function totara_upgrade_menu() {
-    totara_menu_reset_cache();
-    $TOTARAMENU = new \totara_core\totara\menu\build();
-    $plugintypes = core_component::get_plugin_types();
-    foreach ($plugintypes as $plugin => $path) {
-        $pluginname = core_component::get_plugin_list_with_file($plugin, 'db/totaramenu.php');
-        if (!empty($pluginname)) {
-            foreach ($pluginname as $name => $file) {
-                // This is NOT a library file!
-                require($file);
-            }
-        }
-    }
-    $TOTARAMENU->upgrade();
+    \totara_core\totara\menu\helper::add_default_items();
+    totara_menu_reset_all_caches();
 }
 
 /**

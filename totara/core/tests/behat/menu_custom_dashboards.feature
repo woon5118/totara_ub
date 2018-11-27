@@ -16,30 +16,30 @@ Feature: Test menu correctly highlights the custom dashboard menu
 
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
+      | Type                     | Parent        |
       | Menu title               | My dashboards |
-      | Menu default url address | /             |
     And I press "Add new menu item"
 
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | My dashboards                    |
       | Menu title               | Dashboard 2                      |
-      | Menu default url address | /totara/dashboard/index.php?id=2 |
+      | Menu url address         | /totara/dashboard/index.php?id=2 |
     And I press "Add new menu item"
 
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | My dashboards                    |
       | Menu title               | Dashboard 3                      |
-      | Menu default url address | /totara/dashboard/index.php?id=3 |
+      | Menu url address         | /totara/dashboard/index.php?id=3 |
     And I press "Add new menu item"
 
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | My dashboards                    |
       | Menu title               | Dashboard 4                      |
-      | Menu default url address | /totara/dashboard/index.php?id=4 |
+      | Menu url address         | /totara/dashboard/index.php?id=4 |
     And I press "Add new menu item"
 
     And I click on "Home" in the totara menu

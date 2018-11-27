@@ -83,7 +83,7 @@ $string['core:appearance'] = 'Configure site appearance settings';
 $string['core:coursemanagecustomfield'] = 'Manage a course custom field';
 $string['core:delegateownmanager'] = 'Assign a temporary manager to yourself';
 $string['core:delegateusersmanager'] = 'Assign a temporary manager to other users';
-$string['core:editmainmenu'] = 'Edit the top navigation';
+$string['core:editmainmenu'] = 'Edit Main menu';
 $string['core:editownquickaccessmenu'] = 'Edit your own quick access menu';
 $string['core:langconfig'] = 'Edit language settings';
 $string['core:manageprofilefields'] = 'Manage profile fields';
@@ -247,7 +247,7 @@ $string['eventcoursearchived'] = 'Course was archived';
 $string['eventcoursecompletionreset'] = 'Course completion was reset';
 $string['eventcoursecompletionunlocked'] = 'Course completion was unlocked without reset';
 $string['eventcourseinprogress'] = 'User was marked in progress for course';
-$string['eventmenuadminviewed'] = 'Top navigation viewed';
+$string['eventmenuadminviewed'] = 'Main menu administration viewed';
 $string['eventmenuitemcreated'] = 'Menu item created';
 $string['eventmenuitemdeleted'] = 'Menu item deleted';
 $string['eventmenuitemupdated'] = 'Menu item updated';
@@ -337,12 +337,13 @@ $string['menuitem:deletesuccess'] = 'The item was deleted successfully';
 $string['menuitem:edit'] = 'Edit menu item';
 $string['menuitem:editaccess'] = 'Access';
 $string['menuitem:editingx'] = 'Editing menu item "{$a}"';
+$string['menuitem:formitemcustomtitle'] = 'Override menu title';
 $string['menuitem:formitemparent'] = 'Parent item';
 $string['menuitem:formitemtargetattr'] = 'Open link in new window';
 $string['menuitem:formitemtargetattr_help'] = 'If selected, clicking this menu item will open the page in a new browser window instead of the current window.';
 $string['menuitem:formitemtitle'] = 'Menu title';
 $string['menuitem:formitemtitle_help'] = 'The name of this menu item. This field supports the multi-language content filter.';
-$string['menuitem:formitemurl'] = 'Menu default url address';
+$string['menuitem:formitemurl'] = 'Menu url address';
 $string['menuitem:formitemurl_help'] = 'Start the URL with a **/** to make the link relative to your site URL. Otherwise start the URL with http:// or https://, i.e. http://extdomain.com
 
 You can also use following placeholders:
@@ -353,6 +354,8 @@ You can also use following placeholders:
 * ##courseid## : Current course ID.';
 $string['menuitem:formitemvisibility'] = 'Visibility';
 $string['menuitem:hide'] = 'Hide';
+$string['menuitem:hiddentoodeep'] = 'Hidden: menu limit exceeded';
+$string['menuitem:hiddentoodeep_help'] = 'The menu does not show items which are nested deeper than 2 levels.';
 $string['menuitem:mainmenu'] = 'Main menu';
 $string['menuitem:movesuccess'] = 'The item was moved successfully';
 $string['menuitem:navigationsettings'] = 'Navigation settings';
@@ -364,9 +367,12 @@ $string['menuitem:presetwithaccess_help'] = 'This criteria allows you to restric
 How these rules are required is determined by the **Preset rule aggregation** setting. If it is set to **all** then the user must meet all of the selected criteria. If it is set to **any** the user must meet only one of the selected criteria.';
 $string['menuitem:presetaggregation'] = 'Preset rule aggregation';
 $string['menuitem:presetaggregation_help'] = 'Determines whether the user must meet all of the selected preset rules, or any of the selected preset rules.';
+$string['menuitem:resetbackupcustom'] = 'Hidden from menu and available in menu settings';
+$string['menuitem:resetcustomoption'] = 'All custom items will be';
+$string['menuitem:resetdeletecustom'] = 'Permanently deleted';
 $string['menuitem:resettodefault'] = 'Reset menu to default configuration';
-$string['menuitem:resettodefaultconfirm'] = 'Are you absolutely sure that you want to reset the top navigation to its default configuration? This will permanently erase all customisations.';
-$string['menuitem:resettodefaultcomplete'] = 'Top navigation reset to default configuration.';
+$string['menuitem:resettodefaultcomplete'] = 'Main menu has been reset to default configuration.';
+$string['menuitem:resetwarnign'] = 'You are about to reset the Main menu to its default configuration.';
 $string['menuitem:restrictaccess'] = 'Restrict access';
 $string['menuitem:restrictaccessbyaudience'] = 'Restrict access by audience';
 $string['menuitem:roleaggregation'] = 'Role aggregation';
@@ -395,21 +401,20 @@ $string['menuitem:rulepreset_is_not_logged_in'] = 'User is <b>not</b> logged in'
 $string['menuitem:rulepreset_is_site_admin'] = 'User is site administrator';
 $string['menuitem:show'] = 'Show';
 $string['menuitem:showcustom'] = 'Use custom access rules';
-$string['menuitem:showwhenrequired'] = 'Show when required';
+$string['menuitem:showwhenrequired'] = 'Show when accessible';
 $string['menuitem:systemcontext'] = 'Users must have role in the system context';
 $string['menuitem:title'] = 'Item title';
-$string['menuitem:topnavigation'] = 'Top navigation';
 $string['menuitem:type'] = 'Type';
 $string['menuitem:typedisabled'] = 'Feature disabled';
 $string['menuitem:typeparent'] = 'Parent';
 $string['menuitem:typeurl'] = 'URL';
 $string['menuitem:updateaccesssuccess'] = 'Access rules updated successfully';
-$string['menuitem:updatesuccess'] = 'Top navigation updated successfully';
+$string['menuitem:updatesuccess'] = 'Main menu has been updated successfully';
 $string['menuitem:url'] = 'URL address';
 $string['menuitem:visibility'] = 'Visibility';
 $string['menuitem:withrestrictionall'] = 'Users matching <strong>all</strong> of the criteria below can view this menu item.';
 $string['menuitem:withrestrictionany'] = 'Users matching <strong>any</strong> of the criteria below can view this menu item.';
-$string['menulifetime'] = 'Cache top navigation';
+$string['menulifetime'] = 'Main menu cache life time';
 $string['menulifetime_desc'] = 'Higher values improve performance but some changes in menu structure may be delayed.';
 $string['minutelyon'] = 'Minutely on';
 $string['modulearchive'] = 'Activity archives';
@@ -747,3 +752,5 @@ $string['configenhancedcatalog'] = 'This setting allows you to specify if the en
     The enhanced catalog supports faceted search by multiple criteria using custom fields instead of relying on a single category.
     When disabled, the standard catalog (i.e., the hierarchical category system configured in the \'Manage categories\' administration area) appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
     Note: When enabled, the standard catalog remains available for Admins to manage course and program/certification administration in the "backend" (e.g., to assign Instructors to courses and course categories).';
+$string['menuitem:resettodefaultconfirm'] = 'Are you absolutely sure that you want to reset the top navigation to its default configuration? This will permanently erase all customisations.';
+$string['menuitem:topnavigation'] = 'Top navigation';

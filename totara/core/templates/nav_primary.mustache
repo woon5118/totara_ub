@@ -74,7 +74,7 @@
                  data-tw-totaraNav-item=""
                 data-tw-totaraNav-topLevelItem=""
                 {{#haschildren}} data-tw-totaraNav-hasChildren=""{{/haschildren}}>
-                <a class="totaraNav_prim--list_item_link" target="{{target}}"
+                <a class="totaraNav_prim--list_item_link" {{#target}}target="{{.}}" rel="noopener"{{/target}}
                     {{^haschildren}} href="{{url}}"{{/haschildren}}
                     {{#haschildren}} href="#" aria-haspopup="true" aria-expanded="false"{{/haschildren}}>
                     <div class="totaraNav--expand_indent" {{#haschildren}}data-tw-totaraNav-chevron=""{{/haschildren}}></div>{{!

@@ -9,6 +9,7 @@ Feature: Test Appraisals menu item
     And I log in as "admin"
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Performance" in the "#totaramenutable" "css_element"
+    And I should see "Parent" in the "Performance" "table_row"
     And I should see "Performance" in the totara menu
 
   Scenario: Make sure Appraisals is not in totara menu if all features disabled
@@ -22,4 +23,8 @@ Feature: Test Appraisals menu item
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Performance" in the "#totaramenutable" "css_element"
-    And I should see "Feature disabled" in the "Performance" "table_row"
+    And I should see "Parent" in the "Performance" "table_row"
+    And I should see "Feature disabled" in the "Latest Appraisal" "table_row"
+    And I should see "Feature disabled" in the "All Appraisals" "table_row"
+    And I should see "Feature disabled" in the "360° Feedback" "table_row"
+    And I should see "Feature disabled" in the "Goals" "table_row"

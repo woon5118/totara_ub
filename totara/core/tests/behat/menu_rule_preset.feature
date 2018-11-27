@@ -1,4 +1,4 @@
-@totara @totara_menu @javascript
+@totara @totara_core @totara_core_menu @javascript
 Feature: Test restricting Totara custom menu access by preset rules
   In order to limit access to menu items
   As a user
@@ -13,11 +13,11 @@ Feature: Test restricting Totara custom menu access by preset rules
     And I log in as "admin"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Parent item              | Top                     |
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
-      | Menu default url address | /my/                    |
+      | Menu url address         | /my/                    |
     And I click on "Add new menu item" "button"
     And I click on "Access" "link"
     And I expand all fieldsets

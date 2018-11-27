@@ -496,5 +496,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018112201, 'totara', 'core');
     }
 
+    if ($oldversion < 2018112202) {
+        // Add missing class names for custom main menu items.
+        $DB->set_field_select('totara_navigation', 'classname', '\totara_core\totara\menu\item', "custom = 1 AND url <> ''");
+        $DB->set_field_select('totara_navigation', 'classname', '\totara_core\totara\menu\container', "custom = 1 AND url = ''");
+
+        // Switch to one show flag for both custom and default items.
+        $DB->set_field('totara_navigation', 'visibility', '1', array('visibility' => '2'));
+
+        // Migrate to new item for grid catalog, old mixed class is gone.
+        $DB->delete_records('totara_navigation', array('classname' => '\totara_catalog\totara\menu\catalog'));
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018112202, 'totara', 'core');
+    }
+
     return true;
 }

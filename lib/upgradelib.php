@@ -379,6 +379,7 @@ function upgrade_stale_php_files_present() {
     $someexamplesofremovedfiles = array(
         // Removed in Totara 12.0
         '/admin/auth_config.php',
+        '/totara/catalog/classes/totara/menu/catalog.php', // post RC removal
         // Removed in 3.2.
         '/calendar/preferences.php',
         '/lib/alfresco/',

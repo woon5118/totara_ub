@@ -13,9 +13,9 @@ Feature: Test menu correctly highlights the course catalog page when enhanced ca
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"
-    And I set the following fields to these values:
+    And I set the following Totara form fields to these values:
       | Menu title | Enhanced catalog |
-      | Menu default url address | /totara/coursecatalog/courses.php |
+      | Menu url address | /totara/coursecatalog/courses.php |
     And I press "Add new menu item"
     Then I should see "Enhanced catalog" in the totara menu
     When I follow "Enhanced catalog"

@@ -40,28 +40,6 @@ Feature: Admin can set catalog type in Advanced features
     Then a new page should have loaded since I started watching
     And I should see the "totara" catalog page
 
-  Scenario Outline: Top navigation shows catalog sub-item when custom sub-items exist
-    When I navigate to "Main menu" node in "Site administration > Navigation"
-    And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
-      | Parent item              | <Parent Item>   |
-      | Menu title               | Custom item     |
-      | Visibility               | Show            |
-      | Menu default url address | /admin/user.php |
-    And I click on "Add new menu item" "button"
-    And I set the following administration settings values:
-      | Catalogue type   | totara |
-    And I click on "Find Learning" in the totara menu
-    Then I should see "<Other second level item>" in the totara menu drop down list
-    And I should see "Catalogue" in the totara menu drop down list
-    When I click on "Catalogue" in the totara menu
-    Then I should see the "totara" catalog page
-
-    Examples:
-      | Parent Item   | Other second level item |
-      | Courses       | Courses                 |
-      | Find Learning | Custom item             |
-
   Scenario Outline: Disabled totara catalog page shows info message and link to current catalog
     Given I set the following administration settings values:
       | Catalogue type   | <Catalogue type> |

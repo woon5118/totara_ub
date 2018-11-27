@@ -191,12 +191,12 @@
         <FIELD NAME="url" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="classname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="depth" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="path" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="custom" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="depth" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Deprecated since Totara 12.0"/>
+        <FIELD NAME="path" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Deprecated sicec Totara 12.0"/>
+        <FIELD NAME="custom" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Set to 1 for custom items and custom containers only"/>
         <FIELD NAME="customtitle" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="visibility" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="visibilityold" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Stores the last visibility state"/>
+        <FIELD NAME="visibilityold" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Intended for show/hide admin UI buttons"/>
         <FIELD NAME="targetattr" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>

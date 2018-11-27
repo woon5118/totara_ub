@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Oleg Demeshev <oleg.demeshev@totaralms.com>
- * @package totara
- * @subpackage navigation
+ * @package totara_core
+ * @author Petr Skoda <petr.skoda@totaralearning.com>
  */
+namespace totara_core\totara\menu;
 
-defined('MOODLE_INTERNAL') || die();
+class container extends item {
+    /**
+     * Container cannot have URL.
+     *
+     * @param bool $replaceparams ignored
+     * @return string always ''
+     */
+    final public function get_url($replaceparams = true) {
+        return '';
+    }
 
-$TOTARAMENU->add('\totara_hierarchy\totara\menu\mygoals');
+    /**
+     * Container cannot have URL.
+     *
+     * @return string always ''
+     */
+    final protected function get_default_url() {
+        return '';
+    }
+}

@@ -1,5 +1,5 @@
-@core @javascript
-Feature: Totara Top Navigation
+@totara @totara_core @totara_core_menu @javascript
+Feature: Totara menu top navigation
   In order to navigate the site
   As a user
   I need to be able to use the Top Navigation Menu
@@ -11,43 +11,50 @@ Feature: Totara Top Navigation
       | Catalogue type | enhanced |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
-    And I set the following fields to these values:
-      | Parent item              | Courses         |
-      | Menu title               | 3rd Level item  |
+    And I set the following Totara form fields to these values:
+      | Type                     | Parent          |
+      | Parent item              | Find Learning   |
+      | Menu title               | Extra courses   |
       | Visibility               | Show            |
-      | Menu default url address | /admin/user.php |
+    And I click on "Add new menu item" "button"
+    And I click on "Add new menu item" "button"
+    And I set the following Totara form fields to these values:
+      | Type                     | URL             |
+      | Parent item              | Find Learning / Extra courses |
+      | Menu title               | 3rd Level item  |
+      | Menu url address         | /admin/user.php |
+      | Visibility               | Show            |
     And I click on "Add new menu item" "button"
 
   Scenario Outline: Navigation menu expanding and collapsing works on top level
     # Toggling navigation and waiting for a second is only necessary for small window size
     When I change viewport size to "<window_size>"
     And I <toggle_nav_action>
-    And I wait "<wait_seconds>" seconds
 
     # Click on "Find learning" to open drop-down menu.
     And I click on "Find Learning" in the totara menu
     Then Totara menu item "Find Learning" should be expanded
     And Totara menu item "Find Learning" should not be highlighted
-    And I should see "Courses" in the totara menu drop down list
+    And I should see "Extra courses" in the totara menu drop down list
     And I should not see "3rd Level item" in the totara menu
 
     # Click on "Find learning" again to close drop-down menu.
     When I click on "Find Learning" in the totara menu
     Then Totara menu item "Find Learning" should not be expanded
     And Totara menu item "Find Learning" should not be highlighted
-    And I should not see "Courses" in the totara menu
+    And I should not see "Extra courses" in the totara menu
 
     # Open the same drop-down menu again.
     When I click on "Find Learning" in the totara menu
     Then Totara menu item "Find Learning" should be expanded
     And Totara menu item "Find Learning" should not be highlighted
-    And I should see "Courses" in the totara menu drop down list
+    And I should see "Extra courses" in the totara menu drop down list
     And I should not see "3rd Level item" in the totara menu
 
     # Expand sub-item in the drop-down menu.
-    When I click on "Courses" in the totara menu
+    When I click on "Extra courses" in the totara menu
     Then Totara menu item "Find Learning" should be expanded
-    And Totara menu item "Courses" should be expanded
+    And Totara menu item "Extra courses" should be expanded
     And I should see "3rd Level item" in the totara menu drop down list
 
     # Collapse and expand the whole drop-down again and verify the sub-item is also collapsed.
@@ -55,28 +62,28 @@ Feature: Totara Top Navigation
     Then Totara menu item "Find Learning" should not be expanded
     When I click on "Find Learning" in the totara menu
     Then Totara menu item "Find Learning" should be expanded
-    And Totara menu item "Courses" should not be expanded
+    And Totara menu item "Extra courses" should not be expanded
 
     # Expand and collapse sub-item in the drop-down menu.
-    When I click on "Courses" in the totara menu
+    When I click on "Extra courses" in the totara menu
     Then Totara menu item "Find Learning" should be expanded
-    And Totara menu item "Courses" should be expanded
+    And Totara menu item "Extra courses" should be expanded
     And I should see "3rd Level item" in the totara menu
-    When I click on "Courses" in the totara menu
+    When I click on "Extra courses" in the totara menu
     Then Totara menu item "Find Learning" should be expanded
-    And Totara menu item "Courses" should not be expanded
+    And Totara menu item "Extra courses" should not be expanded
     And I should not see "3rd Level item" in the totara menu
 
     # Expand sub-item again and click on it.
-    When I click on "Courses" in the totara menu
+    When I click on "Extra courses" in the totara menu
     And I start watching to see if a new page loads
     And I click on "3rd Level item" in the totara menu
     Then a new page should have loaded since I started watching
 
     Examples:
-      | window_size | toggle_nav_action                             | wait_seconds |
-      | small       | click on "Toggle navigation" "link_or_button" | 1            |
-      | medium      | wait "0" seconds                              | 0            |
+      | window_size | toggle_nav_action                             |
+      | small       | click on "Toggle navigation" "link_or_button" |
+      | medium      | wait "0" seconds                              |
 
   Scenario: Navigation menu expanding and collapsing works on second level
     # Click on "Certifications" to load a page with second level navigation displayed.
@@ -85,20 +92,20 @@ Feature: Totara Top Navigation
     And I click on "Certifications" in the totara menu
     Then a new page should have loaded since I started watching
     And Totara sub menu item "Certifications" should be highlighted
-    And Totara sub menu item "Courses" should not be highlighted
-    And I should see "Courses" in the totara sub menu
+    And Totara sub menu item "Extra courses" should not be highlighted
+    And I should see "Extra courses" in the totara sub menu
     And I should not see "3rd Level item" in the totara sub menu
 
     # Expand and collapse second level drop-down.
-    When I click on "Courses" in the totara sub menu
-    Then Totara sub menu item "Courses" should be expanded
+    When I click on "Extra courses" in the totara sub menu
+    Then Totara sub menu item "Extra courses" should be expanded
     And I should see "3rd Level item" in the totara sub menu drop down list
-    When I click on "Courses" in the totara sub menu
-    Then Totara sub menu item "Courses" should not be expanded
+    When I click on "Extra courses" in the totara sub menu
+    Then Totara sub menu item "Extra courses" should not be expanded
     And I should not see "3rd Level item" in the totara sub menu drop down list
 
     # Expand again and click the link.
-    When I click on "Courses" in the totara sub menu
+    When I click on "Extra courses" in the totara sub menu
     And I start watching to see if a new page loads
     And I click on "3rd Level item" in the totara sub menu
     Then a new page should have loaded since I started watching

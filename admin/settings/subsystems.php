@@ -156,14 +156,14 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enablelearningplans', 'totara_plan'),
         new lang_string('configenablelearningplans', 'totara_plan'),
         TOTARA_SHOWFEATURE,
-        array('totara_menu_reset_cache', 'totara_rb_purge_ignored_reports',
+        array('totara_menu_reset_all_caches', 'totara_rb_purge_ignored_reports',
             array('enrol_totara_learningplan_util', 'feature_setting_updated_callback'))));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableprograms',
         new lang_string('enableprograms', 'totara_program'),
         new lang_string('configenableprograms', 'totara_program'),
         TOTARA_SHOWFEATURE,
-        array('totara_menu_reset_cache', 'totara_rb_purge_ignored_reports',
+        array('totara_menu_reset_all_caches', 'totara_rb_purge_ignored_reports',
             array('enrol_totara_program_util', 'feature_setting_updated_callback'))));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecertifications',
@@ -227,6 +227,6 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         $defaultcatalogtype,
         $options
     );
-    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $setting->set_updatedcallback('totara_menu_reset_all_caches');
     $optionalsubsystems->add($setting);
 }

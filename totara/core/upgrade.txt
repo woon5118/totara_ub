@@ -3,6 +3,15 @@ information provided here is intended especially for developers.
 
 === 12 ===
 
+* Major cleanup and refactoring in Totara menu API:
+** totara_menu_reset_cache() was deprecated, use totara_menu_reset_all_caches() or totara_menu_reset_session_cache() instead
+** \totara_core\totara\menu\item methods that are not allowed to be overridden are now marked with final keyword.
+** item::check_visibility() does not need to use is_disabled() and bool result is now expected.
+** Parentable Totare menu classes now must extends a new base class totara/core/classes/totara/menu/container.php
+** Totara menu list files db/totaramenu.php are now obsolete and should be deleted,
+   item classes are now automatically discovered using component class namespace 'totara\menu' lookup.
+** Internal Totara menu API was refactored, menu and build classes are now deprecated and should not be used,
+   use new constants and methods in item class or new helper class.
 * Deprecated totara_print_my_courses()
 * Deprecated totara_core/progressbar mustache template
 * Icon helpers are no longer used in the following templates, icon data is passed via context data:
