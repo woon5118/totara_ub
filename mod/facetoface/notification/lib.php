@@ -1855,6 +1855,8 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $str_unknowntime = get_string('unknowntime', 'facetoface');
 
     if (!empty($data->sessiondates)) {
+        // Replacing the ['eventperiod'] here to the default [starttime]-[finishtime], [sessiondate]
+        $msg = str_replace("[eventperiod]", "[starttime]-[finishtime], [sessiondate]", $msg);
         // Scheduled session
         $strftimedate = get_string('strftimedate');
         $strftimetime = get_string('strftimetime');
@@ -1873,6 +1875,9 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $latestfinishdate = userdate(end($data->sessiondates)->timefinish, $strftimedate, $sessiontimezone);
         $data->duration = format_time((int)$data->sessiondates[0]->timestart - (int)end($data->sessiondates)->timefinish);
     } else {
+        // If it is a waitlist session, make it as a tbd title here
+        $unknownperiod = get_string("locationtimetbd", 'facetoface');
+        $msg = str_replace("[eventperiod]", strtolower($unknownperiod), $msg);
         // Wait-listed session
         $startdate   = $str_unknowndate;
         $finishdate  = $str_unknowndate;

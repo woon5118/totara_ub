@@ -407,5 +407,47 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018120701, 'facetoface');
     }
 
+    // Update the template's title for seminar's trainer confirmation.
+    if ($oldversion < 2018120702) {
+        // By default: [eventperiod] => [starttime]-[finishtime], [sessiondate]
+        $default = array(
+            "trainerconfirm" => array(
+                "old" =>  "Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]",
+                "new" => "Seminar trainer confirmation: [facetofacename], [eventperiod]"
+            ),
+            "rolerequest" => array(
+                "old" => "Seminar booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]",
+                "new" => "Seminar booking role request: [facetofacename], [eventperiod]",
+            ),
+            "request" => array(
+                "old" => "Seminar booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]",
+                "new" => "Seminar booking request: [facetofacename], [eventperiod]"
+            ),
+            "adminrequest" => array(
+                "old" => "Seminar booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]",
+                "new" => "Seminar booking admin request: [facetofacename], [eventperiod]"
+            )
+        );
+
+        $references = array("trainerconfirm", "rolerequest", "request", "adminrequest");
+        list($sqlin, $params) = $DB->get_in_or_equal($references);
+
+        $sql = "SELECT * FROM {facetoface_notification_tpl} WHERE reference {$sqlin}";
+        $records = $DB->get_records_sql($sql, $params);
+        foreach ($records as $record) {
+            if (isset($default[$record->reference])) {
+                $title = $default[$record->reference];
+                // Only updating the title if it is the same, with the old default, otherwise,
+                // leave it be, as user already modified it.
+                if ($title['old'] === $record->title) {
+                    $record->title = $title['new'];
+                    $DB->update_record("facetoface_notification_tpl", $record);
+                }
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2018120702, 'facetoface');
+    }
+
     return true;
 }

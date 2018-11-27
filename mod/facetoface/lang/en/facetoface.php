@@ -1648,7 +1648,7 @@ Location: [session:room:cf_location]
 This request will expire on [registrationcutoff]
 ';
 $string['setting:defaultrequestsubjectdefault'] = 'Face-to-face booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
-$string['setting:defaultrequestsubjectdefault_v9'] = 'Seminar booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrequestsubjectdefault_v9'] = 'Seminar booking request: [facetofacename], [eventperiod]';
 $string['setting:defaultrolerequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as a [sessionrole] for the session.
 
 Please review this request before registration closes on [registrationcutoff]
@@ -1701,7 +1701,7 @@ Location: [session:room:cf_location]
 
 This request will expire on [registrationcutoff]
 ';
-$string['setting:defaultrolerequestsubjectdefault'] = 'Seminar booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrolerequestsubjectdefault'] = 'Seminar booking role request: [facetofacename], [eventperiod]';
 $string['setting:defaultadminrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as an approver for the session.
 
 Please review this request before registration closes on [registrationcutoff]
@@ -1754,7 +1754,7 @@ Location: [session:room:cf_location]
 
 This request will expire on [registrationcutoff]
 ';
-$string['setting:defaultadminrequestsubjectdefault'] = 'Seminar booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultadminrequestsubjectdefault'] = 'Seminar booking admin request: [facetofacename], [eventperiod]';
 $string['setting:defaulttrainerconfirmationmessage'] = 'Default message sent to trainers when assigned to an event.';
 $string['setting:defaulttrainerconfirmationmessage_caption'] = 'Trainer confirmation message';
 $string['setting:defaulttrainerconfirmationmessagedefault'] = 'This is to confirm that you are now assigned to deliver training on the following course:
@@ -1798,7 +1798,7 @@ Location: [session:room:cf_location]
 $string['setting:defaulttrainerconfirmationsubject'] = 'Default subject line for trainer confirmation emails.';
 $string['setting:defaulttrainerconfirmationsubject_caption'] = 'Trainer confirmation subject';
 $string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Face-to-face trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
-$string['setting:defaulttrainerconfirmationsubjectdefault_v9'] = 'Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaulttrainerconfirmationsubjectdefault_v9'] = 'Seminar trainer confirmation: [facetofacename], [eventperiod]';
 
 $string['setting:defaulttrainersessioncancellationmessage'] = 'Default event cancellation message sent to the trainer.';
 $string['setting:defaulttrainersessioncancellationmessage_caption'] = 'Trainer event cancellation message';
