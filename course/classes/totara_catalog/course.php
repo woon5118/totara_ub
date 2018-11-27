@@ -125,7 +125,7 @@ class course extends provider {
     }
 
     public function get_manage_link(int $objectid) {
-        global $CFG, $DB;
+        global $CFG;
 
         require_once($CFG->dirroot . '/course/lib.php');
 

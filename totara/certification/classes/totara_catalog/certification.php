@@ -28,6 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 use totara_catalog\provider;
 use totara_customfield\totara_catalog\dataholder_factory as customfield_dataholder_factory;
 
+global $CFG;
+
+require_once($CFG->dirroot . '/totara/program/lib.php');
+
 class certification extends provider {
 
     /**
@@ -114,11 +118,8 @@ class certification extends provider {
     }
 
     public function get_manage_link(int $objectid) {
-        global $CFG;
-
-        require_once($CFG->dirroot . '/totara/program/lib.php');
-
         $program = new \program($objectid);
+
         if (!$program->has_capability_for_overview_page()) {
             return null;
         }
@@ -132,8 +133,6 @@ class certification extends provider {
 
     public function get_details_link(int $objectid) {
         global $CFG, $USER;
-
-        require_once($CFG->dirroot . '/totara/program/lib.php');
 
         $program = new \program($objectid);
 

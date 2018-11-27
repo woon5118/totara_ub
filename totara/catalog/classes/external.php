@@ -182,6 +182,11 @@ class external extends \external_api {
         // Get the corresponding provider.
         $provider = provider_handler::instance()->get_provider($object->objecttype);
 
+        // Check that the current user is allowed to see the data.
+        if (!$provider->can_see([$object])[$object->objectid]) {
+            throw new \moodle_exception('Tried to access data without permission');
+        }
+
         // Get the dataholders required to display details for the provider.
         $providerrequireddataholders = details::get_required_dataholders($provider);
         $requireddataholders = [$object->objecttype => $providerrequireddataholders];
