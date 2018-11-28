@@ -167,7 +167,7 @@ $string['deleteusercheckfull'] = 'Are you absolutely sure you want to completely
 <li>reminders</li>
 <li>will be unenroled from courses</li>
 <li>will be unassigned from manager, appraiser and temp manager positions</li>
-<li>will be removed from cohorts</li>
+<li>will be removed from audiences</li>
 <li>will be removed from groups</li>
 <li>messages will be marked as read</li>
 </ul>
