@@ -18,11 +18,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
- * @package totara_catalog
+ * @package core_course
+ * @category totara_catalog
  */
+
+namespace core_course\totara_catalog\course\observer;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2018112201;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509;       // Requires this Moodle version.
-$plugin->component = 'totara_catalog';   // To check on upgrade, that module sits in correct place
+use totara_catalog\observer\object_update_observer;
+
+class course_restored extends object_update_observer {
+
+    public function get_observer_events(): array {
+        return [
+            '\core\event\course_restored'
+        ];
+    }
+
+    /**
+     * init course update object for restored course
+     */
+    protected function init_change_objects(): void {
+        $data = new \stdClass();
+        $data->objectid = $this->event->objectid;
+        $data->contextid = $this->event->contextid;
+        $this->register_for_update($data);
+    }
+}
