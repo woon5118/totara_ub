@@ -111,6 +111,7 @@ class course_tile extends learning_item_tile {
      */
     protected function get_content_wrapper_template_data(\renderer_base $renderer, array $settings = []): array {
         global $CFG;
+        require_once($CFG->dirroot . "/course/lib.php");
         $data = parent::get_content_wrapper_template_data($renderer, $settings);
         if (!empty($this->get_course())) {
             $courseid = $this->get_course()->id;
