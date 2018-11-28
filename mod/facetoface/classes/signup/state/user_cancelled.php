@@ -65,6 +65,13 @@ class user_cancelled extends not_set {
      * @return string
      */
     public function get_action_label(): string {
+        $multisignup = new condition\multisignup_common($this->signup);
+
+        // If user is not able to sign up to different session, and user already has another signup,
+        // then this state should be treated as not_set state.
+        if (!$multisignup->pass()) {
+            return parent::get_action_label();
+        }
         return get_string('cancelbooking', 'mod_facetoface');
     }
 

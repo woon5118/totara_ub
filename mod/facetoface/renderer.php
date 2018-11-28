@@ -755,8 +755,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         } else {
                             $tooltip = '';
                         }
-                        $seminarevent = new \mod_facetoface\seminar_event($session->id);
-                        $signup = \mod_facetoface\signup::create($USER->id, $seminarevent);
                         $signuptext = \mod_facetoface\signup_helper::expected_signup_state($signup)->get_action_label();
                         if (empty($signuptext)) {
                             $signuptext = get_string('moreinfo', 'facetoface');
