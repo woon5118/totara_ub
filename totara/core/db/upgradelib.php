@@ -684,3 +684,38 @@ function totara_core_migrate_old_block_titles() {
         }
     }
 }
+
+/**
+ * Add new 'course_navigation' block to all existing courses.
+ * The block API must be functioning, but to be safe only use the structures used there.
+ */
+function totara_core_add_course_navigation() {
+    global $CFG, $DB;
+
+    if (!class_exists('moodle_page')) {
+        // We need to be able to use moodle_page.
+        return;
+    }
+
+    if (!$courses = $DB->get_records('course')) {
+        // We don't have any courses yet.
+        return;
+    }
+
+    // Ensure the block is visible, so that we can add it.
+    if (!$DB->record_exists('block', ['name' => 'course_navigation'])) {
+        // Likely the block is not installed yet.
+        $file = $CFG->dirroot . '/blocks/course_navigation/version.php';
+        if (file_exists($file)) {
+            // OK, it's going to be installed later on.
+            set_config('navigation_migration', 1, 'block_course_navigation');
+        }
+        return;
+    }
+
+    foreach ($courses as $course) {
+        $page = new moodle_page();
+        $page->set_course($course);
+        $page->blocks->add_blocks(['side-pre' => ['course_navigation']], '*', null, true, -10);
+    }
+}

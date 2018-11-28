@@ -488,5 +488,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018111200, 'totara', 'core');
     }
 
+    if ($oldversion < 2018112201) {
+        // Add 'course_navigation' block to all existing courses.
+        totara_core_add_course_navigation();
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018112201, 'totara', 'core');
+    }
+
     return true;
 }

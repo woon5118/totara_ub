@@ -357,5 +357,8 @@ function xmldb_totara_core_install() {
     // Upgrade the old frontpage block bits when upgrading from Moodle.
     totara_core_migrate_frontpage_display();
 
+    // Add course navigation blocks when upgrading from Moodle.
+    totara_core_add_course_navigation();
+
     return true;
 }
