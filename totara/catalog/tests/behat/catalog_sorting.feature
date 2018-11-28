@@ -1,12 +1,12 @@
 @totara @totara_catalog @javascript
 Feature: Using the sorting feature of catalog
   Background:
-    Given the following "courses" exist:
+    Given I am on a totara site
+    And the following "courses" exist:
       | fullname                | shortname | category | coursetype |
       | Course A Korean Drama   | course A  | 0        | 0          |
       | Course Course Bolo bala | course B  | 0        | 0          |
       | Course This is SPARTAN  | course C  | 0        | 2          |
-    And I am on a totara site
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Configure catalogue"
@@ -20,7 +20,6 @@ Feature: Using the sorting feature of catalog
     And I click on "Save" "button"
 
   Scenario: With only one language installed, sorting can be changed manually
-    Given I am on a totara site
     When I click on "Find Learning" in the totara menu
     Then I should see "Featured"
     And "Course This is SPARTAN" "text" should appear before "Course Bolo bala" "text"
@@ -31,8 +30,7 @@ Feature: Using the sorting feature of catalog
     And "Course Course Bolo bala" "text" should appear before "Course This is SPARTAN" "text"
 
   Scenario: With two languages installed, sorting is changed automatically
-    Given I am on a totara site
-    And I navigate to "Language packs" node in "Site administration > Localisation"
+    Given I navigate to "Language packs" node in "Site administration > Localisation"
     And I set the field "Available language packs" to "fr"
     And I press "Install selected language pack(s)"
     When I click on "Find Learning" in the totara menu

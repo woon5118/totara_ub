@@ -1,7 +1,8 @@
 @course @totara @totara_catalog @javascript
 Feature: Test file for catalog
   Background:
-    Given the following "categories" exist:
+    Given I am on a totara site
+    And the following "categories" exist:
       | name  | category | idnumber |
       | Cat1  | 0        | cat1     |
       | Cat2  | 0        | cat2     |
@@ -29,7 +30,6 @@ Feature: Test file for catalog
     And the following "users" exist:
       | username | firstname | lastname |
       | jongsuk  | Jong Suk  | Lee      |
-    And I am on a totara site
     And I log in as "admin"
     And I go to the courses management page
     And I click on "edit" action for "Cat1" in management category listing

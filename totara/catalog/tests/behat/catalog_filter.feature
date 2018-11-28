@@ -1,7 +1,8 @@
 @totara @totara_catalog @javascript
 Feature: Course catalog filters and featured learning
   Background:
-    Given the following "custom course fields" exist in "totara_core" plugin:
+    Given I am on a totara site
+    And the following "custom course fields" exist in "totara_core" plugin:
       | shortname | fullname | param1         | datatype | defaultdata |
       | colour    | colour   | red/green/blue | menu     |             |
       | checkbox  | checkbox |                | checkbox | 1           |
@@ -20,7 +21,6 @@ Feature: Course catalog filters and featured learning
     And the following "certifications" exist in "totara_program" plugin:
       | fullname | shortname | category |
       | cert1    | cert1     | 0        |
-    And I am on a totara site
     And I log in as "admin"
     And I navigate to "Courses > Configure catalogue" in site administration
     And I follow "Filters"

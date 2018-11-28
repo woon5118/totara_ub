@@ -1,7 +1,8 @@
 @totara @totara_catalog @javascript
 Feature: Viewing course catalog with pagination
   Background:
-    Given the following "users" exist:
+    Given I am on a totara site
+    And the following "users" exist:
       | firstname | lastname | username |
       | jongsuk   | lee      | jongsuk  |
     And the following "courses" exist:
@@ -31,8 +32,7 @@ Feature: Viewing course catalog with pagination
       | course23 | course23  | 0        | 1       |
 
   Scenario: A learner is not able to see the course that has disabled for view
-    Given I am on a totara site
-    And I log in as "jongsuk"
+    Given I log in as "jongsuk"
     And I click on "Find Learning" in the totara menu
     And I should see "Load more"
     And I should see "Up to 30 items"
