@@ -233,8 +233,12 @@ class core_calendar_renderer extends plugin_renderer_base {
                     $deletelink->param('course', $event->calendarcourseid);
                 }
             } else {
-                $params = array('update' => $event->cmid, 'return' => true, 'sesskey' => sesskey());
-                $editlink = new moodle_url('/course/mod.php', $params);
+                if ($event->eventtype == 'facetofacebooking') {
+                    $editlink = new moodle_url('/mod/facetoface/signup.php', array('s' => $event->uuid, 'sesskey' => sesskey()));
+                } else {
+                    $params = array('update' => $event->cmid, 'return' => true, 'sesskey' => sesskey());
+                    $editlink = new moodle_url('/course/mod.php', $params);
+                }
                 $deletelink = null;
             }
 
