@@ -150,6 +150,20 @@ define(['core/templates'], function(templates) {
                         }
                     }
                 });
+
+                window.addEventListener('click', function(e) {
+                    if (!e.target.closest('[data-tw-totaranav-item]')) {
+                        that.closeAllExpandedLists();
+                    }
+                });
+            } else {
+                //On mobile, if someone clicks somewhere other than the menu, we want to close it
+                window.addEventListener('click', function(e) {
+                    if (!e.target.closest('[data-tw-totaraNav-list]') && !e.target.closest('[data-tw-totaraNav-toggle]')) {
+                        that.widget.querySelector('[data-tw-totaraNav-list]').classList.remove('totaraNav_prim--list_showMobile');
+                        that.widget.querySelector('[data-tw-totaraNav-list]').classList.add('totaraNav_prim--list_hideMobile');
+                    }
+                });
             }
 
             // Mobile / Desktop resize changes
