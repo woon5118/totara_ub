@@ -126,7 +126,7 @@ class default_tile extends base{
         if (!isset($this->data->heading_location)) {
             $dataobj->heading_location = self::HEADING_TOP;
         }
-        if (empty($this->icon_size)) {
+        if (empty($dataobj->icon_size) && empty($this->icon_size)) {
             $dataobj->icon_size = 'large';
         }
         return $dataobj;
