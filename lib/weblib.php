@@ -3073,7 +3073,7 @@ function print_maintenance_message() {
     echo $OUTPUT->heading(get_string('sitemaintenance', 'admin'));
     if (isset($CFG->maintenance_message) and !html_is_blank($CFG->maintenance_message)) {
         echo $OUTPUT->box_start('maintenance_message generalbox boxwidthwide boxaligncenter');
-        echo $CFG->maintenance_message;
+        echo format_text($CFG->maintenance_message);
         echo $OUTPUT->box_end();
     }
     echo $OUTPUT->footer();
