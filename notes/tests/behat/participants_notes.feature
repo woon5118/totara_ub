@@ -50,7 +50,7 @@ Feature: Add notes to course participants
     And I follow "Participants"
     And I follow "Student 2"
     And I follow "Notes"
-    And I follow "Course 1"
+    And I click on "Course 1" "link" in the "Navigation" "block"
     And I follow "Participants"
     And I follow "Notes"
     Then I should see "Student 1"
