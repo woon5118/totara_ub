@@ -589,7 +589,7 @@ class totara_core_renderer extends plugin_renderer_base {
             $attributes[] = array ('name' => 'title', 'value' => $name);
             $attributes[] = array ('name' => 'class', 'value' => 'course_icon');
             $attributes[] = array ('name' => 'src', 'value' => $src);
-            $icon = array('id' => $file->get_pathnamehash(), 'attributes' => $attributes, 'name' => $name, 'url' => $url);
+            $icon = array('id' => $file->get_pathnamehash(), 'attributes' => $attributes, 'name' => $name, 'url' => $src);
             $icons[] = $icon;
         }
 
