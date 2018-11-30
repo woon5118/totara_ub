@@ -24,12 +24,40 @@
 defined('MOODLE_INTERNAL') || die();
 
 use totara_core\totara\menu\item;
+use totara_core\totara\menu\container;
 use totara_core\totara\menu\helper;
 
 /**
  * Main menu item tests.
  */
 class totara_core_menu_item_testcase extends advanced_testcase {
+    public function test_constructor() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $data = new stdClass();
+        $data->type = 'container';
+        $data->parentid = '0';
+        $data->title = 'Test container';
+        $data->visibility = (string)item::VISIBILITY_HIDE;
+        $container = helper::add_custom_menu_item($data);
+
+        $instance = new container($container);
+        $this->assertDebuggingCalled('Deprecated item::__construct() call, use item::create_instance() instead.');
+
+        $data = new stdClass();
+        $data->type = 'item';
+        $data->parentid = $container->id;
+        $data->title = 'Test item';
+        $data->url = '/xx';
+        $data->visibility = (string)item::VISIBILITY_SHOW;
+        $data->targetattr = '_blank';
+        $item = helper::add_custom_menu_item($data);
+
+        $instance = new item($container);
+        $this->assertDebuggingCalled('Deprecated item::__construct() call, use item::create_instance() instead.');
+    }
+
     public function test_create_instance() {
         global $DB;
         $this->resetAfterTest();
@@ -86,6 +114,12 @@ class totara_core_menu_item_testcase extends advanced_testcase {
 
         $container->custom = '0';
         $this->assertNull(item::create_instance($container));
+
+        $item->custom = '1';
+        $item->id = '0';
+        $this->assertDebuggingNotCalled();
+        $this->assertNull(item::create_instance($item));
+        $this->assertDebuggingCalled('Incorrect constructor call, fake data is not allowed any more, use real database record');
     }
 
     public function test_is_custom() {

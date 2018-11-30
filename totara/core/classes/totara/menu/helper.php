@@ -112,7 +112,7 @@ final class helper {
         }
 
 
-        /** @var item[] $items */
+        /** @var \stdClass[] $items */
         $items = array();
 
         /** @var string[] $addparents */
@@ -134,7 +134,7 @@ final class helper {
             $classname = '\\' . $class;
 
             if ($record = $DB->get_record('totara_navigation', array('classname' => $classname))) {
-                $items[$classname] = new $class($record);
+                $items[$classname] = $record;
                 continue;
             }
 
@@ -151,8 +151,12 @@ final class helper {
             $record->id = $DB->insert_record('totara_navigation', $record);
             $record = $DB->get_record('totara_navigation', array('id' => $record->id));
 
-            /** @var item $item The initial values should have been in static or at least public methods */
-            $item = new $class($record);
+            $item = item::create_instance($record);
+            if (!$item) {
+                // Something is wrong with the default class, ignore it.
+                debugging('Invalid default menu item class detected: ' . $classname, DEBUG_DEVELOPER);
+                continue;
+            }
 
             $record->visibility = ($item->get_default_visibility() ? item::VISIBILITY_SHOW : item::VISIBILITY_HIDE);
 
@@ -182,14 +186,14 @@ final class helper {
             // Final update before getting real instance.
             $DB->update_record('totara_navigation', $record);
             $record = $DB->get_record('totara_navigation', array('id' => $record->id));
-            $items[$classname] = new $class($record);
+            $items[$classname] = $record;
         }
 
         // Now set parents for new items.
 
         foreach ($addparents as $itemid => $parentclassname) {
             if (isset($items[$parentclassname])) {
-                $parentid = $items[$parentclassname]->get_id();
+                $parentid = $items[$parentclassname]->id;
             } else {
                 $parentid = $unusedcontainerid;
                 $record = $DB->get_record('totara_navigation', array('id' => $itemid));

@@ -86,14 +86,27 @@ class item {
     protected $timemodified;
 
     /**
-     * Set values for node's properties.
+     * Internal flag for detection of incorrect constructor use,
+     * this will be removed after we make constructor private.
+     * @var bool
+     */
+    private static $preventpublicconstructor = true;
+
+    /**
+     * Private constructor, use item::create_instance() instead.
      *
      * @param \stdClass|array $record
      */
     public function __construct($record) {
+        if (self::$preventpublicconstructor) {
+            debugging('Deprecated item::__construct() call, use item::create_instance() instead.', DEBUG_DEVELOPER);
+        }
+        self::$preventpublicconstructor = true;
+
         $this->classname = '\\' . static::class;
         $record = (object)(array)$record;
 
+        // Extra tests until we make this constructor private.
         if (empty($record->id)) {
             debugging('Incorrect item::__construct() call, fake data is not allowed any more, use real database record', DEBUG_DEVELOPER);
         }
@@ -128,8 +141,13 @@ class item {
      * @param \stdClass|array $record
      * @return null|item
      */
-    public static function create_instance($record) {
+    final public static function create_instance($record) {
         $record = (object)(array)$record;
+
+        if (empty($record->id)) {
+            debugging('Incorrect constructor call, fake data is not allowed any more, use real database record', DEBUG_DEVELOPER);
+            return null;
+        }
 
         if (!$record->classname) { // This will trigger notice if invalid data supplied.
             return null;
@@ -151,6 +169,7 @@ class item {
         }
 
         try {
+            self::$preventpublicconstructor = false;
             $instance = new $classname($record);
         } catch (\Throwable $e) {
             return null;
