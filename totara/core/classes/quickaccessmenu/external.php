@@ -46,6 +46,9 @@ final class external extends \external_api {
             throw new \coding_exception('Unable to access menu.');
         }
         self::ensure_current_user_only($userid);
+
+        $context = \context_user::instance($userid);
+        self::validate_context($context);
     }
 
     /**
