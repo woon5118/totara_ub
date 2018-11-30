@@ -54,11 +54,14 @@ if ($node) {
 }
 
 if (!helper::is_item_deletable($record->id)) {
-    redirect($returnurl, get_string('error:menuitemcannotremove', 'totara_core', $itemtitle), 0, core\output\notification::NOTIFY_ERROR);
+    redirect($returnurl, get_string('error:menuitemcannotremove', 'totara_core'), 0, core\output\notification::NOTIFY_ERROR);
 }
 
-if ($confirm) {
-    require_sesskey();
+$form = new \totara_core\form\menu\delete($record, array('itemtitle' => $itemtitle));
+if ($form->is_cancelled()) {
+    redirect($returnurl);
+}
+if ($form->get_data()) {
     ignore_user_abort(true);
     if (helper::delete_item($record->id)) {
         $returnurl = \totara_core\totara\menu\helper::get_admin_edit_return_url(0);
@@ -74,15 +77,5 @@ $PAGE->set_heading($itemtitle);
 
 // Display page header.
 echo $OUTPUT->header();
-
-$url = new moodle_url('/totara/core/menu/delete.php', array('id' => $id, 'confirm' => 'true'));
-$continue = new single_button($url, get_string('continue'), 'post');
-$cancel = new single_button($returnurl, get_string('cancel'), 'get');
-
-echo $OUTPUT->box_start('notifynotice');
-echo html_writer::tag('p', get_string('menuitem:delete', 'totara_core', $itemtitle));
-echo $OUTPUT->box_end();
-
-echo html_writer::tag('div', $OUTPUT->render($continue) . $OUTPUT->render($cancel), array('class' => 'buttons'));
-
+echo $form->render();
 echo $OUTPUT->footer();

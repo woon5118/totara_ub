@@ -333,7 +333,7 @@ When **Users must have role in the system context** is selected the user must be
 When **User may have role in any context** is selected a user can view the report when they have been assigned the selected role anywhere in the system.';
 $string['menuitem:delete'] = 'Are you sure you want to delete the "{$a}" item?';
 $string['menuitem:deletechildren'] = 'All children of "{$a}" will be deleted:';
-$string['menuitem:deletesuccess'] = 'The item was deleted successfully';
+$string['menuitem:deletesuccess'] = 'Menu item has been deleted';
 $string['menuitem:edit'] = 'Edit menu item';
 $string['menuitem:editaccess'] = 'Access';
 $string['menuitem:editingx'] = 'Editing menu item "{$a}"';

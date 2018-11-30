@@ -78,5 +78,8 @@ Feature: A basic test of the Totara Main menu
   Scenario: Delete Main menu items
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Delete" "link" in the "Test item" "table_row"
-    And I click on "Continue" "button"
-    Then I should not see "Test item" in the totara menu
+    And I click on "Delete" "button"
+    Then I should see "Menu item has been deleted"
+    And I should not see "Test item" in the totara menu
+    And I should not see "Test item" in the "#totaramenutable" "css_element"
+
