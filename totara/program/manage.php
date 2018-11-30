@@ -342,7 +342,7 @@ if (can_edit_in_category()) {
         navigation_node::override_active_url(new moodle_url('/totara/program/index.php', array('categoryid' => $id, 'viewtype' => $viewtype)));
     }
     $pagetype = ($viewtype == 'program') ? 'programmgmt' : 'managecertifications';
-    admin_externalpage_setup($pagetype, '', $urlparams, $CFG->wwwroot . "/totara/program/manage.php");
+    admin_externalpage_setup($pagetype, '', $urlparams);
     $settingsnode = $PAGE->settingsnav->find_active_node();
     if ($id && $settingsnode) {
         $settingsnode->make_inactive();
