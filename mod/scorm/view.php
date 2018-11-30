@@ -180,9 +180,12 @@ if (!$available) {
 
 if ($canlaunch && $available && empty($launch)) {
     scorm_print_launch($USER, $scorm, 'view.php?id='.$cm->id, $cm);
-} else {
+}
+
+if (!$canlaunch) {
     echo $OUTPUT->notification(get_string('nolaunch', 'mod_scorm'), \core\output\notification::NOTIFY_INFO);
 }
+
 if ($canlaunch && !empty($forcejs)) {
     echo $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "forcejavascriptmessage");
 }
