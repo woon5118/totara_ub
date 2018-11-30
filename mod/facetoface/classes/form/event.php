@@ -31,6 +31,7 @@ global $CFG;
 use core\command\exception;
 use mod_facetoface\seminar_event;
 use mod_facetoface\signup_helper;
+use stdClass;
 
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
@@ -55,8 +56,15 @@ class event extends \moodleform {
     /** @var context_module */
     protected $returnurl;
 
+    /**
+     * This is an array that holding the confliting users, including the event role and the
+     * attendees of an event.
+     *
+     * @var stdClass[]
+     */
     protected $users_roles_in_conflict;
-    
+
+    /** @var bool */
     Protected $has_date_changed;
 
     function definition() {
@@ -529,7 +537,14 @@ class event extends \moodleform {
             // Loop through roles.
             foreach ($trainerdata as $roleid => $trainers) {
                 // Attempt to load users with this role in this context.
-                $trainerlist = get_role_users($roleid, $this->context, true, "u.id, {$usernamefields}", 'u.id ASC');
+                $trainerlist = get_role_users(
+                    $roleid,
+                    $this->context,
+                    true,
+                    "u.id, {$usernamefields}",
+                    'u.id ASC'
+                );
+
                 foreach ($trainers as $trainer) {
                     // Skip not selected trainers.
                     if (!$trainer) {
@@ -601,14 +616,8 @@ class event extends \moodleform {
                 $whereparams[] = $this->_customdata['s'];
             }
             $currentattendees = facetoface_get_attendees($sessid);
-            $conflictsdetails = facetoface_get_booking_conflicts($dates, $currentattendees, $wheresql, $whereparams);
-            $conflictscount = count($conflictsdetails);
-            if ($conflictscount > 0) {
-                $a = new \stdClass();
-                $a->users = $conflictscount;
-                $a->link = \html_writer::link('#', get_string('viewdetails', 'facetoface'), array('id' => 'viewbookingconflictdetails', 'class' => 'viewbulkresults'));
-                $errors['sessiondates'] = get_string('error:sessiondatesbookingconflict', 'facetoface', $a);
-            }
+            $conflictsdetails = facetoface_get_booking_conflicts($dates, $currentattendees, $wheresql, $whereparams, true);
+            $users_in_conflict = array_merge($users_in_conflict, $conflictsdetails);
         }
 
         // Process the data for a custom field and validate it.
@@ -623,18 +632,25 @@ class event extends \moodleform {
         return $errors;
     }
 
+    /**
+     * The function will calculate which user is in conflicting based on the scenario's parameters.
+     * For example, if the form does not change date then there are no conflicting. Furthermore,
+     * if the event does not have any session, then there should have no conflicting.
+     *
+     * @return array
+     */
     function get_users_in_conflict() {
-        if (!($data = $this->get_data())) { // Form submitted
+        if (!($data = $this->get_data())) {
+            // Only check the conflicts if the form is already submitted
             return array();
         }
 
-        // Check for conflicts only if it's a new session or there was a change in dates or user with roles were added.
-        if ($this->session != false && $this->has_date_changed == false && $this->new_user_roles_added($data) == false) {
+        if ($this->session != false && $this->has_date_changed == false) {
+            // Check for conflicts only if it's a new session or there was a change in dates or
+            // user with roles were added.
             return array();
-        }
-
-        // If save with conflict passed then we don't need to return the users with conflicts.
-        if ($this->_customdata['savewithconflicts']) {
+        } else if ($this->_customdata['savewithconflicts']) {
+            // If save with conflict passed then we don't need to return the users with conflicts.
             return array() ;
         }
 
@@ -731,7 +747,16 @@ class event extends \moodleform {
         return array($sessiondata, $editoroptions, $defaulttimezone, $nbdays);
     }
 
+    /**
+     * This function has been deprecated and will be removed in Totara 14
+     * @param $data
+     * @return bool
+     *
+     * @deprecated Since totara 13
+     */
     public function new_user_roles_added($data) {
+        debugging("This function has been deprecated and will be removed in Totara 14", DEBUG_DEVELOPER);
+
         global $DB;
         $trainersindb = array();
         $newusersadded = false;

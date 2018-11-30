@@ -163,38 +163,6 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
         // Show sesion dates.
         $('.sessiondates').removeClass('hidden');
-
-        // Booking conflict details.
-        $('a#viewbookingconflictdetails').click(function(e) {
-            e.preventDefault();
-            var handler = new totaraDialog_handler();
-            var name = 'bookingconflictresult';
-            var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { handler._cancel(); };
-
-            // Get dates.
-            var cntdates = $('input[name="cntdates"]').val();
-            var datetimestart = [];
-            var datetimefinish = [];
-            for (var i = 0; i < cntdates; i++) {
-                datetimestart.push($('input[name="timestart[' + i + ']"]').val());
-                datetimefinish.push($('input[name="timefinish[' + i + ']"]').val());
-            }
-
-            totaraDialogs[name] = new totaraDialog(
-                name,
-                $(this).attr('id'),
-                {
-                    buttons: buttonsObj,
-                    title: '<h2>'+ M.util.get_string('bookingconflict', 'facetoface') +'</h2>',
-                },
-                M.cfg.wwwroot + '/mod/facetoface/attendees/ajax/booking_conflict.php?datetimestart=' + datetimestart +
-                '&datetimefinish=' + datetimefinish +
-                '&s=' + M.totara_f2f_room.config.sessionid +
-                '&sesskey=' + M.cfg.sesskey,
-                handler
-            );
-        });
     },
 
     init_dates: function() {

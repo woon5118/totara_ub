@@ -2956,15 +2956,20 @@ function facetoface_get_session_involvement($user, $info) {
 /**
  * Build user roles in conflict message, used when saving an event.
  *
- * @param array $users_in_conflict Array of users in conflict.
+ * @param stdClass[] $users_in_conflict Array of users in conflict.
  * @return string Message
  */
-function facetoface_build_user_roles_in_conflict_message($users_in_conflict) {
+function facetoface_build_user_in_conflict_message($users_in_conflict) {
     if (empty($users_in_conflict)) {
         return '';
     }
 
     foreach ($users_in_conflict as $user) {
+        if (property_exists($user, "name")) {
+            // Indicating that the $user was already had the attribute 'name' built.
+            $users[] = $user->name;
+            continue;
+        }
         $users[] = fullname($user);
     }
     $details = new stdClass();
@@ -3684,17 +3689,25 @@ function facetoface_get_env_session($sessionid) {
  * @param array $users Array of user objects that will be checked for booking conflicts
  * @param string $extrawhere SQL fragment to be added to the where clause in facetoface_get_sessions_within
  * @param array $extraparams Paramaters used by the $extrawhere To be used in facetoface_get_sessions_within
+ * @param bool $objreturn Pass this as true if u want an object to be returned
  * @return array The booking conflicts.
  */
-function facetoface_get_booking_conflicts(array $dates, array $users, string $extrawhere, array $extraparams) {
+function facetoface_get_booking_conflicts(array $dates, array $users, string $extrawhere, 
+                                          array $extraparams, bool $objreturn = false) {
     $bookingconflicts = array();
     foreach ($users as $user) {
         if ($availability = facetoface_get_sessions_within($dates, $user->id, $extrawhere, $extraparams)) {
-            $bookingconflicts[] = array(
+            $data = array(
                 'idnumber' => $user->idnumber,
                 'name' => fullname($user),
                 'result' => facetoface_get_session_involvement($user, $availability),
             );
+
+            if ($objreturn) {
+                $data = (object) $data;
+            }
+
+            $bookingconflicts[] = $data;
         }
     }
     return $bookingconflicts;

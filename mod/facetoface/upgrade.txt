@@ -4,6 +4,8 @@ information provided here is intended especially for developers.
 === 13.0 ===
 
 * Deprecated function facetoface_get_ical_attachment() has been removed
+* mod_facetoface\form\event::new_user_roles_added() function has been deprecated and will be removed in Totara 14
+* facetoface_build_user_roles_in_conflict_message() function has been deprecated, please use facetoface_build_user_in_conflict_message() function instead
 
 === 12.0 ===
 

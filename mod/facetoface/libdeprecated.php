@@ -3376,3 +3376,18 @@ function facetoface_check_signup($facetofaceid, $sessionid = null) {
         return false;
     }
 }
+
+/**
+ * This function has been deprecated, please call facetoface_build_user_in_conflict_message instead
+ * @param stdClass[] $user_in_conflict
+ * @deprecated since Totara 13
+ */
+function facetoface_build_user_roles_in_conflict_message($user_in_conflict) {
+    debugging(
+        "The function facetoface_build_user_roles_in_conflict_message() has been renamed " .
+        "to facetoface_build_user_in_conflict_message()",
+        DEBUG_DEVELOPER
+    );
+
+    facetoface_build_user_in_conflict_message($user_in_conflict);
+}

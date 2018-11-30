@@ -103,12 +103,13 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Booking conflict: 2 user(s) have another booking on the selected date and time. Change event time or exclude these users to continue."
+    Then I should see "Saving this event as it is will cause a scheduling conflict for 2 individual/s"
+    And I should see "Please cancel and go back to change the settings (recommended), or save with conflict."
 
-    When I click on "View details" "link"
-    Then I should see "Sam1 Student1 is already booked to attend Test seminar1 at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
-    Then I should see "Sam2 Student2 is already booked to attend Test seminar1 at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
-    Then I should not see "Sam3 Student3"
+    And I should see "Sam1 Student1"
+    And I should see "Sam2 Student2"
+
+    And I should not see "Sam3 Student3"
 
   # Create an event, add users to it and change session dates that result in conflict.
   Scenario: change event dates that result in booking conflicts
@@ -167,12 +168,13 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Booking conflict: 2 user(s) have another booking on the selected date and time. Change event time or exclude these users to continue."
+    Then I should see "Saving this event as it is will cause a scheduling conflict for 2 individual/s"
+    And I should see "Please cancel and go back to change the settings (recommended), or save with conflict."
 
-    When I click on "View details" "link"
-    Then I should see "Sam1 Student1 is already booked to attend Test seminar1 at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
-    Then I should see "Sam2 Student2 is already booked to attend Test seminar1 at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
-    Then I should not see "Sam3 Student3"
+    And I should see "Sam1 Student1"
+    And I should see "Sam2 Student2"
+
+    And I should not see "Sam3 Student3"
 
   # Create a seminar and an event with the same day than seminar1 and check it's saved because there are not booking conflicts.
   Scenario: seminar with same dates can be created if they don't lead to booking conflicts
@@ -199,7 +201,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | capacity                  | 5   |
     And I press "Save changes"
     Then I should see "1 January 2020"
-    And I should not see "Booking conflict"
+    And I should not see "scheduling conflict"
 
   # Modify an event to have the same dates than seminar1 and check it's saved because there are not booking conflicts.
   Scenario: seminar events can be modified to have same dates as others if they don't lead to booking conflicts
@@ -230,5 +232,5 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     Then I should see "1 January 2020"
-    And I should not see "Booking conflict"
+    And I should not see "scheduling conflict"
 

@@ -94,13 +94,14 @@ if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 if ($todb = $mform->process_data()) { // Form submitted
-    // Gets user scheduling conflicts for roles in the event.
     $users_in_conflict = $mform->get_users_in_conflict();
     if (empty($users_in_conflict)) {
+        // If the attendees are not conflicting and event roles are not conflicting then it is able
+        // to save into the database
         $mform->save($todb);
         redirect($returnurl);
     } else {
-        $text = facetoface_build_user_roles_in_conflict_message($users_in_conflict);
+        $text = facetoface_build_user_in_conflict_message($users_in_conflict);
         $PAGE->requires->js_call_amd('mod_facetoface/user_conflicts_confirm', 'init', array('note' => $text));
     }
 }
