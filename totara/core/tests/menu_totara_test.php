@@ -86,7 +86,7 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         $data->type = 'container';
         $data->parentid = '0';
         $data->title = 'Test container 1H';
-        $data->visibility = (string)item::VISIBILITY_SHOW;
+        $data->visibility = (string)item::VISIBILITY_HIDE;
         $container1h = helper::add_custom_menu_item($data);
 
         $data = new stdClass();
