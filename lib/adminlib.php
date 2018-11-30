@@ -7900,6 +7900,12 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
 
     if (!$actualurl) {
         $actualurl = $extpage->url;
+        $quickaccessmenuadd = true;
+    } else {
+        // Totara: The logic here is that if this is not the real admin page,
+        // then we would not be allowing bookmarking it by default.
+        // If necessary dev can add it manually later on page using correct page name.
+        $quickaccessmenuadd = false;
     }
 
     $PAGE->set_url($actualurl, $extraurlparams);
@@ -7948,7 +7954,7 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
     }
 
     // TOTARA: Add the button to add/remove current page to the quick access menu.
-    if (!$extpage->is_hidden()) {
+    if ($quickaccessmenuadd and !$extpage->is_hidden()) {
         \totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, $extpage->name);
     }
 
