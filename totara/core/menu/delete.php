@@ -34,11 +34,9 @@ require_once($CFG->dirroot . '/lib/adminlib.php');
 $id = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
-admin_externalpage_setup('totaranavigation');
+admin_externalpage_setup('totaranavigation', '', null, new moodle_url('/totara/core/menu/delete.php', array('id' => $id)));
 // Double check capability, the settings file is too far away.
 require_capability('totara/core:editmainmenu', context_system::instance());
-
-$PAGE->set_url('/totara/core/menu/delete.php', array('id' => $id));
 
 $returnurl = \totara_core\totara\menu\helper::get_admin_edit_return_url($id);
 
