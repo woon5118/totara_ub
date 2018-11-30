@@ -21,7 +21,7 @@ Feature: Test restricting Totara custom menu access with rule aggregation
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/                    |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by role" "text" in the "#fitem_id_role_enable" "css_element"

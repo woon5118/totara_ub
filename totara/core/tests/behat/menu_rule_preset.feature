@@ -18,7 +18,7 @@ Feature: Test restricting Totara custom menu access by preset rules
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/                    |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by preset rule" "text" in the "#fitem_id_preset_enable" "css_element"

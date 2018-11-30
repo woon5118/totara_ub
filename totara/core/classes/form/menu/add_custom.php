@@ -71,7 +71,7 @@ final class add_custom extends \totara_form\form {
         $this->model->add($targetattr);
         $this->model->add_clientaction(new \totara_form\form\clientaction\hidden_if($targetattr))->is_equal($type, 'container');
 
-        $this->model->add_action_buttons(true, get_string('menuitem:addnew', 'totara_core'));
+        $this->model->add_action_buttons(true, get_string('add'));
 
         $this->model->add(new \totara_form\form\element\hidden('id', PARAM_INT));
     }

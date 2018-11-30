@@ -15,7 +15,7 @@ Feature: Test visibility control of menu items
     And I set the following Totara form fields to these values:
      | Menu title | Test one |
      | Menu url address | http://totaralms.com |
-    When I press "Add new menu item"
+    When I press "Add"
     And I click on "Edit" "link" in the "Test one" "table_row"
     Then I should see "Edit menu item"
     And I should see the "Access" tab is disabled
@@ -30,7 +30,7 @@ Feature: Test visibility control of menu items
       | Menu title | Test one |
       | Menu url address | http://totaralms.com |
       | Visibility               | Use custom access rules |
-    And I press "Add new menu item"
+    And I press "Add"
     And I should see "Edit menu item"
     And I click on "Access" "link"
     And I expand all fieldsets
@@ -52,7 +52,7 @@ Feature: Test visibility control of menu items
       | Menu title | Test one |
       | Menu url address | http://totaralms.com |
       | Visibility               | Use custom access rules |
-    And I press "Add new menu item"
+    And I press "Add"
     And I should see "Edit menu item"
     And I click on "Access" "link"
     And I expand all fieldsets

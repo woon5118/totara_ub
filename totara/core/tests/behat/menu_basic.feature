@@ -10,7 +10,7 @@ Feature: A basic test of the Totara Main menu
       | Menu title               | Test item  |
       | Visibility               | Show       |
       | Menu url address         | /index.php |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I should see "Test item" in the totara menu
 
   Scenario: Reset Main menu to default with custom backup
@@ -67,7 +67,7 @@ Feature: A basic test of the Totara Main menu
       | Menu title               | Another item |
       | Visibility               | Show         |
       | Menu url address         | /index.php   |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I should see "Another item" in the totara menu
     When I click on "Move up" "link" in the "Another item" "table_row"
     Then "Another item" "link" should appear before "Test item" "link"

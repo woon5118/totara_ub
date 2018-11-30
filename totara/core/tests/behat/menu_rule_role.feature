@@ -18,7 +18,7 @@ Feature: Test restricting Totara custom menu access by roles
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/                    |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I expand all fieldsets
 
   Scenario Outline: Test visibility of menu when user has role and when user does not

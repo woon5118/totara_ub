@@ -28,7 +28,7 @@ Feature: Test restricting Totara custom menu access by audience
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/teammembers.php     |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by audience" "text" in the "#fitem_id_audience_enable" "css_element"
@@ -60,7 +60,7 @@ Feature: Test restricting Totara custom menu access by audience
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/teammembers.php     |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by audience" "text" in the "#fitem_id_audience_enable" "css_element"
@@ -98,7 +98,7 @@ Feature: Test restricting Totara custom menu access by audience
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/teammembers.php     |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by audience" "text" in the "#fitem_id_audience_enable" "css_element"
@@ -132,7 +132,7 @@ Feature: Test restricting Totara custom menu access by audience
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/teammembers.php     |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by audience" "text" in the "#fitem_id_audience_enable" "css_element"
@@ -159,7 +159,7 @@ Feature: Test restricting Totara custom menu access by audience
       | Menu title               | test item               |
       | Visibility               | Use custom access rules |
       | Menu url address         | /my/teammembers.php     |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Access" "link"
     And I expand all fieldsets
     And I click on "Restrict access by audience" "text" in the "#fitem_id_audience_enable" "css_element"

@@ -16,7 +16,7 @@ Feature: Totara menu top navigation
       | Parent item              | Find Learning   |
       | Menu title               | Extra courses   |
       | Visibility               | Show            |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
     And I click on "Add new menu item" "button"
     And I set the following Totara form fields to these values:
       | Type                     | URL             |
@@ -24,7 +24,7 @@ Feature: Totara menu top navigation
       | Menu title               | 3rd Level item  |
       | Menu url address         | /admin/user.php |
       | Visibility               | Show            |
-    And I click on "Add new menu item" "button"
+    And I click on "Add" "button"
 
   Scenario Outline: Navigation menu expanding and collapsing works on top level
     # Toggling navigation and waiting for a second is only necessary for small window size

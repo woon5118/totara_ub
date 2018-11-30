@@ -16,7 +16,7 @@ Feature: Test menu correctly highlights the course catalog page when enhanced ca
     And I set the following Totara form fields to these values:
       | Menu title | Enhanced catalog |
       | Menu url address | /totara/coursecatalog/courses.php |
-    And I press "Add new menu item"
+    And I press "Add"
     Then I should see "Enhanced catalog" in the totara menu
     When I follow "Enhanced catalog"
     Then Totara menu item "Enhanced catalog" should be highlighted

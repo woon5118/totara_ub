@@ -274,7 +274,7 @@ class behat_totara_core extends behat_base {
             $this->execute("behat_navigation::i_navigate_to_node_in", array("Main menu", "Site administration > Navigation"));
             $this->execute("behat_forms::press_button", "Add new menu item");
             $this->execute("behat_totara_form::i_set_the_following_totara_form_fields_to_these_values", $menutable);
-            $this->execute("behat_forms::press_button", "Add new menu item");
+            $this->execute("behat_forms::press_button", "Add");
             $this->execute("behat_general::assert_page_contains_text", "Edit menu item");
             $this->execute("behat_general::i_click_on", array('Access', 'link'));
             $this->execute("behat_forms::i_expand_all_fieldsets");
