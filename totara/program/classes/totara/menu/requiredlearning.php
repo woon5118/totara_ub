@@ -31,13 +31,31 @@ namespace totara_program\totara\menu;
  * @subpackage navigation
  */
 class requiredlearning extends \totara_core\totara\menu\item {
+    private $progurl;
+
+    private function get_prog_url() {
+        global $CFG, $USER;
+
+        if (!isset($this->progurl)) {
+            require_once($CFG->dirroot . '/totara/program/lib.php');
+            $this->progurl = prog_get_tab_link($USER->id);
+        }
+
+        return $this->progurl;
+    }
 
     protected function get_default_title() {
         return get_string('requiredlearningmenu', 'totara_program');
     }
 
     protected function get_default_url() {
-        return '/totara/program/required.php';
+        $progurl = $this->get_prog_url();
+        if ($progurl === false) {
+            // This is just a hint for admin UI.
+            return '/totara/program/required.php';
+        } else {
+            return $progurl;
+        }
     }
 
     public function get_default_sortorder() {
@@ -45,16 +63,12 @@ class requiredlearning extends \totara_core\totara\menu\item {
     }
 
     protected function check_visibility() {
-        global $CFG, $USER;
-
         if (!isloggedin() or isguestuser()) {
             return false;
         }
 
-        require_once($CFG->dirroot . '/totara/program/lib.php');
-        $url = prog_get_tab_link($USER->id);
-
-        if ($url === false) {
+        $progurl = $this->get_prog_url();
+        if ($progurl === false) {
             return false;
         } else {
             return true;
