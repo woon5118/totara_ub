@@ -259,12 +259,19 @@ if ($ADMIN->fulltree) {
                 $url = new moodle_url('/admin/roles/define.php', array('action' => 'edit', 'roleid' => $role['id']));
                 $a = (object)['rolename' => $role['localname'], 'shortname' => $role['shortname'], 'charlimit' => 93,
                     'link' => $url->out()];
-                $settings->add(new admin_setting_heading('auth_ldap/role_not_mapped_' . sha1($role['settingname']), '',
+                $settingname = sha1($role['settingname']);
+                $settings->add(new admin_setting_heading('auth_ldap/role_not_mapped_' . $settingname, '',
                     get_string('cannotmaprole', 'auth_ldap', $a)));
             } else {
-                $settings->add(new admin_setting_configtext('auth_ldap/' . $role['settingname'],
+                $settingname = $role['settingname'];
+                $settings->add(new admin_setting_configtext('auth_ldap/' . $settingname,
                     get_string('auth_ldap_rolecontext', 'auth_ldap', $role),
                     get_string('auth_ldap_rolecontext_help', 'auth_ldap', $role), '', PARAM_RAW_TRIMMED));
+            }
+            // Totara: make sure these settings do not pup up randomly after adding new roles,
+            //         there is no point in telling admins about them.
+            if (get_config('auth_ldap', $settingname) === false) {
+                set_config($settingname, '', 'auth_ldap');
             }
         }
 
