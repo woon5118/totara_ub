@@ -91,79 +91,89 @@ class behat_totara_core extends behat_base {
     }
 
     /**
-     * Finds a Totara Main menu item and returns the node.
+     * Finds a Totara Main menu item url.
      *
      * @param string $text
-     * @return NodeElement
+     * @return string|null node URL or null if node not found
      */
-    protected function find_totara_menu_item(string $text): NodeElement {
-        $text = behat_context_helper::escape($text);
-        // Oh well, there is no id on the main menu any more,
-        // use the data attribute instead, class would not be ok here.
-        // Unfortunately it is not easy to do exact match due to optional "Open link in new window" span.
-        $expath = "//*[@data-tw-totaranav-list]//a[starts-with(normalize-space(.),{$text})]";
-        return $this->find(
+    protected function find_totara_menu_item_href(string $text): ?string {
+        // Seriously, why is there nothing that would clearly identify the Main menu items?
+        /** @var NodeElement[] $nodes */
+        $nodes = $this->find_all(
             'xpath',
-            $expath,
-            new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession()),
-            false,
-            1 // No need to wait much here because we will not be checking visibility.
+            "//*[@data-tw-totaranav-list]//a",
+            new \Behat\Mink\Exception\ExpectationException('Totara Main menu could not be found', $this->getSession())
         );
+        $text = preg_quote($text, '/');
+        foreach ($nodes as $k => $node) {
+            $html = $node->getHtml();
+            if (preg_match("/>\\s*$text\\s*</s", $html)) {
+                $href = $node->getAttribute('href');
+                if ($href === '') {
+                    // This should not happen.
+                    return null;
+                }
+                return $href;
+            }
+        }
+        return null;
     }
 
     /**
-     * Check you can see the expected Main menu item.
+     * Check that item is accessible from the Main menu.
+     *
+     * Note: Visibility of sub menus does not matter here.
      *
      * @Given /^I should see "([^"]*)" in the totara menu$/
      */
     public function i_should_see_in_the_totara_menu($text) {
         \behat_hooks::set_step_readonly(true);
-        $this->find_totara_menu_item($text);
+        $url = $this->find_totara_menu_item_href($text);
+        if ($url === null) {
+            new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession());
+        }
+        return true;
     }
 
     /**
-     * Check the Main menu item is not there as expected.
+     * Check that item is not accessible from the Main menu.
+     *
+     * Note: Visibility of sub menus does not matter here.
      *
      * @Given /^I should not see "([^"]*)" in the totara menu$/
      */
     public function i_should_not_see_in_the_totara_menu($text) {
         \behat_hooks::set_step_readonly(true);
-        try {
-            $node = $this->find_totara_menu_item($text);
-            // Javascript needed to test visibility.
-            if ($this->running_javascript() && !$node->isVisible()) {
-                // Exists but is not visible.
-                return true;
-            }
-        } catch (\Behat\Mink\Exception\ExpectationException $ex) {
-            // Does not exist.
+        $url = $this->find_totara_menu_item_href($text);
+        if ($url === null) {
             return true;
         }
-
-        throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" has been found and is visible', $this->getSession());
+        throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" has been found', $this->getSession());
     }
 
     /**
-     * Click on an item in the totara Main menu.
+     * Click on an item in the Main menu.
+     *
+     * Note: Visibility of sub menus does not matter here.
      *
      * @Given /^I click on "([^"]*)" in the totara menu$/
      */
     public function i_click_on_in_the_totara_menu($text) {
-        global $CFG;
-
         \behat_hooks::set_step_readonly(false);
 
         // Double check we are not interrupting any pending action.
         $this->wait_for_pending_js();
 
-        $node = $this->find_totara_menu_item($text);
-        $href = $this->locate_path($node->getAttribute('href'));
-        if (!$href or $href === '#' or $href === $CFG->wwwroot . '/#') {
-            // Detect incorrect attempts to click on containers.
+        $url = $this->find_totara_menu_item_href($text);
+        if ($url === null) {
+            new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession());
+        }
+
+        if ($url === '#') {
             throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" is a Parent, you need to specify item with URL instead', $this->getSession());
         }
-        $this->getSession()->visit($href);
 
+        $this->getSession()->visit($this->locate_path($url));
         $this->wait_for_pending_js();
     }
 

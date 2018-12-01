@@ -316,7 +316,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
 
     # Seeing the certification catalog as sys manager.
     When I log in as "sysmanager"
-    And I click on "Certification" in the totara menu
+    And I click on "Certifications" in the totara menu
     Then I should see "top" in the ".subcategories" "css_element"
     And I should see "cat1" in the ".subcategories" "css_element"
 
