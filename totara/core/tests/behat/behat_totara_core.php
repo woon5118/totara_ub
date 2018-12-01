@@ -100,7 +100,8 @@ class behat_totara_core extends behat_base {
         $text = behat_context_helper::escape($text);
         // Oh well, there is no id on the main menu any more,
         // use the data attribute instead, class would not be ok here.
-        $expath = "//*[@data-tw-totaranav-list]//a[normalize-space(.)={$text}]";
+        // Unfortunately it is not easy to do exact match due to optional "Open link in new window" span.
+        $expath = "//*[@data-tw-totaranav-list]//a[starts-with(normalize-space(.),{$text})]";
         return $this->find(
             'xpath',
             $expath,
