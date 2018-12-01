@@ -367,9 +367,9 @@ $string['menuitem:presetwithaccess_help'] = 'This criteria allows you to restric
 How these rules are required is determined by the **Preset rule aggregation** setting. If it is set to **all** then the user must meet all of the selected criteria. If it is set to **any** the user must meet only one of the selected criteria.';
 $string['menuitem:presetaggregation'] = 'Preset rule aggregation';
 $string['menuitem:presetaggregation_help'] = 'Determines whether the user must meet all of the selected preset rules, or any of the selected preset rules.';
-$string['menuitem:resetbackupcustom'] = 'Hidden from menu and available in menu settings';
+$string['menuitem:resetbackupcustom'] = 'hidden from menu and available in menu settings';
 $string['menuitem:resetcustomoption'] = 'All custom items will be';
-$string['menuitem:resetdeletecustom'] = 'Permanently deleted';
+$string['menuitem:resetdeletecustom'] = 'permanently deleted';
 $string['menuitem:resettodefault'] = 'Reset menu to default configuration';
 $string['menuitem:resettodefaultcomplete'] = 'Main menu has been reset to default configuration.';
 $string['menuitem:resetwarnign'] = 'You are about to reset the Main menu to its default configuration.';

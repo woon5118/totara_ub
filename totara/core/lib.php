@@ -638,17 +638,7 @@ function totara_menu_table_load(html_table &$table, $item = null, $depth = 0, $u
                         array('id' => $unuseditem->id)), $unuseditem->currenttitle, $attributes);
                 }
 
-                if (!$node) {
-                    $itemvisibility = '';
-                } else if ($node->is_disabled()) {
-                    $itemvisibility = get_string('menuitem:typedisabled', 'totara_core');
-                } else {
-                    $itemvisibility = $node->get_visibility_description();
-                }
-
-                if ($itemvisibility !== '') {
-                    $itemvisibility = '<span class="dimmed_text">' . $itemvisibility . '</span>';
-                }
+                $itemvisibility = '<span class="dimmed_text">' . get_string('unused', 'totara_core') . '</span>';
 
                 $icons = array();
 

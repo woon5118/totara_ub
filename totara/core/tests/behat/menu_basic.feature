@@ -17,7 +17,7 @@ Feature: A basic test of the Totara Main menu
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Reset menu to default configuration" "button"
     And I set the following Totara form fields to these values:
-      | All custom items will be | Hidden from menu and available in menu settings |
+      | All custom items will be | hidden from menu and available in menu settings |
     And I press "Reset"
     Then I should see "Main menu has been reset to default configuration"
     And I should not see "Test item" in the totara menu
@@ -27,7 +27,7 @@ Feature: A basic test of the Totara Main menu
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Reset menu to default configuration" "button"
     And I set the following Totara form fields to these values:
-      | All custom items will be | Permanently deleted |
+      | All custom items will be | permanently deleted |
     And I press "Reset"
     Then I should see "Main menu has been reset to default configuration"
     And I should not see "Test item" in the totara menu
