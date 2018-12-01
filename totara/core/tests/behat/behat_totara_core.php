@@ -146,6 +146,8 @@ class behat_totara_core extends behat_base {
      * @Given /^I click on "([^"]*)" in the totara menu$/
      */
     public function i_click_on_in_the_totara_menu($text) {
+        global $CFG;
+
         \behat_hooks::set_step_readonly(false);
 
         // Double check we are not interrupting any pending action.
@@ -153,7 +155,8 @@ class behat_totara_core extends behat_base {
 
         $node = $this->find_totara_menu_item($text);
         $href = $this->locate_path($node->getAttribute('href'));
-        if (!$href) {
+        if (!$href or $href === '#' or $href === $CFG->wwwroot . '/#') {
+            // Detect incorrect attempts to click on containers.
             throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" is a Parent, you need to specify item with URL instead', $this->getSession());
         }
         $this->getSession()->visit($href);
