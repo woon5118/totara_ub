@@ -19,7 +19,6 @@ Feature: An admin can create or update courses with visible fields using a CSV f
     And I should see "Courses total: 3"
     And I should see "Courses created: 3"
     And I should see "Courses errors: 0"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I should see "Course 1"
     And I should see "Course 2"
@@ -27,29 +26,24 @@ Feature: An admin can create or update courses with visible fields using a CSV f
     When I follow "Course 1"
     And I navigate to "Edit settings" node in "Course administration"
     Then the field "visible" matches value "Hide"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     When I follow "Course 2"
     And I navigate to "Edit settings" node in "Course administration"
     Then the field "visible" matches value "Show"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     When I follow "Course 3"
     And I navigate to "Edit settings" node in "Course administration"
     Then the field "visible" matches value "Hide"
     When I set the following administration settings values:
       | Enable audience-based visibility | 1 |
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I navigate to "Edit settings" node in "Course administration"
     Then the field "Visibility" matches value "All users"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Edit settings" node in "Course administration"
     Then the field "Visibility" matches value "No users"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I navigate to "Edit settings" node in "Course administration"
@@ -70,7 +64,6 @@ Feature: An admin can create or update courses with visible fields using a CSV f
     And I should see "Courses total: 3"
     And I should see "Courses created: 3"
     And I should see "Courses errors: 0"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I should see "Course 1"
     And I should see "Course 2"
@@ -78,12 +71,10 @@ Feature: An admin can create or update courses with visible fields using a CSV f
     When I follow "Course 1"
     And I navigate to "Edit settings" node in "Course administration"
     Then the field "Visibility" matches value "No users"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I navigate to "Edit settings" node in "Course administration"
     Then the field "Visibility" matches value "No users"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I navigate to "Edit settings" node in "Course administration"

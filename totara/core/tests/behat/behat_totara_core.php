@@ -91,58 +91,42 @@ class behat_totara_core extends behat_base {
     }
 
     /**
-     * Finds a totara menu item and returns the node.
+     * Finds a Totara Main menu item and returns the node.
      *
      * @param string $text
-     * @param bool $submenu
-     * @param bool $dropdown
      * @return NodeElement
-     * @throws ExpectationException
      */
-    protected function find_totara_menu_item(string $text, bool $submenu = false, bool $dropdown = false): NodeElement {
+    protected function find_totara_menu_item(string $text): NodeElement {
+        $text = behat_context_helper::escape($text);
+        // Oh well, there is no id on the main menu any more,
+        // use the data attribute instead, class would not be ok here.
+        $expath = "//*[@data-tw-totaranav-list]//a[contains(normalize-space(.),{$text})]";
         return $this->find(
             'xpath',
-            $this->get_totara_menu_item_xpath($text, $submenu, $dropdown),
+            $expath,
             new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession())
         );
     }
 
     /**
-     * @param string $text
-     * @param bool $submenu
-     * @param bool $dropdown
-     * @return string
+     * Check you can see the expected Main menu item.
+     *
+     * @Given /^I should see "([^"]*)" in the totara menu$/
      */
-    protected function get_totara_menu_item_xpath(string $text, bool $submenu = false, bool $dropdown = false): string {
-        $text = behat_context_helper::escape($text);
-        $dropdown_xpath = $dropdown ? "//ul[contains(concat(' ', normalize-space(@class), ' '), ' navExpand--list ')]" : '';
-        $submenu_xpath = $submenu ? "//li[contains(concat(' ', normalize-space(@class), ' '), ' totaraNav_sub--list_item ')]" : '';
-        return "//*[@class = 'totaraNav']{$submenu_xpath}{$dropdown_xpath}//a[contains(normalize-space(.),{$text})]";
+    public function i_should_see_in_the_totara_menu($text) {
+        \behat_hooks::set_step_readonly(true);
+        $this->find_totara_menu_item($text);
     }
 
     /**
-     * Check you can see the expected menu item.
+     * Check the Main menu item is not there as expected.
      *
-     * @Given /^I should see "([^"]*)" in the totara(| sub) menu(| drop down list)$/
+     * @Given /^I should not see "([^"]*)" in the totara menu$/
      */
-    public function i_should_see_in_the_totara_menu($text, $submenu, $dropdown) {
+    public function i_should_not_see_in_the_totara_menu($text) {
         \behat_hooks::set_step_readonly(true);
-        $submenu = !empty($submenu);
-        $dropdown = !empty($dropdown);
-        $this->find_totara_menu_item($text, $submenu, $dropdown);
-    }
-
-    /**
-     * Check the menu item is not there as expected.
-     *
-     * @Given /^I should not see "([^"]*)" in the totara(| sub) menu(| drop down list)$/
-     */
-    public function i_should_not_see_in_the_totara_menu($text, $submenu, $dropdown) {
-        \behat_hooks::set_step_readonly(true);
-        $submenu = !empty($submenu);
-        $dropdown = !empty($dropdown);
         try {
-            $node = $this->find_totara_menu_item($text, $submenu, $dropdown);
+            $node = $this->find_totara_menu_item($text);
             // Javascript needed to test visibility.
             if ($this->running_javascript() && !$node->isVisible()) {
                 // Exists but is not visible.
@@ -157,33 +141,28 @@ class behat_totara_core extends behat_base {
     }
 
     /**
-     * Click on an item in the totara menu.
+     * Click on an item in the totara Main menu.
      *
-     * @Given /^I click on "([^"]*)" in the totara(| sub) menu$/
+     * @Given /^I click on "([^"]*)" in the totara menu$/
      */
-    public function i_click_on_in_the_totara_menu($text, $submenu = '') {
+    public function i_click_on_in_the_totara_menu($text) {
         \behat_hooks::set_step_readonly(false);
-        $submenu = !empty($submenu);
-        $node = $this->find_totara_menu_item($text, $submenu);
 
-        // If it's an invisible submenu item, click on the parent item first.
-        // This is a short cut for second level items. For third level items just do separate menu clicks in the behat feature (or extend this if it's worthwhile).
-        if (strpos($node->getAttribute('class'), 'navExpand--list_item_link') !== false && $this->running_javascript() && !$node->isVisible()) {
-            $top_item_xpath = $this->get_totara_menu_item_xpath($text) . "/ancestor::li[contains(concat(' ', normalize-space(@class), ' '), ' totaraNav_prim--list_item ')]//a";
-            $top_item_node = $this->find(
-                'xpath',
-                $top_item_xpath,
-                new \Behat\Mink\Exception\ExpectationException('Totara menu top item for "'.$text.'" with xpath "'.$top_item_xpath.'" could not be found.', $this->getSession())
-            );
-            $top_item_node->click();
-            $this->wait_for_pending_js();
+        // Double check we are not interrupting any pending action.
+        $this->wait_for_pending_js();
+
+        $node = $this->find_totara_menu_item($text);
+        $href = $this->locate_path($node->getAttribute('href'));
+        if (!$href) {
+            throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" is a Parent, you need to specify item with URL instead', $this->getSession());
         }
-        $node->click();
+        $this->getSession()->visit($href);
+
         $this->wait_for_pending_js();
     }
 
     /**
-     * Checks that the specified menu item is or isn't highlighted/expanded.
+     * Checks that the specified Main menu item is or isn't highlighted/expanded.
      *
      * @Then /^Totara (|sub )menu(| drop down list) item "([^"]*)" should (|not )be (highlighted|expanded)$/
      * @param string $submenu
@@ -200,7 +179,16 @@ class behat_totara_core extends behat_base {
          $dropdown = !empty($dropdown);
          $should_be = empty($should_be);
 
-         $a_node = $this->find_totara_menu_item($text, $submenu, $dropdown);
+         // Do not over-complicate everything else just because if this method!
+         $text = behat_context_helper::escape($text);
+         $dropdown_xpath = $dropdown ? "//ul[contains(concat(' ', normalize-space(@class), ' '), ' navExpand--list ')]" : '';
+         $submenu_xpath = $submenu ? "//li[contains(concat(' ', normalize-space(@class), ' '), ' totaraNav_sub--list_item ')]" : '';
+         $a_node = $this->find(
+             'xpath',
+             "//*[@class = 'totaraNav']{$submenu_xpath}{$dropdown_xpath}//a[contains(normalize-space(.),{$text})]",
+             new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession())
+         );
+
          $li_node = $a_node->getParent();
 
          if ($highlighted_or_expanded === 'expanded') {

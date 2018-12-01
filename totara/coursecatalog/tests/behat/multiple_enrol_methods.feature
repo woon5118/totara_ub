@@ -81,7 +81,6 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
 
   Scenario: Self-enrolment through course catalog requiring a group enrolment key or guest access or seminar
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I set the following fields to these values:
@@ -93,7 +92,6 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
     And I log out
 
     When I log in as "student2"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "Guest access"
@@ -104,7 +102,6 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
     And I log out
 
     When I log in as "student3"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"

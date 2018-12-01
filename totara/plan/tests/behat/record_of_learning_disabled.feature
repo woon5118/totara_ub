@@ -1,4 +1,4 @@
-@totara @totara_plan @totara_rol @javascript
+@totara @totara_plan @totara_rol @javascript @totara_core_menu
 Feature: Check Record of Learning feature visibility
   In order to control access to RoL
   As an admin

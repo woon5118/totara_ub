@@ -30,7 +30,6 @@ Feature: Disabling approval options in global settings would
     And I set the following fields to these values:
       | id_s__facetoface_approvaloptions_approval_role_10 | 1 |
     And I click on "Save changes" "button"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course101"
     And I turn editing mode on
@@ -41,7 +40,6 @@ Feature: Disabling approval options in global settings would
     And I set the following fields to these values:
       | id_s__facetoface_approvaloptions_approval_role_10 | 0 |
     And I click on "Save changes" "button"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course101"
     And I follow "Seminar 1"

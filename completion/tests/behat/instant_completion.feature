@@ -52,7 +52,6 @@ Feature: Instant completion
     And I set the following fields to these values:
       | Quiz - Test quiz name | 1 |
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Course 2" "link"
     And completion tracking is "Enabled" in current course
@@ -77,7 +76,6 @@ Feature: Instant completion
       | Quiz - Test quiz name2   | 1 |
       | id_criteria_course_value | Miscellaneous / Course 1 |
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Course 3" "link"
     And completion tracking is "Enabled" in current course
@@ -106,7 +104,6 @@ Feature: Instant completion
       | user     | program  |
       | student1 | program1 |
     And I log in as "admin"
-    And I click on "Find Learning" in the totara menu
     And I click on "Programs" in the totara menu
     And I click on "Program1" "link"
     And I press "Edit program details"
@@ -126,7 +123,6 @@ Feature: Instant completion
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Course 2" "link"
     And I follow "Test quiz name2"
@@ -137,7 +133,6 @@ Feature: Instant completion
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "10.00 out of 10.00"
 
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Course 1" "link"
     And I follow "Test quiz name"
@@ -148,7 +143,6 @@ Feature: Instant completion
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "10.00 out of 10.00"
 
-    When I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Course 3" "link"
     And I follow "Test assignment name"

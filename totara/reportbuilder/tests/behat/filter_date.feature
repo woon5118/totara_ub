@@ -123,7 +123,6 @@ Feature: Use the reportbuilder date filter
     And I log in as "admin"
     And I set the following administration settings values:
       | Catalogue type | enhanced |
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I press "Edit this report"
     And I switch to "Filters" tab
@@ -137,7 +136,6 @@ Feature: Use the reportbuilder date filter
     And I set the following fields to these values:
       | Timezone | Europe/London |
     And I press "Update profile"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I set the following fields to these values:
       | course-startdate_sck        | 1       |
@@ -177,7 +175,6 @@ Feature: Use the reportbuilder date filter
     And I set the following fields to these values:
       | Timezone | America/Los_Angeles |
     And I press "Update profile"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I set the following fields to these values:
       | course-startdate_sck        | 1       |
@@ -217,7 +214,6 @@ Feature: Use the reportbuilder date filter
     And I set the following fields to these values:
       | Timezone | Pacific/Auckland |
     And I press "Update profile"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I set the following fields to these values:
       | course-startdate_sck        | 1       |
@@ -256,7 +252,6 @@ Feature: Use the reportbuilder date filter
     And I log in as "admin"
     And I set the following administration settings values:
       | Catalogue type | enhanced |
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"
     And I switch to "Filters" tab
@@ -275,7 +270,6 @@ Feature: Use the reportbuilder date filter
     And I log in as "admin"
     And I set the following administration settings values:
       | Catalogue type | enhanced |
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"
     And I switch to "Filters" tab

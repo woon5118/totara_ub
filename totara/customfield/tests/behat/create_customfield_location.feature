@@ -41,8 +41,7 @@ Feature: Administrators can add a custom location field to complete during room 
     And I click on "Save changes" "button"
 
   Scenario: Test custom location field
-    Given I click on "Find Learning" in the totara menu
-    And I click on "Courses" in the totara menu
+    Given I click on "Courses" in the totara menu
     And I click on "Create Course" "button"
     And I expand all fieldsets
     # Check the defaults

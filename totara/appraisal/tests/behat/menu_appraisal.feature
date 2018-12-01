@@ -1,5 +1,5 @@
 @totara @totara_appraisal @totara_core_menu
-Feature: Test Appraisals menu item
+Feature: Test Appraisals Main menu item
   In order to use Appraisals menu item
   As an admin
   I must be able to cofigure it

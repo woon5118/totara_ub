@@ -1,4 +1,4 @@
-@totara @totara_catalog @javascript
+@totara @totara_catalog @javascript @totara_core_menu
 Feature: Admin can set catalog type in Advanced features
   As an administrator
   I need to be able to set the catalog type
@@ -13,10 +13,9 @@ Feature: Admin can set catalog type in Advanced features
       | Catalogue type   | moodle |
     And I navigate to "Courses" node in site administration
     Then I should not see "Configure catalogue"
-    When I click on "Find Learning" in the totara menu
-    Then I should see "Courses" in the totara menu drop down list
-    And I should see "Programs" in the totara menu drop down list
-    And I should see "Certifications" in the totara menu drop down list
+    And I should see "Courses" in the totara menu
+    And I should see "Programs" in the totara menu
+    And I should see "Certifications" in the totara menu
     When I click on "Courses" in the totara menu
     Then I should see the "moodle" catalog page
 
@@ -24,10 +23,9 @@ Feature: Admin can set catalog type in Advanced features
       | Catalogue type   | enhanced |
     And I navigate to "Courses" node in site administration
     Then I should not see "Configure catalogue"
-    When I click on "Find Learning" in the totara menu
-    Then I should see "Courses" in the totara menu drop down list
-    And I should see "Programs" in the totara menu drop down list
-    And I should see "Certifications" in the totara menu drop down list
+    And I should see "Courses" in the totara menu
+    And I should see "Programs" in the totara menu
+    And I should see "Certifications" in the totara menu
     And I click on "Courses" in the totara menu
     Then I should see the "enhanced" catalog page
 

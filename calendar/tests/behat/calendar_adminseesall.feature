@@ -52,7 +52,6 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 2"
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -76,7 +75,6 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 3"
     And I add a "Seminar" to section "1" and I fill the form with:

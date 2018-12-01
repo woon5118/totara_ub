@@ -26,7 +26,6 @@ Feature: Test notification templates according TL-10404
     And I click on "Save changes" "button"
     When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "0"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 10404"
     And I follow "Seminar TL-10404"
@@ -37,7 +36,6 @@ Feature: Test notification templates according TL-10404
   @javascript
   Scenario: Changing default Manager Copy value using Update all activities will affect all F2F activities notifications
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 10404"
     And I follow "Seminar TL-10404"
@@ -52,7 +50,6 @@ Feature: Test notification templates according TL-10404
       | ccmanager             | 0 |
       | Update all activities | 1 |
     And I click on "Save changes" "button"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 10404"
     And I follow "Seminar TL-10404"

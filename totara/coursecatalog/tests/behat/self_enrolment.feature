@@ -39,7 +39,6 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I press "Enrol"
@@ -56,7 +55,6 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     Given I log in as "admin"
     And I set the following administration settings values:
       | forcelogin | 0 |
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add "Self enrolment" enrolment method with:

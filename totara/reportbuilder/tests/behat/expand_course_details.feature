@@ -68,7 +68,6 @@ Feature: Test expand course details in Reportbuilder
 
   Scenario: Expand course detail in coursecatalog with filters
     Given I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
@@ -91,7 +90,6 @@ Feature: Test expand course details in Reportbuilder
   @_alert
   Scenario: Expand course detail in coursecatalog with all filters disabled
     Given I log in as "admin"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I press "Edit this report"
     And I switch to "Filters" tab
@@ -102,7 +100,6 @@ Feature: Test expand course details in Reportbuilder
     And I log out
 
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
     Then I should see "Seminar direct enrolment"

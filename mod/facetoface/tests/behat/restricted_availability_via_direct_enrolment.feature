@@ -20,7 +20,6 @@ Feature: Seminar availability based on activity completion using direct enrolmen
     And I navigate to "Seminar direct enrolment" node in "Site administration > Plugins > Enrolments"
     And I select "Yes" from the "Enable existing enrolments" singleselect
     And I click on "Save changes" "button"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add "Seminar direct enrolment" enrolment method with:
@@ -51,7 +50,6 @@ Feature: Seminar availability based on activity completion using direct enrolmen
     And I press "Save changes"
 
     # Create a Seminar and add restriction so it won't be available until the first activity is marked as completed.
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I add a "Seminar" to section "1"
@@ -84,7 +82,6 @@ Feature: Seminar availability based on activity completion using direct enrolmen
 
   Scenario: Signup link is not available when availabilty conditions are not met when using seminar direct enrolment
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should not see "Sign up"
@@ -98,7 +95,6 @@ Feature: Seminar availability based on activity completion using direct enrolmen
     Given the following config values are set as admin:
       | enableavailability  | 0 |
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should see "Test seminar 1"
@@ -114,7 +110,6 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | user     | course | role           |
       | student1 | C1     | student        |
     And I log in as "student1"
-    And I click on "Find Learning" in the totara menu
     And I click on "Courses" in the totara menu
     When I follow "Course 1"
     Then I should see "Available seminar"
