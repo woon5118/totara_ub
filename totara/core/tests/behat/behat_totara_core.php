@@ -105,7 +105,9 @@ class behat_totara_core extends behat_base {
         return $this->find(
             'xpath',
             $expath,
-            new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession())
+            new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession()),
+            false,
+            1 // No need to wait much here because we will not be checking visibility.
         );
     }
 
