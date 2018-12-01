@@ -27,25 +27,11 @@ namespace totara_core\totara\menu;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class to store, render and manage totara navigation category
- *
- * @property-read int $id
- * @property-read int $parentid
- * @property-read string $title
- * @property-read string $url
- * @property-read string $classname
- * @property-read int $sortorder
- * @property-read int $depth
- * @property-read string $path
- * @property-read int $custom
- * @property-read int $customtitle
- * @property-read int $visibility
- * @property-read int $timemodified
+ * This class was originally used to update edit menu items,
+ * existing references to class constants will have to be updated
+ * to use matching constants in item class.
  *
  * @deprecated since Totara 12.0
- *
- * @package    totara_core
- * @subpackage navigation
  */
 class menu implements \renderable, \IteratorAggregate {
 
@@ -57,10 +43,29 @@ class menu implements \renderable, \IteratorAggregate {
     // Database menu item - delete is allowed
     const DB_ITEM = 1;
 
-    // Visibility values.
+    /**
+     * Use item::VISIBILITY_HIDE instead
+     * @deprecated since Totara 12.0
+     * @var int
+     */
     const HIDE_ALWAYS = 0;
+    /**
+     * Use item::VISIBILITY_SHOW instead
+     * @deprecated since Totara 12.0
+     * @var int
+     */
     const SHOW_ALWAYS = 1;
-    const SHOW_WHEN_REQUIRED = 2;
+    /**
+     * Use item::VISIBILITY_SHOW instead
+     * @deprecated since Totara 12.0
+     * @var int
+     */
+    const SHOW_WHEN_REQUIRED = 2; // Use
+    /**
+     * Use item::VISIBILITY_CUSTOM instead
+     * @deprecated since Totara 12.0
+     * @var int
+     */
     const SHOW_CUSTOM = 3;
 
     // Maximum number of levels of menu items.
@@ -81,9 +86,17 @@ class menu implements \renderable, \IteratorAggregate {
      */
     const AGGREGATION_ALL = 1;
 
-    // The target attribute specifies where to open the linked document.
-    // Default _self, no target attribute
+    /**
+     * Use '' or '_self' string instead.
+     * @deprecated since Totara 12.0
+     * @var string
+     */
     const TARGET_ATTR_SELF = '_self';
+    /**
+     * Use '_blank' string instead.
+     * @deprecated since Totara 12.0
+     * @var string
+     */
     const TARGET_ATTR_BLANK = '_blank';
 
     /**
@@ -212,8 +225,9 @@ class menu implements \renderable, \IteratorAggregate {
     }
 
     /**
-     * Constructor.
-     * Constructor is protected, use totara_core_menu::get($id) to retrieve category.
+     * Use item::create_instance() instead.
+     *
+     * @deprecated since Totara 12.0
      *
      * @param \stdClass $record from DB (may not contain all fields)
      */
@@ -227,15 +241,15 @@ class menu implements \renderable, \IteratorAggregate {
     }
 
     /**
-     * Returns totara_core_menu object for requested category.
-     * If id is 0, the pseudo object for root category is returned (convenient
-     * for calling other functions such as get_children()).
+     * Use item and helper classes instead.
+     *
+     * @deprecated since Totara 12.0
      *
      * @param int $id category id
      * @return null|menu
-     * @throws \moodle_exception
      */
     public static function get($id = 0) {
+        debugging('menu class was deprecated, use helper or item class instead', DEBUG_DEVELOPER);
         if (!$id) {
             if (!isset(self::$menucat0)) {
                 $record = new \stdClass();
@@ -269,17 +283,8 @@ class menu implements \renderable, \IteratorAggregate {
     /**
      * Creates a new category from raw data.
      *
-     * Data sample
-     * @global \moodle_database $DB
-     * @param array|\stdClass $data
-     * $data->title = 'New parent|child node title';
-     * $data->url = '/totara/core/tm_sync4.php';
-     * $data->parentid = 0|19;
-     * $data->classname = null|'your_class_name';
-     * $data->custom = 0;
-     * $data->customtitle = 0;
-     * $data->visibility = 2;
-     * $data->targetattr = _self;
+     * @deprecated since Totara 12.0
+     *
      * @return bool
      */
     public static function sync($data) {
@@ -512,7 +517,7 @@ class menu implements \renderable, \IteratorAggregate {
      */
     public static function reset_menu() {
         debugging('menu::reset_menu() is deprecated, use helper::reset_menu() instead.', DEBUG_DEVELOPER);
-        helper::reset_menu();
+        helper::reset_menu(false);
     }
 
     /**
