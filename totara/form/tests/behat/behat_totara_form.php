@@ -294,13 +294,29 @@ class behat_totara_form extends behat_base {
         }
 
         try {
-            $this->find(
+            $node = $this->find(
                 'xpath',
                 $xpath,
                 new ExpectationException("Totara form {$form_item} '{$text}' could not be found", $this->getSession()),
                 false,
                 $timeout
             );
+            if (!$should_be_displayed) {
+                throw new ExpectationException(
+                    "Totara form {$form_item} '{$text}' has been found when it shouldn't have been.",  $this->getSession()
+                );
+            }
+
+            if ($this->running_javascript()) {
+                if (!$node->isVisible()) {
+                    throw new ExpectationException(
+                        "Totara form {$form_item} '{$text}' has been found but is not visible.",  $this->getSession()
+                    );
+                }
+            }
+
+            return true;
+
         } catch (ExpectationException $e) {
             if (!$should_be_displayed) {
                 return true;
@@ -308,14 +324,6 @@ class behat_totara_form extends behat_base {
                 throw $e;
             }
         }
-
-        if (!$should_be_displayed) {
-            throw new ExpectationException(
-                "Totara form {$form_item} '{$text}' has been found when it shouldn't have been.",
-                $this->getSession()
-            );
-        }
-        return true;
     }
 
     /**
