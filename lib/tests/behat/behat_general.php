@@ -1367,18 +1367,18 @@ class behat_general extends behat_base {
             $tbodyheaderxpath = "tbody/tr[1]/td[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
                     $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])]";
 
-            // Check if column exists.
-            $columnheaderxpath = $tablexpath . "[" . $theadheaderxpath . " | " . $tbodyheaderxpath . "]";
+            // Totara: Moodle stuff was not working properly, so let's make this easier by looking up the column number instead.
+            $columnheaderxpath = "$tablexpath/$theadheaderxpath | $tablexpath/$tbodyheaderxpath";
             $columnheader = $this->getSession()->getDriver()->find($columnheaderxpath);
             if (empty($columnheader)) {
                 $columnexceptionmsg = $column . '" in table "' . $table . '"';
                 throw new ElementNotFoundException($this->getSession(), "\n$columnheaderxpath\n\n".'Column', null, $columnexceptionmsg);
             }
-            // Following conditions were considered before finding column count.
-            // 1. Table header can be in thead/tr/th or tbody/tr/td[1].
-            // 2. First column can have th (Gradebook -> user report), so having lenient sibling check.
-            $columnpositionxpath = "/child::*[position() = count(" . $tablexpath . "/" . $theadheaderxpath .
-                "/preceding-sibling::*) + 1]";
+            /** @var \Behat\Mink\Element\NodeElement $columnheader */
+            $columnheader = reset($columnheader);
+            $preceding = $this->getSession()->getDriver()->find($columnheader->getXpath() . '/preceding-sibling::*');
+            $position = count($preceding) + 1;
+            $columnpositionxpath = "/child::*[position() = $position]";
         }
 
         // Check if value exists in specific row/column.
