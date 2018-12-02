@@ -77,7 +77,7 @@ Feature: Create and use multichoice option collections
     # Create some data
     When I log out
     And I log in as "learner1"
-    And I click on "Appraisal" in the totara menu
+    And I click on "Latest Appraisal" in the totara menu
     And I press "Start"
     And I click on "//legend/a[text()='Multi-choice question one']/ancestor::fieldset//select/option[text()='Two']" "xpath_element"
     And I click on "//legend/a[text()='Multi-choice question two']/ancestor::fieldset//select/option[text()='Three']" "xpath_element"

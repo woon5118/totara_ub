@@ -130,7 +130,7 @@ class behat_totara_core extends behat_base {
         \behat_hooks::set_step_readonly(true);
         $url = $this->find_totara_menu_item_href($text);
         if ($url === null) {
-            new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession());
+            throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession());
         }
         return true;
     }
@@ -166,7 +166,7 @@ class behat_totara_core extends behat_base {
 
         $url = $this->find_totara_menu_item_href($text);
         if ($url === null) {
-            new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession());
+            throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession());
         }
 
         if ($url === '#') {
