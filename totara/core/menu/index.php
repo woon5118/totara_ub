@@ -111,10 +111,8 @@ $event->trigger();
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('menuitem:mainmenu', 'totara_core'));
 
-echo '<div class="buttons">';
 $editurl = new moodle_url('/totara/core/menu/edit.php', array('id' => '0'));
 echo $OUTPUT->single_button($editurl, get_string('menuitem:addnew', 'totara_core'), 'get');
-echo '</div>';
 
 // Print table header.
 $table = new html_table;
@@ -139,11 +137,9 @@ $table->data = array();
 totara_menu_table_load($table);
 echo html_writer::table($table);
 
-echo '<div class="buttons">';
 $editurl = new moodle_url('/totara/core/menu/edit.php', array('id' => '0'));
 echo $OUTPUT->single_button($editurl, get_string('menuitem:addnew', 'totara_core'), 'get');
 $reseturl = new moodle_url('/totara/core/menu/index.php', array('reset' => 1));
 echo $OUTPUT->single_button($reseturl, get_string('menuitem:resettodefault', 'totara_core'), 'get');
-echo '</div>';
 
 echo $OUTPUT->footer();
