@@ -268,7 +268,7 @@ if ($ADMIN->fulltree) {
                     get_string('auth_ldap_rolecontext', 'auth_ldap', $role),
                     get_string('auth_ldap_rolecontext_help', 'auth_ldap', $role), '', PARAM_RAW_TRIMMED));
             }
-            // Totara: make sure these settings do not pup up randomly after adding new roles,
+            // Totara: make sure these settings do not pop up randomly after adding new roles,
             //         there is no point in telling admins about them.
             if (get_config('auth_ldap', $settingname) === false) {
                 set_config($settingname, '', 'auth_ldap');
