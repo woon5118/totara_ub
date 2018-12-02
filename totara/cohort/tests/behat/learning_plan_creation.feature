@@ -114,7 +114,7 @@ Feature: Learning plans can be created for members of an audience.
     When I switch to "Learning Plan" tab
     Then the following should exist in the "cohortplancreatehistory" table:
       | Template                 | User       | Plan status | Number of affected users |
-      | Learning plan template 1 | Admin User | Draft       | 2                        |
+      | Learning plan template 1 | Admin User | Draft       | 1                        |
     And I log out
     When I log in as "learner1"
     And I click on "Dashboard" in the totara menu

@@ -66,7 +66,7 @@ Feature: Per user visibility of user report source custom field values
       | Is this field required       | No                  |
       | Is this field locked         | No                  |
       | Should the data be unique    | No                  |
-      | Who is this field visible to | Visible to everyone |
+      | Who is this field visible to | Restricted visibility |
       | Start year                   | 2000                |
       | Include time?                | 1                   |
     And I press "Save changes"
