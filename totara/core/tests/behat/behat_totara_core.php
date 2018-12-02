@@ -305,6 +305,29 @@ class behat_totara_core extends behat_base {
     }
 
     /**
+     * Break some menu items fo testing.
+     *
+     * @Given /^I use magic for Main menu to make invalid menu items$/
+     */
+    public function magic_for_invalid_main_menu_items() {
+        global $DB;
+
+        $dualitem = $DB->get_record('totara_navigation', array('title' => 'Dual item'), '*', MUST_EXIST);
+        $orphaneditem = $DB->get_record('totara_navigation', array('title' => 'Orphaned item'), '*', MUST_EXIST);
+        $orphaneditem->parentid = $dualitem->id;
+        $DB->update_record('totara_navigation', $orphaneditem);
+
+        $uninstalleditem = $DB->get_record('totara_navigation', array('title' => 'Uninstalled item'), '*', MUST_EXIST);
+        $uninstalleditem->classname = '\some_plugin\totara\menu\someitem';
+        $uninstalleditem->custom = 0;
+        $uninstalleditem->customtitle = 0;
+        $uninstalleditem->url = '';
+        $DB->update_record('totara_navigation', $uninstalleditem);
+        // Caching invalidation is not reliable here due to sloppy Moodle internal behat integration design, so better log off and in too.
+        \totara_core\totara\menu\helper::bump_cache_revision();
+    }
+
+    /**
      * Generic focus action.
      *
      * @When /^I set self completion for "([^"]*)" in the "([^"]*)" category$/

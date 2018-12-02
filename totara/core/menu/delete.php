@@ -57,7 +57,12 @@ if (!helper::is_item_deletable($record->id)) {
     redirect($returnurl, get_string('error:menuitemcannotremove', 'totara_core'), 0, core\output\notification::NOTIFY_ERROR);
 }
 
-$form = new \totara_core\form\menu\delete($record, array('itemtitle' => $itemtitle));
+$parentidoptions = helper::create_parentid_form_options(0);
+if (!isset($parentidoptions[$record->parentid])) {
+    $record->parentid = helper::get_unused_container_id();
+}
+
+$form = new \totara_core\form\menu\delete($record, array('itemtitle' => $itemtitle, 'parentidoptions' => $parentidoptions));
 if ($form->is_cancelled()) {
     redirect($returnurl);
 }

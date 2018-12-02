@@ -37,12 +37,12 @@ final class delete extends \totara_form\form {
         $warning = $OUTPUT->notification(get_string('menuitem:delete', 'totara_core', $itemtitle), \core\output\notification::NOTIFY_WARNING);
         $this->model->add(new \totara_form\form\element\static_html('warning', '', $warning));
 
-        $this->model->add(new \totara_form\form\element\static_html('title', get_string('menuitem:formitemtitle', 'totara_core'), $itemtitle));
-
-        $options = \totara_core\totara\menu\helper::create_parentid_form_options(0);
+        $options = $this->get_parameters()['parentidoptions'];
         $parentid = new \totara_form\form\element\select('parentid', get_string('menuitem:formitemparent', 'totara_core'), $options);
         $parentid->set_frozen(true);
         $this->model->add($parentid);
+
+        $this->model->add(new \totara_form\form\element\static_html('title', get_string('menuitem:formitemtitle', 'totara_core'), $itemtitle));
 
         $this->model->add_action_buttons(true, get_string('delete'));
 
