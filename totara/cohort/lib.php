@@ -494,45 +494,6 @@ class cohort {
  ******************************************************************************/
 class totaracohort_event_handler {
     /**
-     * Event handler for when a user custom profiler field is deleted.
-     *
-     * @param \totara_customfield\event\profilefield_deleted $event
-     * @return boolean
-     */
-    public static function profilefield_deleted(\totara_customfield\event\profilefield_deleted $event) {
-        // TODO: rewrite for new dynamic cohorts.
-        return true;
-    }
-
-    /**
-     * Event handler for when a position is updated or deleted
-     *
-     * Cohorts that have this position directly attached to them, and cohorts which
-     * are attached to a parent of this position are affected.
-     *
-     * @param \core\event\base $event - using base since this is called by update and create
-     * @return boolean
-     */
-    public static function position_updated(\core\event\base $event) {
-        // TODO: rewrite for new dynamic cohorts.
-        return true;
-    }
-
-    /**
-     * Event handler for when an organisation is updated
-     *
-     * Cohorts that have this organisation directly attached to them, and cohorts which
-     * are attached to a parent of this organisation are affected.
-     *
-     * @param \core\event\base $event - using base since this is called by update and create
-     * @return boolean
-     */
-    public static function organisation_updated(\core\event\base $event) {
-        // TODO: rewrite for new dynamic cohorts.
-        return true;
-    }
-
-    /**
      * Event handler for when a user gets assigned to a cohort.
      *
      * New members need to have the cohort plans assigned to.
