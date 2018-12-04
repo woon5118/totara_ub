@@ -1397,18 +1397,48 @@ require(['core/autoinitialise'], function(ai) {
             } else {
                 $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.min.js'));
             }
+        }
 
-            // Totara: add ajax activity tracking for behat, this must be done once per page only,
-            //         we do not want it in dialogs or fragments. This was in 'core/first' module before.
-            $ajaxpending = "require(['jquery'], function($) {
-    $(document).on('ajaxStart', function() {
-        M.util.js_pending('jq');
-    }).on('ajaxStop', function() {
-        M.util.js_complete('jq');
-    });
-})";
+        $amdjscode = $this->amdjscode;
+        // Totara: Improve handling of JS breaks over requirejs for behat
+        if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) {
+            $ajaxpending = "
+            if (!behat_original_require) {
+                var behat_original_require = require;
+                require = function(dependants, successCallback, failureCallback) {
+                    var uniqueId = 'require-amd-' + M.util.get_unique_number();
+                    M.util.js_pending(uniqueId);
+                    behat_original_require(
+                        dependants,
+                        function() {
+                            // Some calls don't provide a success callback (I'm looking at you lib/templates/inplace_editable.mustache)
+                            if (successCallback !== undefined) {
+                                successCallback.apply(null, arguments);
+                            }
+                            M.util.js_complete(uniqueId);
+                        },
+                        function() {
+                            console.warn('Require dependancies failed');
+                            // Most calls don't provide a failure callback
+                            if (failureCallback !== undefined) {
+                                failureCallback.apply(null, arguments);
+                            }
+                            M.util.js_complete(uniqueId);
+                        }
+                    );
+                };
+            }";
+            $output .= html_writer::script($ajaxpending);
 
-            array_unshift($amdjscode, $ajaxpending);
+            $jquery_check = "require(['jquery'], function($) {
+                $(document).on('ajaxStart', function() {
+                    M.util.js_pending('jq');
+                }).on('ajaxStop', function() {
+                    M.util.js_complete('jq');
+                });
+            })";
+
+            array_unshift($amdjscode, $jquery_check);
         }
 
         $output .= html_writer::script(implode(";\n", $amdjscode));
