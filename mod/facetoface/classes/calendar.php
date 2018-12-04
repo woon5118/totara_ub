@@ -35,7 +35,7 @@ final class calendar {
      * @return bool
      */
     public static function add_seminar_event(\mod_facetoface\seminar_event $seminarevent, $calendartype = 'none', $userid = 0, $eventtype = 'session') {
-        global $CFG, $PAGE, $DB;
+        global $PAGE, $DB;
 
         $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
 
@@ -68,9 +68,10 @@ final class calendar {
             $description .= \html_writer::link($linkurl, $linktext);
         } else if ($calendartype == 'user' && $seminar->get_usercalentry()) {
             $courseid = 0;
-            $urlvar = ($eventtype == 'session') ? 'attendees' : 'signup';
-            $linkurl = $CFG->wwwroot . "/mod/facetoface/" . $urlvar . ".php?s={$seminarevent->get_id()}";
-            $description .= get_string("calendareventdescription{$eventtype}", 'facetoface', $linkurl);
+            if ($eventtype == 'session') {
+                $linkurl = new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id()));
+            }
+            $description .= get_string("calendareventdescription{$eventtype}", 'facetoface', $linkurl->out());
         } else {
             return true;
         }
@@ -173,11 +174,15 @@ final class calendar {
     public static function delete_user_events(\mod_facetoface\seminar_event $seminarevent, $eventtype) {
         global $DB;
 
-        $whereclause = "modulename = 'facetoface' AND
-                    eventtype = 'facetoface$eventtype' AND
-                    instance = ?";
+        // Without uuid(sessionid) param, this function deletes all events(seminar with multiple events) except the last one,
+        // meaning the last event (running the update calendar) will delete all previous events created just now.
+        // Usercase: Seminar has 2 events and attendee signed to the 1st event.
+        $whereclause = "modulename = ? AND
+                        eventtype = ? AND
+                        instance = ? AND
+                        uuid = ?";
 
-        $whereparams = array($seminarevent->get_facetoface());
+        $whereparams = array('facetoface', "facetoface{$eventtype}", $seminarevent->get_facetoface(), $seminarevent->get_id());
 
         if ('session' == $eventtype) {
             $likestr = "%attendees.php?s={$seminarevent->get_id()}%";
