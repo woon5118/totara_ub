@@ -520,7 +520,6 @@ class report_builder_edit_columns_form extends moodleform {
 
             $columnsList = $report->get_columns_select();
             $deprecatedList = $report->src->get_deprecated_column_options(); // A list of column options that are deprecated.
-            $columnoptions = array();
             $defaultoptions = array('' => get_string('noneselected', 'totara_reportbuilder'));
 
             $badcolumns = array();
@@ -554,9 +553,8 @@ class report_builder_edit_columns_form extends moodleform {
                 $colcount = count($goodcolumns);
                 $i = 1;
                 foreach ($goodcolumns as $cid => $column) {
-                    $columnoptions["{$column->type}_{$column->value}"] = $column->heading;
                     if ($column->heading and $column->customheading) {
-                        $defaultoptions["{$column->type}_{$column->value}"] = $column->heading;
+                        $defaultoptions["{$column->type}_{$column->value}"] = format_string($column->heading);
                     } else if (isset($report->columnoptions["{$column->type}-{$column->value}"])) {
                         $defaultoptions["{$column->type}_{$column->value}"] = $report->columnoptions["{$column->type}-{$column->value}"]->name;
                     } else {
