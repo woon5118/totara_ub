@@ -97,14 +97,7 @@ div.badge {
     display: block;
 }
 
-div.badge .expireimage {
-    width: 100px;
-    height: 100px;
-    left: 20px;
-    top: 0;
-}
-
-.expireimage {
+.badges .expireimage {
     .opacity(.85);
     width: 90px;
     height: 90px;
@@ -169,6 +162,14 @@ img#persona_signin {
 #badge-details {
     display: inline-block;
     width: auto;
+
+    .expireimage {
+        position: absolute;
+        top: 20px;
+        left: 15px;
+        height: 100px;
+        width: 100px;
+    }
 }
 
 #badge-image {
