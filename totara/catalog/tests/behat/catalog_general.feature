@@ -45,11 +45,11 @@ Feature: Test file for catalog
     And I click on "Find Learning" in the totara menu
     When I follow "Alphabetical"
     Then I should not see "Relevance"
-    And I set the field "Search all learning" to "Rang"
+    And I set the field with xpath "//*[@id='catalog_fts_input']" to "Rang"
     When I click on "Search" "button" in the "#region-main" "css_element"
     Then I should see "Relevance"
     And I should see "2 items"
-    When I set the field "Search all learning" to ""
+    When I set the field with xpath "//*[@id='catalog_fts_input']" to ""
     And I click on "Search" "button" in the "#region-main" "css_element"
     Then I should not see "Relevance"
     And I should see "13 items"

@@ -671,11 +671,10 @@ class behat_totara_core extends behat_base {
      */
     public function i_should_see_catalog_page($catalogtype) {
         \behat_hooks::set_step_readonly(true);
-        $this->wait_for_pending_js();
         switch ($catalogtype) {
             case "totara":
-                $this->execute('behat_general::assert_page_contains_text', 'Find learning');
-                $this->execute('behat_general::assert_page_contains_text', 'Search all learning');
+                $this->execute('behat_general::assert_element_contains_text', ["Find learning", ".tw-catalog__title", "css_element"]);
+                $this->execute('behat_general::should_exist', ["#catalog_fts_input", "css_element"]);
                 break;
             case "enhanced":
                 $this->execute('behat_general::assert_page_contains_text', 'Search Courses:');
