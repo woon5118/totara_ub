@@ -854,11 +854,11 @@ class MoodleExcelFormat {
         $numbers[11] = '0.00E+00';
         $numbers[12] = '# ?/?';
         $numbers[13] = '# ??/??';
-        $numbers[14] = 'mm-dd-yy';
+        $numbers[14] = 'm/d/yyyy';
         $numbers[15] = 'd-mmm-yy';
         $numbers[16] = 'd-mmm';
         $numbers[17] = 'mmm-yy';
-        $numbers[22] = 'm/d/yy h:mm';
+        $numbers[22] = 'm/d/yyyy h:mm';
         $numbers[49] = '@';
 
         if ($num_format !== 0 and in_array($num_format, $numbers)) {
