@@ -26,7 +26,6 @@
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
-require_once($CFG->dirroot.'/mod/facetoface/attendees/lib.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
@@ -62,7 +61,7 @@ $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 // If there's no sessionid specified.
 if (!$s) {
-    process_no_sessionid('takeattendance');
+    \mod_facetoface\attendees_list_helper::process_no_sessionid('takeattendance');
     exit;
 }
 
@@ -78,7 +77,8 @@ $baseurl = new moodle_url('/mod/facetoface/attendees/takeattendance.php', array(
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
-list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees) = get_allowed_available_actions($seminar, $seminarevent, $context, $session);
+list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
+    = \mod_facetoface\attendees_list_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
 $includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
 
 $can_view_session = !empty($allowed_actions);
@@ -186,7 +186,7 @@ if ($formdata = data_submitted()) {
  * Print page header
  */
 if (!$onlycontent) {
-    process_attendees_js($action, $seminar, $seminarevent);
+    \mod_facetoface\attendees_list_helper::process_js($action, $seminar, $seminarevent);
     \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
     $PAGE->set_cm($cm);
     $PAGE->set_heading($course->fullname);

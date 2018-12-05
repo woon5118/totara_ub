@@ -67,7 +67,7 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
             buttonsObj[M.util.get_string('update','moodle')] = function() { handler.update_recipients(); };
             buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
-            default_url = M.cfg.wwwroot + '/mod/facetoface/editrecipients.php?s=' + M.totara_f2f_attendees_messaging.config.sessionid;
+            default_url = M.cfg.wwwroot + '/mod/facetoface/attendees/editrecipients.php?s=' + M.totara_f2f_attendees_messaging.config.sessionid;
             totaraDialogs[name] = new totaraDialog(
                 name,
                 undefined,

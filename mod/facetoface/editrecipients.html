@@ -1,13 +1,14 @@
-<form id="assignform" method="post" action="<?php echo "{$CFG->wwwroot}/mod/facetoface/editrecipients.php?s={$s}"; ?>">
+<form id="assignform" method="post" action="<?php echo($url->out()) ?>">
 <div>
+<input type="hidden" name="s" value="<?php echo($s) ?>" />
 <input type="hidden" name="sesskey" value="<?php p(sesskey()) ?>" />
 <input type="hidden" name="add" value="" />
 <input type="hidden" name="remove" value="" />
-<input type="hidden" name="recipients" value="<?php echo implode(',', $recipients) ?>" />
+<input type="hidden" name="recipients" value="<?php echo($recipients) ?>" />
   <table summary="" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
     <tr>
       <td valign="top" width="40%">
-          <label for="removeselect"><?php print_string('existingrecipients', 'facetoface', $existingcount); ?></label>
+          <label for="removeselect"><?php print_string('existingrecipients', 'facetoface'); ?></label>
           <br />
           <select name="removeselect[]" size="22" style="width: 100%;" id="removeselect" multiple="multiple"
                   onfocus="getElementById('assignform').add.disabled=true;
@@ -15,15 +16,13 @@
                            getElementById('assignform').addselect.selectedIndex=-1;">
 
           <?php
-            $i = 0;
-            if ($existingcount > 0) {
+            $existingusers = $recipient_helper->get_existing_recipients();
+            if ($existingusers) {
                 foreach ($existingusers as $existinguser) {
                     $fullname = fullname($existinguser, true);
                     echo "<option value=\"{$existinguser->id}\">{$fullname}, {$existinguser->email}</option>\n";
-                    $i++;
                 }
-            }
-            if ($i==0) {
+            } else {
                 echo '<option/>'; // empty select breaks xhtml strict
             }
           ?>
@@ -38,22 +37,20 @@
         </p>
       </td>
       <td valign="top" width="40%">
-          <label for="addselect"><?php print_string('potentialrecipients', 'facetoface', $usercount); ?></label>
+          <label for="addselect"><?php print_string('potentialrecipients', 'facetoface'); ?></label>
           <br />
           <select name="addselect[]" size="22" style="width: 100%;" id="addselect" multiple="multiple"
                   onfocus="getElementById('assignform').add.disabled=false;
                            getElementById('assignform').remove.disabled=true;
                            getElementById('assignform').removeselect.selectedIndex=-1;">
           <?php
-            $i=0;
-            if ($usercount) {
+            $availableusers = $recipient_helper->get_potential_recipients();
+            if ($availableusers) {
                 foreach ($availableusers as $user) {
                     $fullname = fullname($user, true);
                     echo "<option value=\"{$user->id}\">{$fullname}, {$user->email}</option>\n";
-                    $i++;
                 }
-            }
-            if ($i==0) {
+            } else {
                 echo '<option/>'; // empty select breaks xhtml strict
             }
           ?>

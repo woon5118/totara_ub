@@ -278,4 +278,57 @@ final class messaging {
 
         return $text;
     }
+
+    /**
+     * @param $action
+     * @param seminar $seminar
+     * @param seminar_event $seminar_event
+     * @throws \coding_exception
+     */
+    public static function process_js($action, \mod_facetoface\seminar $seminar, \mod_facetoface\seminar_event $seminar_event) {
+        global $PAGE;
+
+        $pagetitle = format_string($seminar->get_name());
+
+        local_js(
+            array(
+                TOTARA_JS_DIALOG,
+                TOTARA_JS_TREEVIEW
+            )
+        );
+
+        $PAGE->requires->string_for_js('save', 'admin');
+        $PAGE->requires->string_for_js('cancel', 'moodle');
+        $PAGE->requires->strings_for_js(
+            array('uploadfile', 'addremoveattendees', 'approvalreqd', 'areyousureconfirmwaitlist',
+                'addattendeesviaidlist', 'submitcsvtext', 'bulkaddattendeesresults', 'addattendeesviafileupload',
+                'bulkaddattendeesresults', 'wait-list', 'cancellations', 'approvalreqd', 'takeattendance',
+                'updateattendeessuccessful', 'updateattendeesunsuccessful', 'waitlistselectoneormoreusers',
+                'confirmlotteryheader', 'confirmlotterybody', 'updatewaitlist', 'close'
+            ),
+            'facetoface'
+        );
+
+        $json_action = json_encode($action);
+        $args = array('args' => '{"sessionid":'.$seminar_event->get_id().','.
+            '"action":'.$json_action.','.
+            '"sesskey":"'.sesskey().'",'.
+            '"approvalreqd":"' . $seminar->is_approval_required() . '"}'
+        );
+
+        $PAGE->requires->strings_for_js(array('editmessagerecipientsindividually', 'existingrecipients', 'potentialrecipients'),
+            'facetoface');
+        $PAGE->requires->string_for_js('update', 'moodle');
+
+        $jsmodule = array(
+            'name' => 'totara_f2f_attendees_message',
+            'fullpath' => '/mod/facetoface/js/attendees_messaging.js',
+            'requires' => array('json', 'totara_core')
+        );
+
+        $PAGE->requires->js_init_call('M.totara_f2f_attendees_messaging.init', $args, false, $jsmodule);
+        $PAGE->set_url("/mod/facetoface/attendees/{$action}.php", array('s' => $seminar_event->get_id()));
+        $PAGE->set_pagelayout('standard');
+        $PAGE->set_title($pagetitle);
+    }
 }
