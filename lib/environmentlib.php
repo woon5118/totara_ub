@@ -1716,3 +1716,21 @@ function check_icu_version(environment_results $result) {
 
     return $result;
 }
+
+/**
+ * Totara: Check if the site is being served using a 64-bit server.
+ *
+ * @param  environment_results $result $result
+ * @return environment_results|null updated results object, or null if the site is 64-bit.
+ */
+function environment_check_is_64bit(environment_results $result) {
+
+    if (PHP_INT_SIZE === 8) {
+        return null;
+    } else {
+        $result->setInfo(get_string('servernot64bit', 'admin'));
+        $result->setStatus(false);
+    }
+
+    return $result;
+}

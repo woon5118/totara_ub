@@ -71,6 +71,7 @@ $string['authsettings'] = 'Manage authentication';
 $string['autolang'] = 'Language autodetect';
 $string['autologinguests'] = 'Auto-login guests';
 $string['searchareas'] = 'Search areas';
+$string['servernot64bit'] = 'Server not 64-bit';
 $string['sitenothttps'] = 'Site not https';
 $string['availableto'] = 'Available to';
 $string['availablelicenses'] = 'Available licences';
