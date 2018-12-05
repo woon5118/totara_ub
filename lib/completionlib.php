@@ -84,10 +84,6 @@ define('COMPLETION_COMPLETE_PASS', 2);
  * This is a completion state value (course_modules_completion/completionstate)
  */
 define('COMPLETION_COMPLETE_FAIL', 3);
-/** A record of prior learning has been added for a user in this activity */
-// TOTARA: This isn't used anywhere in Totara, and hasn't since 2.2.0 at least, so we're going to
-//         remove it after the release of Totara 10.
-define('COMPLETION_COMPLETE_RPL', 4);
 
 /**
  * The effect of this change to completion status is unknown.

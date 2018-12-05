@@ -1,6 +1,24 @@
 List of upgrade and API changes in Totara core,
 information provided here is intended especially for developers.
 
+=== 13 ===
+
+* Removed deprecated custom errorlog handling
+  The following have all been removed as part of this:
+    - Method: totara_core_renderer::errorlog_link
+    - Function: totara_setup_error_handlers
+    - Function: totara_error_handler
+    - Function: totara_exception_handler
+    - Function: totara_crop_error_log
+    - Function: totara_errors_download
+    - DB Table: errorlog
+    - Template: totara/core/templates/errorlog_link.mustache
+* Removed deprecated templates:
+  - core/alert_danger
+  - core/alert_info
+  - core/alert_success
+  - core/alert_warning
+
 === 12 ===
 
 * Major cleanup and refactoring in Totara menu API:

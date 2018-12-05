@@ -25,7 +25,7 @@ define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/clilib.php');
 
-define('MOODLE_DEFAULT_TAG', 'v3.3.7'); // The upstream release that Totara 10 and 11 are based on.
+define('MOODLE_DEFAULT_TAG', 'v3.3.9'); // The upstream release that Totara 13 is based on.
 
 list($options, $unrecognized) = cli_get_params(
     array(

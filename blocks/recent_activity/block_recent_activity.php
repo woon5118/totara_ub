@@ -194,7 +194,7 @@ class block_recent_activity extends block_base {
     /**
      * Returns list of recent activity within modules
      *
-     * For each used module type executes callback MODULE_print_recent_activity()
+     * For each used module type executes renderer function render_recent_activities()
      *
      * @return array array of pairs moduletype => content
      */
@@ -229,15 +229,7 @@ class block_recent_activity extends block_base {
                         $cm->id);
                 }
                 $recentactivity[$modname] = $renderer->render_recent_activities($modrecentactivities);
-            } else if (component_callback_exists('mod_' . $modname, 'print_recent_activity')) {
-                if (!in_array($modname, $whitelist)) {
-                    debugging("The function {$modname}_print_recent_activity have being deprected since totara 11");
-                }
-                ob_start();
-                component_callback('mod_' . $modname, 'print_recent_activity', [$this->page->course, $viewfullnames, $this->get_timestart()], false);
-                $recentactivity[$modname] = ob_get_clean();
             }
-
         }
         return $recentactivity;
     }

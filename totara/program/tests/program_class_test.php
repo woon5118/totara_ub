@@ -1422,51 +1422,9 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     }
 
     /**
-     * Test the deprecated is_required_learning method.
+     * Test prog_is_accessible method.
      */
-    public function test_deprecated_is_required_learning() {
-
-        $this->resetAfterTest();
-
-        $courses = [];
-        for ($i = 0; $i < 2; $i++) {
-            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
-        }
-        $this->assertCount(2, $courses);
-
-        $user = $this->data_generator->create_user();
-
-        $detail = [
-            'fullname' => 'Testing program fullname',
-            'shortname' => 'Test prog'
-        ];
-        $program = $this->program_generator->create_program($detail);
-        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
-
-        $debugmessage = '$program->is_required_learning() is deprecated, use the lib function prog_required_for_user() instead';
-
-        // Check the program is not required, the user is not assigned.
-        $this->assertFalse($program->is_required_learning($user->id));
-        $this->assertDebuggingCalled($debugmessage);
-
-        // Assign the user and check the program is now required.
-        $this->program_generator->assign_program($program->id, [$user->id]);
-        $this->assertTrue($program->is_required_learning($user->id));
-        $this->assertDebuggingCalled($debugmessage);
-
-        // Mark the program complete for the user, and check it is no longer required.
-        $program->update_program_complete($user->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
-        $this->assertFalse($program->is_required_learning($user->id));
-        $this->assertDebuggingCalled($debugmessage);
-    }
-
-    /**
-     * Test the deprecated is_accessible method.
-     */
-    public function test_deprecated_is_accessible() {
+    public function test_prog_is_accessible() {
 
         $this->resetAfterTest();
 

@@ -785,8 +785,6 @@ class cache implements cache_loader {
      * For stores that don't support key tests this functionality is mimicked by using the equivalent get method.
      * Just one more reason you should not use these methods unless you have a very good reason to do so.
      *
-     * NOTE: second parameter $tryloadifpossible was removed in Totara 10
-     *
      * @param string|int $key
      * @return bool True if the cache has the requested key, false otherwise.
      */
@@ -2122,8 +2120,6 @@ class cache_session extends cache {
      * Its also worth mentioning that not all stores support key tests.
      * For stores that don't support key tests this functionality is mimicked by using the equivalent get method.
      * Just one more reason you should not use these methods unless you have a very good reason to do so.
-     *
-     * NOTE: second parameter $tryloadifpossible was removed in Totara 10
      *
      * @param string|int $key
      * @return bool True if the cache has the requested key, false otherwise.

@@ -1,6 +1,12 @@
 This files describes API changes in Totara Program,
 information provided here is intended especially for developers.
 
+=== 13.0 ===
+
+* Removed deprecated methods:
+  * program::is_required_learning()
+  * program::display_progress()
+
 === 12.0 ===
 
 * Removed deprecated file assignment/remove_item.php

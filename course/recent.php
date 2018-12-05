@@ -446,17 +446,6 @@ if (!empty($activities)) {
                     isset($activity->cmid) && isset($viewfullnames[$activity->cmid]) && $viewfullnames[$activity->cmid],
                     $course->id,
                     isset($activity->extratext) ? $activity->extratext : '');
-            } else {
-                $print_recent_mod_activity = $activity->type.'_print_recent_mod_activity';
-
-                if (function_exists($print_recent_mod_activity)) {
-                    debugging("The function {$print_recent_mod_activity} have being deprected since totara 11");
-                    $print_recent_mod_activity($activity,
-                        $course->id,
-                        $param->sortby != 'default',
-                        $modnames,
-                        $viewfullnames[$activity->cmid]);
-                }
             }
             // END TOTARA CHANGES.
         }

@@ -234,9 +234,7 @@ $temp->add(new admin_setting_configselect('menulifetime', new lang_string('menul
 
 $ADMIN->add('server', $temp);
 
-// The hub registration page is marked as deprecated and will be removed in Totara 12
-$ADMIN->add('server', new admin_externalpage('registrationhubs', new lang_string('hubs', 'admin'),
-    "$CFG->wwwroot/$CFG->admin/registration/index.php", 'moodle/site:config', true));
+// Totara: removed Moodle hubs registration.
 
 // E-mail settings.
 $ADMIN->add('server', new admin_category('email', new lang_string('categoryemail', 'admin')));

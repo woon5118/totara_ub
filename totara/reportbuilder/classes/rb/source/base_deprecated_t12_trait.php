@@ -1416,28 +1416,6 @@ trait base_deprecated_t12_trait {
     }
 
     /**
-     * Indicates if the user is deleted or not.
-     *
-     * @deprecated Since Totara 11.0.
-     *
-     * @param string $status User status value from the column data.
-     * @param stdclass $row The data from the report row.
-     * @return string Text denoting status.
-     */
-    function rb_display_deleted_status($status, $row) {
-        debugging("The report builder display function 'deleted_status' has been deprecated. Please use 'user_status' instead.", DEBUG_DEVELOPER);
-
-        switch($status) {
-            case 1:
-                return get_string('deleteduser', 'totara_reportbuilder');
-            case 2:
-                return get_string('suspendeduser', 'totara_reportbuilder');
-            default:
-                return get_string('activeuser', 'totara_reportbuilder');
-        }
-    }
-
-    /**
      * Column displayfunc to show a hierarchy path as a human-readable string
      *
      * @deprecated Since Totara 12.0

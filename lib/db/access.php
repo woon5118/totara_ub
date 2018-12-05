@@ -173,20 +173,6 @@ $capabilities = array(
         'clonepermissionsfrom' =>  'moodle/backup:backupcourse'
     ),
 
-    'moodle/backup:backuptargethub' => array(
-        // Hub functionality has been deprecated and will be removed in the next major version.
-        'riskbitmask' => RISK_PERSONAL,
-
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ),
-
-        'clonepermissionsfrom' =>  'moodle/backup:backupcourse'
-    ),
-
     'moodle/backup:backuptargetimport' => array(
 
         'riskbitmask' => RISK_PERSONAL,
@@ -363,20 +349,6 @@ $capabilities = array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
-    ),
-
-    'moodle/restore:restoretargethub' => array(
-
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
-
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ),
-
-        'clonepermissionsfrom' =>  'moodle/restore:restorecourse'
     ),
 
     'moodle/restore:restoretargetimport' => array(
@@ -1959,15 +1931,6 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
-     'moodle/course:publish' => array(
-        // Hub functionality (includes course publishing) has been deprecated and will be removed in the next major version.
-        'captype' => 'write',
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
     'moodle/course:markcomplete' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -1975,25 +1938,6 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-        )
-    ),
-    'moodle/community:add' => array(
-        // Hub functionality (includes course publishing) has been deprecated and will be removed in the next major version.
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        )
-    ),
-    'moodle/community:download' => array(
-        // Hub functionality (includes course publishing) has been deprecated and will be removed in the next major version.
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
         )
     ),
 

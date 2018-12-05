@@ -135,21 +135,6 @@ function book_delete_instance($id) {
 }
 
 /**
- * Given a course and a time, this module should find recent activity
- * that has occurred in book activities and print it out.
- *
- * @param stdClass $course
- * @param bool $viewfullnames
- * @param int $timestart
- * @return bool true if there was output, or false is there was none
- *
- * @deprecated since Totara 11
- */
-function book_print_recent_activity($course, $viewfullnames, $timestart) {
-    return false;
-}
-
-/**
  * This function is used by the reset_course_userdata function in moodlelib.
  * @param $data the data submitted from the reset course.
  * @return array status array

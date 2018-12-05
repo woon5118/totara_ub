@@ -475,48 +475,6 @@ function feedback_get_recent_mod_activity(&$activities, &$index,
 }
 
 /**
- * Prints all users who has completed a specified feedback since a given time
- * many thanks to Manolescu Dorel, who contributed these two functions
- *
- * @deprecated since Totara 11.0 - use {@link mod_feedback_renderer::render_recent_activity()} instead
- * @global object
- * @param object $activity
- * @param int $courseid
- * @param string $detail
- * @param array $modnames
- * @return void Output is echo'd
- */
-function feedback_print_recent_mod_activity($activity, $courseid, $detail, $modnames) {
-    global $CFG, $OUTPUT;
-
-    echo '<table border="0" cellpadding="3" cellspacing="0" class="forum-recent">';
-
-    echo "<tr><td class=\"userpicture\" valign=\"top\">";
-    echo $OUTPUT->user_picture($activity->user, array('courseid'=>$courseid));
-    echo "</td><td>";
-
-    if ($detail) {
-        $modname = $modnames[$activity->type];
-        echo '<div class="title">';
-        echo $OUTPUT->pix_icon('icon', $modname, $activity->type);
-        echo "<a href=\"$CFG->wwwroot/mod/feedback/view.php?id={$activity->cmid}\">{$activity->name}</a>";
-        echo '</div>';
-    }
-
-    echo '<div class="title">';
-    echo '</div>';
-
-    echo '<div class="user">';
-    echo "<a href=\"$CFG->wwwroot/user/view.php?id={$activity->user->id}&amp;course=$courseid\">"
-         ."{$activity->user->fullname}</a> - ".userdate($activity->timestamp);
-    echo '</div>';
-
-    echo "</td></tr></table>";
-
-    return;
-}
-
-/**
  * Obtains the specific requirements for completion.
  *
  * @param object $cm Course-module

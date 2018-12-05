@@ -222,15 +222,6 @@ $tasks = array(
         'month' => '*'
     ),
     array(
-        'classname' => 'core\task\registration_cron_task',
-        'blocking' => 0,
-        'minute' => 'R',
-        'hour' => 'R',
-        'day' => '*',
-        'dayofweek' => 'R',
-        'month' => '*'
-    ),
-    array(
         'classname' => 'core\task\cache_cron_task',
         'blocking' => 0,
         'minute' => '50',

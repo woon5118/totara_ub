@@ -1084,12 +1084,6 @@ $string['youmustcompleteorviewing'] = 'A learner must complete {$a}';
 $string['z:incompleterecurringprogrammessage'] = 'A course in a recurring program that you are enrolled on has reached its end date but you have not completed the course. This course must be completed in order to meet the requirements of the program.';
 $string['z:incompleterecurringprogramsubject'] = 'Incomplete recurring course';
 
-// Deprecated since Totara 11
-
-$string['error:cannotrequestextnotuser'] = 'You cannot request an extension for another user';
-$string['extensionrequestfailed:nomanager'] = 'Extension request was not sent. Manager could not be found';
-$string['error:noprogramcompletionfound'] = 'No program completion record was found';
-
 // Deprecated since Totara 12
 
 $string['contentavailability'] = 'Hide currently unavailable content';

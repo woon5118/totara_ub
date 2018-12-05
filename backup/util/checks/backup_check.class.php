@@ -125,18 +125,10 @@ abstract class backup_check {
                 throw new backup_controller_exception('backup_unknown_backup_type', $type);
         }
 
-        // Now, if backup mode is hub or import, check userid has permissions for those modes
+        // Now, if backup mode is import, check userid has permissions for those modes
         // other modes will perform common checks only (backupxxxx capabilities in $typecapstocheck)
         switch ($mode) {
-            case backup::MODE_HUB:
-                if (!has_capability('moodle/backup:backuptargethub', $coursectx, $userid)) {
-                    $a = new stdclass();
-                    $a->userid = $userid;
-                    $a->courseid = $courseid;
-                    $a->capability = 'moodle/backup:backuptargethub';
-                    throw new backup_controller_exception('backup_user_missing_capability', $a);
-                }
-                break;
+            // Totara: removed backup::MODE_HUB.
             case backup::MODE_IMPORT:
                 if (!has_capability('moodle/backup:backuptargetimport', $coursectx, $userid)) {
                     $a = new stdclass();

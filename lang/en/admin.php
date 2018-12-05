@@ -605,7 +605,6 @@ $string['htmleditorsettings'] = 'HTML editor settings';
 $string['htmlsettings'] = 'HTML settings';
 $string['http'] = 'HTTP';
 $string['httpsecurity'] = 'HTTP security';
-$string['hubs'] = 'Hubs';
 $string['incompleteunicodesupport'] = 'The current setup of MySQL or MariaDB is using \'utf8\'. This character set does not support four byte characters which include some emoji. Trying to use these characters will result in an error when updating a record, and any information being sent to the database will be lost. Please consider changing your settings to \'utf8mb4\'. See the documentation for full details.';
 $string['change'] = 'change';
 $string['checkboxno'] = 'No';
@@ -1318,33 +1317,6 @@ $string['wwwroot'] = 'Site www root';
 
 // Deprecated since Moodle 3.2.
 $string['mobile'] = 'Mobile';
-
-/*
- * @deprecated since Totara 10.0
- */
-$string['uselegacybrowselistofusersreport'] = 'Use legacy Browse List of Users report';
-$string['uselegacybrowselistofusersreport_desc'] = 'In Totara 10 the original Browse List of Users report was replaced
-by a new report builder based version that included all the main functionality of the original, with exception of Mnet
-support. Mnet will be deprecated and removed in the next major release of Totara. By default the new Browse List of
-Users report will be used. However, you can override that by choosing this option.';
-
-/*
- * @deprecated since Totara 11.0
- */
-$string['configcustommenuitems'] = 'This is deprecated functionality and will not display in core themes (will be deleted in Totara 10.0). Please customise the main menu instead (Site adminsitration > Appearance > Main menu).<br/>
-You can configure a custom menu here to be shown by themes. Each line consists of some menu text, a link URL (optional), a tooltip title (optional) and a language code or comma-separated list of codes (optional, for displaying the line to users of the specified language only), separated by pipe characters. You can specify a structure using hyphens, and dividers can be used by adding a line of one or more # characters where desired. For example:
-<pre>
-Totara community|https://totara.community
-Totara development|https://help.totaralearning.com/display/DEV
--Totara help|https://help.totaralearning.com/
-Totara News|https://www.totaralms.com/about-us/news-events
-Totara Partners|https://www.totaralms.com/partners
-</pre>';
-$string['custommenuitems'] = 'Custom menu items (Deprecated)';
-$string['custommenu'] = 'Custom menu';
-$string['moodleorghubname'] = 'Totara.net';
-$string['backup_shortname'] = 'Use course name in backup filename';
-$string['backup_shortnamehelp'] = 'Use the course name as part of the backup filename.';
 
 /*
  * @deprecated since Totara 12.0

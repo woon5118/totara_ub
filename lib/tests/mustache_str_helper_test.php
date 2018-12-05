@@ -381,7 +381,6 @@ class mustache_string_helper_testcase extends advanced_testcase {
         $whitelist = [
             $CFG->dirroot . '/lib/templates/test.mustache', // A mustache test file. Must not contain anything exploitable.
             $CFG->dirroot . '/totara/core/templates/progressbar.mustache', // Deprecated since Totara 12.
-            $CFG->dirroot . '/totara/core/templates/errorlog_link.mustache', // Deprecated since Totara 12.
         ];
 
         $recursivehelpers = [];

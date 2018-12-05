@@ -378,6 +378,3 @@ $string['windowperiod'] = 'Window Period';
 $string['years'] = 'Year(s)';
 $string['youhaveunsavedchanges'] = 'You have unsaved changes.';
 $string['youareassigned'] = 'You are assigned to this certification';
-
-// Deprecated.
-$string['error:completionhistoryexpirynotunique'] = 'Expiry date must be unique for this user and certification. Only one history record can have no expiry date.';

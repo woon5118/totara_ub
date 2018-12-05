@@ -63,6 +63,3 @@ $string['type_plan'] = 'Plan';
 $string['type_template'] = 'Plan Template';
 $string['type_course_completion'] = 'Course Completion';
 $string['type_course_completion_history'] = 'Previous Course Completions';
-
-// Deprecated since 10.3
-$string['completionstatusandapproval'] = 'Completion status (and approval status)';

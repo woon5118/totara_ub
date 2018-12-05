@@ -988,51 +988,6 @@ function quiz_get_recent_mod_activity(&$activities, &$index, $timestart,
 }
 
 /**
- * @deprecated since Totara 11.0 - use {@link mod_quiz_renderer::render_recent_activity()} instead
- * @param $activity
- * @param $courseid
- * @param $detail
- * @param $modnames
- */
-function quiz_print_recent_mod_activity($activity, $courseid, $detail, $modnames) {
-    global $CFG, $OUTPUT;
-
-    echo '<table border="0" cellpadding="3" cellspacing="0" class="forum-recent">';
-
-    echo '<tr><td class="userpicture" valign="top">';
-    echo $OUTPUT->user_picture($activity->user, array('courseid' => $courseid));
-    echo '</td><td>';
-
-    if ($detail) {
-        $modname = $modnames[$activity->type];
-        echo '<div class="title">';
-        echo $OUTPUT->pix_icon('icon', $modname, $activity->type);
-        echo '<a href="' . $CFG->wwwroot . '/mod/quiz/view.php?id=' .
-                $activity->cmid . '">' . $activity->name . '</a>';
-        echo '</div>';
-    }
-
-    echo '<div class="grade">';
-    echo  get_string('attempt', 'quiz', $activity->content->attempt);
-    if (isset($activity->content->maxgrade)) {
-        $grades = $activity->content->sumgrades . ' / ' . $activity->content->maxgrade;
-        echo ': (<a href="' . $CFG->wwwroot . '/mod/quiz/review.php?attempt=' .
-                $activity->content->attemptid . '">' . $grades . '</a>)';
-    }
-    echo '</div>';
-
-    echo '<div class="user">';
-    echo '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $activity->user->id .
-            '&amp;course=' . $courseid . '">' . $activity->user->fullname .
-            '</a> - ' . userdate($activity->timestamp);
-    echo '</div>';
-
-    echo '</td></tr></table>';
-
-    return;
-}
-
-/**
  * Pre-process the quiz options form data, making any necessary adjustments.
  * Called by add/update instance in this file.
  *

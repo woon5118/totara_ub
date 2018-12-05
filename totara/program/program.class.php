@@ -1863,21 +1863,6 @@ class program {
         $renderer->display_duedate_highlight_info($duedate);
     }
 
-    /**
-     * Determines and displays the progress of this program for a specified user.
-     *
-     * Progress is determined by course set completion statuses.
-     *
-     * @access  public
-     * @param int $userid
-     * @return  string
-     */
-    public function display_progress($userid) {
-        // Deprecate instead of remove incase someone is using this.
-        debugging('$program->display_progress() is deprecated, use the lib function prog_display_progress() instead', DEBUG_DEVELOPER);
-        prog_display_progress($this->id, $userid);
-    }
-
     public function display_timedue_date($completionstatus, $time, $format = '') {
         global $OUTPUT;
 
@@ -2103,23 +2088,6 @@ class program {
         }
 
         return false;
-    }
-
-    /**
-     * Checks if this program is required learning for
-     * given user or current user
-     *
-     * @param int $userid User ID to check (optional)
-     * @return bool Returns true if this program is required learning
-     */
-    public function is_required_learning($userid = 0) {
-        global $USER;
-
-        // Deprecate instead of remove incase someone is using this.
-        debugging('$program->is_required_learning() is deprecated, use the lib function prog_required_for_user() instead', DEBUG_DEVELOPER);
-
-        $userid = !empty($userid) ? $userid : $USER->id;
-        return prog_required_for_user($this->id, $userid);
     }
 
     /**

@@ -45,6 +45,3 @@ $string['myprofile:addinstance'] = 'Add a new logged in user block';
 $string['myprofile:myaddinstance'] = 'Add a new logged in user block to My learning';
 $string['myprofile_settings'] = 'Visible user information';
 $string['pluginname'] = 'Logged in user';
-
-// Deprecated since Totara 10.
-$string['display_un'] = 'Display name';

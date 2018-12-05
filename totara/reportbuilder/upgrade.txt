@@ -1,6 +1,11 @@
 This file describes API changes in reportbuilder,
 information provided here is intended especially for developers.
 
+=== 13.0 ===
+
+* Deprecated display method rb_display_deleted_status() has been removed
+* Deprecated graph::reset_records() has been removed
+
 === 12.0 ===
 
 * Column and filter option 'grouping' setting is now deprecated and will be removed in Totara 13, use subqueries instead.

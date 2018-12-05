@@ -60,7 +60,3 @@ $string['objshortname'] = 'Objective short name';
 $string['type_plan'] = 'Plan';
 $string['type_template'] = 'Plan Template';
 $string['type_objective'] = 'Objective';
-
-// Deprecated in 9.0
-$string['objproficiency'] = 'Objective proficiency';
-$string['objproficiencyandapproval'] = 'Objective proficiency (and approval status)';

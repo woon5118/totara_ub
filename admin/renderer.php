@@ -723,35 +723,6 @@ class core_admin_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Display a warning about not being registered on Moodle.org if necesary.
-     *
-     * @deprecated
-     * @param boolean $registered true if the site is registered on Moodle.org
-     * @return string HTML to output.
-     */
-    protected function registration_warning($registered) {
-
-        if (!$registered) {
-
-            if (has_capability('moodle/site:config', context_system::instance())) {
-                $registerbutton = $this->single_button(new moodle_url('/admin/registration/register.php',
-                    array('huburl' =>  HUB_MOODLEORGHUBURL, 'hubname' => 'Moodle.net')),
-                    get_string('register', 'admin'));
-                $str = 'registrationwarning';
-            } else {
-                $registerbutton = '';
-                $str = 'registrationwarningcontactadmin';
-            }
-
-            return $this->warning( get_string($str, 'admin')
-                    . '&nbsp;' . $this->help_icon('registration', 'admin') . $registerbutton ,
-                'error alert alert-danger');
-        }
-
-        return '';
-    }
-
-    /**
      * Return an admin page warning if site is not registered with moodle.org
      *
      * @since Moodle 3.2.5

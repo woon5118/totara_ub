@@ -217,6 +217,3 @@ $string['valueoutsiderange'] = 'Please enter a value within the valid range';
 $string['viewdetails'] = 'View details';
 $string['visibleto'] = 'Visible to: {$a}';
 $string['youranswer'] = 'Your answer';
-
-// Deprecated.
-$string['managername'] = 'Manager\'s name';

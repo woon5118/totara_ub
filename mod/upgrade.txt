@@ -1,6 +1,10 @@
 This files describes API changes in /mod/* - activity modules,
 information provided here is intended especially for developers.
 
+=== 13 ===
+
+* Removed deprecated (plugin_name)_print_recent_activity() from all activity plugins
+
 === 12 ===
 
  * External functions that were returning file information now return the following additional file fields:

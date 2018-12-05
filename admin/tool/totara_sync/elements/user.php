@@ -866,11 +866,6 @@ class totara_sync_element_user extends totara_sync_element {
             $params[0] = 0;
         }
 
-        if (!empty($this->config->linkjobassignmentidnumber)) {
-            // Warning regarding functionality that was removed in Totara 10.
-            debugging('Job assignments no longer updated via user source. Please use the jobassignment element.', DEBUG_DEVELOPER);
-        }
-
         $sql = "SELECT id, idnumber, $field as duplicatefield
                   FROM {{$synctable}}
                  WHERE $field IN (SELECT $field FROM {{$synctable_clone}} $extracondition GROUP BY $field HAVING count($field) > 1)";

@@ -15,16 +15,6 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $temp->add(new admin_setting_configcheckbox('enableglobalsearch', new lang_string('enableglobalsearch', 'admin'),
         new lang_string('enableglobalsearch_desc', 'admin'), 0, 1, 0));
 
-    // This setting was added as a temporary solution to allow a user to choose between the
-    // Moodle implmentation of the Browse List of Users report and the new report builder version.
-    // @deprecated from Totara 10.0.
-    $temp->add(new admin_setting_configcheckbox(
-        'uselegacybrowselistofusersreport',
-        new lang_string('uselegacybrowselistofusersreport', 'admin'),
-        new lang_string('uselegacybrowselistofusersreport_desc', 'admin'),
-        0
-    ));
-
     $ADMIN->add('experimental', $temp);
 
     // "debugging" settingpage

@@ -1158,39 +1158,6 @@ function totara_is_post_request() {
     return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST';
 }
 
-
-/**
- * Download stored errorlog as a zip
- *
- * @deprecated since Totara 11
- */
-function totara_errors_download() {
-    global $DB;
-
-    debugging(__FUNCTION__ . ' was deprecated in Totara 11 and will be removed in a future version. There is no alternative.', DEBUG_DEVELOPER);
-
-    // Load errors from database
-    $errors = $DB->get_records('errorlog');
-    if (!$errors) {
-        $errors = array();
-    }
-
-    // Format them nicely as strings
-    $content = '';
-    foreach ($errors as $error) {
-        $error = (array) $error;
-        foreach ($error as $key => $value) {
-            $error[$key] = str_replace(array("\t", "\n"), ' ', $value);
-        }
-
-        $content .= implode("\t", $error);
-        $content .= "\n";
-    }
-
-    send_temp_file($content, 'totara-error.log', true);
-}
-
-
 /**
  * Generate markup for search box
  *

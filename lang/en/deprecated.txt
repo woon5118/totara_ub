@@ -57,10 +57,6 @@ strftimedaydatetime,core_message
 timenosee,core_message
 timesent,core_message
 userssearchresults,core_message
-configcustommenuitems,core_admin
-custommenuitems,core_admin
-custommenu,core_admin
-moodleorghubname,core_admin
 nativesqlsrvnonwindows,core_install
 loginpasswordautocomplete,core_admin
 loginpasswordautocomplete_help,core_admin

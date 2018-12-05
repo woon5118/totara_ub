@@ -769,8 +769,6 @@ class behat_config_util {
     /**
      * Merges $CFG->behat_config with the one passed.
      *
-     * @deprecated since Totara 10
-     *
      * @param array $config existing config.
      * @return array merged config with $CFG->behat_config
      */
@@ -832,8 +830,6 @@ class behat_config_util {
 
     /**
      * Merges $CFG->behat_profiles with the one passed.
-     *
-     * @deprecated since Totara 10
      *
      * @param array $config existing config.
      * @return array merged config with $CFG->behat_profiles

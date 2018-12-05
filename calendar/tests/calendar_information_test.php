@@ -439,20 +439,13 @@ class core_calendar_calendar_information_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey($this->course6->id, $courses);
         $this->assertCount(3, $courses);
 
-        // With unsupported view, the old function is used. This does not restrict by time.
-        // The site has less than 20 courses with events, so all those with events are returned.
-        // IMPORTANT: This part should fail when deprecated function calendar_get_default_courses is removed.
-        // At that point, alter calendar_information::get_default_courses to throw an exception
-        // instead of calling that function. Change this test to reflect that.
-        $courses = $calendar_information->get_default_courses('somecustomstring');
-        $this->assertDebuggingCalled('calendar_get_default_courses has been deprecated since Totara 10.0. Please use calendar_information::get_default_courses instead.');
-        $this->assertArrayHasKey($this->course1->id, $courses);
-        $this->assertArrayHasKey($this->course2->id, $courses);
-        $this->assertArrayNotHasKey($this->course3->id, $courses); // Only the course without events is excluded.
-        $this->assertArrayHasKey($this->course4->id, $courses);
-        $this->assertArrayHasKey($this->course5->id, $courses);
-        $this->assertArrayHasKey($this->course6->id, $courses);
-        $this->assertCount(5, $courses);
+        try {
+            $courses = $calendar_information->get_default_courses('somecustomstring');
+            $this->fail('Exception expected for unsupported view types');
+        } catch (Exception $e) {
+            $this->assertInstanceOf('coding_exception', $e);
+            $this->assertSame('Coding error detected, it must be fixed by a programmer: Unsupported view type', $e->getMessage());
+        }
 
         // Providing we update the lookahead value, 'upcoming' will give us different results from
         // other supported views.

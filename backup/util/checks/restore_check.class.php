@@ -87,18 +87,10 @@ abstract class restore_check {
                 throw new restore_controller_exception('restore_unknown_restore_type', $type);
         }
 
-        // Now, if restore mode is hub or import, check userid has permissions for those modes
+        // Now, if restore mode is import, check userid has permissions for those modes
         // other modes will perform common checks only (restorexxxx capabilities in $typecapstocheck)
         switch ($mode) {
-            case backup::MODE_HUB:
-                if (!has_capability('moodle/restore:restoretargethub', $coursectx, $userid)) {
-                    $a = new stdclass();
-                    $a->userid = $userid;
-                    $a->courseid = $courseid;
-                    $a->capability = 'moodle/restore:restoretargethub';
-                    throw new restore_controller_exception('restore_user_missing_capability', $a);
-                }
-                break;
+            // Totara: removed backup::MODE_HUB.
             case backup::MODE_IMPORT:
                 if (!has_capability('moodle/restore:restoretargetimport', $coursectx, $userid)) {
                     $a = new stdclass();

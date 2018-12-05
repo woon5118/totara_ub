@@ -59,6 +59,10 @@ abstract class backup implements checksumable {
      * during a restore they are copied from the existing file record.
      */
     const MODE_IMPORT    = 20;
+
+    /**
+     * @deprecated since Totara 13.
+     */
     const MODE_HUB       = 30;
 
     /**

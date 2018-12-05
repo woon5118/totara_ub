@@ -167,26 +167,6 @@ class graph {
         }
     }
 
-    /**
-     * @deprecated since Totara 11
-     */
-    public function reset_records() {
-        debugging('do not reset graph records, create a new graph instead', DEBUG_DEVELOPER);
-
-        $this->processedcount = 0;
-
-        if ($this->category == -2) {
-            $this->series = array();
-            $this->svggraphsettings['legend_entries'] = array();
-            foreach ($this->values as $i => $unused) {
-                $prev = $this->values[$i][-2];
-                $this->values[$i] = array(-2 => $prev);
-            }
-        } else {
-            $this->values = array();
-        }
-    }
-
     public function add_record($record) {
         $recorddata = $this->report->src->process_data_row($record, 'graph', $this->report);
 

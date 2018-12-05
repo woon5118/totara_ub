@@ -547,17 +547,6 @@ class course_modinfo {
     }
 
     /**
-     * This method can not be used anymore.
-     *
-     * @see course_modinfo::build_course_cache()
-     * @deprecated since 2.6
-     */
-    public static function build_section_cache($courseid) {
-        throw new coding_exception('Function course_modinfo::build_section_cache() can not be used anymore.' .
-            ' Please use course_modinfo::build_course_cache() whenever applicable.');
-    }
-
-    /**
      * Builds a list of information about sections on a course to be stored in
      * the course cache. (Does not include information that is already cached
      * in some other way.)
@@ -1949,18 +1938,6 @@ class cm_info implements IteratorAggregate {
     }
 
     /**
-     * This method can not be used anymore.
-     *
-     * @see \core_availability\info_module::filter_user_list()
-     * @deprecated Since Moodle 2.8
-     */
-    private function get_deprecated_group_members_only() {
-        throw new coding_exception('$cm->groupmembersonly can not be used anymore. ' .
-                'If used to restrict a list of enrolled users to only those who can ' .
-                'access the module, consider \core_availability\info_module::filter_user_list.');
-    }
-
-    /**
      * Getter method for property $availableinfo, ensures that dynamic data is retrieved
      *
      * @return string Available info (HTML)
@@ -2005,17 +1982,6 @@ class cm_info implements IteratorAggregate {
             // Ensure activity is completely hidden from the user.
             $this->availableinfo = '';
         }
-    }
-
-    /**
-     * This method has been deprecated and should not be used.
-     *
-     * @see $uservisible
-     * @deprecated Since Moodle 2.8
-     */
-    public function is_user_access_restricted_by_group() {
-        throw new coding_exception('cm_info::is_user_access_restricted_by_group() can not be used any more.' .
-            ' Use $cm->uservisible to decide whether the current user can access an activity.');
     }
 
     /**

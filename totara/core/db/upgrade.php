@@ -511,5 +511,29 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018112202, 'totara', 'core');
     }
 
+    if ($oldversion < 2018120701) {
+        // Remove community block.
+        uninstall_plugin('block', 'community');
+
+        // Remove unused 'errorlog' table.
+        $table = new xmldb_table('errorlog');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Remove deprecated 'registration_hubs' table.
+        // We don't have Moodle registration code any more.
+        $table = new xmldb_table('registration_hubs');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Clean up the deprecated settings.
+        unset_config('uselegacybrowselistofusersreport', 'core');
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2018120701, 'totara', 'core');
+    }
+
     return true;
 }

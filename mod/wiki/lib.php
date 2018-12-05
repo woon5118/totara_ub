@@ -271,67 +271,6 @@ function wiki_supports($feature) {
 }
 
 /**
- * Given a course and a time, this module should find recent activity
- * that has occurred in wiki activities and print it out.
- * Return true if there was output, or false is there was none.
- *
- * @deprecated as of totara 11 - use {@link mod_wiki_renderer::render_recent_activities()} instead
- * @global $CFG
- * @global $DB
- * @uses CONTEXT_MODULE
- * @uses VISIBLEGROUPS
- * @param object $course
- * @param bool $viewfullnames capability
- * @param int $timestart
- * @return boolean
- **/
-function wiki_print_recent_activity($course, $viewfullnames, $timestart) {
-    global $CFG, $DB, $OUTPUT;
-
-    $sql = "SELECT p.id, p.timemodified, p.subwikiid, sw.wikiid, w.wikimode, sw.userid, sw.groupid
-            FROM {wiki_pages} p
-                JOIN {wiki_subwikis} sw ON sw.id = p.subwikiid
-                JOIN {wiki} w ON w.id = sw.wikiid
-            WHERE p.timemodified > ? AND w.course = ?
-            ORDER BY p.timemodified ASC";
-    if (!$pages = $DB->get_records_sql($sql, array($timestart, $course->id))) {
-        return false;
-    }
-    require_once($CFG->dirroot . "/mod/wiki/locallib.php");
-
-    $wikis = array();
-
-    $modinfo = get_fast_modinfo($course);
-
-    $subwikivisible = array();
-    foreach ($pages as $page) {
-        if (!isset($subwikivisible[$page->subwikiid])) {
-            $subwiki = (object)array('id' => $page->subwikiid, 'wikiid' => $page->wikiid,
-                'groupid' => $page->groupid, 'userid' => $page->userid);
-            $wiki = (object)array('id' => $page->wikiid, 'course' => $course->id, 'wikimode' => $page->wikimode);
-            $subwikivisible[$page->subwikiid] = wiki_user_can_view($subwiki, $wiki);
-        }
-        if ($subwikivisible[$page->subwikiid]) {
-            $wikis[] = $page;
-        }
-    }
-    unset($subwikivisible);
-    unset($pages);
-
-    if (!$wikis) {
-        return false;
-    }
-    echo $OUTPUT->heading(get_string("updatedwikipages", 'wiki') . ':', 3);
-    foreach ($wikis as $wiki) {
-        $cm = $modinfo->instances['wiki'][$wiki->wikiid];
-        $link = $CFG->wwwroot . '/mod/wiki/view.php?pageid=' . $wiki->id;
-        print_recent_activity_note($wiki->timemodified, $wiki, $cm->name, $link, false, $viewfullnames);
-    }
-
-    return true; //  True if anything was printed, otherwise false
-}
-
-/**
  * Gets recent activity for the wiki module.
  *
  * @param $activities

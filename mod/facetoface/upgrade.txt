@@ -1,6 +1,10 @@
 This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
+=== 13.0 ===
+
+* Deprecated function facetoface_get_ical_attachment() has been removed
+
 === 12.0 ===
 
 * Deprecated the following report builder display functions and replaced with display classes

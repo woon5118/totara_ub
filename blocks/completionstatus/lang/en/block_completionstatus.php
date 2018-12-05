@@ -30,8 +30,3 @@ $string['pluginname'] = 'Course completion status';
 $string['requirement'] = 'Requirement';
 $string['returntocourse'] = 'Return to course';
 $string['xrequired'] = '{$a} required';
-
-// Deprecated in 9.0
-$string['showinguser'] = 'Showing user: {$a}';
-$string['status'] = 'Status: {$a}';
-$string['required'] = 'Required: {$a}';

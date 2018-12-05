@@ -429,6 +429,7 @@ Fields that cannot be empty are:
 * deleted (depending on the source contains all records setting)
 * auth
 ';
+$string['eventsynccompleted'] = 'HR Import completed';
 $string['files'] = 'Files';
 $string['filesdir'] = 'Files directory';
 $string['fileaccess'] = 'File access';
@@ -458,49 +459,6 @@ $string['schedulingdisabled'] = 'Scheduling disabled';
 $string['usedefaultsettings'] = 'Use default settings';
 $string['usedefaultsettings_help'] = 'When selected, settings configured on the \'Default settings\' page will be applied to this element. When deselected, it is possible to override the default with settings specific to this element only.';
 $string['csvencoding'] = 'CSV file encoding';
-
-// Event.
-$string['eventsynccompleted'] = 'HR Import completed';
-
-// Deprecated since 9.0
-$string['posenddate'] = 'Position end date';
-$string['posstartdate'] = 'Position start date';
-$string['posstartdateafterenddate'] = 'Position start date must not be later than end date for user {$a->idnumber}';
-$string['postitle'] = 'Position title';
-
-// Deprecated since 10.0
-$string['appraiserxnotexist'] = 'Appraiser {$a->appraiseridnumber} does not exist. Skipped user {$a->idnumber}';
-$string['cannotcreateuserassignments'] = 'cannot create user assignments (user: {$a})';
-$string['cannotimportjobassignments'] = 'Cannot create job assignment (user: {$a})';
-$string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
-$string['deletednotforjobassign'] = '<strong>Warning:</strong> the "{$a}" field applies to deleting users. Do not set its value to 1 when you only intend to delete a job assignment.';
-$string['error:linkjobassignmentmismatch'] = '<strong>Warning:</strong> Import set to link to first job assignment, but previous import linked to job assignment id number. This indicates a problem with your HR Import configuration, please contact your site administrator.';
-$string['jobassignmentidnumber'] = 'Job assignment ID number';
-$string['jobassignmentidnumberrequired'] = 'Job assignment ID number must be included when providing other job assignment fields';
-$string['jobassignmentfullname'] = 'Job assignment full name';
-$string['jobassignmentenddate'] = 'Job assignment end date';
-$string['jobassignmentstartdate'] = 'Job assignment start date';
-$string['jobassignmentidnumberemptyx'] = 'Job assignment id number cannot be empty. Skipped job assignment for user {$a->idnumber}';
-$string['jobassignmentstartdateafterenddate'] = 'Job assignment start date must not be later than end date for user {$a->idnumber}';
-$string['linkjobassignmentidnumber'] = 'Link job assignments';
-$string['linkjobassignmentidnumberfalse'] = 'to the user\'s first job assignment';
-$string['linkjobassignmentidnumbertrue'] = 'using the user\'s job assignment ID number';
-$string['linkjobassignmentidnumberdesc'] = 'If job assignment data is provided in the import, it will be linked to existing job assignment records using this method. If linking to the user\'s first job assignment, only one job assignment record can be provided in the import for each user.<br>
-<br>
-Note that the first time an import is performed \'using the user\'s job assignment ID number\' setting, this will become permanently set and the setting will be removed from this form. Make sure that you import job assignment ID Numbers by linking \'to the user\'s first job assignment\' before changing this option.';
-$string['managerassignmanagerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassignwoidnumberx'] = 'Manager idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassignwojaidx'] = 'Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassigncanthavejaid'] = 'Manager\'s job assignment idnumber can only be provided if linking by idnumber (invalid configuration)';
-$string['managerassignmissingmanagerjobx'] = 'Manager\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
-$string['managerassignmissingjobx'] = 'User\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
-$string['managerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped user {$a->idnumber}';
-$string['multiplejobassignmentsdisabledmanagerx'] = 'Tried to create a manager\'s job assignment but multiple job assignments site setting is disabled and the manager already has a different job assignment. Skipped job assignment for user {$a->idnumber}';
-$string['multiplejobassignmentsdisabledx'] = 'Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment for user {$a->idnumber}';
-$string['orgxnotexist'] = 'Organisation {$a->orgidnumber} does not exist. Skipped user {$a->idnumber}';
-$string['posxnotexist'] = 'Position {$a->posidnumber} does not exist. Skipped user {$a->idnumber}';
-$string['selfassignedmanagerx'] = 'User {$a->idnumber} cannot be their own manager. Skipped user {$a->idnumber}';
-$string['selfassignedappraiserx'] = 'User {$a->idnumber} cannot be their own appraiser. Skipped user {$a->idnumber}';
 
 // Deprecated since 12.0
 $string['nocsvfilepath'] = 'no CSV filepath specified';

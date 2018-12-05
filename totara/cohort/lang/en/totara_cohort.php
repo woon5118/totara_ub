@@ -437,11 +437,13 @@ $string['ruledesc-learning-coursecompletiondate'] = 'User\'s course completion d
 $string['ruledesc-learning-coursecompletionduration'] = 'User\'s course completion duration';
 $string['ruledesc-learning-coursecompletionlist'] = 'User\'s course completion(s)';
 $string['ruledesc-learning-programcompletiondate'] = 'User\'s program completion date';
+$string['ruledesc-learning-programcompletionduration'] = 'User\'s program completion duration';
 $string['ruledesc-learning-programcompletiondurationassigned'] = 'User\'s program completion duration since assignment';
 $string['ruledesc-learning-programcompletiondurationstarted'] = 'User\'s program completion duration since started';
 $string['ruledesc-learning-programcompletionlist'] = 'User\'s program completion(s)';
 $string['ruledesc-systemaccess-firstlogin'] = 'User\'s first login date';
 $string['ruledesc-systemaccess-lastlogin'] = 'User\'s last login date';
+$string['ruledesc-user-authenticationtype'] = 'User\'s authentication type';
 $string['ruledesc-user-city'] = 'User\'s city';
 $string['ruledesc-user-country'] = 'User\'s country';
 $string['ruledesc-user-department'] = 'User\'s department';
@@ -505,10 +507,12 @@ $string['rulename-alljobassign-postypes'] = 'Position types';
 $string['rulename-alljobassign-startdates'] = 'Start Dates';
 $string['rulename-cohort-cohortmember'] = 'Audience member';
 $string['rulename-learning-certificationcompletiondate'] = 'Certification completion date';
+$string['rulename-learning-certificationstatus'] = 'Certification status';
 $string['rulename-learning-coursecompletiondate'] = 'Course completion date';
 $string['rulename-learning-coursecompletionduration'] = 'Course completion duration';
 $string['rulename-learning-coursecompletionlist'] = 'Course completion';
 $string['rulename-learning-programcompletiondate'] = 'Program completion date';
+$string['rulename-learning-programcompletionduration'] = 'Program completion duration';
 $string['rulename-learning-programcompletiondurationassigned'] = 'Program completion duration since assignment';
 $string['rulename-learning-programcompletiondurationstarted'] = 'Program completion duration since started';
 $string['rulename-learning-programcompletionlist'] = 'Program completion';
@@ -607,44 +611,6 @@ $string['youhaveremoved'] = 'You have removed {$a->itemname} from this program<b
 <strong>This will unasign {$a->affectedusers} users from the program</strong><br />
 <br />
 This change will be applied once the \'Save all changes\' button is clicked on the main Program assignments screen';
-
-// Deprecated.
-$string['ruledesc-learning-programcompletionduration'] = 'User\'s program completion duration';
-$string['ruledesc-org-id'] = 'User\'s organisation';
-$string['ruledesc-org-idnumber'] = 'User\'s organisation ID number';
-$string['ruledesc-org-orgtype'] = 'User\'s organisation type';
-$string['ruledesc-pos-hasdirectreports'] = 'User\'s direct reports';
-$string['ruledesc-pos-id'] = 'User\'s position';
-$string['ruledesc-pos-idnumber'] = 'User\'s position ID number';
-$string['ruledesc-pos-name'] = 'User\'s position name';
-$string['ruledesc-pos-postitle'] = 'User\'s position title (fullname)';
-$string['ruledesc-pos-postype'] = 'User\'s position type';
-$string['ruledesc-pos-startdate'] = 'User\'s position date assigned';
-$string['ruledesc-pos-timevalidfrom'] = 'User\'s position start date';
-$string['ruledesc-pos-timevalidto'] = 'User\'s position end date';
-$string['ruledesc-user-authenticationtype'] = 'User\'s authentication type';
-$string['rulename-learning-certificationstatus'] = 'Certification status';
-$string['rulename-learning-programcompletionduration'] = 'Program completion duration';
-$string['rulename-org-id'] = 'Organisation';
-$string['rulename-org-idnumber'] = 'Organisation ID number';
-$string['rulename-org-orgtype'] = 'Organisation type';
-$string['rulename-pos-hasdirectreports'] = 'Has direct reports';
-$string['rulename-pos-id'] = 'Position';
-$string['rulename-pos-idnumber'] = 'Position ID number';
-$string['rulename-pos-name'] = 'Position name';
-$string['rulename-pos-postitle'] = 'Position title (fullname)';
-$string['rulename-pos-postype'] = 'Position type';
-$string['rulename-pos-reportsto'] = 'Manager';
-$string['rulename-pos-startdate'] = 'Position assigned date';
-$string['rulename-pos-timevalidfrom'] = 'Position start date';
-$string['rulename-pos-timevalidto'] = 'Position end date';
-$string['rulehelp-pos-postitle'] = 'Matches against the text of the user\'s primary position title';
-
-/*
- * @deprecated Since Totara 11.0.
- */
-$string['successfullycreatedplans'] = 'Successfully created new learning plans for {$a} audience members';
-
 
 /*
  * @deprecated Since Totara 12.0.

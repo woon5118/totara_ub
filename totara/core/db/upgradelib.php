@@ -327,7 +327,7 @@ function totara_upgrade_course_completion_remove_duplicates($table, $uniques, $f
 }
 
 /**
- * Uninstall Moodle plugins removed in 3.1 and 3.2 and Totara 10 plugins.
+ * Uninstall Moodle plugins removed in 3.1 - 3.3 and Totara 13 plugins.
  */
 function totara_core_upgrade_delete_moodle_plugins() {
     global $DB;
@@ -335,6 +335,9 @@ function totara_core_upgrade_delete_moodle_plugins() {
     // NOTE: this should match \core_plugin_manager::is_deleted_standard_plugin() data.
 
     $deleteplugins = array(
+        // Totara 13 removals.
+        'block_community',
+
         // Moodle GDPR stuff.
         'tool_dataprivacy',
         'tool_policy',

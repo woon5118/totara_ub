@@ -1659,47 +1659,6 @@ function calendar_edit_event_allowed($event) {
 }
 
 /**
- * Totara: Deprecating this function due to limit on courses returned without taking timeframe
- * into account. Use the method calendar_information::get_default_courses instead.
- *
- * Returns the default courses to display on the calendar when there isn't a specific
- * course to display.
- *
- * @deprecated since 10.0
- * @return array $courses Array of courses to display
- */
-function calendar_get_default_courses() {
-    global $CFG, $DB;
-
-    if (!isloggedin()) {
-        return array();
-    }
-
-    debugging('calendar_get_default_courses has been deprecated since Totara 10.0. Please use calendar_information::get_default_courses instead.',
-        DEBUG_DEVELOPER);
-
-    $courses = array();
-    if (!empty($CFG->calendar_adminseesall) && has_capability('moodle/calendar:manageentries', context_system::instance())) {
-        $select = ', ' . context_helper::get_preload_record_columns_sql('ctx');
-        $join = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
-        $sql = "SELECT c.* $select
-                  FROM {course} c
-                  $join
-                  WHERE EXISTS (SELECT 1 FROM {event} e WHERE e.courseid = c.id)
-                  ";
-        $courses = $DB->get_records_sql($sql, array('contextlevel' => CONTEXT_COURSE), 0, 20);
-        foreach ($courses as $course) {
-            context_helper::preload_from_record($course);
-        }
-        return $courses;
-    }
-
-    $courses = enrol_get_my_courses();
-
-    return $courses;
-}
-
-/**
  * Display calendar preference button
  *
  * @param stdClass $course course object
@@ -3135,12 +3094,7 @@ class calendar_information {
         if (!empty($CFG->calendar_adminseesall) && has_capability('moodle/calendar:manageentries', context_system::instance())) {
             // Load the times for when this view of the calendar starts and ends.
             if (!in_array($view, array('day', 'month', 'sideblockonly', 'upcoming'))) {
-                // Unsupported view type. Use the previous function for getting default courses.
-                // This may leave out desired courses due to an arbitrary limit on the number returned
-                // and no timeframe taken into account.
-                // IMPORTANT: The below function is deprecated. Once it is removed, we can
-                // remove this call to it and throw an exception instead.
-                return calendar_get_default_courses();
+                throw new coding_exception('Unsupported view type');
             }
 
             $boundaries = $this->get_time_boundaries($view);

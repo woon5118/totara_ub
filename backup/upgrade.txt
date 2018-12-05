@@ -1,6 +1,11 @@
 This files describes API changes in /backup/*,
 information provided here is intended especially for developers.
 
+=== 13 ===
+
+* Deprecated restore_ui::cleanup() has been removed
+* Constant backup::MODE_HUB has been deprecated
+
 === 11 ===
 
 * Capability 'moodle/restore:restorecourse' is now used only for targeting of restore operations,

@@ -22,13 +22,6 @@
  */
 
 require_once('../config.php');
-
-// If the legacy report should be used include it instead of this page.
-if (!empty($CFG->uselegacybrowselistofusersreport)) {
-    include(__DIR__ . "/user_legacy.php");
-    die;
-}
-
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 // Reportbuilder basic arguments

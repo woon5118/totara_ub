@@ -1212,14 +1212,6 @@ $string['xrecord'] = '{$a} record shown';
 $string['xrecords'] = '{$a} records shown';
 
 /**
- * @deprecated since Totara 11.0.
- */
-
-$string['activeonly'] = 'Active users only';
-$string['deletedonly'] = 'Deleted users only';
-$string['suspendedonly'] = 'Suspended users only';
-
-/**
  * @deprecated since Totara 12.0.
  */
 $string['activities'] = 'Activities';

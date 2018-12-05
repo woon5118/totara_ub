@@ -1,6 +1,24 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.0 ===
+
+* Deprecated registration_cron_task has been removed
+* Deprecated course publishing has been removed
+* The following deprecated capabilities have been removed:
+    'moodle/community:add',
+    'moodle/course:publish',
+    'moodle/community:download',
+    'moodle/backup:backuptargethub'
+* Deprecated maintenancemodetimer YUI module has been removed
+* Deprecated MForms element 'submitlink' has been removed
+* The following deprecated methods have been removed:
+  - core_grades_external::get_grades()
+  - course_modinfo::build_section_cache()
+  - cm_info::get_deprecated_group_members_only()
+  - cm_info::is_user_access_restricted_by_group()
+  - action_menu::do_not_enhance()
+
 === 12.0 ===
 
 * set_send_count() has been deprecated, please use \core_user\email_bounce_counter instead
@@ -57,7 +75,7 @@ information provided here is intended especially for developers.
 * The method moodleform::after_definition() has been added and can now be used to add some logic
   to be performed after the form's definition was set. This is useful for intermediate subclasses.
 * The mcore YUI rollup which included various YUI modules such as moodle-core-notification is no longer included on every
-  page. Missing YUI depdencies may be exposed by this change (e.g. missing a requirement on moodle-core-notification when
+  page. Missing YUI dependencies may be exposed by this change (e.g. missing a requirement on moodle-core-notification when
   using M.core.dialogue).
 * Return value of the validate_email() is now proper boolean as documented. Previously the function could return 1, 0 or false.
 * Various legacy javascript functions have been removed:

@@ -82,7 +82,3 @@ $string['userdataitemtotara_dashboard'] = 'Customised dashboards';
 $string['userdataitemtotara_dashboard_help'] = 'When purging, all the user\'s dashboards will be reset to their original state. When exporting, this will include the name and ID of all the dashboards the user has customised.';
 $string['unpublish'] = 'Unpublish';
 $string['userhomepagechanged'] = 'Your default page was changed';
-
-// Deprecated in 9.0
-$string['updatelayoutoff'] = 'Stop customizing this dashboard';
-$string['updatelayouton'] = 'Customize dashboard';

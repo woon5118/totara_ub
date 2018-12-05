@@ -228,19 +228,6 @@ class restore_ui extends base_ui {
     }
 
     /**
-     * Delete course which is created by restore process
-     * @deprecated since Totara 11
-     */
-    public function cleanup() {
-        global $DB;
-        $courseid = $this->controller->get_courseid();
-        if ($this->is_temporary_course_created($courseid) && $course = $DB->get_record('course', array('id' => $courseid))) {
-            $course->deletesource = 'restore';
-            delete_course($course, false);
-        }
-    }
-
-    /**
      * Checks if the course is not restored fully and current controller has created it.
      * @param int $courseid id of the course which needs to be checked
      * @return bool

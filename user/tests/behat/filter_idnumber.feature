@@ -12,45 +12,47 @@ Feature: Filter users by idnumber
       | student2 | Student2 | 1 | student2@example.com | 2000000 |
       | student3 | Student3 | 1 | student3@example.com | 3000000 |
     And I log in as "admin"
-    And I set the following administration settings values:
-      | uselegacybrowselistofusersreport | 1 |
     And I navigate to "Users > Browse list of users" in site administration
+    And I press "Edit this report"
+    And I switch to "Filters" tab
+    And I select "User ID Number" from the "newstandardfilter" singleselect
+    And I press "Add"
+    And I press "Save changes"
+    And I follow "View This Report"
 
   @javascript
   Scenario: Filtering id numbers - with case "is empty"
     # We should see see admin on the user list, the following e-mail is admin's e-mail.
-    Then I should see "moodle@example.com" in the "users" "table"
-    And I should see "Teacher" in the "users" "table"
-    And I should see "Student1" in the "users" "table"
-    And I should see "Student2" in the "users" "table"
-    And I should see "Student3" in the "users" "table"
-    And I follow "Show more..."
-    And I set the field "id_idnumber_op" to "is empty"
-    When I press "Add filter"
+    Then I should see "moodle@example.com" in the "system_browse_users" "table"
+    And I should see "Teacher" in the "system_browse_users" "table"
+    And I should see "Student1" in the "system_browse_users" "table"
+    And I should see "Student2" in the "system_browse_users" "table"
+    And I should see "Student3" in the "system_browse_users" "table"
+    And I set the field "id_user-idnumber_op" to "is empty"
+    When I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     # We should see admin on the user list, the following e-mail is admin's e-mail.
-    Then I should see "moodle@example.com" in the "users" "table"
-    And I should not see "Teacher" in the "users" "table"
-    And I should not see "Student1" in the "users" "table"
-    And I should not see "Student2" in the "users" "table"
-    And I should not see "Student3" in the "users" "table"
+    Then I should see "moodle@example.com" in the "system_browse_users" "table"
+    And I should not see "Teacher" in the "system_browse_users" "table"
+    And I should not see "Student1" in the "system_browse_users" "table"
+    And I should not see "Student2" in the "system_browse_users" "table"
+    And I should not see "Student3" in the "system_browse_users" "table"
 
   @javascript
   Scenario Outline: Filtering id numbers - with all other cases
     # We should see see admin on the user list, the following e-mail is admin's e-mail.
-    Then I should see "moodle@example.com" in the "users" "table"
-    And I should see "Teacher" in the "users" "table"
-    And I should see "Student1" in the "users" "table"
-    And I should see "Student2" in the "users" "table"
-    And I should see "Student3" in the "users" "table"
-    And I follow "Show more..."
-    And I set the field "id_idnumber_op" to "<Category>"
-    And I set the field "idnumber" to "<Argument>"
-    When I press "Add filter"
-    Then I should <Admin's Visibility> "moodle@example.com" in the "users" "table"
-    And I should <Teacher's Vis> "Teacher" in the "users" "table"
-    And I should <S1's Vis> "Student1" in the "users" "table"
-    And I should <S2's Vis> "Student2" in the "users" "table"
-    And I should <S3's Vis> "Student3" in the "users" "table"
+    Then I should see "moodle@example.com" in the "system_browse_users" "table"
+    And I should see "Teacher" in the "system_browse_users" "table"
+    And I should see "Student1" in the "system_browse_users" "table"
+    And I should see "Student2" in the "system_browse_users" "table"
+    And I should see "Student3" in the "system_browse_users" "table"
+    And I set the field "id_user-idnumber_op" to "<Category>"
+    And I set the field "id_user-idnumber" to "<Argument>"
+    When I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
+    Then I should <Admin's Visibility> "moodle@example.com" in the "system_browse_users" "table"
+    And I should <Teacher's Vis> "Teacher" in the "system_browse_users" "table"
+    And I should <S1's Vis> "Student1" in the "system_browse_users" "table"
+    And I should <S2's Vis> "Student2" in the "system_browse_users" "table"
+    And I should <S3's Vis> "Student3" in the "system_browse_users" "table"
 
     Examples:
       | Category        | Argument | Admin's Visibility | Teacher's Vis | S1's Vis | S2's Vis | S3's Vis |
