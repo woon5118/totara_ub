@@ -51,7 +51,7 @@ final class local {
      * Return localised formatted string representing the given integer.
      *
      * @param int $integer
-     * @param string $locale Locale to use when formatting currency
+     * @param string $locale - @deprecated since Totara 12.1, do not use
      * @return \string
      */
     public static function format_integer($integer, $locale = null) {
@@ -67,7 +67,7 @@ final class local {
      *
      * @param float $value
      * @param string $currency
-     * @param string $locale Locale to use when formatting currency
+     * @param string $locale - @deprecated since Totara 12.1, do not use
      * @return string
      */
     public static function format_money($value, $currency, $locale = null) {

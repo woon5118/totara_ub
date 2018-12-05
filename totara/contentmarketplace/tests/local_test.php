@@ -32,11 +32,22 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_contentmarketplace_local_testcase extends advanced_testcase {
 
+    protected static function normalise_spaces($text) {
+        $text = str_replace("\u{00a0}", ' ', $text);
+        $text = str_replace("\u{202f}", ' ', $text);
+        return $text;
+    }
+
     /**
      * @dataProvider money_provider
      */
     public function test_format_money($locale, $value, $currency, $expected) {
-        $price = local::format_money($value, $currency, $locale);
+        $this->resetAfterTest();
+        $this->overrideLangString('locale', 'langconfig', $locale);
+        $price = local::format_money($value, $currency);
+        // Formatter may use different unicode spaces in each OS,
+        // just make sure there is some space in result.
+        $price = self::normalise_spaces($price);
         $this->assertSame($expected, $price);
     }
 
@@ -47,10 +58,8 @@ class totara_contentmarketplace_local_testcase extends advanced_testcase {
             ['en_AU.UTF-8', 1.5, "AUD", 'A$1.50'],
             ['en_AU.UTF-8', 1234.5, "AUD", 'A$1,234.50'],
             ['en_AU.UTF-8', 1, "JPY", '¥1'],
-            // NumberFormatter returns no-break space unicode chars (U+00A0)
-            // in some cases.
-            ['fr_FR.UTF-8', 1234.5, "AUD",  "1\u{00a0}234,50\u{00a0}\$AU"],
-            ['de_DE.UTF-8', 1234.5, "USD", "1.234,50\u{00a0}\$"],
+            ['fr_FR.UTF-8', 1234.5, "AUD", "1 234,50 \$AU"],
+            ['de_DE.UTF-8', 1234.5, "USD", "1.234,50 \$"],
 
         ];
     }
@@ -59,7 +68,12 @@ class totara_contentmarketplace_local_testcase extends advanced_testcase {
      * @dataProvider integer_provider
      */
     public function test_format_integer($locale, $integer, $expected) {
-        $number = local::format_integer($integer, $locale);
+        $this->resetAfterTest();
+        $this->overrideLangString('locale', 'langconfig', $locale);
+        $number = local::format_integer($integer);
+        // Formatter may use different unicode spaces in each OS,
+        // just make sure there is some space in result.
+        $number = self::normalise_spaces($number);
         $this->assertSame($expected, $number);
     }
 
@@ -69,7 +83,7 @@ class totara_contentmarketplace_local_testcase extends advanced_testcase {
             ['en_AU.UTF-8', 1, "1"],
             ['en_AU.UTF-8', 1000, "1,000"],
             ['en_AU.UTF-8', 1000000, "1,000,000"],
-            ['fr_FR.UTF-8', 1000000, "1\u{00a0}000\u{00a0}000"],
+            ['fr_FR.UTF-8', 1000000, "1 000 000"],
             ['de_DE.UTF-8', 1000000, "1.000.000"],
         ];
     }
