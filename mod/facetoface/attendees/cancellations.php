@@ -299,7 +299,12 @@ if ($show_table) {
                 $data[] = $reserved.$cancelicon;
             }
 
-            $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
+            // If event was cancelled before attendance was approved by a manager, then timesignedup may be empty.
+            if (empty($attendee->timesignedup)) {
+                $data[] = '';
+            } else {
+                $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
+            }
 
             if ($showjobassignments) {
                 if (!empty($attendee->jobassignmentid)) {
