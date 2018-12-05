@@ -533,9 +533,22 @@ class totara_core_menu_helper_testcase extends advanced_testcase {
     }
 
     public function test_create_parentid_form_options() {
+        global $DB;
         $this->resetAfterTest();
 
         $unusedcontainerid = helper::get_unused_container_id();
+
+        // Remove items from non-standard plugins.
+        $items = $DB->get_records('totara_navigation');
+        foreach ($items as $item) {
+            $parts = explode('\\', ltrim($item->classname, '\\'));
+            $component = reset($parts);
+            list($plugin_type, $plugin_name) = core_component::normalize_component($component);
+            $standardplugins = core_plugin_manager::standard_plugins_list($plugin_type);
+            if (!in_array($plugin_name, $standardplugins)) {
+                $DB->delete_records('totara_navigation', array('id' => $item->id));
+            }
+        }
 
         $defaultoptions = helper::create_parentid_form_options(0);
         // Note: update following test to match default menu structure if it changes.
