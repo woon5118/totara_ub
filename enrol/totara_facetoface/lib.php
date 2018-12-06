@@ -265,7 +265,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $context = context_course::instance($course->id);
         $managers = \totara_job\job_assignment::get_all_manager_userids($USER->id);
 
-        if (!facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
+        if (!$seminarevent->has_capacity($context) && (!$seminarevent->get_allowoverbook())) {
             return array('result' => false, 'message' => get_string('sessionisfull', 'facetoface'));
         } else if (facetoface_get_user_submissions(
             $facetoface->id,

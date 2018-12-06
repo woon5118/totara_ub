@@ -253,8 +253,7 @@ final class seminar_event {
         }
 
         // Notify managers who had reservations.
-        $facetoface = $DB->get_record('facetoface', ['id' => $this->get_facetoface()]);
-        facetoface_notify_reserved_session_deleted($facetoface, $this->to_record());
+        \mod_facetoface\notice_sender::reservation_cancelled($this);
 
         return true;
     }

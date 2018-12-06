@@ -873,22 +873,23 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         // Check if the user is allowed to cancel his booking.
         $allowcancellation = facetoface_allow_user_cancellation($session);
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $seminar = new \mod_facetoface\seminar($session->facetoface);
+        $signup = \mod_facetoface\signup::create($USER->id, $seminarevent);
+        $state = $signup->get_state();
         if ($isbookedsession) {
             if (!$sessionstarted) {
                 $signuplink .= html_writer::link($signupurl, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface'), 'class' => 'mod_facetoface__sessionlist__action__link'));
             }
             if ($allowcancellation) {
                 $signuplink .= html_writer::empty_tag('br');
-                $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
+                $canceltext = ($state instanceof \mod_facetoface\signup\state\waitlisted) ? 'cancelwaitlist' : 'cancelbooking';
                 $signuplink .= html_writer::link($cancelurl, get_string($canceltext, 'facetoface'), array('title' => get_string($canceltext, 'facetoface'), 'class' => 'mod_facetoface__sessionlist__action__link'));
             }
         } else if (!$sessionstarted) {
-            if (!facetoface_session_has_capacity($session, $this->context, \mod_facetoface\signup\state\waitlisted::get_code()) && !$session->allowoverbook) {
+            if (!$seminarevent->has_capacity($this->context, \mod_facetoface\signup\state\waitlisted::get_code()) && !$seminarevent->get_allowoverbook()) {
                 $signuplink .= get_string('none', 'facetoface');
             } else {
-                $seminar = new \mod_facetoface\seminar($session->facetoface);
-                $seminarevent = new \mod_facetoface\seminar_event($session->id);
-                $signup = \mod_facetoface\signup::create($USER->id, $seminarevent);
                 if (empty($session->cancelledstatus) && $registrationopen == true && $registrationclosed == false) {
                     if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions() == 1) {
                         // Ok to register.
@@ -912,7 +913,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         if (empty($signuplink)) {
             if ($sessionstarted && $allowcancellation) {
-                $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
+                $canceltext = ($state instanceof \mod_facetoface\signup\state\waitlisted) ? 'cancelwaitlist' : 'cancelbooking';
                 $signuplink = html_writer::link($cancelurl, get_string($canceltext, 'facetoface'), array('title' => get_string($canceltext, 'facetoface'), 'class' => 'mod_facetoface__sessionlist__action__link'));
             }
         }
@@ -1811,7 +1812,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string html markup
      */
     public function render_seminar_event(\mod_facetoface\seminar_event $seminarevent, $showcapacity, $calendaroutput=false, $hidesignup=false, $class='f2f') {
-        global $DB, $PAGE, $USER;
+        global $PAGE, $USER;
         $output = html_writer::start_tag('dl', array('class' => $class));
 
         $bookedsessions = facetoface_get_user_submissions($seminarevent->get_seminar()->get_id(), $USER->id,
@@ -1830,13 +1831,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
         $rooms = \mod_facetoface\room_list::get_event_rooms($seminarevent->get_id());
+        $seminar = $seminarevent->get_seminar();
 
         $strdatetime = str_replace(' ', '&nbsp;', get_string('sessiondatetime', 'facetoface'));
         if ($seminarevent->get_mintimestart()) {
             foreach ($seminarevent->get_sessions() as $date) {
-                /**
-                 * @var \mod_facetoface\seminar_session $date
-                 */
+
                 $output .= html_writer::empty_tag('br');
 
                 $sessionobj = facetoface_format_session_times($date->get_timestart(), $date->get_timefinish(), $date->get_sessiontimezone());
@@ -1892,12 +1892,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('dd', max(0, $placesleft));
         }
 
-        // Display requires approval notification
-        $facetoface = $DB->get_record('facetoface', array('id' => $seminarevent->get_facetoface()));
-
         // Display job assignments.
         if (get_config(null, 'facetoface_selectjobassignmentonsignupglobal') &&
-            ($facetoface->selectjobassignmentonsignup || $facetoface->forceselectjobassignment)) {
+            ($seminar->get_selectjobassignmentonsignup() || $seminar->get_forceselectjobassignment())) {
             if (isset($bookedsession->jobassignmentid) && $bookedsession->jobassignmentid) {
                 $jobassignment = \totara_job\job_assignment::get_with_id(
                     $bookedsession->jobassignmentid,
@@ -1926,8 +1923,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
 
         // Display managers.
-        if ($facetoface->approvaltype != APPROVAL_NONE && $facetoface->approvaltype != APPROVAL_SELF) {
-            $approver = facetoface_get_approvaltype_string($facetoface->approvaltype, $facetoface->approvalrole);
+        if ($seminar->get_approvaltype() != $seminar::APPROVAL_NONE && $seminar->get_approvaltype() != $seminar::APPROVAL_SELF) {
+            $approver = $seminar->get_approvaltype_string();
             $output .= html_writer::tag('dt', get_string('approvalrequiredby', 'facetoface'));
             $output .= html_writer::tag('dd', $approver);
 
@@ -1951,7 +1948,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             }
         }
         // Display trainers.
-        $trainerroles = facetoface_get_trainer_roles(context_course::instance($facetoface->course));
+        $trainerroles = facetoface_get_trainer_roles(context_course::instance($seminar->get_course()));
         $trainers = facetoface_get_trainers($seminarevent->get_id());
         foreach ((array)$trainerroles as $role => $rolename) {
             if (empty($trainers[$role])) {
@@ -1979,7 +1976,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
 
         if (!empty($seminarevent->get_details())) {
-            if ($cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course)) {
+            if ($cm = get_coursemodule_from_instance('facetoface', $seminar->get_id(), $seminar->get_course())) {
                 $context = context_module::instance($cm->id);
                 $details = file_rewrite_pluginfile_urls($seminarevent->get_details(), 'pluginfile.php', $context->id, 'mod_facetoface', 'session', $seminarevent->get_id());
                 $details = format_text($details, FORMAT_HTML);

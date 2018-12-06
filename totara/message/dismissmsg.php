@@ -54,9 +54,9 @@ $eventdata = totara_message_eventdata($id, 'onaccept', $metadata);
 if ($eventdata && isset($eventdata->action)) {
     switch ($eventdata->action) {
         case 'facetoface':
-            require_once($CFG->dirroot . '/mod/facetoface/lib.php');
             $isfacetoface = true;
-            $canbook = facetoface_task_check_capacity($eventdata->data);
+            $seminarevent = new \mod_facetoface\seminar_event($eventdata->data['session']->id);
+            $canbook = ($seminarevent->has_capacity() || $seminarevent->get_allowoverbook());
             break;
         case 'prog_extension':
             require_once($CFG->dirroot . '/totara/program/lib.php');

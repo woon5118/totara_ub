@@ -3378,19 +3378,317 @@ function facetoface_check_signup($facetofaceid, $sessionid = null) {
 }
 
 /**
- * This function has been deprecated, please call facetoface_build_user_in_conflict_message instead
- * @param stdClass[] $user_in_conflict
- * @deprecated since Totara 13
+ * Kohl's KW - WP06A - Google calendar integration
+ * If the unassigned user belongs to a course with an upcoming
+ * face-to-face session and they are signed-up to attend, cancel
+ * the sign-up (and trigger notification).
+ *
+ * @deprecated since Totara 12.0
  */
-function facetoface_build_user_roles_in_conflict_message($user_in_conflict)
-{
-    debugging(
-        "The function facetoface_build_user_roles_in_conflict_message() has been renamed " .
-        "to facetoface_build_user_in_conflict_message()",
-        DEBUG_DEVELOPER
+function facetoface_eventhandler_role_unassigned($ra) {
+    global $DB;
+
+    debugging('facetoface_eventhandler_role_unassigned() function has been deprecated as unused', DEBUG_DEVELOPER);
+
+    $now = time();
+
+    $ctx = context::instance_by_id($ra->contextid);
+    if ($ctx->contextlevel == CONTEXT_COURSE) {
+        // get all face-to-face activites in the course
+        $activities = $DB->get_records('facetoface', array('course' => $ctx->instanceid));
+        if ($activities) {
+            foreach ($activities as $facetoface) {
+                // get all upcoming sessions for each face-to-face
+                $sql = "SELECT s.id
+                        FROM {facetoface_sessions} s
+                        LEFT JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
+                        WHERE
+                            s.facetoface = ? AND d.sessionid = s.id AND
+                            (d.timestart IS NULL OR d.timestart > ?)
+                        ORDER BY d.timestart
+                ";
+
+                if ($sessions = $DB->get_records_sql($sql, array($facetoface->id, $now))) {
+                    $cancelreason = "Unenrolled from course";
+                    foreach ($sessions as $sessiondata) {
+                        $session = facetoface_get_session($sessiondata->id); // load dates etc.
+                        $seminarevent = new seminar_event($session->id);
+
+                        // remove trainer session assignments for user (if any exist)
+                        if ($trainers = facetoface_get_trainers($session->id)) {
+                            foreach ($trainers as $role_id => $users) {
+                                foreach ($users as $user_id => $trainer) {
+                                    if ($trainer->id == $ra->userid) {
+                                        $form = $trainers;
+                                        unset($form[$role_id][$user_id]); // remove trainer
+                                        facetoface_update_trainers($session->id, $form);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // cancel learner signup for user (if any exist)
+                        $errorstr = '';
+                        $signup = signup::create($ra->userid, $seminarevent);
+                        if (signup_helper::can_user_cancel($signup)) {
+                            signup_helper::user_cancel($signup);
+                            notice_sender::signup_cancellation(signup::create($ra->userid, $seminarevent));
+                        }
+                    }
+                }
+            }
+        }
+    } else if ($ctx->contextlevel == CONTEXT_PROGRAM) {
+        // nothing to do (probably)
+    }
+
+    return true;
+}
+
+/**
+ * Sync the list of assets for a given seminar event date
+ *
+ * @param integer $date Seminar date Id
+ * @param array $assets List of asset Ids
+ * @return bool
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_sync_assets($date, array $assets = []) {
+    global $DB;
+
+    debugging('facetoface_sync_assets() function has been deprecated, please use asset_helper::sync()',
+        DEBUG_DEVELOPER);
+
+    if (empty($assets)) {
+        return $DB->delete_records('facetoface_asset_dates', ['sessionsdateid' => $date]);
+    }
+
+    $oldassets = $DB->get_fieldset_select('facetoface_asset_dates', 'assetid', 'sessionsdateid = :date_id', ['date_id' => $date]);
+
+    // WIPE THEM AND RECREATE if certain conditions have been met.
+    if ((count($assets) == count($oldassets)) && empty(array_diff($assets, $oldassets))) {
+        return true;
+    }
+
+    $res = $DB->delete_records('facetoface_asset_dates', ['sessionsdateid' => $date]);
+
+    foreach ($assets as $asset) {
+        $res &= $DB->insert_record('facetoface_asset_dates', (object) [
+            'sessionsdateid' => $date,
+            'assetid' => intval($asset)
+        ],false);
+    }
+    return !!$res;
+}
+
+/**
+ * Withdraws interest from a facetoface activity for a user.
+ * @param  object $facetoface A database fieldset object for the facetoface activity
+ * @param  int    $userid     Default to current user if null
+ * @return boolean            Success
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_withdraw_interest($facetoface, $userid = null) {
+    global $DB, $USER;
+
+    debugging('facetoface_withdraw_interest() function has been deprecated, please use signup_helper::withdraw_interest()',
+        DEBUG_DEVELOPER);
+
+    if (is_null($userid)) {
+        $userid = $USER->id;
+    }
+
+    return $DB->delete_records('facetoface_interest', array('facetoface' => $facetoface->id, 'userid' => $userid));
+}
+
+/** Download data in ODS format
+ *
+ * @param array $fields Array of column headings
+ * @param string $datarows Array of data to populate table with
+ * @param string $file Name of file for exportig
+ * @return Returns the ODS file
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_download_ods($fields, $datarows, $file=null) {
+    global $CFG;
+
+    debugging('facetoface_download_ods() function has been deprecated, please use export_helper::download_ods()',
+        DEBUG_DEVELOPER);
+
+    require_once("$CFG->libdir/odslib.class.php");
+    $filename = clean_filename($file . '.ods');
+
+    header("Content-Type: application/download\n");
+    header("Content-Disposition: attachment; filename=$filename");
+    header("Expires: 0");
+    header("Cache-Control: must-revalidate,post-check=0,pre-check=0");
+    header("Pragma: public");
+
+    $workbook = new MoodleODSWorkbook('-');
+    $workbook->send($filename);
+
+    $worksheet = array();
+
+    $worksheet[0] = $workbook->add_worksheet('');
+    $row = 0;
+    $col = 0;
+
+    foreach ($fields as $field) {
+        $worksheet[0]->write($row, $col, strip_tags($field));
+        $col++;
+    }
+    $row++;
+
+    $numfields = count($fields);
+
+    foreach ($datarows as $record) {
+        for($col=0; $col<$numfields; $col++) {
+            if (isset($record[$col])) {
+                $worksheet[0]->write($row, $col, html_entity_decode($record[$col], ENT_COMPAT, 'UTF-8'));
+            }
+        }
+        $row++;
+    }
+
+    $workbook->close();
+    die;
+}
+
+/** Download data in XLS format
+ *
+ * @param array $fields Array of column headings
+ * @param string $datarows Array of data to populate table with
+ * @param string $file Name of file for exportig
+ * @return Returns the Excel file
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_download_xls($fields, $datarows, $file=null) {
+    global $CFG;
+
+    debugging('facetoface_download_xls() function has been deprecated, please use export_helper::download_xls()',
+        DEBUG_DEVELOPER);
+
+    require_once($CFG->libdir . '/excellib.class.php');
+    $filename = clean_filename($file . '.xls');
+
+    header("Content-Type: application/download\n");
+    header("Content-Disposition: attachment; filename=$filename");
+    header("Expires: 0");
+    header("Cache-Control: must-revalidate,post-check=0,pre-check=0");
+    header("Pragma: public");
+
+    $workbook = new MoodleExcelWorkbook('-');
+    $workbook->send($filename);
+
+    $worksheet = array();
+
+    $worksheet[0] = $workbook->add_worksheet('');
+    $row = 0;
+    $col = 0;
+
+    foreach ($fields as $field) {
+        $worksheet[0]->write($row, $col, strip_tags($field));
+        $col++;
+    }
+    $row++;
+
+    $numfields = count($fields);
+
+    foreach ($datarows as $record) {
+        for ($col=0; $col<$numfields; $col++) {
+            $worksheet[0]->write($row, $col, html_entity_decode($record[$col], ENT_COMPAT, 'UTF-8'));
+        }
+        $row++;
+    }
+
+    $workbook->close();
+    die;
+}
+
+/** Download data in CSV format
+ *
+ * @param array $fields Array of column headings
+ * @param string $datarows Array of data to populate table with
+ * @param string $file Name of file for exportig
+ * @return Returns the CSV file
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_download_csv($fields, $datarows, $file=null) {
+    global $CFG;
+
+    debugging('facetoface_download_csv() function has been deprecated, please use export_helper::download_csv()',
+        DEBUG_DEVELOPER);
+
+    require_once($CFG->libdir . '/csvlib.class.php');
+
+    $csvexport = new csv_export_writer();
+    $csvexport->set_filename($file);
+    $csvexport->add_data($fields);
+
+    $numfields = count($fields);
+    foreach ($datarows as $record) {
+        $row = array();
+        for ($j = 0; $j < $numfields; $j++) {
+            $row[] = (isset($record[$j]) ? $record[$j] : '');
+        }
+        $csvexport->add_data($row);
+    }
+
+    $csvexport->download_file();
+    die;
+}
+
+/**
+ * Notify managers that a session they had reserved spaces on has been deleted.
+ *
+ * @param object $facetoface
+ * @param object $session
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_notify_reserved_session_deleted($facetoface, $session) {
+    global $CFG;
+
+    debugging('facetoface_notify_reserved_session_deleted() function has been deprecated, please use notice_sender::reservation_cancelled()',
+        DEBUG_DEVELOPER);
+
+    $attendees = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\booked::get_code()), true);
+    $reservedids = array();
+    foreach ($attendees as $attendee) {
+        if ($attendee->bookedby) {
+            if (!$attendee->id) {
+                // Managers can already get booking cancellation notices - just adding reserve cancellation notices.
+                $reservedids[] = $attendee->bookedby;
+            }
+        }
+    }
+    if (!$reservedids) {
+        return;
+    }
+    $reservedids = array_unique($reservedids);
+
+    $ccmanager = !empty($facetoface->ccmanager);
+    $facetoface->ccmanager = false; // Never Cc the manager's manager (that would just be too much).
+
+    // Notify all managers that have reserved spaces for their team.
+    $params = array(
+        'facetofaceid'  => $facetoface->id,
+        'type'          => MDL_F2F_NOTIFICATION_AUTO,
+        'conditiontype' => MDL_F2F_CONDITION_RESERVATION_CANCELLED
     );
 
-    facetoface_build_user_in_conflict_message($user_in_conflict);
+    $includeical = empty($CFG->facetoface_disableicalcancel);
+    foreach ($reservedids as $reservedid) {
+        facetoface_send_notice($facetoface, $session, $reservedid, $params, $includeical ? MDL_F2F_BOTH : MDL_F2F_TEXT, MDL_F2F_CANCEL);
+    }
+
+    $facetoface->ccmanager = $ccmanager;
 }
 
 /**
@@ -3404,7 +3702,7 @@ function facetoface_build_user_roles_in_conflict_message($user_in_conflict)
  * @deprecated since Totara 13.0
  */
 function facetoface_cost($userid, $sessionid, $sessiondata) {
-    global $CFG,$DB;
+    global $CFG, $DB;
     debugging('facetoface_cost() function has been deprecated, please use signup::get_cost()',
         DEBUG_DEVELOPER);
 
@@ -3420,6 +3718,145 @@ function facetoface_cost($userid, $sessionid, $sessiondata) {
     } else {
         // Note that this would return the normal cost if session was deleted and the join above failed.
         return format_string($sessiondata->normalcost);
+    }
+}
+
+/**
+ * Return the approval type of a facetoface as a human readable string
+ *
+ * @param int approvaltype  The $facetoface->approvaltype value
+ * @param int approvalrole  The $facetoface->approvalrole value, only required for role approval
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_approvaltype_string($approvaltype, $approvalrole = null) {
+
+    debugging('facetoface_get_approvaltype_string() function has been deprecated, please use seminar::get_approvaltype_string()',
+        DEBUG_DEVELOPER);
+
+    switch ($approvaltype) {
+        case \mod_facetoface\seminar::APPROVAL_NONE:
+            return get_string('approval_none', 'mod_facetoface');
+        case \mod_facetoface\seminar::APPROVAL_SELF:
+            return get_string('approval_self', 'mod_facetoface');
+        case \mod_facetoface\seminar::APPROVAL_ROLE:
+            $rolenames = role_fix_names(get_all_roles());
+            return $rolenames[$approvalrole]->localname;
+        case \mod_facetoface\seminar::APPROVAL_MANAGER:
+            return get_string('approval_manager', 'mod_facetoface');
+        case \mod_facetoface\seminar::APPROVAL_ADMIN:
+            return get_string('approval_admin', 'mod_facetoface');
+        default:
+            print_error('error:unrecognisedapprovaltype', 'mod_facetoface');
+    }
+}
+
+/**
+ * Confirm that a session has free space for a user
+ *
+ * @param class  $session Record from the facetoface_sessions table
+ * @param object $context (optional) A context object (record from context table)
+ * @param int    $status (optional), default is '70' (booked)
+ * @param int    $userid (optional)
+ * @return bool True if user can be added to session
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_session_has_capacity($session, $context = false, $status = null, $userid = 0) {
+    global $USER;
+
+    debugging('facetoface_session_has_capacity() function has been deprecated, please use seminar_event::has_capacity()',
+        DEBUG_DEVELOPER);
+
+    if (empty($session)) {
+        return false;
+    }
+    if (is_null($status)) {
+        $status = \mod_facetoface\signup\state\booked::get_code();
+    }
+    if (!$userid) {
+        $userid = $USER->id;
+    }
+
+    $signupcount = facetoface_get_num_attendees($session->id, $status);
+
+    if ($signupcount >= $session->capacity) {
+        // if session is full, check if overbooking is allowed for this user
+        if (!$context || !has_capability('mod/facetoface:signupwaitlist', $context, $userid)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Get user current status
+ *
+ * @param $sessionid
+ * @param $userid
+ * @return mixed
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_user_current_status($sessionid, $userid) {
+    global $DB;
+
+    debugging('facetoface_get_user_current_status() function has been deprecated, please use signup_status::get_state()',
+        DEBUG_DEVELOPER);
+
+    $sql = "
+        SELECT ss.*
+          FROM {facetoface_signups} su
+          JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+         WHERE su.sessionid = ?
+           AND su.userid = ?
+           AND ss.superceded = 0";
+
+    return $DB->get_record_sql($sql, array($sessionid, $userid));
+
+}
+
+/**
+ * Sets totara_set_notification message describing bulk import results
+ * @param array $results
+ * @param string $type
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_set_bulk_result_notification($results, $type = 'bulkadd') {
+
+    debugging('facetoface_set_bulk_result_notification() function has been deprecated, please use attendees_list_helper::set_bulk_result_notification()',
+        DEBUG_DEVELOPER);
+
+    $added          = $results[0];
+    $errors         = $results[1];
+    $result_message = '';
+
+    $noticeclass = 'notifysuccess';
+    // Generate messages
+    if ($errors) {
+        $noticeclass = 'notifyproblem';
+        $result_message .= get_string($type.'attendeeserror', 'facetoface') . ' - ';
+
+        if (count($errors) == 1 && is_string($errors[0])) {
+            $result_message .= $errors[0];
+        } else {
+            $result_message .= get_string('xerrorsencounteredduringimport', 'facetoface', count($errors));
+            $result_message .= \html_writer::link('#', get_string('viewresults', 'mod_facetoface'), ['class' => 'f2f-import-results']);
+        }
+    } else if ($added) {
+        $result_message .= get_string($type.'attendeessuccess', 'facetoface') . ' - ';
+        if ($type == 'bulkremove') {
+            $result_message .= get_string('successfullyremovedxattendees', 'facetoface', count($added));
+        } else {
+            $result_message .= get_string('successfullyaddededitedxattendees', 'facetoface', count($added));
+        }
+        $result_message .= \html_writer::link('#', get_string('viewresults', 'mod_facetoface'), ['class' => 'f2f-import-results']);
+    }
+
+    if ($result_message != '') {
+        totara_set_notification($result_message, null, array('class' => $noticeclass));
     }
 }
 
@@ -3452,4 +3889,165 @@ function facetoface_set_completion($facetoface, $userid, $completionstate = COMP
 
     $completion->update_state($cm, $completionstate, $userid);
     $completion->invalidatecache($facetoface->course, $userid, true);
+}
+
+/**
+ * Build user roles in conflict message, used when saving an event.
+ *
+ * @param stdClass[] $users_in_conflict Array of users in conflict.
+ * @return string Message
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_build_user_roles_in_conflict_message($users_in_conflict) {
+
+    debugging('facetoface_build_user_roles_in_conflict_message() function has been deprecated, please use mod_facetoface\form\event::get_conflict_message()',
+        DEBUG_DEVELOPER);
+
+    if (empty($users_in_conflict)) {
+        return '';
+    }
+
+    foreach ($users_in_conflict as $user) {
+        if (property_exists($user, "name")) {
+            // Indicating that the $user was already had the attribute 'name' built.
+            $users[] = $user->name;
+            continue;
+        }
+        $users[] = fullname($user);
+    }
+    $details = new stdClass();
+    $details->users = implode('; ', $users);
+    $details->userscount = count($users_in_conflict);
+
+    return format_text(get_string('userschedulingconflictdetected_body', 'facetoface', $details));
+}
+
+/**
+ * Determine if a user is in the waitlist of a session.
+ *
+ * @param object $session A session object
+ * @param int $userid The user ID
+ * @return bool True if the user is on waitlist, false otherwise.
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_is_user_on_waitlist($session, $userid = null) {
+    global $DB, $USER;
+
+    debugging('facetoface_is_user_on_waitlist() function has been deprecated, please use mod_facetoface\signup\state\waitlisted',
+        DEBUG_DEVELOPER);
+
+    if ($userid === null) {
+        $userid = $USER->id;
+    }
+
+    $sql = "SELECT 1
+            FROM {facetoface_signups} su
+            JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+            WHERE su.sessionid = ?
+              AND ss.superceded != 1
+              AND su.userid = ?
+              AND ss.statuscode = ?";
+
+    return $DB->record_exists_sql($sql, array($session->id, $userid, \mod_facetoface\signup\state\waitlisted::get_code()));
+}
+
+/**
+ * Called when displaying facetoface Task to check
+ * capacity of the session.
+ *
+ * @param array Message data for a facetoface task
+ * @return bool True if there is capacity in the session
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_task_check_capacity($data) {
+
+    debugging('facetoface_task_check_capacity() function has been deprecated as unused', DEBUG_DEVELOPER);
+
+    $session = $data['session'];
+    // Get session from database in case it has been updated
+    $seminarevent = new \mod_facetoface\seminar_event($session->id);
+    if (!$session) {
+        return false;
+    }
+    $facetoface = $data['facetoface'];
+
+    if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course)) {
+        print_error('error:incorrectcoursemodule', 'facetoface');
+    }
+    $contextmodule = context_module::instance($cm->id);
+
+    return ($seminarevent->has_capacity($contextmodule) || $seminarevent->get_allowoverbook());
+}
+
+/**
+ * Return message describing bulk import results
+ *
+ * @access  public
+ * @param   array       $results
+ * @param   string      $type
+ * @return  string
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_generate_bulk_result_notice($results, $type = 'bulkadd') {
+
+    debugging('facetoface_generate_bulk_result_notice() function has been deprecated as unused', DEBUG_DEVELOPER);
+
+    $added          = $results[0];
+    $errors         = $results[1];
+    $result_message = '';
+
+    $dialogid = 'f2f-import-results';
+    $noticeclass = ($added) ? 'addedattendees' : 'noaddedattendees';
+    // Generate messages
+    if ($errors) {
+        $result_message .= '<div class="' . $noticeclass . ' notifyproblem">';
+        $result_message .= get_string($type.'attendeeserror', 'facetoface') . ' - ';
+
+        if (count($errors) == 1 && is_string($errors[0])) {
+            $result_message .= $errors[0];
+        } else {
+            $result_message .= get_string('xerrorsencounteredduringimport', 'facetoface', count($errors));
+            $result_message .= ' <a href="#" id="'.$dialogid.'">('.get_string('viewresults', 'facetoface').')</a>';
+        }
+        $result_message .= '</div>';
+    }
+    if ($added) {
+        $result_message .= '<div class="' . $noticeclass . ' notifysuccess">';
+        $result_message .= get_string($type.'attendeessuccess', 'facetoface') . ' - ';
+        $result_message .= get_string('successfullyaddededitedxattendees', 'facetoface', count($added));
+        $result_message .= ' <a href="#" id="'.$dialogid.'">('.get_string('viewresults', 'facetoface').')</a>';
+        $result_message .= '</div>';
+    }
+
+    return $result_message;
+}
+
+/**
+ * Return an array of all facetoface activities in the current course
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_facetoface_menu() {
+    global $DB;
+
+    debugging('facetoface_get_facetoface_menu() function has been deprecated as unused', DEBUG_DEVELOPER);
+
+    if ($facetofaces = $DB->get_records_sql("SELECT f.id, c.shortname, f.name
+                                            FROM {course} c, {facetoface} f
+                                            WHERE c.id = f.course
+                                            ORDER BY c.shortname, f.name")) {
+        $i=1;
+        foreach ($facetofaces as $facetoface) {
+            $f = $facetoface->id;
+            $facetofacemenu[$f] = $facetoface->shortname.' --- '.$facetoface->name;
+            $i++;
+        }
+        return $facetofacemenu;
+    } else {
+        return '';
+    }
 }

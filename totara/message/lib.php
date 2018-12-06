@@ -190,10 +190,8 @@ function totara_message_alert_popup($id, $extrabuttons=array(), $messagetype) {
     if ($eventdata && isset($eventdata->action)) {
         switch ($eventdata->action) {
             case 'facetoface':
-                require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-
-                $canbook = facetoface_task_check_capacity($eventdata->data);
-
+                $seminarevent = new \mod_facetoface\seminar_event($eventdata->data['session']->id);
+                $canbook = ($seminarevent->has_capacity() || $seminarevent->get_allowoverbook());
                 if (!$canbook) {
                     // Remove accept / reject buttons
                     $extrabuttons = array();

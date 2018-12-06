@@ -300,6 +300,46 @@ class notice_sender {
     }
 
     /**
+     * Notify managers that a session they had reserved spaces on has been deleted.
+     *
+     * @param seminar_event $seminarevent
+     */
+    public static function reservation_cancelled(seminar_event $seminarevent) {
+        global $CFG, $DB;
+
+        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(booked::get_code()), true);
+        $reservedids = array();
+        foreach ($attendees as $attendee) {
+            if ($attendee->bookedby) {
+                if (!$attendee->id) {
+                    // Managers can already get booking cancellation notices - just adding reserve cancellation notices.
+                    $reservedids[] = $attendee->bookedby;
+                }
+            }
+        }
+        if (!$reservedids) {
+            return;
+        }
+        $reservedids = array_unique($reservedids);
+
+        $facetoface = $DB->get_record('facetoface', ['id' => $seminarevent->get_facetoface()]);
+        $facetoface->ccmanager = false; // Never Cc the manager's manager (that would just be too much).
+
+        // Notify all managers that have reserved spaces for their team.
+        $params = array(
+            'facetofaceid'  => $facetoface->id,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_RESERVATION_CANCELLED
+        );
+
+        $session = facetoface_get_session($seminarevent->get_id());
+        $includeical = empty($CFG->facetoface_disableicalcancel);
+        foreach ($reservedids as $reservedid) {
+            facetoface_send_notice($facetoface, $session, $reservedid, $params, $includeical ? MDL_F2F_BOTH : MDL_F2F_TEXT, MDL_F2F_CANCEL);
+        }
+    }
+
+    /**
      * Send message to signed up attendee
      * @param signup $signup
      * @param array $params

@@ -152,7 +152,7 @@ final class attendees_list_helper {
         }
         $_SESSION['f2f-bulk-results'][$seminarevent->get_id()] = array($added, $errors);
 
-        facetoface_set_bulk_result_notification(array($added, $errors));
+        self::set_bulk_result_notification(array($added, $errors));
 
         $list->clean();
     }
@@ -512,7 +512,7 @@ final class attendees_list_helper {
         }
         $_SESSION['f2f-bulk-results'][$seminarevent->get_id()] = array($removed, $errors);
 
-        facetoface_set_bulk_result_notification(array($removed, $errors), 'bulkremove');
+        self::set_bulk_result_notification(array($removed, $errors), 'bulkremove');
 
         $list->clean();
     }
@@ -875,8 +875,52 @@ final class attendees_list_helper {
             }
         }
 
-        return [$allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests,
+        return [
+            $allowed_actions,
+            $available_actions,
+            $staff,
+            $admin_requests,
+            $canapproveanyrequest,
+            $cancellations,
+            $requests,
             $attendees
         ];
+    }
+
+    /**
+     * Sets totara_set_notification message describing bulk import results
+     * @param array $results
+     * @param string $type
+     */
+    public static function set_bulk_result_notification($results, $type = 'bulkadd') {
+        $added          = $results[0];
+        $errors         = $results[1];
+        $result_message = '';
+
+        $noticeclass = 'notifysuccess';
+        // Generate messages
+        if ($errors) {
+            $noticeclass = 'notifyproblem';
+            $result_message .= get_string($type.'attendeeserror', 'facetoface') . ' - ';
+
+            if (count($errors) == 1 && is_string($errors[0])) {
+                $result_message .= $errors[0];
+            } else {
+                $result_message .= get_string('xerrorsencounteredduringimport', 'facetoface', count($errors));
+                $result_message .= \html_writer::link('#', get_string('viewresults', 'mod_facetoface'), ['class' => 'f2f-import-results']);
+            }
+        } else if ($added) {
+            $result_message .= get_string($type.'attendeessuccess', 'facetoface') . ' - ';
+            if ($type == 'bulkremove') {
+                $result_message .= get_string('successfullyremovedxattendees', 'facetoface', count($added));
+            } else {
+                $result_message .= get_string('successfullyaddededitedxattendees', 'facetoface', count($added));
+            }
+            $result_message .= \html_writer::link('#', get_string('viewresults', 'mod_facetoface'), ['class' => 'f2f-import-results']);
+        }
+
+        if ($result_message != '') {
+            totara_set_notification($result_message, null, array('class' => $noticeclass));
+        }
     }
 }

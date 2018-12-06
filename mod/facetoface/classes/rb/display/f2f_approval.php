@@ -45,7 +45,22 @@ class f2f_approval extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
 
-        return facetoface_get_approvaltype_string($value, $extrafields->approvalrole);
+        // Check seminar::get_approvaltype_string()
+        switch ($value) {
+            case \mod_facetoface\seminar::APPROVAL_NONE:
+                return get_string('approval_none', 'mod_facetoface');
+            case \mod_facetoface\seminar::APPROVAL_SELF:
+                return get_string('approval_self', 'mod_facetoface');
+            case \mod_facetoface\seminar::APPROVAL_ROLE:
+                $rolenames = role_fix_names(get_all_roles());
+                return $rolenames[$extrafields->approvalrole]->localname;
+            case \mod_facetoface\seminar::APPROVAL_MANAGER:
+                return get_string('approval_manager', 'mod_facetoface');
+            case \mod_facetoface\seminar::APPROVAL_ADMIN:
+                return get_string('approval_admin', 'mod_facetoface');
+            default:
+                return '';
+        }
     }
 
     /**

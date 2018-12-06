@@ -1008,14 +1008,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         signup_helper::update_attendees(new seminar_event($sess0id));
     }
 
-    function test_facetoface_get_facetoface_menu() {
-        $this->init_sample_data();
-
-        // positive test
-        $menu = facetoface_get_facetoface_menu();
-        $this->assertEquals('array', gettype($menu));
-    }
-
     function test_facetoface_delete_session() {
         global $DB, $CFG;
         require_once("$CFG->dirroot/totara/hierarchy/prefix/position/lib.php");
@@ -2861,22 +2853,22 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
     }
 
     function test_facetoface_session_has_capacity() {
+        global $DB;
+
         $this->init_sample_data();
 
         // Test method - returns boolean.
 
         // Test variables.
-        $session1 = $this->sessions['sess0'];
-        $sess0 = (object)$session1;
-
-        $session2 = $this->sessions['sess1'];
-        $sess1 = (object)$session2;
-
-        // Test for valid case.
-        $this->assertFalse((bool)facetoface_session_has_capacity($sess0), $this->msgfalse);
-
+        $sess0id = $DB->insert_record('facetoface_sessions', (object)$this->sessions['sess0']);
+        $seminarevent = new \mod_facetoface\seminar_event($sess0id);
         // Test for invalid case.
-        $this->assertFalse((bool)facetoface_session_has_capacity($sess1), $this->msgfalse);
+        $this->assertFalse((bool)$seminarevent->has_capacity(), $this->msgfalse);
+
+        $sess1id = $DB->insert_record('facetoface_sessions', (object)$this->sessions['sess1']);
+        $seminarevent = new \mod_facetoface\seminar_event($sess1id);
+        // Test for valid case.
+        $this->assertTrue((bool)$seminarevent->has_capacity(), $this->msgtrue);
     }
 
     function test_facetoface_get_trainer_roles() {
@@ -4676,7 +4668,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $testset = ['3','7','11','15','19'];
 
         // Assets synced successfully
-        $this->assertTrue(facetoface_sync_assets($did, $testset), 'Assets sync failed');
+        $this->assertTrue(\mod_facetoface\asset_helper::sync($did, $testset), 'Assets sync failed');
 
         $assets = $DB->get_fieldset_select('facetoface_asset_dates',
             'assetid',

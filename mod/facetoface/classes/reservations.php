@@ -24,9 +24,8 @@
 namespace mod_facetoface;
 
 use \context_course;
-use mod_facetoface\exception\signup_exception;
 use \moodle_exception;
-
+use mod_facetoface\exception\signup_exception;
 
 final class reservations {
 
@@ -126,14 +125,7 @@ final class reservations {
         }
 
         if ($removecount && $sendnotification) {
-            $params = array(
-                'facetofaceid' => $seminarevent->get_facetoface(),
-                'type' => MDL_F2F_NOTIFICATION_AUTO,
-                'conditiontype' => MDL_F2F_CONDITION_RESERVATION_CANCELLED,
-            );
-            $facetoface = $DB->get_record('facetoface', ['id' => $seminarevent->get_facetoface()]);
-            $session = facetoface_get_session($seminarevent->get_id());
-            facetoface_send_notice($facetoface, $session, $bookedby, $params);
+            notice_sender::reservation_cancelled($seminarevent);
         }
 
         signup_helper::update_attendees($seminarevent);
@@ -465,11 +457,12 @@ final class reservations {
 
         foreach ($userids as $userid) {
             $transaction = $DB->start_delegated_transaction();
-            $userisinwaitlist = facetoface_is_user_on_waitlist($session, $userid);
 
             $signup = signup::create($userid, $seminarevent);
             signup_helper::user_cancel($signup);
 
+            $state = $signup->get_state();
+            $userisinwaitlist = ($state instanceof \mod_facetoface\signup\state\waitlisted);
             if ($converttoreservations) {
                 // Add one reservation.
                 $book = 1;

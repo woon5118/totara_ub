@@ -658,6 +658,32 @@ class event extends \moodleform {
     }
 
     /**
+     * Build user roles in conflict message, used when saving an event.
+     *
+     * @return string Message
+     */
+    public function get_conflict_message() {
+
+        if (empty($this->users_roles_in_conflict)) {
+            return '';
+        }
+
+        foreach ($this->users_roles_in_conflict as $user) {
+            if (property_exists($user, "name")) {
+                // Indicating that the $user was already had the attribute 'name' built.
+                $users[] = $user->name;
+                continue;
+            }
+            $users[] = fullname($user);
+        }
+        $details = new stdClass();
+        $details->users = implode('; ', $users);
+        $details->userscount = count($this->users_roles_in_conflict);
+
+        return format_text(get_string('userschedulingconflictdetected_body', 'facetoface', $details));
+    }
+
+    /**
      * Prepare form data
      *
      * @param \stdClass $session Facetoface session
@@ -748,14 +774,14 @@ class event extends \moodleform {
     }
 
     /**
-     * This function has been deprecated and will be removed in Totara 14
      * @param $data
      * @return bool
      *
      * @deprecated Since totara 13
      */
     public function new_user_roles_added($data) {
-        debugging("This function has been deprecated and will be removed in Totara 14", DEBUG_DEVELOPER);
+
+        debugging("mod_facetoface\\form\\event::new_user_roles_added() function has been deprecated as unused", DEBUG_DEVELOPER);
 
         global $DB;
         $trainersindb = array();

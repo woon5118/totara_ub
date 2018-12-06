@@ -433,13 +433,13 @@ if ($show_table) {
         } else {
             switch ($download) {
                 case 'ods':
-                    facetoface_download_ods($headers, $export_rows, $exportfilename);
+                    \mod_facetoface\export_helper::download_ods($headers, $export_rows, $exportfilename);
                     break;
                 case 'xls':
-                    facetoface_download_xls($headers, $export_rows, $exportfilename);
+                    \mod_facetoface\export_helper::download_xls($headers, $export_rows, $exportfilename);
                     break;
                 case 'csv':
-                    facetoface_download_csv($headers, $export_rows, $exportfilename);
+                    \mod_facetoface\export_helper::download_csv($headers, $export_rows, $exportfilename);
                     break;
             }
         }
@@ -471,7 +471,7 @@ $allowoverbook = $seminarevent->get_allowoverbook();
 $canoverbook = has_capability('mod/facetoface:signupwaitlist', $context);
 
 // Are there more users waiting than spaces available?
-// Note this does not apply to people with overbook capability (see facetoface_session_has_capacity).
+// Note this does not apply to people with overbook capability (see seminar_event::has_capacity).
 if (!$canoverbook && ($numwaiting > $availablespaces)) {
     $stringmodifier = ($availablespaces > 0) ? 'over' : 'no';
     $stringidentifier = ($allowoverbook) ? "approval{$stringmodifier}capacitywaitlist" : "approval{$stringmodifier}capacity";

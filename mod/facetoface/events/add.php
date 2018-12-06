@@ -92,7 +92,14 @@ if ($backtoallsessions) {
 
 list($sessiondata, $editoroptions, $defaulttimezone, $nbdays) = \mod_facetoface\form\event::prepare_data($session, $facetoface, $course, $context, $cntdates);
 
-$mform = new \mod_facetoface\form\event(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata', 'backtoallsessions', 'savewithconflicts'), 'post', '', array('id' => 'mform_seminar_event'));
+$mform = new \mod_facetoface\form\event(
+    null,
+    compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm',
+        'sessiondata', 'backtoallsessions', 'savewithconflicts'),
+    'post',
+    '',
+    array('id' => 'mform_seminar_event')
+);
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);
@@ -104,7 +111,7 @@ if ($todb = $mform->process_data()) { // Form submitted
         $mform->save($todb);
         redirect($returnurl);
     } else {
-        $text = facetoface_build_user_in_conflict_message($users_in_conflict);
+        $text = $mform->get_conflict_message();
         $PAGE->requires->js_call_amd('mod_facetoface/user_conflicts_confirm', 'init', array('note' => $text));
     }
 }

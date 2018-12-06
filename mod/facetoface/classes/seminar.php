@@ -218,15 +218,6 @@ final class seminar {
     }
 
     /**
-     * Return course module.
-     *
-     * @return \stdClass
-     */
-    public function get_coursemodule() : \stdClass {
-        return get_coursemodule_from_instance('facetoface', $this->id, $this->course, false, MUST_EXIST);
-    }
-
-    /**
      * Load facetoface data from DB
      *
      * @return seminar this
@@ -396,6 +387,46 @@ final class seminar {
      */
     public function get_approvaladmins_list() : array {
         return explode(',', $this->get_approvaladmins());
+    }
+
+    /**
+     * Return the approval type of a facetoface as a human readable string
+     * @return string
+     */
+    public function get_approvaltype_string() : string {
+        switch ($this->approvaltype) {
+            case self::APPROVAL_NONE:
+                return get_string('approval_none', 'mod_facetoface');
+            case self::APPROVAL_SELF:
+                return get_string('approval_self', 'mod_facetoface');
+            case self::APPROVAL_ROLE:
+                $rolenames = role_fix_names(get_all_roles());
+                return $rolenames[$this->approvalrole]->localname;
+            case self::APPROVAL_MANAGER:
+                return get_string('approval_manager', 'mod_facetoface');
+            case self::APPROVAL_ADMIN:
+                return get_string('approval_admin', 'mod_facetoface');
+            default:
+                print_error('error:unrecognisedapprovaltype', 'mod_facetoface');
+        }
+    }
+
+    /**
+     * Return course module.
+     *
+     * @return \stdClass
+     */
+    public function get_coursemodule() : \stdClass {
+        return get_coursemodule_from_instance('facetoface', $this->id, $this->course, false, MUST_EXIST);
+    }
+
+    /**
+     * Return context module.
+     * @param int $cmid course module id
+     * @return \context_module
+     */
+    public function get_contextmodule(int $cmid) : \context_module {
+        return \context_module::instance($cmid);
     }
 
     /**

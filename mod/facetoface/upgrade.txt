@@ -3,6 +3,21 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* facetoface_sync_assets() function has been deprecated, please use asset_helper::sync()
+* facetoface_withdraw_interest() function has been deprecated, please use signup_helper::withdraw_interest()
+* facetoface_download_ods() function has been deprecated, please use export_helper::download_ods()
+* facetoface_download_xls() function has been deprecated, please use export_helper::download_xls()
+* facetoface_download_csv() function has been deprecated, please use export_helper::download_csv()
+* facetoface_notify_reserved_session_deleted() function has been deprecated, please use notice_sender::reservation_cancelled()
+* facetoface_get_approvaltype_string() function has been deprecated, please use seminar::get_approvaltype_string()
+* facetoface_session_has_capacity() function has been deprecated, please use seminar_event::has_capacity()
+* facetoface_get_user_current_status() function has been deprecated, please use signup_status::get_state()
+* facetoface_set_bulk_result_notification() function has been deprecated, please use attendees_list_helper::set_bulk_result_notification()
+* facetoface_is_user_on_waitlist() function has been deprecated, please use mod_facetoface\signup\state\waitlisted
+* facetoface_generate_bulk_result_notice() function has been deprecated as unused
+* facetoface_get_facetoface_menu() function has been deprecated as unused
+* facetoface_task_check_capacity() function has been deprecated as unused
+* facetoface_get_ical_attachment() function has been deprecated as unused
 * Deprecated function facetoface_get_ical_attachment() has been removed
 * mod_facetoface\form\event::new_user_roles_added() function has been deprecated and will be removed in Totara 14
 * facetoface_build_user_roles_in_conflict_message() function has been deprecated, please use facetoface_build_user_in_conflict_message() function instead
