@@ -517,11 +517,3 @@ $string['updatelearnerassignmentstask'] = 'Update learner assignments to apprais
 $string['xmoremissingroles'] = '{$a} more user(s) are also missing roles.';
 $string['youareprintingxsappraisal'] = '<strong>{$a->rolename}\'s version of&nbsp;<a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> appraisal.</strong>';
 $string['youareviewingxsappraisal'] = '<strong>You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> appraisal.</strong>';
-
-
-// DEPRECATED OR UNUSED STRINGS
-$string['appraisalclosedalertssent'] = 'Appraisal \'{$a}\' closed and alert have been sent';
-$string['eventtimenow'] = 'Send immediately when event happens';
-$string['immediate'] = 'Immediate';
-$string['rolehaschanged'] = 'This role is due to change';
-$string['myteamappraisals'] = 'My Team\'s Appraisals';

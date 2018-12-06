@@ -78,23 +78,4 @@ class totara_appraisal_observer {
             }
         }
     }
-
-    /**
-     * @deprecated since Totara 11.0
-     * @param \totara_appraisal\event\appraisal_activation $event
-     */
-    public static function appraisal_activation(\totara_appraisal\event\appraisal_activation $event) {
-        debugging('totara_appraisal_observer::appraisal_activation has been deprecated, this functionality is now handled by the appraisals scheduled_messages task', DEBUG_DEVELOPER);
-        return true;
-    }
-
-    /**
-     * @deprecated since Totara 11.0
-     * @param int $time current time
-     */
-    public static function send_scheduled($time) {
-        debugging('totara_appraisal_observer::send_scheduled has been deprecated, please use appraisal::send_scheduled instead', DEBUG_DEVELOPER);
-        return true;
-    }
-
 }
