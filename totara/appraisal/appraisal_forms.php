@@ -224,7 +224,9 @@ class appraisal_answer_form extends moodleform {
                 $spaceelem->_elementTemplateType = 'default';
             }
 
-            if (!$showsubmitbutton || (!$isactivepage && !$pagecanbeanswered)) {
+            if ($preview) {
+                $elem->set_viewonly(false);
+            } else if (!$showsubmitbutton || (!$isactivepage && !$pagecanbeanswered)) {
                 $elem->set_viewonly(true);
             }
 
