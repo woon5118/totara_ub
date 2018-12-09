@@ -589,32 +589,32 @@ final class seminar_event {
 
     /**
      * Get event normalcost
-     * @return int
+     * @return string
      */
-    public function get_normalcost() : int {
-        return (int)$this->normalcost;
+    public function get_normalcost() : string {
+        return (string)$this->normalcost;
     }
     /**
      * Set event normalcost
-     * @param int
+     * @param string
      */
-    public function set_normalcost(int $normalcost) : seminar_event {
+    public function set_normalcost(string $normalcost) : seminar_event {
         $this->normalcost = $normalcost;
         return $this;
     }
 
     /**
      * Get event discountcost
-     * @return int
+     * @return string
      */
-    public function get_discountcost() : int {
-        return (int)$this->discountcost;
+    public function get_discountcost() : string {
+        return (string)$this->discountcost;
     }
     /**
      * Set event discountcost
-     * @param int
+     * @param string
      */
-    public function set_discountcost(int $discountcost) : seminar_event {
+    public function set_discountcost(string $discountcost) : seminar_event {
         $this->discountcost = $discountcost;
         return $this;
     }

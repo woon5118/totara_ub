@@ -3382,7 +3382,8 @@ function facetoface_check_signup($facetofaceid, $sessionid = null) {
  * @param stdClass[] $user_in_conflict
  * @deprecated since Totara 13
  */
-function facetoface_build_user_roles_in_conflict_message($user_in_conflict) {
+function facetoface_build_user_roles_in_conflict_message($user_in_conflict)
+{
     debugging(
         "The function facetoface_build_user_roles_in_conflict_message() has been renamed " .
         "to facetoface_build_user_in_conflict_message()",
@@ -3390,4 +3391,65 @@ function facetoface_build_user_roles_in_conflict_message($user_in_conflict) {
     );
 
     facetoface_build_user_in_conflict_message($user_in_conflict);
+}
+
+/**
+ * Returns the effective cost of a session depending on the presence
+ * or absence of a discount code.
+ *
+ * @param int $userid
+ * @param int $sessionid
+ * @param object $sessiondata
+ * @return string
+ * @deprecated since Totara 13.0
+ */
+function facetoface_cost($userid, $sessionid, $sessiondata) {
+    global $CFG,$DB;
+    debugging('facetoface_cost() function has been deprecated, please use signup::get_cost()',
+        DEBUG_DEVELOPER);
+
+    $count = $DB->count_records_sql("SELECT COUNT(*)
+                               FROM {facetoface_signups} su,
+                                    {facetoface_sessions} se
+                              WHERE su.sessionid = ?
+                                AND su.userid = ?
+                                AND su.discountcode IS NOT NULL
+                                AND su.sessionid = se.id", array($sessionid, $userid));
+    if ($count > 0) {
+        return format_string($sessiondata->discountcost);
+    } else {
+        // Note that this would return the normal cost if session was deleted and the join above failed.
+        return format_string($sessiondata->normalcost);
+    }
+}
+
+/**
+ * Sets activity completion state
+ *
+ * @param stdClass $facetoface object
+ * @param int $userid User ID
+ * @param int $completionstate Completion state
+ * @return mixed Returns false if completion is not enabled, or void otherwise
+ * @deprecated since Totara 13.0
+ */
+function facetoface_set_completion($facetoface, $userid, $completionstate = COMPLETION_COMPLETE) {
+    debugging('facetoface_set_completion() function has been deprecated, please use seminar::set_completion()',
+        DEBUG_DEVELOPER);
+
+    $course = new stdClass();
+    $course->id = $facetoface->course;
+    $completion = new completion_info($course);
+
+    // Check if completion is enabled site-wide, or for the course
+    if (!$completion->is_enabled()) {
+        return;
+    }
+
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course);
+    if (empty($cm) || !$completion->is_enabled($cm)) {
+        return;
+    }
+
+    $completion->update_state($cm, $completionstate, $userid);
+    $completion->invalidatecache($facetoface->course, $userid, true);
 }

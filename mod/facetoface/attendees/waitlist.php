@@ -346,7 +346,8 @@ if ($show_table) {
             }
 
             if (!$hidecost) {
-                $data[] = facetoface_cost($attendee->id, $seminarevent->get_id(), $session);
+                $this_signup = mod_facetoface\signup::create($attendee->id, $seminarevent);
+                $data[] = $this_signup->get_cost();
                 if (!$hidediscount) {
                     $data[] = $attendee->discountcode;
                 }

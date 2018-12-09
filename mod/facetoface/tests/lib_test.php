@@ -888,28 +888,24 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         \totara_job\job_assignment::create($data);
     }
 
-    function test_facetoface_cost() {
+    protected function test_facetoface_cost() {
         $this->init_sample_data();
-
-        // Test variables - case WITH discount.
-        $sessiondata = $this->sessiondata['sess0'];
-        $sess0 = (object)$sessiondata;
 
         $userid1 = 1;
         $sessionid1 = 1;
-
-        // Variable for test case NO discount.
-        $sessiondata1 = $this->sessiondata['sess1'];
-        $sess1 = (object)$sessiondata1;
+        $seminarevent1 = new \mod_facetoface\seminar_event($sessionid1);
+        $signup1 = \mod_facetoface\signup::create($userid1, $seminarevent1);
 
         $userid2 = 2;
         $sessionid2 = 2;
+        $seminarevent2 = new \mod_facetoface\seminar_event($sessionid2);
+        $signup2 = \mod_facetoface\signup::create($userid2, $seminarevent2);
 
         // Test WITH discount.
-        $this->assertEquals(facetoface_cost($userid1, $sessionid1, $sess0), '$60');
+        $this->assertEquals($signup1->get_cost(), '$60');
 
         // Test NO discount case.
-        $this->assertEquals(facetoface_cost($userid2, $sessionid2, $sess1), '$90');
+        $this->assertEquals($signup2->get_cost(), '$90');
     }
 
     function test_facetoface_add_instance() {

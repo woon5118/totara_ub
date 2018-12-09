@@ -861,4 +861,33 @@ final class seminar {
         $this->approvaladmins = $approvaladmins;
         return $this;
     }
+
+    /**
+     * Set completion state of seminar.
+     * @param int $userid
+     * @param int $completionstate
+     * @return bool
+     */
+    public function set_completion(int $userid, int $completionstate) : bool {
+        global $CFG;
+        require_once($CFG->libdir . '/completionlib.php');
+
+        $course = new \stdClass();
+        $course->id = $this->get_course();
+        $completion_info = new \completion_info($course);
+
+        // Check if completion is enabled site-wide.
+        if (!$completion_info->is_enabled()) {
+            return false;
+        }
+        // Check if completion is enabled for the course.
+        $cm = $this->get_coursemodule();
+        if (empty($cm) || !$completion_info->is_enabled($cm)) {
+            return false;
+        }
+
+        $completion_info->update_state($cm, $completionstate, $userid);
+        $completion_info->invalidatecache($course->id, $userid);
+        return true;
+    }
 }

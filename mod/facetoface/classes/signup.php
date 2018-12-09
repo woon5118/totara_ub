@@ -500,6 +500,18 @@ final class signup {
     }
 
     /**
+     * Get cost associated with signup.
+     * @return string
+     */
+    public function get_cost() : string {
+        if (!empty($this->discountcode)) {
+            return format_string($this->seminarevent->get_discountcost());
+        } else {
+            return format_string($this->seminarevent->get_normalcost());
+        }
+    }
+
+    /**
      * @return int
      */
     public function get_notificationtype() : int {

@@ -1846,8 +1846,20 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         return '';
     }
 
-    // Provides facetoface_cost()
-    require_once($CFG->dirroot.'/mod/facetoface/lib.php');
+    // Instantiate \mod_facetoface\signup to get cost.
+    // If session has been deleted, this will fail with a missing record exception.
+    try {
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+        $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
+        $cost = $signup->get_cost();
+    } catch (dml_missing_record_exception $e) {
+        // Session has been deleted. Before refactoring, facetoface_cost() used to return the normal cost by default.
+        if (!empty($data->normalcost)) {
+            $cost = $data->normalcost;
+        } else {
+            $cost = '';
+        }
+    }
 
     // Get timezone setting.
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
@@ -1906,7 +1918,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace('[facetofacename]', $facetofacename, $msg);
     $msg = str_replace('[firstname]', $user->firstname, $msg);
     $msg = str_replace('[lastname]', $user->lastname, $msg);
-    $msg = str_replace('[cost]', facetoface_cost($user->id, $sessionid, $data), $msg);
+    $msg = str_replace('[cost]', $cost, $msg);
     $msg = str_replace('[sessiondate]', $sessiondate, $msg);
     $msg = str_replace('[startdate]', $startdate, $msg);
     $msg = str_replace('[finishdate]', $finishdate, $msg);
@@ -1922,7 +1934,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace(get_string('placeholder:facetofacename', 'facetoface'), $facetofacename, $msg);
     $msg = str_replace(get_string('placeholder:firstname', 'facetoface'), $user->firstname, $msg);
     $msg = str_replace(get_string('placeholder:lastname', 'facetoface'), $user->lastname, $msg);
-    $msg = str_replace(get_string('placeholder:cost', 'facetoface'), facetoface_cost($user->id, $sessionid, $data), $msg);
+    $msg = str_replace(get_string('placeholder:cost', 'facetoface'), $cost, $msg);
     $msg = str_replace(get_string('placeholder:sessiondate', 'facetoface'), $sessiondate, $msg);
     $msg = str_replace(get_string('placeholder:startdate', 'facetoface'), $startdate, $msg);
     $msg = str_replace(get_string('placeholder:finishdate', 'facetoface'), $finishdate, $msg);

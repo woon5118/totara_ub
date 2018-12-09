@@ -172,55 +172,6 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
 }
 
 /**
- * Sets activity completion state
- *
- * @param stdClass $facetoface object
- * @param int $userid User ID
- * @param int $completionstate Completion state
- */
-function facetoface_set_completion($facetoface, $userid, $completionstate = COMPLETION_COMPLETE) {
-    $course = new stdClass();
-    $course->id = $facetoface->course;
-    $completion = new completion_info($course);
-
-    // Check if completion is enabled site-wide, or for the course
-    if (!$completion->is_enabled()) {
-        return;
-    }
-
-    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course);
-    if (empty($cm) || !$completion->is_enabled($cm)) {
-            return;
-    }
-
-    $completion->update_state($cm, $completionstate, $userid);
-    $completion->invalidatecache($facetoface->course, $userid, true);
-}
-
-/**
- * Returns the effective cost of a session depending on the presence
- * or absence of a discount code.
- *
- * @param class $sessiondata contains the discountcost and normalcost
- */
-function facetoface_cost($userid, $sessionid, $sessiondata) {
-    global $CFG,$DB;
-
-    $count = $DB->count_records_sql("SELECT COUNT(*)
-                               FROM {facetoface_signups} su,
-                                    {facetoface_sessions} se
-                              WHERE su.sessionid = ?
-                                AND su.userid = ?
-                                AND su.discountcode IS NOT NULL
-                                AND su.sessionid = se.id", array($sessionid, $userid));
-    if ($count > 0) {
-        return format_string($sessiondata->discountcost);
-    } else {
-        return format_string($sessiondata->normalcost);
-    }
-}
-
-/**
  * Given an object containing all the necessary data, (defined by the
  * form in mod.html) this function will create a new instance and
  * return the id number of the new instance.
