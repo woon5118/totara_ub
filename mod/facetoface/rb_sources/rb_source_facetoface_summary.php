@@ -371,47 +371,48 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     )
                 );
             }
-            $columnoptions[] = new rb_column_option(
-                'session',
-                'eventtimecreated',
-                get_string('eventtimecreated', 'rb_source_facetoface_events'),
-                "sessions.timecreated",
-                array(
-                    'joins' => 'sessions',
-                    'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'base.sessiontimezone',
-                    ),
-                )
-            );
-            $columnoptions[] = new rb_column_option(
-                'session',
-                'eventtimemodified',
-                get_string('lastupdated', 'rb_source_facetoface_summary'),
-                "sessions.timemodified",
-                array(
-                    'joins' => 'sessions',
-                    'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'base.sessiontimezone',
-                    ),
-                )
-            );
-            $columnoptions[] = new rb_column_option(
-                'session',
-                'eventmodifiedby',
-                get_string('lastupdatedby', 'rb_source_facetoface_summary'),
-                "CASE WHEN sessions.usermodified = 0 THEN null
-                  ELSE " . $DB->sql_concat_join("' '", $usernamefieldscreator) . " END",
-                array(
-                    'joins' => 'modifiedby',
-                    'displayfunc' => 'f2f_user_link',
-                    'extrafields' => array_merge(array('id' => 'modifiedby.id'), $usernamefieldscreator),
-                )
-            );
         }
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventtimecreated',
+            get_string('eventtimecreated', 'rb_source_facetoface_events'),
+            "sessions.timecreated",
+            array(
+                'joins' => 'sessions',
+                'displayfunc' => 'event_date',
+                'dbdatatype' => 'timestamp',
+                'extrafields' => array(
+                    'timezone' => 'base.sessiontimezone',
+                ),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventtimemodified',
+            get_string('lastupdated', 'rb_source_facetoface_summary'),
+            "sessions.timemodified",
+            array(
+                'joins' => 'sessions',
+                'displayfunc' => 'event_date',
+                'dbdatatype' => 'timestamp',
+                'extrafields' => array(
+                    'timezone' => 'base.sessiontimezone',
+                ),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventmodifiedby',
+            get_string('lastupdatedby', 'rb_source_facetoface_summary'),
+            "CASE WHEN sessions.usermodified = 0 THEN null
+                  ELSE " . $DB->sql_concat_join("' '", $usernamefieldscreator) . " END",
+            array(
+                'joins' => 'modifiedby',
+                'displayfunc' => 'f2f_user_link',
+                'extrafields' => array_merge(array('id' => 'modifiedby.id'), $usernamefieldscreator),
+            )
+        );
 
         $this->add_session_status_to_columns($columnoptions);
         $this->add_session_common_to_columns($columnoptions);
