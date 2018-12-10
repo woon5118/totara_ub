@@ -63,6 +63,10 @@ class util {
      * @param string $message
      */
     public static function log_sso_attempt_error($message) {
+        if (PHPUNIT_TEST) {
+            // No logging in unit tests, this silences errors sid tests in PHP 7.1.
+            return;
+        }
         error_log('TC SSO ERROR: ' . $message);
     }
 
