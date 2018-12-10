@@ -31,29 +31,35 @@ class attendees_add_file extends \moodleform {
     protected function definition() {
         $mform = $this->_form;
 
+        // $customfieldinfo is used as $a in get_string().
         $customfieldinfo = new \stdClass();
         $customfieldinfo->customfields = '';
         $customfieldinfo->requiredcustomfields = '';
 
+        $dataoptional = get_string('dataoptional', 'mod_facetoface');
+
         $customfields = $this->_customdata['customfields'];
         $requiredcustomfields = $this->_customdata['requiredcustomfields'];
+        $optionalfields = array_diff($customfields, $requiredcustomfields);
 
-        if (!empty($customfields)) {
-            $customfieldinfo->customfields = implode('', array_map(function($item) {
-                return " * {$item} \n";
-            }, $customfields));
-        }
         if (!empty($requiredcustomfields)) {
-            $customfieldinfo->requiredcustomfields = implode('', array_map(function($item) {
-                return " * {$item} \n";
-            }, $requiredcustomfields));
+            foreach ($requiredcustomfields as $item) {
+                $customfieldinfo->customfields .= "* '{$item}'\n";
+                $customfieldinfo->requiredcustomfields .= "* '{$item}'\n";
+            }
+        }
+
+        if (!empty($optionalfields)) {
+            foreach ($optionalfields as $item) {
+                $customfieldinfo->customfields .= "* '{$item}' ({$dataoptional})\n";
+            }
         }
 
         $extrafields = $this->_customdata['extrafields'];
         if (!empty($extrafields)) {
-            $customfieldinfo->customfields .= implode('', array_map(function($item) {
-                return " * {$item} \n";
-            }, $extrafields));
+            foreach ($extrafields as $item) {
+                $customfieldinfo->customfields .= "* '{$item}' ({$dataoptional})\n";
+            }
         }
 
         $mform->addElement('hidden', 's', $this->_customdata['s']);
@@ -76,10 +82,10 @@ class attendees_add_file extends \moodleform {
         $mform->addElement('select', 'delimiter', get_string('delimiter', 'mod_facetoface'), $delimiters);
         $mform->setDefault('delimiter', get_config('facetoface', 'defaultcsvdelimiter'));
 
-        $mform->addElement('advcheckbox', 'ignoreconflicts', get_string('allowscheduleconflicts', 'facetoface'));
+        $mform->addElement('advcheckbox', 'ignoreconflicts', get_string('allowscheduleconflicts', 'mod_facetoface'));
         $mform->setType('ignoreconflicts', PARAM_BOOL);
 
-        $mform->addelement('html', format_text(get_string('scvtextfile_help', 'facetoface', $customfieldinfo), FORMAT_MARKDOWN));
+        $mform->addelement('html', format_text(get_string('csvtextfile_help', 'mod_facetoface', $customfieldinfo), FORMAT_MARKDOWN));
 
         $this->add_action_buttons(true, get_string('continue'));
     }

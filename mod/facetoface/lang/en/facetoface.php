@@ -377,18 +377,13 @@ The start date of the earliest event must be at least this far in the future.';
 $string['created'] = 'Created';
 $string['createnewasset'] = 'Create new asset';
 $string['createnewroom'] = 'Create new room';
-$string['csvtextfile'] = 'CSV text file';
-$string['scvtextfile_help'] = 'The file should be a CSV text file containing a heading row and one or more data rows. If a row contains multiple columns they should be separated by a comma (,). Every row must have the same number of columns. Below is a list of the heading names you can use:
+$string['csvtextfile'] = 'CSV file';
+$string['csvtextfile_help'] = 'Preparing a file for upload: Use .CSV text file with a heading row and one or more data rows.
 
-* **username**: The username of the user to add.
-* **idnumber**: The ID number of the user to add.
-* **email**: The email address of the user to add.
-{$a->customfields}
+All rows must have the following columns:
 
-The following fields must be provided:
-
-* Either username, idnumber, or email (only one)
-{$a->requiredcustomfields}';
+* \'username\' **OR** \'idnumber\' **OR** \'email\' (use only one)
+{$a->customfields}';
 $string['csvtextinput'] = 'CSV text input';
 $string['currentallocations'] = 'Current allocations ({$a->allocated} / {$a->max})';
 $string['currentattendees'] = 'Current attendees';
@@ -397,6 +392,7 @@ $string['currentlyassigned'] = 'Currently assigned to an event';
 $string['currentstatus'] = 'Current status';
 $string['customfieldsheading'] = 'Custom fields';
 $string['customfieldsheadingaction'] = '{$a} Custom Fields';
+$string['dataoptional'] = 'data may be empty';
 $string['date'] = 'Date';
 $string['dateadd'] = 'Add a new session';
 $string['dateandtime'] = 'Date and time';
@@ -2551,3 +2547,14 @@ $string['setting:fromaddress'] = 'What will appear in the From field of email re
 $string['setting:fromaddressdefault'] = 'totara@example.com';
 $string['schedule_unit_3'] = '{$a} weeks';
 $string['schedule_unit_3_singular'] = '1 week';
+$string['scvtextfile_help'] = 'The file should be a CSV text file containing a heading row and one or more data rows. If a row contains multiple columns they should be separated by a comma (,). Every row must have the same number of columns. Below is a list of the heading names you can use:
+
+* **username**: The username of the user to add.
+* **idnumber**: The ID number of the user to add.
+* **email**: The email address of the user to add.
+{$a->customfields}
+
+The following fields must be provided:
+
+* Either username, idnumber, or email (only one)
+{$a->requiredcustomfields}';

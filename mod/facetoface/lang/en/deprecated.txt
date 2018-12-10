@@ -100,3 +100,4 @@ setting:fromaddress,mod_facetoface
 setting:fromaddressdefault,mod_facetoface
 schedule_unit_3,mod_facetoface
 schedule_unit_3_singular,mod_facetoface
+scvtextfile_help,mod_facetoface
