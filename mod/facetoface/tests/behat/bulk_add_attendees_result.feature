@@ -29,13 +29,13 @@ Feature: Add seminar attendees in bulk and see results
 
     And I click on "Attendees" "link"
     And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV file" filemanager
     And I press "Continue"
     When I press "Confirm"
     Then I should see "Uploaded via csv file" in the "John1 Smith1" "table_row"
     And I should see "Also uploaded via csv file" in the "John2 Smith2" "table_row"
     And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV file" filemanager
     And I press "Continue"
     Then I should see "2 problem(s) encountered during import."
     When I click on "View results" "link"
@@ -73,7 +73,7 @@ Feature: Add seminar attendees in bulk and see results
 
     And I click on "Attendees" "link"
     And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV file" filemanager
     And I press "Continue"
     When I press "Confirm"
     Then I should see "Uploaded via csv file" in the "John1 Smith1" "table_row"
