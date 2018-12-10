@@ -61,7 +61,7 @@ class cohort_association_actions_enrolled extends base {
                 'requires' => array('json'));
             $PAGE->requires->js_init_call('M.totara_cohortlearning.init', array(), false, $jsmodule);
             $PAGE->requires->strings_for_js(array('assignenrolledlearningcourse', 'assignenrolledlearningprogram',
-                'assignenrolledlearningcertification', 'deletelearningconfirm', 'savinglearning'),
+                'assignenrolledlearningcertification', 'deletelearningconfirm', 'savinglearning', 'savingrule', 'error:badresponsefromajax'),
                 'totara_cohort');
 
             static $strdelete = false;

@@ -63,7 +63,19 @@ class cohort_association_actions_visible extends base {
                     'd' => $value,
                     'v' => COHORT_ASSN_VALUE_VISIBLE,
                     'sesskey' => sesskey()));
-            return $OUTPUT->action_icon($delurl, new \pix_icon('t/delete', $strdelete), null, array('title' => $strdelete, 'class' => 'learning-delete'));
+
+            $attributes = array(
+                'title' => $strdelete,
+                'class' => 'learning-delete'
+            );
+
+            if (empty($report->embedded)) {
+                // If it is not an embedded, add a custom class here to keep it distinguish from
+                // the embbeded report one
+                $attributes['class'] = 'learning-delete cohort-association-visible-delete';
+            }
+
+            return $OUTPUT->action_icon($delurl, new \pix_icon('t/delete', $strdelete), null, $attributes);
         }
 
         return '';

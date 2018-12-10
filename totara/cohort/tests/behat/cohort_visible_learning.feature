@@ -35,5 +35,5 @@ Feature: User is performing actions on audience learning visibility report
     And I should see "Enrolled users and members of the selected audiences" exactly "2" times
     When I set the field with xpath "//select[@data-name='c101_aud1']" to "No users"
     Then I should see "No users" exactly "2" times
-    When I follow "Delete"
+    When I click on "Delete" "link" confirming the dialogue
     Then I should see "No users" exactly "1" times

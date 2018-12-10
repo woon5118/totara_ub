@@ -90,17 +90,36 @@ M.totara_cohortvisiblelearning = M.totara_cohortvisiblelearning || {
 
         // Pressing the delete button should just sending an AJAX to the server here, and
         // should remove the row after ajax has been done.
-        $(tableselector).on('click', ".learning-delete", function (event) {
+        $(tableselector).on('click', ".cohort-association-visible-delete", function(event) {
             event.preventDefault();
             var self = this;
-            var url = $(self).attr('href');
+            var url = self.href;
+            var confirmed = confirm(M.util.get_string('deletelearningconfirm', 'totara_cohort'));
+            var parent = self.closest('tr');
+
+            if (!confirmed) {
+                return;
+            }
 
             $.ajax({
                 type: "GET",
-                url: url
+                url: url,
+                beforeSend: function() {
+                    require(['core/templates'], function(templates) {
+                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function(html) {
+                            if (self.parentNode !== undefined) {
+                                self.parentNode.innerHTML = html;
+                            }
+                        });
+                    });
+                }
             }).done(function() {
                 // Deleting the row here
-                $(self).parents('tr').remove();
+                parent.remove();
+            }).fail(function() {
+                alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
+                //Reload the broken page
+                location.reload();
             });
         });
     }

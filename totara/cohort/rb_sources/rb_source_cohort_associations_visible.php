@@ -450,7 +450,7 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             'fullpath' => '/totara/cohort/visiblelearning.js',
             'requires' => array('json'));
         $jsdetails->args = array('args' => '{"cohort_visibility":' . json_encode($COHORT_VISIBILITY) . '}');
-        $jsdetails->strings = array('error' => array('invalidentry'));
+        $jsdetails->strings = array('error' => ['invalidentry'], 'totara_cohort' => ['error:badresponsefromajax', 'savingrule', 'deletelearningconfirm']);
 
         return array($jsdetails);
     }
