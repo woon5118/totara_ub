@@ -1010,8 +1010,8 @@ $string['schedule_unit_1'] = '{$a} hours';
 $string['schedule_unit_1_singular'] = '1 hour';
 $string['schedule_unit_2'] = '{$a} days';
 $string['schedule_unit_2_singular'] = '1 day';
-$string['schedule_unit_3'] = '{$a} weeks';
-$string['schedule_unit_3_singular'] = '1 week';
+$string['schedule_unit_4'] = '{$a} weeks';
+$string['schedule_unit_4_singular'] = '1 week';
 $string['scheduledsession'] = 'Scheduled event';
 $string['scheduledsessions'] = 'Scheduled events';
 $string['scheduling'] = 'Scheduling';
@@ -2539,4 +2539,5 @@ $string['approvaloptionsheader'] = 'Approval Options';
 $string['setting:fromaddress_caption'] = 'Sender address:';
 $string['setting:fromaddress'] = 'What will appear in the From field of email reminders sent by this module, unless "Always send email from the no-reply address" is set.';
 $string['setting:fromaddressdefault'] = 'totara@example.com';
-
+$string['schedule_unit_3'] = '{$a} weeks';
+$string['schedule_unit_3_singular'] = '1 week';
