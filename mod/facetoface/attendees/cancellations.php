@@ -249,9 +249,6 @@ if ($show_table) {
         $canchangesignedupjobassignment = has_capability('mod/facetoface:changesignedupjobassignment', $context);
 
         foreach ($rows as $attendee) {
-            if (!empty($attendee->deleted)) {
-                continue;
-            }
             $data = array();
             // Add the name of the manager who made the booking after the user's name.
             $managername = null;

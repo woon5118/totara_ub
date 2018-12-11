@@ -2639,30 +2639,17 @@ function facetoface_get_cancellations($sessionid) {
     $sql = "
             SELECT
                 u.id,
-                u.deleted,
                 su.id AS submissionid,
                 {$usernamefields},
                 su.jobassignmentid,
                 MAX(ss.timecreated) AS timesignedup,
                 c.timecreated AS timecancelled,
                 c.statuscode
-            FROM
-                {facetoface_signups} su
-            JOIN
-                {user} u
-             ON u.id = su.userid
-            JOIN
-                {facetoface_signups_status} c
-             ON su.id = c.signupid
-            AND c.statuscode $cancelledinsql
-            AND c.superceded = 0
-            LEFT JOIN
-                {facetoface_signups_status} ss
-             ON su.id = ss.signupid
-             AND ss.statuscode $insql
-             AND ss.superceded = 1
-            WHERE
-                su.sessionid = ?
+            FROM {facetoface_signups} su
+            JOIN {user} u ON u.id = su.userid
+            JOIN {facetoface_signups_status} c ON su.id = c.signupid AND c.statuscode $cancelledinsql AND c.superceded = 0
+            LEFT JOIN {facetoface_signups_status} ss ON su.id = ss.signupid AND ss.statuscode $insql AND ss.superceded = 1
+            WHERE su.sessionid = ? AND u.deleted = 0 AND u.suspended = 0
             GROUP BY
                 su.id,
                 u.id,

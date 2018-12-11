@@ -93,7 +93,7 @@ Feature: Seminar Manager signup approval changes
     And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking request"
     And I click on "View all tasks" "link"
-    And I should see "Sammy Sam" in the "td.user_namelink" "css_element"
+    And I should see "This is to advise that Sammy Sam has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link" in the "Sammy Sam" "table_row"
     Then I should see "Sammy Sam" in the ".lastrow" "css_element"
 

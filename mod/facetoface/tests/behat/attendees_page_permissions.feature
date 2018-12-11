@@ -217,7 +217,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     When I log in as "manager1"
     And I click on "Dashboard" in the totara menu
     And I click on "View all tasks" "link"
-    And I should see "Sam1 Student1" in the "td.user_namelink" "css_element"
+    And I should see "This is to advise that Sam1 Student1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"
     Then I should see "Sam1 Student1"
     And I should not see "Cancellations" in the "div.f2f-attendees-table" "css_element"

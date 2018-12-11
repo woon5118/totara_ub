@@ -51,7 +51,7 @@ Feature: Seminar Signup User Approval
     And I log in as "student2"
     And I click on "Dashboard" in the totara menu
     And I click on "View all tasks" "link"
-    And I should see "Sam1 Student1" in the "td.user_namelink" "css_element"
+    And I should see "This is to advise that Sam1 Student1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     When I click on "Attendees" "link"
     Then I should see "Sam1 Student1"
     When I click on "requests[3]" "radio" in the ".lastrow .lastcol" "css_element"
