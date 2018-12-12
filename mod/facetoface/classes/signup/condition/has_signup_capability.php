@@ -53,7 +53,7 @@ class has_signup_capability extends condition {
 
         $module = $this->signup->get_seminar_event()->get_seminar()->get_coursemodule();
         $context = \context_module::instance($module->id);
-        return has_capability('mod/facetoface:signup', $context);
+        return has_capability('mod/facetoface:signup', $context, $this->signup->get_userid());
     }
 
     public static function get_description() : string {
