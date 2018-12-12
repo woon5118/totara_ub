@@ -360,5 +360,12 @@ function xmldb_totara_core_install() {
     // Add course navigation blocks when upgrading from Moodle.
     totara_core_add_course_navigation();
 
+    // Removing deprecated table post Totara 12 release.
+    // We don't have Moodle registration code any more.
+    $table = new xmldb_table('registration_hubs');
+    if ($dbman->table_exists($table)) {
+        $dbman->drop_table($table);
+    }
+
     return true;
 }
