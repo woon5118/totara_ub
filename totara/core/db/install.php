@@ -274,65 +274,10 @@ function xmldb_totara_core_install() {
     $field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null);
     $dbman->change_field_precision($table, $field);
 
-    // ==== Moodle 3.3.7 merge cleanup start =====
-
-    // Dealing with oauth2 plugins which we didn't take as of Totara 12.
-    // If the plugin is taken at some stage, the code below as well as this comment may be removed.
-
-    if (get_config('auth_oauth2', 'version') && !file_exists("{$CFG->dirroot}/auth/oauth2/version.php")) {
-        if (!$DB->count_records('user', array('auth' => 'oauth2'))) {
-            // NOTE: tables with 'auth_oauth2' prefix get deleted automatically.
-            uninstall_plugin('auth', 'oauth2');
-        }
-    }
-
-    // Dealing with repository onedrive plugin which we didn't take as of Totara 12. (Requires oauth see above)
-    // If the plugin is taken at some stage, the code below as well as this comment may be removed.
-    if (get_config('repository_onedrive', 'version') && !file_exists("{$CFG->dirroot}/repository/onedrive/version.php")) {
-        if ($dbman->table_exists('repository_onedrive_access')) {
-            if (!$DB->count_records('repository_onedrive_access')) {
-                // NOTE: tables with 'repository_onedrive' prefix get deleted automatically.
-                uninstall_plugin('repository', 'onedrive');
-            }
-        }
-    }
-
-    // Delete oauth2 tool if not used because it was not merged from Moodle 3.3.7 to Totara 12.
-    if (get_config('tool_oauth2', 'version') && !file_exists("{$CFG->dirroot}/admin/tool/oauth2/version.php")) {
-        if ($dbman->table_exists('oauth2_issuer')) {
-            if (!$DB->count_records('oauth2_issuer')) {
-                // Note: we keep the tables from lib/db/install.xml
-                uninstall_plugin('tool', 'oauth2');
-            }
-        }
-    }
-
-    // Uninstall other plugins without stored data that were not merged from Moodle 3.3.7 to Totara 12.
-    $plugins = array(
-        'block_myoverview' => "{$CFG->dirroot}/blocks/myoverview/version.php",
-        'fileconverter_googledrive' => "{$CFG->dirroot}/files/converter/googledrive/version.php",
-        'fileconverter_unoconv' => "{$CFG->dirroot}/files/converter/unoconv/version.php",
-    );
-    foreach ($plugins as $component => $versionfile) {
-        if (file_exists($versionfile)) {
-            continue;
-        }
-        if (!get_config($component, 'version')) {
-            continue;
-        }
-        list($type, $name) = explode('_', $component, 2);
-        uninstall_plugin($type, $name);
-        if ($component === 'fileconverter_unoconv') {
-            unset_config('pathtounoconv');
-        }
-    }
-
     // Disable linking of admin categories introduced in new Moodle admin interface.
     if (get_config('linkadmincategories')) {
         set_config('linkadmincategories', 0);
     }
-
-    // ==== End of Moodle 3.3.7 merge cleanup =====
 
     // Increase course_request fullname column to match the fullname column in the "course" table.
     $table = new xmldb_table('course_request');

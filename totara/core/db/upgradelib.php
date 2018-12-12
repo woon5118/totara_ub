@@ -338,9 +338,15 @@ function totara_core_upgrade_delete_moodle_plugins() {
         // Totara 13 removals.
         'block_community',
 
-        // Moodle GDPR stuff.
+        // Moodle 3.3 removals.
+        'auth_oauth2',
+        'repository_onedrive',
+        'tool_oauth2',
         'tool_dataprivacy',
         'tool_policy',
+        'block_myoverview',
+        'fileconverter_googledrive',
+        'fileconverter_unoconv',
 
         // Totara 10.0 removals.
         'theme_kiwifruitresponsive',
@@ -401,6 +407,22 @@ function totara_core_upgrade_delete_moodle_plugins() {
                 continue;
             }
         }
+        if ($deleteplugin === 'auth_oauth2') {
+            if ($DB->record_exists('user', array('auth' => 'oauth2', 'deleted' => 0))) {
+                // Do not uninstall if users with this auth exist!
+                continue;
+            }
+        }
+        if ($deleteplugin === 'repository_onedrive') {
+            if ($DB->record_exists('repository_onedrive_access', array())) {
+                continue;
+            }
+        }
+        if ($deleteplugin === 'tool_oauth2') {
+            if ($DB->record_exists('oauth2_issuer', array())) {
+                continue;
+            }
+        }
         if ($deleteplugin === 'tool_mobile') {
             $service = $DB->get_record('external_services', array('shortname' => 'moodle_mobile_app'));
             if ($service) {
@@ -432,6 +454,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
     unset_config('updatenotifybuilds');
     unset_config('updateminmaturity');
     unset_config('updatenotifybuilds');
+    unset_config('pathtounoconv');
 }
 
 /**
