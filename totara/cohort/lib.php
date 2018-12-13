@@ -1249,11 +1249,19 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
 
     $memberlist = array();
     $usernamefields = get_all_user_name_fields(true);
-    $users = $DB->get_records_select('user', 'id IN ('.implode(',', $userids).')', null, '', 'id, ' . $usernamefields);
-    foreach ($users as $user) {
-        $memberlist[] = fullname($user);
+
+    $batches = array_chunk($userids, $DB->get_max_in_params());
+    foreach ($batches as $batch) {
+        [$insql, $params] = $DB->get_in_or_equal($batch, SQL_PARAMS_QM);
+
+        $users = $DB->get_records_select('user', "id {$insql}", $params, '', 'id, ' . $usernamefields);
+        foreach ($users as $user) {
+            $memberlist[] = fullname($user);
+        }
+
+        unset($users);
     }
-    unset($users);
+
     sort($memberlist);
 
     $a = new stdClass();
@@ -1268,7 +1276,12 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
     switch ($cohort->alertmembers) {
         case COHORT_ALERT_AFFECTED:
             $towho = 'toaffected';
-            $tousers = $DB->get_records_select('user', 'id IN ('.implode(',', $userids).')', null, 'id', $fields);
+            $tousers = array();
+            foreach ($batches as $batch) {
+                [$insql, $params] = $DB->get_in_or_equal($batch, SQL_PARAMS_QM);
+                $rs = $DB->get_records_select('user', "id {$insql}", $params, 'id', $fields);
+                $tousers = array_merge($tousers, $rs);
+            }
             break;
         case COHORT_ALERT_ALL:
             $towho = 'toall';
@@ -1296,18 +1309,23 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
     // send 'Audience membership revoked' alert emails to deleted users too.
     if ($cohort->alertmembers == COHORT_ALERT_ALL && $action == 'membersremoved') {
         $towho = 'toaffected';
-        $tousers = $DB->get_records_select('user', 'id IN ('.implode(',', $userids).')', null, 'id', $fields);
-        foreach ($tousers as $touser) {
-            // Send emails in user lang.
-            $eventdata = new stdClass();
-            $emailsubject = $strmgr->get_string("msg:{$action}_{$towho}_emailsubject", 'totara_cohort', $a, $touser->lang);
-            $notice = $strmgr->get_string("msg:{$action}_{$towho}_notice", 'totara_cohort', $a, $touser->lang);
-            $eventdata->subject = $emailsubject;
-            $eventdata->fullmessage = $notice;
+        foreach ($batches as $batch) {
+            [$insql, $params] = $DB->get_in_or_equal($batch, SQL_PARAMS_QM);
+            $tousers = $DB->get_records_select('user', "id {$insql}", $params, 'id', $fields);
+            foreach ($tousers as $touser) {
+                // Send emails in user lang.
+                $eventdata = new stdClass();
+                $emailsubject = $strmgr->get_string("msg:{$action}_{$towho}_emailsubject", 'totara_cohort', $a, $touser->lang);
+                $notice = $strmgr->get_string("msg:{$action}_{$towho}_notice", 'totara_cohort', $a, $touser->lang);
+                $eventdata->subject = $emailsubject;
+                $eventdata->fullmessage = $notice;
 
-            $eventdata->userto = $touser;
-            $eventdata->userfrom = $touser;
-            tm_alert_send($eventdata);
+                $eventdata->userto = $touser;
+                $eventdata->userfrom = $touser;
+                tm_alert_send($eventdata);
+            }
+
+            unset($tousers);
         }
     }
 
