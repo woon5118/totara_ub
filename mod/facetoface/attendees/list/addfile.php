@@ -85,7 +85,7 @@ if ($mform->is_cancelled()) {
 // Check if data submitted
 if ($formdata = $mform->get_data()) {
     $formdata->content = $mform->get_file_content('userfile');
-    attendees_list_helper::add_file($formdata);
+    attendees_list_helper::add_file($formdata, $requiredcfnames);
 }
 
 local_js(array(TOTARA_JS_DIALOG));

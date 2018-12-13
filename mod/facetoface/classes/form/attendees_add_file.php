@@ -62,15 +62,19 @@ class attendees_add_file extends \moodleform {
         $mform->addElement('hidden', 'listid', $this->_customdata['listid']);
         $mform->setType('listid', PARAM_ALPHANUM);
 
-        $mform->addElement('header', 'addattendees', get_string('addattendees', 'facetoface'));
+        $mform->addElement('header', 'addattendees', get_string('addattendees', 'mod_facetoface'));
 
         $fileoptions = array('accepted_types' => array('.csv'));
-        $mform->addElement('filepicker', 'userfile', get_string('csvtextfile', 'facetoface'), null, $fileoptions);
+        $mform->addElement('filepicker', 'userfile', get_string('csvtextfile', 'mod_facetoface'), null, $fileoptions);
         $mform->setType('userfile', PARAM_FILE);
         $mform->addRule('userfile', null, 'required');
 
         $encodings = \core_text::get_encodings();
-        $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $encodings);
+        $mform->addElement('select', 'encoding', get_string('encoding', 'mod_facetoface'), $encodings);
+
+        $delimiters = \mod_facetoface\import_helper::csv_get_delimiter_list();
+        $mform->addElement('select', 'delimiter', get_string('delimiter', 'mod_facetoface'), $delimiters);
+        $mform->setDefault('delimiter', get_config('facetoface', 'defaultcsvdelimiter'));
 
         $mform->addElement('advcheckbox', 'ignoreconflicts', get_string('allowscheduleconflicts', 'facetoface'));
         $mform->setType('ignoreconflicts', PARAM_BOOL);

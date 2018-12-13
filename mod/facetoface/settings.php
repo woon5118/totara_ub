@@ -204,9 +204,21 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('facetoface/defaultdaysbetweenstartfinish', new lang_string('defaultdaysbetweenstartfinish', 'facetoface'), new lang_string('defaultdaysbetweenstartfinish_desc', 'facetoface'), '0', PARAM_INT));
     $settings->add(new admin_setting_configtime('facetoface/defaultfinishtime_hours', 'defaultfinishtime_minutes', new lang_string('defaultfinishtime', 'facetoface'), new lang_string('defaultfinishtimehelp', 'facetoface'), array('h' => 10, 'm' => 0)));
     $settings->add(new admin_setting_configtext('facetoface/defaultminbookings',
-        new lang_string('setting:defaultminbookings', 'facetoface'),
-        new lang_string('setting:defaultminbookings_help', 'facetoface'), 0, PARAM_INT));
-
+            new lang_string('setting:defaultminbookings', 'facetoface'),
+            new lang_string('setting:defaultminbookings_help', 'facetoface'),
+            0,
+            PARAM_INT
+        )
+    );
+    require_once($CFG->dirroot.'/lib/csvlib.class.php');
+    $delimiters = \mod_facetoface\import_helper::csv_get_delimiter_list();
+    $settings->add(new admin_setting_configselect('facetoface/defaultcsvdelimiter',
+            new lang_string('defaultcsvdelimiter', 'mod_facetoface'),
+            new lang_string('defaultcsvdelimiter_desc', 'mod_facetoface'),
+            'auto',
+            $delimiters
+        )
+    );
 }
 
 $customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession'));

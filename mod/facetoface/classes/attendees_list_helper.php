@@ -32,6 +32,7 @@ use mod_facetoface\signup\state\partially_attended;
 use mod_facetoface\signup\state\fully_attended;
 use mod_facetoface\form\attendees_add_confirm;
 use mod_facetoface\event\attendees_updated;
+use mod_facetoface\import_helper;
 use \context_module;
 
 defined('MOODLE_INTERNAL') || die();
@@ -167,8 +168,9 @@ final class attendees_list_helper {
      *      @var s seminar event id
      *      @var listid list id
      *      data via file
+     * @param $requiredcfnames array required customfield names
      */
-    public static function add_file($formdata) {
+    public static function add_file($formdata, $requiredcfnames) {
         global $DB;
 
         $importid = optional_param('importid', '', PARAM_INT);
@@ -189,9 +191,14 @@ final class attendees_list_helper {
         if (!$importid) {
             $importid = \csv_import_reader::get_new_iid('uploaduserlist');
             $cir = new \csv_import_reader($importid, 'uploaduserlist');
-            $readcount = $cir->load_csv_content($formdata->content, $formdata->encoding, 'comma');
-            if (!$readcount) {
-                $errors[] = $cir->get_error();
+            $delimiter = import_helper::csv_detect_delimiter($formdata);
+            if (!$delimiter) {
+                $errors[] = get_string('error:delimiternotfound', 'mod_facetoface');
+            } else {
+                $readcount = $cir->load_csv_content($formdata->content, $formdata->encoding, $delimiter);
+                if (!$readcount) {
+                    $errors[] = $cir->get_error();
+                }
             }
             unset($content);
         } else {
@@ -239,18 +246,18 @@ final class attendees_list_helper {
 
         // Check that all required customfields are provided.
         if (empty($errors)) {
-            if (!empty($requiredcfnames)) {
-                $notfoundcf = array_diff($requiredcfnames, $headers);
-                if (!empty($notfoundcf)) {
-                    $errors[] = get_string('error:csvnorequiredcf', 'facetoface', implode('\', \'', $notfoundcf));
-                }
+            $notfoundcf = array_diff($requiredcfnames, $headers);
+            if (!empty($notfoundcf)) {
+                $errors[] = get_string('error:csvnorequiredcf', 'facetoface', implode('\', \'', $notfoundcf));
             }
         }
 
         // Convert headers to field names required for data storing.
-        $fieldnames = array();
-        foreach ($headers as $header) {
-            $fieldnames[] = $header;
+        if (empty($errors)) {
+            $fieldnames = array();
+            foreach ($headers as $header) {
+                $fieldnames[] = $header;
+            }
         }
 
         // Prepare add users information.
