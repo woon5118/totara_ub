@@ -3543,8 +3543,9 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
 
         // Create the reset grade.
         $grade = new stdClass();
-        $grade->userid   = $userid;
-        $grade->rawgrade = null;
+        $grade->userid     = $userid;
+        $grade->overridden = 0; // Needed to be able to reset overridden grades.
+        $grade->rawgrade   = null;
 
         foreach ($modules as $mod) {
             $modfile = $CFG->dirroot . '/mod/' . $mod->name . '/lib.php';
@@ -3636,6 +3637,7 @@ function archive_course_completion($userid, $courseid) {
     global $DB, $CFG, $COMPLETION_STATUS;
 
     require_once($CFG->libdir . '/completionlib.php');
+    require_once($CFG->libdir . '/gradelib.php');
     require_once($CFG->libdir . '/grade/grade_item.php');
     require_once($CFG->libdir . '/grade/grade_grade.php');
     require_once($CFG->dirroot . '/completion/completion_completion.php');
@@ -3661,6 +3663,16 @@ function archive_course_completion($userid, $courseid) {
     } else if ($course_item = grade_item::fetch_course_item($courseid)) {
         $grade = new grade_grade(array('itemid' => $course_item->id, 'userid' => $userid));
         $history->grade = $grade->finalgrade;
+
+        // Reset course grade record (unrelated to the completion record) if it was overridden.
+        // Although, course grade records don't trigger course completion on their own, they do
+        // appear in the grade report which might confuse users, so we might as well reset it.
+        if (isset($grade->id) && isset($grade->overridden)) {
+            $grade->overridden = 0;
+            $grade->rawgrade = null;
+            $grade->finalgrade = null;
+            $grade->update();
+        }
     }
 
     // Copy

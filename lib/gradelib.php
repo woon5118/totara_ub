@@ -232,6 +232,9 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
             // existing grade requested
             $grade       = $grades[$userid];
             $grade_grade = new grade_grade($gd, false);
+            if (isset($grades[$userid]['overridden'])) {
+                $grade_grade->overridden = $grades[$userid]['overridden'];
+            }
             unset($grades[$userid]);
             break;
         }
