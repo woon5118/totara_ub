@@ -543,7 +543,7 @@ switch ($searchtype) {
         // Generate search SQL
         $keywords = totara_search_parse_keywords($query);
         $fields = array('r.name');
-        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
+        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields, SQL_PARAMS_NAMED);
 
         // Custom rooms for session id.
         $sqlsess = '';
@@ -552,29 +552,39 @@ switch ($searchtype) {
         // of the queried rooms to be smaller than the `timefinish` from POST data and the `timefinish` to be bigger
         // than `timestart` from POST data
         $joinsess = 'LEFT JOIN {facetoface_sessions_dates} fsd ON (r.id = fsd.roomid) 
-                     AND (fsd.timestart < ? AND fsd.timefinish > ? AND r.allowconflicts=0 %sessionsql%)';
+                     AND (fsd.timestart < :timestart AND fsd.timefinish > :timefinish 
+                     AND r.allowconflicts = 0 %sessionsql%)';
 
-        $sessionparams = array();
+        // Since we are allowing the custom room created to be used in the same seminar but different
+        // event. Therefore, we need to exclude those custom rooms that have been used by different
+        // seminars.
+        $joinsess .= ' LEFT JOIN (
+            SELECT r2.id FROM {facetoface_room} r2 
+            INNER JOIN {facetoface_sessions_dates} fsd2 ON fsd2.roomid = r2.id
+            INNER JOIN {facetoface_sessions} fs ON fs.id = fsd2.sessionid
+            WHERE r2.custom = 1 AND fs.facetoface <> :facetofaceid
+        ) AS usedrooms ON usedrooms.id = r.id ';
+
         // Parameter for checking against `timestart`
-        $sessionparams[] = $this->customdata['timefinish'];
+        $params['timestart'] = $this->customdata['timefinish'];
         // Parameter for checking against `timefinish`
-        $sessionparams[] = $this->customdata['timestart'];
+        $params['timefinish'] = $this->customdata['timestart'];
+        $params['facetofaceid'] = $this->customdata['facetofaceid'];
+
         // This is a small part of sql for getting those rooms that are not being used by the same session
         $sessionsql = "";
         if ($sessionid) {
-            $sqlsess = 'OR fsd.sessionid = ? ';
-            $params = array_merge($params, array($sessionid));
+            $sqlsess = 'OR fsd.sessionid = :sessionid1 ';
+            $params['sessionid1'] = $sessionid;
 
             // Logic in english: The room that is being used by the same session should not be displayed as unavailable,
             // however if the room is being used by a different session, then it should have a flag of unavailable up
-            $sessionsql = " AND fsd.sessionid <> ? ";
-            $sessionparams[] = $this->customdata['sessionid'];
+            $sessionsql = " AND fsd.sessionid <> :sessionid2 ";
+            $params['sessionid2'] = $this->customdata['sessionid'];
         }
 
         // Update the sql
         $joinsess = str_replace('%sessionsql%', $sessionsql, $joinsess);
-        // Adding the $sessionparams as before $params
-        $params = array_merge($sessionparams, $params);
 
         $search_info->id = 'DISTINCT r.id';
         // This field is required within SELECT, sinc the DISTINCT keyword onlys work well with ORDER BY key word if the
@@ -595,6 +605,7 @@ switch ($searchtype) {
                 {$searchsql}
                 AND (r.custom=0 OR fsd.id IS NULL {$sqlsess})
                 AND r.hidden = 0
+                AND usedrooms.id IS NULL
         ";
 
         $search_info->order = " ORDER BY r.name ASC";

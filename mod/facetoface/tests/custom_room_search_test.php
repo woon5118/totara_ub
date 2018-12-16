@@ -230,10 +230,63 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
 
         $_POST = [
             'search' => 1,
-            'query' => 'seminar room',
+            'query' => 'Seminar Room',
         ];
 
         $markup = $dialog->generate_search();
-        $this->assertNotContains("Seminar Room", $markup);
+        $this->assertContains('No results found for "Seminar Room"', $markup);
+    }
+
+    /**
+     * Test suite of assuring that the custom room that has been used in one facetoface must not
+     * appear in a different seminar.
+     */
+    public function test_custom_room_is_not_appearing_in_different_seminar(): void {
+        global $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $gen = $this->getDataGenerator();
+
+        $course1 = $gen->create_course([], ['createsections' => 1]);
+        $f2f1 = $this->create_seminar($course1);
+        $room1 = $this->create_custom_room($USER);
+        $event = $this->create_facetoface_event($f2f1, $USER);
+        $sessiondate = $this->create_event_session($event, $room1);
+
+        $course2 = $gen->create_course([], ['createsections' => 1]);
+        $f2f2 = $this->create_seminar($course2);
+
+        $time = time() + (42 * 3600);
+        $dialog = new totara_dialog_content();
+        $dialog->searchtype = 'facetoface_room';
+        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
+        $dialog->items = array();
+        $dialog->lang_file = 'facetoface';
+        $dialog->disabled_items = array();
+        $dialog->customdata = [
+            'facetofaceid' => $f2f2->id,
+            'timestart' => $time,
+            'timefinish' => $time + 3600,
+            'sessionid' => 0,
+            'selected' => 0,
+            'offset' => 0,
+        ];
+
+        $dialog->urlparams = [
+            'facetofaceid' => $f2f2->id,
+            'sessionid' => 0,
+            'timestart' => $time,
+            'timefinish' => $time + 3600,
+            'offset' => 0,
+        ];
+
+        $_POST = [
+            'search' => 1,
+            'query' => 'Seminar Room',
+        ];
+
+        $markup = $dialog->generate_search();
+        $this->assertContains('No results found for "Seminar Room"', $markup);
     }
 }
