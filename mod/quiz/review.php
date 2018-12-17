@@ -258,8 +258,8 @@ $output = $PAGE->get_renderer('mod_quiz');
 
 // Arrange for the navigation to be displayed.
 $navbc = $attemptobj->get_navigation_panel($output, 'quiz_review_nav_panel', $page, $showall);
-$regions = $PAGE->blocks->get_regions();
-$PAGE->blocks->add_fake_block($navbc, reset($regions));
+$region = $PAGE->blocks->get_default_region();
+$PAGE->blocks->add_fake_block($navbc, $region);
 
 echo $output->review_page($attemptobj, $slots, $page, $showall, $lastpage, $options, $summarydata);
 
