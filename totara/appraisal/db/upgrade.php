@@ -86,5 +86,29 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018041600, 'totara', 'appraisal');
     }
 
+    if ($oldversion < 2019011500) {
+
+        // Define field usercompleted to be added to appraisal_stage_data.
+        $table = new xmldb_table('appraisal_stage_data');
+        $field = new xmldb_field('usercompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timecompleted');
+
+        // Conditionally launch add field usercompleted.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field realusercompleted to be added to appraisal_stage_data.
+        $table = new xmldb_table('appraisal_stage_data');
+        $field = new xmldb_field('realusercompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'usercompleted');
+
+        // Conditionally launch add field realusercompleted.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Appraisal savepoint reached.
+        upgrade_plugin_savepoint(true, 2019011500, 'totara', 'appraisal');
+    }
+
     return true;
 }

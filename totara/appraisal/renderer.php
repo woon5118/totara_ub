@@ -1585,6 +1585,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             }
             // Text.
             // If stage is completed and a role wasn't assigned at the time of completion - indicate this to user
+            $showactor = true;
             if (!$preview && $stage->is_completed($userassignment)) {
                 // As the learner's managers and appraiser may have changed since completion (and you may not have been the
                 // one providing the answers, do not use 'you' unless you are the learner
@@ -1612,6 +1613,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                         // My appraisal - use 'You' and 'Your'
                         if ($rolecompletion->appraisalrole == $roleassignment->appraisalrole) {
                             $rolecomplete = get_string($prefix . 'you', 'totara_appraisal');
+                            $showactor = false; // You know who you are.
                         } else {
                             $rolecomplete = get_string($prefix . 'your', 'totara_appraisal',
                                     get_string($allroles[$rolecompletion->appraisalrole], 'totara_appraisal'));
@@ -1619,6 +1621,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                     } else {
                         if ($rolecompletion->appraisalrole == appraisal::ROLE_LEARNER) {
                             $rolecomplete = get_string($prefix . 'user', 'totara_appraisal', fullname($userassignment->user));
+                            $showactor = false; // Everyone knows who the learner is.
                         }
                         else {
                             $a = new stdClass();
@@ -1645,6 +1648,11 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 }
             }
 
+            // Add specific user role completion information.
+            if ($showactor || !empty($rolecompletion->realusercompleted)) {
+                $rolecomplete .= $this->get_completion_user_info($rolecompletion->usercompleted, $rolecompletion->realusercompleted);
+            }
+
             // Add whole line in span to enable searching in behat.
             // Better ux element grouping will be better
             $lines[] = $icon . $rolecomplete;
@@ -1663,6 +1671,43 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         return $this->render_from_template('totara_appraisal/stage_brief', $context);
     }
 
+
+    /**
+     * Returns info on the real user who completed an action as a string.
+     * @param integer|null $usercompleted User id for user who completed or null.
+     * @param integer|null $realusercompleted User id for real user who completed on behalf of another user, or null.
+     * @return string Text string describing who completed action.
+     */
+    protected function get_completion_user_info($usercompletedid, $realusercompletedid) {
+        global $DB;
+
+        // Prep user data for stage completions.
+        if (!empty($usercompletedid)) {
+            $u = $DB->get_record('user', ['id' => $usercompletedid]);
+            $usercompleted = $u ? fullname($u) : '';
+        } else {
+            $usercompleted = '';
+        }
+        if (!empty($realusercompletedid)) {
+            $u = $DB->get_record('user', ['id' => $realusercompletedid]);
+            $realusercompleted = $u ? fullname($u) : '';
+        } else {
+            $realusercompleted = '';
+        }
+
+        $out = '';
+        if (!empty($usercompleted)) {
+            if (!empty($realusercompleted)) {
+                $a = new \stdClass();
+                $a->completedby = $realusercompleted;
+                $a->completedonbehalfof = $usercompleted;
+                $out = get_string('completedbyxonbehalfofy', 'totara_appraisal', $a);
+            } else {
+                $out = get_string('completedbyx', 'totara_appraisal', $usercompleted);
+            }
+        }
+        return $out;
+    }
 
     /**
      * Displays the actions for the given stage when shown on the appraisal level.

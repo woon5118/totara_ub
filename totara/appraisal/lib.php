@@ -2703,13 +2703,16 @@ class appraisal_stage {
      * @param appraisal_role_assignment $roleassignment
      */
     public function complete_for_role(appraisal_role_assignment $roleassignment) {
-        global $DB;
+        global $DB, $USER;
 
         if (!$DB->record_exists('appraisal_stage_data',
             array('appraisalroleassignmentid' => $roleassignment->id, 'appraisalstageid' => $this->id))) {
             // Mark the role as complete.
             $stage_data = new stdClass();
             $stage_data->appraisalroleassignmentid = $roleassignment->id;
+            $stage_data->usercompleted = $USER->id;
+            $realuser = \core\session\manager::get_realuser();
+            $stage_data->realusercompleted = \core\session\manager::is_loggedinas() ? $realuser->id : null;
             $stage_data->timecompleted = time();
             $stage_data->appraisalstageid = $this->id;
             $DB->insert_record('appraisal_stage_data', $stage_data);
@@ -2890,7 +2893,8 @@ class appraisal_stage {
             }
         }
 
-        $sql = 'SELECT ara.appraisalrole, ara.userid, ara.activepageid, asd.timecompleted
+        $sql = 'SELECT ara.appraisalrole, ara.userid, ara.activepageid, asd.timecompleted,
+                       asd.usercompleted, asd.realusercompleted
                   FROM {appraisal_role_assignment} ara
                   JOIN {appraisal_user_assignment} aua
                     ON ara.appraisaluserassignmentid = aua.id
