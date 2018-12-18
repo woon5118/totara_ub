@@ -396,28 +396,28 @@ function cohort_rules_list($reset = false){
                 case 'menu':
                     $options = explode("\n", $field->param1);
                     $dialog = new cohort_rule_ui_menu(
-                        get_string('usersposx', 'totara_cohort', $field->name),
+                        get_string('usersposx', 'totara_cohort', format_string($field->name)),
                         array_combine($options, $options)
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id, $field->datatype);
                     break;
                 case 'text':
                     $dialog = new cohort_rule_ui_text(
-                        get_string('usersposx', 'totara_cohort', $field->name),
+                        get_string('usersposx', 'totara_cohort', format_string($field->name)),
                         get_string('separatemultiplebycommas', 'totara_cohort')
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id, $field->datatype);
                     break;
                 case 'datetime':
                     $dialog = new cohort_rule_ui_date(
-                        get_string('usersposx', 'totara_cohort', $field->name)
+                        get_string('usersposx', 'totara_cohort', format_string($field->name))
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_date_poscustomfield($id, $field->datatype);
                     break;
 
                 case 'checkbox':
                     $dialog = new cohort_rule_ui_checkbox(
-                        get_string('usersposx', 'totara_cohort', $field->name),
+                        get_string('usersposx', 'totara_cohort', format_string($field->name)),
                         // Because it may result in major dataloss change the strings vice versa.
                         array(
                             1 => get_string('checkboxno', 'totara_cohort'),
@@ -438,7 +438,7 @@ function cohort_rules_list($reset = false){
                 "poscustomfield{$id}",
                 $dialog,
                 $sqlhandler,
-                s($field->name)
+                s(format_string($field->name))
             );
         }
 
@@ -503,27 +503,27 @@ function cohort_rules_list($reset = false){
                 case 'menu':
                     $options = explode("\n", $field->param1);
                     $dialog = new cohort_rule_ui_menu(
-                        get_string('usersorgx', 'totara_cohort', $field->name),
+                        get_string('usersorgx', 'totara_cohort', format_string($field->name)),
                         array_combine($options, $options)
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_orgcustomfield($id, $field->datatype);
                     break;
                 case 'text':
                     $dialog = new cohort_rule_ui_text(
-                        get_string('usersorgx', 'totara_cohort', $field->name),
+                        get_string('usersorgx', 'totara_cohort', format_string($field->name)),
                         get_string('separatemultiplebycommas', 'totara_cohort')
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_orgcustomfield($id, $field->datatype);
                     break;
                 case 'datetime':
                     $dialog = new cohort_rule_ui_date(
-                        get_string('usersorgx', 'totara_cohort', $field->name)
+                        get_string('usersorgx', 'totara_cohort', format_string($field->name))
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_date_orgcustomfield($id, $field->datatype);
                     break;
                 case 'checkbox':
                     $dialog = new cohort_rule_ui_checkbox(
-                        get_string('usersorgx', 'totara_cohort', $field->name),
+                        get_string('usersorgx', 'totara_cohort', format_string($field->name)),
                         // Because it may result in major dataloss change the strings vice versa.
                         array(
                             1 => get_string('checkboxno', 'totara_cohort'),
@@ -544,7 +544,7 @@ function cohort_rules_list($reset = false){
                 "orgcustomfield{$id}",
                 $dialog,
                 $sqlhandler,
-                s($field->name)
+                s(format_string($field->name))
             );
         }
 

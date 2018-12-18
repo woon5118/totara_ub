@@ -94,8 +94,17 @@ function cohort_rules_get_rule_definition($rulegroup, $rulename) {
 function cohort_rules_get_menu_options() {
     static $rulesmenu = false;
 
+    $reset = false;
+    if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+        // If it is a phpunit test running, then probably we should reset the rules menu for the 
+        // multiple tests
+        unset($rulesmenu);
+        $rulesmenu = false;
+        $reset = true;
+    }
+
     if (!$rulesmenu) {
-        $rules = cohort_rules_list();
+        $rules = cohort_rules_list($reset);
 
         // Set up the list of rules for use in menus.
         $rulesmenu = array();
