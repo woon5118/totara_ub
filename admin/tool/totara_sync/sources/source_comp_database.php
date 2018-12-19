@@ -178,8 +178,9 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         );
 
         // Check the table exists in the database.
-        $tables = $database_connection->get_tables();
-        if (!in_array($db_table, $tables)) {
+        try {
+            $database_connection->get_record_sql("SELECT 1 FROM $db_table", null, IGNORE_MULTIPLE);
+        } catch (Exception $e) {
             $this->addlog(get_string('dbmissingtablex', 'tool_totara_sync', $db_table), 'error', 'importdata');
             return false;
         }
