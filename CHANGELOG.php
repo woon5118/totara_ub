@@ -35,14 +35,6 @@ Security issues:
                    Permissions checks are now also made to ensure that the user exporting has
                    permission to access the information of each user in the report.
 
-New features:
-
-    TL-19629   +   Added form to create a new evidence type
-    TL-19661   +   Created a new report source and embedded report for users who are assigned to competencies
-
-                   The report lists all assigned individual users together with the
-                   competencies they were assigned to.
-
 Improvements:
 
     TL-19292       Added behat test coverage to content marketplace filters
@@ -71,8 +63,6 @@ Improvements:
 
                    To update existing notifications, replace placeholders
                    "[starttime]-[finishtime], [sessiondate]" with "[eventperiod]" manually.
-
-    TL-19656   +   Implemented basket functionality for competency assignments
 
 Bug fixes:
 
