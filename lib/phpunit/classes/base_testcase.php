@@ -646,5 +646,148 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
         self::$lastclassstarttime = microtime(true);
     }
 
+    /**
+     * @param mixed      $exception
+     * @param string     $message   Null means we do not check message at all, string (even empty) means we do. Default: null.
+     * @param int|string $code      Null means we do not check code at all, non-null means we do.
+     *
+     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead
+     */
+    public function setExpectedException($exception, $message = '', $code = null) {
+        debugging("PHPUnits setExpectedException() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead.", DEBUG_DEVELOPER);
+
+        if (null !== $message && !is_string($message)) {
+            throw \PHPUnit\Util\InvalidArgumentHelper::factory(2, 'string');
+        }
+
+        if (func_num_args() < 2) {
+            $message = null;
+        }
+
+        $this->expectException($exception);
+
+        if ($message !== null) {
+            $this->expectExceptionMessage($message);
+        }
+
+        if ($code !== null) {
+            $this->expectExceptionCode($code);
+        }
+    }
+
+    /**
+     * @param mixed  $exception
+     * @param string $messageRegExp
+     * @param int    $code
+     *
+     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectExceptionMessageRegExp() instead
+     */
+    public function setExpectedExceptionRegExp($exception, $messageRegExp = '', $code = null) {
+        debugging("PHPUnits setExpectedExceptionRegExp() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() and expectExceptionMessageRegExp() instead.", DEBUG_DEVELOPER);
+
+        if (!is_string($messageRegExp)) {
+            throw \PHPUnit\Util\InvalidArgumentHelper::factory(2, 'string');
+        }
+
+        $this->expectException($exception);
+        $this->expectExceptionMessageRegExp($messageRegExp);
+
+        if ($code !== null) {
+            $this->expectExceptionCode($code);
+        }
+    }
+
+    /**
+     * Returns a mock object for the specified class.
+     *
+     * @param string     $originalClassName       Name of the class to mock.
+     * @param array|null $methods                 When provided, only methods whose names are in the array
+     *                                            are replaced with a configurable test double. The behavior
+     *                                            of the other methods is not changed.
+     *                                            Providing null means that no methods will be replaced.
+     * @param array      $arguments               Parameters to pass to the original class' constructor.
+     * @param string     $mockClassName           Class name for the generated test double class.
+     * @param bool       $callOriginalConstructor Can be used to disable the call to the original class' constructor.
+     * @param bool       $callOriginalClone       Can be used to disable the call to the original class' clone constructor.
+     * @param bool       $callAutoload            Can be used to disable __autoload() during the generation of the test double class.
+     * @param bool       $cloneArguments
+     * @param bool       $callOriginalMethods
+     * @param object     $proxyTarget
+     *
+     * @return PHPUnit\Framework\MockObject\MockObject
+     *
+     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() or getMockBuilder() instead
+     */
+    protected function getMock($originalClassName, $methods = [], array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $cloneArguments = false, $callOriginalMethods = false, $proxyTarget = null) {
+        debugging("PHPUnits getMock() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() or getMockBuilder() instead.", DEBUG_DEVELOPER);
+
+        $builder = $this->getMockBuilder($originalClassName);
+        $builder->setMethods($methods);
+        if (!empty($arguments)) {
+            $builder->setConstructorArgs($arguments);
+        }
+        if (!empty($mockClassName)) {
+            $builder->setMockClassName($mockClassName);
+        }
+        if ($callOriginalConstructor) {
+            $builder->enableOriginalConstructor();
+        } else {
+            $builder->disableOriginalConstructor();
+        }
+        if ($callOriginalClone) {
+            $builder->enableOriginalClone();
+        } else {
+            $builder->disableOriginalClone();
+        }
+        if ($callAutoload) {
+            $builder->enableAutoload();
+        } else {
+            $builder->disableAutoload();
+        }
+        if ($cloneArguments) {
+            $builder->enableArgumentCloning();
+        } else {
+            $builder->disableArgumentCloning();
+        }
+        if ($callOriginalMethods) {
+            $builder->enableProxyingToOriginalMethods();
+        } else {
+            $builder->disableProxyingToOriginalMethods();
+        }
+        if ($proxyTarget) {
+            $builder->setProxyTarget($proxyTarget);
+        }
+
+        return $builder->getMock();
+    }
+
+    /**
+     * Returns a mock with disabled constructor object for the specified class.
+     *
+     * @param string $originalClassName
+     *
+     * @return PHPUnit\Framework\MockObject\MockObject
+     *
+     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() instead
+     */
+    protected function getMockWithoutInvokingTheOriginalConstructor($originalClassName) {
+        debugging("PHPUnits getMockWithoutInvokingTheOriginalConstructor() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() instead.", DEBUG_DEVELOPER);
+
+        return $this->getMockBuilder($originalClassName)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * @return bool
+     *
+     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use hasExpectationOnOutput() instead
+     */
+    public function hasPerformedExpectationsOnOutput() {
+        debugging("PHPUnits hasPerformedExpectationsOnOutput() method was removed in PHPUnit 6 and is deprecated since Totara 13; use hasExpectationOnOutput() instead.", DEBUG_DEVELOPER);
+
+        return $this->hasExpectationOnOutput();
+    }
+
     // @codingStandardsIgnoreEnd
 }
