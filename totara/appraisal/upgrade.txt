@@ -36,7 +36,7 @@ these columns in the where clause of sql queries will need to be changed to use 
 
 * get_aggregate_question_answers() function added argument $usedefaults
 * Refactored add_field_form_elements() function to perform aggregate calculations in a separate calculate_aggregate() function
-* Reduced specificy of CSS selectors to improve RTL support
+* Reduced specificity of CSS selectors to improve RTL support
 * Renamed CSS class "previewer" to "appraisal-previewer" so that it did not clash with the same CSS class in feedback360
 * totara_appraisal_renderer::display_appraisal_header() has changed
 * totara_appraisal_renderer::display_job_assignment() has changed

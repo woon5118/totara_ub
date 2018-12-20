@@ -23,6 +23,7 @@ information provided here is intended especially for developers.
   A debugging message is issued to use the new methods provided by PHPUnit 7.5.
   All PHPUnit classes are now namespaced and have been added to the totara\core\db\renamedclasses.php file.
   The dbunit package won't receive any updates anymore and composer issues a warning that the "Package phpunit/dbunit is abandoned".
+* Deprecated properties flex_icon::pix, flex_icon::component, flex_icon::attributes have been removed
 
 === 12.0 ===
 

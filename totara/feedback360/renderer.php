@@ -56,21 +56,6 @@ class totara_feedback360_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Renders a single button to request feedback
-     *
-     * @deprecated deprecated since 10
-     * @param int $userid
-     * @return string
-     */
-    public function request_feedback360_button($userid) {
-        $request_params = array('action' => 'form', 'userid' => $userid);
-        $request_url = new moodle_url('/totara/feedback360/request.php', $request_params);
-        $request_str = get_string('requestfeedback360', 'totara_feedback360');
-        $request_options = array('class' => 'requestbutton');
-        return $this->output->single_button($request_url, $request_str, 'get', $request_options);
-    }
-
-    /**
      * Renders a table containing feedback360s list for manager
      *
      * @param array $feedback360s array of feedback360 object

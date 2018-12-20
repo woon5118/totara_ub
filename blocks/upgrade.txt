@@ -1,5 +1,10 @@
 This files describes API changes in /blocks/* - activity modules,
 information provided here is intended especially for developers.
+
+=== 13 ===
+
+* lib/templates/block.mustache the properties $accessible_skip_from and $accessible_skip_to have been removed.
+
 === 12 ===
 
 * Introduced block_edit_form::has_common_settings() method to allow custom blocks to turn new settings off.

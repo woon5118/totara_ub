@@ -33,8 +33,6 @@ use html_writer;
 class block implements renderable {
 
     public $attributes = array();
-    public $accessible_skip_from = array();
-    public $accessible_skip_to = array();
     public $header = false;
     public $content;
     public $footer = false;
@@ -86,10 +84,6 @@ class block implements renderable {
                 'title' => $skiptitle,
                 'skiptext' => get_string('skipa', 'access', $skiptitle)
             );
-
-            // @deprecated since Totara 10
-            $block->accessible_skip_from = array('href' => '#sb-' . $bc->skipid, 'title' => $skiptitle);
-            $block->accessible_skip_to = array('id' => 'sb-' . $bc->skipid);
         }
         $title = array();
         if ($bc->title) {

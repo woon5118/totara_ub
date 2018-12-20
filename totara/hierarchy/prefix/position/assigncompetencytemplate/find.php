@@ -54,14 +54,6 @@ $frameworkid = optional_param('frameworkid', 0, PARAM_INT);
 // Only return generated tree html
 $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 
-// No javascript parameters
-$nojs = optional_param('nojs', false, PARAM_BOOL);
-$returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
-$s = optional_param('s', '', PARAM_TEXT);
-
-// string of params needed in non-js url strings
-$urlparams = array('assignto' => $assignto, 'frameworkid' => $frameworkid, 'nojs' => $nojs, 'returnurl' => urlencode($returnurl), 's' => $s);
-
 ///
 /// Permissions checks
 ///
@@ -79,89 +71,28 @@ if (!$currentlyassigned = $positions->get_assigned_competency_templates($assignt
 /// Display page
 ///
 
-if (!$nojs) {
+// Load dialog content generator
+$dialog = new totara_dialog_content_hierarchy_multi('competency', $frameworkid);
 
-    // Load dialog content generator
-    $dialog = new totara_dialog_content_hierarchy_multi('competency', $frameworkid);
+// Templates only
+$dialog->templates_only = true;
 
-    // Templates only
-    $dialog->templates_only = true;
+// Toggle treeview only display
+$dialog->show_treeview_only = $treeonly;
 
-    // Toggle treeview only display
-    $dialog->show_treeview_only = $treeonly;
+// Load competency templates to display
+$dialog->items = $dialog->hierarchy->get_templates();
 
-    // Load competency templates to display
-    $dialog->items = $dialog->hierarchy->get_templates();
+// Set disabled items
+$dialog->disabled_items = $currentlyassigned;
 
-    // Set disabled items
-    $dialog->disabled_items = $currentlyassigned;
+// Set strings
+$dialog->string_nothingtodisplay = 'notemplateinframework';
+$dialog->select_title = 'locatecompetencytemplate';
+$dialog->selected_title = 'selectedcompetencytemplates';
 
-    // Set strings
-    $dialog->string_nothingtodisplay = 'notemplateinframework';
-    $dialog->select_title = 'locatecompetencytemplate';
-    $dialog->selected_title = 'selectedcompetencytemplates';
+// Disable framework picker
+$dialog->disable_picker = true;
 
-    // Disable framework picker
-    $dialog->disable_picker = true;
-
-    // Display
-    echo $dialog->generate_markup();
-
-} else {
-    // non JS version of page
-    // Check permissions
-    $sitecontext = context_system::instance();
-    require_capability('totara/hierarchy:updateposition', $sitecontext);
-
-
-    // Setup hierarchy object
-    $hierarchy = new competency();
-
-    // Load framework
-    if (!$framework = $hierarchy->get_framework($frameworkid)) {
-        print_error('competencyframeworknotfound', 'totara_hierarchy');
-    }
-
-    echo $OUTPUT->header();
-    $out = html_writer::tag('h2', get_string('assigncompetencytemplate', 'totara_hierarchy'));
-    $link = html_writer::link($returnurl, get_string('cancelwithoutassigning','totara_hierarchy'));
-    $out .= html_writer::tag('p', $link);
-
-    if (empty($frameworkid) || $frameworkid == 0) {
-
-        echo build_nojs_frameworkpicker(
-            $hierarchy,
-            '/totara/hierarchy/prefix/position/assigncompetencytemplate/find.php',
-            array(
-                'returnurl' => $returnurl,
-                's' => $s,
-                'nojs' => 1,
-                'assignto' => $assignto,
-                'frameworkid' => $frameworkid,
-            )
-        );
-
-    } else {
-        $out .= html_writer::start_tag('div', array('id' => 'nojsinstructions'));
-        $out .= html_writer::tag('p', get_string('clicktoassigntemplate', 'totara_hierarchy').' ');
-        $out .= html_writer::start_tag('div', array('id' => 'nojsselect'));
-        $out .= build_nojs_treeview(
-            $items,
-            get_string('nounassignedcompetencytemplates', 'totara_hierarchy'),
-            '/totara/hierarchy/prefix/position/assigncompetencytemplate/assign.php',
-            array(
-                's' => $s,
-                'returnurl' => $returnurl,
-                'nojs' => 1,
-                'frameworkid' => $frameworkid,
-                'assignto' => $assignto,
-            ),
-            '/totara/hierarchy/prefix/position/assigncompetencytemplate/find.php',
-            $urlparams,
-            $hierarchy->get_all_parents()
-        );
-        $out .= html_writer::end_tag('div');
-    }
-    echo $out;
-    echo $OUTPUT->footer();
-}
+// Display
+echo $dialog->generate_markup();

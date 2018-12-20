@@ -43,18 +43,4 @@ class block_totara_stats_renderer extends plugin_renderer_base {
         $output .= html_writer::alist($items, array('class' => 'list'));
         return $output;
     }
-
-    /**
-     * Displays a single statistic.
-     *
-     * @deprecated Since Learn 11
-     * @param object $stat An object containing the image and string stating the statistic.
-     *
-     * @returns the rendered statistic.
-     */
-    public function display_stats_list_item($stat) {
-        $statstr = html_writer::tag('p', $stat->icon . ' ' . $stat->displaystring);
-        $output = html_writer::tag('li', $statstr);
-        return $output;
-    }
 }

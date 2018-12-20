@@ -1,10 +1,14 @@
 This file describes API changes in Totara Feedback360,
 information provided here is intended especially for developers.
 
+=== 13 ===
+
+* Removed deprecated method totara_feedback360_renderer::request_feedback360_button()
+
 === 12 ===
 
 * Removed deprecated class request_select_form
-* Removed deprecated methods feedback360::get_available_forms()
+* Removed deprecated method feedback360::get_available_forms()
 
 === 10 ===
 
@@ -14,7 +18,7 @@ the response should be queried via this value, particularly if anonymous feedbac
 When a user that has requested feedback views a response, a 'responseid' in the url can no longer
 be used to fetch feedback, they must use the 'requestertoken'. This does not apply to users who are
 submitting feedback.
-* Reduced specificy of CSS selectors to improve RTL support
+* Reduced specificity of CSS selectors to improve RTL support
 * Renamed CSS class "previewer" to "feedback360-previewer" so that it did not clash with the same CSS class in appraisals
 * Altered the renderer display_feedback_header()
 * Altered the renderer display_preview_feedback_header()

@@ -91,9 +91,6 @@ if (!$item) {
     $out .= html_writer::start_tag('div');
     $out .= html_writer::empty_tag('input', array('type' => 'submit', 'id' => "show-related-dialog", 'value' => get_string('assignrelatedcompetencies', 'totara_hierarchy')));
     $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "id", 'value' => $item->id));
-    $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
-    $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "returnurl", 'value' => qualified_me()));
-    $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "s", 'value' => sesskey()));
     $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "frameworkid", 'value' => $item->frameworkid));
     $out .= html_writer::end_tag('div');
     $out .= html_writer::end_tag('form');
@@ -101,7 +98,6 @@ if (!$item) {
     $out .= html_writer::end_tag('div');
     echo $out;
 }
-
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();

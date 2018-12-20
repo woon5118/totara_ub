@@ -2427,16 +2427,6 @@ class html_table implements renderable, templatable {
     public $caption;
 
     /**
-     * @var bool Whether to hide the table's caption from sighted users.
-     * @deprecated since 9.0
-     *
-     * Example of usage:
-     * $t->caption = "TV Guide";
-     * $t->captionhide = true;
-     */
-    public $captionhide = false;
-
-    /**
      * Constructor
      */
     public function __construct() {
@@ -2832,10 +2822,6 @@ class html_table implements renderable, templatable {
         if (!empty($this->caption)) {
             $data->caption = new stdClass;
             $data->caption->text = $this->caption;
-            if ($this->captionhide) {
-                debugging("The 'captionhide' argument for tables has been deprecated. Please apply any class to hide the caption directly to the table template.", DEBUG_DEVELOPER);
-                $data->caption->hidden = true;
-            }
         }
 
         // Prepare the head portion of the table.

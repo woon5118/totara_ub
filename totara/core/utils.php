@@ -106,19 +106,6 @@ function sql_sequence($field, $items, $type=SQL_PARAMS_QM, $negate = false) {
     return array('(' . implode($operator, $out) . ')', $outparams);
 }
 
-
-
-/**
- * Check if a specified language string already exists
- *
- * @deprecated Use string_exists() instead
- */
-function check_string($identifier, $module='', $extralocations=null) {
-    debugging('The function check_string() is deprecated. Use string_exists() instead.', DEBUG_DEVELOPER);
-    return string_exists($identifier, $module);
-}
-
-
 /**
  * Returns an attribute variable used to limit the width of a pulldown
  *

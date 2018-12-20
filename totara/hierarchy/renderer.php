@@ -407,12 +407,6 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     array('type' => 'submit', 'id' => "show-{$displaytitle}-dialog", 'value' => $add_button_text));
             $out .= html_writer::empty_tag('input',
                     array('type' => 'hidden', 'name' => "assignto", 'value' => $itemid));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "returnurl", 'value' => qualified_me()));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "s", 'value' => sesskey()));
             $out .= html_writer::end_tag('div');
             $out .= html_writer::end_tag('form');
             $out .= html_writer::end_tag('div');
@@ -567,12 +561,10 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 );
 
                 $update_text = get_string('update');
-                $scaleurl = new moodle_url('/totara/hierarchy/prefix/goal/update-scalevalue.php', array('nojs' => true));
+                $scaleurl = new moodle_url('/totara/hierarchy/prefix/goal/update-scalevalue.php');
 
                 $scalevalue = html_writer::start_tag('form',
                         array('action' => $scaleurl, 'method' => 'get'));
-                $scalevalue .= html_writer::empty_tag('input',
-                        array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
                 $scalevalue .= html_writer::empty_tag('input',
                         array('type' => 'hidden', 'name' => "scope", 'value' => goal::SCOPE_COMPANY));
                 $scalevalue .= html_writer::empty_tag('input',
@@ -697,12 +689,10 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     );
 
                     $update_text = get_string('update');
-                    $scaleurl = new moodle_url('/totara/hierarchy/prefix/goal/update-scalevalue.php', array('nojs' => true));
+                    $scaleurl = new moodle_url('/totara/hierarchy/prefix/goal/update-scalevalue.php');
 
                     $scalevalue = html_writer::start_tag('form',
                             array('action' => $scaleurl, 'method' => 'get'));
-                    $scalevalue .= html_writer::empty_tag('input',
-                            array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
                     $scalevalue .= html_writer::empty_tag('input',
                             array('type' => 'hidden', 'name' => "scope", 'value' => goal::SCOPE_PERSONAL));
                     $scalevalue .= html_writer::empty_tag('input',

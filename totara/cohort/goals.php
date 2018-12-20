@@ -112,12 +112,6 @@ if ($can_edit) {
         'name' => "assignto", 'value' => $cohort->id));
     $button_form .= html_writer::empty_tag('input', array('type' => 'hidden',
         'name' => "assigntype", 'value' => GOAL_ASSIGNMENT_AUDIENCE));
-    $button_form .= html_writer::empty_tag('input', array('type' => 'hidden',
-        'name' => "nojs", 'value' => '1'));
-    $button_form .= html_writer::empty_tag('input', array('type' => 'hidden',
-        'name' => "returnurl", 'value' => qualified_me()));
-    $button_form .= html_writer::empty_tag('input', array('type' => 'hidden',
-        'name' => "s", 'value' => sesskey()));
     $button_form .= html_writer::end_tag('div');
     $button_form .= html_writer::end_tag('form');
     $button_form .= html_writer::end_tag('div');

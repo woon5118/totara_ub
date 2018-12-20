@@ -159,12 +159,6 @@ if ($can_view_company) {
                 array('type' => 'hidden', 'name' => "assignto", 'value' => $userid));
         $company_edit .= html_writer::empty_tag('input',
                 array('type' => 'hidden', 'name' => "assigntype", 'value' => GOAL_ASSIGNMENT_INDIVIDUAL));
-        $company_edit .= html_writer::empty_tag('input',
-                array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
-        $company_edit .= html_writer::empty_tag('input',
-                array('type' => 'hidden', 'name' => "returnurl", 'value' => qualified_me()));
-        $company_edit .= html_writer::empty_tag('input',
-                array('type' => 'hidden', 'name' => "s", 'value' => sesskey()));
         $company_edit .= html_writer::end_tag('div');
         $company_edit .= html_writer::end_tag('form');
         $company_edit .= html_writer::end_tag('div');

@@ -18,6 +18,8 @@ information provided here is intended especially for developers.
   - core/alert_info
   - core/alert_success
   - core/alert_warning
+* Removed deprecated function totara_random_bytes()
+* Removed deprecated function check_string()
 
 === 12 ===
 

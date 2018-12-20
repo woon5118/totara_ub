@@ -124,9 +124,6 @@ if ($can_edit) {
                 <input type="submit" id="show-coursecompetency-dialog" value="<?php echo get_string('assigncoursecompletiontocompetencies', 'totara_hierarchy'); ?>" />
             <?php } ?>
             <input type="hidden" name="id" value="<?php echo $id ?>">
-            <input type="hidden" name="nojs" value="1">
-            <input type="hidden" name="returnurl" value="<?php echo qualified_me(); ?>">
-            <input type="hidden" name="s" value="<?php echo sesskey(); ?>">
         </div>
     </form>
 </div>

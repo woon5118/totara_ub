@@ -40,14 +40,6 @@ defined('MOODLE_INTERNAL') || die();
  * @package   core
  */
 class flex_icon extends \pix_icon {
-    /** @deprecated do not use in flex icons */
-    var $pix;
-
-    /** @deprecated do not use in flex icons */
-    var $component;
-
-    /** @deprecated do not use in flex icons */
-    var $attributes;
 
     /**
      * @var string Flex icon identifier
