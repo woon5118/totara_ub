@@ -28,7 +28,7 @@ require_once(__DIR__ . '/../../../config.php');
 require_login(null, false);
 
 $courseid = optional_param('course', 0, PARAM_INT);
-$filter = optional_param('filter', '', PARAM_ALPHANUM);
+$filter = optional_param('filter', '', PARAM_TEXT);
 
 // Permissions checks on the system context to make sure we have access to see audiences.
 if ($courseid) {
