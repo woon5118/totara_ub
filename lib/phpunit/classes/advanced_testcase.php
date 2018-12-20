@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 /**
  * Advanced PHPUnit test case customised for Moodle.
  *
@@ -60,7 +59,7 @@ abstract class advanced_testcase extends base_testcase {
      * Runs the bare test sequence.
      * @return void
      */
-    final public function runBare() {
+    final public function runBare(): void {
         global $DB;
 
         try {
@@ -108,9 +107,9 @@ abstract class advanced_testcase extends base_testcase {
         // make sure test did not forget to close transaction
         if ($DB->is_transaction_started()) {
             self::resetAllData();
-            if ($this->getStatus() == PHPUnit_Runner_BaseTestRunner::STATUS_PASSED
-                or $this->getStatus() == PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED
-                or $this->getStatus() == PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE) {
+            if ($this->getStatus() == \PHPUnit\Runner\BaseTestRunner::STATUS_PASSED
+                or $this->getStatus() == \PHPUnit\Runner\BaseTestRunner::STATUS_SKIPPED
+                or $this->getStatus() == \PHPUnit\Runner\BaseTestRunner::STATUS_INCOMPLETE) {
                 throw new coding_exception('Test '.$this->getName().' did not close database transaction');
             }
         }
@@ -120,20 +119,20 @@ abstract class advanced_testcase extends base_testcase {
      * Creates a new FlatXmlDataSet with the given $xmlFile. (absolute path.)
      *
      * @param string $xmlFile
-     * @return PHPUnit_Extensions_Database_DataSet_FlatXmlDataSet
+     * @return \PHPUnit\DbUnit\DataSet\FlatXmlDataSet
      */
     protected function createFlatXMLDataSet($xmlFile) {
-        return new PHPUnit_Extensions_Database_DataSet_FlatXmlDataSet($xmlFile);
+        return new \PHPUnit\DbUnit\DataSet\FlatXmlDataSet($xmlFile);
     }
 
     /**
      * Creates a new XMLDataSet with the given $xmlFile. (absolute path.)
      *
      * @param string $xmlFile
-     * @return PHPUnit_Extensions_Database_DataSet_XmlDataSet
+     * @return \PHPUnit\DbUnit\DataSet\XmlDataSet
      */
     protected function createXMLDataSet($xmlFile) {
-        return new PHPUnit_Extensions_Database_DataSet_XmlDataSet($xmlFile);
+        return new \PHPUnit\DbUnit\DataSet\XmlDataSet($xmlFile);
     }
 
     /**
@@ -143,10 +142,10 @@ abstract class advanced_testcase extends base_testcase {
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escape
-     * @return PHPUnit_Extensions_Database_DataSet_CsvDataSet
+     * @return \PHPUnit\DbUnit\DataSet\CsvDataSet
      */
     protected function createCsvDataSet($files, $delimiter = ',', $enclosure = '"', $escape = '"') {
-        $dataSet = new PHPUnit_Extensions_Database_DataSet_CsvDataSet($delimiter, $enclosure, $escape);
+        $dataSet = new \PHPUnit\DbUnit\DataSet\CsvDataSet($delimiter, $enclosure, $escape);
         foreach($files as $table=>$file) {
             $dataSet->addTable($table, $file);
         }
@@ -168,10 +167,10 @@ abstract class advanced_testcase extends base_testcase {
      *
      * Note: it is usually better to use data generators
      *
-     * @param PHPUnit_Extensions_Database_DataSet_IDataSet $dataset
+     * @param \PHPUnit\DbUnit\DataSet\IDataSet $dataset
      * @return void
      */
-    protected function loadDataSet(PHPUnit_Extensions_Database_DataSet_IDataSet $dataset) {
+    protected function loadDataSet(\PHPUnit\DbUnit\DataSet\IDataSet $dataset) {
         global $DB;
 
         foreach($dataset->getTableNames() as $tablename) {

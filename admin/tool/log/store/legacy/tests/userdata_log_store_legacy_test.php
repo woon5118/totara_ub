@@ -275,9 +275,13 @@ class logstore_legacy_userdata_log_testcase extends advanced_testcase {
      * @param $user
      */
     private function create_test_log($user) {
+        global $CFG;
+
         $this->setUser($user);
         $course = $this->getDataGenerator()->create_course();
         $module = $this->getDataGenerator()->create_module('resource', array('course' => $course));
+
+        require_once($CFG->dirroot.'/admin/tool/log/store/legacy/tests/fixtures/event.php');
 
         $event = unittest_executed::create(
             array('context' => context_module::instance($module->cmid), 'other' => array('sample' => 1)));

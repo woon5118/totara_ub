@@ -67,7 +67,7 @@ class block_totara_featured_links_tile_base_testcase extends test_helper {
         $this->assertInstanceOf($expected, base::get_tile_instance($tile->id));
 
         // Now test with an id that can't possibly exist.
-        $this->setExpectedException('dml_missing_record_exception', 'Can not find data record in database');
+        $this->expectException('dml_missing_record_exception', 'Can not find data record in database');
         base::get_tile_instance(-1);
     }
 
@@ -274,7 +274,7 @@ class block_totara_featured_links_tile_base_testcase extends test_helper {
      * Tests the base::get_name() method.
      */
     public function test_get_name() {
-        $this->setExpectedException('Exception', 'Please Override this function');
+        $this->expectException('Exception', 'Please Override this function');
         base::get_name();
     }
 

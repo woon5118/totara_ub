@@ -103,7 +103,7 @@ class core_completionlib_testcase extends advanced_testcase {
      * @param  boolean $canonicalize
      * @param  boolean $ignoreCase
      */
-    public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE) {
+    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void {
         // Nasty cheating hack: prevent random failures on timemodified field.
         if (is_object($expected) and is_object($actual)) {
             if (property_exists($expected, 'timemodified') and property_exists($actual, 'timemodified')) {
@@ -305,7 +305,7 @@ class core_completionlib_testcase extends advanced_testcase {
         // Test getting module name.
         $cm->module = 13;
         unset($cm->modname);
-        /** @var $DB PHPUnit_Framework_MockObject_MockObject */
+        /** @var $DB \PHPUnit\Framework\MockObject\MockObject */
         $DB->expects($this->once())
             ->method('get_field')
             ->with('modules', 'name', array('id'=>13))
@@ -379,7 +379,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $course = (object)array('id'=>13);
         $cm = (object)array('id'=>42);
 
-        /** @var $DB PHPUnit_Framework_MockObject_MockObject */
+        /** @var $DB \PHPUnit\Framework\MockObject\MockObject */
         $DB->expects($this->at(0))
             ->method('get_field_sql')
             ->will($this->returnValue(666));
@@ -399,7 +399,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $c = new completion_info($course);
 
         // Check it works ok without data in cache.
-        /** @var $DB PHPUnit_Framework_MockObject_MockObject */
+        /** @var $DB \PHPUnit\Framework\MockObject\MockObject */
         $DB->expects($this->at(0))
             ->method('delete_records')
             ->with('course_modules_completion', array('coursemoduleid'=>42))
@@ -442,7 +442,7 @@ class core_completionlib_testcase extends advanced_testcase {
 
         $cm = (object)array('id'=>13, 'course'=>42, 'completion'=>COMPLETION_TRACKING_AUTOMATIC);
 
-        /** @var $DB PHPUnit_Framework_MockObject_MockObject */
+        /** @var $DB \PHPUnit\Framework\MockObject\MockObject */
         $DB->expects($this->at(0))
             ->method('get_recordset')
             ->will($this->returnValue(
@@ -487,7 +487,7 @@ class core_completionlib_testcase extends advanced_testcase {
         // 1. Not current user, record exists.
         $sillyrecord = (object)array('frog'=>'kermit');
 
-        /** @var $DB PHPUnit_Framework_MockObject_MockObject */
+        /** @var $DB \PHPUnit\Framework\MockObject\MockObject */
         $DB->expects($this->at(0))
             ->method('get_record')
             ->with('course_modules_completion', array('coursemoduleid'=>13, 'userid'=>123))

@@ -646,9 +646,9 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
             }
 
             if ($expectedhaserrors) {
-                $this->assertNotEmpty($errors, $i);
+                $this->assertNotEmpty($errors);
             } else {
-                $this->assertEmpty($errors, array($i, $errors));
+                $this->assertEmpty($errors);
             }
         }
 
@@ -804,9 +804,9 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
             }
 
             if ($expectedhaserrors) {
-                $this->assertNotEmpty($errors, $i);
+                $this->assertNotEmpty($errors);
             } else {
-                $this->assertEmpty($errors, array($i, $errors));
+                $this->assertEmpty($errors);
             }
         }
 
@@ -908,9 +908,9 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
             }
 
             if ($expectedhaserrors) {
-                $this->assertNotEmpty($errors, $i);
+                $this->assertNotEmpty($errors);
             } else {
-                $this->assertEmpty($errors, array($i, $errors));
+                $this->assertEmpty($errors);
             }
         }
 
@@ -1013,9 +1013,9 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
             }
 
             if ($expectedhaserrors) {
-                $this->assertNotEmpty($errors, $i);
+                $this->assertNotEmpty($errors);
             } else {
-                $this->assertEmpty($errors, array($i, $errors));
+                $this->assertEmpty($errors);
             }
         }
 

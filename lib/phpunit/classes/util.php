@@ -697,7 +697,7 @@ class phpunit_util extends testing_util {
 
         foreach ($backtrace as $bt) {
             if (isset($bt['object']) and is_object($bt['object'])
-                    && $bt['object'] instanceof PHPUnit_Framework_TestCase) {
+                    && $bt['object'] instanceof \PHPUnit\Framework\TestCase) {
                 $debug = new stdClass();
                 $debug->message = $message;
                 $debug->level   = $level;

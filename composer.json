@@ -5,8 +5,8 @@
     "type": "project",
     "homepage": "https://totaralms.com",
     "require-dev": {
-        "phpunit/phpunit": "5.7.*",
-        "phpunit/dbUnit": "1.4.*",
+        "phpunit/phpunit": "7.5.*",
+        "phpunit/dbunit": "4.0.*",
         "behat/mink": "~1.7",
         "behat/mink-extension": "~2.2",
         "behat/mink-goutte-driver": "~1.2",

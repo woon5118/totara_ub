@@ -44,7 +44,7 @@ class block_admin_related_pages_map_testcase extends \advanced_testcase {
 
     /**
      * @param map $map
-     * @return \PHPUnit_Framework_MockObject_MockObject|\admin_root
+     * @return \PHPUnit\Framework\MockObject\MockObject|\admin_root
      */
     private function mock_admin_root(map $map) {
         $root = $this->createMock(\admin_root::class);
@@ -58,7 +58,7 @@ class block_admin_related_pages_map_testcase extends \advanced_testcase {
      * @param string $key
      * @param string $name
      * @param string $url
-     * @return \PHPUnit_Framework_MockObject_MockObject|\admin_externalpage
+     * @return \PHPUnit\Framework\MockObject\MockObject|\admin_externalpage
      */
     private function mock_admin_externalpage(string $key = 'test', string $name = 'Test', string $url = '/test', $can_access = true, $hidden = false) {
         $page = $this->getMockBuilder(\admin_externalpage::class)

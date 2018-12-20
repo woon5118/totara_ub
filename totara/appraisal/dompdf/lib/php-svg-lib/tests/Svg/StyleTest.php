@@ -12,7 +12,7 @@ include_once __DIR__."/../../src/autoload.php";
 
 use Svg\Style;
 
-class StyleTest extends \PHPUnit_Framework_TestCase {
+class StyleTest extends \PHPUnit\Framework\TestCase {
   public function test_parseColor() {
     $this->assertEquals("none",               Style::parseColor("none"));
     $this->assertEquals(array(255,   0,   0), Style::parseColor("RED"));

@@ -227,7 +227,7 @@ class totara_hierarchy_lib_contentrestrictions_testcase extends advanced_testcas
         $this->assertEquals($data->posfw['pframe'], $data->position->get_framework(0));
 
         // user2 should get an error if we search for pframe2
-        $this->setExpectedException('moodle_exception', get_string('frameworkdoesntexist', 'totara_hierarchy', 'position'));
+        $this->expectException('moodle_exception', get_string('frameworkdoesntexist', 'totara_hierarchy', 'position'));
         $data->position->get_framework($data->posfw['pframe2']->id);
     }
 
@@ -255,7 +255,7 @@ class totara_hierarchy_lib_contentrestrictions_testcase extends advanced_testcas
         $this->assertEquals($data->orgfw['oframe'], $data->organisation->get_framework(0));
 
         // User2 should get an error when searching for oframe2
-        $this->setExpectedException('moodle_exception', get_string('frameworkdoesntexist', 'totara_hierarchy', 'organisation'));
+        $this->expectException('moodle_exception', get_string('frameworkdoesntexist', 'totara_hierarchy', 'organisation'));
 
         $userid = $data->users[2]->id;
         $data->organisation->set_content_restriction_from_report($data->reportid, $userid);

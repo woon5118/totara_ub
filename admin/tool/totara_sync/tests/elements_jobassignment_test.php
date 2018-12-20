@@ -42,12 +42,12 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
      *
      * To add data to the table, created a stdClass object and insert into $source->temptablename.
      *
-     * @return PHPUnit_Framework_MockObject_MockObject|totara_sync_source_jobassignment
+     * @return \PHPUnit\Framework\MockObject\MockObject|totara_sync_source_jobassignment
      */
     private function prepare_source_table() {
         // Build the table with all columns. Only those set to be imported during tests will actually be used.
 
-        /** @var totara_sync_source_jobassignment|PHPUnit_Framework_MockObject_MockObject $source_tablebuilder */
+        /** @var totara_sync_source_jobassignment|\PHPUnit\Framework\MockObject\MockObject $source_tablebuilder */
         $source_tablebuilder = $this->getMockBuilder('totara_sync_source_jobassignment')
             ->setMethods(array('import_data', 'is_importing_field'))
             ->getMock();
@@ -55,7 +55,7 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $source_tablebuilder->temptablename = 'test_totara_sync';
         $source_tablebuilder->prepare_temp_table();
 
-        /** @var totara_sync_source_jobassignment|PHPUnit_Framework_MockObject_MockObject $source */
+        /** @var totara_sync_source_jobassignment|\PHPUnit\Framework\MockObject\MockObject $source */
         $source = $this->getMockBuilder('totara_sync_source_jobassignment')
             ->setMethods(array('import_data'))
             ->enableOriginalConstructor()
@@ -69,8 +69,8 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
      * send HR Import looking for the php file for our generic totara_sync_source_jobassignment
      * created with prepare_source_table.
      *
-     * @param totara_sync_source_jobassignment|PHPUnit_Framework_MockObject_MockObject $source
-     * @return totara_sync_element_jobassignment|PHPUnit_Framework_MockObject_MockObject
+     * @param totara_sync_source_jobassignment|\PHPUnit\Framework\MockObject\MockObject $source
+     * @return totara_sync_element_jobassignment|\PHPUnit\Framework\MockObject\MockObject
      */
     private function get_element_mock($source) {
         $element = $this->getMockBuilder('totara_sync_element_jobassignment')

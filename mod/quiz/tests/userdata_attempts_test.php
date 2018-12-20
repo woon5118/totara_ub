@@ -796,6 +796,9 @@ class mod_quiz_userdata_attempts_testcase extends advanced_testcase {
         foreach ($attempts as $attempt) {
             if ($attempt['id'] == $quizattemptid) {
                 $this->assertArrayHasKey($key, $attempt);
+                if (is_numeric($attempt[$key])) {
+                    $attempt[$key] = (float)$attempt[$key];
+                }
                 $this->assertEquals($value, $attempt[$key]);
                 return;
             }

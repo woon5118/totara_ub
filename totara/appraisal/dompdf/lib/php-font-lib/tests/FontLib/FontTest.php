@@ -4,7 +4,7 @@ namespace FontLib\Tests;
 
 use FontLib\Font;
 
-class FontTest extends \PHPUnit_Framework_TestCase
+class FontTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Fontlib\Exception\FontNotFoundException

@@ -70,7 +70,7 @@ if ($options['run']) {
         }
     }
     $_SERVER['argv'] = array_values($_SERVER['argv']);
-    PHPUnit_TextUI_Command::main(true);
+    \PHPUnit\TextUI\Command::main(true);
     exit(0); // Not reached.
 }
 

@@ -44,13 +44,13 @@ class tool_totara_sync_element_run_sync_testcase extends advanced_testcase {
      * You may need to mock the get_source method as well as any abstract methods that should
      * return a value.
      *
-     * @return PHPUnit_Framework_MockObject_MockObject|totara_sync_element
+     * @return \PHPUnit\Framework\MockObject\MockObject|totara_sync_element
      */
     private function create_mock_element() {
         global $DB;
 
         // We want to mock one concrete method, get_dedicated_scheduled_task.
-        /** @var totara_sync_element|PHPUnit_Framework_MockObject_MockObject $element */
+        /** @var totara_sync_element|\PHPUnit\Framework\MockObject\MockObject $element */
         $element = $this->getMockForAbstractClass(
             'totara_sync_element',
             [],
@@ -68,7 +68,7 @@ class tool_totara_sync_element_run_sync_testcase extends advanced_testcase {
             ->method('get_name')
             ->will($this->returnValue('mockname'));
 
-        /** @var \core\task\scheduled_task|PHPUnit_Framework_MockObject_MockObject $scheduled_task */
+        /** @var \core\task\scheduled_task|\PHPUnit\Framework\MockObject\MockObject $scheduled_task */
         $scheduled_task = $this->getMockForAbstractClass('\core\task\scheduled_task', [], 'mock_task');
         $scheduled_task_record = \core\task\manager::record_from_scheduled_task($scheduled_task);
         $DB->insert_record('task_scheduled', $scheduled_task_record);

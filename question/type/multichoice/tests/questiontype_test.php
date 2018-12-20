@@ -135,13 +135,13 @@ class qtype_multichoice_test extends advanced_testcase {
 
         foreach ($questiondata as $property => $value) {
             if (!in_array($property, array('id', 'version', 'timemodified', 'timecreated', 'options', 'hints', 'stamp'))) {
-                $this->assertAttributeEquals($value, $property, $actualquestiondata);
+                $this->assertEquals($value, $actualquestiondata->$property);
             }
         }
 
         foreach ($questiondata->options as $optionname => $value) {
             if ($optionname != 'answers') {
-                $this->assertAttributeEquals($value, $optionname, $actualquestiondata->options);
+                $this->assertEquals($value, $actualquestiondata->options->$optionname);
             }
         }
 
@@ -149,7 +149,7 @@ class qtype_multichoice_test extends advanced_testcase {
             $actualhint = array_shift($actualquestiondata->hints);
             foreach ($hint as $property => $value) {
                 if (!in_array($property, array('id', 'questionid', 'options'))) {
-                    $this->assertAttributeEquals($value, $property, $actualhint);
+                    $this->assertEquals($value, $actualhint->$property);
                 }
             }
         }
@@ -159,7 +159,11 @@ class qtype_multichoice_test extends advanced_testcase {
             foreach ($answer as $ansproperty => $ansvalue) {
                 // This question does not use 'answerformat', will ignore it.
                 if (!in_array($ansproperty, array('id', 'question', 'answerformat'))) {
-                    $this->assertAttributeEquals($ansvalue, $ansproperty, $actualanswer);
+                    $property = $actualanswer->$ansproperty;
+                    if (is_numeric($property)) {
+                        $property = (float)$actualanswer->$ansproperty;
+                    }
+                    $this->assertEquals($ansvalue, $property);
                 }
             }
         }

@@ -237,10 +237,14 @@ class userdata_block_recent_activity_test extends advanced_testcase {
      * @param $user
      */
     private function create_recent_activity_block($user) {
+        global $CFG;
+
         $this->setUser($user);
         $this->getDataGenerator()->create_block('recent_activity');
         $course = $this->getDataGenerator()->create_course();
         $module = $this->getDataGenerator()->create_module('resource', array('course' => $course));
+
+        require_once($CFG->dirroot.'/admin/tool/log/store/legacy/tests/fixtures/event.php');
 
         $event = unittest_executed::create(
             array('context' => context_module::instance($module->cmid), 'other' => array('sample' => 1)));

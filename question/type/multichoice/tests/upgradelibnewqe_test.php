@@ -114,7 +114,7 @@ class qtype_multichoice_attempt_upgrader_test extends question_attempt_upgrader_
             'modifiedby' => '3',
             'defaultmark' => '1.0000000',
             'penalty' => '0.3333333',
-            'maxmark' => '1.00000',
+            'maxmark' => 1.00000,
             'options' => (object) array(
                 'id' => '1',
                 'question' => '2',

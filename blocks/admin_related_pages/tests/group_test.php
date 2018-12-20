@@ -42,7 +42,7 @@ class block_admin_related_pages_group_testcase extends \basic_testcase {
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\admin_root
+     * @return \PHPUnit\Framework\MockObject\MockObject|\admin_root
      */
     private function mock_admin_root() {
         $root = $this->createMock(\admin_root::class);
@@ -53,7 +53,7 @@ class block_admin_related_pages_group_testcase extends \basic_testcase {
      * @param string $key
      * @param string $name
      * @param string $url
-     * @return \PHPUnit_Framework_MockObject_MockObject|\admin_externalpage
+     * @return \PHPUnit\Framework\MockObject\MockObject|\admin_externalpage
      */
     private function mock_admin_externalpage(string $key = 'test', string $name = 'Test', string $url = '/test') {
         $page = $this->getMockBuilder(\admin_externalpage::class)

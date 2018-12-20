@@ -73,7 +73,7 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
      *
      * @param int $expectedcount the expected number of items in the recordset
      * @param moodle_recordset $rs the recordset to iterate over and then close
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws \PHPUnit\Framework\ExpectationFailedException
      */
     public function assert_count_and_close_recordset($expectedcount, $rs) {
         $i = 0;

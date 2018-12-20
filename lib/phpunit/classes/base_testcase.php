@@ -36,7 +36,7 @@
  * @copyright  2015 Blackboard (http://www.blackboard.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class base_testcase extends PHPUnit_Framework_TestCase {
+abstract class base_testcase extends \PHPUnit\Framework\TestCase {
     // @codingStandardsIgnoreStart
 
     /** @var float tracks the total time waiting for the next second */
@@ -60,7 +60,7 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
      * @deprecated 3.0
      */
     public static function assertTag($matcher, $actual, $message = '', $ishtml = true) {
-        $dom = PHPUnit_Util_XML::load($actual, $ishtml);
+        $dom = \PHPUnit\Util\XML::load($actual, $ishtml);
         $tags = self::findNodes($dom, $matcher, $ishtml);
         $matched = count($tags) > 0 && $tags[0] instanceof DOMNode;
         self::assertTrue($matched, $message);
@@ -78,7 +78,7 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
      * @deprecated 3.0
      */
     public static function assertNotTag($matcher, $actual, $message = '', $ishtml = true) {
-        $dom = PHPUnit_Util_XML::load($actual, $ishtml);
+        $dom = \PHPUnit\Util\XML::load($actual, $ishtml);
         $tags = self::findNodes($dom, $matcher, $ishtml);
         $matched = isset($tags[0]) && $tags[0] instanceof DOMNode; // Totara: count is slow and cannot be used on false!
         self::assertFalse($matched, $message);
@@ -92,7 +92,7 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
      *
      * @return array
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws \PHPUnit\Framework\Exception
      */
     public static function assertValidKeys(array $hash, array $validKeys) {
         $valids = array();
@@ -113,7 +113,7 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
         }
 
         if (!empty($unknown)) {
-            throw new PHPUnit_Framework_Exception(
+            throw new \PHPUnit\Framework\Exception(
                 'Unknown key(s): ' . implode(', ', $unknown)
             );
         }
@@ -595,7 +595,7 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
         return __DIR__ . '/../../../phpunit_profile_classes_' . $DB->get_dbfamily() . '.csv';
     }
 
-    public function runBare() {
+    public function runBare(): void {
         if (!defined('PHPUNIT_PROFILING')) {
             parent::runBare();
             return;
