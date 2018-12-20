@@ -26,6 +26,15 @@ use mod_facetoface\room;
 defined('MOODLE_INTERNAL') || die();
 
 class mod_facetoface_renderer extends plugin_renderer_base {
+
+    /**
+     * This link will be changed if Seminar enrolment method is enabled.
+     * Enrolment link is '/enrol/totara_facetoface/signup.php';
+     * @var $signuplink string
+     */
+    protected $signuplink = '/mod/facetoface/signup.php';
+
+    /** @var $context null */
     protected $context = null;
 
     /**
@@ -722,7 +731,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if ($returntoallsessions) {
             $urlparams['backtoallsessions'] = 1;
         }
-        $signupurl = new moodle_url('/mod/facetoface/signup.php', $urlparams);
+        $signupurl = new moodle_url($this->signuplink, $urlparams);
         $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', $urlparams);
 
         $hasbookedsession = !empty($session->bookedsession);
@@ -1773,5 +1782,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         return $out;
     }
 
+    /**
+     * Set singup link when enrolment method is enabled and called.
+     *
+     * @param string $link
+     */
+    public function set_signup_link(string $link): void {
+        $this->signuplink = $link;
+    }
 }
 

@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ use mod_facetoface\signup;
 use mod_facetoface\seminar;
 
 $s = required_param('s', PARAM_INT); // {facetoface_sessions}.id
-$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
 
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
@@ -58,14 +57,9 @@ if ($CFG->enableavailability) {
     }
 }
 
-require_login($course, false, $cm);
-require_capability('mod/facetoface:view', $context);
+require_login();
 
-if ($backtoallsessions) {
-    $returnurl = new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
-} else {
-    $returnurl = new moodle_url('/course/view.php', ['id' => $course->id]);
-}
+$returnurl = new moodle_url('/enrol/index.php', ['id' => $course->id]);
 
 // This is not strictly required for signup (more correctly it is checked in actor_has_role), but leaving it for early
 // indication of the issue.
@@ -78,23 +72,20 @@ if ($seminar->get_approvaltype() == seminar::APPROVAL_ROLE) {
 }
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/facetoface/signup.php', ['s' => $s, 'backtoallsessions' => $backtoallsessions]);
+$PAGE->set_url('/enrol/totara_facetoface/signup.php', ['s' => $s]);
 $PAGE->set_title(format_string($seminar->get_name()));
 $PAGE->set_heading($course->fullname);
 
-$params = [
-    'signup' => $signup,
-    'backtoallsessions' => $backtoallsessions,
-];
+$params = ['signup' => $signup, 'backtoallsessions' => false];
 $mform = new \mod_facetoface\form\signup(null, $params, 'post', '', ['name' => 'signupform']);
 
 local_js([TOTARA_JS_DIALOG, TOTARA_JS_TREEVIEW]);
 
 $PAGE->requires->strings_for_js(['selectmanager'], 'mod_facetoface');
 $jsmodule = [
-        'name' => 'facetoface_managerselect',
-        'fullpath' => '/mod/facetoface/js/manager.js',
-        'requires' => ['json']
+    'name' => 'facetoface_managerselect',
+    'fullpath' => '/mod/facetoface/js/manager.js',
+    'requires' => ['json']
 ];
 $selected_manager = dialog_display_currently_selected(get_string('currentmanager', 'mod_facetoface'), 'manager');
 $args = [
@@ -113,50 +104,21 @@ if ($fromform = $mform->get_data()) {
         print_error('error:unknownbuttonclicked', 'mod_facetoface', $returnurl);
     }
 
-    $signup->set_notificationtype($fromform->notificationtype);
-    $signup->set_discountcode($fromform->discountcode);
-
-    $managerselect = get_config(null, 'facetoface_managerselect');
-    if ($managerselect && isset($fromform->managerid)) {
-        $signup->set_managerid($fromform->managerid);
-    }
-
-    $f2fselectedjobassignmentelemid = 'selectedjobassignment_' . $seminar->get_id();
-    if (property_exists($fromform, $f2fselectedjobassignmentelemid)) {
-        $signup->set_jobassignmentid($fromform->$f2fselectedjobassignmentelemid);
-    }
-
-    if (signup_helper::can_signup($signup)) {
-        signup_helper::signup($signup);
-
-        // Custom fields.
-        $fromform->id = $signup->get_id();
-        customfield_save_data($fromform, 'facetofacesignup', 'facetoface_signup');
-
-        // Notification.
-        $state = $signup->get_state();
-        $message = $state->get_message();
-        $cssclass = 'notifymessage';
-
-        // There may be lots of factors that will prevent confirmation message to appear at user mailbox
-        // but in most cases this will be true:
-        if ($state instanceof signup\state\booked) {
-            $cssclass = 'notifysuccess';
-            if (!$signup->get_skipusernotification() && $fromform->notificationtype != MDL_F2F_NONE) {
-                $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') .
-                    get_string('confirmationsent', 'mod_facetoface');
+    if (!is_enrolled($context, $USER)) {
+        // Check for and attempt to enrol via the totara_facetoface enrolment plugin.
+        $enrolments = enrol_get_plugins(true);
+        $instances = enrol_get_instances($course->id, true);
+        foreach ($instances as $instance) {
+            if ($instance->enrol === 'totara_facetoface') {
+                $data = clone($fromform);
+                $data->sid = [$seminarevent->get_id()];
+                $enrolments[$instance->enrol]->enrol_totara_facetoface($instance, $data, $course, $returnurl);
+                // We expect enrol module to take all required sign up action and redirect, so it should never return.
+                debugging("Seminar direct enrolment should never return to signup page");
+                exit();
             }
         }
-    } else {
-        // Note - We can't use the renderer_signup_failures() function here, but this is the same.
-        $failures = signup_helper::get_failures($signup);
-        reset($failures);
-        $message = current($failures);
-
-        $cssclass = 'notifyerror';
     }
-
-    totara_set_notification($message, $returnurl, ['class' => $cssclass]);
 }
 
 echo $OUTPUT->header();
@@ -179,28 +141,12 @@ $signedup = !$signup->get_state()->is_not_happening();
 $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
 echo $seminarrenderer->render_seminar_event($seminarevent, $viewattendees, false, $signedup);
 
-// Cancellation links
-if ($currentstate->can_switch(signup\state\user_cancelled::class)) {
-    $canceltext = get_string('cancelbooking', 'mod_facetoface');
-    if ($currentstate instanceof signup\state\waitlisted) {
-        $canceltext = get_string('cancelwaitlist', 'mod_facetoface');
-    }
-    $cancelurl = new moodle_url('cancelsignup.php', ['s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions]);
-    echo html_writer::link($cancelurl, $canceltext, ['title' => $canceltext]);
-    echo ' &ndash; ';
-}
-
-if ($viewattendees) {
-    $viewurl = new moodle_url('attendees/view.php', ['s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions]);
-    echo html_writer::link($viewurl, get_string('seeattendees', 'mod_facetoface'), ['title' => get_string('seeattendees', 'mod_facetoface')]);
-}
-
 if (signup_helper::can_signup($signup)) {
     $mform->display();
 } else if ($currentstate instanceof signup\state\not_set
     || $currentstate instanceof signup\state\user_cancelled
     || $currentstate instanceof signup\state\declined
-    ) {
+) {
     // Display message only if user is not signed up:
     echo $seminarrenderer->render_signup_failures(signup_helper::get_failures($signup));
 }

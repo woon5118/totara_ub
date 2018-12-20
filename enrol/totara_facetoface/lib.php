@@ -364,7 +364,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $enrol = true;
                 $message = get_string('autobookingcompleted', 'enrol_totara_facetoface', $joinedsessions);
             }
-
+            $returnurl = new moodle_url('/course/view.php', ['id' => $instance->courseid]);
         } else {
             // No autosignup, use user submitted session ids.
             $sids = empty($fromform->sid) ? array() : $fromform->sid;
@@ -410,6 +410,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                     'message' => $result['message']
                 )), 'enrolfacetofacesignupresult');
             }
+            $returnurl = new moodle_url('/mod/facetoface/view.php', ['f' => $session->facetoface]);
         }
 
         // Enrol or add pending enrolent.
@@ -503,10 +504,11 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
      * @return string table with rendered enrollable facetoface sessions
      */
     protected function render_facetoface_sessions(stdClass $instance) {
-        global $CFG, $PAGE, $DB;
+        global $CFG, $PAGE;
 
         /** @var mod_facetoface_renderer $f2frenderer */
         $f2frenderer = $PAGE->get_renderer('mod_facetoface');
+        $f2frenderer->set_signup_link('/enrol/totara_facetoface/signup.php');
 
         $sessions = $this->get_enrolable_sessions($instance->courseid);
 
@@ -548,7 +550,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $output .= html_writer::tag('h4', format_string($seminar->get_name()));
                 $f2frenderer->setcontext($contextmodule);
                 $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editevents,
-                    $displaytimezones, $reserveinfo, null, true);
+                    $displaytimezones, $reserveinfo, null, true, false);
             }
         }
 
