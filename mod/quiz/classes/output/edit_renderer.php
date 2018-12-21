@@ -901,19 +901,19 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function question_dependency_icon($structure, $slot) {
+        global $OUTPUT;
+
         $a = array(
             'thisq' => $structure->get_displayed_number_for_slot($slot),
             'previousq' => $structure->get_displayed_number_for_slot(max($slot - 1, 1)),
         );
         if ($structure->is_question_dependent_on_previous_slot($slot)) {
             $title = get_string('questiondependencyremove', 'quiz', $a);
-            $image = $this->pix_icon('t/locked', get_string('questiondependsonprevious', 'quiz'),
-                    'moodle', array('title' => ''));
+            $image = $OUTPUT->flex_icon('lock', ['alt' => get_string('questiondependencyfree', 'quiz')]);
             $action = 'removedependency';
         } else {
             $title = get_string('questiondependencyadd', 'quiz', $a);
-            $image = $this->pix_icon('t/unlocked', get_string('questiondependencyfree', 'quiz'),
-                    'moodle', array('title' => ''));
+            $image = $OUTPUT->flex_icon('unlock', ['alt' => get_string('questiondependencyfree', 'quiz')]);
             $action = 'adddependency';
         }
 
