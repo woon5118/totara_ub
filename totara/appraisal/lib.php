@@ -257,7 +257,7 @@ class appraisal {
 
         $assign = new totara_assign_appraisal('appraisal', $this);
         $assign->store_user_assignments();
-        $assign->store_job_assignments();
+        $assign->store_job_assignments(null, false);
         $assign->store_role_assignments();
 
         $this->create_answers_table();
@@ -527,8 +527,10 @@ class appraisal {
             $DB->set_field('appraisal_user_assignment', 'activestageid', reset($stages)->id, array('appraisalid' => $this->id, 'activestageid' => null));
         }
 
-        // Link job assignments if required.
-        $assign->store_job_assignments($linkjobappraiseeids);
+        // Link job assignments if required. The manager is not notified at this
+        // time; this will done when the notification is sent to the appraisees
+        // below.
+        $assign->store_job_assignments($linkjobappraiseeids, false);
 
         // Find old user assignments that need to be reactivated.
         list($groupjoinsql, $groupparams, $groupalias) = $assign->get_users_from_groups_sql('u', 'id');
@@ -645,14 +647,29 @@ class appraisal {
             }
         }
 
-        // The activate() method sends out activation notifications for learners
-        // that were added *before* the appraisal was activated. However learners
-        // that were added after activation also have to be notified; that needs
-        // to be done here.
         if (!empty($appraiseestonotify)) {
+            // Unfortunately there are many independent threads of control when
+            // it comes to firing activation notifications: cron, this method and
+            // appraisal_user_assignment::send_manager_messages(). Hence the
+            // 'triggered' condition here:
+            // - for static appraisals:
+            //   - initially, the appraisal event would NOT be marked as
+            //     "triggered"
+            //   - cron would then tell the appraisee and manager and mark the
+            //     event as "triggered".
+            //   - Therefore this part of the code does not need to do anything.
+            // - for dynamic appraisals:
+            //   - initially, the appraisal event would NOT be marked as
+            //     "triggered"
+            //   - cron would only send the notification to the appraisees that
+            //     were assigned BEFORE activation BUT WOULD STILL MARK THE EVENT
+            //     AS "triggered". The event would not fire again.
+            //   - This method must then send out notifications to the newly
+            //     assigned appraisees.
             $filters = [
                 'event' => appraisal_message::EVENT_APPRAISAL_ACTIVATION,
-                'appraisalid' => $this->id
+                'appraisalid' => $this->id,
+                'triggered' => true
             ];
             $event = $DB->get_record("appraisal_event", $filters);
 
@@ -6040,10 +6057,12 @@ class appraisal_user_assignment {
      * Associates a job assignment with this appraisal.
      *
      * @param int $jobassignmentid job assignment identifer.
+     * @param bool $notifymanager if true sends a notification to the appraisee's
+     *        manager about the appraisal.
      *
      * @return \appraisal_user_assignment the updated assignment.
      */
-    public function with_job_assignment($jobassignmentid) {
+    public function with_job_assignment($jobassignmentid, $notifymanager=true) {
         if (empty($jobassignmentid) || !is_numeric($jobassignmentid)) {
             throw new \InvalidArgumentException(
                 "invalid parameter [user_assignment job id]: '$jobassignmentid'"
@@ -6063,7 +6082,9 @@ class appraisal_user_assignment {
         // totara_job\job_assignment::totara_assign_appraisal
         // if we need to send manager messages again when any job
         // assignment is updated
-        $this->send_manager_messages();
+        if ($notifymanager) {
+            $this->send_manager_messages();
+        }
 
         return $this;
     }
@@ -6126,13 +6147,15 @@ class appraisal_user_assignment {
      * @param boolean linkfirst if true, links the first existing job assignment
      *        to the appraisee assignment. Note "first" here is the first in the
      *        list that job_assignment::get_all() returns.
+     * @param bool $notifymanager if true sends a notification to the appraisee's
+     *        manager about the appraisal.
      *
      * @return array (\appraisal_user_assignment, \job_assignment) tuple with an
      *         updated appraisee assignment and assigned job. This could be an
      *         empty array if there were multiple job assignments from which to
      *         choose and the passed 'linkfirst' value was false.
      */
-    public function with_auto_job_assignment($linkfirst) {
+    public function with_auto_job_assignment($linkfirst, $notifymanager=true) {
         // For the appraisee who has already specified a job for this appraisal.
         $jobassignmentid = $this->jobassignmentid;
         if (!empty($jobassignmentid)) {
@@ -6155,12 +6178,12 @@ class appraisal_user_assignment {
 
         if ($noofjobs === 0) {
             $job = job_assignment::create_default($appraisee);
-            return [$this->with_job_assignment($job->id), $job];
+            return [$this->with_job_assignment($job->id, $notifymanager), $job];
         }
         else if ($noofjobs === 1
                  || ($noofjobs > 1 && $linkfirst)) {
             $job = current($jobs);
-            return [$this->with_job_assignment($job->id), $job];
+            return [$this->with_job_assignment($job->id, $notifymanager), $job];
         }
         else {
             // For an appraisee with multiple formal job assignments and cannot
@@ -6194,16 +6217,35 @@ class appraisal_user_assignment {
     private function send_manager_messages() {
         global $DB;
 
-        $appraisalid = $this->appraisalid;
+        // For now only do Activation messages that needs to be sent to managers.
+        //
+        // Unfortunately there are many independent threads of control when it
+        // comes to firing activation notifications: cron, this method and
+        // appraisal::check_assignment_changes(). Hence the 'triggered' condition
+        // here:
+        // - if multiple jobs was off:
+        //   - initially, the appraisal event would NOT be marked as "triggered"
+        //   - cron would then tell the appraisee and manager and mark the event
+        //     as "triggered".
+        //   - Therefore this method does not need to do anything.
+        //
+        // - if multiple jobs was on:
+        //   - initially, the appraisal event would NOT be marked as "triggered"
+        //   - cron would only send the notification to the appraisee BUT WOULD
+        //     STILL MARK THE EVENT AS "triggered". The activation event will
+        //     never fire again.
+        //   - Therefore this method must send out notifications to managers when
+        //     the appraisee finally selects a job assignment.
+        $filters = [
+            'event' => appraisal_message::EVENT_APPRAISAL_ACTIVATION,
+            'appraisalid' => $this->appraisalid,
+            'triggered' => true
+        ];
+        $event = $DB->get_record("appraisal_event", $filters);
 
-        // For now only do Activation messages that needs to be sent to managers
-        $sql = "SELECT id FROM {appraisal_event} WHERE event = ? AND appraisalid = ?";
-        $params = array(appraisal_message::EVENT_APPRAISAL_ACTIVATION, $appraisalid);
-        $events = $DB->get_records_sql($sql, $params);
-        foreach ($events as $id => $eventdata) {
-            $eventmessage = new appraisal_message($id);
+        if ($event) {
+            $eventmessage = new appraisal_message($event->id);
             $eventmessage->send_user_specific_message($this->userid, true);
         }
     }
-
 }

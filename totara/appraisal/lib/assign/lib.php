@@ -54,8 +54,10 @@ class totara_assign_appraisal extends totara_assign_core {
      *
      * @param array|null $appraisee_ids  If passed in, only appraisees for these ids
      * are handled. If any id does not belong to a current appraisee, it is ignored.
+     * @param bool $notifymanager if true sends a notification to the appraisee's
+     *        manager about the appraisal.
      */
-    public function store_job_assignments(array $appraisee_ids = null) {
+    public function store_job_assignments(array $appraisee_ids = null, $notifymanager=true) {
         /** @var appraisal $appraisal */
         $appraisal = $this->moduleinstance;
 
@@ -69,7 +71,7 @@ class totara_assign_appraisal extends totara_assign_core {
             // Ignore if user is not assigned to the appraisal.
             if (!empty($assignment->userid)) {
                 // Call with param=false, so no job will be linked if user has multiple jobs.
-                $assignment->with_auto_job_assignment(false);
+                $assignment->with_auto_job_assignment(false, $notifymanager);
             }
         }
     }
