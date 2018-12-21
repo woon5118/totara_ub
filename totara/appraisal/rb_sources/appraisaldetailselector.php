@@ -36,7 +36,7 @@ $PAGE->set_context($systemcontext);
 
 $output = $PAGE->get_renderer('totara_appraisal');
 
-$report = reportbuilder::create($detailreportid. null, true);
+$report = reportbuilder::create($detailreportid, null, true);
 
 $fullname = $report->fullname;
 
