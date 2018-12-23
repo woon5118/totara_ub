@@ -9,12 +9,13 @@ Feature: Test file for catalog
       | Cat1a | cat1     | cat1a    |
       | Cat1b | cat1     | cat1b    |
     And the following "courses" exist:
-      | fullname              | shortname | category | visible |
-      | Hello Kim Sa Rang     | course101 | 0        | 1        |
-      | Wave Park Min Young   | course102 | cat2     | 0        |
-      | Bye Bye Park Shin Hye | course103 | cat1     | 1        |
-      | Wow Han Hyo Joo       | course104 | cat1a    | 1        |
-      | Leave Shin Min Ah     | course105 | cat1b    | 1        |
+      | fullname                  | shortname | category | visible |
+      | Hello Kim Sa Rang         | course101 | 0        | 1        |
+      | Wave Park Min Young       | course102 | cat2     | 0        |
+      | Bye Bye Park Shin Hye     | course103 | cat1     | 1        |
+      | Wow Han Hyo Joo           | course104 | cat1a    | 1        |
+      | Leave Shin Min Ah         | course105 | cat1b    | 1        |
+      | Motörhead with Smørrebrød | umlaut1   | 0        | 1        |
     And the following "programs" exist in "totara_program" plugin:
       | fullname                                  | shortname | idnumber | category | visible |
       | Han Hyo Joo's program                     | prog1     | prog1    | cat1     | 1       |
@@ -52,7 +53,14 @@ Feature: Test file for catalog
     When I set the field with xpath "//*[@id='catalog_fts_input']" to ""
     And I click on "Search" "button" in the "#region-main" "css_element"
     Then I should not see "Relevance"
-    And I should see "13 items"
+    And I should see "14 items"
+
+  Scenario: User performs full text search with non-ASCII characters
+    When I click on "Find Learning" in the totara menu
+    And I set the field with xpath "//*[@id='catalog_fts_input']" to "Smørrebrød Motörhead"
+    And I click on "Search" "button" in the "#region-main" "css_element"
+    Then I should see "1 item"
+    And I should see "Motörhead with Smørrebrød"
 
   # Browsing
   Scenario: User is browsing within find learning home page
@@ -84,7 +92,7 @@ Feature: Test file for catalog
     And I should see "cert3"
     When I follow "Cat1a"
     And I follow "All"
-    And I should see "13 items"
+    And I should see "14 items"
 
   # Sorting and Viewing (Tile/List)
   Scenario: User is sorting the courses and modifying the layout of course page
@@ -152,7 +160,7 @@ Feature: Test file for catalog
     And I should not see "Tom and Jerry's Special Department"
     And I should not see "cert2"
     And I should not see "cert3"
-    And I should see "8 items"
+    And I should see "9 items"
 
   # Share feature
   Scenario: User is sharing the course catalog page
