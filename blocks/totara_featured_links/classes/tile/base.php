@@ -940,6 +940,16 @@ abstract class base {
         if (substr($this->url_mod, 0, 1) == '/') {
             $this->url_mod = (new \moodle_url($this->url_mod))->out();
         }
+
+        if (isset($this->data->heading)) {
+            $this->data->heading = format_string($this->data->heading);
+        }
+        if (isset($this->data->textbody)) {
+            $this->data->textbody = format_string($this->data->textbody);
+        }
+        if (isset($this->data->alt_text)) {
+            $this->data->alt_text = format_string($this->data->alt_text);
+        }
     }
 
     /**

@@ -43,6 +43,7 @@ define(['jquery', 'core/templates', 'block_totara_featured_links/slick'], functi
                     nextArrow: rightArrowMarkup,
                     fade: fade,
                     dots: dots,
+                    rtl: document.dir === "rtl",
                     arrows: arrows,
                     infinite: repeat === '1',
                     pauseOnHover: pauseonhover === '1'
