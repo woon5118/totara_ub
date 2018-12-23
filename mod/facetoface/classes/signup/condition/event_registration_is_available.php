@@ -55,20 +55,20 @@ class event_registration_is_available extends condition {
         $failure = [];
 
         if (!empty($timestart) && $timestart > $now) {
-            $datetimetz = new stdClass();
+            $datetimetz = new \stdClass();
             $datetimetz->date = userdate($timestart, get_string('strftimedate', 'langconfig'));
             $datetimetz->time = userdate($timestart,  get_string('strftimetime', 'langconfig'));
-            $datetimetz->timezone = core_date::get_user_timezone();
+            $datetimetz->timezone = \core_date::get_user_timezone();
             $failure['event_registration_is_available'] = get_string('signupregistrationnotyetopen', 'facetoface', $datetimetz);
 
             $failure['event_registration_is_available_start'] = get_string('state_eventregistrationisavailable_failstart', 'mod_facetoface');
         }
 
         if (!empty($timefinish) && $timefinish < $now) {
-            $datetimetz = new stdClass();
+            $datetimetz = new \stdClass();
             $datetimetz->date = userdate($timefinish, get_string('strftimedate', 'langconfig'));
             $datetimetz->time = userdate($timefinish,  get_string('strftimetime', 'langconfig'));
-            $datetimetz->timezone = core_date::get_user_timezone();
+            $datetimetz->timezone = \core_date::get_user_timezone();
             $failure['event_registration_is_available_finish'] = get_string('signupregistrationclosed', 'facetoface', $datetimetz);
         }
 

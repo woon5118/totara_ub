@@ -425,6 +425,28 @@ final class seminar_event {
     }
 
     /**
+     * Returns true if the session is over.
+     * @param integer $timenow current time
+     * @return bool
+     */
+    public function is_over(int $time = 0): bool {
+
+        $time = $time ?: time();
+        $sessions = $this->get_sessions();
+
+        // Check that a date has actually been set.
+        if (!$sessions->count()) {
+            return false;
+        }
+
+        $maxtimefinish = $this->get_maxtimefinish();
+        if (!(bool)($maxtimefinish)) {
+            return false;
+        }
+        return $maxtimefinish < $time;
+    }
+
+    /**
      * Get the earliest start time from associated sessions.
      * @return int
      */
@@ -476,6 +498,22 @@ final class seminar_event {
         return seminar_session_list::from_seminar_event($this);
     }
 
+    /**
+     * Get the oldiest finish time from associated sessions.
+     * @return int
+     */
+    public function get_maxtimefinish(): int {
+        $maxtimefinish = 0;
+        $sessions = $this->get_sessions();
+        foreach ($sessions as $session) {
+            // Check for max time finish.
+            if (empty($maxtimefinish) || $session->get_timefinish() > $maxtimefinish) {
+                $maxtimefinish = $session->get_timefinish();
+            }
+        }
+        return $maxtimefinish;
+    }
+
     public function get_id() : int {
         return (int)$this->id;
     }
@@ -519,6 +557,19 @@ final class seminar_event {
                             AND ss.statuscode >= :status';
         $numattendees = (int)$DB->count_records_sql($attendeesql, ['sessionid' => $this->id, 'status' => \mod_facetoface\signup\state\booked::get_code()]);
         return $this->get_capacity() - $numattendees;
+    }
+
+    public function has_capacity(): bool {
+        if ($this->get_free_capacity() > 0) {
+            return true;
+        }
+        // User can overbook directly if waitlist is disabled.
+        $cm = $this->get_seminar()->get_coursemodule();
+        $context = \context_module::instance($cm->id);
+        if (!$this->get_allowoverbook() && has_capability('mod/facetoface:signupwaitlist', $context)) {
+            return true;
+        }
+        return false;
     }
 
     /**

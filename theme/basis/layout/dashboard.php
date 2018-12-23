@@ -79,8 +79,8 @@ echo $totara_core_renderer->masthead($hasguestlangmenu, $nocustommenu);
         <?php echo $themerenderer->blocks_top(); ?>
         <div class="row">
             <div id="region-main" class="<?php echo $themerenderer->main_content_classes(); ?>">
-                <?php echo $themerenderer->blocks_main(); ?>
                 <?php echo $themerenderer->course_content_header(); ?>
+                <?php echo $themerenderer->blocks_main(); ?>
                 <?php echo $themerenderer->main_content(); ?>
                 <?php echo $themerenderer->course_content_footer(); ?>
             </div>
