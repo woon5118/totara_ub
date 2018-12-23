@@ -103,7 +103,8 @@ class block_totara_featured_links_external_testcase extends test_helper {
             block_totara_featured_links\external::remove_tile($tile1->id);
             $this->fail('Removing a tile when being a guest should not be allowed');
         } catch (\Exception $e) {
-            $this->assertEquals("error/You do not have permissions to edit this tile\n\$a contents: ", $e->getMessage());
+            $message = 'error/'.get_string('cannot_edit_tile', 'block_totara_featured_links').PHP_EOL.'$a contents: ';
+            $this->assertEquals($message, $e->getMessage());
         }
         $this->assertTrue($DB->record_exists('block_totara_featured_links_tiles', ['id' => $tile1->id]));
     }
