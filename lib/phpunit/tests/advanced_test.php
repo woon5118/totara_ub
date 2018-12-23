@@ -729,4 +729,246 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
         $dateformat = get_string('strftimedaydatetime', 'langconfig');
         $this->assertSame($en, $dateformat);
     }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     */
+    public function test_deprecated_set_expected_exception() {
+        $this->setExpectedException(coding_exception::class, 'this is a message');
+
+        $this->assertEquals('this is a message', $this->getExpectedExceptionMessage());
+        $this->assertEquals(coding_exception::class, $this->getExpectedException());
+        $this->assertDebuggingCalled('PHPUnits setExpectedException() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead.');
+
+        throw new coding_exception('this is a message');
+    }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     */
+    public function test_deprecated_set_expected_exception_with_code() {
+        $this->setExpectedException(\Exception::class, 'this is a message', 123);
+
+        $this->assertEquals(123, $this->getExpectedExceptionCode());
+        $this->assertDebuggingCalled('PHPUnits setExpectedException() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead.');
+
+        throw new \Exception('this is a message', 123);
+    }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     */
+    public function test_deprecated_set_expected_exception_with_invalid_message() {
+        try {
+            $this->setExpectedException(\Exception::class, ['ast']);
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(PHPUnit\Framework\Exception::class, $exception);
+            $this->assertEquals('Argument #2 (No Value) of base_testcase::setExpectedException() must be a string', $exception->getMessage());
+        }
+        $this->assertDebuggingCalled('PHPUnits setExpectedException() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead.');
+    }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     */
+    public function test_deprecated_set_expected_exception_regex() {
+        $this->setExpectedExceptionRegExp(coding_exception::class, '/this is a message/');
+
+        $this->assertEquals('/this is a message/', $this->getExpectedExceptionMessageRegExp());
+        $this->assertEquals(coding_exception::class, $this->getExpectedException());
+        $this->assertDebuggingCalled('PHPUnits setExpectedExceptionRegExp() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() and expectExceptionMessageRegExp() instead.');
+
+        throw new coding_exception('this is a message');
+    }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     *
+     * Test if all the correct methods for getMockBuilder are proxies if you call getMock.
+     * Here we use a mock to test it as we are not interested in the actual resulting object but only if the right methods are called.
+     */
+    public function test_deprecated_get_mock_all_arguments() {
+        $originalClassName = 'my_test_class';
+        $methods = ['my_custom_method'];
+        $arguments = ['arg1', 'arg2'];
+        $mockClassName = 'my_custom_name';
+        $callOriginalConstructor = true;
+        $callOriginalClone = true;
+        $callAutoload = true;
+        $cloneArguments = true;
+        $callOriginalMethods = true;
+        $proxyTarget = 'proxytarget';
+
+        [$mock, $mock_builder_mock] = $this->get_mock_builder_mock($originalClassName);
+
+        $mock_builder_mock->expects($this->once())
+            ->method('setMethods')
+            ->with($methods);
+
+        $mock_builder_mock->expects($this->once())
+            ->method('setConstructorArgs')
+            ->with($arguments);
+
+        $mock_builder_mock->expects($this->once())
+            ->method('setMockClassName')
+            ->with($mockClassName);
+
+        $mock_builder_mock->expects($this->once())
+            ->method('enableOriginalConstructor');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('enableOriginalClone');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('enableAutoload');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('enableArgumentCloning');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('enableProxyingToOriginalMethods');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('setProxyTarget')
+            ->with($proxyTarget);
+
+        $mock_builder_mock->expects($this->once())
+            ->method('getMock');
+
+        $mock->getMock($originalClassName, $methods, $arguments, $mockClassName, $callOriginalConstructor, $callOriginalClone,
+            $callAutoload, $cloneArguments, $callOriginalMethods, $proxyTarget);
+
+        $this->assertDebuggingCalled('PHPUnits getMock() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() or getMockBuilder() instead.');
+    }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     *
+     * Test if all the correct methods for getMockBuilder are proxies if you call getMock.
+     * Here we use a mock to test it as we are not interested in the actual resulting object but only if the right methods are called.
+     */
+    public function test_deprecated_get_mock_no_arguments() {
+        $originalClassName = 'my_test_class';
+        $methods = [];
+        $arguments = [];
+        $mockClassName = '';
+        $callOriginalConstructor = false;
+        $callOriginalClone = false;
+        $callAutoload = false;
+        $cloneArguments = false;
+        $callOriginalMethods = false;
+        $proxyTarget = null;
+
+        [$mock, $mock_builder_mock] = $this->get_mock_builder_mock($originalClassName);
+
+        $mock_builder_mock->expects($this->once())
+            ->method('setMethods')
+            ->with($methods);
+
+        $mock_builder_mock->expects($this->never())
+            ->method('setConstructorArgs');
+
+        $mock_builder_mock->expects($this->never())
+            ->method('setMockClassName');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('disableOriginalConstructor');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('disableOriginalClone');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('disableAutoload');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('disableArgumentCloning');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('disableProxyingToOriginalMethods');
+
+        $mock_builder_mock->expects($this->never())
+            ->method('setProxyTarget');
+
+        $mock_builder_mock->expects($this->never())
+            ->method('setProxyTarget');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('getMock');
+
+        $mock->getMock($originalClassName, $methods, $arguments, $mockClassName, $callOriginalConstructor, $callOriginalClone,
+            $callAutoload, $cloneArguments, $callOriginalMethods, $proxyTarget);
+
+        $this->assertDebuggingCalled('PHPUnits getMock() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() or getMockBuilder() instead.');
+    }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     *
+     * Test if all the correct methods for getMockBuilder are proxies if you call getMock.
+     * Here we use a mock to test it as we are not interested in the actual resulting object but only if the right methods are called.
+     */
+    public function test_deprecated_get_mock_methods_nul() {
+        [$mock, $mock_builder_mock] = $this->get_mock_builder_mock('my_test_class');
+
+        $mock_builder_mock->expects($this->never())
+            ->method('setMethods');
+
+        $mock->getMock('my_test_class', null);
+
+        $this->assertDebuggingCalled('PHPUnits getMock() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() or getMockBuilder() instead.');
+    }
+
+    /**
+     * Test if all the correct methods for getMockBuilder are proxies if you call getMockWithoutInvokingTheOriginalConstructor.
+     * Here we use a mock to test it as we are not interested in the actual resulting object but only if the right methods are called.
+     */
+    public function test_deprecated_get_mock_without_constructor_arguments() {
+        [$mock, $mock_builder_mock] = $this->get_mock_builder_mock('my_test_class');
+
+        $mock_builder_mock->expects($this->once())
+            ->method('disableOriginalConstructor')
+            ->willReturn($mock_builder_mock);
+
+        $mock->getMockWithoutInvokingTheOriginalConstructor('my_test_class');
+
+        $this->assertDebuggingCalled('PHPUnits getMockWithoutInvokingTheOriginalConstructor() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() instead.');
+    }
+
+
+    /**
+     * @return [\PHPUnit\Framework\MockObject\MockObject, \PHPUnit\Framework\MockObject\MockObject]
+     */
+    private function get_mock_builder_mock(string $class) {
+        $mock_builder_mock = $this->getMockBuilder(\PHPUnit\Framework\MockObject\MockBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mock = $this->getMockBuilder(advanced_testcase::class)
+            ->setMethods(['getMockBuilder'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $mock->expects($this->once())
+            ->method('getMockBuilder')
+            ->willReturn($mock_builder_mock)
+            ->with($class);
+
+        return [$mock, $mock_builder_mock];
+    }
+
+    /**
+     * Test deprecated method works as expected: functionality is proxied to new methods and debug message is issued
+     */
+    public function test_has_performed_expectations_on_output() {
+        $string = 'my expected output string';
+        $this->expectOutputString($string);
+
+        $this->assertTrue($this->hasPerformedExpectationsOnOutput());
+        $this->assertTrue($this->hasExpectationOnOutput());
+
+        echo $string;
+
+        $this->assertDebuggingCalled('PHPUnits hasPerformedExpectationsOnOutput() method was removed in PHPUnit 6 and is deprecated since Totara 13; use hasExpectationOnOutput() instead.');
+    }
+
 }

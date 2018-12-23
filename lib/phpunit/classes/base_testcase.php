@@ -653,15 +653,11 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      *
      * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead
      */
-    public function setExpectedException($exception, $message = '', $code = null) {
+    public function setExpectedException($exception, $message = null, $code = null) {
         debugging("PHPUnits setExpectedException() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead.", DEBUG_DEVELOPER);
 
         if (null !== $message && !is_string($message)) {
             throw \PHPUnit\Util\InvalidArgumentHelper::factory(2, 'string');
-        }
-
-        if (func_num_args() < 2) {
-            $message = null;
         }
 
         $this->expectException($exception);
@@ -718,11 +714,13 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      *
      * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() or getMockBuilder() instead
      */
-    protected function getMock($originalClassName, $methods = [], array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $cloneArguments = false, $callOriginalMethods = false, $proxyTarget = null) {
+    public function getMock($originalClassName, $methods = [], array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $cloneArguments = false, $callOriginalMethods = false, $proxyTarget = null) {
         debugging("PHPUnits getMock() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() or getMockBuilder() instead.", DEBUG_DEVELOPER);
 
         $builder = $this->getMockBuilder($originalClassName);
-        $builder->setMethods($methods);
+        if (!is_null($methods)) {
+            $builder->setMethods($methods);
+        }
         if (!empty($arguments)) {
             $builder->setConstructorArgs($arguments);
         }
@@ -770,7 +768,7 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      *
      * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() instead
      */
-    protected function getMockWithoutInvokingTheOriginalConstructor($originalClassName) {
+    public function getMockWithoutInvokingTheOriginalConstructor($originalClassName) {
         debugging("PHPUnits getMockWithoutInvokingTheOriginalConstructor() method was removed in PHPUnit 6 and is deprecated since Totara 13; use createMock() instead.", DEBUG_DEVELOPER);
 
         return $this->getMockBuilder($originalClassName)
