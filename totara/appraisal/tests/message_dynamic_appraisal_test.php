@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Murali Nair <murali.nair@totaralearning.com>
- * @package totara
- * @subpackage appraisal
+ * @package totara_appraisal
  */
 global $CFG;
 require_once($CFG->dirroot.'/totara/appraisal/tests/appraisal_testcase.php');
@@ -29,7 +28,7 @@ use \totara_job\job_assignment;
 /**
  * Tests the sending of activation notifications for dynamic appraisals.
  */
-class appraisal_messages_dynamic_test extends appraisal_testcase {
+class totara_appraisal_messages_dynamic_test extends appraisal_testcase {
     /**
      * @var stdClass test execution context with these fields:
      *      - [appraisal] appraisal: test appraisal
@@ -508,7 +507,7 @@ class appraisal_messages_dynamic_test extends appraisal_testcase {
     /**
      * Convenience function assign a cohort to the test appraisal.
      *
-     * @param stdClass $testenv test execution context.
+     * @param stdClass $context test execution context.
      * @param stdClass $cohort cohort details.
      */
     private function assign_cohort_step(stdClass $context, stdClass $cohort): void {
@@ -520,7 +519,7 @@ class appraisal_messages_dynamic_test extends appraisal_testcase {
     /**
      * Activates an appraisal.
      *
-     * @param stdClass $testenv test execution context.
+     * @param stdClass $context test execution context.
      * @param array[string=>string] $recipients expected notification recipients;
      *        a mapping of role names to email addresses.
      */
@@ -532,7 +531,7 @@ class appraisal_messages_dynamic_test extends appraisal_testcase {
     /**
      * Convenience function to run the specified cron tasks.
      *
-     * @param stdClass $testenv test execution context.
+     * @param stdClass $context test execution context.
      * @param array[string=>string] $recipients expected notification recipients;
      *        a mapping of role names to email addresses.
      */
@@ -548,7 +547,7 @@ class appraisal_messages_dynamic_test extends appraisal_testcase {
      * Convenience function to simulate the pressing of the "update" button when
      * assign users after activation.
      *
-     * @param stdClass $testenv test execution context.
+     * @param stdClass $context test execution context.
      * @param array[string=>string] $recipients expected notification recipients;
      *        a mapping of role names to email addresses.
      */
@@ -561,11 +560,11 @@ class appraisal_messages_dynamic_test extends appraisal_testcase {
      * Convenience function to simulate when the appraisee first views the
      * appraisal.
      *
-     * @param stdClass $testenv test execution context.
+     * @param stdClass $context test execution context.
      * @param array[string=>string] $recipients expected notification recipients;
      *        a mapping of role names to email addresses.
      * @param stdClass $appraisee appraisee who "views the appraisal".
-     * @param stdClass $ja appraisee job assignment.
+     * @param job_assignment $ja appraisee job assignment.
      */
     private function view_appraisal_step(
         stdClass $context,
@@ -588,7 +587,7 @@ class appraisal_messages_dynamic_test extends appraisal_testcase {
     /**
      * Checks the correct emails are sent out.
      *
-     * @param stdClass $testenv test execution context.
+     * @param stdClass $context test execution context.
      * @param array[string=>string] $recipients expected notification recipients;
      *        a mapping of role names to email addresses.
      */
