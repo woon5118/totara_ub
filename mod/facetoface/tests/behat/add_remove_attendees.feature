@@ -67,6 +67,53 @@ Feature: Add - Remove seminar attendees
     When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     Then I should see "Sam1 Student1, student1@example.com"
 
+  Scenario: Add and remove users to a seminar in past
+    Given I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I follow "Test seminar name"
+    And I follow "Add a new event"
+    And I click on "Edit session" "link"
+    And I set the following fields to these values:
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2018 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2018 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 1    |
+    And I press "Save changes"
+
+    When I click on "Attendees" "link"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the following fields to these values:
+      | searchtext | Sam1 Student1 |
+    And I click on "Search" "button" in the "#region-main" "css_element"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I press "Confirm"
+    Then I should see "Sam1 Student1"
+    # View existing attendees in "Users to add" select box
+    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
+    And I should see "Sam1 Student1, student1@example.com"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Remove"
+    And I wait "1" seconds
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should not see "Sam1 Student1"
+    And I should see "There are no records in this report"
+    And I switch to "Cancellations" tab
+    And I should see "Sam1 Student1" in the "User cancellation" "table_row"
+
+
   Scenario: Add and remove users to a Seminar session without dates (waitlist)
     Given I log in as "admin"
     And I am on "Course 1" course homepage

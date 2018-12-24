@@ -26,7 +26,7 @@ namespace mod_facetoface\signup\restriction;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * User have capability to signup on past or in progress events.
+ * User have capability to signup and cancel on past or in progress events.
  */
 class actor_can_signuppastevents extends restriction {
     public function pass() : bool {
