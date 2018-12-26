@@ -110,8 +110,9 @@ class completion_criteria_duration extends completion_criteria {
     private function get_timeenrolled($completion) {
         global $DB;
 
+        // Select lowest timestart to handle cases where user has multiple enrolments.
         return $DB->get_field_sql('
-            SELECT eu.timestart
+            SELECT MIN(eu.timestart)
               FROM {user_enrolments} eu
               JOIN {enrol} e ON eu.enrolid = e.id
              WHERE e.courseid = ?
