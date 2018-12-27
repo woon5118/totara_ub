@@ -80,8 +80,8 @@ define(['core/str', 'core/popover_region_controller'], function(str, PopoverRegi
         var popover = this.element.querySelector('#quickaccess-popover-content');
         var boundingRect = popover.getBoundingClientRect();
 
-        // If left is off-screen as well, it's probably intentional, so we don't need to mark it
-        if (boundingRect.right > window.innerWidth && boundingRect.left < window.innerWidth) {
+        // If popover is off-screen, i.e. on RTL
+        if (boundingRect.left < 0 || boundingRect.right > window.innerWidth) {
             popover.classList.add('totara_core__QuickAccess_menu--large');
         } else {
             popover.classList.remove('totara_core__QuickAccess_menu--large');

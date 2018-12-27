@@ -62,21 +62,29 @@
     //Desktop sizings
     @media (min-width: @quickaccess_desktop_breakpoint) {
       position: absolute;
-
-      &--large {
-        transform: scaleY(1);
-        right: 0;
-      }
-
       max-width: 95vw;
 
       //Open/Close animation properties
-      transform: scaleY(1) translateX(-50%);
-
       box-shadow: @totara_core__QuickAccessMenu__shadow;
       border-top: 1px solid @totara_core__QuickAccessMenu_search_color-text;
 
       transform-origin: top;
+
+      [dir=rtl] & {
+        transform: scaleY(1) translateX(50%);
+      }
+
+      [dir=ltr] & {
+        transform: scaleY(1) translateX(-50%);
+      }
+
+      &--large {
+        right: 0;
+
+        [dir=rtl] &, [dir=ltr] & {
+          transform: scaleY(1);
+        }
+      }
     }
 
     //Mobile sizings
@@ -105,15 +113,29 @@
       visibility: hidden;
 
       @media (min-width: @quickaccess_desktop_breakpoint) {
-        transform: scaleY(0) translateX(-50%);
+        [dir=rtl] & {
+          transform: scaleY(0) translateX(50%);
+        }
+  
+        [dir=ltr] & {
+          transform: scaleY(0) translateX(-50%);
+        }
 
         &--large {
-          transform: scaleY(0);
+          [dir=rtl] &, [dir=ltr] & {
+            transform: scaleY(0);
+          }
         }
       }
 
       @media (max-width: @quickaccess_mobile_breakpoint) {
-        transform: translateX(100%);
+        [dir=ltr] & {
+          transform: translateX(100%);
+        }
+
+        [dir=rtl] & {
+          transform: translateX(-100%);
+        }
       }
     }
 
