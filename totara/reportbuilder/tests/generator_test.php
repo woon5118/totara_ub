@@ -256,7 +256,9 @@ class totara_reportbuilder_generator_testcase extends advanced_testcase {
      * Test Scheduled Report generator
      */
     public function test_create_scheduled_report() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
         $this->resetAfterTest();
 
@@ -321,7 +323,9 @@ class totara_reportbuilder_generator_testcase extends advanced_testcase {
      * Test Adding Audience to scheduled report generator
      */
     public function test_add_scheduled_audience() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
         $this->resetAfterTest();
 
@@ -349,7 +353,9 @@ class totara_reportbuilder_generator_testcase extends advanced_testcase {
      * Test Adding External User's Email to scheduled report generator
      */
     public function test_add_scheduled_email() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
         $this->resetAfterTest();
 
@@ -386,7 +392,9 @@ class totara_reportbuilder_generator_testcase extends advanced_testcase {
      * Test Adding System User to scheduled report generator
      */
     public function test_add_scheduled_user() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
         $this->resetAfterTest();
 

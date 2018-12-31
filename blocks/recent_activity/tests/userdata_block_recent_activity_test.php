@@ -36,6 +36,14 @@ defined('MOODLE_INTERNAL') || die();
  */
 class userdata_block_recent_activity_test extends advanced_testcase {
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        global $CFG;
+
+        require_once($CFG->dirroot . '/admin/tool/log/store/legacy/tests/fixtures/event.php');
+    }
+
     /**
      * Test the abilities to purge, export and count
      */

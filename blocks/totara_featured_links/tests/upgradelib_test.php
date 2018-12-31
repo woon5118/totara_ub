@@ -239,11 +239,11 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
      */
     public function test_setting_default_heading_location_on_gallery_program_and_certification_tile() {
         global $CFG, $DB;
+        require_once($CFG->dirroot.'/blocks/totara_featured_links/db/upgradelib.php');
+
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $data = $this->get_data_with_empty_heading_location();
-
-        require_once($CFG->dirroot.'/blocks/totara_featured_links/db/upgradelib.php');
 
         // Test data before the upgrade of heading location.
         $this->assertFalse(isset($data->programtilewithoutlocation->data->heading_location));

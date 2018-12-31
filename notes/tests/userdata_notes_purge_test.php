@@ -346,6 +346,9 @@ class core_notes_userdata_notes_purge_testcase extends advanced_testcase {
      * Tests that the count only includes notes in the category when using category context.
      */
     public function test_count_works_on_category_context() {
+        global $CFG;
+        require_once($CFG->dirroot . '/notes/lib.php');
+
         $this->resetAfterTest();
         $data = $this->get_category_data();
         $categorycontext = context_coursecat::instance($data->category->id);
@@ -370,6 +373,9 @@ class core_notes_userdata_notes_purge_testcase extends advanced_testcase {
      * Tests that the export only contains notes in the category when using category context.
      */
     public function test_purge_works_on_category_context() {
+        global $CFG;
+        require_once($CFG->dirroot . '/notes/lib.php');
+
         $this->resetAfterTest();
         $data = $this->get_category_data();
         $categorycontext = context_coursecat::instance($data->category->id);

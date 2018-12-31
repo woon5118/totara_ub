@@ -39,7 +39,10 @@ class totara_cohort_cross_dependency_testcase extends advanced_testcase {
      * 12345 -> 1234, 15
      */
     public function test_cohort_dependency() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+
         $this->resetAfterTest();
 
         $cohort1 = $this->create_username_cohort('1', 'user1');

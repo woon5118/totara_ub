@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/upgradelib.php');
 
+
 /**
  * Tests various classes and functions in upgradelib.php library.
  */
@@ -326,6 +327,8 @@ class core_upgradelib_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         require_once($CFG->libdir . '/db/upgradelib.php');
+        // Totara: resolve dependencies for the test
+        require_once($CFG->libdir . '/gradelib.php');
 
         // Create a user.
         $user = $this->getDataGenerator()->create_user();
@@ -457,6 +460,8 @@ class core_upgradelib_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         require_once($CFG->libdir . '/db/upgradelib.php');
+        // Totara: resolve dependencies for the test
+        require_once($CFG->libdir . '/gradelib.php');
 
         // Create a user.
         $user = $this->getDataGenerator()->create_user();

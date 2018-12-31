@@ -109,6 +109,9 @@ class core_blog_userdata_blog_testcase extends advanced_testcase {
      * doesnt do this by default.
      */
     public function test_purge_removes_blogs_comments() {
+        global $CFG;
+        require_once($CFG->dirroot . '/comment/lib.php');
+
         global $DB;
         $data = $this->get_data();
 

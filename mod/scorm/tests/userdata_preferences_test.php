@@ -26,7 +26,7 @@ namespace mod_scorm\userdata;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/user/tests/userdata_plugin_preferences_test.php');
+require_once($CFG->dirroot . '/user/tests/userdata_plugin_preferences_testcase.php');
 
 /**
  * @group totara_userdata

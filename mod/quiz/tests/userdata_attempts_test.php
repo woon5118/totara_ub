@@ -29,9 +29,6 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/mod/quiz/lib.php');
-
 /**
  * Test purging, exporting and counting of quiz attempts
  * @group totara_userdata
@@ -510,6 +507,7 @@ class mod_quiz_userdata_attempts_testcase extends advanced_testcase {
      */
     public function test_export() {
         global $CFG;
+        require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
         require_once($CFG->dirroot . '/question/type/essay/tests/helper.php');
 
         $this->resetAfterTest(true);

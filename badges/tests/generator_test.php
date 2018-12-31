@@ -28,6 +28,14 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_badges_generator_testcase extends advanced_testcase {
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        global $CFG;
+
+        require_once($CFG->libdir . '/badgeslib.php');
+    }
+
     /**
      * Test the badge generator instance is what we expect.
      */

@@ -191,6 +191,8 @@ class format_weeks_testcase extends advanced_testcase {
      */
     public function test_inplace_editable() {
         global $CFG, $DB, $PAGE;
+        // Totara: resolve dependencies for the test
+        require_once($CFG->libdir . '/externallib.php');
 
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();

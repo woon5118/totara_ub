@@ -91,6 +91,9 @@ class core_user_profilelib_testcase extends advanced_testcase {
     public function test_default_constructor() {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/user/profile/definelib.php');
+        // Totara: missing dependency
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+
         $datatypes = profile_list_datatypes();
         foreach ($datatypes as $datatype => $datatypename) {
             require_once($CFG->dirroot . '/user/profile/field/' .
@@ -148,6 +151,10 @@ class core_user_profilelib_testcase extends advanced_testcase {
      */
     public function test_profile_has_required_custom_fields_set() {
         global $CFG, $DB, $USER;
+
+        // Totara: resolve dependencies for the test
+        require_once($CFG->dirroot . '/user/lib.php');
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         $this->resetAfterTest();
 

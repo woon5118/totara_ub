@@ -31,15 +31,20 @@ use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once("$CFG->dirroot/user/lib.php");
-
 /**
  * Tests the connected connectedbackpacks userdata.
  *
  * @group totara_userdata
  */
 class core_badges_userdata_backpack_testcase extends advanced_testcase {
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        global $CFG;
+
+        require_once($CFG->dirroot . '/user/lib.php');
+    }
 
     /**
      * Test issuebadges is purgeable in all statuses.
@@ -298,6 +303,10 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
      * Tests export of connected backpacks.
      */
     public function test_export() {
+        global $CFG;
+
+        require_once($CFG->libdir . '/badgeslib.php');
+
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
@@ -330,6 +339,10 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
      * Tests export of connected backpacks for suspended users.
      */
     public function test_export_of_suspended_users() {
+        global $CFG;
+
+        require_once($CFG->libdir . '/badgeslib.php');
+
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
@@ -365,6 +378,10 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
      * Tests export of connected backpacks for deleted users.
      */
     public function test_export_of_deleted_users() {
+        global $CFG;
+
+        require_once($CFG->libdir . '/badgeslib.php');
+
         global $DB;
         $this->resetAfterTest();
 

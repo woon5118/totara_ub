@@ -184,7 +184,9 @@ class format_topics_testcase extends advanced_testcase {
      * Test callback updating section name
      */
     public function test_inplace_editable() {
-        global $DB, $PAGE;
+        // Totara: resolve dependencies for the test
+        global $CFG, $DB, $PAGE;
+        require_once($CFG->libdir . '/externallib.php');
 
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();

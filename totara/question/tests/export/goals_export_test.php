@@ -130,7 +130,9 @@ class totara_question_goals_export_testcase extends advanced_testcase {
     }
 
     public function test_get_items_with_personal_goals() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
         $this->resetAfterTest();
 

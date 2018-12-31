@@ -22,7 +22,7 @@
  */
 
 use logstore_standard\userdata\log;
-use logstore_legacy\event\unittest_executed;
+use logstore_standard\event\unittest_executed;
 use totara_userdata\userdata\target_user;
 use totara_userdata\userdata\item;
 
@@ -34,6 +34,12 @@ defined('MOODLE_INTERNAL') || die();
  * @group logstore_standard
  */
 class logstore_standard_userdata_log_testcase extends advanced_testcase {
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        require_once(__DIR__ . '/fixtures/event.php');
+    }
 
     /**
      * Test the abilities to purge, export and count

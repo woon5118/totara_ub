@@ -23,10 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
-require_once($CFG->dirroot . '/admin/tool/totara_sync/tests/source_csv_testcase.php');
-require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_user_csv.php');
+require_once(__DIR__ . '/source_csv_testcase.php');
 
 /**
  * @group tool_totara_sync
@@ -116,6 +113,16 @@ class tool_totara_sync_user_csv_emptyfields_setting_testcase extends totara_sync
         'address' => 'Centre Point, Brighton, UK'
         //'Text input custom field - edited
     );
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        global $CFG;
+
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_user_csv.php');
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+    }
 
     protected function tearDown() {
         $this->filedir = null;

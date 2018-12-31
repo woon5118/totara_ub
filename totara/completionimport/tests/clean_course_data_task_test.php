@@ -30,11 +30,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-
-require_once($CFG->libdir . '/csvlib.class.php');
-require_once($CFG->libdir . '/completionlib.php');
-
 define('COURSE_IMPORT_USERS', 11);
 define('COURSE_IMPORT_COURSES', 11);
 define('COURSE_IMPORT_CSV_ROWS', 100);
@@ -47,7 +42,11 @@ define('COURSE_IMPORT_CSV_ROWS', 100);
 class clean_course_data_task_testcase extends advanced_testcase {
 
     public function test_task() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->libdir . '/csvlib.class.php');
+        require_once($CFG->libdir . '/completionlib.php');
+        require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 
         set_config('enablecompletion', 1);
         $this->resetAfterTest(true);

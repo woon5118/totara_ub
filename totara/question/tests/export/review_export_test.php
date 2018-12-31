@@ -22,11 +22,6 @@
  * @subpackage question
  */
 
-global $CFG;
-
-require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
-require_once($CFG->dirroot.'/totara/question/field/multichoice.class.php');
-
 /**
  * @group totara_userdata
  * @group totara_question
@@ -55,7 +50,9 @@ class totara_question_review_export_testcase extends advanced_testcase {
     }
 
     public function test_export_data_single_question() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
 
         $this->resetAfterTest();
 
@@ -144,7 +141,10 @@ class totara_question_review_export_testcase extends advanced_testcase {
     }
 
     public function test_export_data_multiple_questions() {
-        global $DB;
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
+        require_once($CFG->dirroot.'/totara/question/field/multichoice.class.php');
 
         $this->resetAfterTest();
 
@@ -256,7 +256,7 @@ class totara_question_review_export_testcase extends advanced_testcase {
 
         $result = $exporter->export_data($data, $question);
 
-        $this->assertEquals($expectedresult, $result);
+        $this->assert_export_data_multiple_questions($expectedresult, $result);
 
         // Then check the review data record which has no answer to either competency.
         $exporter = \totara_question\local\export_helper::create('appraisal', 'appraisalroleassignmentid', 'compfromplan');
@@ -285,6 +285,22 @@ class totara_question_review_export_testcase extends advanced_testcase {
             $answer2,
         ];
         $result = $exporter->export_data($data, $question);
+
+        $this->assert_export_data_multiple_questions($expectedresult, $result);
+    }
+
+    private function assert_export_data_multiple_questions(array &$expectedresult, array $result): void {
+        $this->assertCount(1, $result);
+        $this->assertObjectHasAttribute('subquestions', $result[0]);
+        $this->assertCount(3, $result[0]->subquestions);
+
+        // stabilise the order of subquestions
+        usort(
+            $result[0]->subquestions,
+            function ($x, $y) {
+                return strcmp($x->question, $y->question);
+            }
+        );
 
         $this->assertEquals($expectedresult, $result);
     }
