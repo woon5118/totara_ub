@@ -61,7 +61,7 @@ abstract class review_export extends export_helper {
         if (!empty($question->param1)) {
             if (empty(static::$scales[$question->param1])) {
                 $params = [$prefix . 'scaleid' => $question->param1];
-                static::$scales[$question->param1] = $DB->get_records($prefix . '_scale_value', $params);
+                static::$scales[$question->param1] = $DB->get_records($prefix . '_scale_value', $params, 'id');
             }
             $subquestions = static::$scales[$question->param1];
         }

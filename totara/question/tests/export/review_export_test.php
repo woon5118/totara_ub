@@ -292,7 +292,7 @@ class totara_question_review_export_testcase extends advanced_testcase {
     public function create_competency(int $id, $record = array()) {
         $default = array(
             'shortname' => 'Competency ' . $id,
-            'fullname' => 'Comptenecy #' . $id,
+            'fullname' => 'Competency #' . $id,
             'description' => 'This is test competency #' . $id,
             'idnumber' => 'ID' . $id,
             'timemodified' => time(),
