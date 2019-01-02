@@ -1674,8 +1674,8 @@ class program {
 
             if ($prog_completion) {
                 $timedue = $prog_completion->timedue;
-                $startdatestr = ($prog_completion->timestarted != 0
-                                ? $this->display_date_as_text($prog_completion->timestarted)
+                $startdatestr = ($prog_completion->timecreated != 0
+                                ? $this->display_date_as_text($prog_completion->timecreated)
                                 : get_string('unknown', 'totara_program'));
                 if ($iscertif) {
                     $duedatestr = prog_display_duedate($timedue, $this->id, $prog_completion->userid, $certifcompletion->certifpath, $certifcompletion->status);
