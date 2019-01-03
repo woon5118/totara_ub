@@ -66,7 +66,7 @@ Feature: Seminar Event Registration Closure
       | registrationtimefinish[enabled] | 1    |
       | registrationtimefinish[day]     | 30   |
       | registrationtimefinish[month]   | 12   |
-      | registrationtimefinish[year]    | 2019 |
+      | registrationtimefinish[year]    | 2020 |
       | registrationtimefinish[hour]    | 17   |
       | registrationtimefinish[minute]  | 00   |
     And I press "Save changes"

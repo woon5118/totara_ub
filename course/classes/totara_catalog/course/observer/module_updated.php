@@ -45,9 +45,15 @@ class module_updated extends object_update_observer {
      * init course update object for modified course module
      */
     protected function init_change_objects(): void {
+        // Exclude the site course.
+        if ($this->event->courseid == SITEID) {
+            return;
+        }
+        
         $data = new \stdClass();
         $data->objectid = $this->event->courseid;
         $data->contextid = \context_course::instance($this->event->courseid)->id;
+
         $this->register_for_update($data);
     }
 }
