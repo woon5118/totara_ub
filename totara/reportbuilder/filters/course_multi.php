@@ -41,7 +41,7 @@ class rb_filter_course_multi extends rb_filter_type {
     }
 
     public function __construct($type, $value, $advanced, $region, $report, $defaultvalue) {
-        global $SESSION;
+        global $SESSION, $DB;
         parent::__construct($type, $value, $advanced, $region, $report, $defaultvalue);
 
         // We need to check the user has permission to view the courses in the saved
@@ -55,7 +55,8 @@ class rb_filter_course_multi extends rb_filter_type {
 
                 // Remove course ids that aren't viewable by this user.
                 foreach ($courseids as $key => $courseid) {
-                    if (!totara_course_is_viewable($courseid)) {
+                    $course = $DB->get_record('course', array('id' => $courseid), '*', IGNORE_MISSING);
+                    if (!$course || !totara_course_is_viewable($course)) {
                         unset($courseids[$key]);
                     }
                 }
