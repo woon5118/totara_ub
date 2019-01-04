@@ -96,7 +96,7 @@ abstract class base_form extends base {
         if (isset($hidden['rule'])) {
             $this->rule = $hidden['rule'];
         }
-        echo $OUTPUT->heading(get_string('ruledialogdesc', 'totara_cohort', $this->description), '2', 'cohort-rule-dialog-heading');
+        echo $OUTPUT->heading(get_string('ruledialogdesc', 'totara_cohort', $this->description), '3', 'cohort-rule-dialog-heading');
         echo $OUTPUT->box_start('cohort-rule-dialog-setting');
 
         $form = $this->constructForm();

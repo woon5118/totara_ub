@@ -186,6 +186,16 @@ function cohort_rules_list($reset = false){
             ),
             new cohort_rule_sqlhandler_suspended_user_account()
         );
+        // User's time created date
+        $rules[] = new cohort_rule_option(
+            'user',
+            'timecreated',
+            new cohort_rule_ui_date(
+                get_string('ruledesc-user-timecreated', 'totara_cohort')
+            ),
+            new cohort_rule_sqlhandler_date_userfield('timecreated')
+        );
+
         // User custom fields
         $usercustomfields = $DB->get_records_sql(
             "SELECT usinfi.id, usinfi.name, usinfi.datatype, usinfi.param1

@@ -28,7 +28,7 @@ require_once("{$CFG->dirroot}/totara/cohort/rules/lib.php");
 /**
  * Class record_checker_for_broken_rules_testcase
  */
-class record_checker_for_broken_rules_testcase extends advanced_testcase {
+class totara_cohort_record_checker_for_broken_rules_testcase extends advanced_testcase {
     /**
      * Creating the number of course base on $n
      * @param int $n

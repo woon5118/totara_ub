@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-class create_learning_plans_testcase extends advanced_testcase {
+class totara_cohort_create_learning_plans_testcase extends advanced_testcase {
 
     /**
      * @var array User objects used in the test.

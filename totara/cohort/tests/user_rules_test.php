@@ -78,6 +78,7 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
 
         // Create users.
         $users = array();
+        $timenow = time();
         for ($i = 1; $i <= self::TEST_USER_COUNT_MEMBERS; $i++) {
             $userdata = array(
                 'username' => 'user' . $i,
@@ -88,6 +89,7 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
                 'lang' => 'es',
                 'institution' => 'UV',
                 'department' => 'system',
+                'timecreated' => $timenow - (60 * DAYSECS)
             );
 
             if ($i <= 10) {
@@ -102,6 +104,7 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
                 $userdata['email'] = 'user' . $i . '@nz.com';
                 $userdata['lang'] = 'en';
                 $userdata['institution'] = 'Totara';
+                $userdata['timecreated'] = $timenow - (120 * DAYSECS);
             }
 
             $user = $this->getDataGenerator()->create_user($userdata);
@@ -694,5 +697,43 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
         $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'department', $params, $listofvalues);
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals($usercount, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+    }
+
+    /**
+     * Data provider for time created rule.
+     */
+    public function data_time_created() {
+        $data = array(
+            array(array('operator' => COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION, 'date' => 90), 26),
+            array(array('operator' => COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE, 'date' => time()), 53),
+            array(array('operator' => COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE, 'date' => time() - (90 * DAYSECS)), 26),
+            array(array('operator' => COHORT_RULE_DATE_OP_AFTER_FIXED_DATE, 'date' => time() - (30 * DAYSECS)), 0),
+        );
+        return $data;
+    }
+
+    /**
+     * @dataProvider data_time_created
+     */
+    public function test_time_created_date($params, $usercount) {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Exclude admin user from this cohort.
+        $param = array('equal' => COHORT_RULES_OP_IN_NOTEQUALTO);
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'username', $param, array('admin'));
+
+        // Create a last login rule.
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'timecreated', $params, array());
+        cohort_rules_approve_changes($this->cohort);
+
+        // It should match:
+        // 1. data1: 26 (users which timecreated has been before the past duration of 90 days)
+        // 2. data2: 53 (users which time created is before from now)
+        // 3. data3: 26 (users which time created is before 3 months from now)
+        // 4. data4: 0 (users which time created is after today - 30 days ago)
+        $members = $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id));
+        $this->assertEquals($usercount, $members);
     }
 }

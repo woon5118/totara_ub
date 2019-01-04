@@ -28,7 +28,7 @@ require_once("{$CFG->dirroot}/totara/cohort/lib.php");
 /**
  * Class audience_member_authentication_rule_test
  */
-class audience_member_authentication_rule_test extends advanced_testcase {
+class totara_cohort_audience_member_authentication_rule_testcase extends advanced_testcase {
     /**
      * @param int $max
      * @param string $authtype
