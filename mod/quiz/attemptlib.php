@@ -1524,6 +1524,8 @@ class quiz_attempt {
      * @return string HTML fragment.
      */
     protected function render_question_helper($slot, $reviewing, $thispageurl, mod_quiz_renderer $renderer, $seq) {
+        global $DB;
+
         $originalslot = $this->get_original_slot($slot);
         $number = $this->get_question_number($originalslot);
         $displayoptions = $this->get_display_options_with_edit_link($reviewing, $slot, $thispageurl);
@@ -1534,8 +1536,12 @@ class quiz_attempt {
         }
 
         if ($this->can_question_be_redone_now($slot)) {
-            $displayoptions->extrainfocontent = $renderer->redo_question_button(
+            // Only supported by random type questions
+            $qtype = $DB->get_field('question', 'qtype', ['id' => $this->slots[$slot]->questionid]);
+            if ($qtype == 'random') {
+                $displayoptions->extrainfocontent = $renderer->redo_question_button(
                     $slot, $displayoptions->readonly);
+            }
         }
 
         if ($displayoptions->history && $displayoptions->questionreviewlink) {
