@@ -614,7 +614,8 @@ class assign_events_testcase extends mod_assign_base_testcase {
         );
         $assign->testable_process_save_quick_grades($data);
         $grade = $assign->get_user_grade($this->students[0]->id, false);
-        $this->assertEquals(60.0, $grade->grade);
+        // TOTARA: required as string comparison of numeric values no longer coerces type.
+        $this->assertSame('60.00000', $grade->grade);
 
         $events = $sink->get_events();
 
@@ -653,7 +654,8 @@ class assign_events_testcase extends mod_assign_base_testcase {
         $data->grade = '50.0';
         $assign->update_grade($data);
         $grade = $assign->get_user_grade($this->students[0]->id, false, 0);
-        $this->assertEquals(50.0, $grade->grade);
+        // TOTARA: required as string comparison of numeric values no longer coerces type.
+        $this->assertSame('50.00000', $grade->grade);
         $events = $sink->get_events();
 
         // TOTARA: has two events called here, both of type totara_core\event\module_completion

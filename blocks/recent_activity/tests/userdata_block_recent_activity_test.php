@@ -244,6 +244,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $module = $this->getDataGenerator()->create_module('resource', array('course' => $course));
 
+        // TOTARA: Add missing require.
         require_once($CFG->dirroot.'/admin/tool/log/store/legacy/tests/fixtures/event.php');
 
         $event = unittest_executed::create(

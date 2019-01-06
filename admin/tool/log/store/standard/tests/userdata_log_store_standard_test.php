@@ -277,6 +277,7 @@ class logstore_standard_userdata_log_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $module = $this->getDataGenerator()->create_module('resource', array('course' => $course));
 
+        // TOTARA: Add missing require.
         require_once($CFG->dirroot.'/admin/tool/log/store/legacy/tests/fixtures/event.php');
 
         $event = unittest_executed::create(

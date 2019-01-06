@@ -274,7 +274,8 @@ class block_totara_featured_links_tile_base_testcase extends test_helper {
      * Tests the base::get_name() method.
      */
     public function test_get_name() {
-        $this->expectException('Exception', 'Please Override this function');
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Please Override this function');
         base::get_name();
     }
 

@@ -888,7 +888,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         \totara_job\job_assignment::create($data);
     }
 
-    protected function test_facetoface_cost() {
+    public function test_facetoface_cost() {
         $this->init_sample_data();
 
         $userid1 = 1;

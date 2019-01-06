@@ -564,7 +564,7 @@ class mod_quiz_userdata_attempts_testcase extends advanced_testcase {
         $this->assert_attempt_has_key_value(
             $attempt1->get_attemptid(),
             'grade',
-            '100.0',
+            '100.00',
             $result->data
         );
         $this->assert_attempt_has_question_key_value(
@@ -588,7 +588,7 @@ class mod_quiz_userdata_attempts_testcase extends advanced_testcase {
         $this->assert_attempt_has_key_value(
             $attempt3->get_attemptid(),
             'grade',
-            '50.0',
+            '50.00',
             $result->data
         );
         $this->assert_attempt_has_question_key_value(
@@ -796,10 +796,7 @@ class mod_quiz_userdata_attempts_testcase extends advanced_testcase {
         foreach ($attempts as $attempt) {
             if ($attempt['id'] == $quizattemptid) {
                 $this->assertArrayHasKey($key, $attempt);
-                if (is_numeric($attempt[$key])) {
-                    $attempt[$key] = (float)$attempt[$key];
-                }
-                $this->assertEquals($value, $attempt[$key]);
+                $this->assertSame($value, $attempt[$key]);
                 return;
             }
         }
