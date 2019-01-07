@@ -30,6 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 use totara_cohort\rules\ui\base_selector_course as base_selector;
 
 class course_completion_date extends base_selector {
+
+    /** @var string dialog title string */
+    protected $dialogdatetitle = 'completionusercompletedbeforeafter';
     /**
      * @var array
      */
@@ -43,7 +46,6 @@ class course_completion_date extends base_selector {
      * @return string
      */
     public function getExtraSelectedItemsPaneWidgets(){
-        global $CFG;
 
         $html = '';
         $html .= \html_writer::start_div('mform cohort-treeview-dialog-extrafields');
@@ -77,7 +79,7 @@ class course_completion_date extends base_selector {
         }
 
         // Fixed date.
-        $html .= get_string('completionusercompletedbeforeafter', 'totara_cohort');
+        $html .= get_string($this->dialogdatetitle, 'totara_cohort');
         $html .= \html_writer::start_tag('fieldset');
         $html .= \html_writer::empty_tag('input', array_merge(array('id' => 'fixedordynamic1', 'value' => '1'), $radio1prop));
         $html .= \html_writer::select($opmenufix, 'beforeaftermenu', $selected, array(), array('class' => $class));
@@ -133,7 +135,7 @@ class course_completion_date extends base_selector {
      * @return string
      */
     public function getRuleDescription($ruleid, $static=true) {
-        global $DB, $CFG, $COHORT_RULE_COMPLETION_OP;
+        global $DB, $COHORT_RULE_COMPLETION_OP;
         if (!isset($this->operator) || !isset($this->listofids)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }

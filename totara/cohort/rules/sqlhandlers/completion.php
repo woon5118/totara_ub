@@ -149,6 +149,29 @@ class cohort_rule_sqlhandler_completion_list_program extends cohort_rule_sqlhand
     }
 }
 
+/**
+ * Rule for completing all/any/some/none of the archived courses in a list
+ */
+class cohort_rule_sqlhandler_course_completion_history_list extends cohort_rule_sqlhandler_completion_list {
+
+    protected function construct_sql_snippet($goalnum, $operator, $lov) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'chlc'.$this->ruleid);
+
+        $sqlhandler->sql = "{$goalnum} {$operator}
+                  (
+                  SELECT count(*)
+                    FROM {course_completion_history} cch
+                   WHERE cch.userid = u.id
+                     AND cch.courseid {$sqlin}
+                     AND cch.timecompleted > 0
+                  )";
+
+        $sqlhandler->params = $params;
+        return $sqlhandler;
+    }
+}
 
 /**
  * Abstract rule for handling date-based completion
@@ -213,6 +236,29 @@ class cohort_rule_sqlhandler_completion_date_course extends cohort_rule_sqlhandl
                      AND cc.course {$sqlin}
                      AND cc.timecompleted > 0
                      AND cc.timecompleted {$comparison}
+                  )";
+        $sqlhandler->params = $params;
+        return $sqlhandler;
+    }
+}
+
+/**
+ * Rule for checking whether users has completed all the archived courses in a list before a fixed date
+ */
+class cohort_rule_sqlhandler_course_completion_history_date extends cohort_rule_sqlhandler_completion_date {
+
+    protected function construct_sql_snippet($goalnum, $comparison, $lov) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'chdc'.$this->ruleid);
+        $sqlhandler->sql = "{$goalnum} =
+                  (
+                  SELECT count(*)
+                    FROM {course_completion_history} cch
+                   WHERE cch.userid = u.id
+                     AND cch.courseid {$sqlin}
+                     AND cch.timecompleted > 0
+                     AND cch.timecompleted {$comparison}
                   )";
         $sqlhandler->params = $params;
         return $sqlhandler;

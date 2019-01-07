@@ -77,20 +77,7 @@ class course_allanynotallnone extends base_selector {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
 
-        $strvar = new \stdClass();
-        switch ($this->operator) {
-            case COHORT_RULE_COMPLETION_OP_ALL:
-                $strvar->desc = get_string('ccdescall', 'totara_cohort');
-                break;
-            case COHORT_RULE_COMPLETION_OP_ANY:
-                $strvar->desc = get_string('ccdescany', 'totara_cohort');
-                break;
-            case COHORT_RULE_COMPLETION_OP_NOTALL:
-                $strvar->desc = get_string('ccdescnotall', 'totara_cohort');
-                break;
-            default:
-                $strvar->desc = get_string('ccdescnotany', 'totara_cohort');
-        }
+        $strvar = $this->get_description_string();
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;
@@ -152,5 +139,28 @@ class course_allanynotallnone extends base_selector {
                 }
             }
         }
+    }
+
+    /**
+     * Get description string depends from operator for course completion history.
+     *
+     * @return \stdClass
+     */
+    protected function get_description_string(): \stdClass {
+        $strvar = new \stdClass();
+        switch ($this->operator) {
+            case COHORT_RULE_COMPLETION_OP_ALL:
+                $strvar->desc = get_string('ccdescall', 'totara_cohort');
+                break;
+            case COHORT_RULE_COMPLETION_OP_ANY:
+                $strvar->desc = get_string('ccdescany', 'totara_cohort');
+                break;
+            case COHORT_RULE_COMPLETION_OP_NOTALL:
+                $strvar->desc = get_string('ccdescnotall', 'totara_cohort');
+                break;
+            default:
+                $strvar->desc = get_string('ccdescnotany', 'totara_cohort');
+        }
+        return $strvar;
     }
 }

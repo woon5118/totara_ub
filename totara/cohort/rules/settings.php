@@ -48,11 +48,13 @@ use totara_cohort\rules\ui\date_no_timezone as cohort_rule_ui_date_no_timezone;
 use totara_cohort\rules\ui\base_selector_hierarchy as cohort_rule_ui_picker_hierarchy;
 use totara_cohort\rules\ui\manager as cohort_rule_ui_reportsto;
 use totara_cohort\rules\ui\course_completion_date as cohort_rule_ui_picker_course_date;
+use totara_cohort\rules\ui\course_completion_history_date as cohort_rule_ui_picker_course_history_date;
 use totara_cohort\rules\ui\program_completion_date as cohort_rule_ui_picker_program_date;
 use totara_cohort\rules\ui\certification_completion_date as cohort_rule_ui_picker_certification_completion_date;
 use totara_cohort\rules\ui\course_duration as cohort_rule_ui_picker_course_duration;
 use totara_cohort\rules\ui\program_duration as cohort_rule_ui_picker_program_duration;
 use totara_cohort\rules\ui\course_allanynotallnone as cohort_rule_ui_picker_course_allanynotallnone;
+use totara_cohort\rules\ui\course_history_allanynotallnone as cohort_rule_ui_picker_course_history_allanynotallnone;
 use totara_cohort\rules\ui\program_allanynotallnone as cohort_rule_ui_picker_program_allanynotallnone;
 use totara_cohort\rules\ui\certification_status as cohort_rule_ui_picker_certification_status;
 use totara_cohort\rules\ui\cohort_member as cohort_rule_ui_cohortmember;
@@ -600,6 +602,26 @@ function cohort_rules_list($reset = false){
                 COHORT_PICKER_COURSE_COMPLETION
             ),
             new cohort_rule_sqlhandler_completion_duration_course()
+        );
+        // Historic Completion of all/any/none/not-all courses in a list
+        $rules[] = new cohort_rule_option(
+            'learning',
+            'coursecompletionhistorylist',
+            new cohort_rule_ui_picker_course_history_allanynotallnone(
+                get_string('ruledesc-learning-coursecompletionhistorylist', 'totara_cohort'),
+                COHORT_PICKER_COURSE_COMPLETION
+            ),
+            new cohort_rule_sqlhandler_course_completion_history_list()
+        );
+        // History completion of all courses in a list before/after a fixed date
+        $rules[] = new cohort_rule_option(
+            'learning',
+            'coursecompletionhistorydate',
+            new cohort_rule_ui_picker_course_history_date(
+                get_string('ruledesc-learning-coursecompletionhistorydate', 'totara_cohort'),
+                COHORT_PICKER_COURSE_COMPLETION
+            ),
+            new cohort_rule_sqlhandler_course_completion_history_date()
         );
         if (totara_feature_visible('programs')) {
             // Completion of all/any/not-all/none of programs in a list
