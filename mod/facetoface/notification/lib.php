@@ -27,6 +27,7 @@ use mod_facetoface\task\send_user_message_adhoc_task;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/message/messagelib.php');
 require_once($CFG->dirroot . '/completion/data_object.php');
 

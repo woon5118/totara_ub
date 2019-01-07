@@ -26,6 +26,8 @@
 
 namespace mod_facetoface;
 
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+
 final class messaging {
 
     /**
