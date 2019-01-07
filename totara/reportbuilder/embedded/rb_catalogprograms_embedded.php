@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/embedded/rb_findprograms_emb
 class rb_catalogprograms_embedded extends rb_base_embedded {
 
     public function __construct($data) {
-        $this->url = $this->url = '/totara/coursecatalog/programs.php';
+        $this->url = '/totara/coursecatalog/programs.php';
         $this->source = 'program';
         $this->shortname = 'catalogprograms';
         $this->fullname = get_string('reportbasedprograms', 'totara_coursecatalog');
@@ -62,7 +62,16 @@ class rb_catalogprograms_embedded extends rb_base_embedded {
             ),
         );
 
-        parent::__construct($data);
+        parent::__construct();
+    }
+
+    /**
+     * Hide this embedded report if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        global $CFG;
+        return ($CFG->catalogtype !== 'enhanced' || !totara_feature_visible('programs'));
     }
 
     /**

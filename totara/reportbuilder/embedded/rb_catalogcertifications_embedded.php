@@ -61,6 +61,15 @@ class rb_catalogcertifications_embedded extends rb_base_embedded {
     }
 
     /**
+     * Hide this embedded report if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        global $CFG;
+        return ($CFG->catalogtype !== 'enhanced' || !totara_feature_visible('certifications'));
+    }
+
+    /**
      * Check if the user is capable of accessing this report.
      * We use $reportfor instead of $USER->id and $report->get_param_value() instead of getting report params
      * some other way so that the embedded report will be compatible with the scheduler (in the future).
