@@ -181,16 +181,19 @@ class enrol_totara_program_plugin extends enrol_plugin {
             return;
         }
 
-        // Get all the suspended enrolments with this plugin for these users.
-        list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
-        $params['enrolid'] = $instance->id;
-        $params['suspended'] = ENROL_USER_SUSPENDED;
-        $suspendedenrolments = $DB->get_fieldset_select('user_enrolments', 'userid',
-            "userid $insql AND enrolid = :enrolid AND status = :suspended", $params);
+        // Get all the suspended enrolments for these users in batches.
+        $batches = array_chunk($userids, $DB->get_max_in_params());
+        foreach ($batches as $batch) {
+            list($insql, $params) = $DB->get_in_or_equal($batch, SQL_PARAMS_NAMED);
+            $params['enrolid'] = $instance->id;
+            $params['suspended'] = ENROL_USER_SUSPENDED;
+            $suspendedenrolments = $DB->get_fieldset_select('user_enrolments', 'userid',
+                "userid $insql AND enrolid = :enrolid AND status = :suspended", $params);
 
-        foreach ($suspendedenrolments as $userid) {
-            // Reactivate the enrolment. Use the API, not db update!
-            $this->update_user_enrol($instance, $userid, ENROL_USER_ACTIVE);
+            foreach ($suspendedenrolments as $userid) {
+                // Reactivate the enrolment. Use the API, not db update!
+                $this->update_user_enrol($instance, $userid, ENROL_USER_ACTIVE);
+            }
         }
     }
 
