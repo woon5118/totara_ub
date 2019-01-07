@@ -616,6 +616,10 @@ class totara_appraisal_messages_dynamic_test extends appraisal_testcase {
         );
         $context->sink->clear();
 
+        // Sort both array's the same way, we're not worried about the order, just the result.
+        ksort($recipients);
+        ksort($actual);
+
         $this->assertSame($recipients, $actual, "wrong email recipients");
     }
 }
