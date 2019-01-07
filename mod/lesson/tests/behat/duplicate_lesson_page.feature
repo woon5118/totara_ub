@@ -55,6 +55,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
     When I follow "Update page: First page name"
     And I should see "First page name"
     Then "//*[contains(@id, 'id_contents_editor')]//img[contains(@src, 'moodle_logo.jpg')]" "xpath_element" should exist
+    And I should see image with alt text "It's the logo"
 
   @javascript @_file_upload
   Scenario: Duplicate question page with image in answer.
@@ -92,6 +93,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
     And I should see "True false with an image in the answer"
     And I should see "Select the picture"
     Then "//*[contains(@id, 'id_answer_editor_0')]//img[contains(@src, 'moodle_logo.jpg')]" "xpath_element" should exist
+    And I should see image with alt text "It's the logo"
 
   @javascript @_file_upload
   Scenario: Duplicate question page with image in feedback.
@@ -129,3 +131,4 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
     And I should see "True false with an image in the feedback"
     And I should see "Select the picture"
     Then "//*[contains(@id, 'id_response_editor_0')]//img[contains(@src, 'moodle_logo.jpg')]" "xpath_element" should exist
+    And I should see image with alt text "It's the logo"
