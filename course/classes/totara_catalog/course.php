@@ -239,14 +239,15 @@ class course extends provider {
 
         $wm = new coursecreate();
         $categoryid = totara_get_categoryid_with_capability('moodle/course:create');
-        $wm->set_params(['category' => $categoryid]);
-        if ($wm->workflows_available()) {
-            $button = new \stdClass();
-            $button->label = get_string('course');
-            $button->url = $wm->get_url()->out();
-            $buttons[] = $button;
+        if ($categoryid) {
+            $wm->set_params(['category' => $categoryid]);
+            if ($wm->workflows_available()) {
+                $button = new \stdClass();
+                $button->label = get_string('course');
+                $button->url = $wm->get_url()->out();
+                $buttons[] = $button;
+            }
         }
-
         return $buttons;
     }
 }
