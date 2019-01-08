@@ -23,6 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/mod/quiz/report/reportlib.php');
+require_once("$CFG->dirroot/totara/cohort/lib.php");
+
 /**
  * Test that dynamic cohorts that depend on another cohorts are processed in correct order
  */

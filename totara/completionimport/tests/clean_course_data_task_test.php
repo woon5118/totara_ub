@@ -44,6 +44,7 @@ class clean_course_data_task_testcase extends advanced_testcase {
     public function test_task() {
         global $CFG, $DB;
 
+        // The naming of functions in this file is horrible, do NOT put it into the global scope!
         require_once($CFG->libdir . '/csvlib.class.php');
         require_once($CFG->libdir . '/completionlib.php');
         require_once($CFG->dirroot . '/totara/completionimport/lib.php');
