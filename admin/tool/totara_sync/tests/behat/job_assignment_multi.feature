@@ -1,6 +1,6 @@
 @_file_upload @javascript @tool @tool_totara_sync @totara @totara_job
-Feature: Use user source to import job assignments data in HR sync
-  In order to test HR import of users with job assignments
+Feature: Use user source to import multiple job assignments data in HR sync
+  In order to test HR import of users with multiple job assignments
   I must log in as an admin and import from a CSV file
 
   Background:
@@ -33,6 +33,7 @@ Feature: Use user source to import job assignments data in HR sync
       | manager5   | manager5   | man5      | man5     | manager5@example.com   | 1          |
       | appraiserx | appraiserx | appx      | appx     | appraiserx@example.com | 0          |
       | appraisery | appraisery | appy      | appy     | appraisery@example.com | 0          |
+      | appraiserz | appraiserz | appz      | appz     | appraiserz@example.com | 0          |
       | username1  | user1      | first1    | last1    | user1@example.com      | 1          |
       | username2  | user2      | first2    | last2    | user2@example.com      | 0          |
       | username3  | user3      | first3    | last3    | user3@example.com      | 1          |
@@ -94,10 +95,10 @@ Feature: Use user source to import job assignments data in HR sync
       | Appraiser    | 1 |
     And I press "Save changes"
 
-  Scenario: Update ID numbers is on, multiple jobs disabled, empty strings will not erase existing data
+  Scenario: Update ID numbers is on, multiple jobs enabled, empty strings will not erase existing data
     # Configure.
     Given I set the following administration settings values:
-      | totara_job_allowmultiplejobs | 0 |
+      | totara_job_allowmultiplejobs | 1 |
     And I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
       | Empty string behaviour | Empty strings are ignored |
@@ -152,7 +153,6 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
     When I am on profile page for user "username7"
-    Then I should not see "Add job assignment"
     And I click on "fullx" "link"
     Then the following fields match these values:
       | Full name          | fullx   |
@@ -268,14 +268,14 @@ Feature: Use user source to import job assignments data in HR sync
       | startdate[enabled] | 0                  |
       | enddate[enabled]   | 0                  |
 
-  Scenario: Update ID numbers is on, multiple jobs disabled, empty string erases existing data
+  Scenario: Update ID numbers is on, multiple jobs enabled, empty string erases existing data
     # Configure.
     Given I set the following administration settings values:
-      | totara_job_allowmultiplejobs | 0 |
+      | totara_job_allowmultiplejobs | 1 |
     And I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
-      | Empty string behaviour | Empty strings erase existing data |
-      | Update ID numbers      | Yes                               |
+      | Empty string behaviour | Empty strings erase existing data  |
+      | Update ID numbers      | Yes                                |
     And I press "Save changes"
 
     # Import.
@@ -320,14 +320,13 @@ Feature: Use user source to import job assignments data in HR sync
     # But this should not have generated any notices.
     And I should not see "User 'manager3' does not have a job assignment and was set to be assigned as manager."
 
-
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
     When I am on profile page for user "username5"
+    Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
     When I am on profile page for user "username7"
-    Then I should not see "Add job assignment"
     And I click on "fullx" "link"
     Then the following fields match these values:
       | Full name          | fullx   |
@@ -437,10 +436,10 @@ Feature: Use user source to import job assignments data in HR sync
       | startdate[enabled] | 0                  |
       | enddate[enabled]   | 0                  |
 
-  Scenario: Update ID numbers is off, multiple jobs disabled, empty strings will not erase existing data
+  Scenario: Update ID numbers is off, multiple jobs enabled, empty strings will not erase existing data
     # Configure.
     Given I set the following administration settings values:
-      | totara_job_allowmultiplejobs | 0 |
+      | totara_job_allowmultiplejobs | 1 |
     And I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
       | Empty string behaviour | Empty strings are ignored |
@@ -469,9 +468,6 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "User 'notrealmanager' does not exist and was set to be assigned as manager. Skipped job assignment 'nonexistentanything' for user 'user5'."
     And I should see "User 'notrealappraiser' does not exist and was set to be assigned as appraiser. Skipped job assignment 'nonexistentanything' for user 'user5'."
 
-    # User 9 failed because they already had existing job assignments and a new would need to have been created.
-    And I should see "Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment 'newjaid' for user 'user9'."
-
     # User 11 failed because they had no jaid.
     And I should see "Some records are missing their idnumber and/or useridnumber. These records were skipped."
 
@@ -494,6 +490,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
     When I am on profile page for user "username5"
+    Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
@@ -533,7 +530,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "man5 man5 (manager5@example.com) - full5y"
     And I should see "appx appx"
 
-    # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates here.
+    # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates for the existing two.
     When I am on profile page for user "username9"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -567,7 +564,24 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "man3 man3 (manager3@example.com) - New Job Assignment"
     And I should not see "appx appx"
 
-    # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
+    # User 9 - but they do now have a third job assignment.
+    When I am on profile page for user "username9"
+    And I click on "Unnamed job assignment (ID: newjaid)" "link"
+    Then the following fields match these values:
+      | Full name          | Unnamed job assignment (ID: newjaid) |
+      | Short name         |                                      |
+      | ID Number          | newjaid                              |
+      | startdate[enabled] | 1                                    |
+      | startdate[year]    | 2015                                 |
+      | startdate[month]   | March                                |
+      | startdate[day]     | 20                                   |
+      | enddate[enabled]   | 0                                    |
+    And I should see "PositionY"
+    And I should see "OrganisationZ"
+    And I should see "man3 man3 (manager3@example.com) - New Job Assignment"
+    And I should see "appx appx"
+
+    # User 10 - Had two existing job assignments. First one should have been updated given the id numbers matched.
     # Empty strings don't erase, so Full Name should still be there.
     When I am on profile page for user "username10"
     And I click on "fullx" "link"
@@ -612,10 +626,10 @@ Feature: Use user source to import job assignments data in HR sync
       | startdate[enabled] | 0                  |
       | enddate[enabled]   | 0                  |
 
-  Scenario: Update ID numbers is off, multiple jobs disabled, empty string erases existing data
+  Scenario: Update ID numbers is off, multiple jobs enabled, empty string erases existing data
     # Configure.
     Given I set the following administration settings values:
-      | totara_job_allowmultiplejobs | 0 |
+      | totara_job_allowmultiplejobs | 1 |
     And I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
     And I set the following fields to these values:
       | Empty string behaviour | Empty strings erase existing data |
@@ -644,9 +658,6 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "User 'notrealmanager' does not exist and was set to be assigned as manager. Skipped job assignment 'nonexistentanything' for user 'user5'."
     And I should see "User 'notrealappraiser' does not exist and was set to be assigned as appraiser. Skipped job assignment 'nonexistentanything' for user 'user5'."
 
-    # User 9 failed because they already had existing job assignments and a new would need to have been created.
-    And I should see "Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment 'newjaid' for user 'user9'."
-
     # User 11 failed because they had no jaid.
     And I should see "Some records are missing their idnumber and/or useridnumber. These records were skipped."
 
@@ -669,6 +680,7 @@ Feature: Use user source to import job assignments data in HR sync
 
     # User 5 - imports failed and had no previous job assignments, so none should exist now.
     When I am on profile page for user "username5"
+    Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
     # User 7 - had nothing in import file, but did have existing which should be unchanged.
@@ -708,7 +720,7 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "man5 man5 (manager5@example.com) - full5y"
     And I should see "appx appx"
 
-    # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates here.
+    # User 9 - Had two existing job assignments. Nothing in the CSV matched any of them, so no updates for the existing two.
     When I am on profile page for user "username9"
     And I click on "fullx" "link"
     Then the following fields match these values:
@@ -742,7 +754,24 @@ Feature: Use user source to import job assignments data in HR sync
     And I should not see "man3 man3 (manager3@example.com) - New Job Assignment"
     And I should not see "appx appx"
 
-    # User 10 - Had two existing job assignments. First one should have been updated. Id number was also the same.
+    # User 9 - but they do now have a third job assignment.
+    When I am on profile page for user "username9"
+    And I click on "Unnamed job assignment (ID: newjaid)" "link"
+    Then the following fields match these values:
+      | Full name          | Unnamed job assignment (ID: newjaid) |
+      | Short name         |                                      |
+      | ID Number          | newjaid                              |
+      | startdate[enabled] | 1                                    |
+      | startdate[year]    | 2015                                 |
+      | startdate[month]   | March                                |
+      | startdate[day]     | 20                                   |
+      | enddate[enabled]   | 0                                    |
+    And I should see "PositionY"
+    And I should see "OrganisationZ"
+    And I should see "man3 man3 (manager3@example.com) - New Job Assignment"
+    And I should see "appx appx"
+
+    # User 10 - Had two existing job assignments. First one should have been updated given the id numbers matched.
     # Empty strings erase.
     When I am on profile page for user "username10"
     And I click on "Unnamed job assignment (ID: jaidx)" "link"
@@ -784,63 +813,3 @@ Feature: Use user source to import job assignments data in HR sync
       | startdate[enabled] | 0                  |
       | enddate[enabled]   | 0                  |
 
-  Scenario: Upload CSV to test that job assignment start and end dates are validated correctly
-    # Configure.
-    Given I set the following fields to these values:
-    | Organisation              | 0      |
-    | Position                  | 0      |
-    | Manager                   | 0      |
-    | Appraiser                 | 0      |
-    And I press "Save changes"
-    And I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
-    And I set the following fields to these values:
-      | Update ID numbers      | No |
-    And I press "Save changes"
-    And I set the following administration settings values:
-      | csvdateformat           | d/m/Y  |
-
-    # Import.
-    And I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
-    And I upload "admin/tool/totara_sync/tests/fixtures/jobassignment/dates.csv" file to "CSV" filemanager
-    And I press "Upload"
-    And I navigate to "Run HR Import" node in "Site administration > HR Import"
-    And I press "Run HR Import"
-    And I navigate to "HR Import Log" node in "Site administration > HR Import"
-
-    # Check the results.
-    Then I should see "HR Import finished" in the "#totarasynclog" "css_element"
-    And I should see "Created job assignment 'newjaid' for user 'user1'."
-    And I should not see "Invalid date format for field 'startdate' for job assignment with id number 'newjaid' for user 'user1'"
-    And I should see "Created job assignment 'newjaid' for user 'user2'."
-    And I should not see "Invalid date format for field 'startdate' for job assignment with id number 'newjaid' for user 'user2'"
-
-    # Invalid date formats are an exception to normal errors given that the rest of the date record still gets added.
-    # Doesn't seem ideal but one justification for this may be that they are dealt with in the source class,
-    # if we drop them there and source contains all records, you may lose their record.
-    And I should see "Created job assignment 'newjaid' for user 'user3'."
-    And I should see "Invalid date format for field 'startdate' for job assignment with id number 'newjaid' for user 'user3'. Values for this field will not be added/updated."
-
-  Scenario: Verify the uploaded useridnumber field is validated against the user idnumber data.
-
-    Given I set the following fields to these values:
-      | Full name                 | 0      |
-      | Start date                | 0      |
-      | End date                  | 0      |
-      | Organisation              | 0      |
-      | Position                  | 0      |
-      | Manager                   | 0      |
-      | Appraiser                 | 0      |
-    When I press "Save changes"
-    Then I should see "Settings saved"
-
-    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
-    And I upload "admin/tool/totara_sync/tests/fixtures/jobassignment/idnumber_2.csv" file to "CSV" filemanager
-    And I press "Upload"
-    And I navigate to "Run HR Import" node in "Site administration > HR Import"
-    And I press "Run HR Import"
-    Then I should see "Running HR Import cron...Done! However, there have been some problems"
-
-    When I navigate to "HR Import Log" node in "Site administration > HR Import"
-    Then the following should exist in the "totarasynclog" table:
-      | Log type | Action      | Info                                                                                 |
-      | Error    | checksanity | Unable to match useridnumber 'userbob' to a user ID number for job assignment 'dev1' |

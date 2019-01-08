@@ -699,4 +699,19 @@ class behat_totara_core extends behat_base {
         $this->getSession()->visit($this->locate_path('totara/catalog/index.php'));
         $this->wait_for_pending_js();
     }
+
+    /**
+     * Navigate to profile page for a given user
+     *
+     * @Given /^I am on profile page for user "([^"]*)"$/
+     */
+    public function i_am_on_profile_for_user($username) {
+        global $DB;
+
+        $user = $DB->get_record('user', ['username' => $username]);
+
+        $url = new moodle_url('/user/profile.php', ['id' => $user->id]);
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->wait_for_pending_js();
+    }
 }
