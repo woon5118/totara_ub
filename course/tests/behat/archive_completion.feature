@@ -195,9 +195,9 @@ Feature: Test we can manually archive course completion.
     And I follow "View"
     Then I should see "0.00" in the "//table[@id='user-grades']//th/a[contains(text(), 'Learner One')]/ancestor::tr/td[contains(@class, 'course')]/span[contains(@class, 'gradevalue')]" "xpath_element"
     And I should see "10.00" in the "//table[@id='user-grades']//th/a[contains(text(), 'Learner Two')]/ancestor::tr/td[contains(@class, 'course')]/span[contains(@class, 'gradevalue')]" "xpath_element"
-    And I should see "20.00" in the "//table[@id='user-grades']//th/a[contains(text(), 'Learner Three')]/ancestor::tr/td[contains(@class, 'course')]/span[contains(@class, 'gradevalue')]" "xpath_element"
-    And I should see "30.00" in the "//table[@id='user-grades']//th/a[contains(text(), 'Learner Four')]/ancestor::tr/td[contains(@class, 'course')]/span[contains(@class, 'gradevalue')]" "xpath_element"
-    And I should see "15.00" in the "//table[@id='user-grades']//th[contains(text(), 'Overall average')]/ancestor::tr/td[contains(@class, 'lastcol')]" "xpath_element"
+    And I should see "-" in the "//table[@id='user-grades']//th/a[contains(text(), 'Learner Three')]/ancestor::tr/td[contains(@class, 'course')]/span[contains(@class, 'gradevalue')]" "xpath_element"
+    And I should see "-" in the "//table[@id='user-grades']//th/a[contains(text(), 'Learner Four')]/ancestor::tr/td[contains(@class, 'course')]/span[contains(@class, 'gradevalue')]" "xpath_element"
+    And I should see "5.00" in the "//table[@id='user-grades']//th[contains(text(), 'Overall average')]/ancestor::tr/td[contains(@class, 'lastcol')]" "xpath_element"
 
     When I run the scheduled task "core\task\completion_regular_task"
     And I am on homepage
@@ -206,13 +206,13 @@ Feature: Test we can manually archive course completion.
     # Grade column
     Then "Learner One" row "Grade" column of "report_test_course_completion_report" table should contain "0.0%"
     And "Learner Two" row "Grade" column of "report_test_course_completion_report" table should contain "28.6%"
-    And "Learner Three" row "Grade" column of "report_test_course_completion_report" table should contain "57.1%"
-    And "Learner Four" row "Grade" column of "report_test_course_completion_report" table should contain "85.7%"
+    And "Learner Three" row "Grade" column of "report_test_course_completion_report" table should contain "-"
+    And "Learner Four" row "Grade" column of "report_test_course_completion_report" table should contain "-"
     # Completion status
     And "Learner One" row "Completion Status" column of "report_test_course_completion_report" table should contain "Not yet started"
     And "Learner Two" row "Completion Status" column of "report_test_course_completion_report" table should contain "Complete"
-    And "Learner Three" row "Completion Status" column of "report_test_course_completion_report" table should contain "Complete"
-    And "Learner Four" row "Completion Status" column of "report_test_course_completion_report" table should contain "Complete"
+    And "Learner Three" row "Completion Status" column of "report_test_course_completion_report" table should contain "Not yet started"
+    And "Learner Four" row "Completion Status" column of "report_test_course_completion_report" table should contain "Not yet started"
     # Pass grade
     And "Learner One" row "Pass Grade" column of "report_test_course_completion_report" table should contain "28.6%"
     And "Learner Two" row "Pass Grade" column of "report_test_course_completion_report" table should contain "28.6%"
@@ -221,9 +221,12 @@ Feature: Test we can manually archive course completion.
     # Required grade
     And "Learner One" row "Required grade" column of "report_test_course_completion_report" table should contain "0.0% (28.6% to complete)"
     And "Learner Two" row "Required grade" column of "report_test_course_completion_report" table should contain "28.6% (28.6% to complete)"
-    And "Learner Three" row "Required grade" column of "report_test_course_completion_report" table should contain "57.1% (28.6% to complete)"
-    And "Learner Four" row "Required grade" column of "report_test_course_completion_report" table should contain "85.7% (28.6% to complete)"
+    And "Learner Three" row "Required grade" column of "report_test_course_completion_report" table should contain ""
+    And "Learner Four" row "Required grade" column of "report_test_course_completion_report" table should contain ""
 
     When I follow "Reports"
     And I follow "Test course completion including history report"
-    Then "Learner Two" row "Grade at time of completion" column of "report_test_course_completion_including_history_report" table should contain "28.6%"
+    Then I should not see "Learner One"
+    And "Learner Two" row "Grade at time of completion" column of "report_test_course_completion_including_history_report" table should contain "28.6%"
+    And "Learner Three" row "Grade at time of completion" column of "report_test_course_completion_including_history_report" table should contain "57.1%"
+    And "Learner Four" row "Grade at time of completion" column of "report_test_course_completion_including_history_report" table should contain "85.7%"
