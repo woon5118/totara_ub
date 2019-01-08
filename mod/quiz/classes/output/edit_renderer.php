@@ -909,7 +909,7 @@ class edit_renderer extends \plugin_renderer_base {
         );
         if ($structure->is_question_dependent_on_previous_slot($slot)) {
             $title = get_string('questiondependencyremove', 'quiz', $a);
-            $image = $OUTPUT->flex_icon('lock', ['alt' => get_string('questiondependencyfree', 'quiz')]);
+            $image = $OUTPUT->flex_icon('lock', ['alt' => get_string('questiondependsonprevious', 'quiz')]);
             $action = 'removedependency';
         } else {
             $title = get_string('questiondependencyadd', 'quiz', $a);
