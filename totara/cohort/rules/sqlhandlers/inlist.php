@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author David Curry <david.curry@totaralearning.com>
  * @author Aaron Wells <aaronw@catalyst.net.nz>
  * @package totara
  * @subpackage cohort/rules/sqlhandlers
@@ -446,6 +447,80 @@ class cohort_rule_sqlhandler_in_poscustomfield extends cohort_rule_sqlhandler_in
 }
 
 /**
+ * SQL snippet for a pos custom field using data params for the user's position across all of their job assignments.
+ * Created for the multi-select custom field type.
+ */
+class cohort_rule_sqlhandler_in_poscustomfield_params extends cohort_rule_sqlhandler_in {
+
+    public $params = array(
+        'equal' => 0,
+        'exact' => 0,
+        'listofvalues' => 1
+    );
+
+    /**
+     * These fields are always char
+     */
+    public function __construct($field, $datatype) {
+
+        $this->fielddatatype = $datatype;
+        parent::__construct($field, true);
+    }
+
+    /**
+     * Custom snippets to handle the options.
+     *
+     * @param int     $field The id of the custom field
+     * @param boolean $not   false = equals, true = not equals
+     * @param array   $lov   List of values (i.e. multiselect hashes)
+     */
+    protected function construct_sql_snippet($field, $not, $lov) {
+        global $DB;
+
+        // Create object to be returned
+        $sqlhandler = new stdClass();
+
+        if ($this->exact == COHORT_RULES_OP_IN_ANY) {
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid);
+            $operator = $this->equal == COHORT_RULES_OP_IN_ISEQUALTO ? '<=' : '>';
+            $sql = "EXISTS ( SELECT 1
+                               FROM {job_assignment} ja
+                              WHERE ja.userid = u.id
+                                AND 1 {$operator} ( SELECT COUNT(DISTINCT ptip.id)
+                                                      FROM {pos_type_info_data} ptid
+                                                 LEFT JOIN {pos_type_info_data_param} ptip
+                                                        ON ptip.dataid = ptid.id
+                                                     WHERE ptid.positionid = ja.positionid
+                                                       AND ptid.fieldid = {$field}
+                                                       AND ptip.value {$sqlin}
+                                                  )
+                           )";
+        } else { // ALL.
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid);
+            $count = count($lov);
+            $operator = $this->equal == COHORT_RULES_OP_IN_ISEQUALTO ? '=' : '>';
+
+            $sql = "EXISTS ( SELECT 1
+                               FROM {job_assignment} ja
+                              WHERE ja.userid = u.id
+                                AND {$count} {$operator} ( SELECT COUNT(DISTINCT ptip.id)
+                                                             FROM {pos_type_info_data} ptid
+                                                        LEFT JOIN {pos_type_info_data_param} ptip
+                                                               ON ptip.dataid = ptid.id
+                                                            WHERE ja.positionid = ptid.positionid
+                                                              AND ptid.fieldid = {$field}
+                                                              AND ptip.value {$sqlin}
+                                                         )
+                           )";
+        }
+
+        $sqlhandler->sql = $sql;
+        $sqlhandler->params = $params;
+        return $sqlhandler;
+    }
+}
+
+/**
  * SQL snippet for a field from mdl_org, joined across all of the users job assignments.
  */
 class cohort_rule_sqlhandler_in_orgfield extends cohort_rule_sqlhandler_in {
@@ -471,6 +546,79 @@ class cohort_rule_sqlhandler_in_orgfield extends cohort_rule_sqlhandler_in {
             $sqlhandler->params = $params;
         }
 
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a org custom field using data params for the user's organisation across all of their job assignments.
+ * Created for the multi-select custom field type.
+ */
+class cohort_rule_sqlhandler_in_orgcustomfield_params extends cohort_rule_sqlhandler_in {
+    public $params = array(
+        'equal' => 0,
+        'exact' => 0,
+        'listofvalues' => 1
+    );
+
+    /**
+     * These fields are always char
+     */
+    public function __construct($field, $datatype) {
+
+        $this->fielddatatype = $datatype;
+        parent::__construct($field, true);
+    }
+
+    /**
+     * Custom snippets to handle the options.
+     *
+     * @param int     $field The id of the custom field
+     * @param boolean $not   false = equals, true = not equals
+     * @param array   $lov   List of values (i.e. multiselect hashes)
+     */
+    protected function construct_sql_snippet($field, $not, $lov) {
+        global $DB;
+
+        // Create object to be returned
+        $sqlhandler = new stdClass();
+
+        if ($this->exact == COHORT_RULES_OP_IN_ANY) {
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid);
+            $operator = $this->equal == COHORT_RULES_OP_IN_ISEQUALTO ? '<=' : '>';
+            $sql = "EXISTS ( SELECT 1
+                               FROM {job_assignment} ja
+                              WHERE ja.userid = u.id
+                                AND 1 {$operator} ( SELECT COUNT(DISTINCT otip.id)
+                                                      FROM {org_type_info_data} otid
+                                                 LEFT JOIN {org_type_info_data_param} otip
+                                                        ON otip.dataid = otid.id
+                                                     WHERE otid.organisationid = ja.organisationid
+                                                       AND otid.fieldid = {$field}
+                                                       AND otip.value {$sqlin}
+                                                  )
+                           )";
+        } else { // ALL.
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid);
+            $count = count($lov);
+            $operator = $this->equal == COHORT_RULES_OP_IN_ISEQUALTO ? '=' : '>';
+
+            $sql = "EXISTS ( SELECT 1
+                               FROM {job_assignment} ja
+                              WHERE ja.userid = u.id
+                                AND {$count} {$operator} ( SELECT COUNT(DISTINCT otip.id)
+                                                             FROM {org_type_info_data} otid
+                                                        LEFT JOIN {org_type_info_data_param} otip
+                                                               ON otip.dataid = otid.id
+                                                            WHERE ja.organisationid = otid.organisationid
+                                                              AND otid.fieldid = {$field}
+                                                              AND otip.value {$sqlin}
+                                                         )
+                           )";
+        }
+
+        $sqlhandler->sql = $sql;
+        $sqlhandler->params = $params;
         return $sqlhandler;
     }
 }

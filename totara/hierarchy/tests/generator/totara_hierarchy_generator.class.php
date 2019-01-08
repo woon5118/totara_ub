@@ -684,6 +684,67 @@ class totara_hierarchy_generator extends component_generator_base {
         $this->create_hierarchy_type_customfield($customfield);
     }
 
+    /**
+     * A wrapped call to set_hierarchy_type_multiselect_data
+     *
+     * @param int    $itemid  - The id of the position
+     * @param int    $fieldid - The id of the custom field
+     * @param array  $data    - An array of the items to select
+     * @return int
+     */
+    function set_pos_type_multiselect_data($posid, $fieldid, $data) {
+        return $this->set_hierarchy_type_multiselect_data('position', $posid, $fieldid, $data);
+    }
+
+    /**
+     * A wrapped call to set_hierarchy_type_multiselect_data
+     *
+     * @param int    $itemid  - The id of the organisation
+     * @param int    $fieldid - The id of the custom field
+     * @param array  $data    - An array of the items to select
+     * @return int
+     */
+    function set_org_type_multiselect_data($orgid, $fieldid, $data) {
+        return $this->set_hierarchy_type_multiselect_data('organisation', $orgid, $fieldid, $data);
+    }
+
+    /**
+     * Create the data records for a hierarchy multiselect custom field.
+     *
+     * Note: For the best accuracy the data should be formatted with [hash => object]
+     *       Where the object is an array holding all the selections data and the hash
+     *       is an md5(object['option']). See hierarchy_type_customfield_mult
+     *
+     * @param string $prefix  - The hierarchy prefix position/organisation
+     * @param int    $itemid  - The id of the hierarchy item
+     * @param int    $fieldid - The id of the custom field
+     * @param array  $data    - An array of the items to select
+     * @return int
+     */
+    public function set_hierarchy_type_multiselect_data(string $prefix, int $itemid, int $fieldid, array $data) : int {
+        global $DB;
+
+        $shortprefix = $this->hierarchy_type_prefix[$prefix];
+        $datatable = "{$shortprefix}_type_info_data";
+        $paramtable = "{$shortprefix}_type_info_data_param";
+        $fieldname = "{$prefix}id";
+
+        $record = new \stdClass();
+        $record->fieldid = $fieldid;
+        $record->{$fieldname} = $itemid;
+        $record->data = json_encode($data);
+        $dataid = $DB->insert_record($datatable, $record);
+
+        foreach ($data as $hash => $selection) {
+            $msp_record = new \stdClass();
+            $msp_record->dataid = $dataid;
+            $msp_record->value = $hash;
+            $DB->insert_record($paramtable, $msp_record);
+        }
+
+        return $dataid;
+    }
+
     public function create_hierarchy_type_generic_menu($data) {
         $customfield = $data;
         $customfield['field']  = 'menu';

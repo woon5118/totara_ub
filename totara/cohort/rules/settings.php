@@ -43,6 +43,7 @@ require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/enrolment.php');
 
 use totara_cohort\rules\ui\text as cohort_rule_ui_text;
 use totara_cohort\rules\ui\menu as cohort_rule_ui_menu;
+use totara_cohort\rules\ui\multiselect as cohort_rule_ui_multiselect;
 use totara_cohort\rules\ui\checkbox as cohort_rule_ui_checkbox;
 use totara_cohort\rules\ui\authentication_type as cohort_rule_ui_authentication_type;
 use totara_cohort\rules\ui\date as cohort_rule_ui_date;
@@ -445,6 +446,22 @@ function cohort_rules_list($reset = false){
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id, $field->datatype);
                     break;
+                case 'multiselect':
+                    // Quickly loop through the fields and add the hash as the key.
+                    $options = [];
+                    $rawoptions = json_decode($field->param1, true);
+                    foreach ($rawoptions as $option) {
+                        $hash = md5($option['option']);
+                        $options[$hash] = $option;
+                    }
+
+                    $dialog = new cohort_rule_ui_multiselect(
+                        $field->name,
+                        get_string('usersposx', 'totara_cohort', $field->name),
+                        $options
+                    );
+                    $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield_params($id, $field->datatype);
+                    break;
                 default:
                     // Skip field types we haven't defined a rule for yet.
                     unset($dialog);
@@ -550,6 +567,22 @@ function cohort_rules_list($reset = false){
                         )
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_orgcustomfield($id, $field->datatype);
+                    break;
+                case 'multiselect':
+                    // Quickly loop through the fields and add the hash as the key.
+                    $options = [];
+                    $rawoptions = json_decode($field->param1, true);
+                    foreach ($rawoptions as $option) {
+                        $hash = md5($option['option']);
+                        $options[$hash] = $option;
+                    }
+
+                    $dialog = new cohort_rule_ui_multiselect(
+                        $field->name,
+                        get_string('usersorgx', 'totara_cohort', $field->name),
+                        $options
+                    );
+                    $sqlhandler = new cohort_rule_sqlhandler_in_orgcustomfield_params($id, $field->datatype);
                     break;
                 default:
                     // Skip field types we haven't defined a rule for yet.
