@@ -105,7 +105,8 @@ if ($data = data_submitted()) {
 
     $eventdata = array();
     foreach ($program->get_assignments()->get_assignments() as $assignment) {
-        $eventdata[] = (array) $assignment;
+        // Event expects an array.
+        $eventdata[] = json_decode(json_encode($assignment), true);
     }
 
     $event = \totara_program\event\program_assignmentsupdated::create(
