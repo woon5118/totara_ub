@@ -83,6 +83,9 @@ class rb_source_site_logstore extends rb_base_source {
 
         // Add related user support.
         $this->add_core_user_tables($joinlist, 'base', 'relateduserid', 'ruser');
+
+        // Add real user support.
+        $this->add_core_user_tables($joinlist, 'base', 'realuserid', 'realuser');
         return $joinlist;
     }
 
@@ -250,6 +253,33 @@ class rb_source_site_logstore extends rb_base_source {
             ),
         );
 
+        // Add composite real + on-behalf-of fullname column option.
+        $userusednamefields = totara_get_all_user_name_fields_join('auser', null, true);
+        $userallnamefields = totara_get_all_user_name_fields(false, 'auser', null, 'auser');
+        $realallnamefields = totara_get_all_user_name_fields(false, 'realuser', null, 'realuser');
+
+        $allnamefields = array_merge($userallnamefields, $realallnamefields);
+        foreach ($allnamefields as $key => $field) {
+            $allnamefields[$key] = "COALESCE($field,'')";
+        }
+        $allnamefields['auserid'] = 'auser.id';
+        $allnamefields['realuserid'] = 'realuser.id';
+
+        $columnoptions[] = new rb_column_option(
+            'logstore_standard_log',
+            'userfullnameincludingonbehalfof',
+            get_string('userfullnameincludingonbehalfof', 'rb_source_site_logstore'),
+            $DB->sql_concat_join("' '", $userusednamefields),
+            array(
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+                'joins' => array('auser', 'realuser'),
+                'displayfunc' => 'log_user_full_name_including_on_behalf_of',
+                'extrafields' => $allnamefields,
+                'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
+            )
+        );
+
         // Include some standard columns.
         $this->add_core_user_columns($columnoptions);
         $this->add_core_course_columns($columnoptions);
@@ -259,6 +289,9 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_totara_cohort_course_columns($columnoptions);
         // Add related user support.
         $this->add_core_user_columns($columnoptions, 'ruser', 'relateduser', true);
+
+        // Add real user support.
+        $this->add_core_user_columns($columnoptions, 'realuser', 'realuser', true);
 
         return $columnoptions;
     }
@@ -312,6 +345,7 @@ class rb_source_site_logstore extends rb_base_source {
         // Include some standard filters.
         $this->add_core_user_filters($filteroptions);
         $this->add_core_user_filters($filteroptions, 'relateduser', true);
+        $this->add_core_user_filters($filteroptions, 'realuser', true);
         $this->add_core_course_filters($filteroptions);
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');

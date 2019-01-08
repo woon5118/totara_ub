@@ -553,9 +553,9 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     protected $logstore_standard_log_data = array('id' => 1, 'eventname' => '\core\event\user_loggedin', 'component' => 'core',
         'action' => 'loggedin', 'target' => 'user', 'objecttable' => 'user', 'objectid' => 2, 'crud' => 'r', 'edulevel' => 0,
-        'contextid' => 1, 'contextlevel' => 10, 'contextinstanceid' => 0, 'userid' => 2, 'courseid' => 0, 'relateduserid' => 0,
+        'contextid' => 1, 'contextlevel' => 10, 'contextinstanceid' => 0, 'userid' => 1, 'courseid' => 0, 'relateduserid' => 0,
         'anonymous' => 0, 'other' => 'a:1:{s:8:"username";s:5:"admin";}', 'timecreated' => 1416859984, 'origin' => 'web',
-        'ip' => '127.0.0.1'
+        'ip' => '127.0.0.1', 'realuserid' => 2
     );
 
     protected $repository_opensesame_bdls_data = array('id' => 1, 'name' => 'Some budle', 'timecreated' => 1416859984);
