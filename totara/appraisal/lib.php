@@ -768,6 +768,20 @@ class appraisal {
             }
         }
 
+        $event = \totara_appraisal\event\appraisal_role_page_saved::create(
+            array(
+                'objectid' => $this->id,
+                'context' => context_system::instance(),
+                // 'userid' is the user who performed the action, defaults to $USER->id.
+                'relateduserid' => $roleassignment->subjectid, // Learner whose appraisal this is.
+                'other' => array(
+                    'pageid' => $pageid,
+                    'role' => $roleassignment->appraisalrole,
+                )
+            )
+        );
+        $event->trigger();
+
         if ($updateprogress) {
             // Check if page is valid and user wants to go to next page.
             if (($formdata->submitaction == 'next') || ($formdata->submitaction == 'completestage')) {
@@ -2215,7 +2229,7 @@ class appraisal_stage {
     /**
      * Appraisal id that this stage is related to
      *
-     * @var type
+     * @var int
      */
     public $appraisalid = null;
 
@@ -2700,6 +2714,20 @@ class appraisal_stage {
             $stage_data->appraisalstageid = $this->id;
             $DB->insert_record('appraisal_stage_data', $stage_data);
 
+            $event = \totara_appraisal\event\appraisal_role_stage_completed::create(
+                array(
+                    'objectid' => $this->appraisalid,
+                    'context' => context_system::instance(),
+                    // 'userid' is the user who performed the action, defaults to $USER->id.
+                    'relateduserid' => $roleassignment->subjectid, // Learner whose appraisal this is.
+                    'other' => array(
+                        'stageid' => $this->id,
+                        'role' => $roleassignment->appraisalrole,
+                    )
+                )
+            );
+            $event->trigger();
+
             // Check if all involved roles are complete for this user and stage.
             $rolescompletion = $this->get_mandatory_completion($roleassignment->subjectid);
             $complete = true;
@@ -2743,12 +2771,29 @@ class appraisal_stage {
         if (!empty($nextstageid)) {
             $DB->set_field('appraisal_user_assignment', 'activestageid', $nextstageid,
                 array('userid' => $subjectid, 'appraisalid' => $this->appraisalid));
-        } else {
+        }
+
+        $event = \totara_appraisal\event\appraisal_stage_completed::create(
+            array(
+                'objectid' => $this->appraisalid,
+                'context' => context_system::instance(),
+                // 'userid' is the user who performed the action, defaults to $USER->id.
+                'relateduserid' => $subjectid, // Learner whose appraisal this is.
+                'other' => array(
+                    'stageid' => $this->id,
+                    'complete_for_user' => empty($nextstageid),
+                )
+            )
+        );
+        $event->trigger();
+
+        if (empty($nextstageid)) {
             // Mark the appraisal as complete for the given user.
             $appraisal = new appraisal($this->appraisalid);
             $appraisal->complete_for_user($subjectid);
         }
 
+        // Deprecated in Totara 13.0 - observe event appraisal_stage_completed (triggered just above) instead.
         $event = \totara_appraisal\event\appraisal_stage_completion::create(
             array(
                 'objectid' => $this->appraisalid,

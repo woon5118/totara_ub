@@ -6,6 +6,9 @@ information provided here is intended especially for developers.
 * Removed deprecated methods:
   * totara_appraisal_observer::appraisal_activation()
   * totara_appraisal_observer::send_scheduled()
+* The event appraisal_stage_completion has been deprecated. This event wasn't storing the correct data in the correct
+  fields. The event appraisal_stage_completed was added, which contains more, and more accurate, data.
+* Added appraisal_role_page_saved and appraisal_role_stage_completed events.
 
 === 12.0 ===
 
