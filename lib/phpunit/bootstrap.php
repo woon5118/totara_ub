@@ -140,7 +140,29 @@ if (!is_writable($CFG->phpunit_dataroot)) {
 
 // Totara: decide which instance to use.
 if (!defined('PHPUNIT_INSTANCE')) {
-    define('PHPUNIT_INSTANCE', '00');
+    if (getenv('TEST_TOKEN') !== false) {
+        // Running paratest.
+        define('PHPUNIT_PARATEST', true);
+
+        // NOTE: test tokens are inconsistent for different runners, see https://github.com/paratestphp/paratest/issues/213
+        $token = getenv('TEST_TOKEN');
+
+        if (!is_numeric($token)) {
+            echo "Invalid paratest token\n";
+            exit(1);
+        }
+
+        $token = str_pad((string)$token, 2, '0', STR_PAD_LEFT);
+        if (!file_exists($CFG->phpunit_dataroot . '/' . $token)) {
+            echo "Environemnt not initialised\n";
+            exit(1);
+        }
+        define('PHPUNIT_INSTANCE', $token);
+
+    } else {
+        // Normal run or paratest is just starting.
+        define('PHPUNIT_INSTANCE', '00');
+    }
 }
 
 // Totara: Make sure the dataroot is ready.

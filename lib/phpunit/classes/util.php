@@ -395,6 +395,9 @@ class phpunit_util extends testing_util {
      * @return void
      */
     public static function bootstrap_moodle_info() {
+        if (defined('PHPUNIT_PARATEST') and PHPUNIT_PARATEST) {
+            return;
+        }
         echo self::get_site_info();
     }
 
