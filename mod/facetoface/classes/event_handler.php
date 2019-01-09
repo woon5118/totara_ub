@@ -49,6 +49,8 @@ class event_handler {
             foreach ($signups as $signupdata) {
                 $seminarevent = new seminar_event($signupdata->sessionid);
                 $signup = signup::create($signupdata->userid, $seminarevent);
+                // We want to cancel only signup that learner can cancel themselves. E.g. we don't want to cancel past signups.
+                $signup->set_actorid($signup->get_userid());
                 if (signup_helper::can_user_cancel($signup)) {
                     signup_helper::user_cancel($signup);
                 }
@@ -74,7 +76,8 @@ class event_handler {
             foreach ($signups as $signupdata) {
                 $seminarevent = new seminar_event($signupdata->sessionid);
                 $signup = signup::create($signupdata->userid, $seminarevent);
-
+                // We want to cancel only signup that learner can cancel themselves. E.g. we don't want to cancel past signups.
+                $signup->set_actorid($signup->get_userid());
                 if (signup_helper::can_user_cancel($signup)) {
                     signup_helper::user_cancel($signup);
                 }
@@ -126,6 +129,8 @@ class event_handler {
 
                     // And cancel them.
                     $signup = signup::create($uid, $seminarevent);
+                    // We want to cancel only signup that learner can cancel themselves. E.g. we don't want to cancel past signups.
+                    $signup->set_actorid($signup->get_userid());
                     if (signup_helper::can_user_cancel($signup)) {
                         signup_helper::user_cancel($signup);
                     }
