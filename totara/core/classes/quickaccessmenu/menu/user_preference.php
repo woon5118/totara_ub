@@ -52,9 +52,10 @@ final class user_preference extends base {
             preference_helper::unset_preference($factory->get_userid(), self::PREFERENCE);
             return $menu;
         }
+        $groups = group::get_groups($factory->get_userid());
         foreach ($preference as $entry) {
             $key = (isset($entry->key)) ? $entry->key : null;
-            $group = (isset($entry->group)) ? group::get($entry->group) : null;
+            $group = (isset($entry->group) && isset($groups[$entry->group])) ? $groups[$entry->group] : null;
             $label = (isset($entry->label)) ? $entry->label : null;
             $weight = (isset($entry->weight)) ? $entry->weight : null;
             $visible = (isset($entry->visible)) ? $entry->visible : null;

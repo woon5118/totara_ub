@@ -115,11 +115,15 @@ abstract class base implements menu {
      * Returns all visible items in the given group.
      *
      * @param group $group
+     * @param bool $includehidden
      * @return item[]
      */
-    final public function get_items_in_group(group $group): array {
-        $items = array_filter($this->items, function(item $item) use ($group) {
-            return $item->get_visible() && $item->get_group() === (string)$group;
+    final public function get_items_in_group(group $group, bool $includehidden = false): array {
+        $items = array_filter($this->items, function(item $item) use ($group, $includehidden) {
+
+            $include = $includehidden ? true : $item->get_visible();
+
+            return $include && $item->get_group() === (string)$group;
         });
         usort($items, [item::class, 'sort_items']);
         return $items;

@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* totara_core\quickaccessmenu\menu::get_items_in_group() added second argument $includehidden
 * Removed deprecated custom errorlog handling
   The following have all been removed as part of this:
     - Method: totara_core_renderer::errorlog_link

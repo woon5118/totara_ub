@@ -256,7 +256,7 @@ final class helper {
         $factory = factory::instance($userid);
 
         $usermenu = $factory->get_user_preference_menu();
-        $items = $usermenu->get_items_in_group(group::get($groupkey));
+        $items = $usermenu->get_items_in_group(group::get($groupkey), true);
 
         // Hide all items in the group.
         // We cannot just remove them since they can pop-up in the default groups.

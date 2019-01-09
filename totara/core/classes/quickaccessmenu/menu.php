@@ -75,9 +75,10 @@ interface menu {
      * Returns all visible items in the given group.
      *
      * @param group $group
+     * @param bool $includehidden
      * @return item[]
      */
-    public function get_items_in_group(group $group);
+    public function get_items_in_group(group $group, bool $includehidden = false): array;
 
     /**
      * Returns an array of all items, regardless of whether the user can see them or not.
