@@ -2224,8 +2224,6 @@ class core_moodlelib_testcase extends advanced_testcase {
         // Test config we know to exist.
         $this->assertSame($CFG->dataroot, get_config('core', 'dataroot'));
         $this->assertSame($CFG->phpunit_dataroot, get_config('core', 'phpunit_dataroot'));
-        $this->assertSame($CFG->dataroot, get_config('core', 'phpunit_dataroot'));
-        $this->assertSame(get_config('core', 'dataroot'), get_config('core', 'phpunit_dataroot'));
 
         // Test setting a config var that already exists.
         set_config('phpunit_test_get_config_1', 'test a');

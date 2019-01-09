@@ -46,10 +46,10 @@ class totara_catalog_catalog_retrieval_testcase extends advanced_testcase {
         $this->assertEquals(true, $catalog->alphabetical_sorting_enabled());
 
         // Create a second language and see that it is disabled.
-        make_writable_directory($CFG->phpunit_dataroot . '/lang/de');
+        make_writable_directory($CFG->dataroot . '/lang/de');
         copy(
             $CFG->dirroot . "/install/lang/de/langconfig.php",
-            $CFG->phpunit_dataroot . "/lang/de/langconfig.php"
+            $CFG->dataroot . "/lang/de/langconfig.php"
         );
         get_string_manager()->reset_caches();
         $this->assertEquals(false, $catalog->alphabetical_sorting_enabled());

@@ -71,7 +71,7 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
             $this->dbname = $CFG->dbname;
             $this->dbuser = $CFG->dbuser;
             $this->dbpass = !empty($CFG->dbpass) ? $CFG->dbpass : '';
-            $this->dbtable = $CFG->phpunit_prefix . $this->sourcetable; //'totara_sync_jobassignment_source';
+            $this->dbtable = $CFG->prefix . $this->sourcetable; //'totara_sync_jobassignment_source';
         }
 
         if (!empty($this->dbtype) &&

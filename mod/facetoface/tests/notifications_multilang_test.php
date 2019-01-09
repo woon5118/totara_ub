@@ -495,10 +495,10 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
             if ($lang == 'en') {
                 continue;
             }
-            make_writable_directory($CFG->phpunit_dataroot . '/lang/' . $lang);
+            make_writable_directory($CFG->dataroot . '/lang/' . $lang);
             copy(
                 $CFG->dirroot . "/install/lang/{$lang}/langconfig.php",
-                $CFG->phpunit_dataroot . "/lang/{$lang}/langconfig.php"
+                $CFG->dataroot . "/lang/{$lang}/langconfig.php"
             );
 
         }

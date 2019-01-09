@@ -60,7 +60,7 @@ class core_phpunit_basic_testcase extends basic_testcase {
         // The use of httpswwwroot is deprecated, but we are still setting it for backwards compatibility.
         $this->assertTrue(isset($CFG->httpswwwroot));
         $this->assertEquals($CFG->httpswwwroot, $CFG->wwwroot);
-        $this->assertEquals($CFG->prefix, $CFG->phpunit_prefix);
+        $this->assertEquals('https://www.example.com/moodle', $CFG->wwwroot);
     }
 
     /**
