@@ -278,8 +278,11 @@ class base_selector_hierarchy extends base {
                 'name'   => 'listofvalues',
             ), "", 'value as instanceid, id as paramid');
 
+            // Need full hierarchy list as the contextualised hierarchy list may be incomplete when multiple frameworks are in play.
+            $fullhierarchylist = array_flip($DB->get_fieldset_sql("SELECT id FROM {{$this->shortprefix}}"));
+
             foreach ($this->listofvalues as $instanceid) {
-                if (!isset($hierarchylist[$instanceid])) {
+                if (!isset($fullhierarchylist[$instanceid])) {
                     // Detected one of the missing hierachy instance here
                     $item = isset($fullparams[$instanceid]) ? $fullparams[$instanceid] : null;
                     if (!$item) {
