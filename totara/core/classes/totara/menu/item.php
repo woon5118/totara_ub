@@ -687,7 +687,7 @@ class item {
     private function check_menu_item_visibility($menuclass) {
         global $DB;
 
-        $record = $DB->get_record('totara_learning', array('classname' => $menuclass, 'custom' => 0));
+        $record = $DB->get_record('totara_navigation', array('classname' => $menuclass, 'custom' => 0));
         if (!$record) {
             return false;
         }
