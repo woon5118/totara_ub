@@ -141,7 +141,7 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
         $dialog = new totara_dialog_content();
         $dialog->searchtype = 'facetoface_room';
 
-        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capcity']);
+        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
         $dialog->items = [$room];
         $dialog->disabled_items = [];
         $dialog->lang_file = 'facetoface';

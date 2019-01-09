@@ -118,7 +118,7 @@ class mod_facetoface_asset_search_testcase extends advanced_testcase {
 
         $dialog = new totara_dialog_content();
         $dialog->searchtype = 'facetoface_asset';
-        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
+        $dialog->proxy_dom_data(['id', 'name', 'custom']);
         $dialog->lang_file = 'facetoface';
         $dialog->customdata = array(
             'facetofaceid' => $f2f->id,

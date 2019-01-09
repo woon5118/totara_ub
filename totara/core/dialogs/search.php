@@ -526,6 +526,10 @@ switch ($searchtype) {
 
         $search_info->order = " ORDER BY a.name ASC";
         $search_info->params = $params;
+        $search_info->extrafields = "a.name, a.custom";
+        $search_info->name = 'a.name';
+        $search_info->custom = 'a.custom';
+        $search_info->datakeys = array('id', 'name', 'custom');
         break;
 
     /**
@@ -551,15 +555,15 @@ switch ($searchtype) {
         // The logic of checking whether the room was already within a sesison or not is working by checking the `timestart`
         // of the queried rooms to be smaller than the `timefinish` from POST data and the `timefinish` to be bigger
         // than `timestart` from POST data
-        $joinsess = 'LEFT JOIN {facetoface_sessions_dates} fsd ON (r.id = fsd.roomid) 
-                     AND (fsd.timestart < :timestart AND fsd.timefinish > :timefinish 
+        $joinsess = 'LEFT JOIN {facetoface_sessions_dates} fsd ON (r.id = fsd.roomid)
+                     AND (fsd.timestart < :timestart AND fsd.timefinish > :timefinish
                      AND r.allowconflicts = 0 %sessionsql%)';
 
         // Since we are allowing the custom room created to be used in the same seminar but different
         // event. Therefore, we need to exclude those custom rooms that have been used by different
         // seminars.
         $joinsess .= ' LEFT JOIN (
-            SELECT r2.id FROM {facetoface_room} r2 
+            SELECT r2.id FROM {facetoface_room} r2
             INNER JOIN {facetoface_sessions_dates} fsd2 ON fsd2.roomid = r2.id
             INNER JOIN {facetoface_sessions} fs ON fs.id = fsd2.sessionid
             WHERE r2.custom = 1 AND fs.facetoface <> :facetofaceid
@@ -589,14 +593,14 @@ switch ($searchtype) {
         $search_info->id = 'DISTINCT r.id';
         // This field is required within SELECT, sinc the DISTINCT keyword onlys work well with ORDER BY key word if the
         // the field is ordered also selected
-        $search_info->extrafields= "r.name";
+        $search_info->extrafields = "r.name, r.capacity, r.custom";
         $sqlavailable = $DB->sql_concat("r.name", "' (" . get_string('capacity', 'facetoface') . ": '", "r.capacity", "')'");
         $sqlunavailable = $DB->sql_concat("r.name",
             "' (" . get_string('capacity', 'facetoface') . ": '", "r.capacity", "')'",
             "' " . get_string('roomalreadybooked', 'facetoface') . "'"
         );
         $search_info->fullname = " CASE WHEN(fsd.id IS NULL) THEN {$sqlavailable} ELSE {$sqlunavailable} END";
-            
+
         $search_info->sql = "
             FROM
                 {facetoface_room} r
@@ -610,6 +614,10 @@ switch ($searchtype) {
 
         $search_info->order = " ORDER BY r.name ASC";
         $search_info->params = $params;
+        $search_info->name = 'r.name';
+        $search_info->capacity = 'r.capacity';
+        $search_info->custom = 'r.custom';
+        $search_info->datakeys = array('id', 'name', 'custom', 'capacity');
         break;
 
     case 'temporary_manager':
@@ -774,10 +782,14 @@ if (strlen($query)) {
                 $dialog->items = $this->get_search_items_array($results);
             } else {
                 foreach ($results as $result) {
-                    $item = new stdClass();
-
                     if (method_exists($this, 'search_can_display_result') && !$this->search_can_display_result($result->id)) {
                         continue;
+                    }
+
+                    // Add datakey attributes to item.
+                    $item = new stdClass();
+                    foreach ($this->datakeys as $key) {
+                        $item->$key = $result->$key;
                     }
 
                     $item->id = $result->id;
