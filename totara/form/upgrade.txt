@@ -1,7 +1,9 @@
 This file describes API changes in Totara forms,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * Icon helpers are no longer used in the following templates, icon data is passed via context data:
 ** totara/form/templates/element_checkbox.mustache
@@ -16,7 +18,7 @@ information provided here is intended especially for developers.
 * Removed totara_form/form_clientaction_autosubmit AMD module as it is not used and does not have an equivilent source file
 * Added support for autosubmit client actions on radio items
 
-=== 10 ===
+=== 10.0 ===
 
 * totara/form/templates/element_filemanager.mustache flex-icon used for upload rather than CSS loaded image
 * totara/form/templates/element_filepicker.mustache flex-icon used for upload rather than CSS loaded image

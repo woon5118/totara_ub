@@ -1,16 +1,16 @@
 This file describes API changes in Totara Feedback360,
 information provided here is intended especially for developers.
 
-=== 13 ===
+=== 13.0 ===
 
 * Removed deprecated method totara_feedback360_renderer::request_feedback360_button()
 
-=== 12 ===
+=== 12.0 ===
 
 * Removed deprecated class request_select_form
 * Removed deprecated method feedback360::get_available_forms()
 
-=== 10 ===
+=== 10.0 ===
 
 * New database field requestertoken added to the feedback360_resp_assignment table.
 This is will hold sha1 hashes unique to each response. If the user who requested feedback is viewing responses,

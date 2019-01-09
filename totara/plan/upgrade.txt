@@ -1,6 +1,8 @@
 This files describes API changes in Learning plans,
 information provided here is intended especially for developers.
 
+=== 13.0 ===
+
 === 12.0 ===
 
 Removed deprecated methods:
@@ -40,7 +42,7 @@ Removed deprecated methods:
   * rb_source_dp_program_recurring::rb_display_program_completion_status(), please call totara_program\rb\display\program_completion_status::display() instead.
   * rb_source_dp_program_recurring::rb_display_completion_date(), please call totara_program\rb\display\program_completion_date::display() instead.
 
-=== 10 ===
+=== 10.0 ===
 
 Added isexport param to rb_source_dp_certification::rb_display_link_program_icon.
 Added isexport param to rb_source_dp_certification_history::rb_display_link_program_icon.

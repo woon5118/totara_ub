@@ -1,12 +1,14 @@
 This files describes API changes in /search/*,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * String helpers are no longer used in the following templates, string data is passed via context data:
 ** search/templates/result.mustache
 
-=== 10 ===
+=== 10.0 ===
 
 * Base search area classes have been renamed, please update your search areas to use the classes below:
   - \core_search\area\base has been renamed to \core_search\base

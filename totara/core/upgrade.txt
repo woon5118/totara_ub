@@ -1,7 +1,7 @@
 List of upgrade and API changes in Totara core,
 information provided here is intended especially for developers.
 
-=== 13 ===
+=== 13.0 ===
 
 * Removed deprecated custom errorlog handling
   The following have all been removed as part of this:
@@ -21,7 +21,7 @@ information provided here is intended especially for developers.
 * Removed deprecated function totara_random_bytes()
 * Removed deprecated function check_string()
 
-=== 12 ===
+=== 12.0 ===
 
 * Major cleanup and refactoring in Totara menu API:
 ** totara_menu_reset_cache() was deprecated, use totara_menu_reset_all_caches() or totara_menu_reset_session_cache() instead
@@ -87,7 +87,7 @@ information provided here is intended especially for developers.
     - DB Table: errorlog
     - Template: totara/core/templates/errorlog_link.mustache
 
-=== 10 ===
+=== 10.0 ===
 
 * unused function resize_image() was renamed to totara_resize_image() because it collided with gdlib
 * totara_dialog_content_manager has been deprecated, please use totara_job_dialog_assign_manager instead.

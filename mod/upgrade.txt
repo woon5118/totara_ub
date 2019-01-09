@@ -1,11 +1,11 @@
 This files describes API changes in /mod/* - activity modules,
 information provided here is intended especially for developers.
 
-=== 13 ===
+=== 13.0 ===
 
 * Removed deprecated (plugin_name)_print_recent_activity() from all activity plugins
 
-=== 12 ===
+=== 12.0 ===
 
  * External functions that were returning file information now return the following additional file fields:
    - mimetype (the file mime type)
@@ -13,7 +13,7 @@ information provided here is intended especially for developers.
    - repositorytype (the repository name in case is a external file)
    Those fields are VALUE_OPTIONAL for backwards compatibility.
 
-=== 10 ===
+=== 10.0 ===
 
 * Old /mod/MODULENAME/pix/icon.gif and enrol/paypal/pix/icon.gif GIF icons have been removed. Please use pix_icon
   renderable instead.

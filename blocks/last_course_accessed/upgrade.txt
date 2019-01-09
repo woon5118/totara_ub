@@ -1,7 +1,9 @@
 This files describes API changes in /blocks/last_course_accessed,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * String helpers are no longer used in the following templates, string data is passed via context data:
 ** blocks/last_course_accessed/templates/block.mustache

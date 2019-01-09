@@ -1,5 +1,7 @@
 This file describes API changes for 'theme_basis'.
 
+=== 13.0 ===
+
 === 12.0 ===
 
 * Altered theme/basis/layout/partials/footer.php, removing reference to page_footer_nav

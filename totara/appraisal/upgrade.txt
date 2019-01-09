@@ -1,7 +1,7 @@
 This files describes API changes for code that uses the appraisal API,
 information provided here is intended especially for developers.
 
-=== 13 ===
+=== 13.0 ===
 
 * Removed deprecated methods:
   * totara_appraisal_observer::appraisal_activation()

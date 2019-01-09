@@ -1,7 +1,9 @@
 This files describes API changes in /filter/filter_tex,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * Removed deprecated methods:
   * latex::execute() in latex.php

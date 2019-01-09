@@ -1,13 +1,13 @@
 This files describes API changes in /admin/*.
 
-=== 13 ===
+=== 13.0 ===
 
 * Hub registration functionality has been removed
 * Deprecated core_admin_renderer::registration_warning() has been removed
 * Deprecated setting 'uselegacybrowselistofusersreport' has been removed
 * Legacy "Browse list of users" admin page (admin/user_legacy.php) has been removed
 
-=== 12 ===
+=== 12.0 ===
 
 * Icon helpers are no longer used in the following templates, icon data is passed via context data:
 ** admin/templates/setting_configcolourpicker.mustache
@@ -27,7 +27,7 @@ This files describes API changes in /admin/*.
    site front page and general site navigation
 ** reportbuilder related pages have been extracted into their own 'reportsmain' category
 
-=== 11 ===
+=== 11.0 ===
 
 * Hub functionality has been deprecated and will be removed entirely in the next major version.
 * \core_admin_renderer::registration_warning() has been deprecated, the functionality for registering hubs will be removed in the next major version
@@ -40,7 +40,7 @@ This files describes API changes in /admin/*.
 * admin/registration/lib.php has been deprecated and should no longer be included anywhere.
 * Database table for hub registration 'registration_hubs' has been deprecated.
 
-=== 10 ===
+=== 10.0 ===
 
 * Admin settings have been refined to better support right-to-left languages. In RTL,
   most fields should not have their direction flipped, a URL, a path to a file, ...

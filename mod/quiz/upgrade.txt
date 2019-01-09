@@ -1,10 +1,12 @@
 This files describes API changes in the quiz code,
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * mod_quiz_renderer::summary_table() has changed
 
-=== 10 ===
+=== 10.0 ===
 
 * External functions mod_quiz_external::get_attempt_data, mod_quiz_external::get_attempt_summary
   and mod_quiz_external::get_attempt_review now return additional optional fields:

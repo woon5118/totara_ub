@@ -1,16 +1,18 @@
 This files describes API changes in tagging, information provided
 here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * String helpers are no longer used in the following templates, string data is passed via context data:
 ** tag/templates/tagcloud.mustache
 
-=== 11 ===
+=== 11.0 ===
 
 * Updated delete and combine tags buttons to use standard bootstrap 3 markup
 
-=== 10 ===
+=== 10.0 ===
 
 * Each plugin must define the tag areas it uses in plugindir/db/tag.php
   See https://docs.moodle.org/dev/Tag_API for more details.

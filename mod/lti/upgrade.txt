@@ -1,7 +1,9 @@
 This files describes API changes in the lti code,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * String helpers are no longer used in the following templates, string data is passed via context data:
 ** mod/lti/templates/loader.mustache
@@ -10,7 +12,7 @@ information provided here is intended especially for developers.
 ** mod/lti/templates/tool_proxy_card.mustache
 * "Embed, without blocks" now uses incourse page layout (with blocks disabled)
 
-=== 10 ===
+=== 10.0 ===
 
 * When requesting a grade from the outcome service, and empty grade will now be returned as
   an empty grade in accordance with the spec. Previously a grade of 0 would be returned.

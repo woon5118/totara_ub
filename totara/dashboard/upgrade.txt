@@ -1,7 +1,9 @@
 List of upgrade and API changes in Totara core,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * Blocks on Totara dashboards are now added with pagetype 'totara-dashboard'.
   Previously they were added with pagetype 'my-totara-dashboard'.

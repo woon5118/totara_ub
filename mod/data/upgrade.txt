@@ -1,6 +1,8 @@
 This files describes API changes in /mod/data - plugins,
 information provided here is intended especially for developers.
 
+=== 13.0 ===
+
 === 12.0 ===
 
 * External function get_databases_by_courses now return more fields for users with mod/data:viewentry capability enabled:
@@ -11,7 +13,7 @@ information provided here is intended especially for developers.
     You should check the user capabilities of the current user before returning any field setting value.
     This is intended to protect field settings like private keys for external systems.
 
-=== 10 ===
+=== 10.0 ===
 
 * New hook - update_content_import - Can be implemented by field subplugins data_field_* class
     This can be used to pre-process data from a csv file before it is inserted into the database.

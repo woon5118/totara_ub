@@ -1,7 +1,9 @@
 This files describes API changes in /mod/forum/*,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
  * String helpers are no longer used in the following templates, string data is passed via context data:
   ** mod/forum/templates/forum_post_email_htmlemail_body.mustache
@@ -20,7 +22,7 @@ information provided here is intended especially for developers.
 * The template mod_forum/big_search_form has been updated.
 * mod_forum_renderer::render_big_search_form has been updated to include the newly created mod_forum/big_search_form AMD module
 
-=== 10 ===
+=== 10.0 ===
 
  * The setting $CFG->forum_replytouser has been removed in favour of a centralized noreplyaddress setting.
    Please use $CFG->noreplyaddress setting instead.

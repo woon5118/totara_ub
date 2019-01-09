@@ -1,6 +1,8 @@
 This files describes API changes in the assign code.
 information provided here is intended especially for developers.
 
+=== 13.0 ===
+
 === 12.0 ===
 
 * Modified mod_assign_renderer::render_assign_submission_status_compact removing incorrect use alert-error CSS class
@@ -28,7 +30,7 @@ information provided here is intended especially for developers.
 * assign::add_attempt requires that set_most_recent_team_submission() be called if attempting to use this function with a team
   submission.
 
-=== 10 ===
+=== 10.0 ===
 * External function mod_assign_external::get_assignments now returns additional optional fields:
    - preventsubmissionnotingroup: Prevent submission not in group.
    - submissionstatement and submissionstatementformat: When there is a submission statement defined.

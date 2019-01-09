@@ -36,7 +36,7 @@ information provided here is intended especially for developers.
 * Updated totara_program_renderer::coursecat_tree, removing a reference to an unnecessary JavaScript function call
 * totara_program_renderer::display_duedate_highlight_info() has changed, fixing a HTML validation issue
 
-=== 10 ===
+=== 10.0 ===
 
 API Changes:
 

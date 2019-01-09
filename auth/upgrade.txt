@@ -1,7 +1,9 @@
 This files describes API changes in /auth/* - plugins,
 information provided here is intended especially for developers.
 
-=== 12 ===
+=== 13.0 ===
+
+=== 12.0 ===
 
 * $CFG->alternateloginurl setting is deprecated and will be removed in Totara 13,
   you need to enable $CFG->allowlogincsrf in config.php if you want to keep using it
@@ -15,8 +17,7 @@ information provided here is intended especially for developers.
   Old deprecated config.html files are not supported any more. See how the helper function
   upgrade_fix_config_auth_plugin_names() can be used to convert the legacy settings to the new ones.
 
-
-=== 10 ===
+=== 10.0 ===
 
 * New auth hook - pre_user_login_hook() - available, triggered right after the user object is created.
   This can be used to modify the user object before any authentication errors are raised.
