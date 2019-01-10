@@ -31,6 +31,18 @@ class rb_source_certification extends rb_base_source {
     use \totara_cohort\rb\source\report_trait;
     use \totara_certification\rb\source\certification_trait;
 
+    /**
+     * Set only by generate_visibility_sql. Ensure you call that before accessing this property.
+     * @var string
+     */
+    private $visibilitywhere_sql;
+
+    /**
+     * Set only by generate_visibility_sql. Ensure you call that before accessing this property.
+     * @var array
+     */
+    private $visibilitywhere_params;
+
     public function __construct() {
         $this->base = "(SELECT p.*, c.learningcomptype, c.activeperiod, c.minimumactiveperiod, c.windowperiod, c.recertifydatetype
                           FROM {prog} p
@@ -44,6 +56,7 @@ class rb_source_certification extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification');
+        list($this->sourcewhere, $this->sourceparams, $this->sourcejoins) = $this->define_source_args();
         $this->usedcomponents[] = 'totara_certification';
         $this->usedcomponents[] = "totara_program";
         $this->usedcomponents[] = 'totara_cohort';
@@ -164,66 +177,24 @@ class rb_source_certification extends rb_base_source {
         return $defaultfilters;
     }
 
-    protected function define_requiredcolumns() {
-        $requiredcolumns = array();
-
-        $requiredcolumns[] = new rb_column(
-            'ctx',
-            'id',
-            '',
-            "ctx.id",
-            array('joins' => 'ctx')
-        );
-
-        // Visibility.
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'id',
-            '',
-            "base.id"
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'visible',
-            '',
-            "base.visible"
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'audiencevisible',
-            '',
-            "base.audiencevisible"
-        );
-
-        $requiredcolumns[] = new rb_column(
+    /**
+     * Generates the sourcewhere and sourceparams for this report.
+     *
+     * @return array SQL, params, and joins
+     */
+    protected function define_source_args() {
+        list($sql, $params) = totara_visibility_where(
+            null, // Current user.
+            'base.id',
+            'base.visible',
+            'base.audiencevisible',
             'base',
-            'available',
-            '',
-            "base.available"
+            'certification',
+            false
         );
+        $joins = ['ctx'];
 
-        $requiredcolumns[] = new rb_column(
-            'base',
-            'availablefrom',
-            '',
-            "base.availablefrom"
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'base',
-            'availableuntil',
-            '',
-            "base.availableuntil"
-        );
-
-        return $requiredcolumns;
-    }
-
-    public function post_config(reportbuilder $report) {
-        $reportfor = $report->reportfor; // ID of the user the report is for.
-        $report->set_post_config_restrictions($report->post_config_visibility_where('certification', 'base', $reportfor));
+        return [$sql, $params, $joins];
     }
 
 }
