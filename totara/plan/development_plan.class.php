@@ -1914,7 +1914,9 @@ class development_plan {
                 $row[] = new tabobject(
                     $component->component,
                     $component->get_url(),
-                    $componentname = get_string("{$component->component}plural", 'totara_plan')
+                    $componentname = get_string("{$component->component}plural", 'totara_plan'),
+                    '',
+                    true
                 );
             }
         }

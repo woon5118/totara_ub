@@ -3430,23 +3430,31 @@ EOD;
      */
     protected function render_tabobject(tabobject $tab) {
         // Totara: Bootstrap 3 code
+        $link = '';
+        // Generate link HTML
+        if (!($tab->link instanceof moodle_url)) {
+            // Backward compatibility when link was passed as quoted string.
+            $title = $tab->title ? ' title="' . $tab->title . '"' : '';
+            $link = "<a href=\"$tab->link\"$title>$tab->text</a>";
+        } else {
+            $args = array();
+            if ($tab->title) {
+                $args['title'] = $tab->title;
+            }
+
+            $link = html_writer::link($tab->link, $tab->text, $args);
+        }
+
         if ($tab->selected or $tab->activated) {
-            return html_writer::tag('li', html_writer::tag('a', $tab->text), array('class' => 'active'));
+            if ($tab->linkedwhenselected) {
+                return html_writer::tag('li', $link, array('class' => 'active'));
+            } else {
+                // Bootstrap requires tabs to be links (to style correctly), we check for href to make pointer correct
+                return html_writer::tag('li', html_writer::tag('a', $tab->text), array('class' => 'active'));
+            }
         } else if ($tab->inactive) {
             return html_writer::tag('li', html_writer::tag('a', $tab->text), array('class' => 'disabled'));
         } else {
-            if (!($tab->link instanceof moodle_url)) {
-                // Backward compatibility when link was passed as quoted string.
-                $title = $tab->title ? ' title="' . $tab->title . '"' : '';
-                $link = "<a href=\"$tab->link\"$title>$tab->text</a>";
-            } else {
-                $args = array();
-                if ($tab->title) {
-                    $args['title'] = $tab->title;
-                }
-
-                $link = html_writer::link($tab->link, $tab->text, $args);
-            }
             return html_writer::tag('li', $link);
         }
     }

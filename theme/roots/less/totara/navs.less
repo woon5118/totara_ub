@@ -99,6 +99,12 @@
 // (on ul) adding padding to Bootstrap 3 nav-tabs.
 .nav-tabs {
     margin-left: 0;
+
+    // Bootstrap requires tabs to be links to be styled correctly, and sets pointer to default
+    // on active tabs. We supply href when the tab is still ment to be a link
+    > li.active > a[href] {
+        cursor: pointer;
+    }
 }
 
 .tabtree {
