@@ -46,7 +46,7 @@ class rb_source_program extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program');
-        $this->sourcewhere = $this->define_sourcewhere();
+        list($this->sourcewhere, $this->sourceparams, $this->sourcejoins) = $this->define_source_args();
         $this->usedcomponents[] = "totara_program";
         $this->usedcomponents[] = 'totara_cohort';
 
@@ -72,7 +72,6 @@ class rb_source_program extends rb_base_source {
     }
 
     protected function define_joinlist() {
-        global $CFG;
 
         $joinlist = array(
             new rb_join(
@@ -160,72 +159,33 @@ class rb_source_program extends rb_base_source {
         return $defaultfilters;
     }
 
-    protected function define_requiredcolumns() {
-        $requiredcolumns = array();
-
-        $requiredcolumns[] = new rb_column(
-            'ctx',
-            'id',
-            '',
-            "ctx.id",
-            array('joins' => 'ctx')
-        );
-
-        // Visibility.
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'id',
-            '',
-            "base.id"
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'visible',
-            '',
-            "base.visible"
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'audiencevisible',
-            '',
-            "base.audiencevisible"
-        );
-
-        $requiredcolumns[] = new rb_column(
+    /**
+     * Generates the totara visibility where SQL and params.
+     *
+     * There get stored in private variables, and should only be accessed after calling this method.
+     */
+    protected function define_source_args() {
+        list($sql, $params) =  totara_visibility_where(
+            null, // Current user.
+            'base.id',
+            'base.visible',
+            'base.audiencevisible',
             'base',
-            'available',
-            '',
-            "base.available"
+            'program',
+            false
         );
+        $joins = ['ctx'];
 
-        $requiredcolumns[] = new rb_column(
-            'base',
-            'availablefrom',
-            '',
-            "base.availablefrom"
-        );
+        // Remove certifications.
+        $sql = "(base.certifid IS NULL) AND ({$sql})";
 
-        $requiredcolumns[] = new rb_column(
-            'base',
-            'availableuntil',
-            '',
-            "base.availableuntil"
-        );
-
-        return $requiredcolumns;
+        return [$sql, $params, $joins];
     }
 
     protected function define_sourcewhere() {
-        $sourcewhere = '(base.certifid IS NULL)';
-
-        return $sourcewhere;
-    }
-
-    public function post_config(reportbuilder $report) {
-        $reportfor = $report->reportfor; // ID of the user the report is for.
-        $report->set_post_config_restrictions($report->post_config_visibility_where('program', 'base', $reportfor));
+        // There is no way to nicely get past this.
+        // The source has fundamentally changed and if you had extended it then you will need to remake your customisation.
+        throw new \coding_exception('\rb_source_program::define_sourcewhere is deprecated please upgrade your code to use define_source_args');
     }
 
 }
