@@ -69,7 +69,8 @@ $COHORT_RULES_OP_IN_LIST = array(
     COHORT_RULES_OP_IN_NOTEQUALTO => get_string('isnotequalto', 'totara_cohort'),
 );
 
-define('COHORT_RULES_UI_MENU_LIMIT', 2500);
+// Set to 0 for no limit on rule options returned to UI.
+define('COHORT_RULES_UI_MENU_LIMIT', 0);
 
 /**
  * Get the definition of a specific rule
