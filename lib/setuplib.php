@@ -1382,11 +1382,12 @@ function disable_output_buffering() {
     // disable any other output handlers
     ini_set('output_handler', '');
 
+    // Totara: Disable buffering in nginx web servers, always hide errors.
+    if (isset($_SERVER['REMOTE_ADDR'])) {
+        header('X-Accel-Buffering: no');
+    }
+
     error_reporting($olddebug);
-
-    // Disable buffering in nginx.
-    header('X-Accel-Buffering: no');
-
 }
 
 /**
